@@ -6,19 +6,21 @@
  */
 package org.mule.runtime.module.extension.internal.operation;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.api.message.MuleEvent;
 import org.mule.tck.testmodels.fruit.Apple;
+import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.test.vegan.extension.VeganExtension;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-public class NoRefFunctionalTestCase extends ExtensionFunctionalTestCase
+public class XmlStyleFunctionalTestCase extends ExtensionFunctionalTestCase
 {
 
     private static final String MEAT = "Nice, juicy and tasty meat";
@@ -34,7 +36,7 @@ public class NoRefFunctionalTestCase extends ExtensionFunctionalTestCase
     @Override
     protected String getConfigFile()
     {
-        return "vegan-noref-config.xml";
+        return "vegan-xml-style-config.xml";
     }
 
     @Test
@@ -63,6 +65,12 @@ public class NoRefFunctionalTestCase extends ExtensionFunctionalTestCase
     {
         expectedException.expectMessage(containsString("I SHALL NEVER EAT "));
         flowRunner("eatBlank").run();
+    }
+
+    @Test
+    public void eatPealed() throws Exception {
+        Banana banana = flowRunner("eatPealedBanana").run().getMessage().getPayload();
+        assertThat(banana.isBitten(), is(true));
     }
 
     private void expectMeatRejection()

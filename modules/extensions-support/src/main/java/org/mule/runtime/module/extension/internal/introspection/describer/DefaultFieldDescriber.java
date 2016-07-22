@@ -11,16 +11,15 @@ import static org.mule.runtime.module.extension.internal.introspection.describer
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getExpressionSupport;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldMetadataType;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getDefaultValue;
-
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
-import org.mule.runtime.extension.api.annotation.param.NoRef;
+import org.mule.runtime.extension.api.annotation.dsl.xml.XmlElementStyle;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ParameterDeclarer;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ParameterizedDeclarer;
 import org.mule.runtime.extension.api.introspection.property.LayoutModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.DeclaringMemberModelProperty;
-import org.mule.runtime.module.extension.internal.model.property.NoReferencesModelProperty;
+import org.mule.runtime.extension.xml.dsl.api.property.XmlElementStyleModelProperty;
 
 import java.lang.reflect.Field;
 
@@ -68,9 +67,10 @@ final class DefaultFieldDescriber implements FieldDescriber
         parameterDeclarer = optional == null ? declarer.withRequiredParameter(parameterName)
                                              : declarer.withOptionalParameter(parameterName).defaultingTo(getDefaultValue(optional));
 
-        if (field.getAnnotation(NoRef.class) != null)
+        XmlElementStyle elementStyle = field.getAnnotation(XmlElementStyle.class);
+        if (elementStyle != null)
         {
-            parameterDeclarer.withModelProperty(new NoReferencesModelProperty());
+            parameterDeclarer.withModelProperty(new XmlElementStyleModelProperty(elementStyle));
         }
 
         parameterDeclarer.ofType(fieldType)
