@@ -10,7 +10,6 @@ package org.mule.test.config;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 import org.mule.api.AnnotatedObject;
@@ -27,6 +26,8 @@ import org.mule.util.SystemUtils;
 import javax.xml.namespace.QName;
 
 import org.junit.Test;
+
+import junit.framework.AssertionFailedError;
 
 /**
  * Test that configuration-based annotations are propagated to the appropriate runtime objects
@@ -134,12 +135,31 @@ public class ConfigurationAnnotationsTestCase extends FunctionalTestCase
     @Test
     public void testJavaComponentAnnotations()
     {
-        DefaultJavaComponent echo = muleContext.getRegistry().lookupByType(DefaultJavaComponent.class).values().iterator().next();
-        assertEquals("echo", getDocName(echo));
-        assertThat(getSourceFile(echo), is("annotations.xml"));
-        assertThat(getSourceFileLine(echo), is(17));
-        assertThat(getSourceElement(echo), is("<echo-component doc:name=\"echo\">" +
-                                              "</echo-component>"));
+        AssertionFailedError lastError = null;
+
+        for (DefaultJavaComponent echo : muleContext.getRegistry().lookupByType(DefaultJavaComponent.class).values())
+        {
+            try
+            {
+                assertThat(getDocName(echo), is("echo"));
+                assertThat(getSourceFile(echo), is("annotations.xml"));
+                assertThat(getSourceFileLine(echo), is(17));
+                assertThat(getSourceElement(echo), is("<echo-component doc:name=\"echo\">" +
+                                                      "</echo-component>"));
+
+                lastError = null;
+                break;
+            }
+            catch (AssertionFailedError e)
+            {
+                lastError = e;
+            }
+        }
+
+        if (lastError != null)
+        {
+            throw lastError;
+        }
     }
 
     @Test
@@ -161,13 +181,32 @@ public class ConfigurationAnnotationsTestCase extends FunctionalTestCase
     @Test
     public void testOutboundEndpointAnnotations()
     {
-        OutboundEndpoint out = muleContext.getRegistry().lookupByType(OutboundEndpoint.class).values().iterator().next();
-        assertThat(out, not(nullValue()));
-        assertThat(getDocName(out), is(nullValue()));
-        assertThat(getDocDescription(out), is(nullValue()));
-        assertThat(getSourceFile(out), is("annotations.xml"));
-        assertThat(getSourceFileLine(out), is(18));
-        assertThat(getSourceElement(out), is("<outbound-endpoint ref=\"out\"></outbound-endpoint>"));
+        AssertionFailedError lastError = null;
+        
+        for (OutboundEndpoint out : muleContext.getRegistry().lookupByType(OutboundEndpoint.class).values())
+        {
+            try
+            {
+                assertThat(out, not(nullValue()));
+                assertThat(getDocName(out), is(nullValue()));
+                assertThat(getDocDescription(out), is(nullValue()));
+                assertThat(getSourceFile(out), is("annotations.xml"));
+                assertThat(getSourceFileLine(out), is(18));
+                assertThat(getSourceElement(out), is("<outbound-endpoint ref=\"out\"></outbound-endpoint>"));
+                
+                lastError = null;
+                break;
+            }
+            catch (AssertionFailedError e)
+            {
+                lastError = e;
+            }
+        }
+        
+        if(lastError != null)
+        {
+            throw lastError;
+        }
     }
 
     @Test
