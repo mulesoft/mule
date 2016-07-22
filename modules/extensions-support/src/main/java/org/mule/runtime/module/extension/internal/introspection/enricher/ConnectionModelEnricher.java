@@ -40,8 +40,7 @@ public class ConnectionModelEnricher implements ModelEnricher
     public ConnectionModelEnricher()
     {
         ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
-        transactionalActionType = typeLoader.load(OperationTransactionalAction.class.getName())
-                .orElseThrow(() -> new RuntimeException("Could not load type " + OperationTransactionalAction.class.getName()));
+        transactionalActionType = typeLoader.load(OperationTransactionalAction.class);
     }
 
     @Override
