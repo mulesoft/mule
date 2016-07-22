@@ -20,7 +20,9 @@ import static org.mule.test.heisenberg.extension.HeisenbergConnectionProvider.SA
 import static org.mule.test.heisenberg.extension.HeisenbergOperations.CALL_GUS_MESSAGE;
 import static org.mule.test.heisenberg.extension.HeisenbergOperations.CURE_CANCER_MESSAGE;
 import static org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher.ENRICHED_MESSAGE;
+import static org.mule.test.heisenberg.extension.model.HealthStatus.CANCER;
 import static org.mule.test.heisenberg.extension.model.HealthStatus.DEAD;
+import static org.mule.test.heisenberg.extension.model.HealthStatus.HEALTHY;
 import static org.mule.test.heisenberg.extension.model.KnockeableDoor.knock;
 import static org.mule.test.heisenberg.extension.model.Ricin.RICIN_KILL_MESSAGE;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
@@ -162,9 +164,9 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase
     public void optionalParameterWithDefaultOverride() throws Exception
     {
         MuleEvent event = flowRunner("customKillWithoutDefault").withPayload("")
-                                                                .withFlowVariable("goodbye", GOODBYE_MESSAGE)
-                                                                .withFlowVariable("victim", VICTIM)
-                                                                .run();
+                .withFlowVariable("goodbye", GOODBYE_MESSAGE)
+                .withFlowVariable("victim", VICTIM)
+                .run();
 
         assertKillPayload(event);
     }
@@ -245,10 +247,10 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase
     public void operationWithInlineListParameter() throws Exception
     {
         List<String> response = (List<String>) flowRunner("knockManyWithInlineList").withPayload("")
-                                                                                    .withFlowVariable("victim", "Saul")
-                                                                                    .run()
-                                                                                    .getMessage()
-                                                                                    .getPayload();
+                .withFlowVariable("victim", "Saul")
+                .run()
+                .getMessage()
+                .getPayload();
         assertThat(response, Matchers.contains(knock("Inline Skyler"), knock("Saul")));
     }
 
@@ -258,10 +260,10 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase
         List<KnockeableDoor> doors = Arrays.asList(new KnockeableDoor("Skyler"), new KnockeableDoor("Saul"));
 
         List<String> response = (List<String>) flowRunner("knockManyByExpression").withPayload("")
-                                                                                  .withFlowVariable("doors", doors)
-                                                                                  .run()
-                                                                                  .getMessage()
-                                                                                  .getPayload();
+                .withFlowVariable("doors", doors)
+                .run()
+                .getMessage()
+                .getPayload();
         assertThat(response, Matchers.contains(knock("Skyler"), knock("Saul")));
     }
 
@@ -379,13 +381,12 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase
     @Test
     public void getMedicalHistory() throws Exception
     {
-
-        Map<Integer, HealthStatus> getMedicalHistory = runFlow("getMedicalHistory").getMessage().getPayload();
+        Map<Integer, HealthStatus> getMedicalHistory = flowRunner("getMedicalHistory").run().getMessage().getPayload();
         assertThat(getMedicalHistory, is(notNullValue()));
         assertThat(getMedicalHistory.entrySet().size(), is(3));
-        assertThat(getMedicalHistory.get(2013), is(HealthStatus.HEALTHY));
-        assertThat(getMedicalHistory.get(2014), is(HealthStatus.CANCER));
-        assertThat(getMedicalHistory.get(2015), is(HealthStatus.DEAD));
+        assertThat(getMedicalHistory.get(2013), is(HEALTHY));
+        assertThat(getMedicalHistory.get(2014), is(CANCER));
+        assertThat(getMedicalHistory.get(2015), is(DEAD));
     }
 
     private void assertDynamicDoor(String flowName) throws Exception
@@ -397,10 +398,10 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase
     private void assertDynamicVictim(String flowName, String victim) throws Exception
     {
         assertKnockedDoor(getPayloadAsString(flowRunner(flowName).withPayload("")
-                                                                 .withFlowVariable("victim", victim)
-                                                                 .run()
-                                                                 .getMessage()),
-                victim);
+                                                     .withFlowVariable("victim", victim)
+                                                     .run()
+                                                     .getMessage()),
+                          victim);
     }
 
     private void assertKnockedDoor(String actual, String expected)
