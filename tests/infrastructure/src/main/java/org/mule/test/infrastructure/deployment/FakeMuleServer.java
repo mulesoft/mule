@@ -50,7 +50,7 @@ public class FakeMuleServer
     private File appsDir;
     private File domainsDir;
     private File logsDir;
-    private File pluginsDir;
+    private File serverPluginsDir;
 
     private final DeploymentService deploymentService;
     private final DeploymentListener deploymentListener;
@@ -234,7 +234,7 @@ public class FakeMuleServer
     {
         appsDir = createFolder("apps");
         logsDir = createFolder("logs");
-        pluginsDir = createFolder("plugins");
+        serverPluginsDir = createFolder("server-plugins");
         domainsDir = createFolder("domains");
         createFolder("domains/default");
 
@@ -320,26 +320,26 @@ public class FakeMuleServer
     }
 
     /**
-     * Adds a plugin file to the Mule server.
+     * Adds a server plugin file to the Mule server.
      *
      * @param plugin plugin file to add. Non null.
      * @throws IOException if the plugin file cannot be accessed
      */
-    public void addZippedPlugin(File plugin) throws IOException
+    public void addZippedServerPlugin(File plugin) throws IOException
     {
-        addZippedPlugin(plugin.toURI().toURL());
+        addZippedServerPlugin(plugin.toURI().toURL());
     }
 
     /**
-     * Adds a plugin to the Mule server .
+     * Adds a server plugin to the Mule server .
      *
      * @param resource points to the plugin to add. Non null.
      * @throws IOException if the plugin URL cannot be accessed
      */
-    public void addZippedPlugin(URL resource) throws IOException
+    public void addZippedServerPlugin(URL resource) throws IOException
     {
         String baseName = FilenameUtils.getName(resource.getPath());
-        File tempFile = new File(getPluginsDir(), baseName);
+        File tempFile = new File(getServerPluginsDir(), baseName);
         copyURLToFile(resource, tempFile);
     }
 
@@ -363,9 +363,9 @@ public class FakeMuleServer
         return domainsDir;
     }
 
-    public File getPluginsDir()
+    public File getServerPluginsDir()
     {
-        return pluginsDir;
+        return serverPluginsDir;
     }
 
     public void resetDeploymentListener()
