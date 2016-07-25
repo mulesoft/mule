@@ -10,6 +10,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mule.extension.FtpTestHarness.HELLO_WORLD;
 import org.mule.extension.FtpTestHarness;
+import org.mule.functional.junit4.runners.RunnerDelegateTo;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.core.util.IOUtils;
@@ -22,10 +23,9 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-@RunWith(Parameterized.class)
+@RunnerDelegateTo(Parameterized.class)
 public class FtpWriteTypeTestCase extends FtpConnectorTestCase
 {
 
