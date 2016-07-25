@@ -8,6 +8,7 @@ package org.mule.test.integration.messaging.meps;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_PROPERTY;
 
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleMessage;
@@ -33,7 +34,7 @@ public class InOutAsyncTestCase extends FunctionalTestCase
         MuleMessage result = client.send("inboundEndpoint", MuleMessage.builder()
                                                                        .payload("some data")
                                                                        // Almost any endpoint can be used here
-                                                                       .replyTo("jms://client-reply")
+                                                                       .addOutboundProperty(MULE_REPLY_TO_PROPERTY, "jms://client-reply")
                                                                        .build());
         assertNotNull(result);
         assertEquals("got it!", getPayloadAsString(result));

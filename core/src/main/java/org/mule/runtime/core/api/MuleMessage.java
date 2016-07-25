@@ -87,15 +87,6 @@ public interface MuleMessage extends org.mule.runtime.api.message.MuleMessage, M
     Correlation getCorrelation();
 
     /**
-     * Returns a replyTo address for this message. This is useful in an asynchronous environment where the caller
-     * doesn't wait for a response and the response needs to be routed somewhere for further processing. The value of
-     * this field can be any valid endpointUri url.
-     *
-     * @return the endpointUri url to reply to or null if one has not been set
-     */
-    Object getReplyTo();
-
-    /**
      * If an error occurred during the processing of this message this will return a
      * ErrorPayload that contains the root exception and Mule error code, plus any
      * other releated info
@@ -155,12 +146,6 @@ public interface MuleMessage extends org.mule.runtime.api.message.MuleMessage, M
          * @return this builder.
          */
         Builder exceptionPayload(ExceptionPayload exceptionPayload);
-
-        /**
-         * @param replyTo
-         * @return
-         */
-        Builder replyTo(Object replyTo);
 
         /**
          * @param id

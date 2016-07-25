@@ -8,9 +8,7 @@ package org.mule.test.integration.routing.replyto;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.functional.listener.ExceptionListener;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 
@@ -28,14 +26,9 @@ public class ReplyToChainIntegration2TestCase extends FunctionalTestCase
     public void testReplyToChain() throws Exception
     {
         String message = "test";
-
-        ExceptionListener exceptionListener = new ExceptionListener(muleContext);
-
         MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("vm://pojo1", message, null);
         assertNotNull(result);
         assertEquals("Received: " + message, result.getPayload());
-
-        exceptionListener.waitUntilAllNotificationsAreReceived();
     }
 }

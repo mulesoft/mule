@@ -96,7 +96,7 @@ public class MuleHeadersInInterceptor extends AbstractMuleHeaderInterceptor
         String replyTo = (String) message.get(MULE_REPLY_TO_PROPERTY);
         if (replyTo != null)
         {
-            builder.replyTo(replyTo);
+            builder.addOutboundProperty(MULE_REPLY_TO_PROPERTY, replyTo);
         }
 
         String corId = (String) message.get(MULE_CORRELATION_ID_PROPERTY);

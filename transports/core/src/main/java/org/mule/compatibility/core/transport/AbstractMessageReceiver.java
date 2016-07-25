@@ -7,6 +7,7 @@
 package org.mule.compatibility.core.transport;
 
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REMOTE_SYNC_PROPERTY;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_ROOT_MESSAGE_ID_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER;
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_RESPONSE;
@@ -294,26 +295,29 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
         {
             session = new DefaultMuleSession();
         }
-        final Object replyToFromMessage = message.getReplyTo();
+        final Object replyToFromMessage = getReplyToDestination(message);
+        DefaultMuleEvent newEvent = null;
         if (replyToFromMessage != null)
         {
-            message = MuleMessage.builder(message).replyTo(null).build();
-            DefaultMuleEvent newEvent = new DefaultMuleEvent(message, flowConstruct, session, replyToHandler, replyToFromMessage, ros);
-            DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(newEvent, getEndpoint());
-            event = newEvent;
+            newEvent = new DefaultMuleEvent(message, flowConstruct, session, replyToHandler, replyToFromMessage, ros);
         }
         else
         {
-            DefaultMuleEvent newEvent = new DefaultMuleEvent(message, flowConstruct, session, null, null, ros);
-            DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(newEvent, getEndpoint());
-            event = newEvent;
+            newEvent = new DefaultMuleEvent(message, flowConstruct, session, null, null, ros);
         }
+        DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(newEvent, getEndpoint());
+        event = newEvent;
         event = OptimizedRequestContext.unsafeSetEvent(event);
         if (session.getSecurityContext() != null && session.getSecurityContext().getAuthentication() != null)
         {
             session.getSecurityContext().getAuthentication().setEvent(event);
         }
         return event;
+    }
+
+    protected Object getReplyToDestination(MuleMessage message)
+    {
+        return message.getInboundProperty(MULE_REPLY_TO_PROPERTY);
     }
 
     @Override

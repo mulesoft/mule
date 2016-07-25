@@ -7,7 +7,6 @@
 package org.mule.runtime.core.client;
 
 import static org.mule.runtime.core.api.client.SimpleOptionsBuilder.newOptions;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTOR_MESSAGE_PROCESSOR_LOCATOR;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.MessageExchangePattern;
@@ -127,13 +126,7 @@ public class DefaultLocalMuleClient implements MuleClient
         if (messageProperties != null)
         {
             builder.outboundProperties(messageProperties);
-
-            if (messageProperties.containsKey(MULE_REPLY_TO_PROPERTY))
-            {
-                builder.replyTo(messageProperties.get(MULE_REPLY_TO_PROPERTY));
-            }
         }
-
         return builder.build();
     }
 

@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.core.routing.outbound;
 
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY;
-
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
@@ -66,8 +64,6 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
 
     protected List<MessageProcessor> routes = new CopyOnWriteArrayList<>();
 
-    protected String replyTo = null;
-
     /**
      * Determines if Mule stamps outgoing message with a correlation ID or not.
      */
@@ -124,12 +120,6 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
                                           final MessageProcessor route,
                                           boolean awaitResponse) throws MuleException
     {
-        if (awaitResponse && replyTo != null)
-        {
-            logger.debug("event was dispatched synchronously, but there is a ReplyTo route set, so using asynchronous dispatch");
-            awaitResponse = false;
-        }
-
         setMessageProperties(originalEvent.getFlowConstruct(), eventToRoute, route);
 
         MuleEvent result;
@@ -181,14 +171,6 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
     protected void setMessageProperties(FlowConstruct service, MuleEvent event, MessageProcessor route)
     {
         MuleMessage message = event.getMessage();
-        if (replyTo != null)
-        {
-            // if replyTo is set we'll probably want the correlationId set as well
-            event.setMessage(MuleMessage.builder(message)
-                                        .replyTo(replyTo)
-                                        .addOutboundProperty(MULE_REPLY_TO_REQUESTOR_PROPERTY, service.getName())
-                                        .build());
-        }
         if (enableCorrelation != CorrelationMode.NEVER)
         {
             String correlation = service.getMessageInfoMapping().getCorrelationId(event);
@@ -278,17 +260,6 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
             }
         }
         routes.remove(route);
-    }
-
-    public String getReplyTo()
-    {
-        return replyTo;
-    }
-
-    @Override
-    public void setReplyTo(String replyTo)
-    {
-        this.replyTo = replyTo;
     }
 
     public CorrelationMode getEnableCorrelation()

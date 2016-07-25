@@ -109,22 +109,6 @@ public class MessageContextTestCase extends AbstractELTestCase
     }
 
     @Test
-    public void replyTo() throws Exception
-    {
-        when(message.getReplyTo()).thenReturn("replyQueue");
-        assertEquals("replyQueue", evaluate("message.replyTo", event));
-        assertFinalProperty("message.correlationGroupSize=2", event);
-    }
-
-    @Test
-    public void assignValueToReplyTo() throws Exception
-    {
-        MuleEvent event = getTestEvent("");
-        evaluate("message.replyTo='my://uri'", event);
-        assertEquals("my://uri", event.getMessage().getReplyTo());
-    }
-
-    @Test
     public void dataType() throws Exception
     {
         when(message.getDataType()).thenReturn(DataType.STRING);

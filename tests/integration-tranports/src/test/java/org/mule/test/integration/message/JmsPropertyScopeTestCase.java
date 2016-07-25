@@ -8,6 +8,7 @@ package org.mule.test.integration.message;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_PROPERTY;
 
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
@@ -32,7 +33,7 @@ public class JmsPropertyScopeTestCase extends AbstractPropertyScopeTestCase
         final MuleMessage message = MuleMessage.builder()
                                                .payload(TEST_PAYLOAD)
                                                .addOutboundProperty("foo", "fooValue")
-                                               .replyTo("jms://reply")
+                                               .addOutboundProperty(MULE_REPLY_TO_PROPERTY, "jms://reply")
                                                .build();
 
         client.dispatch("inbound", message);

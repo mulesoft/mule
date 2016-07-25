@@ -150,9 +150,9 @@ public class HttpResponseBuilder extends AbstractMessageProcessorOwner
 
     private void copyReplyToProperty(HttpResponse response, MuleMessage message)
     {
-        if(message.getReplyTo() != null)
+        if(message.getOutboundProperty(MULE_REPLY_TO_PROPERTY) != null)
         {
-            response.setHeader(new Header(CUSTOM_HEADER_PREFIX + MULE_REPLY_TO_PROPERTY, message.getReplyTo().toString()));
+            response.setHeader(new Header(CUSTOM_HEADER_PREFIX + MULE_REPLY_TO_PROPERTY, message.getOutboundProperty(MULE_REPLY_TO_PROPERTY).toString()));
         }
     }
 

@@ -8,7 +8,7 @@ package org.mule.test.integration.routing.replyto;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_PROPERTY;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -45,7 +45,7 @@ public class ReplyToChainIntegration3TestCase extends FunctionalTestCase
         @Override
         public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException
         {
-            final MuleMessage message = MuleMessage.builder(event.getMessage()).replyTo("jms://response").build();
+            final MuleMessage message = MuleMessage.builder(event.getMessage()).addOutboundProperty(MULE_REPLY_TO_PROPERTY, "jms://response").build();
             event.setMessage(message);
             return message;
         }
