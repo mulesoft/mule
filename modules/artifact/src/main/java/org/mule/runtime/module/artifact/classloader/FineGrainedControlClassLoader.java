@@ -115,6 +115,13 @@ public class FineGrainedControlClassLoader extends GoodCitizenClassLoader implem
     {
         synchronized (getClassLoadingLock(name))
         {
+            Class<?> result = findLoadedClass(name);
+
+            if (result != null)
+            {
+                return result;
+            }
+
             return super.findClass(name);
         }
     }
