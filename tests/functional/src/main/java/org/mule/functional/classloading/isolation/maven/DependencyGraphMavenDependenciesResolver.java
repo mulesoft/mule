@@ -7,15 +7,15 @@
 
 package org.mule.functional.classloading.isolation.maven;
 
+import static java.nio.file.Files.getFileAttributeView;
 import static java.nio.file.Files.readAllLines;
+import static java.nio.file.Paths.get;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributeView;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.HashSet;
@@ -81,8 +81,8 @@ public class DependencyGraphMavenDependenciesResolver implements MavenDependenci
         {
             final File dependenciesGraphFile = getDependenciesGraphFile();
 
-            Path dependenciesPath = Paths.get(dependenciesGraphFile.toURI());
-            BasicFileAttributes view = Files.getFileAttributeView(dependenciesPath, BasicFileAttributeView.class).readAttributes();
+            Path dependenciesPath = get(dependenciesGraphFile.toURI());
+            BasicFileAttributes view = getFileAttributeView(dependenciesPath, BasicFileAttributeView.class).readAttributes();
             logger.debug("Building maven dependencies graph using depgraph-maven-plugin output file: '{}', created: {}, last modified: {}", dependenciesGraphFile, view.creationTime(), view.lastModifiedTime());
 
 
@@ -120,7 +120,7 @@ public class DependencyGraphMavenDependenciesResolver implements MavenDependenci
         URL dependenciesListFileURL = DependencyGraphMavenDependenciesResolver.class.getClassLoader().getResource(DEPENDENCIES_GRAPH_FILE_NAME);
         if (dependenciesListFileURL == null)
         {
-            throw new IllegalStateException(DEPENDENCIES_GRAPH_FILE_NAME + " not found, the maven plugin 'depgraph-maven-plugin ' should be executed first.");
+            throw new IllegalStateException(DEPENDENCIES_GRAPH_FILE_NAME + " not found, the maven plugin 'depgraph-maven-plugin' should be executed first.");
         }
         File file = new File(dependenciesListFileURL.getFile());
         if (!file.exists())

@@ -65,6 +65,24 @@ public @interface ArtifactClassLoaderRunnerConfig
     String extensionBasePackage() default "";
 
     /**
+     * <b>WARNING: do not use this if you want to have a pure isolated test case.</b>
+     * <p/>
+     * Allows to declare an array of {@link String} fully qualified {@link Class}es that the test would need to get
+     * access to and they are not exposed by the plugin. Meaning that the isolation of plugins would be broken due to these
+     * {@link Class}es would be exposed no matter if the plugin doesn't expose them.
+     * <p/>
+     * For each class defined here it will look the source code location of that file in order to get which plugin or extension has to be appended
+     * to export the {@link Class} defined.
+     * <p/>
+     * {@link Class}es defined here will be also visible for all the tests in the module due to the {@link ClassLoader} is created one per module when
+     * running tests.
+     *
+     * @return array of {@link String} with fully qualified {@link Class} name for those classes that has to be exposed for the test. By default
+     * is empty.
+     */
+    Class[] exportClasses() default {};
+
+    /**
      * List of groupId:artifactId:type to define the exclusions of artifacts that shouldn't be added to the application {@link ClassLoader}.
      * Default exclusion is already defined in {@code excluded.properties} file and by using this annotation the ones defined here will be appended
      * to those defined in file.

@@ -162,7 +162,7 @@ public class MuleClassLoaderRunnerFactory
             }
             ArtifactClassLoaderFilter filter = artifactClassLoaderFilterFactory.create(exportedPackages.stream().collect(Collectors.joining(", ")),
                                                                                        exportedResources.stream().collect(Collectors.joining(", ")));
-            pluginClassLoaders.add(new FilteringArtifactClassLoader(pluginCL, filter));
+            pluginClassLoaders.add(new FilteringArtifactClassLoader(pluginCL, new TestArtifactClassLoaderFilter(filter, pluginUrlClassification.getExportClasses())));
         }
         return new CompositeClassLoader(parent, pluginClassLoaders, childClassLoaderLookupPolicy);
     }
