@@ -7,11 +7,14 @@
 
 package org.mule.functional.classloading.isolation.maven;
 
+import static org.apache.commons.lang.StringUtils.isNotEmpty;
+
 import com.google.common.collect.ImmutableSet;
 
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Represents a tree graph of maven dependencies for a {@link MavenArtifact}.
@@ -57,6 +60,13 @@ public class DependenciesGraph
 
     /**
      * Gets the transitive dependencies for a {@link MavenArtifact}, rootArtifact cannot be used here.
+     * <p/>
+     * The dependencies graph could have transitive dependencies from provided->compile scope when the rootArtifact defines a
+     * dependency {@code x->y} as provided therefore {@code y->z} would be also provided but at the same time it has y as compile so there will
+     * be a link from {@code x:provided->y:provided} and {@code y:compile->z:compile}. So we have to look for these scenarios when looking for
+     * y dependencies we cannot rely on y's scope, we just need to look for its groupId/artifactId/version (if it has one).
+     * <p/>
+     * The identity of a {@link MavenArtifact} cannot be used here, we have to compare it with a different logic.
      *
      * @param dependency the {@link MavenArtifact} to get is transitive dependencies
      * @throws IllegalArgumentException if the rootArtifact was used to get its transitive dependencies
@@ -68,11 +78,29 @@ public class DependenciesGraph
         {
             throw new IllegalArgumentException("RootArtifact cannot be used to get transitive dependencies");
         }
-        if (!transitiveDependencies.containsKey(dependency))
+        Set<MavenArtifact> transitiveDependencyKeys = transitiveDependencies.keySet().stream().filter(mavenArtifact -> areSameArtifactIgnoringScope(mavenArtifact, dependency)).collect(Collectors.toSet());
+        if (transitiveDependencyKeys.size() == 0)
         {
             return Collections.emptySet();
         }
-        return ImmutableSet.<MavenArtifact>builder().addAll(transitiveDependencies.get(dependency)).build();
+
+        ImmutableSet.Builder<MavenArtifact> builder = ImmutableSet.<MavenArtifact>builder();
+        transitiveDependencyKeys.forEach(key -> builder.addAll(transitiveDependencies.get(key)));
+        return builder.build();
+    }
+
+    /**
+     * Compares two {@link MavenArtifact} if they reference to the same maven artifact, without taking into account the {@code scope} due to that defines how it could be used but not the identity.
+     *
+     * @param artifact {@link MavenArtifact}
+     * @param anotherArtifact {@link MavenArtifact}
+     * @return true if the reference to the same {@MavenArtifact} by groupdId, artifactId and version (optional)
+     */
+    private static boolean areSameArtifactIgnoringScope(MavenArtifact artifact, MavenArtifact anotherArtifact)
+    {
+        return artifact.getGroupId().equals(anotherArtifact.getGroupId()) &&
+               artifact.getArtifactId().equals(anotherArtifact.getArtifactId()) &&
+               (isNotEmpty(artifact.getVersion()) ? artifact.getVersion().equals(anotherArtifact.getVersion()) : true);
     }
 
 }
