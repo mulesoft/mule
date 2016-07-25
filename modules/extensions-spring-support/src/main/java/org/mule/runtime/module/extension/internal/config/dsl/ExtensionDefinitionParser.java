@@ -79,8 +79,10 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver
 
 import com.google.common.collect.ImmutableList;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -98,6 +100,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
 
 import org.joda.time.DateTime;
+import org.joda.time.format.ISODateTimeFormat;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.support.DefaultConversionService;
 
@@ -762,13 +765,8 @@ public abstract class ExtensionDefinitionParser
             }
             else if (type.equals(LocalDateTime.class))
             {
-                constructedValue = LocalDateTime.of(dateTime.getYear(),
-                                                    dateTime.getMonthOfYear(),
-                                                    dateTime.getDayOfMonth(),
-                                                    dateTime.getHourOfDay(),
-                                                    dateTime.getMinuteOfHour(),
-                                                    dateTime.getSecondOfMinute());
-
+                Instant instant = Instant.ofEpochMilli(dateTime.getMillis());
+                constructedValue = LocalDateTime.ofInstant(instant, ZoneId.of(dateTime.getZone().getID()));
             }
             else if (type.equals(Calendar.class))
             {
@@ -799,7 +797,7 @@ public abstract class ExtensionDefinitionParser
     {
         try
         {
-            return new DateTime(value);
+            return ISODateTimeFormat.dateTimeParser().withOffsetParsed().parseDateTime(value);
         }
         catch (DateTimeParseException e)
         {

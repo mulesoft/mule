@@ -20,7 +20,7 @@ import org.mule.runtime.extension.api.annotation.param.ConfigName;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.display.Password;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 
 import javax.inject.Inject;
 
@@ -57,7 +57,7 @@ public abstract class PetStoreConnectionProvider implements ConnectionProvider<P
 
     @Optional
     @Parameter
-    private LocalDateTime openingDate;
+    private Date openingDate;
 
 
     @Override
@@ -157,7 +157,7 @@ public abstract class PetStoreConnectionProvider implements ConnectionProvider<P
         this.password = password;
     }
 
-    public LocalDateTime getOpeningDate()
+    public Date getOpeningDate()
     {
         return openingDate;
     }

@@ -13,7 +13,7 @@ import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 public class PetStoreClient implements TransactionalConnection
@@ -26,9 +26,9 @@ public class PetStoreClient implements TransactionalConnection
     private ThreadingProfile threadingProfile;
     private boolean begun, commited, rolledback = false;
     private int disconnectCount;
-    private LocalDateTime openingDate;
+    private Date openingDate;
 
-    public PetStoreClient(String username, String password, TlsContextFactory tlsContextFactory, ThreadingProfile threadingProfile, String configName, LocalDateTime openingDate)
+    public PetStoreClient(String username, String password, TlsContextFactory tlsContextFactory, ThreadingProfile threadingProfile, String configName, Date openingDate)
     {
         this.username = username;
         this.password = password;
@@ -118,7 +118,7 @@ public class PetStoreClient implements TransactionalConnection
         return rolledback;
     }
 
-    public LocalDateTime getOpeningDate()
+    public Date getOpeningDate()
     {
         return openingDate;
     }

@@ -17,6 +17,14 @@
         <petstore:connection username="john" password="doe" openingDate="2008-09-15"/>
     </petstore:config>
 
+    <petstore:config name="petstoreWithTimeZoneNoSeconds">
+        <petstore:connection username="john" password="doe" openingDate="2008-09-15T15:53+05:00"/>
+    </petstore:config>
+
+    <petstore:config name="petstoreWithTimeZoneNoMinutes">
+        <petstore:connection username="john" password="doe" openingDate="2008-09-15T15+05:00"/>
+    </petstore:config>
+
     <flow name="getWithTimeZone">
         <petstore:get-client config-ref="petstoreWithTimeZone" />
     </flow>
@@ -27,6 +35,14 @@
 
     <flow name="getWithDate">
         <petstore:get-client config-ref="petstoreWithDate" />
+    </flow>
+
+    <flow name="getWithTimeZoneNoSeconds">
+        <petstore:get-client config-ref="petstoreWithTimeZoneNoSeconds" />
+    </flow>
+
+    <flow name="getWithTimeZoneNoMinutes">
+        <petstore:get-client config-ref="petstoreWithTimeZoneNoMinutes" />
     </flow>
 
 
