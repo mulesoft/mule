@@ -203,6 +203,11 @@ public class HeisenbergOperations
         return literalExpression;
     }
 
+    public int[][] getGramsInStorage()
+    {
+        return new int[][] {{0, 22},{1, 10},{2, 30}};
+    }
+
     @Ignore
     public void ignoredOperation()
     {

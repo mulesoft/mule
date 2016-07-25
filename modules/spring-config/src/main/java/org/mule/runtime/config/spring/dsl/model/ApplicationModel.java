@@ -17,9 +17,9 @@ import static org.mule.runtime.config.spring.dsl.processor.xml.CoreXmlNamespaceI
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.from;
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.to;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
-import org.mule.runtime.config.spring.dsl.processor.ArtifactConfig;
 import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.extension.api.util.NameUtils.pluralize;
+import org.mule.runtime.config.spring.dsl.processor.ArtifactConfig;
 import org.mule.runtime.config.spring.dsl.processor.ConfigFile;
 import org.mule.runtime.config.spring.dsl.processor.ConfigLine;
 import org.mule.runtime.config.spring.dsl.processor.SimpleConfigAttribute;
@@ -358,7 +358,8 @@ public class ApplicationModel
             {
                 if (existingObjectsWithName.containsKey(nameAttributeValue))
                 {
-                    throw new MuleRuntimeException(createStaticMessage("Two configuration elements have been defined with the same global name. Global name must be unique. Clashing components are %s and %s",
+                    throw new MuleRuntimeException(createStaticMessage("Two configuration elements have been defined with the same global name. Global name [%s] must be unique. Clashing components are %s and %s",
+                                                                       nameAttributeValue,
                                                                        existingObjectsWithName.get(nameAttributeValue).getIdentifier(),
                                                                        componentModel.getIdentifier()));
                 }

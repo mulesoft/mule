@@ -213,4 +213,8 @@
             </heisenberg:health-by-years>
         </heisenberg:get-medical-history>
     </flow>
+
+    <flow name="getGramsInStorage">
+        <heisenberg:get-grams-in-storage/>
+    </flow>
 </mule>

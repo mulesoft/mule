@@ -389,6 +389,13 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase
         assertThat(getMedicalHistory.get(2015), is(DEAD));
     }
 
+    @Test
+    public void getGramsInStorage() throws Exception
+    {
+        int[][] gramsInStorage = flowRunner("getGramsInStorage").run().getMessage().getPayload();
+        assertThat(gramsInStorage, is(notNullValue()));
+    }
+
     private void assertDynamicDoor(String flowName) throws Exception
     {
         assertDynamicVictim(flowName, "Skyler");

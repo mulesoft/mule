@@ -149,6 +149,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
     private static final String IGNORED_OPERATION = "ignoredOperation";
 
     private static final String EXTENSION_VERSION = MuleManifest.getProductVersion();
+    public static final String GET_GRAMS_IN_STORAGE = "getGramsInStorage";
 
     @Before
     public void setUp()
@@ -475,7 +476,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
 
     private void assertTestModuleOperations(ExtensionDeclaration extensionDeclaration) throws Exception
     {
-        assertThat(extensionDeclaration.getOperations(), hasSize(24));
+        assertThat(extensionDeclaration.getOperations(), hasSize(25));
         assertOperation(extensionDeclaration, SAY_MY_NAME_OPERATION, "");
         assertOperation(extensionDeclaration, GET_ENEMY_OPERATION, "");
         assertOperation(extensionDeclaration, KILL_OPERATION, "");
@@ -496,6 +497,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         assertOperation(extensionDeclaration, CALL_GUS_FRING, "");
         assertOperation(extensionDeclaration, GET_SAUL_PHONE, "");
         assertOperation(extensionDeclaration, GET_MEDICAL_HISTORY, "");
+        assertOperation(extensionDeclaration, GET_GRAMS_IN_STORAGE, "");
 
         OperationDeclaration operation = getOperation(extensionDeclaration, SAY_MY_NAME_OPERATION);
         assertThat(operation, is(notNullValue()));
@@ -589,6 +591,10 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
                                 .ofValue(TYPE_LOADER.load(HealthStatus.class))
                                 .build(),
                         true, SUPPORTED, null);
+
+        operation = getOperation(extensionDeclaration, GET_GRAMS_IN_STORAGE);
+        assertThat(operation, is(notNullValue()));
+        assertThat(operation.getParameters().isEmpty(), is(true));
 
         operation = getOperation(extensionDeclaration, IGNORED_OPERATION);
         assertThat(operation, is(nullValue()));
