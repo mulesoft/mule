@@ -23,13 +23,11 @@
     <flow name="client" processingStrategy="synchronous">
 
         <set-variable variableName="flowVarName" value="testFlowVar" />
-        <set-session-variable variableName="sessionVarName" value="testSessionVar" />
 
         <ws:consumer operation="echo"/>
 
         <catch-exception-strategy>
             <set-property propertyName="flowVar" value="#[flowVars['flowVarName']]" />
-            <set-property propertyName="sessionVar" value="#[sessionVars['sessionVarName']]" />
             <test:queue name="out"/>
         </catch-exception-strategy>
     </flow>

@@ -11,19 +11,20 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
+
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleMessage;
 
 import org.junit.Ignore;
 import org.junit.Test;
 
-public class MessagePropertyScopesTestCase extends FunctionalTestCase
+public class MessagePropertySessionScopesTestCase extends FunctionalTestCase
 {
 
     @Override
     protected String getConfigFile()
     {
-        return "org/mule/test/integration/messaging/message-property-scopes-config-flow.xml";
+        return "org/mule/test/integration/messaging/message-property-session-scopes-config-flow.xml";
     }
 
     @Test

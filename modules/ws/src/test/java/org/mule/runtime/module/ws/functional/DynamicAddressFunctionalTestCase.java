@@ -39,12 +39,6 @@ public class DynamicAddressFunctionalTestCase extends AbstractWSConsumerFunction
     }
 
     @Test
-    public void returnsExpectedResponseWhenValidPathIsProvidedSessionVar() throws Exception
-    {
-        assertValidResponse("clientSessionVar");
-    }
-
-    @Test
     public void failsWhenInvalidPathIsProvided() throws Exception
     {
         assertSoapFault("clientInboundProperty", ECHO_REQUEST, singletonMap("clientInboundProperty", "invalid"), "Client");

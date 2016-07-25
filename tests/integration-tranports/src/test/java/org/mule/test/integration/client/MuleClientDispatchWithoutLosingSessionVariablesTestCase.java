@@ -23,10 +23,10 @@ import org.junit.ClassRule;
 import org.junit.Test;
 
 /**
- * Tests to validate that MuleClient can be used from MessageProcessor and JavaComponent in order to dispatch an event to
- * a sub-flow, without losing the Flow variables.
+ * Tests to validate that MuleClient can be used from MessageProcessor and JavaComponent in order to dispatch an event
+ * to a sub-flow, without losing the Session variables.
  */
-public class MuleClientDispatchWithoutLosingVariablesTestCase extends FunctionalTestCase
+public class MuleClientDispatchWithoutLosingSessionVariablesTestCase extends FunctionalTestCase
 {
     @ClassRule
     public static DynamicPort port = new DynamicPort("port");
@@ -34,7 +34,7 @@ public class MuleClientDispatchWithoutLosingVariablesTestCase extends Functional
     @Override
     protected String getConfigFile()
     {
-        return "org/mule/test/integration/client/client-flow-vars-when-dispatch-flow.xml";
+        return "org/mule/test/integration/client/client-session-vars-when-dispatch-flow.xml";
     }
 
     private void doSendMessageToHttp(String flowName) throws Exception
@@ -44,32 +44,22 @@ public class MuleClientDispatchWithoutLosingVariablesTestCase extends Functional
         FlowAssert.verify(flowName);
     }
 
-    /**
-     * When doing a dispatch from a MessageProcessor the event was overwritten in ThreadLocal by
-     * OptimizedRequestContext while processing it and before dispatching it to a different thread so
-     * the original event that is the one that has to continue the execution of the main flow
-     * was losing the Flow variables.
-     *
-     * @throws Exception
-     */
     @Test
-    public void testFlowVarsAfterDispatchFromMessageProcessor() throws Exception
+    public void testSessionVarsAfterDispatchFromMessageProcessor() throws Exception
     {
-        doSendMessageToHttp("flowVarsFlowUsingProcessor");
+        doSendMessageToHttp("sessionVarsFlowUsingProcessor");
     }
 
-    /**
-     * When doing a dispatch from a JavaComponent the event was overwritten in ThreadLocal by
-     * OptimizedRequestContext while processing it and before dispatching it to a different thread so
-     * the original event that is the one that has to continue the execution of the main flow
-     * was losing the Flow variables.
-     *
-     * @throws Exception
-     */
     @Test
-    public void testFlowVarsAfterDispatchFromJavaComponent() throws Exception
+    public void testSessionVarsAfterDispatchFromJavaComponent() throws Exception
     {
-        doSendMessageToHttp("flowVarsFlowUsingJavaComponent");
+        doSendMessageToHttp("sessionVarsFlowUsingJavaComponent");
+    }
+
+    @Test
+    public void testSessionVarsFlowUsingJavaComponentRequestResponse() throws Exception
+    {
+        doSendMessageToHttp("sessionVarsFlowUsingJavaComponentRequestResponse");
     }
 
     public static class MessageProcessorDispatchFlowUsingNewMuleClient implements MessageProcessor

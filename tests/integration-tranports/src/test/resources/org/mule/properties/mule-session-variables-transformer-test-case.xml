@@ -2,28 +2,29 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns:transports="http://www.mulesoft.org/schema/mule/transports"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-
+       http://www.mulesoft.org/schema/mule/transports http://www.mulesoft.org/schema/mule/transports/current/mule-transports.xsd
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
-    <set-session-variable name="addSessionVariable" variableName="sesVarKey" value="sesVarValue" />
+    <transports:set-session-variable name="addSessionVariable" variableName="sesVarKey" value="sesVarValue" />
 
-    <set-session-variable name="addSessionVariableName" variableName="sesVarKeyName" value="sesVarKey" />
+    <transports:set-session-variable name="addSessionVariableName" variableName="sesVarKeyName" value="sesVarKey" />
 
-    <set-session-variable name="addSessionVariable2" variableName="invVarKey2" value="invVarValue2" />
+    <transports:set-session-variable name="addSessionVariable2" variableName="invVarKey2" value="invVarValue2" />
 
-    <set-session-variable name="addAnotherSessionVariable" variableName="anotherSessionVarKey" value="anotherSessionVarValue" />
+    <transports:set-session-variable name="addAnotherSessionVariable" variableName="anotherSessionVarKey" value="anotherSessionVarValue" />
 
     <set-variable name="addInvocationVariable" variableName="invVarKey" value="invVarValue" />
 
     <set-variable name="addInvocationVariable2" variableName="invVarKey2" value="invVarValue2" />
 
-    <set-session-variable name="setSessVarGlobal" variableName="#[sessionVars.sesVarKey]" value="#[flowVars.invVarKey]"/>
+    <transports:set-session-variable name="setSessVarGlobal" variableName="#[sessionVars.sesVarKey]" value="#[flowVars.invVarKey]"/>
 
-    <remove-session-variable name="remSessVarGlobal" variableName="sesVarKey" />
+    <transports:remove-session-variable name="remSessVarGlobal" variableName="sesVarKey" />
 
     <flow name="addSessionVariableFlow" processingStrategy="synchronous">
-        <set-session-variable variableName="prop" value="#['some value']"/>
+        <transports:set-session-variable variableName="prop" value="#['some value']"/>
         <test:assert expression="#[sessionVars.prop == 'some value']"/>
     </flow>
 
@@ -37,7 +38,7 @@
     <flow name="addVariableWithParsedStringKeyFlow" processingStrategy="synchronous">
         <transformer ref="addSessionVariable"/>
         <transformer ref="addInvocationVariable"/>
-        <set-session-variable variableName="-#[sessionVars.sesVarKey]-" value="-#[flowVars.invVarKey]-"/>
+        <transports:set-session-variable variableName="-#[sessionVars.sesVarKey]-" value="-#[flowVars.invVarKey]-"/>
         <test:assert expression="#[sessionVars['-sesVarValue-'] == '-invVarValue-']"/>
     </flow>
 
@@ -50,14 +51,14 @@
     <flow name="removeSessionVariableUsingExpressionFlow" processingStrategy="synchronous">
         <transformer ref="addSessionVariable"/>
         <transformer ref="addSessionVariableName"/>
-        <remove-session-variable variableName="#[sessionVars.sesVarKeyName]"/>
+        <transports:remove-session-variable variableName="#[sessionVars.sesVarKeyName]"/>
         <test:assert expression="#[sessionVars.sesVarKey == null]"/>
     </flow>
     
     <flow name="removeSessionVariableUsingParsedStringFlow" processingStrategy="synchronous">
         <transformer ref="addSessionVariable"/>
         <transformer ref="addSessionVariableName"/>
-        <remove-session-variable variableName="ses#['Var']key"/>
+        <transports:remove-session-variable variableName="ses#['Var']key"/>
         <test:assert expression="#[sessionVars.sesVarKey == null]"/>
     </flow>
 
@@ -65,7 +66,7 @@
         <transformer ref="addSessionVariable"/>
         <transformer ref="addSessionVariable2"/>
         <transformer ref="addAnotherSessionVariable"/>
-        <remove-session-variable variableName="ses*"/>
+        <transports:remove-session-variable variableName="ses*"/>
         <test:assert expression="#[sessionVars.sesPropKey == null]"/>
         <test:assert expression="#[sessionVars.sesPropKey2 == null]"/>
         <test:assert expression="#[sessionVars.anotherSessionVarKey != null]"/>
@@ -75,7 +76,7 @@
         <transformer ref="addSessionVariable"/>
         <transformer ref="addSessionVariable2"/>
         <transformer ref="addAnotherSessionVariable"/>
-        <remove-session-variable variableName="*" />
+        <transports:remove-session-variable variableName="*" />
         <test:assert expression="#[sessionVars.invPropKey == null]"/>
         <test:assert expression="#[sessionVars.invPropKey2 == null]"/>
         <test:assert expression="#[sessionVars.anotherSessionVarKey == null]"/>

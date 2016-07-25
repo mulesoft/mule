@@ -41,12 +41,6 @@
     <ws:consumer-config serviceAddress="http://localhost:${port}/#[pathSessionVar]" wsdlLocation="Test.wsdl"
                         service="TestService" port="TestPort" name="globalConfigSessionVar" />
 
-    <flow name="clientSessionVar">
-        <set-session-variable variableName="pathSessionVar" value="services/Test" />
-        <ws:consumer operation="echo" config-ref="globalConfigSessionVar"/>
-    </flow>
-
-
     <flow name="server">
         <http:listener path="/services/Test" config-ref="listenerConfig"/>
         <cxf:jaxws-service serviceClass="org.mule.runtime.module.ws.consumer.TestService"/>

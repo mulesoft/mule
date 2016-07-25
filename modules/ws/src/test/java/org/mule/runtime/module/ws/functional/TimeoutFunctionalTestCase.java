@@ -9,13 +9,11 @@ package org.mule.runtime.module.ws.functional;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 
-import org.mule.runtime.core.api.MuleEventContext;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.functional.functional.EventCallback;
 import org.mule.functional.junit4.FlowRunner;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.util.concurrent.Latch;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -37,14 +35,7 @@ public class TimeoutFunctionalTestCase extends FunctionalTestCase
     {
         final Latch serverLatch = new Latch();
 
-        getFunctionalTestComponent("server").setEventCallback(new EventCallback()
-        {
-            @Override
-            public void eventReceived(MuleEventContext context, Object component) throws Exception
-            {
-                serverLatch.await();
-            }
-        });
+        getFunctionalTestComponent("server").setEventCallback((context, component) -> serverLatch.await());
 
         FlowRunner runner = flowRunner("client").withPayload("<echo/>");
         runner.buildEvent().setTimeout(1);
@@ -54,6 +45,5 @@ public class TimeoutFunctionalTestCase extends FunctionalTestCase
         MuleMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT);
 
         assertThat(message.<String>getOutboundProperty("flowVar"), equalTo("testFlowVar"));
-        assertThat(message.<String>getOutboundProperty("sessionVar"), equalTo("testSessionVar"));
     }
 }

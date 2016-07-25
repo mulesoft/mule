@@ -12,6 +12,7 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 
+import org.mule.functional.transformer.simple.AbstractRemoveVariablePropertyTransformerTestCase;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.tck.size.SmallTest;
 
