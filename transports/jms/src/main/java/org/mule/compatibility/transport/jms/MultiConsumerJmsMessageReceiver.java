@@ -6,6 +6,7 @@
  */
 package org.mule.compatibility.transport.jms;
 
+import static org.mule.compatibility.transport.jms.JmsConstants.JMS_REPLY_TO;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.core.connector.EndpointConnectException;
@@ -17,6 +18,7 @@ import org.mule.compatibility.transport.jms.redelivery.RedeliveryHandler;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.RollbackSourceCallback;
 import org.mule.runtime.core.api.lifecycle.CreateException;
@@ -547,6 +549,12 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
                 }
             }
         }
+    }
+
+    @Override
+    protected Object getReplyToDestination(MuleMessage message)
+    {
+        return message.getInboundProperty(JMS_REPLY_TO);
     }
 
 }

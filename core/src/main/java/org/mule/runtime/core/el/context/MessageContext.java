@@ -62,16 +62,6 @@ public class MessageContext
         return event.getMessage().getCorrelation();
     }
 
-    public Object getReplyTo()
-    {
-        return event.getMessage().getReplyTo();
-    }
-
-    public void setReplyTo(String replyTo)
-    {
-        event.setMessage(MuleMessage.builder(event.getMessage()).replyTo(replyTo).build());
-    }
-
     public DataType getDataType()
     {
         return event.getMessage().getDataType();

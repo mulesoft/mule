@@ -305,10 +305,9 @@ public class MuleMessageToHttpResponse extends AbstractMessageTransformer
             msg.getCorrelation().getGroupSize().ifPresent(s -> response.setHeader(new Header(CUSTOM_HEADER_PREFIX + MULE_CORRELATION_GROUP_SIZE_PROPERTY, valueOf(s))));
             msg.getCorrelation().getSequence().ifPresent(s -> response.setHeader(new Header(CUSTOM_HEADER_PREFIX + MULE_CORRELATION_SEQUENCE_PROPERTY, valueOf(s))));
         });
-        if (msg.getReplyTo() != null)
+        if (msg.getOutboundProperty(MULE_REPLY_TO_PROPERTY) != null)
         {
-            response.setHeader(new Header(CUSTOM_HEADER_PREFIX + MULE_REPLY_TO_PROPERTY,
-                    msg.getReplyTo().toString()));
+            response.setHeader(new Header(CUSTOM_HEADER_PREFIX + MULE_REPLY_TO_PROPERTY, msg.getOutboundProperty(MULE_REPLY_TO_PROPERTY).toString()));
         }
 
         try

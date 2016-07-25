@@ -28,7 +28,6 @@ import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.metadata.DefaultCollectionDataType;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.tck.testmodels.fruit.Orange;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -52,7 +51,6 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase
     private static final Serializable PROPERTY_VALUE = "propertyValue";
     private static final String ATTACHMENT_KEY = "attachmentKey";
     private static final String ATTACHMENT_VALUE = "attachmentValue";
-    private static final Object REPLY_TO = new Orange();
     private static final MediaType HTML_STRING_UTF8 = HTML.withCharset(UTF_8);
 
     @Test
@@ -399,7 +397,6 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase
                 .correlationId("2")
                 .correlationGroupSize(3)
                 .correlationSequence(4)
-                .replyTo(REPLY_TO)
                 .build();
     }
 
@@ -412,7 +409,6 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase
         assertThat(message.getCorrelation().getId().get(), equalTo("2"));
         assertThat(message.getCorrelation().getGroupSize().get(), equalTo(3));
         assertThat(message.getCorrelation().getSequence().get(), equalTo(4));
-        assertThat(message.getReplyTo(), is(REPLY_TO));
     }
 
 }

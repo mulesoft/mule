@@ -8,7 +8,7 @@ package org.mule.compatibility.transport.jms.integration;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_PROPERTY;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
@@ -55,7 +55,7 @@ public class JmsResponseElementTestCase extends FunctionalTestCase
         MuleClient client = muleContext.getClient();
 
         String replyToUri = "jms://out2";
-        client.dispatch("jms://out", MuleMessage.builder().payload(MESSAGE).replyTo(replyToUri).build());
+        client.dispatch("jms://out", MuleMessage.builder().payload(MESSAGE).addOutboundProperty(MULE_REPLY_TO_PROPERTY, replyToUri).build());
 
         MuleMessage response = client.request(replyToUri, TIMEOUT);
         assertThat(getPayloadAsString(response), is(EXPECTED_MODIFIED_MESSAGE));

@@ -11,6 +11,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_PROPERTY;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -131,7 +132,7 @@ public class JmsTemporaryReplyToTestCase extends AbstractJmsFunctionalTestCase
         @Override
         public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException
         {
-            final MuleMessage message = MuleMessage.builder(event.getMessage()).replyTo(muleContext.getRegistry().get(MIDDLE_ENDPOINT_KEY)).build();
+            final MuleMessage message = MuleMessage.builder(event.getMessage()).addOutboundProperty(MULE_REPLY_TO_PROPERTY, muleContext.getRegistry().get(MIDDLE_ENDPOINT_KEY)).build();
             event.setMessage(message);
             return message;
         }

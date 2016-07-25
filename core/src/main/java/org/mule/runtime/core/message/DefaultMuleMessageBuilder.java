@@ -73,7 +73,6 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
     private String correlationId;
     private Integer correlationSequence;
     private Integer correlationGroupSize;
-    private Object replyTo;
     private ExceptionPayload exceptionPayload;
 
     private Map<String, TypedValue<Serializable>> inboundProperties = new CaseInsensitiveMapWrapper<>(HashMap.class);
@@ -96,7 +95,6 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
         message.getCorrelation().getId().ifPresent(v -> this.correlationId = v);
         message.getCorrelation().getSequence().ifPresent(v -> this.correlationSequence = v);
         message.getCorrelation().getGroupSize().ifPresent(v -> this.correlationGroupSize = v);
-        this.replyTo = message.getReplyTo();
         this.rootId = message.getMessageRootId();
         this.exceptionPayload = message.getExceptionPayload();
         message.getInboundPropertyNames().forEach(key -> {
@@ -229,13 +227,6 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
     public MuleMessage.Builder exceptionPayload(ExceptionPayload exceptionPayload)
     {
         this.exceptionPayload = exceptionPayload;
-        return this;
-    }
-
-    @Override
-    public MuleMessage.Builder replyTo(Object replyTo)
-    {
-        this.replyTo = replyTo;
         return this;
     }
 
@@ -378,7 +369,7 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
                                              new TypedValue(payload, resolveDataType()), attributes,
                                              inboundProperties, outboundProperties, inboundAttachments,
                                              outboundAttachments, correlationId, correlationGroupSize,
-                                             correlationSequence, replyTo, exceptionPayload);
+                                             correlationSequence, exceptionPayload);
     }
 
     private DataType resolveDataType()
@@ -430,7 +421,6 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
         private Correlation correlation;
         private transient TypedValue typedValue;
         private Attributes attributes;
-        private Serializable replyTo;
 
         private Map<String, TypedValue<Serializable>> inboundMap = new CaseInsensitiveMapWrapper<>(HashMap.class);
         private Map<String, TypedValue<Serializable>> outboundMap = new CaseInsensitiveMapWrapper<>(HashMap.class);
@@ -440,7 +430,7 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
                                   Map<String, TypedValue<Serializable>> outboundProperties,
                                   Map<String, DataHandler> inboundAttachments, Map<String, DataHandler> outboundAttachments,
                                   String correlationId, Integer correlationGroupSize, Integer correlationSequence,
-                                  Object replyTo, ExceptionPayload exceptionPayload)
+                                  ExceptionPayload exceptionPayload)
         {
             this.id = id;
             this.rootId = rootId != null ? rootId : id;
@@ -451,7 +441,6 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
             this.inboundAttachments = inboundAttachments;
             this.outboundAttachments = outboundAttachments;
             this.correlation = new Correlation(correlationId, correlationGroupSize, correlationSequence);
-            setReplyTo(replyTo);
             this.exceptionPayload = exceptionPayload;
         }
 
@@ -474,34 +463,6 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
         public Correlation getCorrelation()
         {
             return correlation;
-        }
-
-        private void setReplyTo(Object replyTo)
-        {
-            if (replyTo != null)
-            {
-                if(!(replyTo instanceof Serializable))
-                {
-                    logger.warn("ReplyTo " + replyTo + " is not serializable and will not be propagated by Mule");
-                }
-                else
-                {
-                    this.replyTo = (Serializable) replyTo;
-                }
-            }
-            else
-            {
-                this.replyTo = null;
-            }
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public Object getReplyTo()
-        {
-            return replyTo;
         }
 
         /**

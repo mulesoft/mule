@@ -33,7 +33,7 @@
         <echo-component/>
         <request-reply>
             <transports:outbound-endpoint address="jms://pojo4" exchange-pattern="one-way"/>
-            <transports:inbound-endpoint address="jms://response"/>
+            <transports:inbound-endpoint address="jms://response2"/>
         </request-reply>
     </flow>
 

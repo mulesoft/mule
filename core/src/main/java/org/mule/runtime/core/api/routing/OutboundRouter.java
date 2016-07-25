@@ -29,16 +29,6 @@ public interface OutboundRouter
     void setTransactionConfig(TransactionConfig transactionConfig);
 
     /**
-     * Sets the replyTo route for any outgoing messages. This will then be used by
-     * other Mule routers to send replies back for this message. If the underlying
-     * protocol supports replyTo messages, such as Jms, a Jms Destination will be
-     * attached to the outbound message
-     * 
-     * @param replyTo route string to use
-     */
-    void setReplyTo(String replyTo);
-
-    /**
      * Determines whether this router supports dynamic route. i.e. routes that are
      * not configured at design time. routes might be pulled from the message or
      * payload.

@@ -7,7 +7,6 @@
 package org.mule.compatibility.transport.jms;
 
 import static org.mule.compatibility.transport.jms.JmsConstants.JMS_REPLY_TO;
-
 import org.mule.compatibility.core.transport.AbstractMuleMessageFactory;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
@@ -139,10 +138,8 @@ public class JmsMuleMessageFactory extends AbstractMuleMessageFactory
                 {
                     logger.warn("ReplyTo " + replyTo + " is not serializable and will not be propagated by Mule");
                 }
-                messageBuilder.addOutboundProperty(JMS_REPLY_TO, (Serializable) replyTo);
+                messageBuilder.addInboundProperty(JMS_REPLY_TO, (Serializable) replyTo);
             }
-
-            messageBuilder.replyTo(replyTo);
         }
         catch (JMSException e)
         {

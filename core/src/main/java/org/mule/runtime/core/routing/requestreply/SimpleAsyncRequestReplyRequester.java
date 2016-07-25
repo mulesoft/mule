@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.routing.requestreply;
 
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY;
 
 import org.mule.runtime.core.api.MuleContext;
@@ -38,7 +39,7 @@ public class SimpleAsyncRequestReplyRequester extends AbstractAsyncRequestReplyR
     protected void setAsyncReplyProperties(MuleEvent event) throws MuleException
     {
         event.setMessage(MuleMessage.builder(event.getMessage())
-                                    .replyTo(getReplyTo())
+                                    .addOutboundProperty(MULE_REPLY_TO_PROPERTY, getReplyTo())
                                     .addOutboundProperty(MULE_REPLY_TO_REQUESTOR_PROPERTY, event.getFlowConstruct().getName())
                                     .correlationId(event.getFlowConstruct().getMessageInfoMapping().getCorrelationId(event))
                                     .build());

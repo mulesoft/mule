@@ -8,6 +8,7 @@ package org.mule.compatibility.transport.jms;
 
 import static org.mule.compatibility.core.registry.MuleRegistryTransportHelper.lookupEndpointBuilder;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_ID_PROPERTY;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_PROPERTY;
 import static org.mule.runtime.core.util.NumberUtils.toInt;
 
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
@@ -567,7 +568,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
             if (tempReplyTo == null)
             {
                 //It may be a Mule URI or global endpoint Ref
-                tempReplyTo = event.getMessage().getReplyTo();
+                tempReplyTo = event.getMessage().getOutboundProperty(MULE_REPLY_TO_PROPERTY);
                 if (tempReplyTo != null)
                 {
                     int i = tempReplyTo.toString().indexOf("://");
