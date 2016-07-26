@@ -203,6 +203,11 @@ public class HeisenbergOperations
         return literalExpression;
     }
 
+    public int[][] getGramsInStorage(@Optional(defaultValue = "#[payload]") int[][] grams)
+    {
+        return grams;
+    }
+
     @Ignore
     public void ignoredOperation()
     {

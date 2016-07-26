@@ -410,6 +410,24 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
+      <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="GetGramsInStorageType" substitutionGroup="heisenberg-empire" name="get-grams-in-storage"></xs:element>
+      <xs:complexType name="GetGramsInStorageType">
+        <xs:complexContent>
+          <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+            <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
+              <xs:annotation>
+                <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute type="mule:expressionList" use="optional" default="#[payload]" name="grams"></xs:attribute>
+            <xs:attribute type="xs:string" use="optional" name="target">
+              <xs:annotation>
+                <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+          </xs:extension>
+        </xs:complexContent>
+      </xs:complexType>
     <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="GetInjectedExtensionManagerType" substitutionGroup="heisenberg-empire" name="get-injected-extension-manager"></xs:element>
     <xs:complexType name="GetInjectedExtensionManagerType">
         <xs:complexContent>
