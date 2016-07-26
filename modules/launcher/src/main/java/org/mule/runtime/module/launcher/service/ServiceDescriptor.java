@@ -7,9 +7,9 @@
 
 package org.mule.runtime.module.launcher.service;
 
+import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import org.mule.runtime.api.service.Service;
-import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
 
 /**
@@ -29,7 +29,7 @@ public class ServiceDescriptor extends ArtifactDescriptor
 
     public void setServiceProviderClassName(String serviceProviderClassName)
     {
-        checkArgument(!StringUtils.isEmpty(serviceProviderClassName), "serviceProviderClassName cannot be empty");
+        checkArgument(!isEmpty(serviceProviderClassName), "serviceProviderClassName cannot be empty");
 
         this.serviceProviderClassName = serviceProviderClassName;
     }

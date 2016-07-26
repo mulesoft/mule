@@ -42,6 +42,7 @@ import static org.mule.runtime.module.launcher.MuleFoldersUtil.CONTAINER_APP_PLU
 import static org.mule.runtime.module.launcher.MuleFoldersUtil.PLUGINS_FOLDER;
 import static org.mule.runtime.module.launcher.MuleFoldersUtil.getContainerAppPluginsFolder;
 import static org.mule.runtime.module.launcher.MuleFoldersUtil.getDomainFolder;
+import static org.mule.runtime.module.launcher.MuleFoldersUtil.getServicesFolder;
 import static org.mule.runtime.module.launcher.application.TestApplicationFactory.createTestApplicationFactory;
 import static org.mule.runtime.module.launcher.descriptor.PropertiesDescriptorParser.PROPERTY_DOMAIN;
 import static org.mule.runtime.module.launcher.domain.Domain.DEFAULT_DOMAIN_NAME;
@@ -211,7 +212,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
         final File domainFolder = getDomainFolder(DEFAULT_DOMAIN_NAME);
         assertThat(domainFolder.mkdirs(), is(true));
 
-        services = new File(muleHome, "services");
+        services = getServicesFolder();
         services.mkdirs();
 
         new File(muleHome, "lib/shared/default").mkdirs();

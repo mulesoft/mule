@@ -30,6 +30,9 @@ public class ServiceClassLoaderFactory implements ArtifactClassLoaderFactory<Ser
     public static final String LIB_DIR = "lib";
     private static final String JAR_FILE = "*.jar";
 
+    /**
+     * @inherited
+     */
     @Override
     public ArtifactClassLoader create(ArtifactClassLoader parent, ServiceDescriptor descriptor)
     {

@@ -7,6 +7,7 @@
 
 package org.mule.runtime.module.launcher.service;
 
+import static java.lang.String.format;
 import static org.reflections.ReflectionUtils.getAllFields;
 import static org.reflections.ReflectionUtils.withAnnotation;
 import org.mule.runtime.api.service.Service;
@@ -36,7 +37,7 @@ public class ReflectionServiceProviderResolutionHelper implements ServiceProvide
             final Object dependency = lookupService(resolvedServices, dependencyType);
             if (dependency == null)
             {
-                throw new ServiceResolutionError(String.format("Cannot find a service to inject into field '%s' of service provider '%s'", field.getName(), serviceProvider.getClass().getName()));
+                throw new ServiceResolutionError(format("Cannot find a service to inject into field '%s' of service provider '%s'", field.getName(), serviceProvider.getClass().getName()));
             }
             try
             {
@@ -45,7 +46,7 @@ public class ReflectionServiceProviderResolutionHelper implements ServiceProvide
             }
             catch (Exception e)
             {
-                throw new ServiceResolutionError(String.format("Could not inject dependency on field %s of type %s", field.getName(), dependencyType.getClass().getName()), e);
+                throw new ServiceResolutionError(format("Could not inject dependency on field %s of type %s", field.getName(), dependencyType.getClass().getName()), e);
             }
         }
     }

@@ -15,7 +15,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * Utility interface used on the {@lionk ServiceProvider} resolution process.
+ * Utility interface used on the {@link ServiceProvider} resolution process.
  */
 public interface ServiceProviderResolutionHelper
 {

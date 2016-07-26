@@ -8,6 +8,9 @@
 package org.mule.runtime.module.launcher;
 
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
+
+import org.mule.runtime.core.util.StringUtils;
 
 import java.io.File;
 
@@ -41,13 +44,23 @@ public class MuleFoldersUtil
         return new File(muleHome);
     }
 
+    /**
+     * @return a {@link File} pointing to the container folder that contains services.
+     */
     public static File getServicesFolder()
     {
         return new File(getMuleHomeFolder(), SERVICES_FOLDER);
     }
 
+    /**
+     * Returns the file for a given service name.
+     *
+     * @param name name of the service. Non empty.
+     * @return a {@link File} pointing to the folder that corresponds to the provided service name when installed.
+     */
     public static File getServiceFolder(String name)
     {
+        checkArgument(!StringUtils.isEmpty(name), "name cannot be empty");
         return new File(getServicesFolder(), name);
     }
 
@@ -126,6 +139,9 @@ public class MuleFoldersUtil
         return new File(getMuleHomeFolder(), CONTAINER_APP_PLUGINS);
     }
 
+    /**
+     * @return a {@link File} pointing to the container folder used to temporarily store services on deployment
+     */
     public static File getServicesTempFolder()
     {
         return new File(getExecutionFolder(), SERVICES_FOLDER);

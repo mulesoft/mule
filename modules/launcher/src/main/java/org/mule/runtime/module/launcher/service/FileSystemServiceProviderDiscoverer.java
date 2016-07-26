@@ -7,13 +7,17 @@
 
 package org.mule.runtime.module.launcher.service;
 
+import static java.lang.String.format;
+import static org.apache.commons.io.FilenameUtils.getBaseName;
+import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.ClassUtils.instanciateClass;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.util.FileUtils.unzip;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.launcher.MuleFoldersUtil.getServicesFolder;
+import static org.mule.runtime.module.launcher.MuleFoldersUtil.getServicesTempFolder;
 import org.mule.runtime.api.service.ServiceProvider;
-import org.mule.runtime.core.util.FilenameUtils;
+import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.launcher.MuleFoldersUtil;
 
@@ -56,7 +60,7 @@ public class FileSystemServiceProviderDiscoverer implements ServiceProviderDisco
 
         for (String serviceFile : getServicesFolder().list(new SuffixFileFilter(".zip")))
         {
-            final File tempFolder = new File(MuleFoldersUtil.getServicesTempFolder(), FilenameUtils.getBaseName(serviceFile));
+            final File tempFolder = new File(getServicesTempFolder(), getBaseName(serviceFile));
             try
             {
                 unzip(new File(getServicesFolder(), serviceFile), tempFolder);
@@ -79,9 +83,7 @@ public class FileSystemServiceProviderDiscoverer implements ServiceProviderDisco
         for (ServiceDescriptor serviceDescriptor : serviceDescriptors)
         {
             final ArtifactClassLoader serviceClassLoader = serviceClassLoaderFactory.create(apiClassLoader, serviceDescriptor);
-
             final ServiceProvider serviceProvider = instantiateServiceProvider(serviceClassLoader.getClassLoader(), serviceDescriptor.getServiceProviderClassName());
-
 
             serviceProviders.add(serviceProvider);
         }
@@ -101,7 +103,7 @@ public class FileSystemServiceProviderDiscoverer implements ServiceProviderDisco
                 }
                 catch (Exception e)
                 {
-                    throw new RuntimeException("Unable to create service from class: " + className, e);
+                    throw new MuleRuntimeException(createStaticMessage("Unable to create service from class: " + className), e);
                 }
             });
         }
@@ -112,7 +114,7 @@ public class FileSystemServiceProviderDiscoverer implements ServiceProviderDisco
 
         if (!(reflectedObject instanceof ServiceProvider))
         {
-            throw new ServiceResolutionError(String.format("Provided service class '%s' does not implement '%s'", className, ServiceProvider.class.getName()));
+            throw new ServiceResolutionError(format("Provided service class '%s' does not implement '%s'", className, ServiceProvider.class.getName()));
         }
 
         return (ServiceProvider) reflectedObject;
