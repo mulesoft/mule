@@ -17,8 +17,8 @@ import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
 import org.mule.runtime.extension.api.introspection.source.RuntimeSourceModel;
-import org.mule.runtime.extension.xml.dsl.api.DslElementDeclaration;
-import org.mule.runtime.extension.xml.dsl.api.resolver.DslElementResolver;
+import org.mule.runtime.extension.xml.dsl.api.DslElementSyntax;
+import org.mule.runtime.extension.xml.dsl.api.resolver.DslSyntaxResolver;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinitionParser;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingContext;
 import org.mule.runtime.module.extension.internal.runtime.source.ExtensionMessageSource;
@@ -35,17 +35,17 @@ public class SourceDefinitionParser extends ExtensionDefinitionParser
     private final RuntimeExtensionModel extensionModel;
     private final RuntimeSourceModel sourceModel;
     private final MuleContext muleContext;
-    private final DslElementDeclaration sourceDsl;
+    private final DslElementSyntax sourceDsl;
 
     public SourceDefinitionParser(ComponentBuildingDefinition.Builder definition, RuntimeExtensionModel extensionModel,
-                                  RuntimeSourceModel sourceModel, DslElementResolver dslElementResolver, MuleContext muleContext,
+                                  RuntimeSourceModel sourceModel, DslSyntaxResolver dslSyntaxResolver, MuleContext muleContext,
                                   ExtensionParsingContext parsingContext)
     {
-        super(definition, dslElementResolver, parsingContext);
+        super(definition, dslSyntaxResolver, parsingContext);
         this.extensionModel = extensionModel;
         this.sourceModel = sourceModel;
         this.muleContext = muleContext;
-        this.sourceDsl = dslElementResolver.resolve(sourceModel);
+        this.sourceDsl = dslSyntaxResolver.resolve(sourceModel);
     }
 
     @Override

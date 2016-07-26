@@ -16,9 +16,9 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.extension.api.annotation.DataTypeParameters;
+import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
 import org.mule.runtime.extension.api.annotation.param.Connection;
-import org.mule.runtime.extension.api.annotation.param.NoRef;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
@@ -169,7 +169,7 @@ public class StandardFileSystemOperations
     public void write(@UseConfig FileConnectorConfig config,
                       @Connection FileSystem fileSystem,
                       @Optional String path,
-                      @Optional(defaultValue = "#[payload]") @Summary("Content to be written into the file") @NoRef Object content,
+                      @Optional(defaultValue = "#[payload]") @Summary("Content to be written into the file") @XmlHints(allowReferences = false) Object content,
                       @Optional(defaultValue = "OVERWRITE") @Summary("How the file is going to be written") @DisplayName("Write Mode") FileWriteMode mode,
                       @Optional(defaultValue = "false") boolean lock,
                       @Optional(defaultValue = "true") boolean createParentDirectories,

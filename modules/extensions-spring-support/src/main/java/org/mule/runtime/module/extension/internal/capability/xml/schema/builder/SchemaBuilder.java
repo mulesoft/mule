@@ -76,13 +76,14 @@ import org.mule.runtime.extension.api.annotation.Extensible;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.SubTypeMapping;
 import org.mule.runtime.extension.api.annotation.SubTypesMapping;
-import org.mule.runtime.extension.api.annotation.capability.Xml;
+import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 import org.mule.runtime.extension.api.connectivity.OperationTransactionalAction;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
 import org.mule.runtime.extension.api.introspection.connection.ConnectionProviderModel;
 import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.introspection.declaration.type.TypeUtils;
+import org.mule.runtime.extension.api.introspection.declaration.type.annotation.XmlHintsAnnotation;
 import org.mule.runtime.extension.api.introspection.operation.OperationModel;
 import org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
@@ -665,7 +666,7 @@ public final class SchemaBuilder
     {
         //TODO MULE-10029 replace this logic with DslElementDeclaration
         XmlModelProperty baseTypeXml = xmlProperties;
-        if(importedTypes.get(type) != null)
+        if (importedTypes.get(type) != null)
         {
             baseTypeXml = registerExtensionImport(getType(importedTypes.get(type)));
         }
@@ -705,7 +706,7 @@ public final class SchemaBuilder
         final MetadataType keyType = metadataType.getKeyType();
         final MetadataType valueType = metadataType.getValueType();
         final LocalComplexType entryComplexType = new LocalComplexType();
-        final Attribute keyAttribute = createAttribute(ATTRIBUTE_NAME_KEY, keyType, true, ExpressionSupport.REQUIRED);
+        final Attribute keyAttribute = createAttribute(ATTRIBUTE_NAME_KEY, keyType, true, REQUIRED);
         entryComplexType.getAttributeOrAttributeGroup().add(keyAttribute);
 
         valueType.accept(new MetadataTypeVisitor()
@@ -925,7 +926,7 @@ public final class SchemaBuilder
                     return;
                 }
 
-                if (ExpressionSupport.REQUIRED != expressionSupport)
+                if (REQUIRED != expressionSupport)
                 {
                     if (importedTypes.get(objectType) != null)
                     {
@@ -983,11 +984,19 @@ public final class SchemaBuilder
 
     private boolean shouldGenerateChildElement(MetadataType metadataType, ExpressionSupport expressionSupport)
     {
-        return ExpressionSupport.REQUIRED != expressionSupport && shouldGenerateChildElementForType(metadataType);
+        return REQUIRED != expressionSupport && shouldGenerateChildElementForType(metadataType);
     }
 
+    //TODO: MULE-10029 child element should not be generated if xml style says so
     private boolean shouldGenerateChildElementForType(MetadataType metadataType)
     {
+        if (getSingleAnnotation(metadataType, XmlHintsAnnotation.class)
+                .filter(annotation -> !annotation.isAllowInlineDefinition())
+                .isPresent())
+        {
+            return false;
+        }
+
         boolean isPojo = metadataType instanceof ObjectType;
         Class<?> clazz = getType(metadataType);
         boolean isPrimitive = clazz.isPrimitive() || ClassUtils.isPrimitiveWrapper(clazz);

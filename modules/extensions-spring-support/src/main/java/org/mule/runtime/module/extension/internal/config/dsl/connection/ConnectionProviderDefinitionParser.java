@@ -16,8 +16,8 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.extension.api.introspection.connection.ConnectionProviderModel;
-import org.mule.runtime.extension.xml.dsl.api.DslElementDeclaration;
-import org.mule.runtime.extension.xml.dsl.api.resolver.DslElementResolver;
+import org.mule.runtime.extension.xml.dsl.api.DslElementSyntax;
+import org.mule.runtime.extension.xml.dsl.api.resolver.DslSyntaxResolver;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinitionParser;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingContext;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderResolver;
@@ -33,15 +33,15 @@ public final class ConnectionProviderDefinitionParser extends ExtensionDefinitio
 
     private final ConnectionProviderModel providerModel;
     private final MuleContext muleContext;
-    private final DslElementDeclaration connectionDsl;
+    private final DslElementSyntax connectionDsl;
 
-    public ConnectionProviderDefinitionParser(Builder definition, ConnectionProviderModel providerModel, DslElementResolver dslElementResolver,
+    public ConnectionProviderDefinitionParser(Builder definition, ConnectionProviderModel providerModel, DslSyntaxResolver dslSyntaxResolver,
                                               MuleContext muleContext, ExtensionParsingContext parsingContext)
     {
-        super(definition, dslElementResolver, parsingContext);
+        super(definition, dslSyntaxResolver, parsingContext);
         this.providerModel = providerModel;
         this.muleContext = muleContext;
-        this.connectionDsl = dslElementResolver.resolve(providerModel);
+        this.connectionDsl = dslSyntaxResolver.resolve(providerModel);
     }
 
     @Override

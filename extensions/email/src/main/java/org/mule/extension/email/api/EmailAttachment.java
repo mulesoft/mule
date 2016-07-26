@@ -9,7 +9,7 @@ package org.mule.extension.email.api;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.extension.api.annotation.Parameter;
-import org.mule.runtime.extension.api.annotation.param.NoRef;
+import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 
 /**
@@ -29,7 +29,7 @@ public class EmailAttachment
      * the content of the attachment.
      */
     @Parameter
-    @NoRef
+    @XmlHints(allowReferences = false)
     private Object content;
     /**
      * the content type of the attachment content.

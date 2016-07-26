@@ -20,8 +20,8 @@ import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition.Builder;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport;
-import org.mule.runtime.extension.xml.dsl.api.DslElementDeclaration;
-import org.mule.runtime.extension.xml.dsl.api.resolver.DslElementResolver;
+import org.mule.runtime.extension.xml.dsl.api.DslElementSyntax;
+import org.mule.runtime.extension.xml.dsl.api.resolver.DslSyntaxResolver;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinitionParser;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingContext;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
@@ -40,28 +40,28 @@ public class ObjectTypeParameterParser extends ExtensionDefinitionParser
 
     private final ObjectType type;
     private final ClassLoader classLoader;
-    private final DslElementDeclaration typeDsl;
+    private final DslElementSyntax typeDsl;
     private final String name;
     private final String namespace;
 
     public ObjectTypeParameterParser(Builder definition, ObjectType type, ClassLoader classLoader,
-                                     DslElementResolver dslElementResolver, ExtensionParsingContext context)
+                                     DslSyntaxResolver dslSyntaxResolver, ExtensionParsingContext context)
     {
-        super(definition, dslElementResolver, context);
+        super(definition, dslSyntaxResolver, context);
         this.type = type;
         this.classLoader = classLoader;
-        this.typeDsl = dslElementResolver.resolve(type);
+        this.typeDsl = dslSyntaxResolver.resolve(type);
         this.name = typeDsl.getElementName();
         this.namespace = typeDsl.getElementNamespace();
     }
 
     public ObjectTypeParameterParser(Builder definition, String name, String namespace, ObjectType type, ClassLoader classLoader,
-                                     DslElementResolver dslElementResolver, ExtensionParsingContext context)
+                                     DslSyntaxResolver dslSyntaxResolver, ExtensionParsingContext context)
     {
-        super(definition, dslElementResolver, context);
+        super(definition, dslSyntaxResolver, context);
         this.type = type;
         this.classLoader = classLoader;
-        this.typeDsl = dslElementResolver.resolve(type);
+        this.typeDsl = dslSyntaxResolver.resolve(type);
         this.name = name;
         this.namespace = namespace;
     }
@@ -83,7 +83,7 @@ public class ObjectTypeParameterParser extends ExtensionDefinitionParser
             final boolean acceptsReferences = acceptsReferences(objectField);
             final Object defaultValue = getDefaultValue(fieldType).orElse(null);
             final ExpressionSupport expressionSupport = getExpressionSupport(fieldType);
-            final DslElementDeclaration childDsl = typeDsl.getChild(fieldName).orElse(dslElementResolver.resolve(fieldType));
+            final DslElementSyntax childDsl = typeDsl.getChild(fieldName).orElse(dslSyntaxResolver.resolve(fieldType));
 
             fieldType.accept(new MetadataTypeVisitor()
             {

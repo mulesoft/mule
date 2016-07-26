@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.introspection.enricher;
 
 
 import static org.mule.runtime.extension.xml.dsl.api.XmlModelUtils.createXmlModelProperty;
-import org.mule.runtime.extension.api.annotation.capability.Xml;
+import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 import org.mule.runtime.extension.api.introspection.declaration.DescribingContext;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclarer;

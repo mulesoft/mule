@@ -54,7 +54,7 @@ public class OperationReturnTypeModelValidator implements ModelValidator
                         .ifPresent(forbiddenType -> {
                             throw new IllegalOperationModelDefinitionException(String.format("Operation '%s' in Extension '%s' specifies '%s' as a return type. Operations are " +
                                                                                              "not allowed to return objects of that type",
-                                                                                             operationModel.getName(), extensionModel.getName(), MuleEvent.class.getName()));
+                                                                                             operationModel.getName(), extensionModel.getName(), forbiddenType.getName()));
                         });
             }
         }.walk(extensionModel);

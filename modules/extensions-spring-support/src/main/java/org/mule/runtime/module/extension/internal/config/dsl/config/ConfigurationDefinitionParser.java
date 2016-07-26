@@ -16,8 +16,8 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
-import org.mule.runtime.extension.xml.dsl.api.DslElementDeclaration;
-import org.mule.runtime.extension.xml.dsl.api.resolver.DslElementResolver;
+import org.mule.runtime.extension.xml.dsl.api.DslElementSyntax;
+import org.mule.runtime.extension.xml.dsl.api.resolver.DslSyntaxResolver;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinitionParser;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingContext;
 import org.mule.runtime.module.extension.internal.runtime.DynamicConfigPolicy;
@@ -34,9 +34,9 @@ public final class ConfigurationDefinitionParser extends ExtensionDefinitionPars
 
     private final RuntimeConfigurationModel configurationModel;
     private final MuleContext muleContext;
-    private final DslElementDeclaration configDsl;
+    private final DslElementSyntax configDsl;
 
-    public ConfigurationDefinitionParser(Builder definition, RuntimeConfigurationModel configurationModel, DslElementResolver dslResolver,
+    public ConfigurationDefinitionParser(Builder definition, RuntimeConfigurationModel configurationModel, DslSyntaxResolver dslResolver,
                                          MuleContext muleContext, ExtensionParsingContext parsingContext)
     {
         super(definition, dslResolver, parsingContext);

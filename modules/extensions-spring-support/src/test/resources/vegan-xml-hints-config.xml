@@ -5,8 +5,7 @@
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/vegan http://www.mulesoft.org/schema/mule/vegan/current/mule-vegan.xsd">
 
-
-    <vegan:apple-config name="apple"/>
+    <vegan:banana-config name="banana"/>
 
     <flow name="eatFromExpression">
         <vegan:try-eat food="#[payload]"/>
@@ -18,6 +17,10 @@
 
     <flow name="eatBlank">
         <vegan:try-eat food=""/>
+    </flow>
+
+    <flow name="eatPealedBanana">
+        <vegan:eat-pealed banana="#[new org.mule.tck.testmodels.fruit.Banana()]" />
     </flow>
 
 </mule>

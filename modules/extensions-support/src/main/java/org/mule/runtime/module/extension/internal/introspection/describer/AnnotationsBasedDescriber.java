@@ -34,8 +34,7 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getSourceName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getSuperClassGenerics;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isMultiLevelMetadataKeyId;
-
-import org.mule.runtime.api.MuleVersion;
+import org.mule.api.MuleVersion;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -58,11 +57,11 @@ import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.Sources;
 import org.mule.runtime.extension.api.annotation.connector.Providers;
+import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 import org.mule.runtime.extension.api.annotation.metadata.Content;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
 import org.mule.runtime.extension.api.annotation.param.Connection;
-import org.mule.runtime.extension.api.annotation.param.NoRef;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.introspection.ComponentModel;
@@ -91,6 +90,7 @@ import org.mule.runtime.extension.api.introspection.property.LayoutModelProperty
 import org.mule.runtime.extension.api.introspection.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.manifest.DescriberManifest;
 import org.mule.runtime.extension.api.runtime.source.Source;
+import org.mule.runtime.extension.xml.dsl.api.property.XmlHintsModelProperty;
 import org.mule.runtime.module.extension.internal.exception.IllegalConfigurationModelDefinitionException;
 import org.mule.runtime.module.extension.internal.exception.IllegalConnectionProviderModelDefinitionException;
 import org.mule.runtime.module.extension.internal.exception.IllegalOperationModelDefinitionException;
@@ -102,7 +102,6 @@ import org.mule.runtime.module.extension.internal.model.property.ExtendingOperat
 import org.mule.runtime.module.extension.internal.model.property.ImplementingMethodModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingParameterModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingTypeModelProperty;
-import org.mule.runtime.module.extension.internal.model.property.NoReferencesModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.TypeRestrictionModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.exception.DefaultExceptionEnricherFactory;
@@ -477,11 +476,12 @@ public final class AnnotationsBasedDescriber implements Describer
                                                            ModelPropertyContributor... contributors)
     {
         return parameterFields.stream()
-                .map(field -> {
-                    final ParameterDeclarer describe = getFieldDescriber(field).describe(field, parameterizedDeclarer);
-                    stream(contributors).forEach(contributor -> contributor.contribute(field, describe));
-                    return describe;
-                })
+                .map(field ->
+                     {
+                         final ParameterDeclarer describe = getFieldDescriber(field).describe(field, parameterizedDeclarer);
+                         stream(contributors).forEach(contributor -> contributor.contribute(field, describe));
+                         return describe;
+                     })
                 .collect(toCollection(LinkedHashSet::new));
     }
 
@@ -694,9 +694,10 @@ public final class AnnotationsBasedDescriber implements Describer
                 enrichWithImplementingParameterProperty(parsedParameter, parameter);
                 parseMetadataAnnotations(parsedParameter, parameter);
 
-                if (parsedParameter.isAnnotationPresent(NoRef.class))
+                XmlHints elementStyle = parsedParameter.getAnnotation(XmlHints.class);
+                if (elementStyle != null)
                 {
-                    parameter.withModelProperty(new NoReferencesModelProperty());
+                    parameter.withModelProperty(new XmlHintsModelProperty(elementStyle));
                 }
             }
 
@@ -732,21 +733,22 @@ public final class AnnotationsBasedDescriber implements Describer
 
     private void checkAnnotationsNotUsedMoreThanOnce(Method method, OperationDeclarer operation, Class<? extends Annotation>... annotations)
     {
-        stream(annotations).forEach(annotation -> {
-            List<java.lang.reflect.Parameter> annotatedParameters =
-                    stream(method.getParameters())
-                            .filter(parameter -> parameter.isAnnotationPresent(annotation))
-                            .collect(new ImmutableListCollector<>());
+        stream(annotations).forEach(annotation ->
+                                    {
+                                        List<java.lang.reflect.Parameter> annotatedParameters =
+                                                stream(method.getParameters())
+                                                        .filter(parameter -> parameter.isAnnotationPresent(annotation))
+                                                        .collect(new ImmutableListCollector<>());
 
-            if (annotatedParameters.size() > 1)
-            {
-                throw new IllegalModelDefinitionException(format("Method [%s] defined in Class [%s] of extension [%s] uses the annotation @%s more than once",
-                                                                 method.getName(),
-                                                                 method.getDeclaringClass(),
-                                                                 operation.getDeclaration().getName(),
-                                                                 annotation.getSimpleName()));
-            }
-        });
+                                        if (annotatedParameters.size() > 1)
+                                        {
+                                            throw new IllegalModelDefinitionException(format("Method [%s] defined in Class [%s] of extension [%s] uses the annotation @%s more than once",
+                                                                                             method.getName(),
+                                                                                             method.getDeclaringClass(),
+                                                                                             operation.getDeclaration().getName(),
+                                                                                             annotation.getSimpleName()));
+                                        }
+                                    });
     }
 
     private void addTypeRestrictions(ParameterDeclarer parameter, ParsedParameter descriptor)
