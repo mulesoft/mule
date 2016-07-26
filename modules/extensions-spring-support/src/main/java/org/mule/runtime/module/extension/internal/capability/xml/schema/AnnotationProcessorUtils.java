@@ -6,13 +6,13 @@
  */
 package org.mule.runtime.module.extension.internal.capability.xml.schema;
 
+import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.Ignore;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
-import org.mule.runtime.core.util.ClassUtils;
 
 import com.google.common.collect.ImmutableMap;
 import com.sun.tools.javac.code.Attribute;
@@ -48,10 +48,13 @@ import org.apache.commons.lang.StringUtils;
 public final class AnnotationProcessorUtils
 {
 
-    private static final char NEW_LINE_CHAR = '\n';
+    private static final String PARAM = "@param";
+    private static final String VALUE = "value";
     private static final char AT_CHAR = '@';
-    public static final String PARAM = "@param";
-    public static final String VALUE = "value";
+    private static final char NEW_LINE_CHAR = '\n';
+    private static final char SPACE_CHAR = ' ';
+    private static final char CLOSING_BRACKET_CHAR = '}';
+    private static final char OPENING_BRACKET_CHAR = '{';
 
     /**
      * Returns the {@link Class} object that is associated to the {@code typeElement}
@@ -195,7 +198,6 @@ public final class AnnotationProcessorUtils
 
         parseOperationParameterGroups(processingEnv, (MethodSymbol) element, parameters);
 
-
         return new MethodDocumentation(stripTags(parsedComment.toString()), parameters);
     }
 
@@ -301,17 +303,21 @@ public final class AnnotationProcessorUtils
         final int length = comment.length();
         for (int i = 0; i < length; i++)
         {
-            if (comment.charAt(i) == '{')
+            if (comment.charAt(i) == OPENING_BRACKET_CHAR)
             {
                 int nextCharIndex = i + 1;
                 if (nextCharIndex < length && comment.charAt(nextCharIndex) == AT_CHAR)
                 {
+                    while (comment.charAt(nextCharIndex) != SPACE_CHAR && comment.charAt(nextCharIndex) != CLOSING_BRACKET_CHAR)
+                    {
+                        nextCharIndex = i++;
+                    }
                     insideTag = true;
                     i = nextCharIndex;
                     continue;
                 }
             }
-            else if (comment.charAt(i) == '}' && insideTag)
+            else if (comment.charAt(i) == CLOSING_BRACKET_CHAR && insideTag)
             {
                 insideTag = false;
                 continue;
@@ -363,14 +369,14 @@ public final class AnnotationProcessorUtils
         {
             paramName = param.substring(0, descriptionIndex).trim();
             description = param.substring(descriptionIndex).trim();
-
         }
         else
         {
             paramName = param;
             description = "";
         }
-        parameters.put(paramName, description);
+
+        parameters.put(paramName, stripTags(description));
     }
 
     private static String extractJavadoc(ProcessingEnvironment processingEnv, Element element)
@@ -391,7 +397,6 @@ public final class AnnotationProcessorUtils
         abstract void onParam(String param);
 
         abstract void onBodyLine(String bodyLine);
-
     }
 
     /**
