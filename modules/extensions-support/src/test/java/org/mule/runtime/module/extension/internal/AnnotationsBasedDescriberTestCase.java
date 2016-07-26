@@ -594,7 +594,8 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
 
         operation = getOperation(extensionDeclaration, GET_GRAMS_IN_STORAGE);
         assertThat(operation, is(notNullValue()));
-        assertThat(operation.getParameters().isEmpty(), is(true));
+        assertParameter(operation.getParameters(), "grams", "", TYPE_LOADER.load(int[][].class), false, SUPPORTED, "#[payload]");
+        assertThat(operation.getOutput().getType(), is(TYPE_LOADER.load(int[][].class)));
 
         operation = getOperation(extensionDeclaration, IGNORED_OPERATION);
         assertThat(operation, is(nullValue()));

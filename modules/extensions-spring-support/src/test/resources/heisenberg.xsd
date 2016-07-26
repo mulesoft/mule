@@ -419,6 +419,7 @@
                 <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
+            <xs:attribute type="mule:expressionList" use="optional" default="#[payload]" name="grams"></xs:attribute>
             <xs:attribute type="xs:string" use="optional" name="target">
               <xs:annotation>
                 <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>

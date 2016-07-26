@@ -203,9 +203,9 @@ public class HeisenbergOperations
         return literalExpression;
     }
 
-    public int[][] getGramsInStorage()
+    public int[][] getGramsInStorage(@Optional(defaultValue = "#[payload]") int[][] grams)
     {
-        return new int[][] {{0, 22},{1, 10},{2, 30}};
+        return grams;
     }
 
     @Ignore

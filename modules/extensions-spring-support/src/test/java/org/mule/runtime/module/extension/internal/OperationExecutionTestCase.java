@@ -392,7 +392,8 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase
     @Test
     public void getGramsInStorage() throws Exception
     {
-        int[][] gramsInStorage = flowRunner("getGramsInStorage").run().getMessage().getPayload();
+        int[][] gramsInStorage = flowRunner("getGramsInStorage")
+                .withPayload(new int[][] {{0, 22},{1, 10},{2, 30}}).run().getMessage().getPayload();
         assertThat(gramsInStorage[0][0], is(0));
         assertThat(gramsInStorage[0][1], is(22));
         assertThat(gramsInStorage[1][0], is(1));
