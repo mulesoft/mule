@@ -12,6 +12,7 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.extension.api.manifest.ExtensionManifest;
+import org.mule.runtime.extension.api.runtime.operation.InterceptingCallback;
 
 /**
  * Constants for the Extensions Framework
@@ -25,6 +26,11 @@ public class ExtensionProperties
      * The key of an operation's variable on which the connection to be used was set
      */
     public static final String CONNECTION_PARAM = PROPERTY_PREFIX + "CONNECTION_PARAM";
+
+    /**
+     * The key of an operation's variable on which the {@link InterceptingCallback} is stored
+     */
+    public static final String INTERCEPTING_CALLBACK_PARAM = PROPERTY_PREFIX + "INTERCEPTING_CALLBACK_PARAM";
 
     /**
      * The name of a parameter that allows configuring the mimeType that should be applied

@@ -6,13 +6,14 @@
  */
 package org.mule.runtime.module.extension.internal;
 
+import static org.apache.commons.collections.CollectionUtils.find;
 import static org.mule.runtime.core.config.MuleManifest.getProductVersion;
-
-import org.mule.runtime.core.util.CollectionUtils;
+import org.mule.runtime.extension.api.introspection.declaration.fluent.ConfigurationDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ParameterDeclaration;
+import org.mule.runtime.extension.api.introspection.declaration.fluent.WithOperationsDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.spi.Describer;
 import org.mule.runtime.module.extension.internal.introspection.describer.AnnotationsBasedDescriber;
 import org.mule.runtime.module.extension.internal.introspection.version.StaticVersionResolver;
@@ -45,13 +46,18 @@ public abstract class AbstractAnnotationsBasedDescriberTestCase extends Abstract
         return getDescriber().describe(new DefaultDescribingContext(getClass().getClassLoader()));
     }
 
-    protected OperationDeclaration getOperation(ExtensionDeclaration extensionDeclaration, final String operationName)
+    protected ConfigurationDeclaration getConfiguration(ExtensionDeclaration extensionDeclaration, final String configurationName)
     {
-        return (OperationDeclaration) CollectionUtils.find(extensionDeclaration.getOperations(), object -> ((OperationDeclaration) object).getName().equals(operationName));
+        return (ConfigurationDeclaration) find(extensionDeclaration.getConfigurations(), object -> ((ConfigurationDeclaration) object).getName().equals(configurationName));
+    }
+
+    protected OperationDeclaration getOperation(WithOperationsDeclaration declaration, final String operationName)
+    {
+        return (OperationDeclaration) find(declaration.getOperations(), object -> ((OperationDeclaration) object).getName().equals(operationName));
     }
 
     protected ParameterDeclaration findParameter(List<ParameterDeclaration> parameters, final String name)
     {
-        return (ParameterDeclaration) CollectionUtils.find(parameters, object -> name.equals(((ParameterDeclaration) object).getName()));
+        return (ParameterDeclaration) find(parameters, object -> name.equals(((ParameterDeclaration) object).getName()));
     }
 }
