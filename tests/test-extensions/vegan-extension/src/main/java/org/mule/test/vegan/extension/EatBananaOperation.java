@@ -6,7 +6,7 @@
  */
 package org.mule.test.vegan.extension;
 
-import org.mule.runtime.extension.api.annotation.dsl.xml.XmlElementStyle;
+import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.tck.testmodels.fruit.Banana;
 
@@ -19,7 +19,7 @@ public class EatBananaOperation
         return banana;
     }
 
-    public Banana eatPealed(@XmlElementStyle(allowInlineDefinition = false, allowReferences = false) Banana banana)
+    public Banana eatPealed(@XmlHints(allowInlineDefinition = false, allowReferences = false) Banana banana)
     {
         return eatBanana(banana);
     }

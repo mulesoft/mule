@@ -58,7 +58,7 @@ import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsT
 import org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 import org.mule.runtime.extension.xml.dsl.api.DslElementSyntax;
-import org.mule.runtime.extension.xml.dsl.api.property.XmlElementStyleModelProperty;
+import org.mule.runtime.extension.xml.dsl.api.property.XmlHintsModelProperty;
 import org.mule.runtime.extension.xml.dsl.api.resolver.DslSyntaxResolver;
 import org.mule.runtime.module.extension.internal.config.dsl.object.CharsetValueResolverParsingDelegate;
 import org.mule.runtime.module.extension.internal.config.dsl.object.DefaultObjectParsingDelegate;
@@ -841,7 +841,7 @@ public abstract class ExtensionDefinitionParser
     private boolean acceptsReferences(ParameterModel parameterModel)
     {
         return getStyleModelProperty(parameterModel)
-                .map(XmlElementStyleModelProperty::allowsReferences)
+                .map(XmlHintsModelProperty::allowsReferences)
                 .orElse(true);
     }
 }

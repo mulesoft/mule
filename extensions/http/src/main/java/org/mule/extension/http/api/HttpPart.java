@@ -9,7 +9,7 @@ package org.mule.extension.http.api;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Parameter;
-import org.mule.runtime.extension.api.annotation.dsl.xml.XmlElementStyle;
+import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 
 /**
@@ -30,7 +30,7 @@ public class HttpPart
      * Actual value the part holds.
      */
     @Parameter
-    @XmlElementStyle(allowReferences = false)
+    @XmlHints(allowReferences = false)
     private Object data;
 
     /**

@@ -13,13 +13,13 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getDefaultValue;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
-import org.mule.runtime.extension.api.annotation.dsl.xml.XmlElementStyle;
+import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ParameterDeclarer;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ParameterizedDeclarer;
 import org.mule.runtime.extension.api.introspection.property.LayoutModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.DeclaringMemberModelProperty;
-import org.mule.runtime.extension.xml.dsl.api.property.XmlElementStyleModelProperty;
+import org.mule.runtime.extension.xml.dsl.api.property.XmlHintsModelProperty;
 
 import java.lang.reflect.Field;
 
@@ -67,10 +67,10 @@ final class DefaultFieldDescriber implements FieldDescriber
         parameterDeclarer = optional == null ? declarer.withRequiredParameter(parameterName)
                                              : declarer.withOptionalParameter(parameterName).defaultingTo(getDefaultValue(optional));
 
-        XmlElementStyle elementStyle = field.getAnnotation(XmlElementStyle.class);
+        XmlHints elementStyle = field.getAnnotation(XmlHints.class);
         if (elementStyle != null)
         {
-            parameterDeclarer.withModelProperty(new XmlElementStyleModelProperty(elementStyle));
+            parameterDeclarer.withModelProperty(new XmlHintsModelProperty(elementStyle));
         }
 
         parameterDeclarer.ofType(fieldType)

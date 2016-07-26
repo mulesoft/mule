@@ -57,7 +57,7 @@ import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.Sources;
 import org.mule.runtime.extension.api.annotation.connector.Providers;
-import org.mule.runtime.extension.api.annotation.dsl.xml.XmlElementStyle;
+import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 import org.mule.runtime.extension.api.annotation.metadata.Content;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
@@ -90,7 +90,7 @@ import org.mule.runtime.extension.api.introspection.property.LayoutModelProperty
 import org.mule.runtime.extension.api.introspection.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.manifest.DescriberManifest;
 import org.mule.runtime.extension.api.runtime.source.Source;
-import org.mule.runtime.extension.xml.dsl.api.property.XmlElementStyleModelProperty;
+import org.mule.runtime.extension.xml.dsl.api.property.XmlHintsModelProperty;
 import org.mule.runtime.module.extension.internal.exception.IllegalConfigurationModelDefinitionException;
 import org.mule.runtime.module.extension.internal.exception.IllegalConnectionProviderModelDefinitionException;
 import org.mule.runtime.module.extension.internal.exception.IllegalOperationModelDefinitionException;
@@ -694,10 +694,10 @@ public final class AnnotationsBasedDescriber implements Describer
                 enrichWithImplementingParameterProperty(parsedParameter, parameter);
                 parseMetadataAnnotations(parsedParameter, parameter);
 
-                XmlElementStyle elementStyle = parsedParameter.getAnnotation(XmlElementStyle.class);
+                XmlHints elementStyle = parsedParameter.getAnnotation(XmlHints.class);
                 if (elementStyle != null)
                 {
-                    parameter.withModelProperty(new XmlElementStyleModelProperty(elementStyle));
+                    parameter.withModelProperty(new XmlHintsModelProperty(elementStyle));
                 }
             }
 

@@ -83,7 +83,7 @@ import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationM
 import org.mule.runtime.extension.api.introspection.connection.ConnectionProviderModel;
 import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.introspection.declaration.type.TypeUtils;
-import org.mule.runtime.extension.api.introspection.declaration.type.annotation.XmlElementStyleAnnotation;
+import org.mule.runtime.extension.api.introspection.declaration.type.annotation.XmlHintsStyleAnnotation;
 import org.mule.runtime.extension.api.introspection.operation.OperationModel;
 import org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
@@ -990,7 +990,7 @@ public final class SchemaBuilder
     //TODO: MULE-10029 child element should not be generated if xml style says so
     private boolean shouldGenerateChildElementForType(MetadataType metadataType)
     {
-        if (getSingleAnnotation(metadataType, XmlElementStyleAnnotation.class)
+        if (getSingleAnnotation(metadataType, XmlHintsStyleAnnotation.class)
                 .filter(annotation -> !annotation.isAllowInlineDefinition())
                 .isPresent())
         {

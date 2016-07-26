@@ -12,7 +12,7 @@ import org.mule.extension.socket.api.connection.RequesterConnection;
 import org.mule.extension.socket.api.metadata.SocketMetadataResolver;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.message.MuleMessage;
-import org.mule.runtime.extension.api.annotation.dsl.xml.XmlElementStyle;
+import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
 import org.mule.runtime.extension.api.annotation.param.Connection;
@@ -47,7 +47,7 @@ public class SocketOperations
     @MetadataScope(outputResolver = SocketMetadataResolver.class, keysResolver = SocketMetadataResolver.class)
     public OperationResult<?, ?> send(@Connection RequesterConnection connection,
                                       @UseConfig RequesterConfig config,
-                                      @Optional(defaultValue = "#[payload]") @XmlElementStyle(allowReferences = false) Object content,
+                                      @Optional(defaultValue = "#[payload]") @XmlHints(allowReferences = false) Object content,
                                       @Optional @Summary("Encoding to use when the data to serialize is of String type") String outputEncoding,
                                       @MetadataKeyId String hasResponse,
                                       MuleMessage muleMessage)

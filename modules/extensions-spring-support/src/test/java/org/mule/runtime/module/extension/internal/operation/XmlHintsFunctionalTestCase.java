@@ -20,7 +20,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-public class XmlStyleFunctionalTestCase extends ExtensionFunctionalTestCase
+public class XmlHintsFunctionalTestCase extends ExtensionFunctionalTestCase
 {
 
     private static final String MEAT = "Nice, juicy and tasty meat";
@@ -36,7 +36,7 @@ public class XmlStyleFunctionalTestCase extends ExtensionFunctionalTestCase
     @Override
     protected String getConfigFile()
     {
-        return "vegan-xml-style-config.xml";
+        return "vegan-xml-hints-config.xml";
     }
 
     @Test
