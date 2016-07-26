@@ -225,7 +225,6 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> implemen
                         @Override
                         public void onCompletion(org.mule.runtime.api.message.MuleEvent result, ExceptionCallback<org.mule.runtime.api.message.MuleEvent, Exception> exceptionCallback)
                         {
-                            //TODO: MULE-9699 Analyse adding static resource handler here
                             final HttpResponseBuilder responseBuilder = new HttpResponseBuilder();
                             final HttpResponse httpResponse = buildResponse((MuleEvent) result, responseBuilder, supportStreaming, exceptionCallback);
                             responseCallback.responseReady(httpResponse, getResponseFailureCallback(responseCallback));
