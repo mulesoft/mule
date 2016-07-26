@@ -80,10 +80,11 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver
 
 import com.google.common.collect.ImmutableList;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -99,6 +100,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
 
+import org.joda.time.DateTime;
+import org.joda.time.format.ISODateTimeFormat;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.support.DefaultConversionService;
 
@@ -514,7 +517,7 @@ public abstract class ExtensionDefinitionParser
                 @Override
                 public void visitDateTime(DateTimeType dateTimeType)
                 {
-                    resolverValueHolder.set(parseDateTime(value, dateTimeType, defaultValue));
+                    resolverValueHolder.set(parseDate(value, dateTimeType, defaultValue));
                 }
 
                 @Override
@@ -745,71 +748,85 @@ public abstract class ExtensionDefinitionParser
         }
     }
 
-    private ValueResolver parseDateTime(Object value, DateTimeType dataType, Object defaultValue)
+
+    private ValueResolver doParseDate(Object value, Class<?> type)
     {
-        Class<?> type = getType(dataType);
+
+        if (value instanceof String)
+        {
+            Object constructedValue = null;
+            DateTime dateTime = getParsedDateTime((String) value);
+
+            if (type.equals(LocalDate.class))
+            {
+                constructedValue = LocalDate.of(dateTime.getYear(), dateTime.getMonthOfYear(), dateTime.getDayOfMonth());
+            }
+            else if (type.equals(Date.class))
+            {
+                constructedValue = dateTime.toDate();
+            }
+            else if (type.equals(LocalDateTime.class))
+            {
+                Instant instant = Instant.ofEpochMilli(dateTime.getMillis());
+                constructedValue = LocalDateTime.ofInstant(instant, ZoneId.of(dateTime.getZone().getID()));
+            }
+            else if (type.equals(Calendar.class))
+            {
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(dateTime.toDate());
+                constructedValue = calendar;
+            }
+
+            if (constructedValue == null)
+            {
+                throw new IllegalArgumentException(format("Could not construct value of type '%s' from String '%s'", type.getName(), value));
+            }
+            else
+            {
+                value = constructedValue;
+            }
+        }
+
+        if (value instanceof Date || value instanceof LocalDate || value instanceof LocalDateTime || value instanceof Calendar)
+        {
+            return new StaticValueResolver(value);
+        }
+
+        throw new IllegalArgumentException(format("Could not transform value of type '%s' to a valid date type", value != null ? value.getClass().getName() : "null"));
+    }
+
+    private DateTime getParsedDateTime(String value)
+    {
+        try
+        {
+            return ISODateTimeFormat.dateTimeParser().withOffsetParsed().parseDateTime(value);
+        }
+        catch (DateTimeParseException e)
+        {
+            throw new IllegalArgumentException(format("Could not parse value '%s' according to ISO 8601", value));
+        }
+    }
+
+    private ValueResolver parseDate(Object value, MetadataType dateType, Object defaultValue)
+    {
+
+        Class<?> type = getType(dateType);
         if (isExpression(value, parser))
         {
             return new TypeSafeExpressionValueResolver((String) value, type);
         }
 
-        if (type.equals(LocalDateTime.class))
-        {
-            Date date = doParseDate(value, DATE_FORMAT, defaultValue);
-            return new StaticValueResolver(LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault()));
-        }
-        else
-        {
-            Date date = doParseDate(value, CALENDAR_FORMAT, defaultValue);
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTime(date);
-            return new StaticValueResolver(calendar);
-        }
-    }
-
-    private ValueResolver parseDate(Object value, DateType dateType, Object defaultValue)
-    {
-        if (isExpression(value, parser))
-        {
-            return new TypeSafeExpressionValueResolver((String) value, getType(dateType));
-        }
-        else
-        {
-            return new StaticValueResolver(doParseDate(value, DATE_FORMAT, defaultValue));
-        }
-    }
-
-    private Date doParseDate(Object value, String parseFormat, Object defaultValue)
-    {
         if (value == null)
         {
             if (defaultValue == null)
             {
-                return null;
+                return new StaticValueResolver(null);
             }
 
             value = defaultValue;
         }
 
-        if (value instanceof String)
-        {
-            SimpleDateFormat format = new SimpleDateFormat(parseFormat);
-            try
-            {
-                return format.parse((String) value);
-            }
-            catch (ParseException e)
-            {
-                throw new IllegalArgumentException(format("Could not transform value '%s' into a Date using pattern '%s'", value, parseFormat));
-            }
-        }
-
-        if (value instanceof Date)
-        {
-            return (Date) value;
-        }
-
-        throw new IllegalArgumentException(format("Could not transform value of type '%s' to Date", value != null ? value.getClass().getName() : "null"));
+        return doParseDate(value, type);
     }
 
 

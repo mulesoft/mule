@@ -20,6 +20,8 @@ import org.mule.runtime.extension.api.annotation.param.ConfigName;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.display.Password;
 
+import java.util.Date;
+
 import javax.inject.Inject;
 
 ;
@@ -53,10 +55,15 @@ public abstract class PetStoreConnectionProvider implements ConnectionProvider<P
     @Optional
     private ThreadingProfile threadingProfile;
 
+    @Optional
+    @Parameter
+    private Date openingDate;
+
+
     @Override
     public PetStoreClient connect()
     {
-        return new PetStoreClient(username, password, tls, threadingProfile, configName);
+        return new PetStoreClient(username, password, tls, threadingProfile, configName, openingDate);
     }
 
     @Override
@@ -148,5 +155,10 @@ public abstract class PetStoreConnectionProvider implements ConnectionProvider<P
     public void setPassword(String password)
     {
         this.password = password;
+    }
+
+    public Date getOpeningDate()
+    {
+        return openingDate;
     }
 }
