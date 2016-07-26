@@ -11,6 +11,7 @@ import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
+import org.mule.runtime.extension.api.annotation.param.Optional;
 
 @Extension(name = "documentation")
 @Operations({TestDocumentedExtensionOperations.class})
@@ -23,6 +24,13 @@ public class TestExtensionWithDocumentation
      */
     @Parameter
     private String configParameter;
+
+    /**
+     * Config {@link Parameter} with an {@link Optional} value
+     */
+    @Parameter
+    @Optional
+    private String configParameterWithComplexJavadoc;
 
     @ParameterGroup
     private TestDocumentedParameterGroup group;

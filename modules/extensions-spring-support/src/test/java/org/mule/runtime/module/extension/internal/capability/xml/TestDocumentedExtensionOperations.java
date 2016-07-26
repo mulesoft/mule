@@ -43,6 +43,16 @@ public class TestDocumentedExtensionOperations
     }
 
     /**
+     * Operation that returns a {@link String} value
+     *
+     * @param value this is the {@link String} to be returned
+     */
+    public void operationWithJavadocLinkReferences(String value)
+    {
+
+    }
+
+    /**
      * This operation should not be documented
      *
      * @param value test value

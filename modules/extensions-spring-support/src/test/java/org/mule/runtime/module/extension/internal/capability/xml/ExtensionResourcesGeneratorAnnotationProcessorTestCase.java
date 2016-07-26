@@ -81,6 +81,7 @@ public class ExtensionResourcesGeneratorAnnotationProcessorTestCase extends Abst
         String generatedSchema = IOUtils.toString(generatedByteSource.openStream());
 
         assertXpath(generatedSchema, "//xs:attribute[@name='configParameter']/xs:annotation/xs:documentation", "Config parameter");
+        assertXpath(generatedSchema, "//xs:attribute[@name='configParameterWithComplexJavadoc']/xs:annotation/xs:documentation", "Config Parameter with an Optional value");
         assertXpath(generatedSchema, "//xs:attribute[@name='value1']/xs:annotation/xs:documentation", GROUP_PARAMETER_1);
         assertXpath(generatedSchema, "//xs:attribute[@name='value2']/xs:annotation/xs:documentation", GROUP_PARAMETER_2);
 
@@ -95,6 +96,9 @@ public class ExtensionResourcesGeneratorAnnotationProcessorTestCase extends Abst
 
         assertXpath(generatedSchema, "//xs:element[@name='operation-with-blank-parameter-description']/xs:annotation/xs:documentation", "Test Operation with blank parameter description");
         assertXpath(generatedSchema, "//xs:complexType[@name='OperationWithBlankParameterDescriptionType']/xs:complexContent/xs:extension/xs:attribute[@name='value']/xs:annotation/xs:documentation", "");
+
+        assertXpath(generatedSchema, "//xs:element[@name='operation-with-javadoc-link-references']/xs:annotation/xs:documentation", "Operation that returns a String value");
+        assertXpath(generatedSchema, "//xs:complexType[@name='OperationWithJavadocLinkReferencesType']/xs:complexContent/xs:extension/xs:attribute[@name='value']/xs:annotation/xs:documentation", "this is the String to be returned");
     }
 
     private void assertXpath(String input, String expression, String expected) throws Exception
@@ -107,7 +111,6 @@ public class ExtensionResourcesGeneratorAnnotationProcessorTestCase extends Abst
         Node node = builderFactory.newDocumentBuilder().parse(new InputSource(new StringReader(input)));
         return (String) xpath.evaluate(expression, node, XPathConstants.STRING);
     }
-
 
     private Iterable<JavaFileObject> testSourceFiles() throws Exception
     {
