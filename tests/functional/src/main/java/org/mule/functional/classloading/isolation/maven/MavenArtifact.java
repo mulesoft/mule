@@ -121,6 +121,14 @@ public class MavenArtifact
         return groupId + MAVEN_DEPENDENCIES_DELIMITER + artifactId + MAVEN_DEPENDENCIES_DELIMITER + type + MAVEN_DEPENDENCIES_DELIMITER + (!isEmpty(version) ? version : "") + MAVEN_DEPENDENCIES_DELIMITER + scope;
     }
 
+    /**
+     * Identity is defined by groupId, artifactId, type and version only. Scope is not considered due to
+     * the same {@link MavenArtifact} could be referenced from different scopes and the scope is how the dependencies is going
+     * to be treated but when working with the whole dependency graph including duplicates the scope shouldn't be part of the identity.
+     *
+     * @param o another {@link MavenArtifact} to compare with
+     * @return true if the two instances are equals
+     */
     @Override
     public boolean equals(Object o)
     {
@@ -151,7 +159,7 @@ public class MavenArtifact
         {
             return false;
         }
-        return scope.equals(that.scope);
+        return true;
 
     }
 
@@ -162,7 +170,6 @@ public class MavenArtifact
         result = 31 * result + artifactId.hashCode();
         result = 31 * result + type.hashCode();
         result = 31 * result + (version != null ? version.hashCode() : 0);
-        result = 31 * result + scope.hashCode();
         return result;
     }
 
