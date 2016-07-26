@@ -34,8 +34,9 @@ import java.util.Set;
 public class TestContainerClassLoaderFactory extends ContainerClassLoaderFactory
 {
 
-    private Set<String> extraBootPackages;
-    private URL[] urls;
+    private final Set<String> extraBootPackages;
+    private final URL[] urls;
+    private final ClassLoader classLoader;
 
     /**
      * Factory class that extends the default way to create a container {@link ArtifactClassLoader} in order to support
@@ -44,10 +45,11 @@ public class TestContainerClassLoaderFactory extends ContainerClassLoaderFactory
      * @param extraBootPackages {@link Set} of {@link String}s extra boot packages that need to be appended to the container (junit for instance)
      * @param urls {@link URL}s that were classified to be added to the container {@link ClassLoader}
      */
-    public TestContainerClassLoaderFactory(Set<String> extraBootPackages, URL[] urls)
+    public TestContainerClassLoaderFactory(final Set<String> extraBootPackages, final URL[] urls)
     {
         this.extraBootPackages = ImmutableSet.<String>builder().addAll(super.getBootPackages()).addAll(extraBootPackages).build();
         this.urls = urls;
+        this.classLoader = new URLClassLoader(urls, null);
     }
 
     /**
@@ -55,6 +57,9 @@ public class TestContainerClassLoaderFactory extends ContainerClassLoaderFactory
      * from a mule standalone container where the parent {@link ClassLoader} for the container only has bootstrap jars plugins mule modules and third-party libraries when the runner
      * runs this tests using has a full class path with all the artifacts declared as dependencies for the artifact so we have to change that and change the look strategy to be CHILD_FIRST for
      * the container.
+     * <p/>
+     * The {@code muleModules} parameter will be ignored due to it has all the modules in classpath, instead they are discovered once again but using a {@link URLClassLoader} that has the {@link URL}'s
+     * classified for the container {@link ClassLoader}.
      *
      * @param parentClassLoader the parent {@link ClassLoader} to delegate PARENT look ups
      * @param muleModules {@link MuleModule} discovered from the launcher {@link ClassLoader} but will be not considered here due to it has all the class path
@@ -62,10 +67,10 @@ public class TestContainerClassLoaderFactory extends ContainerClassLoaderFactory
      * @return the {@link ArtifactClassLoader} to be used for the container
      */
     @Override
-    protected ArtifactClassLoader createArtifactClassLoader(ClassLoader parentClassLoader, List<MuleModule> muleModules, ClassLoaderLookupPolicy containerLookupPolicy)
+    protected ArtifactClassLoader createArtifactClassLoader(final ClassLoader parentClassLoader, final List<MuleModule> muleModules, final ClassLoaderLookupPolicy containerLookupPolicy)
     {
         final ArtifactClassLoader containerClassLoader = new MuleArtifactClassLoader("mule", urls, parentClassLoader, new MuleClassLoaderLookupPolicy(Collections.emptyMap(), getBootPackages()));
-        return createContainerFilteringClassLoader(discoverModules(), containerClassLoader);
+        return createContainerFilteringClassLoader(withContextClassLoader(classLoader, () -> discoverModules()), containerClassLoader);
     }
 
     /**
@@ -83,7 +88,7 @@ public class TestContainerClassLoaderFactory extends ContainerClassLoaderFactory
      */
     public ClassLoaderLookupPolicy getContainerClassLoaderLookupPolicy()
     {
-        return withContextClassLoader(new URLClassLoader(urls, null), () -> super.getContainerClassLoaderLookupPolicy(discoverModules()));
+        return withContextClassLoader(classLoader, () -> super.getContainerClassLoaderLookupPolicy(discoverModules()));
     }
 
     /**
