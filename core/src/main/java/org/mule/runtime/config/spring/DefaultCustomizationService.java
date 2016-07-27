@@ -8,6 +8,8 @@ package org.mule.runtime.config.spring;
 
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Optional.ofNullable;
+import static org.apache.commons.lang.StringUtils.isEmpty;
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import org.mule.runtime.core.api.CustomService;
 import org.mule.runtime.core.api.CustomizationService;
 
@@ -53,12 +55,16 @@ public class DefaultCustomizationService implements CustomizationService
     @Override
     public <T> void registerCustomServiceImpl(String serviceId, T serviceImpl)
     {
+        checkArgument(!isEmpty(serviceId), "serviceId cannot be empty");
+        checkArgument(serviceImpl != null , "serviceImpl cannot be null");
         customServices.put(serviceId, new CustomService(serviceImpl));
     }
 
     @Override
     public <T> void registerCustomServiceClass(String serviceId, Class<T> serviceClass)
     {
+        checkArgument(!isEmpty(serviceId), "serviceId cannot be empty");
+        checkArgument(serviceClass != null , "serviceClass cannot be null");
         customServices.put(serviceId, new CustomService(serviceClass));
     }
 
