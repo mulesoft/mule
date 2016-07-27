@@ -6,10 +6,13 @@
  */
 package org.mule.test.config.spring.parsers;
 
+import static java.lang.String.format;
+
 import org.junit.Test;
 
 public class EndpointServiceConflictTestCase extends AbstractBadConfigTestCase
 {
+    private static final String REPEATED_GLOBAL_NAME = "LenderService";
 
     @Override
     protected String getConfigFile()
@@ -20,7 +23,8 @@ public class EndpointServiceConflictTestCase extends AbstractBadConfigTestCase
     @Test
     public void testBeanError() throws Exception
     {
-        assertErrorContains("Two configuration elements have been defined with the same global name. Global name must be unique");
+        assertErrorContains(format("Two configuration elements have been defined with the same global name. Global name [%s] must be unique",
+                                   REPEATED_GLOBAL_NAME));
     }
 
 }
