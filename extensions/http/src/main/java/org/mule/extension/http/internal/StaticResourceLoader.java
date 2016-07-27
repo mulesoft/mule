@@ -50,6 +50,7 @@ public class StaticResourceLoader
 
     public MuleMessage load(MuleEvent event) throws ResourceNotFoundException
     {
+        //TODO: MULE-10163 - Analyse removing the static resource loader in favor of file read
         checkArgument(event.getMessage().getAttributes() instanceof HttpRequestAttributes, "Message attributes must be HttpRequestAttributes.");
         HttpRequestAttributes attributes = (HttpRequestAttributes) event.getMessage().getAttributes();
         String path = attributes.getRequestPath();
