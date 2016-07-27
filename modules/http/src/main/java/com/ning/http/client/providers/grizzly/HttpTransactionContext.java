@@ -12,6 +12,15 @@
  */
 package com.ning.http.client.providers.grizzly;
 
+import com.ning.http.client.AsyncHandler;
+import com.ning.http.client.ProxyServer;
+import com.ning.http.client.Request;
+import com.ning.http.client.providers.grizzly.events.GracefulCloseEvent;
+import com.ning.http.client.uri.Uri;
+import com.ning.http.client.ws.WebSocket;
+import com.ning.http.util.AsyncHttpProviderUtils;
+import com.ning.http.util.ProxyUtils;
+
 import java.io.IOException;
 
 import org.glassfish.grizzly.CloseListener;
@@ -28,15 +37,6 @@ import org.glassfish.grizzly.http.HttpHeader;
 import org.glassfish.grizzly.http.HttpResponsePacket;
 import org.glassfish.grizzly.websockets.HandShake;
 import org.glassfish.grizzly.websockets.ProtocolHandler;
-
-import com.ning.http.client.AsyncHandler;
-import com.ning.http.client.ProxyServer;
-import com.ning.http.client.Request;
-import com.ning.http.client.providers.grizzly.events.GracefulCloseEvent;
-import com.ning.http.client.uri.Uri;
-import com.ning.http.client.ws.WebSocket;
-import com.ning.http.util.AsyncHttpProviderUtils;
-import com.ning.http.util.ProxyUtils;
 
 /**
  *
@@ -109,7 +109,7 @@ public final class HttpTransactionContext {
                 // try {
                 // closeable.assertOpen();
                 // } catch (IOException ioe) {
-                // abort(ioe);
+                // abort(ioe.getCause());
                 // }
             }
         }
@@ -172,7 +172,6 @@ public final class HttpTransactionContext {
         return connection;
     }
 
-    // MULE: made this public
     public AsyncHandler getAsyncHandler() {
         return future.getAsyncHandler();
     }
