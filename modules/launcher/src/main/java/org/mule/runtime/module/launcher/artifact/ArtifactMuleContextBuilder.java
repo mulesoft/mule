@@ -25,7 +25,6 @@ import org.mule.runtime.core.context.DefaultMuleContextFactory;
 import org.mule.runtime.module.launcher.application.ApplicationExtensionsManagerConfigurationBuilder;
 import org.mule.runtime.module.launcher.application.ApplicationMuleContextBuilder;
 import org.mule.runtime.module.launcher.application.ArtifactPlugin;
-import org.mule.runtime.module.launcher.application.ServicesConfigurationBuilder;
 import org.mule.runtime.module.launcher.domain.DomainMuleContextBuilder;
 import org.mule.runtime.module.launcher.service.ServiceRepository;
 
@@ -218,10 +217,10 @@ public class ArtifactMuleContextBuilder
         checkState(executionClassLoader != null, EXECUTION_CLASSLOADER_WAS_NOT_SET);
         checkState(APP.equals(artifactType) || parentContext == null, ONLY_APPLICATIONS_ARE_ALLOWED_TO_HAVE_A_PARENT_CONTEXT);
         List<ConfigurationBuilder> builders = new LinkedList<>();
-        builders.add(new ServicesConfigurationBuilder(serviceRepository));
         builders.add(new ApplicationExtensionsManagerConfigurationBuilder(artifactPlugins));
         builders.add(createConfigurationBuilderFromApplicationProperties());
         SpringXmlConfigurationBuilder mainBuilder = new SpringXmlConfigurationBuilder(configurationFiles, artifactProperties, artifactType);
+        mainBuilder.addServiceConfigurator(new ContainerServicesMuleContextConfigurator(serviceRepository));
         if (parentContext != null)
         {
             mainBuilder.setParentContext(parentContext);

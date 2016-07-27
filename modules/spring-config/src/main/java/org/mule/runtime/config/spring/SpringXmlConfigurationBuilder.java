@@ -8,6 +8,7 @@ package org.mule.runtime.config.spring;
 
 import static java.util.Collections.emptyMap;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.ParentMuleContextAwareConfigurationBuilder;
@@ -18,7 +19,6 @@ import org.mule.runtime.core.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.config.builders.AbstractResourceConfigurationBuilder;
 import org.mule.runtime.core.config.i18n.MessageFactory;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -43,6 +43,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     protected ApplicationContext parentContext;
     protected ApplicationContext applicationContext;
     private final ArtifactType artifactType;
+    private final List<MuleContextServiceConfigurator> serviceConfigurators = new ArrayList<>();
 
     public SpringXmlConfigurationBuilder(String[] configResources, Map<String, String> artifactProperties, ArtifactType artifactType) throws ConfigurationException
     {
@@ -70,6 +71,17 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     {
         super(configFiles, emptyMap());
         this.artifactType = APP;
+    }
+
+    /**
+     * Adds a service configurator to be used on the context being built.
+     *
+     * @param serviceConfigurator service to add. Non null.
+     */
+    public void addServiceConfigurator(MuleContextServiceConfigurator serviceConfigurator)
+    {
+        checkArgument(serviceConfigurator != null, "serviceConfigurator cannot be null");
+        serviceConfigurators.add(serviceConfigurator);
     }
 
     @Override
@@ -117,7 +129,9 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
             applicationObjectcontroller = new CompositeOptionalObjectsController(applicationObjectcontroller, parentObjectController);
         }
 
-        return doCreateApplicationContext(muleContext, artifactConfigResources, applicationObjectcontroller);
+        final ApplicationContext applicationContext = doCreateApplicationContext(muleContext, artifactConfigResources, applicationObjectcontroller);
+        serviceConfigurators.forEach(serviceConfigurator -> serviceConfigurator.configure(muleContext.getCustomizationService()));
+        return applicationContext;
     }
 
     protected ApplicationContext doCreateApplicationContext(MuleContext muleContext, ConfigResource[] artifactConfigResources, OptionalObjectsController optionalObjectsController)

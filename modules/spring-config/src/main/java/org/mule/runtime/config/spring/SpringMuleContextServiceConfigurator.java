@@ -107,6 +107,7 @@ import com.google.common.collect.ImmutableSet;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -224,6 +225,24 @@ class SpringMuleContextServiceConfigurator
         createQueueStoreBeanDefinitions();
         createQueueManagerBeanDefinitions();
         createEndpointFactory();
+        createCustomServices();
+    }
+
+    private void createCustomServices()
+    {
+        final Map<String, CustomService> customServices = customizationService.getCustomServices();
+        for (String serviceName : customServices.keySet())
+        {
+            if (beanDefinitionRegistry.containsBeanDefinition(serviceName))
+            {
+                throw new IllegalStateException("There is already a bean definition registered with key: " + serviceName);
+            }
+
+            final CustomService customService = customServices.get(serviceName);
+            final BeanDefinition beanDefinition = getCustomServiceBeanDefinition(customService);
+
+            registerBeanDefinition(serviceName, beanDefinition);
+        }
     }
 
     private void initialiseExpressionManager()
@@ -244,21 +263,33 @@ class SpringMuleContextServiceConfigurator
     private void registerBeanDefinition(String serviceId, BeanDefinition defaultBeanDefinition)
     {
         BeanDefinition beanDefinition = defaultBeanDefinition;
-        Optional<CustomService> customServiceOptional = customizationService.getCustomizedService(serviceId);
+        Optional<CustomService> customServiceOptional = customizationService.getOverriddenService(serviceId);
         if (customServiceOptional.isPresent())
         {
-            Optional<Class> customServiceClass = customServiceOptional.get().getServiceClass();
-            Optional<Object> customServiceImpl = customServiceOptional.get().getServiceImpl();
-            if (customServiceClass.isPresent())
-            {
-                beanDefinition = getBeanDefinitionBuilder(customServiceClass.get()).getBeanDefinition();
-            }
-            else if (customServiceImpl.isPresent())
-            {
-                beanDefinition = getConstantObjectBeanDefinition(customServiceImpl.get());
-            }
+            beanDefinition = getCustomServiceBeanDefinition(customServiceOptional.get());
         }
         beanDefinitionRegistry.registerBeanDefinition(serviceId, beanDefinition);
+    }
+
+    private BeanDefinition getCustomServiceBeanDefinition(CustomService customService)
+    {
+        BeanDefinition beanDefinition;
+
+        Optional<Class> customServiceClass = customService.getServiceClass();
+        Optional<Object> customServiceImpl = customService.getServiceImpl();
+        if (customServiceClass.isPresent())
+        {
+            beanDefinition = getBeanDefinitionBuilder(customServiceClass.get()).getBeanDefinition();
+        }
+        else if (customServiceImpl.isPresent())
+        {
+            beanDefinition = getConstantObjectBeanDefinition(customServiceImpl.get());
+        }
+        else
+        {
+            throw new IllegalStateException("A custom service must define a service class or instance");
+        }
+        return beanDefinition;
     }
 
 
@@ -281,7 +312,7 @@ class SpringMuleContextServiceConfigurator
 
     private void createQueueManagerBeanDefinitions()
     {
-        if (customizationService.getCustomizedService(OBJECT_QUEUE_MANAGER).isPresent())
+        if (customizationService.getOverriddenService(OBJECT_QUEUE_MANAGER).isPresent())
         {
             registerBeanDefinition(OBJECT_LOCAL_QUEUE_MANAGER, getBeanDefinitionBuilder(ConstantFactoryBean.class).addConstructorArgReference(OBJECT_LOCAL_QUEUE_MANAGER).getBeanDefinition());
         }
@@ -295,7 +326,7 @@ class SpringMuleContextServiceConfigurator
     {
         AtomicBoolean anyBaseStoreWasRedefined = new AtomicBoolean(false);
         OBJECT_STORE_NAME_TO_LOCAL_OBJECT_STORE_NAME.entrySet().forEach(objectStoreLocal -> {
-            customizationService.getCustomizedService(objectStoreLocal.getKey()).ifPresent(customService -> {
+            customizationService.getOverriddenService(objectStoreLocal.getKey()).ifPresent(customService -> {
                 beanDefinitionRegistry.registerAlias(objectStoreLocal.getKey(), objectStoreLocal.getValue());
                 customService.getServiceClass().ifPresent(serviceClass -> {
                     anyBaseStoreWasRedefined.set(true);

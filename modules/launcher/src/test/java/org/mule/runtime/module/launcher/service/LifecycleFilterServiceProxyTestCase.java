@@ -13,12 +13,17 @@ import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 public class LifecycleFilterServiceProxyTestCase extends AbstractMuleTestCase
 {
 
-    @Test(expected = UnsupportedOperationException.class)
+    @Rule
+    public ExpectedException expected = ExpectedException.none();
+
+    @Test
     public void avoidsStartExecution() throws Exception
     {
 
@@ -26,16 +31,18 @@ public class LifecycleFilterServiceProxyTestCase extends AbstractMuleTestCase
 
         final Startable serviceProxy = (Startable) LifecycleFilterServiceProxy.createServiceProxy(service);
 
+        expected.expect(UnsupportedOperationException.class);
         serviceProxy.start();
     }
 
-    @Test(expected = UnsupportedOperationException.class)
+    @Test
     public void avoidsStopExecution() throws Exception
     {
         StoppableService service = mock(StoppableService.class);
 
         final Stoppable serviceProxy = (Stoppable) LifecycleFilterServiceProxy.createServiceProxy(service);
 
+        expected.expect(UnsupportedOperationException.class);
         serviceProxy.stop();
     }
 
