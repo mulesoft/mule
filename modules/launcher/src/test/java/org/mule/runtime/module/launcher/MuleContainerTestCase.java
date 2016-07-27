@@ -16,6 +16,7 @@ import static org.mule.runtime.module.launcher.MuleFoldersUtil.getExecutionFolde
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.module.launcher.coreextension.MuleCoreExtensionManagerServer;
 import org.mule.runtime.module.launcher.log4j2.MuleLog4jContextFactory;
+import org.mule.runtime.module.launcher.service.ServiceManager;
 import org.mule.runtime.module.repository.api.RepositoryService;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -46,12 +47,14 @@ public class MuleContainerTestCase extends AbstractMuleTestCase
 
     private RepositoryService repositoryService = mock(RepositoryService.class);
 
+    private final ServiceManager serviceManager = mock(ServiceManager.class);
+
     @Before
     public void setUp() throws Exception
     {
         coreExtensionManager = mock(MuleCoreExtensionManagerServer.class);
 
-        container = new MuleContainer(deploymentService, repositoryService, coreExtensionManager);
+        container = new MuleContainer(deploymentService, repositoryService, coreExtensionManager, serviceManager);
         FileUtils.deleteDirectory(getExecutionFolder());
     }
 
@@ -139,5 +142,26 @@ public class MuleContainerTestCase extends AbstractMuleTestCase
     {
         assertThat(getExecutionFolder().mkdirs(), is(true));
         container.start(false);
+    }
+
+    @Test
+    public void startsServiceManagerBeforeDeploymentService() throws Exception
+    {
+        container.start(false);
+
+        InOrder inOrder = inOrder(serviceManager, deploymentService);
+        inOrder.verify(serviceManager).start();
+        inOrder.verify(deploymentService).start();
+    }
+
+    @Test
+    public void stopsServiceManagerAfterDeploymentService() throws Exception
+    {
+        container.start(false);
+        container.stop();
+
+        InOrder inOrder = inOrder(serviceManager, deploymentService);
+        inOrder.verify(deploymentService).stop();
+        inOrder.verify(serviceManager).stop();
     }
 }

@@ -16,6 +16,7 @@ import static org.mule.runtime.module.launcher.artifact.ArtifactMuleContextBuild
 import static org.mule.runtime.module.launcher.artifact.ArtifactMuleContextBuilder.INSTALLATION_DIRECTORY_MUST_BE_A_DIRECTORY;
 import static org.mule.runtime.module.launcher.artifact.ArtifactMuleContextBuilder.MULE_CONTEXT_ARTIFACT_PROPERTIES_CANNOT_BE_NULL;
 import static org.mule.runtime.module.launcher.artifact.ArtifactMuleContextBuilder.ONLY_APPLICATIONS_ARE_ALLOWED_TO_HAVE_A_PARENT_CONTEXT;
+import static org.mule.runtime.module.launcher.artifact.ArtifactMuleContextBuilder.SERVICE_REPOSITORY_CANNOT_BE_NULL;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -78,4 +79,10 @@ public class ArtifactMuleContextBuilderTestCase extends AbstractMuleTestCase
                 .build();
     }
 
+    @Test
+    public void setNullServiceRepository() throws Exception
+    {
+        expectedException.expectMessage(SERVICE_REPOSITORY_CANNOT_BE_NULL);
+        new ArtifactMuleContextBuilder().setServiceRepository(null);
+    }
 }

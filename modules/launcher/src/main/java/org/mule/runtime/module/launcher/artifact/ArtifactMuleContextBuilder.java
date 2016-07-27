@@ -26,9 +26,11 @@ import org.mule.runtime.module.launcher.application.ApplicationExtensionsManager
 import org.mule.runtime.module.launcher.application.ApplicationMuleContextBuilder;
 import org.mule.runtime.module.launcher.application.ArtifactPlugin;
 import org.mule.runtime.module.launcher.domain.DomainMuleContextBuilder;
+import org.mule.runtime.module.launcher.service.ServiceRepository;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -46,6 +48,7 @@ public class ArtifactMuleContextBuilder
     protected static final String MULE_CONTEXT_ARTIFACT_PROPERTIES_CANNOT_BE_NULL = "MuleContext artifact properties cannot be null";
     protected static final String INSTALLATION_DIRECTORY_MUST_BE_A_DIRECTORY = "installation directory must be a directory";
     protected static final String ONLY_APPLICATIONS_ARE_ALLOWED_TO_HAVE_A_PARENT_CONTEXT = "Only applications are allowed to have a parent context";
+    protected static final String SERVICE_REPOSITORY_CANNOT_BE_NULL = "serviceRepository cannot be null";
 
     private List<ArtifactPlugin> artifactPlugins = new ArrayList<>();
     private ArtifactType artifactType = APP;
@@ -58,6 +61,7 @@ public class ArtifactMuleContextBuilder
     private File artifactInstallationDirectory;
     private MuleContextListener muleContextListener;
     private String defaultEncoding;
+    private ServiceRepository serviceRepository = Collections::emptyList;
 
     /**
      * The {@code ArtifactType} defines the set of services that will be available in the
@@ -182,11 +186,25 @@ public class ArtifactMuleContextBuilder
      * the {@code MuleContext} to be created. It may also be that the configuration files make use of this extensions.
      *
      * @param artifactPlugins collection of artifact extensions that define resources as part of the {@code MuleContext} to be created.
-     * @return
+     * @return the builder
      */
     public ArtifactMuleContextBuilder setArtifactPlugins(List<ArtifactPlugin> artifactPlugins)
     {
         this.artifactPlugins = artifactPlugins;
+        return this;
+    }
+
+    /**
+     * Provides a {@link ServiceRepository} containing all the services that will be accessible from the {@link MuleContext}
+     * to be created.
+     *
+     * @param serviceRepository repository of available services. Non null.
+     * @return the builder
+     */
+    public ArtifactMuleContextBuilder setServiceRepository(ServiceRepository serviceRepository)
+    {
+        checkArgument(serviceRepository != null, SERVICE_REPOSITORY_CANNOT_BE_NULL);
+        this.serviceRepository = serviceRepository;
         return this;
     }
 
@@ -202,6 +220,7 @@ public class ArtifactMuleContextBuilder
         builders.add(new ApplicationExtensionsManagerConfigurationBuilder(artifactPlugins));
         builders.add(createConfigurationBuilderFromApplicationProperties());
         SpringXmlConfigurationBuilder mainBuilder = new SpringXmlConfigurationBuilder(configurationFiles, artifactProperties, artifactType);
+        mainBuilder.addServiceConfigurator(new ContainerServicesMuleContextConfigurator(serviceRepository));
         if (parentContext != null)
         {
             mainBuilder.setParentContext(parentContext);

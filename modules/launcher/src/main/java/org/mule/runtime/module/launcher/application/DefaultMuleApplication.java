@@ -8,7 +8,6 @@ package org.mule.runtime.module.launcher.application;
 
 import static java.lang.String.format;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
-import static org.mule.runtime.core.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.util.SplashScreen.miniSplash;
@@ -19,7 +18,7 @@ import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
 import org.mule.runtime.core.api.context.notification.ServerNotificationListener;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
-import org.mule.runtime.core.config.bootstrap.ArtifactType;
+import org.mule.runtime.module.launcher.service.ServiceRepository;
 import org.mule.runtime.core.config.builders.SimpleConfigurationBuilder;
 import org.mule.runtime.core.context.notification.MuleContextNotification;
 import org.mule.runtime.core.context.notification.NotificationException;
@@ -57,6 +56,7 @@ public class DefaultMuleApplication implements Application
     protected final ApplicationDescriptor descriptor;
     private final DomainRepository domainRepository;
     private final List<ArtifactPlugin> artifactPlugins;
+    private final ServiceRepository serviceRepository;
     private ApplicationStatus status;
 
     protected MuleContext muleContext;
@@ -64,10 +64,11 @@ public class DefaultMuleApplication implements Application
     protected DeploymentListener deploymentListener;
     private ServerNotificationListener<MuleContextNotification> statusListener;
 
-    public DefaultMuleApplication(ApplicationDescriptor descriptor, MuleApplicationClassLoader deploymentClassLoader, List<ArtifactPlugin> artifactPlugins, DomainRepository domainRepository)
+    public DefaultMuleApplication(ApplicationDescriptor descriptor, MuleApplicationClassLoader deploymentClassLoader, List<ArtifactPlugin> artifactPlugins, DomainRepository domainRepository, ServiceRepository serviceRepository)
     {
         this.descriptor = descriptor;
         this.domainRepository = domainRepository;
+        this.serviceRepository = serviceRepository;
         this.deploymentListener = new NullDeploymentListener();
         this.artifactPlugins = artifactPlugins;
         updateStatusFor(NotInLifecyclePhase.PHASE_NAME);
@@ -182,7 +183,8 @@ public class DefaultMuleApplication implements Application
                     .setConfigurationFiles(descriptor.getAbsoluteResourcePaths())
                     .setDefaultEncoding(descriptor.getEncoding())
                     .setArtifactPlugins(artifactPlugins)
-                    .setExecutionClassloader(deploymentClassLoader.getClassLoader());
+                    .setExecutionClassloader(deploymentClassLoader.getClassLoader())
+                    .setServiceRepository(serviceRepository);
 
             Domain domain = domainRepository.getDomain(descriptor.getDomain());
             if (domain.getMuleContext() != null)

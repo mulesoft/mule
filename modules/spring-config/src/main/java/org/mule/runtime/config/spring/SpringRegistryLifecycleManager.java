@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.spring;
 
+import org.mule.runtime.api.service.Service;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.agent.Agent;
 import org.mule.runtime.core.api.component.Component;
@@ -106,7 +107,8 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager
                     AbstractAsyncRequestReplyRequester.class,
                     OutboundRouter.class,
                     MessageProcessorChain.class,
-                    MuleContext.class
+                    MuleContext.class,
+                    Service.class
             });
         }
     }
@@ -129,7 +131,9 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager
                     OutboundRouter.class,
                     Transformer.class,
                     MuleContext.class,
-                    ServerNotificationManager.class});
+                    ServerNotificationManager.class,
+                    Service.class
+            });
         }
 
         @Override

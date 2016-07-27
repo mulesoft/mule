@@ -42,6 +42,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -1275,5 +1276,27 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
         {
             currentThread.setContextClassLoader(currentClassLoader);
         }
+    }
+
+    /**
+     * Returns the list of interfaces implemented in a given class.
+     *
+     * @param aClass class to analyze. Non null.
+     * @return the list of interfaces implemented in the provided class and all its super classes.
+     */
+    public static Class<?>[] findImplementedInterfaces(Class<?> aClass)
+    {
+        checkArgument(aClass != null, "Class to analyze cannot be null");
+
+        Class<?> currentClass = aClass;
+        List<Class<?>> foundInterfaces = new LinkedList<>();
+        while (currentClass != null)
+        {
+            Class<?>[] interfaces = currentClass.getInterfaces();
+            Collections.addAll(foundInterfaces, interfaces);
+            currentClass = currentClass.getSuperclass();
+        }
+
+        return foundInterfaces.toArray(new Class<?>[0]);
     }
 }

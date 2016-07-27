@@ -29,6 +29,7 @@ import org.mule.runtime.module.launcher.plugin.ArtifactPluginDescriptorFactory;
 import org.mule.runtime.module.launcher.plugin.ArtifactPluginDescriptorLoader;
 import org.mule.runtime.module.launcher.plugin.ArtifactPluginRepository;
 import org.mule.runtime.module.launcher.plugin.DefaultArtifactPluginRepository;
+import org.mule.runtime.module.launcher.service.ServiceManager;
 import org.mule.runtime.module.launcher.util.DebuggableReentrantLock;
 import org.mule.runtime.module.launcher.util.ObservableList;
 
@@ -75,7 +76,7 @@ public class MuleDeploymentService implements DeploymentService
     private final ArtifactPluginRepository artifactPluginRepository;
     private DefaultArchiveDeployer<Application> applicationDeployer;
 
-    public MuleDeploymentService(ArtifactClassLoader containerClassLoader)
+    public MuleDeploymentService(ArtifactClassLoader containerClassLoader, ServiceManager serviceManager)
     {
         DomainClassLoaderFactory domainClassLoaderFactory = new DomainClassLoaderFactory(containerClassLoader.getClassLoader());
 
@@ -94,7 +95,7 @@ public class MuleDeploymentService implements DeploymentService
 
         ApplicationClassLoaderBuilderFactory applicationClassLoaderBuilderFactory = new ApplicationClassLoaderBuilderFactory(applicationClassLoaderFactory, artifactPluginRepository, artifactPluginFactory, artifactPluginDescriptorLoader);
 
-        DefaultApplicationFactory applicationFactory = new DefaultApplicationFactory(applicationClassLoaderBuilderFactory, applicationDescriptorFactory, artifactPluginRepository, domainManager);
+        DefaultApplicationFactory applicationFactory = new DefaultApplicationFactory(applicationClassLoaderBuilderFactory, applicationDescriptorFactory, artifactPluginRepository, domainManager, serviceManager);
         applicationFactory.setDeploymentListener(applicationDeploymentListener);
 
         ArtifactDeployer<Application> applicationMuleDeployer = new DefaultArtifactDeployer<>();
