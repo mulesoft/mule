@@ -24,4 +24,8 @@ public class ResourceNotFoundException extends MessagingException
         super(message, event, failingMessageProcessor);
     }
 
+    public ResourceNotFoundException(Message message, MuleEvent event, Throwable cause)
+    {
+        super(message, event, cause);
+    }
 }

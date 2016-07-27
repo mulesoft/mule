@@ -7,30 +7,31 @@
 package org.mule.runtime.module.http.functional;
 
 import static java.lang.String.format;
+import static org.apache.http.impl.client.HttpClientBuilder.create;
+import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.core.util.ClassUtils.getClassPathRoot;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.NOT_FOUND;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.OK;
-import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTPS;
-import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
-import static org.mule.runtime.core.util.ClassUtils.getClassPathRoot;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.module.tls.internal.DefaultTlsContextFactory;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
-import org.mule.runtime.module.tls.internal.DefaultTlsContextFactory;
 
 import java.io.IOException;
 
+import org.apache.http.Header;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
-@Ignore("MULE-9699: Not currently supported.")
-public class HttpListenerStaticResourcesTestCase extends FunctionalTestCase
+public class HttpListenerStaticResourcesTestCase extends AbstractHttpTestCase
 {
 
     public static final String INDEX_HTML_CONTENT = "Test index.html";
@@ -48,7 +49,7 @@ public class HttpListenerStaticResourcesTestCase extends FunctionalTestCase
 
     private int responseCode;
     private String payload;
-    private MuleMessage response;
+    private String contentType;
     private DefaultTlsContextFactory tlsContextFactory;
 
     @Override
@@ -58,20 +59,21 @@ public class HttpListenerStaticResourcesTestCase extends FunctionalTestCase
     }
 
     @Before
-    public void setup() throws IOException
+    public void setup() throws IOException, InitialisationException
     {
         tlsContextFactory = new DefaultTlsContextFactory();
 
         // Configure trust store in the client with the certificate of the server.
         tlsContextFactory.setTrustStorePath("trustStore");
         tlsContextFactory.setTrustStorePassword("mulepassword");
+        tlsContextFactory.initialise();
     }
 
     @Test
     public void httpUrlWithoutExplicitResourceShouldReturnDefaultDocument() throws Exception
     {
         String url = format("http://localhost:%d/static", port1.getNumber());
-        executeRequest(url, true);
+        executeRequest(url);
         assertThat(OK.getStatusCode(), is(responseCode));
         assertThat(payload, is(INDEX_HTML_CONTENT));
     }
@@ -80,7 +82,7 @@ public class HttpListenerStaticResourcesTestCase extends FunctionalTestCase
     public void httpUrlRequestingExplicitResourceShouldReturnResource() throws Exception
     {
         String url = format("http://localhost:%d/static/main.html", port1.getNumber());
-        executeRequest(url, true);
+        executeRequest(url);
         assertThat(OK.getStatusCode(), is(responseCode));
         assertThat(payload, is(MAIN_HTML_CONTENT));
     }
@@ -89,15 +91,15 @@ public class HttpListenerStaticResourcesTestCase extends FunctionalTestCase
     public void httpUrlRequestingNonexistentResourceShouldReturnNotFoundStatus() throws Exception
     {
         String url = format("http://localhost:%d/static/foo.html", port1.getNumber());
-        executeRequest(url, true);
-        assertThat(NOT_FOUND.getStatusCode(), is(responseCode));
+        executeRequest(url);
+        assertThat(responseCode, is(NOT_FOUND.getStatusCode()));
     }
 
     @Test
     public void contentTypeForDefaultResourceShouldBeTextHtml() throws Exception
     {
         String url = format("http://localhost:%d/static", port1.getNumber());
-        executeRequest(url, true);
+        executeRequest(url);
         assertThat(OK.getStatusCode(), is(responseCode));
         assertResponseContentType("text/html");
     }
@@ -106,7 +108,7 @@ public class HttpListenerStaticResourcesTestCase extends FunctionalTestCase
     public void contentTypeShouldBeDeterminedFromResource() throws Exception
     {
         String url = format("http://localhost:%d/static/image.gif", port1.getNumber());
-        executeRequest(url, true);
+        executeRequest(url);
         assertThat(OK.getStatusCode(), is(responseCode));
         assertResponseContentType("image/gif");
     }
@@ -115,7 +117,7 @@ public class HttpListenerStaticResourcesTestCase extends FunctionalTestCase
     public void explicitMimeTypeConfigurationShouldOverrideDefaults() throws Exception
     {
         String url = format("http://localhost:%d/static/image.png", port1.getNumber());
-        executeRequest(url, true);
+        executeRequest(url);
         assertThat(OK.getStatusCode(), is(responseCode));
         assertResponseContentType("image/png");
     }
@@ -124,7 +126,7 @@ public class HttpListenerStaticResourcesTestCase extends FunctionalTestCase
     public void httpsUrlWithoutExplicitResourceShouldReturnDefaultDocument() throws Exception
     {
         String url = format("https://localhost:%d/static", port2.getNumber());
-        executeRequest(url, true);
+        executeRequest(url);
         assertThat(OK.getStatusCode(), is(responseCode));
         assertThat(payload, is(INDEX_HTML_CONTENT));
     }
@@ -133,7 +135,7 @@ public class HttpListenerStaticResourcesTestCase extends FunctionalTestCase
     public void httpsUrlRequestingExplicitResourceShouldReturnResource() throws Exception
     {
         String url = format("https://localhost:%d/static/main.html", port2.getNumber());
-        executeRequest(url, true);
+        executeRequest(url);
         assertThat(OK.getStatusCode(), is(responseCode));
         assertThat(payload, is(MAIN_HTML_CONTENT));
     }
@@ -142,13 +144,13 @@ public class HttpListenerStaticResourcesTestCase extends FunctionalTestCase
     public void httpsUrlRequestingNonexistentResourceShouldReturnNotFoundStatus() throws Exception
     {
         String url = format("https://localhost:%d/static/foo.html", port2.getNumber());
-        executeRequest(url, true);
+        executeRequest(url);
         assertThat(NOT_FOUND.getStatusCode(), is(responseCode));
     }
 
-    private void assertResponseContentType(String contentType)
+    private void assertResponseContentType(String expectedContentType)
     {
-        assertThat(response.getInboundProperty(CONTENT_TYPE.toLowerCase()), is(contentType));
+        assertThat(contentType, startsWith(expectedContentType));
     }
 
     /**
@@ -159,11 +161,11 @@ public class HttpListenerStaticResourcesTestCase extends FunctionalTestCase
     public void testFlowBindingOnSamePort() throws Exception
     {
         String url = format("http://localhost:%d/echo", port1.getNumber());
-        executeRequest(url, true);
+        executeRequest(url);
         assertThat(OK.getStatusCode(), is(responseCode));
 
         url = format("https://localhost:%d/echo", port2.getNumber());
-        executeRequest(url, true);
+        executeRequest(url);
         assertThat(OK.getStatusCode(), is(responseCode));
     }
 
@@ -171,7 +173,7 @@ public class HttpListenerStaticResourcesTestCase extends FunctionalTestCase
     public void httpUrlWithRootAddressShouldReturnDefaultDocument() throws Exception
     {
         String url = format("http://localhost:%d/", port3.getNumber());
-        executeRequest(url, false);
+        executeRequest(url);
         assertThat(OK.getStatusCode(), is(responseCode));
         assertThat(payload, is(INDEX_HTML_CONTENT));
     }
@@ -180,25 +182,27 @@ public class HttpListenerStaticResourcesTestCase extends FunctionalTestCase
     public void httpUrlExplicitResourceInRootPathShouldReturnResource() throws Exception
     {
         String url = format("http://localhost:%d/index.html", port3.getNumber());
-        executeRequest(url, false);
+        executeRequest(url);
         assertThat(OK.getStatusCode(), is(responseCode));
         assertThat(payload, is(INDEX_HTML_CONTENT));
     }
 
-    private void executeRequest(String url, boolean followRedirects) throws Exception
+    private void executeRequest(String url) throws Exception
     {
-        HttpRequestOptionsBuilder optionsBuilder = HttpRequestOptionsBuilder.newOptions().disableStatusCodeValidation();
-        if (!followRedirects)
+        try (CloseableHttpClient httpClient = create().setSslcontext(tlsContextFactory.createSslContext()).build())
         {
-            optionsBuilder.disableFollowsRedirect();
+            HttpGet httpGet = new HttpGet(url);
+            try (CloseableHttpResponse response = httpClient.execute(httpGet))
+            {
+                responseCode = response.getStatusLine().getStatusCode();
+                payload = IOUtils.toString(response.getEntity().getContent());
+                Header contentTypeHeader = response.getFirstHeader(CONTENT_TYPE);
+                if (contentTypeHeader != null)
+                {
+                    contentType = contentTypeHeader.getValue();
+                }
+            }
         }
-        if (url.startsWith(HTTPS.getScheme()))
-        {
-            optionsBuilder.tlsContextFactory(tlsContextFactory);
-        }
-        response = muleContext.getClient().send(url, getTestMuleMessage(), optionsBuilder.build());
-        responseCode = response.getInboundProperty(HTTP_STATUS_PROPERTY);
-        payload = getPayloadAsString(response);
     }
 
 }
