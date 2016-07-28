@@ -10,7 +10,7 @@
 
     <configuration>
         <expression-language>
-            <import class="org.mule.runtime.module.http.functional.listener.HttpListenerResponseStreamingExceptionStrategyTestCase"/>
+            <import class="org.mule.test.module.http.functional.listener.HttpListenerResponseStreamingExceptionStrategyTestCase"/>
             <alias name="inputStreamPayload" expression="HttpListenerResponseStreamingExceptionStrategyTestCase.stream"/>
         </expression-language>
     </configuration>
@@ -24,7 +24,7 @@
         <set-payload value="#[inputStreamPayload]"/>
 
         <catch-exception-strategy>
-            <custom-processor class="org.mule.runtime.module.http.functional.listener.HttpListenerResponseStreamingExceptionStrategyTestCase$TrackPassageMessageProcessor"/>
+            <custom-processor class="org.mule.test.module.http.functional.listener.HttpListenerResponseStreamingExceptionStrategyTestCase$TrackPassageMessageProcessor"/>
             <set-payload value="#['Exception Handled']"/>
         </catch-exception-strategy>
     </flow>
@@ -34,7 +34,7 @@
         <set-payload value="#[inputStreamPayload]"/>
 
         <catch-exception-strategy>
-            <custom-processor class="org.mule.runtime.module.http.functional.listener.HttpListenerResponseStreamingExceptionStrategyTestCase$TrackPassageMessageProcessor"/>
+            <custom-processor class="org.mule.test.module.http.functional.listener.HttpListenerResponseStreamingExceptionStrategyTestCase$TrackPassageMessageProcessor"/>
             <set-payload value="#['Exception Handled']"/>
         </catch-exception-strategy>
     </flow>
@@ -44,7 +44,7 @@
         <set-payload value="#[inputStreamPayload]"/>
 
         <catch-exception-strategy>
-            <custom-processor class="org.mule.runtime.module.http.functional.listener.HttpListenerResponseStreamingExceptionStrategyTestCase$TrackPassageMessageProcessor"/>
+            <custom-processor class="org.mule.test.module.http.functional.listener.HttpListenerResponseStreamingExceptionStrategyTestCase$TrackPassageMessageProcessor"/>
             <set-payload value="#[inputStreamPayload]"/>
         </catch-exception-strategy>
     </flow>
@@ -54,7 +54,7 @@
         <set-payload value="#[inputStreamPayload]"/>
 
         <catch-exception-strategy>
-            <custom-processor class="org.mule.runtime.module.http.functional.listener.HttpListenerResponseStreamingExceptionStrategyTestCase$TrackPassageMessageProcessor"/>
+            <custom-processor class="org.mule.test.module.http.functional.listener.HttpListenerResponseStreamingExceptionStrategyTestCase$TrackPassageMessageProcessor"/>
             <set-payload value="#[inputStreamPayload]"/>
         </catch-exception-strategy>
     </flow>

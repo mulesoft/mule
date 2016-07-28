@@ -95,10 +95,10 @@ public class ExtensionsTestInfrastructureDiscoverer
         if (isEmpty(describers) && !isEmpty(annotatedClasses))
         {
             describers = stream(annotatedClasses).map(annotatedClass -> new AnnotationsBasedDescriber(annotatedClass, new StaticVersionResolver(getProductVersion()))).collect(Collectors.toList()).toArray(new Describer[annotatedClasses.length]);
-            if (isEmpty(describers))
-            {
-                throw new IllegalStateException("No extension found");
-            }
+        }
+        if (isEmpty(describers))
+        {
+            throw new IllegalStateException("No extension found");
         }
         loadExtensionsFromDescribers(extensionManager, describers);
 

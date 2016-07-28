@@ -17,7 +17,7 @@
             <httpn:response-builder partsRef="#[parts]"/>
         </httpn:listener>
         <custom-processor
-                class="org.mule.runtime.module.http.functional.listener.HttpListenerAttachmentsTestCase$ConvertPartsMessageProcessor"/>
+                class="org.mule.test.module.http.functional.listener.HttpListenerAttachmentsTestCase$ConvertPartsMessageProcessor"/>
         <set-payload value="#[message.getAttributes()]"/>
         <test:queue name="out"/>
     </flow>
@@ -31,7 +31,7 @@
             </httpn:response-builder>
         </httpn:listener>
         <custom-processor
-                class="org.mule.runtime.module.http.functional.listener.HttpListenerAttachmentsTestCase$ConvertPartsMessageProcessor"/>
+                class="org.mule.test.module.http.functional.listener.HttpListenerAttachmentsTestCase$ConvertPartsMessageProcessor"/>
         <set-payload value="#[message.getAttributes()]"/>
         <test:queue name="out"/>
     </flow>
@@ -41,7 +41,7 @@
             <httpn:response-builder partsRef="#[parts]"/>
         </httpn:listener>
         <custom-processor
-                class="org.mule.runtime.module.http.functional.listener.HttpListenerAttachmentsTestCase$CreatePartMessageProcessor"/>
+                class="org.mule.test.module.http.functional.listener.HttpListenerAttachmentsTestCase$CreatePartMessageProcessor"/>
         <echo-component/>
     </flow>
 
@@ -50,7 +50,7 @@
             <httpn:response-builder partsRef="#[parts]"/>
         </httpn:listener>
         <custom-processor
-                class="org.mule.runtime.module.http.functional.listener.HttpListenerAttachmentsTestCase$CreatePartMessageProcessor"/>
+                class="org.mule.test.module.http.functional.listener.HttpListenerAttachmentsTestCase$CreatePartMessageProcessor"/>
         <echo-component/>
     </flow>
 
@@ -59,7 +59,7 @@
             <httpn:response-builder partsRef="#[parts]"/>
         </httpn:listener>
         <custom-processor
-                class="org.mule.runtime.module.http.functional.listener.HttpListenerAttachmentsTestCase$CreatePartsMessageProcessor"/>
+                class="org.mule.test.module.http.functional.listener.HttpListenerAttachmentsTestCase$CreatePartsMessageProcessor"/>
         <echo-component/>
     </flow>
 
