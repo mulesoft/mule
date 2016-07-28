@@ -143,6 +143,7 @@
         <asmVersion>3.3.1</asmVersion>
         <aspectjVersion>1.8.5</aspectjVersion>
         <asyncHttpClientVersion>1.9.37</asyncHttpClientVersion>
+        <awaitilityVersion>1.7.0</awaitilityVersion>
         <bshVersion>2.0b4</bshVersion>
         <bouncycastleVersion>1.54</bouncycastleVersion>
         <c3p0Version>0.9.5.2</c3p0Version>
@@ -549,6 +550,11 @@
                         <artifactId>hamcrest-core</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>com.jayway.awaitility</groupId>
+                <artifactId>awaitility</artifactId>
+                <version>${awaitilityVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.hamcrest</groupId>

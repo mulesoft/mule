@@ -6,17 +6,15 @@
  */
 package org.mule.test.infrastructure.process.rules;
 
-import static com.jayway.awaitility.Awaitility.*;
+import static com.jayway.awaitility.Awaitility.await;
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.Integer.parseInt;
 import static java.lang.System.getProperty;
-import static java.util.concurrent.TimeUnit.*;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.apache.commons.io.FilenameUtils.removeExtension;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
 import org.mule.test.infrastructure.process.MuleProcessController;
-
-import com.jayway.awaitility.Awaitility;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -24,7 +22,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.FilenameUtils;
 import org.junit.runner.Description;
