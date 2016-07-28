@@ -6,8 +6,11 @@
  */
 package org.mule.test.infrastructure.process.rules;
 
+import static com.jayway.awaitility.Awaitility.await;
+import static java.lang.Boolean.parseBoolean;
 import static java.lang.Integer.parseInt;
 import static java.lang.System.getProperty;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.apache.commons.io.FilenameUtils.removeExtension;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
@@ -47,6 +50,7 @@ public class MuleDeployment extends MuleInstallation
 
     private static final long POLL_DELAY_MILLIS = 1000;
     private static final String DEFAULT_DEPLOYMENT_TIMEOUT = "60000";
+    private static final boolean STOP_ON_EXIT = parseBoolean(getProperty("mule.test.stopOnExit", "true"));
     private static Logger logger = LoggerFactory.getLogger(MuleDeployment.class);
     private static PollingProber prober;
     private int deploymentTimeout = parseInt(getProperty("mule.test.deployment.timeout", DEFAULT_DEPLOYMENT_TIMEOUT));
@@ -192,15 +196,45 @@ public class MuleDeployment extends MuleInstallation
         super.before();
         prober = new PollingProber(deploymentTimeout, POLL_DELAY_MILLIS);
         mule = new MuleProcessController(getMuleHome());
-        libraries.forEach((library) -> mule.addLibrary(new File(library)));
-        domains.forEach((domain) -> mule.deployDomain(domain));
-        applications.forEach((application) -> mule.deploy(application));
-        mule.start(toArray(properties));
-        logger.info("Starting Mule Server");
-        domains.forEach((domain) -> checkDomainIsDeployed(getName(domain)));
-        applications.forEach((application) -> checkAppIsDeployed(getName(application)));
-        logger.info("Deployment successful");
+        if (!mule.isRunning())
+        {
+            libraries.forEach((library) -> mule.addLibrary(new File(library)));
+            domains.forEach((domain) -> mule.deployDomain(domain));
+            applications.forEach((application) -> mule.deploy(application));
+            mule.start(toArray(properties));
+            logger.info("Starting Mule Server");
+            domains.forEach((domain) -> checkDomainIsDeployed(getName(domain)));
+            applications.forEach((application) -> checkAppIsDeployed(getName(application)));
+            logger.info("Deployment successful");
+        }
+        else
+        {
+            logger.warn("Mule Server was already running");
+            libraries.forEach((library) -> mule.addLibrary(new File(library)));
+            logger.info("Redeploying domains");
+            domains.forEach((domain) -> redeployDomain(domain));
+            logger.info("Redeploying applications");
+            applications.forEach((application) -> redeploy(application));
+            logger.info("Redeployment successful");
+        }
     }
+
+    private void redeployDomain(String domain)
+    {
+        mule.undeployDomain(getName(domain));
+        await("Domain " + domain + " is undeployed").atMost(deploymentTimeout, MILLISECONDS).until(() -> ! mule.isDomainDeployed(getName(domain)));
+        mule.deployDomain(domain);
+        await("Domain " + domain + " is deployed").atMost(deploymentTimeout, MILLISECONDS).until(() -> mule.isDomainDeployed(getName(domain)));
+    }
+
+    private void redeploy(String application)
+    {
+        mule.undeploy(getName(application));
+        await("Application " + application + " is undeployed").atMost(deploymentTimeout, MILLISECONDS).until(() -> ! mule.isDeployed(getName(application)));
+        mule.deploy(application);
+        await("Application " + application + " is deployed").atMost(deploymentTimeout, MILLISECONDS).until(() -> mule.isDeployed(getName(application)));
+    }
+
 
     private String getName(String application)
     {
@@ -245,12 +279,15 @@ public class MuleDeployment extends MuleInstallation
 
     protected void after()
     {
-        if (mule.isRunning())
+        if (STOP_ON_EXIT)
         {
-            logger.info("Stopping Mule Server");
-            mule.stop();
+            if (mule.isRunning())
+            {
+                logger.info("Stopping Mule Server");
+                mule.stop();
+            }
+            super.after();
         }
-        super.after();
     }
 
 }

@@ -7,6 +7,12 @@
 
 package org.mule.test.infrastructure.process;
 
+import static org.apache.commons.io.FileUtils.copyDirectoryToDirectory;
+import static org.apache.commons.io.FileUtils.copyFileToDirectory;
+import static org.apache.commons.io.FileUtils.forceDelete;
+import static org.apache.commons.io.FileUtils.listFiles;
+import static org.mule.runtime.core.util.FileUtils.newFile;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
@@ -19,7 +25,6 @@ import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteException;
 import org.apache.commons.exec.ExecuteWatchdog;
 import org.apache.commons.exec.PumpStreamHandler;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
@@ -150,11 +155,11 @@ public abstract class Controller
         {
             if (domainFile.isDirectory())
             {
-                FileUtils.copyDirectoryToDirectory(domainFile, this.domainsDir);
+                copyDirectoryToDirectory(domainFile, this.domainsDir);
             }
             else
             {
-                FileUtils.copyFileToDirectory(domainFile, this.domainsDir);
+                copyFileToDirectory(domainFile, this.domainsDir);
             }
         }
         catch (IOException e)
@@ -171,7 +176,7 @@ public abstract class Controller
         verify(libsDir.canWrite(), "Cannot write on lib dir: %", libsDir);
         try
         {
-            FileUtils.copyFileToDirectory(jar, libsDir);
+            copyFileToDirectory(jar, libsDir);
         }
         catch (IOException e)
         {
@@ -182,12 +187,12 @@ public abstract class Controller
     protected void deleteAnchors()
     {
         @SuppressWarnings("unchecked")
-        Collection<File> anchors = FileUtils.listFiles(appsDir, ANCHOR_FILTER, null);
+        Collection<File> anchors = listFiles(appsDir, ANCHOR_FILTER, null);
         for (File anchor : anchors)
         {
             try
             {
-                FileUtils.forceDelete(anchor);
+                forceDelete(anchor);
             }
             catch (IOException e)
             {
@@ -206,11 +211,11 @@ public abstract class Controller
         {
             if (app.isFile())
             {
-                FileUtils.copyFileToDirectory(app, appsDir);
+                copyFileToDirectory(app, appsDir);
             }
             else
             {
-                FileUtils.copyDirectoryToDirectory(app, appsDir);
+                copyDirectoryToDirectory(app, appsDir);
             }
         }
         catch (IOException e)
@@ -225,18 +230,41 @@ public abstract class Controller
         return IS_RUNNING_STATUS_CODE == status();
     }
 
+    public void undeploy(String application)
+    {
+        if (! new File(appsDir, application + ANCHOR_SUFFIX).exists())
+        {
+            throw new MuleControllerException("Couldn't undeploy application [" + application + "]. Application is not deployed");
+        }
+        if (! new File(appsDir, application + ANCHOR_SUFFIX).delete())
+        {
+            throw new MuleControllerException("Couldn't undeploy application [" + application + "]");
+        }
+    }
+
+    public void undeployDomain(String domain)
+    {
+        if (! new File(domainsDir, domain + ANCHOR_SUFFIX).exists())
+        {
+            new MuleControllerException("Couldn't undeploy domain [" + domain + "]. Domain is not deployed");
+        }
+        if (! new File(domainsDir, domain + ANCHOR_SUFFIX).delete())
+        {
+            new MuleControllerException("Couldn't undeploy domain [" + domain + "]");
+        }
+    }
+
     public void undeployAll()
     {
         for (File file : appsDir.listFiles())
         {
             try
             {
-                FileUtils.forceDelete(file);
+                forceDelete(file);
             }
             catch (IOException e)
             {
-                throw new MuleControllerException("Could not delete directory [" + file.getAbsolutePath()
-                                                  + "]", e);
+                throw new MuleControllerException("Could not delete directory [" + file.getAbsolutePath()  + "]", e);
             }
         }
     }
@@ -263,9 +291,8 @@ public abstract class Controller
 
     public File getLog()
     {
-        File logEE = org.mule.runtime.core.util.FileUtils.newFile(muleHome + "/logs/mule_ee.log");
-        File logCE = org.mule.runtime.core.util.FileUtils.newFile(muleHome + "/logs/mule.log");
-
+        File logEE = newFile(muleHome + "/logs/mule_ee.log");
+        File logCE = newFile(muleHome + "/logs/mule.log");
         if (logCE.exists() && logCE.isFile())
         {
             return logCE;
@@ -274,13 +301,12 @@ public abstract class Controller
         {
             return logEE;
         }
-
         throw new MuleControllerException(String.format("There is no mule log available at %s/logs/", muleHome));
     }
 
     public File getLog(String appName)
     {
-        File log = org.mule.runtime.core.util.FileUtils.newFile(String.format("%s/logs/mule-app-%s.log", muleHome, appName));
+        File log = newFile(String.format("%s/logs/mule-app-%s.log", muleHome, appName));
         if (log.exists() && log.isFile())
         {
             return log;
