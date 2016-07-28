@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/vegan http://www.mulesoft.org/schema/mule/vegan/current/mule-vegan.xsd">
+
+    <vegan:banana-config name="banana"/>
+
+    <flow name="interceptingWithoutNext">
+        <vegan:get-qualified-lunch />
+    </flow>
+
+    <flow name="interceptingBanana">
+        <vegan:get-lunch />
+        <expression-component>payload.bite()</expression-component>
+    </flow>
+
+    <flow name="interceptingNotBanana">
+        <vegan:get-lunch />
+        <set-payload value="pork beef" />
+    </flow>
+
+    <flow name="interceptingError">
+        <vegan:get-lunch />
+        <expression-component>bla bla bla</expression-component>
+    </flow>
+
+    <flow name="interceptingWithTarget">
+        <vegan:get-lunch target="banana"/>
+        <expression-component>banana.payload.bite()</expression-component>
+    </flow>
+
+    <flow name="nestedInterceptingWithTarget">
+        <vegan:get-lunch />
+        <vegan:get-lunch target="banana"/>
+    </flow>
+
+</mule>

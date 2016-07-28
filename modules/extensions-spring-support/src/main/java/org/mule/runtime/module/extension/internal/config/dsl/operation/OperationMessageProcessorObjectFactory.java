@@ -15,6 +15,8 @@ import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
 import org.mule.runtime.extension.api.introspection.operation.RuntimeOperationModel;
 import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionObjectFactory;
 import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
+import org.mule.runtime.module.extension.internal.model.property.InterceptingModelProperty;
+import org.mule.runtime.module.extension.internal.runtime.operation.InterceptingOperationMessageProcessor;
 import org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 
@@ -43,16 +45,12 @@ public class OperationMessageProcessorObjectFactory extends AbstractExtensionObj
     @Override
     public OperationMessageProcessor getObject() throws Exception
     {
-        return withContextClassLoader(getClassLoader(extensionModel), () -> {
+        return withContextClassLoader(getClassLoader(extensionModel), () ->
+        {
             try
             {
                 ResolverSet resolverSet = getParametersAsResolverSet();
-                OperationMessageProcessor processor = new OperationMessageProcessor(extensionModel,
-                                                                                    operationModel,
-                                                                                    configurationProviderName,
-                                                                                    target,
-                                                                                    resolverSet,
-                                                                                    (ExtensionManagerAdapter) muleContext.getExtensionManager());
+                OperationMessageProcessor processor = createMessageProcessor(resolverSet);
 
                 //TODO: MULE-5002 this should not be necessary but lifecycle issues when injecting message processors automatically
                 muleContext.getInjector().inject(processor);
@@ -63,6 +61,28 @@ public class OperationMessageProcessorObjectFactory extends AbstractExtensionObj
                 throw new MuleRuntimeException(e);
             }
         });
+    }
+
+    private OperationMessageProcessor createMessageProcessor(ResolverSet resolverSet)
+    {
+        if (operationModel.getModelProperty(InterceptingModelProperty.class).isPresent())
+        {
+            return new InterceptingOperationMessageProcessor(extensionModel,
+                                                             operationModel,
+                                                             configurationProviderName,
+                                                             target,
+                                                             resolverSet,
+                                                             (ExtensionManagerAdapter) muleContext.getExtensionManager());
+        }
+        else
+        {
+            return new OperationMessageProcessor(extensionModel,
+                                                 operationModel,
+                                                 configurationProviderName,
+                                                 target,
+                                                 resolverSet,
+                                                 (ExtensionManagerAdapter) muleContext.getExtensionManager());
+        }
     }
 
     public void setConfigurationProviderName(String configurationProviderName)

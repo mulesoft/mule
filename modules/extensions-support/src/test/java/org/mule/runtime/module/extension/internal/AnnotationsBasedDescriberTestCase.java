@@ -36,7 +36,6 @@ import static org.mule.test.heisenberg.extension.HeisenbergExtension.EXTENSION_D
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
 import static org.mule.test.vegan.extension.VeganExtension.APPLE;
 import static org.mule.test.vegan.extension.VeganExtension.BANANA;
-
 import org.mule.metadata.api.model.AnyType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.NullType;
@@ -77,6 +76,7 @@ import org.mule.runtime.module.extension.internal.model.property.ImplementingTyp
 import org.mule.tck.message.IntegerAttributes;
 import org.mule.tck.message.StringAttributes;
 import org.mule.tck.size.SmallTest;
+import org.mule.tck.testmodels.fruit.Fruit;
 import org.mule.test.heisenberg.extension.HeisenbergConnection;
 import org.mule.test.heisenberg.extension.HeisenbergConnectionProvider;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
@@ -95,6 +95,7 @@ import org.mule.test.metadata.extension.model.attribute.AbstractOutputAttributes
 import org.mule.test.metadata.extension.model.shapes.Shape;
 import org.mule.test.petstore.extension.PetStoreConnector;
 import org.mule.test.vegan.extension.PaulMcCartneySource;
+import org.mule.test.vegan.extension.VeganAttributes;
 import org.mule.test.vegan.extension.VeganExtension;
 
 import java.math.BigDecimal;
@@ -118,12 +119,11 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedDescriberTestCase
 {
 
+    public static final String GET_GRAMS_IN_STORAGE = "getGramsInStorage";
     private static final String EXTENDED_CONFIG_NAME = "extendedConfig";
     private static final String EXTENDED_CONFIG_DESCRIPTION = "extendedDescription";
-
     private static final String SOURCE_NAME = "ListenPayments";
     private static final String SOURCE_PARAMETER = "initialBatchNumber";
-
     private static final String SAY_MY_NAME_OPERATION = "sayMyName";
     private static final String GET_ENEMY_OPERATION = "getEnemy";
     private static final String KILL_OPERATION = "kill";
@@ -148,9 +148,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
     private static final String GET_SAUL_PHONE = "getSaulPhone";
     private static final String GET_MEDICAL_HISTORY = "getMedicalHistory";
     private static final String IGNORED_OPERATION = "ignoredOperation";
-
     private static final String EXTENSION_VERSION = MuleManifest.getProductVersion();
-    public static final String GET_GRAMS_IN_STORAGE = "getGramsInStorage";
 
     @Before
     public void setUp()
@@ -382,6 +380,32 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         ExtensionDeclarer declarer = describeExtension();
         final ExtensionDeclaration declaration = declarer.getDeclaration();
         assertThat(declaration.getCategory(), is(COMMUNITY));
+    }
+
+    @Test
+    public void interceptingOperationWithoutAttributes()
+    {
+        setDescriber(describerFor(VeganExtension.class));
+        ExtensionDeclarer declarer = describeExtension();
+        final ExtensionDeclaration declaration = declarer.getDeclaration();
+
+        OperationDeclaration operation = getOperation(getConfiguration(declaration, BANANA), "getLunch");
+        assertThat(operation, is(notNullValue()));
+        assertOutputType(operation.getOutput(), toMetadataType(Fruit.class), false);
+        assertOutputType(operation.getOutputAttributes(), TYPE_BUILDER.nullType().build(), false);
+    }
+
+    @Test
+    public void interceptingOperationWithAttributes()
+    {
+        setDescriber(describerFor(VeganExtension.class));
+        ExtensionDeclarer declarer = describeExtension();
+        final ExtensionDeclaration declaration = declarer.getDeclaration();
+
+        OperationDeclaration operation = getOperation(getConfiguration(declaration, BANANA), "getQualifiedLunch");
+        assertThat(operation, is(notNullValue()));
+        assertOutputType(operation.getOutput(), toMetadataType(Fruit.class), false);
+        assertOutputType(operation.getOutputAttributes(), toMetadataType(VeganAttributes.class), false);
     }
 
     private <T extends NamedDeclaration> T findDeclarationByName(Collection<T> declarations, String name)

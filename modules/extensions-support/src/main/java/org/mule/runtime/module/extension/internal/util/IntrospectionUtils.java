@@ -47,6 +47,7 @@ import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterizedModel;
 import org.mule.runtime.extension.api.introspection.property.MetadataContentModelProperty;
 import org.mule.runtime.extension.api.introspection.property.MetadataKeyPartModelProperty;
+import org.mule.runtime.extension.api.runtime.operation.InterceptingCallback;
 import org.mule.runtime.extension.api.runtime.operation.OperationResult;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser;
@@ -71,7 +72,6 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Supplier;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.core.ResolvableType;
@@ -113,12 +113,25 @@ public final class IntrospectionUtils
      */
     public static MetadataType getMethodReturnType(Method method, ClassTypeLoader typeLoader)
     {
-        return getMethodType(method, typeLoader, 0, () -> {
-            ResolvableType methodType = getMethodResolvableType(method);
-            return methodType.getRawClass().equals(OperationResult.class)
-                   ? typeBuilder().anyType().build()
-                   : typeLoader.load(methodType.getType());
-        });
+        ResolvableType methodType = unwrapInterceptingCallback(method);
+
+        Type type = methodType.getType();
+        if (methodType.getRawClass().equals(OperationResult.class))
+        {
+            ResolvableType genericType = methodType.getGenerics()[0];
+            if (genericType.getRawClass() != null)
+            {
+                type = genericType.getType();
+            }
+            else
+            {
+                type = null;
+            }
+        }
+
+        return type != null
+               ? typeLoader.load(type)
+               : typeBuilder().anyType().build();
     }
 
     /**
@@ -136,26 +149,36 @@ public final class IntrospectionUtils
      */
     public static MetadataType getMethodReturnAttributesType(Method method, ClassTypeLoader typeLoader)
     {
-        return getMethodType(method, typeLoader, 1, () -> typeBuilder().nullType().build());
-    }
-
-    private static MetadataType getMethodType(Method method,
-                                              ClassTypeLoader typeLoader,
-                                              int genericIndex,
-                                              Supplier<MetadataType> fallbackSupplier)
-    {
-        ResolvableType methodType = getMethodResolvableType(method);
         Type type = null;
+
+        ResolvableType methodType = unwrapInterceptingCallback(method);
+
         if (methodType.getRawClass().equals(OperationResult.class))
         {
-            ResolvableType genericType = methodType.getGenerics()[genericIndex];
+            ResolvableType genericType = methodType.getGenerics()[1];
             if (genericType.getRawClass() != null)
             {
                 type = genericType.getType();
             }
         }
 
-        return type != null ? typeLoader.load(type) : fallbackSupplier.get();
+        return type != null
+               ? typeLoader.load(type)
+               : typeBuilder().nullType().build();
+    }
+
+    private static ResolvableType unwrapInterceptingCallback(Method method)
+    {
+        ResolvableType methodType = getMethodResolvableType(method);
+        if (InterceptingCallback.class.isAssignableFrom(methodType.getRawClass()))
+        {
+            ResolvableType genericType = methodType.getGenerics()[0];
+            if (genericType.getRawClass() != null)
+            {
+                methodType = genericType;
+            }
+        }
+        return methodType;
     }
 
     private static ResolvableType getMethodResolvableType(Method method)

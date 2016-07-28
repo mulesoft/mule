@@ -55,7 +55,7 @@ import org.slf4j.LoggerFactory;
  *
  * @since 3.7.0
  */
-public final class OperationMessageProcessor extends ExtensionComponent implements MessageProcessor, Lifecycle
+public class OperationMessageProcessor extends ExtensionComponent implements MessageProcessor, Lifecycle
 {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OperationMessageProcessor.class);
@@ -86,18 +86,24 @@ public final class OperationMessageProcessor extends ExtensionComponent implemen
     @Override
     public MuleEvent process(MuleEvent event) throws MuleException
     {
-        return withContextClassLoader(
-                getExtensionClassLoader(), () -> {
+        return (MuleEvent) withContextClassLoader(
+                getExtensionClassLoader(), () ->
+                {
                     ConfigurationInstance<Object> configuration = getConfiguration(event);
                     OperationContextAdapter operationContext = createOperationContext(configuration, event);
-                    Object result = executeOperation(operationContext, event);
-
-                    return returnDelegate.asReturnValue(result, operationContext);
+                    return doProcess(event, operationContext);
                 },
                 MuleException.class,
-                e -> {
+                e ->
+                {
                     throw new DefaultMuleException(e);
                 });
+    }
+
+    protected org.mule.runtime.api.message.MuleEvent doProcess(MuleEvent event, OperationContextAdapter operationContext) throws MuleException
+    {
+        Object result = executeOperation(operationContext, event);
+        return returnDelegate.asReturnValue(result, operationContext);
     }
 
     private Object executeOperation(OperationContextAdapter operationContext, MuleEvent event) throws MuleException
@@ -135,7 +141,7 @@ public final class OperationMessageProcessor extends ExtensionComponent implemen
     {
         returnDelegate = createReturnDelegate();
         operationExecutor = operationModel.getExecutor().createExecutor();
-        executionMediator = new DefaultExecutionMediator(extensionModel, operationModel, connectionManager);
+        executionMediator = createExecutionMediator();
         initialiseIfNeeded(operationExecutor, true, muleContext);
     }
 
@@ -165,6 +171,11 @@ public final class OperationMessageProcessor extends ExtensionComponent implemen
     public void doDispose()
     {
         disposeIfNeeded(operationExecutor, LOGGER);
+    }
+
+    protected ExecutionMediator createExecutionMediator()
+    {
+        return new DefaultExecutionMediator(extensionModel, operationModel, connectionManager);
     }
 
     /**

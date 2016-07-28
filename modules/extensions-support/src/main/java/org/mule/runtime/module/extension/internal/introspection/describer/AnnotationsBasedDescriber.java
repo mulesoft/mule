@@ -89,6 +89,7 @@ import org.mule.runtime.extension.api.introspection.property.LayoutModelProperty
 import org.mule.runtime.extension.api.introspection.property.LayoutModelPropertyBuilder;
 import org.mule.runtime.extension.api.introspection.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.manifest.DescriberManifest;
+import org.mule.runtime.extension.api.runtime.operation.InterceptingCallback;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.xml.dsl.api.property.XmlHintsModelProperty;
 import org.mule.runtime.module.extension.internal.exception.IllegalConfigurationModelDefinitionException;
@@ -102,6 +103,7 @@ import org.mule.runtime.module.extension.internal.model.property.ExtendingOperat
 import org.mule.runtime.module.extension.internal.model.property.ImplementingMethodModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingParameterModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingTypeModelProperty;
+import org.mule.runtime.module.extension.internal.model.property.InterceptingModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.TypeRestrictionModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.exception.DefaultExceptionEnricherFactory;
@@ -542,6 +544,11 @@ public final class AnnotationsBasedDescriber implements Describer
             if (metadataScope.isCustomScope())
             {
                 declareOperationMetadataKeyId(operationMethod, operation);
+            }
+
+            if (InterceptingCallback.class.isAssignableFrom(operationMethod.getReturnType()))
+            {
+                operation.withModelProperty(new InterceptingModelProperty());
             }
 
             declareOperationParameters(operationMethod, operation, metadataScope);
