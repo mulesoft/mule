@@ -55,7 +55,7 @@ public class FileReadTestCase extends FileConnectorTestCase
         assertThat(response.getMessage().getDataType().getMediaType().getPrimaryType(), is(JSON.getPrimaryType()));
         assertThat(response.getMessage().getDataType().getMediaType().getSubType(), is(JSON.getSubType()));
 
-        AbstractFileInputStream payload = (AbstractFileInputStream) response.getMessage().getPayload();
+        AbstractFileInputStream payload = response.getMessage().getPayload();
         assertThat(payload.isLocked(), is(false));
         assertThat(IOUtils.toString(payload), is(HELLO_WORLD));
     }

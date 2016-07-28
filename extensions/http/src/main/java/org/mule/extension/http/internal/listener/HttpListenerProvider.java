@@ -20,13 +20,10 @@ import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTP;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTPS;
-
 import org.mule.extension.http.api.server.HttpListenerConnectionManager;
 import org.mule.extension.http.internal.listener.server.HttpServerConfiguration;
+import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.connection.ConnectionHandlingStrategy;
-import org.mule.runtime.api.connection.ConnectionHandlingStrategyFactory;
-import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.DefaultMuleException;
@@ -62,7 +59,7 @@ import javax.inject.Inject;
  * @since 4.0
  */
 @Alias("listener")
-public class HttpListenerProvider implements ConnectionProvider<Server>, Initialisable, Startable, Stoppable
+public class HttpListenerProvider implements CachedConnectionProvider<Server>, Initialisable, Startable, Stoppable
 {
 
     private static final int DEFAULT_MAX_THREADS = 128;
@@ -252,12 +249,6 @@ public class HttpListenerProvider implements ConnectionProvider<Server>, Initial
         {
             return ConnectionValidationResult.success();
         }
-    }
-
-    @Override
-    public ConnectionHandlingStrategy<Server> getHandlingStrategy(ConnectionHandlingStrategyFactory<Server> handlingStrategyFactory)
-    {
-        return handlingStrategyFactory.cached();
     }
 
     private void verifyConnectionsParameters() throws InitialisationException

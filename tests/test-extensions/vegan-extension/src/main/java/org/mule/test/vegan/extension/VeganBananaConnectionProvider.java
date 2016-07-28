@@ -7,8 +7,6 @@
 package org.mule.test.vegan.extension;
 
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.connection.ConnectionHandlingStrategy;
-import org.mule.runtime.api.connection.ConnectionHandlingStrategyFactory;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.extension.api.annotation.Alias;
@@ -34,11 +32,5 @@ public class VeganBananaConnectionProvider implements ConnectionProvider<Banana>
     public ConnectionValidationResult validate(Banana banana)
     {
         return ConnectionValidationResult.success();
-    }
-
-    @Override
-    public ConnectionHandlingStrategy<Banana> getHandlingStrategy(ConnectionHandlingStrategyFactory<Banana> handlingStrategyFactory)
-    {
-        return handlingStrategyFactory.none();
     }
 }

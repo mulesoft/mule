@@ -6,8 +6,7 @@
  */
 package org.mule.extension.file.internal;
 
-import org.mule.runtime.api.connection.ConnectionHandlingStrategy;
-import org.mule.runtime.api.connection.ConnectionHandlingStrategyFactory;
+import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.core.api.MuleContext;
@@ -23,7 +22,7 @@ import javax.inject.Inject;
  * @since 4.0
  */
 @DisplayName("Local FileSystem Connection")
-public final class LocalFileConnectionProvider implements ConnectionProvider<FileSystem>
+public final class LocalFileConnectionProvider implements CachedConnectionProvider<FileSystem>
 {
     @Inject
     private MuleContext muleContext;
@@ -55,14 +54,5 @@ public final class LocalFileConnectionProvider implements ConnectionProvider<Fil
     public ConnectionValidationResult validate(FileSystem fileSystem)
     {
         return ConnectionValidationResult.success();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ConnectionHandlingStrategy<FileSystem> getHandlingStrategy(ConnectionHandlingStrategyFactory<FileSystem> handlingStrategyFactory)
-    {
-        return handlingStrategyFactory.cached();
     }
 }

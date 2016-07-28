@@ -29,7 +29,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class NullConnectionHandlingStrategyTestCase extends AbstractMuleTestCase
+public class NullConnectionManagementStrategyTestCase extends AbstractMuleTestCase
 {
 
     @Mock
@@ -44,13 +44,13 @@ public class NullConnectionHandlingStrategyTestCase extends AbstractMuleTestCase
     @Mock
     private MuleContext muleContext;
 
-    private NullConnectionHandlingStrategy<Banana> strategy;
+    private NullConnectionManagementStrategy<Banana> strategy;
 
     @Before
     public void before() throws Exception
     {
         when(connectionProvider.connect()).thenReturn(connection);
-        strategy = new NullConnectionHandlingStrategy<>(connectionProvider, muleContext);
+        strategy = new NullConnectionManagementStrategy<>(connectionProvider, muleContext);
     }
 
     @Test

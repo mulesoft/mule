@@ -7,8 +7,6 @@
 package org.mule.test.heisenberg.extension;
 
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.connection.ConnectionHandlingStrategy;
-import org.mule.runtime.api.connection.ConnectionHandlingStrategyFactory;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.tls.TlsContextFactory;
@@ -45,11 +43,5 @@ public class HeisenbergConnectionProvider implements ConnectionProvider<Heisenbe
     public ConnectionValidationResult validate(HeisenbergConnection heisenbergConnection)
     {
         return ConnectionValidationResult.success();
-    }
-
-    @Override
-    public ConnectionHandlingStrategy<HeisenbergConnection> getHandlingStrategy(ConnectionHandlingStrategyFactory<HeisenbergConnection> handlingStrategyFactory)
-    {
-        return handlingStrategyFactory.supportsPooling();
     }
 }

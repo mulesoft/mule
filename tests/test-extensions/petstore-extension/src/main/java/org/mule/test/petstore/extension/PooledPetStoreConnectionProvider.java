@@ -6,17 +6,11 @@
  */
 package org.mule.test.petstore.extension;
 
-import org.mule.runtime.api.connection .ConnectionHandlingStrategy;
-import org.mule.runtime.api.connection .ConnectionHandlingStrategyFactory;
+import org.mule.runtime.api.connection.PoolingConnectionProvider;
 import org.mule.runtime.extension.api.annotation.Alias;
 
 @Alias("pooled")
-public class PooledPetStoreConnectionProvider extends PetStoreConnectionProvider
+public class PooledPetStoreConnectionProvider extends PetStoreConnectionProvider implements PoolingConnectionProvider<PetStoreClient>
 {
 
-    @Override
-    public ConnectionHandlingStrategy<PetStoreClient> getHandlingStrategy(ConnectionHandlingStrategyFactory handlingStrategyFactory)
-    {
-        return handlingStrategyFactory.requiresPooling();
-    }
 }

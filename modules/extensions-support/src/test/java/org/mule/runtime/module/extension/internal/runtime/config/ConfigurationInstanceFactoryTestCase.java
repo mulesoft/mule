@@ -18,8 +18,6 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.connection.ConnectionHandlingStrategy;
-import org.mule.runtime.api.connection.ConnectionHandlingStrategyFactory;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.core.api.MuleEvent;
@@ -148,12 +146,6 @@ public class ConfigurationInstanceFactoryTestCase extends AbstractMuleTestCase
         {
             return ConnectionValidationResult.success();
         }
-
-        @Override
-        public ConnectionHandlingStrategy<Banana> getHandlingStrategy(ConnectionHandlingStrategyFactory<Banana> handlingStrategyFactory)
-        {
-            return handlingStrategyFactory.cached();
-        }
     }
 
     public static class InvalidConnectionTypeProvider implements ConnectionProvider<Kiwi>
@@ -175,12 +167,6 @@ public class ConfigurationInstanceFactoryTestCase extends AbstractMuleTestCase
         public ConnectionValidationResult validate(Kiwi kiwi)
         {
             return ConnectionValidationResult.success();
-        }
-
-        @Override
-        public ConnectionHandlingStrategy<Kiwi> getHandlingStrategy(ConnectionHandlingStrategyFactory<Kiwi> handlingStrategyFactory)
-        {
-            return handlingStrategyFactory.cached();
         }
     }
 }

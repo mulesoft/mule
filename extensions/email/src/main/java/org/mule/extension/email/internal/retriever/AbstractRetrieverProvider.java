@@ -9,10 +9,8 @@ package org.mule.extension.email.internal.retriever;
 import org.mule.extension.email.api.EmailConnectionSettings;
 import org.mule.extension.email.internal.AbstractEmailConnection;
 import org.mule.extension.email.internal.AbstractEmailConnectionProvider;
-import org.mule.runtime.api.connection.ConnectionHandlingStrategy;
-import org.mule.runtime.api.connection.ConnectionHandlingStrategyFactory;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
-import org.mule.runtime.api.connection.PoolingListener;
+import org.mule.runtime.api.connection.PoolingConnectionProvider;
 import org.mule.runtime.extension.api.annotation.ParameterGroup;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 
@@ -23,6 +21,7 @@ import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
  */
 // TODO: Change generic signature for a more specific one. MULE-9874
 public abstract class AbstractRetrieverProvider<Connection extends AbstractEmailConnection> extends AbstractEmailConnectionProvider<Connection>
+        implements PoolingConnectionProvider<Connection>
 {
 
     /**
@@ -49,28 +48,12 @@ public abstract class AbstractRetrieverProvider<Connection extends AbstractEmail
         return connection.validate();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public ConnectionHandlingStrategy<Connection> getHandlingStrategy(ConnectionHandlingStrategyFactory<Connection> connectionHandlingStrategyFactory)
+    public void onBorrow(Connection connection)
     {
-        return connectionHandlingStrategyFactory.supportsPooling(new PoolingListener<Connection>()
+        if (connection instanceof RetrieverConnection)
         {
-            @Override
-            public void onBorrow(Connection connection)
-            {
-                if (connection instanceof RetrieverConnection)
-                {
-                    ((RetrieverConnection) connection).closeFolder(false);
-                }
-            }
-
-            @Override
-            public void onReturn(Connection connection)
-            {
-                // do nothing
-            }
-        });
+            ((RetrieverConnection) connection).closeFolder(false);
+        }
     }
 }

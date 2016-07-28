@@ -7,13 +7,11 @@
 package org.mule.test.transactional;
 
 import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
+import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.connection.ConnectionHandlingStrategy;
-import org.mule.runtime.api.connection.ConnectionHandlingStrategyFactory;
-import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 
-public class LocalTransactionProvider implements ConnectionProvider<TestTransactionalConnection>
+public class LocalTransactionProvider implements CachedConnectionProvider<TestTransactionalConnection>
 {
 
     @Override
@@ -32,11 +30,5 @@ public class LocalTransactionProvider implements ConnectionProvider<TestTransact
     public ConnectionValidationResult validate(TestTransactionalConnection testTransactionalConnection)
     {
         return success();
-    }
-
-    @Override
-    public ConnectionHandlingStrategy<TestTransactionalConnection> getHandlingStrategy(ConnectionHandlingStrategyFactory<TestTransactionalConnection> handlingStrategyFactory)
-    {
-        return handlingStrategyFactory.cached();
     }
 }

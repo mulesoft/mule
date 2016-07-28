@@ -13,8 +13,6 @@ import org.mule.extension.socket.api.socket.udp.UdpSocketProperties;
 import org.mule.extension.socket.api.source.SocketListener;
 import org.mule.extension.socket.internal.SocketUtils;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.connection.ConnectionHandlingStrategy;
-import org.mule.runtime.api.connection.ConnectionHandlingStrategyFactory;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.extension.api.annotation.Alias;
@@ -63,11 +61,5 @@ public class UdpListenerProvider implements ConnectionProvider<UdpListenerConnec
     public ConnectionValidationResult validate(UdpListenerConnection connection)
     {
         return SocketUtils.validate(connection);
-    }
-
-    @Override
-    public ConnectionHandlingStrategy<UdpListenerConnection> getHandlingStrategy(ConnectionHandlingStrategyFactory<UdpListenerConnection> handlingStrategyFactory)
-    {
-        return handlingStrategyFactory.none();
     }
 }

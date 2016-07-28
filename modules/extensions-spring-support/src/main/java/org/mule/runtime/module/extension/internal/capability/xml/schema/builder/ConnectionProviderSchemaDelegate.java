@@ -7,6 +7,8 @@
 package org.mule.runtime.module.extension.internal.capability.xml.schema.builder;
 
 import static java.math.BigInteger.ZERO;
+import static org.mule.runtime.extension.api.introspection.connection.ConnectionManagementType.CACHED;
+import static org.mule.runtime.extension.api.introspection.connection.ConnectionManagementType.POOLING;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.DISABLE_VALIDATION;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_EXTENSION_CONNECTION_PROVIDER_ELEMENT;
@@ -14,10 +16,9 @@ import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MUL
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_POOLING_PROFILE_TYPE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.UNBOUNDED;
 import org.mule.metadata.api.ClassTypeLoader;
+import org.mule.runtime.extension.api.introspection.connection.ConnectionManagementType;
 import org.mule.runtime.extension.api.introspection.connection.ConnectionProviderModel;
-import org.mule.runtime.extension.api.introspection.connection.PoolingSupport;
 import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
-import org.mule.runtime.extension.api.introspection.property.ConnectionHandlingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ComplexContent;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Element;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ExplicitGroup;
@@ -66,26 +67,23 @@ final class ConnectionProviderSchemaDelegate
         choice.setMinOccurs(ZERO);
         choice.setMaxOccurs(UNBOUNDED);
 
-        providerModel.getModelProperty(ConnectionHandlingTypeModelProperty.class).ifPresent(connectionHandlingType -> {
-            if (connectionHandlingType.isPooled() || connectionHandlingType.isCached())
-            {
-                addValidationFlag(providerType);
-                builder.addRetryPolicy(choice);
-            }
-            if (connectionHandlingType.isPooled())
-            {
-                addConnectionProviderPoolingProfile(choice, providerModel);
-            }
-        });
+        ConnectionManagementType managementType = providerModel.getConnectionManagementType();
+        if (managementType == POOLING || managementType == CACHED)
+        {
+            addValidationFlag(providerType);
+            builder.addRetryPolicy(choice);
+        }
+        if (managementType == POOLING)
+        {
+            addConnectionProviderPoolingProfile(choice);
+        }
 
         builder.registerParameters(providerType, choice, providerModel.getParameterModels());
     }
 
-    private void addConnectionProviderPoolingProfile(ExplicitGroup choice, ConnectionProviderModel providerModel)
+    private void addConnectionProviderPoolingProfile(ExplicitGroup choice)
     {
-        PoolingSupport poolingSupport = providerModel.getModelProperty(ConnectionHandlingTypeModelProperty.class).get().getPoolingSupport();
-        TopLevelElement objectElement = builder.createRefElement(MULE_POOLING_PROFILE_TYPE, poolingSupport == PoolingSupport.REQUIRED);
-
+        TopLevelElement objectElement = builder.createRefElement(MULE_POOLING_PROFILE_TYPE, false);
         choice.getParticle().add(objectFactory.createElement(objectElement));
     }
 

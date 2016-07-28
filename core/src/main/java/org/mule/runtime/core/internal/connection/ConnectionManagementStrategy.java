@@ -6,22 +6,24 @@
  */
 package org.mule.runtime.core.internal.connection;
 
-import org.mule.runtime.api.connection.ConnectionHandlingStrategy;
+import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.core.api.Closeable;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 
 /**
- * Base class for {@link ConnectionHandlingStrategy} implementations which contains state
- * and expands its contract with non API functionality
+ * Strategy to implement different connection management mechanisms.
+ * <p>
+ * For example, whether connections should be pooled, tied to an OAuth
+ * token, cached, etc.
  *
- * @param <Connection> the generic type of the connections to be managed
- * @since 4.0
+ * @param <Connection> the generic type of the connection being managed by {@code this} instance
+ * @since 1.0
  */
-public abstract class ConnectionHandlingStrategyAdapter<Connection> implements ConnectionHandlingStrategy<Connection>, Closeable
+abstract class ConnectionManagementStrategy<Connection> implements Closeable
 {
-
     protected final ConnectionProvider<Connection> connectionProvider;
     protected final MuleContext muleContext;
 
@@ -31,11 +33,22 @@ public abstract class ConnectionHandlingStrategyAdapter<Connection> implements C
      * @param connectionProvider the {@link ConnectionProvider} which will be used to manage the connections
      * @param muleContext        the application's {@link MuleContext}
      */
-    ConnectionHandlingStrategyAdapter(ConnectionProvider<Connection> connectionProvider, MuleContext muleContext)
+    ConnectionManagementStrategy(ConnectionProvider<Connection> connectionProvider, MuleContext muleContext)
     {
         this.connectionProvider = connectionProvider;
         this.muleContext = muleContext;
     }
+
+    /**
+     * Wraps a connection into a {@link ConnectionHandler} and returns it.
+     * This method is to be assumed thread-safe, but no assumptions should be made
+     * on whether each invokation returns the same {@link ConnectionHandler} or if
+     * that return value is wrapping the same underlying {@code Connection} instance.
+     *
+     * @return a {@link ConnectionHandler}
+     * @throws ConnectionException if an exception was found trying to obtain the connection
+     */
+    abstract ConnectionHandler<Connection> getConnectionHandler() throws ConnectionException;
 
     /**
      * Closes all connections and resources allocated through {@code this} instance.

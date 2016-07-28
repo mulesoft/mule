@@ -256,7 +256,7 @@ public final class IntrospectionUtils
         {
             for (ResolvableType iType : ResolvableType.forClass(searchClass).getInterfaces())
             {
-                if (iType.getRawClass().equals(implementedInterface))
+                if (implementedInterface.isAssignableFrom(iType.getRawClass()))
                 {
                     interfaceType = iType;
                     break;

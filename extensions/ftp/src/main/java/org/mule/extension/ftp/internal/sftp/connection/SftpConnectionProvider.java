@@ -7,13 +7,10 @@
 package org.mule.extension.ftp.internal.sftp.connection;
 
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.CONNECTION;
-
 import org.mule.extension.ftp.api.sftp.SftpAuthenticationMethod;
 import org.mule.extension.ftp.internal.AbstractFtpConnectionProvider;
 import org.mule.extension.ftp.internal.FtpConnector;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.connection.ConnectionHandlingStrategy;
-import org.mule.runtime.api.connection.ConnectionHandlingStrategyFactory;
 import org.mule.runtime.core.util.CollectionUtils;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Parameter;
@@ -125,15 +122,6 @@ public class SftpConnectionProvider extends AbstractFtpConnectionProvider<SftpFi
         return new SftpFileSystem(client, muleContext);
     }
 
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ConnectionHandlingStrategy<SftpFileSystem> getHandlingStrategy(ConnectionHandlingStrategyFactory<SftpFileSystem> handlingStrategyFactory)
-    {
-        return handlingStrategyFactory.supportsPooling();
-    }
 
     void setPort(int port)
     {

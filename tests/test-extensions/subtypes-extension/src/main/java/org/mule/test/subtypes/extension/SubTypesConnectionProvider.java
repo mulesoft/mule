@@ -8,8 +8,6 @@ package org.mule.test.subtypes.extension;
 
 
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.connection.ConnectionHandlingStrategy;
-import org.mule.runtime.api.connection.ConnectionHandlingStrategyFactory;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.extension.api.annotation.Parameter;
@@ -48,11 +46,5 @@ public class SubTypesConnectionProvider implements ConnectionProvider<SubTypesCo
     public ConnectionValidationResult validate(SubTypesConnectorConnection subtypesConnectorConnection)
     {
         return ConnectionValidationResult.success();
-    }
-
-    @Override
-    public ConnectionHandlingStrategy<SubTypesConnectorConnection> getHandlingStrategy(ConnectionHandlingStrategyFactory<SubTypesConnectorConnection> handlingStrategyFactory)
-    {
-        return handlingStrategyFactory.supportsPooling();
     }
 }

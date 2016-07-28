@@ -219,13 +219,13 @@
                             <xs:complexType>
                                 <xs:sequence>
                                     <xs:element minOccurs="0" maxOccurs="unbounded" name="health-progression">
-                                <xs:complexType>
-                              <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="org.mule.test.heisenberg.extension.model.HealthStatusEnumType" use="required" name="value"></xs:attribute>
+                                        <xs:complexType>
+                                            <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="org.mule.test.heisenberg.extension.model.HealthStatusEnumType" use="required" name="value"></xs:attribute>
+                                        </xs:complexType>
+                                    </xs:element>
+                                </xs:sequence>
                             </xs:complexType>
-                          </xs:element>
-                        </xs:sequence>
-                      </xs:complexType>
-                    </xs:element>
+                        </xs:element>
                     </xs:sequence>
                     <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
                     <xs:attribute type="mule:expressionList" use="optional" name="enemies"></xs:attribute>
@@ -265,11 +265,8 @@
             <xs:complexContent>
                 <xs:extension base="extension:abstractConnectionProviderType">
                     <xs:sequence minOccurs="0" maxOccurs="unbounded">
-                        <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
-                        <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" minOccurs="0" maxOccurs="1" ref="mule:pooling-profile"></xs:element>
                         <xs:element xmlns:tls="http://www.mulesoft.org/schema/mule/tls" minOccurs="0" maxOccurs="1" ref="tls:context"></xs:element>
                     </xs:sequence>
-                    <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:substitutableBoolean" use="optional" name="disableValidation"></xs:attribute>
                     <xs:attribute type="xs:string" use="optional" name="tlsContext"></xs:attribute>
                     <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionString" use="optional" default="505-503-4455" name="saulPhoneNumber"></xs:attribute>
                 </xs:extension>
@@ -410,24 +407,24 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-      <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="GetGramsInStorageType" substitutionGroup="heisenberg-empire" name="get-grams-in-storage"></xs:element>
-      <xs:complexType name="GetGramsInStorageType">
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="GetGramsInStorageType" substitutionGroup="heisenberg-empire" name="get-grams-in-storage"></xs:element>
+    <xs:complexType name="GetGramsInStorageType">
         <xs:complexContent>
-          <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
-            <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
-              <xs:annotation>
-                <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
-              </xs:annotation>
-            </xs:attribute>
-            <xs:attribute type="mule:expressionList" use="optional" default="#[payload]" name="grams"></xs:attribute>
-            <xs:attribute type="xs:string" use="optional" name="target">
-              <xs:annotation>
-                <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
-              </xs:annotation>
-            </xs:attribute>
-          </xs:extension>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+                <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
+                    <xs:annotation>
+                        <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="mule:expressionList" use="optional" default="#[payload]" name="grams"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="target">
+                    <xs:annotation>
+                        <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
         </xs:complexContent>
-      </xs:complexType>
+    </xs:complexType>
     <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="GetInjectedExtensionManagerType" substitutionGroup="heisenberg-empire" name="get-injected-extension-manager"></xs:element>
     <xs:complexType name="GetInjectedExtensionManagerType">
         <xs:complexContent>
@@ -445,38 +442,38 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-  <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="GetMedicalHistoryType" substitutionGroup="heisenberg-empire" name="get-medical-history"></xs:element>
-  <xs:complexType name="GetMedicalHistoryType">
-    <xs:complexContent>
-      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
-        <xs:sequence>
-          <xs:element minOccurs="0" maxOccurs="1" name="health-by-years">
-            <xs:complexType>
-              <xs:sequence>
-                <xs:element minOccurs="0" maxOccurs="unbounded" name="health-by-year">
-                  <xs:complexType>
-                    <xs:attribute type="mule:expressionInt" use="required" name="key"></xs:attribute>
-                    <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="org.mule.test.heisenberg.extension.model.HealthStatusEnumType" use="required" name="value"></xs:attribute>
-                  </xs:complexType>
-                </xs:element>
-              </xs:sequence>
-            </xs:complexType>
-          </xs:element>
-        </xs:sequence>
-        <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
-          <xs:annotation>
-            <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute type="mule:expressionMap" use="optional" name="healthByYear"></xs:attribute>
-        <xs:attribute type="xs:string" use="optional" name="target">
-          <xs:annotation>
-            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="GetMedicalHistoryType" substitutionGroup="heisenberg-empire" name="get-medical-history"></xs:element>
+    <xs:complexType name="GetMedicalHistoryType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+                <xs:sequence>
+                    <xs:element minOccurs="0" maxOccurs="1" name="health-by-years">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element minOccurs="0" maxOccurs="unbounded" name="health-by-year">
+                                    <xs:complexType>
+                                        <xs:attribute type="mule:expressionInt" use="required" name="key"></xs:attribute>
+                                        <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="org.mule.test.heisenberg.extension.model.HealthStatusEnumType" use="required" name="value"></xs:attribute>
+                                    </xs:complexType>
+                                </xs:element>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+                <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
+                    <xs:annotation>
+                        <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="mule:expressionMap" use="optional" name="healthByYear"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="target">
+                    <xs:annotation>
+                        <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
     <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="GetPaymentFromEventType" substitutionGroup="heisenberg-empire" name="get-payment-from-event"></xs:element>
     <xs:complexType name="GetPaymentFromEventType">
         <xs:complexContent>
