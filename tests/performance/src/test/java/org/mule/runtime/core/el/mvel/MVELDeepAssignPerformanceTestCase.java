@@ -9,6 +9,12 @@ package org.mule.runtime.core.el.mvel;
 import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.construct.Flow;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
+
 import java.util.Random;
 
 import org.databene.contiperf.PerfTest;
@@ -18,11 +24,6 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.construct.Flow;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 public class MVELDeepAssignPerformanceTestCase extends AbstractMuleContextTestCase {
 
@@ -34,8 +35,12 @@ public class MVELDeepAssignPerformanceTestCase extends AbstractMuleContextTestCa
     return 180;
   }
 
-  final protected String mel = "payload.firstName = 'Tom';" + "payload.lastName = 'Fennelly';"
-      + "payload.contact.address = 'Male';" + "payload.contact.telnum = '4';" + "payload.sin = 'Ireland';" + "payload;";
+  final protected String mel = "payload.firstName = 'Tom';"
+      + "payload.lastName = 'Fennelly';"
+      + "payload.contact.address = 'Male';"
+      + "payload.contact.telnum = '4';"
+      + "payload.sin = 'Ireland';"
+      + "payload;";
 
   final protected Payload payload = new Payload();
 

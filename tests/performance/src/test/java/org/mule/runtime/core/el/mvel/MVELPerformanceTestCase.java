@@ -9,6 +9,12 @@ package org.mule.runtime.core.el.mvel;
 import static org.mule.runtime.core.DefaultMessageExecutionContext.create;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.construct.Flow;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
+
 import java.util.Random;
 
 import org.databene.contiperf.PerfTest;
@@ -18,11 +24,6 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.construct.Flow;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 public class MVELPerformanceTestCase extends AbstractMuleContextTestCase {
 
@@ -34,14 +35,15 @@ public class MVELPerformanceTestCase extends AbstractMuleContextTestCase {
     return 180;
   }
 
-  final protected String mel =
-      "StringBuilder sb = new StringBuilder(); fields = payload.split(',\');" + "if (fields.length > 4) {"
-          + "    sb.append('  <Contact>\n');" + "    sb.append('    <FirstName>').append(fields[0]).append('</FirstName>\n');"
-          + "    sb.append('    <LastName>').append(fields[1]).append('</LastName>\n');"
-          + "    sb.append('    <Address>').append(fields[2]).append('</Address>\n');"
-          + "    sb.append('    <TelNum>').append(fields[3]).append('</TelNum>\n');"
-          + "    sb.append('    <SIN>').append(fields[4]).append('</SIN>\n');" + "    sb.append('  </Contact>\n');" + "}"
-          + "sb.toString();";
+  final protected String mel = "StringBuilder sb = new StringBuilder(); fields = payload.split(',\');"
+      + "if (fields.length > 4) {"
+      + "    sb.append('  <Contact>\n');"
+      + "    sb.append('    <FirstName>').append(fields[0]).append('</FirstName>\n');"
+      + "    sb.append('    <LastName>').append(fields[1]).append('</LastName>\n');"
+      + "    sb.append('    <Address>').append(fields[2]).append('</Address>\n');"
+      + "    sb.append('    <TelNum>').append(fields[3]).append('</TelNum>\n');"
+      + "    sb.append('    <SIN>').append(fields[4]).append('</SIN>\n');"
+      + "    sb.append('  </Contact>\n');" + "}" + "sb.toString();";
 
   final protected String payload = "Tom,Fennelly,Male,4,Ireland";
 

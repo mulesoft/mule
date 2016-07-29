@@ -10,13 +10,11 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.runtime.core.util.UUID;
 
 import org.databene.contiperf.PerfTest;
+import org.databene.contiperf.Required;
 import org.databene.contiperf.junit.ContiPerfRule;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
 
-@RunWith(MockitoJUnitRunner.class)
 public class UUIDPerformanceTestCase extends AbstractMuleContextTestCase {
 
   @Rule
@@ -28,6 +26,7 @@ public class UUIDPerformanceTestCase extends AbstractMuleContextTestCase {
   }
 
   @Test
+  @Required(throughput = 3500, average = 1, percentile90 = 2)
   @PerfTest(duration = 30000, threads = 1, warmUp = 5000)
   public void singleThread() throws Exception {
     for (int i = 0; i < 1000; i++) {
@@ -36,6 +35,7 @@ public class UUIDPerformanceTestCase extends AbstractMuleContextTestCase {
   }
 
   @Test
+  @Required(throughput = 5800, average = 2, percentile90 = 2)
   @PerfTest(duration = 30000, threads = 10, warmUp = 5000)
   public void tenThreads() throws Exception {
     for (int i = 0; i < 1000; i++) {
@@ -44,6 +44,7 @@ public class UUIDPerformanceTestCase extends AbstractMuleContextTestCase {
   }
 
   @Test
+  @Required(throughput = 5900, average = 4, percentile90 = 2)
   @PerfTest(duration = 30000, threads = 20, warmUp = 5000)
   public void twentyThreads() throws Exception {
     for (int i = 0; i < 1000; i++) {
@@ -52,14 +53,16 @@ public class UUIDPerformanceTestCase extends AbstractMuleContextTestCase {
   }
 
   @Test
+  @Required(throughput = 5800, average = 10, percentile90 = 2)
   @PerfTest(duration = 30000, threads = 50, warmUp = 5000)
-  public void fivtyThreads() throws Exception {
+  public void fiftyThreads() throws Exception {
     for (int i = 0; i < 1000; i++) {
       UUID.getUUID();
     }
   }
 
   @Test
+  @Required(throughput = 5800, average = 20, percentile90 = 2)
   @PerfTest(duration = 30000, threads = 100, warmUp = 5000)
   public void hundredThreads() throws Exception {
     for (int i = 0; i < 1000; i++) {
@@ -68,6 +71,7 @@ public class UUIDPerformanceTestCase extends AbstractMuleContextTestCase {
   }
 
   @Test
+  @Required(throughput = 5600, average = 40, percentile90 = 2)
   @PerfTest(duration = 30000, threads = 200, warmUp = 5000)
   public void twoHundredThreads() throws Exception {
     for (int i = 0; i < 1000; i++) {
