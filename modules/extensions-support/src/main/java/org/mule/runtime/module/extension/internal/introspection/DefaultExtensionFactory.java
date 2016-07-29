@@ -17,7 +17,6 @@ import static org.mule.runtime.extension.api.introspection.parameter.ExpressionS
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.REQUIRED;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.alphaSortDescribedList;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.createInterceptors;
-
 import org.mule.common.MuleVersion;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
@@ -60,13 +59,14 @@ import org.mule.runtime.extension.api.runtime.operation.OperationExecutorFactory
 import org.mule.runtime.module.extension.internal.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.module.extension.internal.introspection.validation.ConfigurationModelValidator;
 import org.mule.runtime.module.extension.internal.introspection.validation.ConnectionProviderModelValidator;
+import org.mule.runtime.module.extension.internal.introspection.validation.ExclusiveParameterModelValidator;
 import org.mule.runtime.module.extension.internal.introspection.validation.MetadataComponentModelValidator;
 import org.mule.runtime.module.extension.internal.introspection.validation.ModelValidator;
 import org.mule.runtime.module.extension.internal.introspection.validation.NameClashModelValidator;
+import org.mule.runtime.module.extension.internal.introspection.validation.OperationParametersModelValidator;
 import org.mule.runtime.module.extension.internal.introspection.validation.OperationReturnTypeModelValidator;
 import org.mule.runtime.module.extension.internal.introspection.validation.ParameterModelValidator;
 import org.mule.runtime.module.extension.internal.introspection.validation.SubtypesModelValidator;
-import org.mule.runtime.module.extension.internal.introspection.validation.OperationParametersModelValidator;
 import org.mule.runtime.module.extension.internal.runtime.executor.OperationExecutorFactoryWrapper;
 
 import com.google.common.cache.Cache;
@@ -119,6 +119,7 @@ public final class DefaultExtensionFactory implements ExtensionFactory
                 .add(new OperationReturnTypeModelValidator())
                 .add(new OperationParametersModelValidator())
                 .add(new MetadataComponentModelValidator())
+                .add(new ExclusiveParameterModelValidator())
                 .build();
     }
 

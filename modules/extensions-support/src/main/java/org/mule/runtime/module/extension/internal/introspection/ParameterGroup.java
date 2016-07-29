@@ -7,6 +7,8 @@
 package org.mule.runtime.module.extension.internal.introspection;
 
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotation;
+import org.mule.runtime.extension.api.annotation.Exclusion;
 import org.mule.runtime.extension.api.introspection.EnrichableModel;
 import org.mule.runtime.extension.api.introspection.ModelProperty;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclaration;
@@ -123,4 +125,23 @@ public class ParameterGroup implements EnrichableModel
         checkArgument(modelProperty != null, "Cannot add a null model property");
         modelProperties.put(modelProperty.getClass(), modelProperty);
     }
+
+    /**
+     * Whether the class is annotated with {@link Exclusion} or not
+     */
+    public boolean hasExclusiveParameters()
+    {
+        return getAnnotation(type, Exclusion.class) != null;
+    }
+
+    /**
+     * Whether the class is annotated with {@link Exclusion} and {@link Exclusion#atLeastOneIsRequired()} is set
+     */
+    public boolean atLeastOneIsRequired()
+    {
+        Exclusion annotation = getAnnotation(type, Exclusion.class);
+        return annotation != null ? annotation.atLeastOneIsRequired() : false;
+    }
+
+
 }
