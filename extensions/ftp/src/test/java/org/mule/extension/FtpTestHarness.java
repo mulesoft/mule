@@ -27,8 +27,8 @@ public interface FtpTestHarness extends TestRule
     String HELLO_PATH = "files/" + HELLO_FILE_NAME;
     String DEFAULT_FTP_HOST = "localhost";
     String FTP_SERVER_BASE_DIR = "target/ftpserver";
-    String BASE_DIR_SYSTEM_PROPERTY = "baseDir";
-    String BASE_DIR = "base";
+    String WORKING_DIR_SYSTEM_PROPERTY = "workingDir";
+    String WORKING_DIR = "base";
 
     /**
      * Creates a test hello world file

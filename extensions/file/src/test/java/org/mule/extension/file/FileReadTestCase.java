@@ -135,7 +135,7 @@ public class FileReadTestCase extends FileConnectorTestCase
     public void getProperties() throws Exception
     {
         LocalFileAttributes filePayload = (LocalFileAttributes) readHelloWorld().getMessage().getAttributes();
-        Path file = Paths.get(baseDir.getValue()).resolve(HELLO_PATH);
+        Path file = Paths.get(workingDir.getValue()).resolve(HELLO_PATH);
         assertExists(true, file.toFile());
 
         BasicFileAttributes attributes = Files.readAttributes(file, BasicFileAttributes.class);

@@ -38,8 +38,8 @@ public class ClassicFtpTestHarness extends AbstractFtpTestHarness
     private static final String FTP_USER = "anonymous";
     private static final String FTP_PASSWORD = "password";
 
-    private FtpServer ftpServer = new FtpServer("ftpPort", new File(FTP_SERVER_BASE_DIR, BASE_DIR));
-    private SystemProperty baseDirSystemProperty = new SystemProperty(BASE_DIR_SYSTEM_PROPERTY, BASE_DIR);
+    private FtpServer ftpServer = new FtpServer("ftpPort", new File(FTP_SERVER_BASE_DIR, WORKING_DIR));
+    private SystemProperty workingDirSystemProperty = new SystemProperty(WORKING_DIR_SYSTEM_PROPERTY, WORKING_DIR);
     private FTPTestClient ftpClient;
 
 
@@ -64,7 +64,7 @@ public class ClassicFtpTestHarness extends AbstractFtpTestHarness
         {
             throw new IOException("could not connect to ftp server");
         }
-        ftpClient.changeWorkingDirectory(BASE_DIR);
+        ftpClient.changeWorkingDirectory(WORKING_DIR);
     }
 
     /**
@@ -88,12 +88,12 @@ public class ClassicFtpTestHarness extends AbstractFtpTestHarness
     }
 
     /**
-     * @return {@link #baseDirSystemProperty, and {@link #ftpServer}}
+     * @return {@link #workingDirSystemProperty , and {@link #ftpServer}}
      */
     @Override
     protected TestRule[] getChildRules()
     {
-        return new TestRule[] {baseDirSystemProperty, ftpServer};
+        return new TestRule[] {workingDirSystemProperty, ftpServer};
     }
 
     /**
@@ -187,7 +187,7 @@ public class ClassicFtpTestHarness extends AbstractFtpTestHarness
         FTPFile file = ftpClient.get(path);
 
         assertThat(fileAttributes.getName(), equalTo(file.getName()));
-        assertThat(fileAttributes.getPath(), equalTo(Paths.get("/", BASE_DIR, HELLO_PATH).toString()));
+        assertThat(fileAttributes.getPath(), equalTo(Paths.get("/", WORKING_DIR, HELLO_PATH).toString()));
         assertThat(fileAttributes.getSize(), is(file.getSize()));
         assertTime(fileAttributes.getTimestamp(), file.getTimestamp());
         assertThat(fileAttributes.isDirectory(), is(false));

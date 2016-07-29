@@ -64,45 +64,44 @@ public class FileConnector extends FileConnectorConfig
      */
     @Parameter
     @Optional
-    @DisplayName("Base Directory")
+    @DisplayName("Working Directory")
     @Summary("Directory to be considered as the root of every relative path used with this connector")
-    private String baseDir;
+    private String workingDir;
 
     @Override
     protected void doInitialise() throws InitialisationException
     {
-        validateBaseDir();
+        validateWorkingDir();
     }
 
-    private void validateBaseDir() throws InitialisationException
+    private void validateWorkingDir() throws InitialisationException
     {
-        if (baseDir == null)
+        if (workingDir == null)
         {
-            baseDir = System.getProperty("user.home");
-            if (baseDir == null)
+            workingDir = System.getProperty("user.home");
+            if (workingDir == null)
             {
-                throw new InitialisationException(createStaticMessage("Could not obtain user's home directory. Please provide a explicit value for the baseDir parameter"), this);
+                throw new InitialisationException(createStaticMessage("Could not obtain user's home directory. Please provide a explicit value for the workingDir parameter"), this);
             }
 
-            LOGGER.warn("File connector '{}' does not specify the baseDir property. Defaulting to '{}'", getConfigName(), baseDir);
+            LOGGER.warn("File connector '{}' does not specify the workingDir property. Defaulting to '{}'", getConfigName(), workingDir);
         }
-        Path baseDirPath = Paths.get(baseDir);
-        if (Files.notExists(baseDirPath))
+        Path workingDirPath = Paths.get(workingDir);
+        if (Files.notExists(workingDirPath))
         {
-            throw new InitialisationException(createStaticMessage(format("Provided baseDir '%s' does not exists", baseDirPath.toAbsolutePath())), this);
+            throw new InitialisationException(createStaticMessage(format("Provided workingDir '%s' does not exists", workingDirPath.toAbsolutePath())), this);
         }
-        if (!Files.isDirectory(baseDirPath))
+        if (!Files.isDirectory(workingDirPath))
         {
-            throw new InitialisationException(createStaticMessage(format("Provided baseDir '%s' is not a directory", baseDirPath.toAbsolutePath())), this);
+            throw new InitialisationException(createStaticMessage(format("Provided workingDir '%s' is not a directory", workingDirPath.toAbsolutePath())), this);
         }
     }
 
     /**
      * {@inheritDoc}
      */
-    @Override
-    public String getBaseDir()
+    public String getWorkingDir()
     {
-        return baseDir;
+        return workingDir;
     }
 }

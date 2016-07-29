@@ -40,8 +40,8 @@ public class DirectoryListenerCommand extends LocalFileCommand
     public Path resolveRootPath(FileConnectorConfig config, String directory)
     {
         Path directoryPath = directory == null
-                             ? Paths.get(config.getBaseDir())
-                             : Paths.get(config.getBaseDir()).resolve(directory).toAbsolutePath();
+                             ? Paths.get(config.getWorkingDir())
+                             : Paths.get(config.getWorkingDir()).resolve(directory).toAbsolutePath();
 
         return resolveExistingPath(config, directoryPath.toAbsolutePath().toString());
     }

@@ -56,17 +56,16 @@ public class FtpConnector extends FileConnectorConfig
     @Parameter
     @Optional
     @Summary("The directory to be considered as the root of every relative path used with this connector")
-    @DisplayName("Base Directory")
-    private String baseDir = null;
+    @DisplayName("Working Directory")
+    private String workingDir = null;
 
 
     /**
      * {@inheritDoc}
      */
-    @Override
-    public String getBaseDir()
+    public String getWorkingDir()
     {
-        return baseDir;
+        return workingDir;
     }
 
     public ConnectionManager getConnectionManager()

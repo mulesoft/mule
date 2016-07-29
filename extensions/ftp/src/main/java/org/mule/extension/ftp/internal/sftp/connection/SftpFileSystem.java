@@ -99,7 +99,7 @@ public class SftpFileSystem extends AbstractFileSystem implements FtpFileSystem
     @Override
     public void changeToBaseDir(FileConnectorConfig config)
     {
-        client.changeWorkingDirectory(config.getBaseDir());
+        client.changeWorkingDirectory(config.getWorkingDir());
     }
 
     /**

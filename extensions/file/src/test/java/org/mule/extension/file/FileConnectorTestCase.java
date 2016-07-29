@@ -43,7 +43,7 @@ public abstract class FileConnectorTestCase extends MuleArtifactFunctionalTestCa
     public ExpectedException expectedException = none();
 
     @Rule
-    public SystemProperty baseDir = new SystemProperty("baseDir", temporaryFolder.getRoot().getAbsolutePath());
+    public SystemProperty workingDir = new SystemProperty("workingDir", temporaryFolder.getRoot().getAbsolutePath());
 
     @Override
     protected void doSetUpBeforeMuleContextCreation() throws Exception

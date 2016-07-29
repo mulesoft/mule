@@ -63,7 +63,7 @@ public class SftpTestHarness extends AbstractFtpTestHarness
     protected void doBefore() throws Exception
     {
         temporaryFolder.create();
-        System.setProperty(BASE_DIR_SYSTEM_PROPERTY, temporaryFolder.getRoot().getAbsolutePath());
+        System.setProperty(WORKING_DIR_SYSTEM_PROPERTY, temporaryFolder.getRoot().getAbsolutePath());
         setUpServer();
         sftpClient = createDefaultSftpClient();
     }
@@ -89,7 +89,7 @@ public class SftpTestHarness extends AbstractFtpTestHarness
         finally
         {
             temporaryFolder.delete();
-            System.clearProperty(BASE_DIR_SYSTEM_PROPERTY);
+            System.clearProperty(WORKING_DIR_SYSTEM_PROPERTY);
         }
     }
 
