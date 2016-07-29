@@ -159,7 +159,7 @@
 /mule-standalone-${productVersion}/lib/mule/mule-mvel2-2.1.9-MULE-010.jar
 
 #
-# /app-plugins
+# /plugins
 #
 /mule-standalone-${productVersion}/plugins
 /mule-standalone-${productVersion}/plugins/mule-module-email-${productVersion}.zip
