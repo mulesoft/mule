@@ -49,7 +49,7 @@ public class OperationMessageProcessorObjectFactory extends AbstractExtensionObj
         {
             try
             {
-                ResolverSet resolverSet = getParametersAsResolverSet();
+                ResolverSet resolverSet = getParametersAsResolverSet(operationModel);
                 OperationMessageProcessor processor = createMessageProcessor(resolverSet);
 
                 //TODO: MULE-5002 this should not be necessary but lifecycle issues when injecting message processors automatically

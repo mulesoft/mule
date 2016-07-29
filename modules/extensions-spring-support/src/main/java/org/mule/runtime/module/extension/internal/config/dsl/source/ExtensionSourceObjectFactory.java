@@ -63,7 +63,7 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
     @Override
     public ExtensionMessageSource getObject() throws ConfigurationException
     {
-        ResolverSet resolverSet = getParametersAsResolverSet();
+        ResolverSet resolverSet = getParametersAsResolverSet(sourceModel);
         if (resolverSet.isDynamic())
         {
             throw dynamicParameterException(resolverSet, sourceModel);

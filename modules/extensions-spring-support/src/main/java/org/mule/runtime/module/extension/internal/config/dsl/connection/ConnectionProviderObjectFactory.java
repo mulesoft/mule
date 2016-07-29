@@ -43,7 +43,7 @@ public class ConnectionProviderObjectFactory extends AbstractExtensionObjectFact
     @Override
     public ConnectionProviderResolver getObject() throws Exception
     {
-        ResolverSet resolverSet = getParametersAsResolverSet();
+        ResolverSet resolverSet = getParametersAsResolverSet(providerModel);
         return new ConnectionProviderResolver(new ConnectionProviderObjectBuilder(providerModel, resolverSet, poolingProfile, disableValidation, retryPolicyTemplate, getConnectionManager()));
     }
 
