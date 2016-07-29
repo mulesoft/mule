@@ -43,6 +43,7 @@
         <module>spring-security</module>
         <module>tls</module>
         <module>tomcat</module>
+        <module>tooling</module>
         <module>ws</module>
         <module>xml</module>
     </modules>

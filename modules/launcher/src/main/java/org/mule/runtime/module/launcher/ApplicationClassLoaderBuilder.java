@@ -35,14 +35,12 @@ public class ApplicationClassLoaderBuilder extends AbstractArtifactClassLoaderBu
      * @param artifactClassLoaderFactory factory for the classloader specific to the artifact resource and classes
      * @param artifactPluginRepository repository of plugins contained by the runtime
      * @param artifactPluginFactory factory for creating artifact plugins
-     * @param artifactPluginDescriptorLoader loader for plugin zip files into their descriptors
      */
     public ApplicationClassLoaderBuilder(MuleApplicationClassLoaderFactory artifactClassLoaderFactory,
                                          ArtifactPluginRepository artifactPluginRepository,
-                                         ArtifactPluginFactory artifactPluginFactory,
-                                         ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader)
+                                         ArtifactPluginFactory artifactPluginFactory)
     {
-        super(artifactClassLoaderFactory, artifactPluginRepository, artifactPluginFactory, artifactPluginDescriptorLoader);
+        super(artifactClassLoaderFactory, artifactPluginRepository, artifactPluginFactory);
     }
 
     /**

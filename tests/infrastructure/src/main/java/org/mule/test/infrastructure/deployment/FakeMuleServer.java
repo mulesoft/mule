@@ -14,8 +14,6 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import org.mule.runtime.container.api.MuleCoreExtension;
-import org.mule.runtime.container.internal.ContainerClassLoaderFactory;
-import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.config.MuleProperties;
@@ -25,17 +23,11 @@ import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.launcher.DeploymentListener;
 import org.mule.runtime.module.launcher.DeploymentService;
+import org.mule.runtime.module.launcher.MuleArtifactResourcesRegistry;
 import org.mule.runtime.module.launcher.MuleDeploymentService;
 import org.mule.runtime.module.launcher.application.Application;
 import org.mule.runtime.module.launcher.coreextension.DefaultMuleCoreExtensionManagerServer;
-import org.mule.runtime.module.launcher.coreextension.MuleCoreExtensionDiscoverer;
 import org.mule.runtime.module.launcher.coreextension.ReflectionMuleCoreExtensionDependencyResolver;
-import org.mule.runtime.module.launcher.service.MuleServiceManager;
-import org.mule.runtime.module.launcher.service.DefaultServiceDiscoverer;
-import org.mule.runtime.module.launcher.service.FileSystemServiceProviderDiscoverer;
-import org.mule.runtime.module.launcher.service.ReflectionServiceResolver;
-import org.mule.runtime.module.launcher.service.ReflectionServiceProviderResolutionHelper;
-import org.mule.runtime.module.launcher.service.ServiceClassLoaderFactory;
 import org.mule.runtime.module.launcher.service.ServiceManager;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
@@ -86,8 +78,9 @@ public class FakeMuleServer
 
     public FakeMuleServer(String muleHomePath, List<MuleCoreExtension> intialCoreExtensions)
     {
-        final ContainerClassLoaderFactory containerClassLoaderFactory = new ContainerClassLoaderFactory();
-        containerClassLoader = containerClassLoaderFactory.createContainerClassLoader(getClass().getClassLoader());
+        MuleArtifactResourcesRegistry muleArtifactResourcesRegistry = new MuleArtifactResourcesRegistry();
+        containerClassLoader = muleArtifactResourcesRegistry.getContainerClassLoader();
+        serviceManager = muleArtifactResourcesRegistry.getServiceManager();
 
         this.coreExtensions = intialCoreExtensions;
         for (MuleCoreExtension extension : coreExtensions)
@@ -115,20 +108,12 @@ public class FakeMuleServer
             throw new RuntimeException(e);
         }
 
-        serviceManager = new MuleServiceManager(new DefaultServiceDiscoverer(new FileSystemServiceProviderDiscoverer(containerClassLoader, new ServiceClassLoaderFactory()), new ReflectionServiceResolver(new ReflectionServiceProviderResolutionHelper())));
-        deploymentService = new MuleDeploymentService(containerClassLoader, serviceManager);
+        deploymentService = new MuleDeploymentService(muleArtifactResourcesRegistry.getDomainFactory(), muleArtifactResourcesRegistry.getApplicationFactory());
         deploymentListener = mock(DeploymentListener.class);
         deploymentService.addDeploymentListener(deploymentListener);
 
         coreExtensionManager = new DefaultMuleCoreExtensionManagerServer(
-                new MuleCoreExtensionDiscoverer()
-                {
-                    @Override
-                    public List<MuleCoreExtension> discover() throws DefaultMuleException
-                    {
-                        return coreExtensions;
-                    }
-                },
+                () -> coreExtensions,
                 new ReflectionMuleCoreExtensionDependencyResolver());
         coreExtensionManager.setDeploymentService(deploymentService);
     }

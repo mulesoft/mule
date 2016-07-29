@@ -47,6 +47,11 @@
             <artifactId>mule-module-spring-config</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-tooling</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <!--Other Dependencies-->
         <dependency>

@@ -49,7 +49,6 @@ import static org.mule.runtime.module.launcher.domain.Domain.DEFAULT_DOMAIN_NAME
 import static org.mule.runtime.module.launcher.domain.Domain.DOMAIN_CONFIG_FILE_LOCATION;
 import static org.mule.runtime.module.launcher.service.ServiceDescriptorFactory.SERVICE_PROVIDER_CLASS_NAME;
 import static org.mule.tck.junit4.AbstractMuleContextTestCase.TEST_MESSAGE;
-import org.mule.runtime.container.internal.ContainerClassLoaderFactory;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
@@ -82,12 +81,6 @@ import org.mule.runtime.module.launcher.domain.Domain;
 import org.mule.runtime.module.launcher.domain.DomainClassLoaderFactory;
 import org.mule.runtime.module.launcher.domain.TestDomainFactory;
 import org.mule.runtime.module.launcher.nativelib.DefaultNativeLibraryFinderFactory;
-import org.mule.runtime.module.launcher.service.MuleServiceManager;
-import org.mule.runtime.module.launcher.service.DefaultServiceDiscoverer;
-import org.mule.runtime.module.launcher.service.FileSystemServiceProviderDiscoverer;
-import org.mule.runtime.module.launcher.service.ReflectionServiceResolver;
-import org.mule.runtime.module.launcher.service.ReflectionServiceProviderResolutionHelper;
-import org.mule.runtime.module.launcher.service.ServiceClassLoaderFactory;
 import org.mule.runtime.module.launcher.service.ServiceManager;
 import org.mule.runtime.module.launcher.service.ServiceRepository;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -175,7 +168,6 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     private final DomainFileBuilder dummyUndeployableDomainFileBuilder = new DomainFileBuilder("dummy-undeployable-domain").definedBy("empty-domain-config.xml").deployedWith("redeployment.enabled", "false");
     private final DomainFileBuilder sharedHttpDomainFileBuilder = new DomainFileBuilder("shared-http-domain").definedBy("shared-http-domain-config.xml");
     private final DomainFileBuilder sharedHttpBundleDomainFileBuilder = new DomainFileBuilder("shared-http-domain").definedBy("shared-http-domain-config.xml").containing(httpAAppFileBuilder).containing(httpBAppFileBuilder);
-    private final ArtifactClassLoader containerClassLoader = new ContainerClassLoaderFactory().createContainerClassLoader(getClass().getClassLoader());
 
     protected File muleHome;
     protected File appsDir;
@@ -186,6 +178,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     protected MuleDeploymentService deploymentService;
     protected DeploymentListener applicationDeploymentListener;
     protected DeploymentListener domainDeploymentListener;
+    private ArtifactClassLoader containerClassLoader;
 
     @Rule
     public SystemProperty changeChangeInterval = new SystemProperty(DeploymentDirectoryWatcher.CHANGE_CHECK_INTERVAL_PROPERTY, "10");
@@ -219,8 +212,10 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
 
         applicationDeploymentListener = mock(DeploymentListener.class);
         domainDeploymentListener = mock(DeploymentListener.class);
-        serviceManager = new MuleServiceManager(new DefaultServiceDiscoverer(new FileSystemServiceProviderDiscoverer(containerClassLoader, new ServiceClassLoaderFactory()), new ReflectionServiceResolver(new ReflectionServiceProviderResolutionHelper())));
-        deploymentService = new MuleDeploymentService(containerClassLoader, serviceManager);
+        MuleArtifactResourcesRegistry muleArtifactResourcesRegistry = new MuleArtifactResourcesRegistry();
+        serviceManager = muleArtifactResourcesRegistry.getServiceManager();
+        containerClassLoader = muleArtifactResourcesRegistry.getContainerClassLoader();
+        deploymentService = new MuleDeploymentService(muleArtifactResourcesRegistry.getDomainFactory(), muleArtifactResourcesRegistry.getApplicationFactory());
         deploymentService.addDeploymentListener(applicationDeploymentListener);
         deploymentService.addDomainDeploymentListener(domainDeploymentListener);
     }

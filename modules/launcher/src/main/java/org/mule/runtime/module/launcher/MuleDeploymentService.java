@@ -9,19 +9,11 @@ package org.mule.runtime.module.launcher;
 import static org.mule.runtime.module.launcher.ArtifactDeploymentTemplate.NOP_ARTIFACT_DEPLOYMENT_TEMPLATE;
 import static org.mule.runtime.module.launcher.DefaultArchiveDeployer.ZIP_FILE_SUFFIX;
 import org.mule.runtime.core.util.Preconditions;
-import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilterFactory;
 import org.mule.runtime.module.launcher.application.Application;
-import org.mule.runtime.module.launcher.application.ArtifactPluginClassLoaderFactory;
-import org.mule.runtime.module.launcher.application.ArtifactPluginFactory;
 import org.mule.runtime.module.launcher.application.DefaultApplicationFactory;
-import org.mule.runtime.module.launcher.application.DefaultArtifactPluginFactory;
-import org.mule.runtime.module.launcher.application.MuleApplicationClassLoaderFactory;
 import org.mule.runtime.module.launcher.artifact.ArtifactFactory;
 import org.mule.runtime.module.launcher.domain.DefaultDomainFactory;
-import org.mule.runtime.module.launcher.domain.DefaultDomainManager;
 import org.mule.runtime.module.launcher.domain.Domain;
-import org.mule.runtime.module.launcher.domain.DomainClassLoaderFactory;
 import org.mule.runtime.module.launcher.domain.DomainFactory;
 import org.mule.runtime.module.launcher.domain.DomainManager;
 import org.mule.runtime.module.launcher.nativelib.DefaultNativeLibraryFinderFactory;
@@ -72,30 +64,12 @@ public class MuleDeploymentService implements DeploymentService
     private final CompositeDeploymentListener domainDeploymentListener = new CompositeDeploymentListener();
     private final ArchiveDeployer<Domain> domainDeployer;
     private final DeploymentDirectoryWatcher deploymentDirectoryWatcher;
-    private final DomainManager domainManager = new DefaultDomainManager();
-    private final ArtifactPluginRepository artifactPluginRepository;
     private DefaultArchiveDeployer<Application> applicationDeployer;
 
-    public MuleDeploymentService(ArtifactClassLoader containerClassLoader, ServiceManager serviceManager)
+    public MuleDeploymentService(DefaultDomainFactory domainFactory, DefaultApplicationFactory applicationFactory)
     {
-        DomainClassLoaderFactory domainClassLoaderFactory = new DomainClassLoaderFactory(containerClassLoader.getClassLoader());
-
-        MuleApplicationClassLoaderFactory applicationClassLoaderFactory = new MuleApplicationClassLoaderFactory(new DefaultNativeLibraryFinderFactory());
-
         //TODO MULE-9653 : Migrate domain class loader creation to use ArtifactClassLoaderBuilder which already has support for artifact plugins.
-        DefaultDomainFactory domainFactory = new DefaultDomainFactory(domainClassLoaderFactory, domainManager, containerClassLoader);
         domainFactory.setDeploymentListener(domainDeploymentListener);
-
-        final ArtifactPluginFactory artifactPluginFactory = new DefaultArtifactPluginFactory(new ArtifactPluginClassLoaderFactory());
-        final ArtifactPluginDescriptorFactory artifactPluginDescriptorFactory = new ArtifactPluginDescriptorFactory(new DefaultArtifactClassLoaderFilterFactory());
-        artifactPluginRepository = new DefaultArtifactPluginRepository(artifactPluginDescriptorFactory);
-
-        ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader = new ArtifactPluginDescriptorLoader(artifactPluginDescriptorFactory);
-        final ApplicationDescriptorFactory applicationDescriptorFactory = new ApplicationDescriptorFactory(artifactPluginDescriptorLoader, artifactPluginRepository);
-
-        ApplicationClassLoaderBuilderFactory applicationClassLoaderBuilderFactory = new ApplicationClassLoaderBuilderFactory(applicationClassLoaderFactory, artifactPluginRepository, artifactPluginFactory, artifactPluginDescriptorLoader);
-
-        DefaultApplicationFactory applicationFactory = new DefaultApplicationFactory(applicationClassLoaderBuilderFactory, applicationDescriptorFactory, artifactPluginRepository, domainManager, serviceManager);
         applicationFactory.setDeploymentListener(applicationDeploymentListener);
 
         ArtifactDeployer<Application> applicationMuleDeployer = new DefaultArtifactDeployer<>();

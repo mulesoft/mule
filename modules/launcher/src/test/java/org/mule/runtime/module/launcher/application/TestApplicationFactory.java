@@ -45,7 +45,7 @@ public class TestApplicationFactory extends DefaultApplicationFactory
         ApplicationDescriptorFactory applicationDescriptorFactory = new ApplicationDescriptorFactory(artifactPluginDescriptorLoader, applicationPluginRepository);
         ArtifactPluginClassLoaderFactory artifactPluginClassLoaderFactory = new ArtifactPluginClassLoaderFactory();
         DefaultArtifactPluginFactory applicationPluginFactory = new DefaultArtifactPluginFactory(artifactPluginClassLoaderFactory);
-        ApplicationClassLoaderBuilderFactory applicationClassLoaderBuilderFactory = new ApplicationClassLoaderBuilderFactory(applicationClassLoaderFactory, applicationPluginRepository, applicationPluginFactory, artifactPluginDescriptorLoader);
+        ApplicationClassLoaderBuilderFactory applicationClassLoaderBuilderFactory = new ApplicationClassLoaderBuilderFactory(applicationClassLoaderFactory, applicationPluginRepository, applicationPluginFactory);
         return new TestApplicationFactory(applicationClassLoaderBuilderFactory, applicationDescriptorFactory, applicationPluginRepository, domainManager, serviceRepository);
     }
 

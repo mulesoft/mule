@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.launcher;
 
-import org.mule.runtime.container.internal.ContainerClassLoaderFactory;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleRuntimeException;
@@ -24,15 +23,11 @@ import org.mule.runtime.module.launcher.coreextension.DefaultMuleCoreExtensionMa
 import org.mule.runtime.module.launcher.coreextension.MuleCoreExtensionManagerServer;
 import org.mule.runtime.module.launcher.coreextension.ReflectionMuleCoreExtensionDependencyResolver;
 import org.mule.runtime.module.launcher.log4j2.MuleLog4jContextFactory;
-import org.mule.runtime.module.launcher.service.DefaultServiceDiscoverer;
-import org.mule.runtime.module.launcher.service.ReflectionServiceResolver;
-import org.mule.runtime.module.launcher.service.MuleServiceManager;
-import org.mule.runtime.module.launcher.service.FileSystemServiceProviderDiscoverer;
-import org.mule.runtime.module.launcher.service.ReflectionServiceProviderResolutionHelper;
-import org.mule.runtime.module.launcher.service.ServiceClassLoaderFactory;
 import org.mule.runtime.module.launcher.service.ServiceManager;
 import org.mule.runtime.module.repository.api.RepositoryService;
 import org.mule.runtime.module.repository.internal.RepositoryServiceFactory;
+import org.mule.runtime.module.tooling.api.ToolingService;
+import org.mule.runtime.module.tooling.internal.DefaultToolingService;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -76,7 +71,9 @@ public class MuleContainer
 
     protected final DeploymentService deploymentService;
     private final RepositoryService repositoryService;
+    private final ToolingService toolingService;
     private final MuleCoreExtensionManagerServer coreExtensionManager;
+    private MuleArtifactResourcesRegistry artifactResourcesRegistry;
 
     static
     {
@@ -104,32 +101,35 @@ public class MuleContainer
 
     public MuleContainer(String[] args)
     {
-        final ContainerClassLoaderFactory containerClassLoaderFactory = new ContainerClassLoaderFactory();
-        final ArtifactClassLoader containerClassLoader = containerClassLoaderFactory.createContainerClassLoader(getClass().getClassLoader());
+        artifactResourcesRegistry = new MuleArtifactResourcesRegistry();
 
-        this.serviceManager = new MuleServiceManager(new DefaultServiceDiscoverer(new FileSystemServiceProviderDiscoverer(containerClassLoader, new ServiceClassLoaderFactory()), new ReflectionServiceResolver(new ReflectionServiceProviderResolutionHelper())));
-        this.deploymentService = new MuleDeploymentService(containerClassLoader, serviceManager);
+        this.serviceManager = artifactResourcesRegistry.getServiceManager();
+
+        this.deploymentService = new MuleDeploymentService(artifactResourcesRegistry.getDomainFactory(), artifactResourcesRegistry.getApplicationFactory());
         this.repositoryService = new RepositoryServiceFactory().createRepositoryService();
-        this.coreExtensionManager = new DefaultMuleCoreExtensionManagerServer(new ClasspathMuleCoreExtensionDiscoverer(containerClassLoader), new ReflectionMuleCoreExtensionDependencyResolver());
+
+        this.toolingService = new DefaultToolingService(repositoryService, new TemporaryToolingArtifactBuilderFactory(artifactResourcesRegistry));
+        this.coreExtensionManager = new DefaultMuleCoreExtensionManagerServer(new ClasspathMuleCoreExtensionDiscoverer(artifactResourcesRegistry.getContainerClassLoader()), new ReflectionMuleCoreExtensionDependencyResolver());
 
         init(args);
     }
 
-    public MuleContainer(DeploymentService deploymentService, RepositoryService repositoryService, MuleCoreExtensionManagerServer coreExtensionManager, ServiceManager serviceManager)
+    public MuleContainer(DeploymentService deploymentService, RepositoryService repositoryService, ToolingService toolingService, MuleCoreExtensionManagerServer coreExtensionManager, ServiceManager serviceManager)
     {
-        this(new String[0], deploymentService, repositoryService, coreExtensionManager, serviceManager);
+        this(new String[0], deploymentService, repositoryService, toolingService, coreExtensionManager, serviceManager);
     }
 
     /**
      * Configure the server with command-line arguments.
      */
-    public MuleContainer(String[] args, DeploymentService deploymentService, RepositoryService repositoryService, MuleCoreExtensionManagerServer coreExtensionManager, ServiceManager serviceManager) throws IllegalArgumentException
+    public MuleContainer(String[] args, DeploymentService deploymentService, RepositoryService repositoryService, ToolingService toolingService, MuleCoreExtensionManagerServer coreExtensionManager, ServiceManager serviceManager) throws IllegalArgumentException
     {
         //TODO(pablo.kraan): remove the args argument and use the already existing setters to set everything needed
         this.deploymentService = deploymentService;
         this.coreExtensionManager = coreExtensionManager;
         this.repositoryService = repositoryService;
         this.serviceManager = serviceManager;
+        this.toolingService = toolingService;
         init(args);
     }
 
@@ -186,6 +186,7 @@ public class MuleContainer
 
             coreExtensionManager.setDeploymentService(deploymentService);
             coreExtensionManager.setRepositoryService(repositoryService);
+            coreExtensionManager.setToolingService(toolingService);
             coreExtensionManager.initialise();
             coreExtensionManager.start();
 

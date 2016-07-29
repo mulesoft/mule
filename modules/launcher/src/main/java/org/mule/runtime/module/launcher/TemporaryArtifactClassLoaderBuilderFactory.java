@@ -6,9 +6,7 @@
  */
 package org.mule.runtime.module.launcher;
 
-import org.mule.runtime.module.artifact.classloader.DeployableArtifactClassLoaderFactory;
 import org.mule.runtime.module.launcher.application.ArtifactPluginFactory;
-import org.mule.runtime.module.launcher.plugin.ArtifactPluginDescriptorLoader;
 import org.mule.runtime.module.launcher.plugin.ArtifactPluginRepository;
 
 /**
@@ -16,28 +14,22 @@ import org.mule.runtime.module.launcher.plugin.ArtifactPluginRepository;
  *
  * @since 4.0
  */
-public class ArtifactClassLoaderBuilderFactory
+public class TemporaryArtifactClassLoaderBuilderFactory
 {
 
-    private DeployableArtifactClassLoaderFactory artifactClassLoaderFactory;
     private ArtifactPluginRepository applicationPluginRepository;
     private ArtifactPluginFactory artifactPluginFactory;
-    private ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader;
 
     /**
      * Creates an {@code ArtifactClassLoaderBuilderFactory} to create instances of {@code ArtifactClassLoaderBuilder}.
      *
-     * @param artifactClassLoaderFactory factory for creating the artifact resources and classes specific class loader
      * @param applicationPluginRepository repository for artifacts plugins that are provided by default by the runtime
      * @param artifactPluginFactory factory for creating an artifact plugin from it's descriptor
-     * @param artifactPluginDescriptorLoader factory for loading the artifact plugin descriptor from a file
      */
-    public ArtifactClassLoaderBuilderFactory(DeployableArtifactClassLoaderFactory artifactClassLoaderFactory, ArtifactPluginRepository applicationPluginRepository, ArtifactPluginFactory artifactPluginFactory, ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader)
+    public TemporaryArtifactClassLoaderBuilderFactory(ArtifactPluginRepository applicationPluginRepository, ArtifactPluginFactory artifactPluginFactory)
     {
-        this.artifactClassLoaderFactory = artifactClassLoaderFactory;
         this.applicationPluginRepository = applicationPluginRepository;
         this.artifactPluginFactory = artifactPluginFactory;
-        this.artifactPluginDescriptorLoader = artifactPluginDescriptorLoader;
     }
 
     /**
@@ -45,9 +37,9 @@ public class ArtifactClassLoaderBuilderFactory
      *
      * @return a new instance of {@code ArtifactClassLoaderBuilder}
      */
-    public ArtifactClassLoaderBuilder createArtifactClassLoaderBuilder()
+    public TemporaryArtifactClassLoaderBuilder createArtifactClassLoaderBuilder()
     {
-        return new ArtifactClassLoaderBuilder(artifactClassLoaderFactory, applicationPluginRepository, artifactPluginFactory, artifactPluginDescriptorLoader);
+        return new TemporaryArtifactClassLoaderBuilder(applicationPluginRepository, artifactPluginFactory);
     }
 
 }

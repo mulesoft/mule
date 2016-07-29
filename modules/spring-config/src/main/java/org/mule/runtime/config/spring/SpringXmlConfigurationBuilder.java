@@ -6,9 +6,11 @@
  */
 package org.mule.runtime.config.spring;
 
+import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import org.mule.runtime.config.spring.dsl.api.config.ArtifactConfiguration;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.ParentMuleContextAwareConfigurationBuilder;
@@ -34,6 +36,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 public class SpringXmlConfigurationBuilder extends AbstractResourceConfigurationBuilder implements ParentMuleContextAwareConfigurationBuilder
 {
 
+    private ArtifactConfiguration artifactConfiguration = new ArtifactConfiguration(emptyList());
     protected boolean useDefaultConfigResource = true;
     protected boolean useMinimalConfigResource = false;
 
@@ -42,7 +45,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     protected ApplicationContext domainContext;
     protected ApplicationContext parentContext;
     protected ApplicationContext applicationContext;
-    private final ArtifactType artifactType;
+    private ArtifactType artifactType;
     private final List<MuleContextServiceConfigurator> serviceConfigurators = new ArrayList<>();
 
     public SpringXmlConfigurationBuilder(String[] configResources, Map<String, String> artifactProperties, ArtifactType artifactType) throws ConfigurationException
@@ -70,6 +73,13 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     public SpringXmlConfigurationBuilder(String[] configFiles) throws ConfigurationException
     {
         super(configFiles, emptyMap());
+        this.artifactType = APP;
+    }
+
+    public SpringXmlConfigurationBuilder(String[] configurationFiles, ArtifactConfiguration artifactConfiguration, Map<String, String> artifactProperties, ArtifactType artifactType) throws ConfigurationException
+    {
+        this(configurationFiles, artifactProperties, artifactType);
+        this.artifactConfiguration = artifactConfiguration;
         this.artifactType = APP;
     }
 
@@ -128,15 +138,15 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
         {
             applicationObjectcontroller = new CompositeOptionalObjectsController(applicationObjectcontroller, parentObjectController);
         }
-
-        final ApplicationContext applicationContext = doCreateApplicationContext(muleContext, artifactConfigResources, applicationObjectcontroller);
+        //TODO MULE-10084 : Refactor to only accept artifactConfiguration and not artifactConfigResources
+        final ApplicationContext applicationContext = doCreateApplicationContext(muleContext, artifactConfigResources, artifactConfiguration, applicationObjectcontroller);
         serviceConfigurators.forEach(serviceConfigurator -> serviceConfigurator.configure(muleContext.getCustomizationService()));
         return applicationContext;
     }
 
-    protected ApplicationContext doCreateApplicationContext(MuleContext muleContext, ConfigResource[] artifactConfigResources, OptionalObjectsController optionalObjectsController)
+    protected ApplicationContext doCreateApplicationContext(MuleContext muleContext, ConfigResource[] artifactConfigResources, ArtifactConfiguration artifactConfiguration, OptionalObjectsController optionalObjectsController)
     {
-        return new MuleArtifactContext(muleContext, artifactConfigResources, optionalObjectsController, getArtifactProperties(), artifactType);
+        return new MuleArtifactContext(muleContext, artifactConfigResources, artifactConfiguration, optionalObjectsController, getArtifactProperties(), artifactType);
     }
 
 

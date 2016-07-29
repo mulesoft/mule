@@ -156,6 +156,7 @@
                 <include>org.mule.modules:mule-module-sockets</include>
                 <include>org.mule.modules:mule-module-tls</include>
                 <include>org.mule.modules:mule-module-tomcat</include>
+                <include>org.mule.modules:mule-module-tooling</include>
                 <include>org.mule.modules:mule-module-ws</include>
                 <include>org.mule.modules:mule-module-xml</include>
                 <include>org.mule.transports:mule-transport-sockets</include>
@@ -224,6 +225,7 @@
                 <exclude>org.mule.modules:mule-module-sockets</exclude>
                 <exclude>org.mule.modules:mule-module-tls</exclude>
                 <exclude>org.mule.modules:mule-module-tomcat</exclude>
+                <exclude>org.mule.modules:mule-module-tooling</exclude>
                 <exclude>org.mule.modules:mule-module-ws</exclude>
                 <exclude>org.mule.modules:mule-module-xml</exclude>
                 <exclude>org.mule.transports:mule-transport-sockets</exclude>

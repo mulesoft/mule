@@ -18,6 +18,7 @@ import org.mule.runtime.module.launcher.coreextension.MuleCoreExtensionManagerSe
 import org.mule.runtime.module.launcher.log4j2.MuleLog4jContextFactory;
 import org.mule.runtime.module.launcher.service.ServiceManager;
 import org.mule.runtime.module.repository.api.RepositoryService;
+import org.mule.runtime.module.tooling.api.ToolingService;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.size.SmallTest;
@@ -49,12 +50,13 @@ public class MuleContainerTestCase extends AbstractMuleTestCase
 
     private final ServiceManager serviceManager = mock(ServiceManager.class);
 
+    private ToolingService toolingService = mock(ToolingService.class);
+
     @Before
     public void setUp() throws Exception
     {
         coreExtensionManager = mock(MuleCoreExtensionManagerServer.class);
-
-        container = new MuleContainer(deploymentService, repositoryService, coreExtensionManager, serviceManager);
+        container = new MuleContainer(deploymentService, repositoryService, toolingService, coreExtensionManager, serviceManager);
         FileUtils.deleteDirectory(getExecutionFolder());
     }
 
@@ -65,6 +67,7 @@ public class MuleContainerTestCase extends AbstractMuleTestCase
 
         verify(coreExtensionManager).setDeploymentService(deploymentService);
         verify(coreExtensionManager).setRepositoryService(repositoryService);
+        verify(coreExtensionManager).setToolingService(toolingService);
         verify(coreExtensionManager).initialise();
         verify(coreExtensionManager).start();
     }

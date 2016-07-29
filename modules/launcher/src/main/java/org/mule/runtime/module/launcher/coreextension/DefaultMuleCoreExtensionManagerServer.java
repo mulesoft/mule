@@ -15,7 +15,9 @@ import org.mule.runtime.module.launcher.DeploymentListener;
 import org.mule.runtime.module.launcher.DeploymentService;
 import org.mule.runtime.module.launcher.DeploymentServiceAware;
 import org.mule.runtime.module.launcher.RepositoryServiceAware;
+import org.mule.runtime.module.launcher.ToolingServiceAware;
 import org.mule.runtime.module.repository.api.RepositoryService;
+import org.mule.runtime.module.tooling.api.ToolingService;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -33,6 +35,7 @@ public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionM
     private List<MuleCoreExtension> coreExtensions = new LinkedList<>();
     private DeploymentService deploymentService;
     private RepositoryService repositoryService;
+    private ToolingService toolingService;
     private List<MuleCoreExtension> orderedCoreExtensions;
 
     public DefaultMuleCoreExtensionManagerServer(MuleCoreExtensionDiscoverer coreExtensionDiscoverer, MuleCoreExtensionDependencyResolver coreExtensionDependencyResolver)
@@ -124,6 +127,11 @@ public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionM
                 ((RepositoryServiceAware) extension).setRepositoryService(repositoryService);
             }
 
+            if (extension instanceof ToolingServiceAware)
+            {
+                ((ToolingServiceAware) extension).setToolingService(toolingService);
+            }
+
             if (extension instanceof DeploymentListener)
             {
                 deploymentService.addDeploymentListener((DeploymentListener) extension);
@@ -148,5 +156,10 @@ public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionM
     public void setRepositoryService(RepositoryService repositoryService)
     {
         this.repositoryService = repositoryService;
+    }
+
+    public void setToolingService(ToolingService toolingService)
+    {
+        this.toolingService = toolingService;
     }
 }

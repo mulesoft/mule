@@ -6,11 +6,13 @@
  */
 package org.mule.runtime.config.builders;
 
+import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
 import org.mule.runtime.config.spring.MuleArtifactContext;
 import org.mule.runtime.config.spring.OptionalObjectsController;
 import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
+import org.mule.runtime.config.spring.dsl.api.config.ArtifactConfiguration;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.config.ConfigResource;
@@ -99,10 +101,10 @@ public class WebappMuleXmlConfigurationBuilder extends SpringXmlConfigurationBui
     }
 
     @Override
-    protected ApplicationContext doCreateApplicationContext(MuleContext muleContext, ConfigResource[] artifactConfigResources, OptionalObjectsController optionalObjectsController)
+    protected ApplicationContext doCreateApplicationContext(MuleContext muleContext, ConfigResource[] artifactConfigResources, ArtifactConfiguration artifactConfiguration, OptionalObjectsController optionalObjectsController)
     {
         Resource[] artifactConfigServletContextResources = preProcessResources(artifactConfigResources);
-        return new MuleArtifactContext(muleContext, artifactConfigServletContextResources, optionalObjectsController, emptyMap(), APP);
+        return new MuleArtifactContext(muleContext, artifactConfigServletContextResources, new ArtifactConfiguration(emptyList()), optionalObjectsController, emptyMap(), APP);
     }
 
     private Resource[] preProcessResources(ConfigResource[] configResources)

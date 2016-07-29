@@ -259,6 +259,18 @@
 			<!--<scope>test</scope>-->
 		</dependency>
 		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>${jsonVersion}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.mashape.unirest</groupId>
+			<artifactId>unirest-java</artifactId>
+			<version>${unirestVersion}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
 			<groupId>org.aspectj</groupId>
 			<artifactId>aspectjrt</artifactId>
 			<scope>test</scope>

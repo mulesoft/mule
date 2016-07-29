@@ -154,6 +154,7 @@
 /mule-standalone-${productVersion}/lib/mule/mule-transport-sockets-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-tls-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-tomcat-${productVersion}.jar
+/mule-standalone-${productVersion}/lib/mule/mule-module-tooling-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-ws-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-xml-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-mvel2-2.1.9-MULE-010.jar
