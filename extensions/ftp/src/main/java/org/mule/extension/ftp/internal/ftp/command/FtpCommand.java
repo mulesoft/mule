@@ -185,7 +185,7 @@ public abstract class FtpCommand<Connection extends FtpFileSystem> extends FileC
 
     protected void createDirectory(FileConnectorConfig config, String directoryPath)
     {
-        final Path path = Paths.get(config.getBaseDir()).resolve(directoryPath);
+        final Path path = Paths.get(config.getWorkingDir()).resolve(directoryPath);
         FileAttributes targetFile = getFile(config, directoryPath);
 
         if (targetFile != null)

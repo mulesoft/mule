@@ -35,12 +35,12 @@ abstract class LocalFileCommand extends FileCommand<LocalFileSystem>
     }
 
     /**
-     * @return a {@link Path} derived from {@link FileConnector#getBaseDir()}
+     * @return a {@link Path} derived from {@link FileConnector#getWorkingDir()}
      */
     @Override
     protected Path getBasePath(FileConnectorConfig config)
     {
-        return Paths.get(config.getBaseDir());
+        return Paths.get(config.getWorkingDir());
     }
 
     /**

@@ -43,7 +43,7 @@ public abstract class FileConnectorConfig implements Initialisable
      * The directory to be considered as the root of every
      * relative path used with this connector.
      */
-    public abstract String getBaseDir();
+    public abstract String getWorkingDir();
 
     /**
      * @return the name that this config has on the mule registry

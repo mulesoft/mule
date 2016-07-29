@@ -275,20 +275,20 @@ public final class ClassicFtpFileSystem extends AbstractFileSystem implements Ft
 
     /**
      * Changes the {@link #client}'s current working directory to
-     * the {@code config}'s {@link FileConnectorConfig#getBaseDir()}
+     * the {@code config}'s {@link FileConnectorConfig#getWorkingDir()}
      */
     @Override
     public void changeToBaseDir(FileConnectorConfig config)
     {
-        if (config.getBaseDir() != null)
+        if (config.getWorkingDir() != null)
         {
             try
             {
-                client.changeWorkingDirectory(Paths.get(config.getBaseDir()).toString());
+                client.changeWorkingDirectory(Paths.get(config.getWorkingDir()).toString());
             }
             catch (IOException e)
             {
-                throw new MuleRuntimeException(createStaticMessage(format("Failed to perform CWD to the base directory '%s'", config.getBaseDir())), e);
+                throw new MuleRuntimeException(createStaticMessage(format("Failed to perform CWD to the base directory '%s'", config.getWorkingDir())), e);
             }
         }
     }
