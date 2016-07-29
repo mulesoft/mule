@@ -6,12 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.config;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
 import org.mule.functional.junit4.InvalidExtensionConfigTestCase;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
-
-import org.junit.rules.ExpectedException;
 
 public class OperationWithExpressionConfigReference extends InvalidExtensionConfigTestCase
 {
@@ -20,12 +16,6 @@ public class OperationWithExpressionConfigReference extends InvalidExtensionConf
     protected Class<?>[] getAnnotatedExtensionClasses()
     {
         return new Class<?>[]{HeisenbergExtension.class};
-    }
-
-    @Override
-    protected void additionalExceptionAssertions(ExpectedException expectedException)
-    {
-        expectedException.expectCause(instanceOf(InitialisationException.class));
     }
 
     @Override

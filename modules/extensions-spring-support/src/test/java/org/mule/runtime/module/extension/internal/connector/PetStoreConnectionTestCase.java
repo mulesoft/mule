@@ -62,7 +62,7 @@ public abstract class PetStoreConnectionTestCase extends ExtensionFunctionalTest
 
     protected PetStoreClient getClient() throws Exception
     {
-        PetStoreClient client = (PetStoreClient) runFlow("getClient").getMessage().getPayload();
+        PetStoreClient client = runFlow("getClient").getMessage().getPayload();
         assertThat(client, is(notNullValue()));
         return client;
     }

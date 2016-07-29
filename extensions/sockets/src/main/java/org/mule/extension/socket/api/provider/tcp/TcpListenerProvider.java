@@ -9,7 +9,6 @@ package org.mule.extension.socket.api.provider.tcp;
 import static org.mule.extension.socket.api.SocketsExtension.TLS;
 import static org.mule.extension.socket.api.SocketsExtension.TLS_CONFIGURATION;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-
 import org.mule.extension.socket.api.ConnectionSettings;
 import org.mule.extension.socket.api.connection.tcp.TcpListenerConnection;
 import org.mule.extension.socket.api.connection.tcp.protocol.SafeProtocol;
@@ -21,8 +20,6 @@ import org.mule.extension.socket.api.socket.tcp.TcpServerSocketProperties;
 import org.mule.extension.socket.api.source.SocketListener;
 import org.mule.extension.socket.internal.SocketUtils;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.connection.ConnectionHandlingStrategy;
-import org.mule.runtime.api.connection.ConnectionHandlingStrategyFactory;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.tls.TlsContextFactory;
@@ -123,15 +120,6 @@ public final class TcpListenerProvider implements ConnectionProvider<TcpListener
     public ConnectionValidationResult validate(TcpListenerConnection connection)
     {
         return SocketUtils.validate(connection);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ConnectionHandlingStrategy<TcpListenerConnection> getHandlingStrategy(ConnectionHandlingStrategyFactory<TcpListenerConnection> handlingStrategyFactory)
-    {
-        return handlingStrategyFactory.none();
     }
 
     @Override

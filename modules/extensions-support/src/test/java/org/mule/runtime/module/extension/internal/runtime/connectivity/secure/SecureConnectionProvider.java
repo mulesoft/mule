@@ -7,8 +7,6 @@
 package org.mule.runtime.module.extension.internal.runtime.connectivity.secure;
 
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.connection.ConnectionHandlingStrategy;
-import org.mule.runtime.api.connection.ConnectionHandlingStrategyFactory;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.extension.api.annotation.Parameter;
@@ -42,11 +40,5 @@ public class SecureConnectionProvider implements ConnectionProvider<Object>
     public ConnectionValidationResult validate(Object o)
     {
         return ConnectionValidationResult.success();
-    }
-
-    @Override
-    public ConnectionHandlingStrategy<Object> getHandlingStrategy(ConnectionHandlingStrategyFactory<Object> connectionHandlingStrategyFactory)
-    {
-        return null;
     }
 }

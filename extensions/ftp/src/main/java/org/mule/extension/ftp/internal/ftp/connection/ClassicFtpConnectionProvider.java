@@ -11,9 +11,6 @@ import org.mule.extension.ftp.api.ftp.FtpTransferMode;
 import org.mule.extension.ftp.internal.AbstractFtpConnectionProvider;
 import org.mule.extension.ftp.internal.FtpConnector;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.connection.ConnectionHandlingStrategy;
-import org.mule.runtime.api.connection.ConnectionHandlingStrategyFactory;
-import org.mule.runtime.api.connection.PoolingListener;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
@@ -126,26 +123,11 @@ public class ClassicFtpConnectionProvider extends AbstractFtpConnectionProvider<
         return new FTPClient();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public ConnectionHandlingStrategy<ClassicFtpFileSystem> getHandlingStrategy(ConnectionHandlingStrategyFactory<ClassicFtpFileSystem> handlingStrategyFactory)
+    public void onBorrow(ClassicFtpFileSystem connection)
     {
-        return handlingStrategyFactory.supportsPooling(new PoolingListener<ClassicFtpFileSystem>()
-        {
-            @Override
-            public void onBorrow(ClassicFtpFileSystem connection)
-            {
-                connection.setTransferMode(transferMode);
-                connection.setResponseTimeout(getResponseTimeout(), getResponseTimeoutUnit());
-                connection.setPassiveMode(passive);
-            }
-
-            @Override
-            public void onReturn(ClassicFtpFileSystem connection)
-            {
-            }
-        });
+        connection.setTransferMode(transferMode);
+        connection.setResponseTimeout(getResponseTimeout(), getResponseTimeoutUnit());
+        connection.setPassiveMode(passive);
     }
 }

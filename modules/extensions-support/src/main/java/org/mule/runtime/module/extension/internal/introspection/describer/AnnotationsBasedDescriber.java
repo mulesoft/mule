@@ -11,6 +11,9 @@ import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toCollection;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import static org.mule.runtime.extension.api.introspection.connection.ConnectionManagementType.CACHED;
+import static org.mule.runtime.extension.api.introspection.connection.ConnectionManagementType.NONE;
+import static org.mule.runtime.extension.api.introspection.connection.ConnectionManagementType.POOLING;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.THREADING_PROFILE_ATTRIBUTE_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.TLS_ATTRIBUTE_NAME;
 import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.addConfigTypeModelProperty;
@@ -37,7 +40,9 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.MuleVersion;
+import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionProvider;
+import org.mule.runtime.api.connection.PoolingConnectionProvider;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.internal.metadata.DefaultMetadataResolverFactory;
@@ -66,6 +71,7 @@ import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.introspection.ComponentModel;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
+import org.mule.runtime.extension.api.introspection.connection.ConnectionManagementType;
 import org.mule.runtime.extension.api.introspection.declaration.DescribingContext;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ComponentDeclarer;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ConfigurationDeclarer;
@@ -641,6 +647,18 @@ public final class AnnotationsBasedDescriber implements Describer
                 .createdWith(new DefaultConnectionProviderFactory<>(providerClass, extensionType.getClassLoader()))
                 .whichGivesConnectionsOfType(providerGenerics.get(0))
                 .withModelProperty(new ImplementingTypeModelProperty(providerClass));
+
+        ConnectionManagementType managementType = NONE;
+        if (PoolingConnectionProvider.class.isAssignableFrom(providerClass))
+        {
+            managementType = POOLING;
+        }
+        else if (CachedConnectionProvider.class.isAssignableFrom(providerClass))
+        {
+            managementType = CACHED;
+        }
+
+        providerDeclarer.withConnectionManagementType(managementType);
 
         connectionProviderDeclarers.put(providerClass, providerDeclarer);
         declareAnnotatedParameters(providerClass, providerDeclarer);

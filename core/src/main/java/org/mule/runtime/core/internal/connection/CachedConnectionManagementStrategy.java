@@ -13,20 +13,20 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 
 /**
- * A {@link ConnectionHandlingStrategyAdapter} which lazily creates and caches connections,
+ * A {@link ConnectionManagementStrategy} which lazily creates and caches connections,
  * so that the same instance is returned each time that one is required.
  * <p/>
  * When {@link ConnectionHandler#release()} is invoked on the instances returned
  * by {@link #getConnectionHandler()}, the connection is not actually closed. It
  * will only be disconnected when {@link #close()} is called.
  *
- * @param <Connection> the generic type of the connections being managed
+ * @param <C> the generic type of the connections being managed
  * @since 4.0
  */
-final class CachedConnectionHandlingStrategy<Connection> extends ConnectionHandlingStrategyAdapter<Connection>
+final class CachedConnectionManagementStrategy<C> extends ConnectionManagementStrategy<C>
 {
 
-    private final ConnectionHandlerAdapter<Connection> connection;
+    private final ConnectionHandlerAdapter<C> connection;
 
     /**
      * Creates a new instance
@@ -34,7 +34,7 @@ final class CachedConnectionHandlingStrategy<Connection> extends ConnectionHandl
      * @param connectionProvider the {@link ConnectionProvider} used to manage the connections
      * @param muleContext        the owning {@link MuleContext}
      */
-    CachedConnectionHandlingStrategy(ConnectionProvider<Connection> connectionProvider, MuleContext muleContext)
+    CachedConnectionManagementStrategy(ConnectionProvider<C> connectionProvider, MuleContext muleContext)
     {
         super(connectionProvider, muleContext);
         connection = new CachedConnectionHandler<>(connectionProvider, muleContext);
@@ -47,7 +47,7 @@ final class CachedConnectionHandlingStrategy<Connection> extends ConnectionHandl
      * @throws ConnectionException if the connection could not be established
      */
     @Override
-    public ConnectionHandler<Connection> getConnectionHandler() throws ConnectionException
+    public ConnectionHandler<C> getConnectionHandler() throws ConnectionException
     {
         return connection;
     }

@@ -6,15 +6,9 @@
  */
 package org.mule.test.petstore.extension;
 
-import org.mule.runtime.api.connection.ConnectionHandlingStrategy;
-import org.mule.runtime.api.connection.ConnectionHandlingStrategyFactory;
+import org.mule.runtime.api.connection.CachedConnectionProvider;
 
-public class SimplePetStoreConnectionProvider extends PetStoreConnectionProvider
+public class SimplePetStoreConnectionProvider extends PetStoreConnectionProvider implements CachedConnectionProvider<PetStoreClient>
 {
 
-    @Override
-    public ConnectionHandlingStrategy<PetStoreClient> getHandlingStrategy(ConnectionHandlingStrategyFactory handlingStrategyFactory)
-    {
-        return handlingStrategyFactory.cached();
-    }
 }

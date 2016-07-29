@@ -24,13 +24,8 @@ import java.util.Date;
 
 import javax.inject.Inject;
 
-;
-
 public abstract class PetStoreConnectionProvider implements ConnectionProvider<PetStoreClient>, Lifecycle
 {
-
-    public static final String USER = "john";
-    public static final String PASSWORD = "doe";
 
     private int initialise, start, stop, dispose = 0;
 

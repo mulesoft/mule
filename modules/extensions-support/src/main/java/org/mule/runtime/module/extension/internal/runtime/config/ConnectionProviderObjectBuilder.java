@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.config;
 
+import static org.mule.runtime.extension.api.introspection.connection.ConnectionManagementType.CACHED;
+import static org.mule.runtime.extension.api.introspection.connection.ConnectionManagementType.NONE;
+import static org.mule.runtime.extension.api.introspection.connection.ConnectionManagementType.POOLING;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.injectConfigName;
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -14,8 +17,8 @@ import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.internal.connection.CachedConnectionProviderWrapper;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.connection.PoolingConnectionProviderWrapper;
+import org.mule.runtime.extension.api.introspection.connection.ConnectionManagementType;
 import org.mule.runtime.extension.api.introspection.connection.RuntimeConnectionProviderModel;
-import org.mule.runtime.extension.api.introspection.property.ConnectionHandlingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.ParameterGroupAwareObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
@@ -70,19 +73,18 @@ public final class ConnectionProviderObjectBuilder extends ParameterGroupAwareOb
         ConnectionProvider provider = super.build(result);
         injectConfigName(providerModel, provider, ownerConfigName);
 
-        ConnectionHandlingTypeModelProperty connectionHandlingType = providerModel.getModelProperty(ConnectionHandlingTypeModelProperty.class).orElse(null);
-
-        if (connectionHandlingType != null)
+        final ConnectionManagementType connectionManagementType = providerModel.getConnectionManagementType();
+        if (connectionManagementType == POOLING)
         {
-            if (connectionHandlingType.isPooled())
-            {
-                provider = new PoolingConnectionProviderWrapper(provider, poolingProfile, disableValidation, retryPolicyTemplate);
-            }
-
-            if (connectionHandlingType.isCached())
-            {
-                provider = new CachedConnectionProviderWrapper(provider, disableValidation, retryPolicyTemplate);
-            }
+            provider = new PoolingConnectionProviderWrapper(provider, poolingProfile, disableValidation, retryPolicyTemplate);
+        }
+        else if (connectionManagementType == CACHED)
+        {
+            provider = new CachedConnectionProviderWrapper(provider, disableValidation, retryPolicyTemplate);
+        }
+        else if (connectionManagementType != NONE)
+        {
+            throw new IllegalArgumentException("Unknown connection management type: " + connectionManagementType);
         }
 
         return provider;

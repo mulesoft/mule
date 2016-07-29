@@ -26,20 +26,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A {@link ConnectionHandlingStrategyAdapter} which returns connections obtained from a {@link #pool}
+ * A {@link ConnectionManagementStrategy} which returns connections obtained from a {@link #pool}
  *
- * @param <Connection> the generic type of the connections to be managed
+ * @param <C> the generic type of the connections to be managed
  * @since 4.0
  */
-final class PoolingConnectionHandlingStrategy<Connection> extends ConnectionHandlingStrategyAdapter<Connection>
+final class PoolingConnectionManagementStrategy<C> extends ConnectionManagementStrategy<C>
 {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PoolingConnectionHandlingStrategy.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PoolingConnectionManagementStrategy.class);
     private static final String NULL_VALIDATION_RESULT_ERROR_MESSAGE = "Error validating connection. ConnectionValidationResult can not be null";
 
     private final PoolingProfile poolingProfile;
-    private final ObjectPool<Connection> pool;
-    private final PoolingListener<Connection> poolingListener;
+    private final ObjectPool<C> pool;
+    private final PoolingListener<C> poolingListener;
 
     /**
      * Creates a new instance
@@ -49,10 +49,10 @@ final class PoolingConnectionHandlingStrategy<Connection> extends ConnectionHand
      * @param poolingListener    a {@link PoolingListener}
      * @param muleContext        the application's {@link MuleContext}
      */
-    PoolingConnectionHandlingStrategy(ConnectionProvider<Connection> connectionProvider,
-                                      PoolingProfile poolingProfile,
-                                      PoolingListener<Connection> poolingListener,
-                                      MuleContext muleContext)
+    PoolingConnectionManagementStrategy(ConnectionProvider<C> connectionProvider,
+                                        PoolingProfile poolingProfile,
+                                        PoolingListener<C> poolingListener,
+                                        MuleContext muleContext)
     {
         super(connectionProvider, muleContext);
         this.poolingProfile = poolingProfile;
@@ -68,11 +68,11 @@ final class PoolingConnectionHandlingStrategy<Connection> extends ConnectionHand
      * @throws ConnectionException if the connection could not be obtained
      */
     @Override
-    public ConnectionHandler<Connection> getConnectionHandler() throws ConnectionException
+    public ConnectionHandler<C> getConnectionHandler() throws ConnectionException
     {
         try
         {
-            Connection connection = borrowConnection();
+            C connection = borrowConnection();
             ConnectionValidationResult validationResult = connectionProvider.validate(connection);
 
             if (validationResult == null)
@@ -107,9 +107,9 @@ final class PoolingConnectionHandlingStrategy<Connection> extends ConnectionHand
         }
     }
 
-    private Connection borrowConnection() throws Exception
+    private C borrowConnection() throws Exception
     {
-        Connection connection = pool.borrowObject();
+        C connection = pool.borrowObject();
         try
         {
             poolingListener.onBorrow(connection);
@@ -142,7 +142,7 @@ final class PoolingConnectionHandlingStrategy<Connection> extends ConnectionHand
         }
     }
 
-    private ObjectPool<Connection> createPool()
+    private ObjectPool<C> createPool()
     {
         GenericObjectPool.Config config = new GenericObjectPool.Config();
         config.maxIdle = poolingProfile.getMaxIdle();
@@ -161,34 +161,34 @@ final class PoolingConnectionHandlingStrategy<Connection> extends ConnectionHand
         return poolingProfile;
     }
 
-    private class ObjectFactoryAdapter implements PoolableObjectFactory<Connection>
+    private class ObjectFactoryAdapter implements PoolableObjectFactory<C>
     {
 
         @Override
-        public Connection makeObject() throws Exception
+        public C makeObject() throws Exception
         {
             return connectionProvider.connect();
         }
 
         @Override
-        public void destroyObject(Connection connection) throws Exception
+        public void destroyObject(C connection) throws Exception
         {
             connectionProvider.disconnect(connection);
         }
 
         @Override
-        public boolean validateObject(Connection obj)
+        public boolean validateObject(C obj)
         {
             return false;
         }
 
         @Override
-        public void activateObject(Connection connection) throws Exception
+        public void activateObject(C connection) throws Exception
         {
         }
 
         @Override
-        public void passivateObject(Connection connection) throws Exception
+        public void passivateObject(C connection) throws Exception
         {
         }
     }

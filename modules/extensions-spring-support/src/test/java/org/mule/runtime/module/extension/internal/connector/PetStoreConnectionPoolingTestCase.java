@@ -38,7 +38,6 @@ public class PetStoreConnectionPoolingTestCase extends PetStoreConnectionTestCas
 {
 
     private static final String CUSTOM_POOLING_CONFIG = "customPooling";
-    private static final String CUSTOM_POOLING_POOLED_CONFIG = CUSTOM_POOLING_CONFIG + "Pooled";
     private static final String CUSTOM_POOLING_POOLABLE_CONFIG = CUSTOM_POOLING_CONFIG + "Poolable";
     private static final String NO_POOLING = "noPooling";
 
@@ -47,7 +46,6 @@ public class PetStoreConnectionPoolingTestCase extends PetStoreConnectionTestCas
     {
         return asList(new Object[][] {
                 {CUSTOM_POOLING_POOLABLE_CONFIG, 3},
-                {CUSTOM_POOLING_POOLED_CONFIG, 3},
                 {NO_POOLING, 0}});
     }
 

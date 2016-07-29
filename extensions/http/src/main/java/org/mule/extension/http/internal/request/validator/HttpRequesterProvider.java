@@ -15,7 +15,6 @@ import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessa
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTP;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTPS;
-
 import org.mule.extension.http.api.request.client.HttpClient;
 import org.mule.extension.http.api.request.proxy.ProxyConfig;
 import org.mule.extension.http.internal.request.client.DefaultUriParameters;
@@ -23,10 +22,8 @@ import org.mule.extension.http.internal.request.client.HttpClientConfiguration;
 import org.mule.extension.http.internal.request.client.HttpClientFactory;
 import org.mule.extension.http.internal.request.grizzly.GrizzlyHttpClient;
 import org.mule.extension.socket.api.socket.tcp.TcpClientSocketProperties;
+import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.connection.ConnectionHandlingStrategy;
-import org.mule.runtime.api.connection.ConnectionHandlingStrategyFactory;
-import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.api.tls.TlsContextFactoryBuilder;
@@ -56,7 +53,7 @@ import javax.inject.Inject;
  * @since 4.0
  */
 @Alias("request")
-public class HttpRequesterProvider implements ConnectionProvider<HttpClient>, Initialisable
+public class HttpRequesterProvider implements CachedConnectionProvider<HttpClient>, Initialisable
 {
 
     private static final int UNLIMITED_CONNECTIONS = -1;
@@ -197,12 +194,6 @@ public class HttpRequesterProvider implements ConnectionProvider<HttpClient>, In
     public ConnectionValidationResult validate(HttpClient httpClient)
     {
         return ConnectionValidationResult.success();
-    }
-
-    @Override
-    public ConnectionHandlingStrategy<HttpClient> getHandlingStrategy(ConnectionHandlingStrategyFactory<HttpClient> connectionHandlingStrategyFactory)
-    {
-        return connectionHandlingStrategyFactory.cached();
     }
 
     @Override

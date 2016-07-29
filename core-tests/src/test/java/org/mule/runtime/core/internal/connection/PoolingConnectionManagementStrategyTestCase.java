@@ -45,7 +45,7 @@ import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class PoolingConnectionHandlingStrategyTestCase extends AbstractMuleContextTestCase
+public class PoolingConnectionManagementStrategyTestCase extends AbstractMuleContextTestCase
 {
 
     private static final int MAX_ACTIVE = 2;
@@ -54,7 +54,7 @@ public class PoolingConnectionHandlingStrategyTestCase extends AbstractMuleConte
 
     private Object config = new Object();
     private PoolingProfile poolingProfile = new PoolingProfile(MAX_ACTIVE, MAX_ACTIVE, DEFAULT_MAX_POOL_WAIT, WHEN_EXHAUSTED_WAIT, INITIALISE_NONE);
-    private PoolingConnectionHandlingStrategy< Lifecycle> strategy;
+    private PoolingConnectionManagementStrategy< Lifecycle> strategy;
     private PoolingListener<Lifecycle> poolingListener;
     private Injector injector;
 
@@ -176,7 +176,7 @@ public class PoolingConnectionHandlingStrategyTestCase extends AbstractMuleConte
 
     private void initStrategy()
     {
-        strategy = new PoolingConnectionHandlingStrategy<>(connectionProvider, poolingProfile, poolingListener, muleContext);
+        strategy = new PoolingConnectionManagementStrategy<>(connectionProvider, poolingProfile, poolingListener, muleContext);
     }
 
     private <T> void verifyThat(Assertion<T> assertion) throws Exception

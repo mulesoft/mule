@@ -8,8 +8,6 @@ package org.mule.runtime.module.extension.internal.introspection.validation;
 
 import static org.mule.runtime.core.config.MuleManifest.getProductVersion;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.connection.ConnectionHandlingStrategy;
-import org.mule.runtime.api.connection.ConnectionHandlingStrategyFactory;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
@@ -150,12 +148,6 @@ public class ConnectionProviderModelValidatorTestCase extends AbstractMuleTestCa
         {
             return ConnectionValidationResult.success();
         }
-
-        @Override
-        public ConnectionHandlingStrategy<ValidatorTestConnection> getHandlingStrategy(ConnectionHandlingStrategyFactory<ValidatorTestConnection> handlingStrategyFactory)
-        {
-            return handlingStrategyFactory.cached();
-        }
     }
 
     @Alias("provider2")
@@ -185,12 +177,6 @@ public class ConnectionProviderModelValidatorTestCase extends AbstractMuleTestCa
         {
             return ConnectionValidationResult.success();
         }
-
-        @Override
-        public ConnectionHandlingStrategy<ValidatorTestConnection> getHandlingStrategy(ConnectionHandlingStrategyFactory<ValidatorTestConnection> handlingStrategyFactory)
-        {
-            return handlingStrategyFactory.cached();
-        }
     }
 
     @Alias("invalidConnection")
@@ -213,12 +199,6 @@ public class ConnectionProviderModelValidatorTestCase extends AbstractMuleTestCa
         public ConnectionValidationResult validate(Apple apple)
         {
             return ConnectionValidationResult.success();
-        }
-
-        @Override
-        public ConnectionHandlingStrategy<Apple> getHandlingStrategy(ConnectionHandlingStrategyFactory<Apple> handlingStrategyFactory)
-        {
-            return handlingStrategyFactory.cached();
         }
     }
 

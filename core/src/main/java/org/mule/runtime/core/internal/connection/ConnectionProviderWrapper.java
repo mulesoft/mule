@@ -12,8 +12,6 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import org.mule.runtime.api.config.HasPoolingProfile;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.connection.ConnectionHandlingStrategy;
-import org.mule.runtime.api.connection.ConnectionHandlingStrategyFactory;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.core.api.MuleContext;
@@ -75,12 +73,6 @@ public abstract class ConnectionProviderWrapper<Connection> implements Connectio
     public void disconnect(Connection connection)
     {
         delegate.disconnect(connection);
-    }
-
-    @Override
-    public ConnectionHandlingStrategy<Connection> getHandlingStrategy(ConnectionHandlingStrategyFactory<Connection> handlingStrategyFactory)
-    {
-        return delegate.getHandlingStrategy(handlingStrategyFactory);
     }
 
     public ConnectionProvider<Connection> getDelegate()

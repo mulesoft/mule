@@ -8,25 +8,23 @@ package org.mule.runtime.module.extension.internal.connector;
 
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
-
-import org.mule.runtime.core.api.MessagingException;
+import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionExceptionCode;
-import org.mule.runtime.api.connection.ConnectionHandlingStrategy;
-import org.mule.runtime.api.connection.ConnectionHandlingStrategyFactory;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
+import org.mule.runtime.api.connection.PoolingConnectionProvider;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
-import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 import org.mule.runtime.extension.api.annotation.connector.Providers;
+import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 import org.mule.runtime.extension.api.annotation.param.Connection;
-import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.test.petstore.extension.PetStoreClient;
 import org.mule.test.petstore.extension.PetStoreConnectionProvider;
 import org.mule.test.petstore.extension.PetStoreConnector;
 import org.mule.test.petstore.extension.PetStoreOperations;
-import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -100,29 +98,19 @@ public class PetStoreRetryPolicyConnectionTestCase extends ExtensionFunctionalTe
     }
 
     @Alias("valid")
-    public static class PooledPetStoreConnectionProviderWithValidConnection extends PetStoreConnectionProvider
+    public static class PooledPetStoreConnectionProviderWithValidConnection extends PetStoreConnectionProvider implements PoolingConnectionProvider<PetStoreClient>
     {
 
-        @Override
-        public ConnectionHandlingStrategy<PetStoreClient> getHandlingStrategy(ConnectionHandlingStrategyFactory handlingStrategyFactory)
-        {
-            return handlingStrategyFactory.requiresPooling();
-        }
     }
 
     @Alias("invalid")
     public static class PooledPetStoreConnectionProviderWithFailureInvalidConnection extends PetStoreConnectionProvider
+            implements PoolingConnectionProvider<PetStoreClient>
     {
         @Override
         public ConnectionValidationResult validate(PetStoreClient connection)
         {
              return ConnectionValidationResult.failure(CONNECTION_FAIL, ConnectionExceptionCode.INCORRECT_CREDENTIALS, new Exception("Invalid credentials"));
-        }
-
-        @Override
-        public ConnectionHandlingStrategy<PetStoreClient> getHandlingStrategy(ConnectionHandlingStrategyFactory handlingStrategyFactory)
-        {
-            return handlingStrategyFactory.requiresPooling();
         }
     }
 

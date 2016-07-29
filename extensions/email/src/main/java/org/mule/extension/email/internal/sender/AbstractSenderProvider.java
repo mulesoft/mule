@@ -6,14 +6,14 @@
  */
 package org.mule.extension.email.internal.sender;
 
-import org.mule.extension.email.internal.AbstractEmailConnectionProvider;
 import org.mule.extension.email.api.EmailConnectionSettings;
-import org.mule.runtime.api.connection.ConnectionHandlingStrategy;
-import org.mule.runtime.api.connection.ConnectionHandlingStrategyFactory;
+import org.mule.extension.email.internal.AbstractEmailConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
+import org.mule.runtime.api.connection.PoolingConnectionProvider;
 import org.mule.runtime.extension.api.annotation.ParameterGroup;
 
 public abstract class AbstractSenderProvider extends AbstractEmailConnectionProvider<SenderConnection>
+        implements PoolingConnectionProvider<SenderConnection>
 {
 
     /**
@@ -38,14 +38,5 @@ public abstract class AbstractSenderProvider extends AbstractEmailConnectionProv
     public ConnectionValidationResult validate(SenderConnection connection)
     {
         return connection.validate();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ConnectionHandlingStrategy<SenderConnection> getHandlingStrategy(ConnectionHandlingStrategyFactory<SenderConnection> handlingStrategyFactory)
-    {
-        return handlingStrategyFactory.supportsPooling();
     }
 }

@@ -7,7 +7,6 @@
 package org.mule.runtime.core.internal.connection;
 
 import org.mule.runtime.api.config.PoolingProfile;
-import org.mule.runtime.api.connection.ConnectionHandlingStrategyFactory;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
@@ -18,11 +17,6 @@ import java.util.Optional;
 /**
  * A {@link ConnectionProviderWrapper} which decorates the {@link #delegate}
  * with a user configured {@link PoolingProfile} or the default one if is was not supplied by the user.
- * <p/>
- * The purpose of this wrapper is having the {@link #getHandlingStrategy(ConnectionHandlingStrategyFactory)}
- * method use the configured {@link #poolingProfile} instead of the default included
- * in the {@link #delegate}
- * <p/>
  *
  * @since 4.0
  */

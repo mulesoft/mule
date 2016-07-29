@@ -18,16 +18,16 @@ import org.slf4j.LoggerFactory;
  * Implementation of {@link ConnectionHandlerAdapter} which wraps a {@code Connection}
  * obtained from a {@link #pool}.
  *
- * @param <Connection> the generic type of the connection to be returned
+ * @param <C> the generic type of the connection to be returned
  * @since 4.0
  */
-final class PoolingConnectionHandler<Connection> implements ConnectionHandlerAdapter<Connection>
+final class PoolingConnectionHandler<C> implements ConnectionHandlerAdapter<C>
 {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PoolingConnectionHandler.class);
 
-    private final Connection connection;
-    private final ObjectPool<Connection> pool;
+    private final C connection;
+    private final ObjectPool<C> pool;
     private final PoolingListener poolingListener;
 
     /**
@@ -36,7 +36,7 @@ final class PoolingConnectionHandler<Connection> implements ConnectionHandlerAda
      * @param connection the connection to be wrapped
      * @param pool       the pool from which the {@code connection} was obtained and to which it has to be returned
      */
-    PoolingConnectionHandler(Connection connection, ObjectPool<Connection> pool, PoolingListener poolingListener)
+    PoolingConnectionHandler(C connection, ObjectPool<C> pool, PoolingListener poolingListener)
     {
         this.connection = connection;
         this.pool = pool;
@@ -47,7 +47,7 @@ final class PoolingConnectionHandler<Connection> implements ConnectionHandlerAda
      * @return the {@link #connection}
      */
     @Override
-    public Connection getConnection() throws ConnectionException
+    public C getConnection() throws ConnectionException
     {
         return connection;
     }

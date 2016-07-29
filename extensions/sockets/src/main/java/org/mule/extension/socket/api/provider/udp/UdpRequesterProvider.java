@@ -6,17 +6,16 @@
  */
 package org.mule.extension.socket.api.provider.udp;
 
-import org.mule.extension.socket.api.SocketOperations;
 import org.mule.extension.socket.api.ConnectionSettings;
+import org.mule.extension.socket.api.SocketOperations;
 import org.mule.extension.socket.api.connection.udp.UdpRequesterConnection;
 import org.mule.extension.socket.api.exceptions.UnresolvableHostException;
 import org.mule.extension.socket.api.socket.udp.UdpSocketProperties;
 import org.mule.extension.socket.internal.SocketUtils;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.connection.ConnectionHandlingStrategy;
-import org.mule.runtime.api.connection.ConnectionHandlingStrategyFactory;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
+import org.mule.runtime.api.connection.PoolingConnectionProvider;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.ParameterGroup;
@@ -31,7 +30,7 @@ import java.net.DatagramSocket;
  * @since 4.0
  */
 @Alias("udp-requester")
-public final class UdpRequesterProvider implements ConnectionProvider<UdpRequesterConnection>
+public final class UdpRequesterProvider implements PoolingConnectionProvider<UdpRequesterConnection>
 {
 
     /**
@@ -71,12 +70,6 @@ public final class UdpRequesterProvider implements ConnectionProvider<UdpRequest
     public ConnectionValidationResult validate(UdpRequesterConnection connection)
     {
         return SocketUtils.validate(connection);
-    }
-
-    @Override
-    public ConnectionHandlingStrategy<UdpRequesterConnection> getHandlingStrategy(ConnectionHandlingStrategyFactory<UdpRequesterConnection> handlingStrategyFactory)
-    {
-        return handlingStrategyFactory.supportsPooling();
     }
 }
 

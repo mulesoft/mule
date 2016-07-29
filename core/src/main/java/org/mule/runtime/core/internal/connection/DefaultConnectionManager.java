@@ -13,8 +13,6 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
-import org.mule.runtime.api.connection.ConnectionHandlingStrategy;
-import org.mule.runtime.api.connection.ConnectionHandlingStrategyFactory;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
@@ -47,13 +45,14 @@ public final class DefaultConnectionManager implements ConnectionManagerAdapter,
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultConnectionManager.class);
 
-    private final Map<Reference<Object>, ConnectionHandlingStrategyAdapter> connections = new HashMap<>();
+    private final Map<Reference<Object>, ConnectionManagementStrategy> connections = new HashMap<>();
     private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
     private final Lock readLock = readWriteLock.readLock();
     private final Lock writeLock = readWriteLock.writeLock();
     private final MuleContext muleContext;
     private final RetryPolicyTemplate retryPolicyTemplate;
-    private final PoolingProfile poolingProfile;
+    private final PoolingProfile defaultPoolingProfile;
+    private final ConnectionManagementStrategyFactory managementStrategyFactory;
 
     /**
      * Creates a new instance
@@ -64,8 +63,9 @@ public final class DefaultConnectionManager implements ConnectionManagerAdapter,
     public DefaultConnectionManager(MuleContext muleContext)
     {
         this.muleContext = muleContext;
-        this.poolingProfile = new PoolingProfile();
+        this.defaultPoolingProfile = new PoolingProfile();
         this.retryPolicyTemplate = new NoRetryPolicyTemplate();
+        managementStrategyFactory = new ConnectionManagementStrategyFactory(defaultPoolingProfile, muleContext);
     }
 
     /**
@@ -79,9 +79,9 @@ public final class DefaultConnectionManager implements ConnectionManagerAdapter,
         assertNotStopping(muleContext, "Mule is shutting down... cannot bind new connections");
 
         connectionProvider = new LifecycleAwareConnectionProviderWrapper<>(connectionProvider, muleContext);
+        ConnectionManagementStrategy<Connection> managementStrategy = managementStrategyFactory.getStrategy(connectionProvider);
 
-        ConnectionHandlingStrategyAdapter<Connection> managementStrategy = getManagementStrategy(connectionProvider);
-        ConnectionHandlingStrategyAdapter<Connection> previous = null;
+        ConnectionManagementStrategy<Connection> previous = null;
 
         writeLock.lock();
         try
@@ -115,7 +115,7 @@ public final class DefaultConnectionManager implements ConnectionManagerAdapter,
     @Override
     public void unbind(Object config)
     {
-        ConnectionHandlingStrategyAdapter managementStrategy;
+        ConnectionManagementStrategy managementStrategy;
         writeLock.lock();
         try
         {
@@ -138,7 +138,7 @@ public final class DefaultConnectionManager implements ConnectionManagerAdapter,
     @Override
     public <Config, Connection> ConnectionHandler<Connection> getConnection(Config config) throws ConnectionException
     {
-        ConnectionHandlingStrategy<Connection> handlingStrategy = null;
+        ConnectionManagementStrategy<Connection> handlingStrategy = null;
         readLock.lock();
         try
         {
@@ -178,7 +178,7 @@ public final class DefaultConnectionManager implements ConnectionManagerAdapter,
     }
 
     //TODO: MULE-9082
-    private void close(ConnectionHandlingStrategyAdapter managementStrategy)
+    private void close(ConnectionManagementStrategy managementStrategy)
     {
         try
         {
@@ -188,23 +188,6 @@ public final class DefaultConnectionManager implements ConnectionManagerAdapter,
         {
             LOGGER.warn("An error was found trying to release connections", e);
         }
-    }
-
-    private <Connection> ConnectionHandlingStrategyAdapter<Connection> getManagementStrategy(ConnectionProvider<Connection> connectionProvider)
-    {
-        PoolingProfile poolingProfile;
-        if (connectionProvider instanceof ConnectionProviderWrapper)
-        {
-            poolingProfile = ((ConnectionProviderWrapper) connectionProvider).getPoolingProfile().orElse(getDefaultPoolingProfile());
-        }
-        else
-        {
-            poolingProfile = getDefaultPoolingProfile();
-        }
-
-        ConnectionHandlingStrategyFactory<Connection> connectionHandlingStrategyFactory;
-        connectionHandlingStrategyFactory = new DefaultConnectionHandlingStrategyFactory<>(connectionProvider, poolingProfile, muleContext);
-        return (ConnectionHandlingStrategyAdapter<Connection>) connectionProvider.getHandlingStrategy(connectionHandlingStrategyFactory);
     }
 
     @Override
@@ -240,7 +223,7 @@ public final class DefaultConnectionManager implements ConnectionManagerAdapter,
     @Override
     public PoolingProfile getDefaultPoolingProfile()
     {
-        return poolingProfile;
+        return defaultPoolingProfile;
     }
 
 }

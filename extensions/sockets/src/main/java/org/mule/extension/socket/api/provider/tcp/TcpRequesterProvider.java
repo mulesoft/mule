@@ -10,7 +10,6 @@ import static org.mule.extension.socket.api.SocketsExtension.TLS;
 import static org.mule.extension.socket.api.SocketsExtension.TLS_CONFIGURATION;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.CONNECTION;
-
 import org.mule.extension.socket.api.ConnectionSettings;
 import org.mule.extension.socket.api.SocketOperations;
 import org.mule.extension.socket.api.connection.tcp.TcpRequesterConnection;
@@ -22,10 +21,9 @@ import org.mule.extension.socket.api.socket.tcp.TcpClientSocketProperties;
 import org.mule.extension.socket.api.socket.tcp.TcpProtocol;
 import org.mule.extension.socket.internal.SocketUtils;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.connection.ConnectionHandlingStrategy;
-import org.mule.runtime.api.connection.ConnectionHandlingStrategyFactory;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
+import org.mule.runtime.api.connection.PoolingConnectionProvider;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
@@ -49,7 +47,7 @@ import javax.net.ssl.SSLSocket;
  * @since 4.0
  */
 @Alias("tcp-requester")
-public final class TcpRequesterProvider implements ConnectionProvider<TcpRequesterConnection>, Initialisable
+public final class TcpRequesterProvider implements PoolingConnectionProvider<TcpRequesterConnection>, Initialisable
 {
 
     /**
@@ -135,15 +133,6 @@ public final class TcpRequesterProvider implements ConnectionProvider<TcpRequest
     public ConnectionValidationResult validate(TcpRequesterConnection connection)
     {
         return SocketUtils.validate(connection);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ConnectionHandlingStrategy<TcpRequesterConnection> getHandlingStrategy(ConnectionHandlingStrategyFactory<TcpRequesterConnection> handlingStrategyFactory)
-    {
-        return handlingStrategyFactory.supportsPooling();
     }
 
     @Override

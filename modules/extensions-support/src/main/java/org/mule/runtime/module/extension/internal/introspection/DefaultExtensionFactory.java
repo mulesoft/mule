@@ -316,6 +316,7 @@ public final class DefaultExtensionFactory implements ExtensionFactory
                             declaration.getConnectionType(),
                             declaration.getFactory(),
                             toParameters(declaration.getParameters()),
+                            declaration.getConnectionManagementType(),
                             declaration.getModelProperties())
             );
         }

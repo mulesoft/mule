@@ -30,7 +30,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class CachedConnectionHandlingStrategyTestCase extends AbstractMuleTestCase
+public class CachedConnectionManagementStrategyTestCase extends AbstractMuleTestCase
 {
 
     private Banana connection = new Banana();
@@ -41,13 +41,13 @@ public class CachedConnectionHandlingStrategyTestCase extends AbstractMuleTestCa
     @Mock
     private MuleContext muleContext;
 
-    private CachedConnectionHandlingStrategy<Banana> connectionStrategy;
+    private CachedConnectionManagementStrategy<Banana> connectionStrategy;
 
     @Before
     public void before() throws Exception
     {
         when(connectionProvider.connect()).thenReturn(connection);
-        connectionStrategy = new CachedConnectionHandlingStrategy<>(connectionProvider, muleContext);
+        connectionStrategy = new CachedConnectionManagementStrategy<>(connectionProvider, muleContext);
         when(connectionProvider.validate(connection)).thenReturn(ConnectionValidationResult.success());
     }
 

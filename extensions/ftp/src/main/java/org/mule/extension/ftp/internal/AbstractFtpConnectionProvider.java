@@ -13,6 +13,7 @@ import org.mule.extension.ftp.internal.ftp.connection.ClassicFtpFileSystem;
 import org.mule.extension.ftp.internal.ftp.connection.FtpFileSystem;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
+import org.mule.runtime.api.connection.PoolingConnectionProvider;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -30,7 +31,7 @@ import javax.inject.Inject;
  * @param <Connection> the generic type of the connection object
  * @since 4.0
  */
-public abstract class AbstractFtpConnectionProvider<Connection extends FtpFileSystem> implements ConnectionProvider<Connection>
+public abstract class AbstractFtpConnectionProvider<Connection extends FtpFileSystem> implements PoolingConnectionProvider<Connection>
 {
 
     private static final String TIMEOUT_CONFIGURATION = "Timeout Configuration";
