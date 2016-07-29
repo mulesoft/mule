@@ -21,6 +21,7 @@ import static org.mule.extension.email.api.EmailContentProcessor.process;
 import static org.mule.extension.email.internal.commands.ReplyCommand.IN_REPLY_TO_HEADER;
 import static org.mule.extension.email.internal.commands.ReplyCommand.NO_EMAIL_FOUND;
 import static org.mule.extension.email.util.EmailTestUtils.ALE_EMAIL;
+import static org.mule.extension.email.util.EmailTestUtils.DEFAULT_CHARSET;
 import static org.mule.extension.email.util.EmailTestUtils.EMAIL_CONTENT;
 import static org.mule.extension.email.util.EmailTestUtils.EMAIL_JSON_ATTACHMENT_CONTENT;
 import static org.mule.extension.email.util.EmailTestUtils.EMAIL_SUBJECT;
@@ -28,7 +29,9 @@ import static org.mule.extension.email.util.EmailTestUtils.EMAIL_TEXT_PLAIN_ATTA
 import static org.mule.extension.email.util.EmailTestUtils.JUANI_EMAIL;
 import static org.mule.extension.email.util.EmailTestUtils.MG_EMAIL;
 import org.mule.extension.email.EmailConnectorTestCase;
+import org.mule.extension.email.api.Email;
 import org.mule.extension.email.api.EmailAttributes;
+import org.mule.extension.email.api.EmailContent;
 import org.mule.extension.email.api.exception.EmailException;
 import org.mule.functional.junit4.runners.RunnerDelegateTo;
 import org.mule.runtime.core.util.IOUtils;
@@ -125,8 +128,7 @@ public class SMTPTestCase extends EmailConnectorTestCase
         when(attributes.getReplyToAddresses()).thenReturn(singletonList(MG_EMAIL));
 
         flowRunner(REPLY_EMAIL)
-                .withPayload(EMAIL_CONTENT)
-                .withAttributes(attributes)
+                .withPayload(new Email(new EmailContent(EMAIL_CONTENT, DEFAULT_CHARSET), attributes))
                 .run();
 
         Message repliedMessage = getReceivedMessagesAndAssertCount(1)[0];
@@ -152,8 +154,7 @@ public class SMTPTestCase extends EmailConnectorTestCase
     public void forwardEmail() throws Exception
     {
         flowRunner(FORWARD_EMAIL)
-                .withPayload(EMAIL_CONTENT)
-                .withAttributes(getTestAttributes())
+                .withPayload(new Email(new EmailContent(EMAIL_CONTENT, DEFAULT_CHARSET), getTestAttributes()))
                 .run();
 
         Message[] messages = getReceivedMessagesAndAssertCount(1);
@@ -165,8 +166,7 @@ public class SMTPTestCase extends EmailConnectorTestCase
     public void forwardEmailWithContent() throws Exception
     {
         flowRunner(FORWARD_EMAIL_WITH_CONTENT)
-                .withPayload(EMAIL_CONTENT)
-                .withAttributes(getTestAttributes())
+                .withPayload(new Email(new EmailContent(EMAIL_CONTENT, DEFAULT_CHARSET), getTestAttributes()))
                 .run();
 
         Message[] messages = getReceivedMessagesAndAssertCount(1);

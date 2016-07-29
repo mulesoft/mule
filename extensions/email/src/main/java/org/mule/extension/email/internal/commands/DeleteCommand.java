@@ -39,9 +39,11 @@ public final class DeleteCommand
      * @param folderName the folder where the emails are going to be fetched
      * @param emailId    an optional email number to look up in the folder.
      */
-    public void delete(MuleMessage message, RetrieverConnection connection, String folderName, Integer emailId)
+    public void delete(List<Integer> emailIds,
+                       RetrieverConnection connection,
+                       String folderName)
     {
-        setFlagCommand.set(message, connection, folderName, emailId, DELETED);
+        setFlagCommand.set(emailIds, connection, folderName, DELETED);
         connection.closeFolder(true);
     }
 }

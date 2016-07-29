@@ -33,13 +33,14 @@ import static org.mule.extension.email.util.EmailTestUtils.assertAttachmentConte
 import static org.mule.extension.email.util.EmailTestUtils.getMultipartTestMessage;
 import static org.mule.extension.email.util.EmailTestUtils.testSession;
 import org.mule.extension.email.EmailConnectorTestCase;
+import org.mule.extension.email.api.Email;
 import org.mule.extension.email.api.EmailAttributes;
-import org.mule.runtime.api.message.MuleMessage;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -64,10 +65,9 @@ public abstract class AbstractEmailRetrieverTestCase extends EmailConnectorTestC
     protected static final String RETRIEVE_WITH_ATTACHMENTS = "retrieveWithAttachments";
     protected static final String STORE_MESSAGES = "storeMessages";
     protected static final String STORE_SINGLE_MESSAGE = "storeSingleMessage";
-
     @ClassRule
     public static TemporaryFolder temporaryFolder = new TemporaryFolder();
-
+    protected final List<Integer> deliveredEmails = new LinkedList<>();
     @Rule
     public SystemProperty temporaryFolderProperty = new SystemProperty("storePath", temporaryFolder.getRoot().getAbsolutePath());
 
@@ -82,13 +82,16 @@ public abstract class AbstractEmailRetrieverTestCase extends EmailConnectorTestC
     {
         for (int i = 0; i < 10; i++)
         {
-            user.deliver(newMessage(testSession)
-                                 .to(singletonList(JUANI_EMAIL))
-                                 .fromAddresses(ESTEBAN_EMAIL)
-                                 .cc(singletonList(ALE_EMAIL))
-                                 .withContent(EMAIL_CONTENT)
-                                 .withSubject(EMAIL_SUBJECT)
-                                 .build());
+            MimeMessage message = newMessage(testSession)
+                    .to(singletonList(JUANI_EMAIL))
+                    .fromAddresses(ESTEBAN_EMAIL)
+                    .cc(singletonList(ALE_EMAIL))
+                    .withContent(EMAIL_CONTENT)
+                    .withSubject(EMAIL_SUBJECT)
+                    .build();
+
+            user.deliver(message);
+            deliveredEmails.add(message.getMessageNumber());
         }
     }
 
@@ -97,8 +100,8 @@ public abstract class AbstractEmailRetrieverTestCase extends EmailConnectorTestC
     {
         server.purgeEmailFromAllMailboxes();
         assertThat(server.getReceivedMessages(), arrayWithSize(0));
-        List<MuleMessage> messages = runFlowAndGetMessages(RETRIEVE_AND_READ);
-        assertThat(messages, hasSize(0));
+        List<Email> emails = runFlowAndGetEmails(RETRIEVE_AND_READ);
+        assertThat(emails, hasSize(0));
     }
 
     @Test
@@ -116,9 +119,9 @@ public abstract class AbstractEmailRetrieverTestCase extends EmailConnectorTestC
                                  .build());
         }
 
-        List<MuleMessage> messages = runFlowAndGetMessages(RETRIEVE_MATCH_SUBJECT_AND_FROM);
+        List<Email> emails = runFlowAndGetEmails(RETRIEVE_MATCH_SUBJECT_AND_FROM);
         assertThat(server.getReceivedMessages(), arrayWithSize(15));
-        assertThat(messages, hasSize(10));
+        assertThat(emails, hasSize(10));
     }
 
     @Test
@@ -126,10 +129,10 @@ public abstract class AbstractEmailRetrieverTestCase extends EmailConnectorTestC
     {
         server.purgeEmailFromAllMailboxes();
         user.deliver(getMultipartTestMessage());
-        List<MuleMessage> messages = runFlowAndGetMessages(RETRIEVE_WITH_ATTACHMENTS);
+        List<Email> emails = runFlowAndGetEmails(RETRIEVE_WITH_ATTACHMENTS);
 
-        assertThat(messages, hasSize(1));
-        EmailAttributes attributes = (EmailAttributes) messages.get(0).getAttributes();
+        assertThat(emails, hasSize(1));
+        EmailAttributes attributes = emails.get(0).getAttributes();
         Map<String, DataHandler> emailAttachments = attributes.getAttachments();
 
         assertThat(emailAttachments.entrySet(), hasSize(2));
@@ -180,9 +183,9 @@ public abstract class AbstractEmailRetrieverTestCase extends EmailConnectorTestC
         assertThat(fileContent, containsString(EMAIL_CONTENT));
     }
 
-    protected List<MuleMessage> runFlowAndGetMessages(String flowName) throws Exception
+    protected List<Email> runFlowAndGetEmails(String flowName) throws Exception
     {
-        return (List<MuleMessage>) runFlow(flowName).getMessage().getPayload();
+        return (List<Email>) runFlow(flowName).getMessage().getPayload();
     }
 
     protected void assertFlag(MimeMessage m, Flag flag, boolean contains)

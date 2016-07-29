@@ -6,6 +6,7 @@
  */
 package org.mule.extension.email.internal.retriever.imap;
 
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED;
 import org.mule.extension.email.internal.retriever.RetrieverConfiguration;
 import org.mule.extension.email.internal.retriever.RetrieverOperations;
 import org.mule.runtime.extension.api.annotation.Configuration;
@@ -14,6 +15,7 @@ import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.connector.Providers;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
+import org.mule.runtime.extension.api.annotation.param.display.Placement;
 
 /**
  * Configuration for operations that are performed through the IMAP (Internet Message Access Protocol) protocol.
@@ -28,11 +30,24 @@ public class IMAPConfiguration implements RetrieverConfiguration
 {
 
     /**
+     * Default encoding to be used in all the messages. If not specified, it defaults
+     * to the default encoding in the mule configuration
+     */
+    @Parameter
+    @Optional
+    @Placement(group = ADVANCED)
+    private String defaultCharset;
+    /**
      * Indicates whether the retrieved emails should be opened and read. The default value is "true".
      */
     @Parameter
     @Optional(defaultValue = "true")
     private boolean eagerlyFetchContent;
+
+    public String getDefaultCharset()
+    {
+        return defaultCharset;
+    }
 
     /**
      * {@inheritDoc}

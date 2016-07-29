@@ -16,8 +16,9 @@ import static org.mule.extension.email.util.EmailTestUtils.EMAIL_JSON_ATTACHMENT
 import static org.mule.extension.email.util.EmailTestUtils.EMAIL_TEXT_PLAIN_ATTACHMENT_CONTENT;
 import static org.mule.extension.email.util.EmailTestUtils.EMAIL_TEXT_PLAIN_ATTACHMENT_NAME;
 import static org.mule.extension.email.util.EmailTestUtils.assertAttachmentContent;
-import static org.mule.extension.email.util.EmailTestUtils.getSinglePartTestMessage;
 import static org.mule.extension.email.util.EmailTestUtils.getMultipartTestMessage;
+import static org.mule.extension.email.util.EmailTestUtils.getSinglePartTestMessage;
+import org.mule.tck.size.SmallTest;
 
 import java.util.Map;
 
@@ -26,8 +27,10 @@ import javax.mail.Message;
 
 import org.junit.Test;
 
+@SmallTest
 public class EmailContentProcessorTestCase
 {
+
     @Test
     public void emailTextBodyFromMultipart() throws Exception
     {

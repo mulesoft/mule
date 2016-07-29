@@ -9,17 +9,16 @@ package org.mule.extension.email.internal.retriever.imap;
 import static javax.mail.Flags.Flag.DELETED;
 import static javax.mail.Flags.Flag.SEEN;
 import static org.mule.extension.email.internal.util.EmailConnectorUtils.INBOX_FOLDER;
-
 import org.mule.extension.email.internal.commands.ExpungeCommand;
 import org.mule.extension.email.internal.commands.SetFlagCommand;
 import org.mule.extension.email.internal.retriever.RetrieverConnection;
 import org.mule.extension.email.internal.retriever.RetrieverOperations;
-import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
-import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
+
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -33,56 +32,53 @@ public class IMAPOperations
 
     private final SetFlagCommand setFlagCommand = new SetFlagCommand();
     private final ExpungeCommand expungeCommand = new ExpungeCommand();
+
     @Inject
     private MuleContext context;
 
     /**
-     * Marks an incoming email as READ.
+     * Marks the incoming emails as READ.
      * <p>
-     * This operation can target a single email, but if no emailID is specified and the incoming {@link MuleMessage} is carrying a list of emails
-     * this operation will mark all the emails that the {@link MuleMessage} is carrying if they belong to the specified folder.
+     * This operation targets all the emails specified by its id number,
+     * marking all the emails that belong to the specified folder.
      *
-     * @param message       The incoming {@link MuleMessage}.
+     * @param emailIds      A list of the email numbers to look up in the folder.
      * @param connection    The corresponding {@link RetrieverConnection} instance.
-     * @param mailboxFolder Folder where the emails are going to be marked as read
-     * @param emailId       Email ID Number of the email to mark as read, if there is no email in the incoming {@link MuleMessage}.
+     * @param mailboxFolder The folder where the emails are going to be fetched
      */
-    public void markAsRead(MuleMessage message,
+    public void markAsRead(@Optional(defaultValue = "#[payload]")
+                           @Summary("Email ID Number of the emails to mark as read") List<Integer> emailIds,
                            @Connection RetrieverConnection connection,
-                           @Optional(defaultValue = INBOX_FOLDER) String mailboxFolder,
-                           @Optional @Summary("Email ID Number of the email to mark as read") @DisplayName("Email ID") Integer emailId)
+                           @Optional(defaultValue = INBOX_FOLDER) String mailboxFolder)
     {
-        setFlagCommand.set(message, connection, mailboxFolder, emailId, SEEN);
+        setFlagCommand.set(emailIds, connection, mailboxFolder, SEEN);
     }
 
     /**
-     * Marks an incoming email as DELETED, this way the marked email(s) are scheduled for deletion when the folder closes.
+     * Marks the incoming emails as DELETED, this way the marked email(s) are scheduled for deletion when the folder closes.
      * <p>
-     * All DELETED marked emails are going to be eliminated from the mailbox when one of {@link IMAPOperations#expungeFolder(RetrieverConnection, String)}
-     * or {@link RetrieverOperations#delete(MuleMessage, RetrieverConnection, String, Integer)} is executed.
+     * All DELETED marked emails are going to be eliminated from the mailbox when one of {@link IMAPOperations#expungeFolder}
+     * or {@link RetrieverOperations#delete} is executed.
      * <p>
-     * This operation can target a single email, but also if the incoming {@link MuleMessage} is carrying a list of emails
-     * this operation will mark all the emails that the {@link MuleMessage} is carrying.
+     * This operation targets all the emails specified by its id number.
      *
-     * @param message       The incoming {@link MuleMessage}.
+     * @param emailIds      a list of the email numbers to look up in the folder.
      * @param connection    The corresponding {@link RetrieverConnection} instance.
-     * @param mailboxFolder Mailbox folder where the emails are going to be marked as deleted
-     * @param emailId       Email ID Number of the email to mark as deleted, if there is no email in the incoming {@link MuleMessage}.
+     * @param mailboxFolder The folder where the emails are going to be fetched
      */
-    public void markAsDeleted(MuleMessage message,
+    public void markAsDeleted(@Optional(defaultValue = "#[payload]")
+                              @Summary("Email ID Number of the emails to mark as read") List<Integer> emailIds,
                               @Connection RetrieverConnection connection,
-                              @Optional(defaultValue = INBOX_FOLDER) String mailboxFolder,
-                              @Optional @Summary("Email ID Number of the email to mark as deleted") @DisplayName("Email ID") Integer emailId)
+                              @Optional(defaultValue = INBOX_FOLDER) String mailboxFolder)
     {
-        setFlagCommand.set(message, connection, mailboxFolder, emailId, DELETED);
+        setFlagCommand.set(emailIds, connection, mailboxFolder, DELETED);
     }
 
     /**
      * Eliminates from the mailbox all the messages scheduled for deletion with the DELETED flag set.
      *
-     * @param connection    The associated {@link RetrieverConnection}.
-     * @param mailboxFolder Mailbox folder where the emails with the 'DELETED' flag are going to be scheduled to be
-     *                      definitely deleted
+     * @param connection    the associated {@link RetrieverConnection}.
+     * @param mailboxFolder the folder where the emails are going to be fetched
      */
     public void expungeFolder(@Connection RetrieverConnection connection,
                               @Optional(defaultValue = INBOX_FOLDER) String mailboxFolder)

@@ -9,7 +9,6 @@ package org.mule.extension.email.internal.retriever.imap;
 import static org.mule.extension.email.internal.EmailProtocol.IMAP;
 import static org.mule.extension.email.internal.util.EmailConnectorUtils.IMAP_PORT;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.CONNECTION;
-
 import org.mule.extension.email.internal.retriever.AbstractRetrieverProvider;
 import org.mule.extension.email.internal.retriever.RetrieverConnection;
 import org.mule.runtime.api.connection.ConnectionException;

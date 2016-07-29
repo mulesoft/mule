@@ -8,8 +8,8 @@ package org.mule.extension.email.internal.commands;
 
 import static java.lang.String.format;
 import static javax.mail.Folder.READ_WRITE;
-import org.mule.extension.email.internal.retriever.RetrieverConnection;
 import org.mule.extension.email.api.exception.EmailException;
+import org.mule.extension.email.internal.retriever.RetrieverConnection;
 import org.mule.runtime.api.message.MuleMessage;
 
 import java.util.List;
@@ -27,9 +27,9 @@ import javax.mail.MessagingException;
  */
 public class SetFlagCommand
 {
-    private final EmailIdConsumerExecutor executor = new EmailIdConsumerExecutor();
 
     private static final String SET_FLAG_ERROR_MESSAGE_MASK = "Error while setting [%s] flag in email of id [%s]";
+    private final EmailIdConsumerExecutor executor = new EmailIdConsumerExecutor();
 
     /**
      * Sets the specified {@code flag} into the email of number {@code emailId}
@@ -46,10 +46,15 @@ public class SetFlagCommand
      * @param emailId     the optional number of the email to be marked. for default the email is taken from the incoming {@link MuleMessage}.
      * @param flag        the flag to be set.
      */
-    public void set(MuleMessage muleMessage, RetrieverConnection connection, String folderName, Integer emailId, Flag flag)
+    public void set(//MuleMessage muleMessage,
+                    List<Integer> emailIds,
+                    RetrieverConnection connection,
+                    String folderName,
+                    //Integer emailId,
+                    Flag flag)
     {
         Folder folder = connection.getFolder(folderName, READ_WRITE);
-        executor.execute(muleMessage, emailId, id ->
+        executor.execute(emailIds, id ->
         {
             try
             {

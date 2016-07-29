@@ -11,7 +11,6 @@ import static org.mule.extension.email.internal.EmailProtocol.IMAPS;
 import static org.mule.extension.email.internal.util.EmailConnectorUtils.IMAPS_PORT;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.CONNECTION;
-
 import org.mule.extension.email.internal.retriever.AbstractRetrieverProvider;
 import org.mule.extension.email.internal.retriever.RetrieverConnection;
 import org.mule.runtime.api.connection.ConnectionException;

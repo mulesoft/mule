@@ -7,7 +7,6 @@
 package org.mule.extension.email.api;
 
 import static java.util.regex.Pattern.compile;
-
 import org.mule.runtime.core.api.util.TimeSinceFunction;
 import org.mule.runtime.core.api.util.TimeUntilFunction;
 import org.mule.runtime.extension.api.annotation.Alias;

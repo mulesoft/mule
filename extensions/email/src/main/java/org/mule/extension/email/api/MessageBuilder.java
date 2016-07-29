@@ -199,17 +199,18 @@ public final class MessageBuilder
     public MessageBuilder withAttachments(List<EmailAttachment> attachments)
     {
         Map<String, DataHandler> attachmentsMap = new HashMap<>();
-        attachments.forEach(a -> {
-            try
-            {
-                DataHandler dataHandler = toDataHandler(a.getId(), a.getContent(), a.getContentType());
-                attachmentsMap.put(a.getId(), dataHandler);
-            }
-            catch (Exception e)
-            {
-                throw new EmailException(ERROR + " could not add attachments", e);
-            }
-        });
+        attachments.forEach(a ->
+                            {
+                                try
+                                {
+                                    DataHandler dataHandler = toDataHandler(a.getId(), a.getContent(), a.getContentType());
+                                    attachmentsMap.put(a.getId(), dataHandler);
+                                }
+                                catch (Exception e)
+                                {
+                                    throw new EmailException(ERROR + " could not add attachments", e);
+                                }
+                            });
         this.attachments = attachmentsMap;
         return this;
     }

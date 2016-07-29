@@ -15,7 +15,6 @@ import static javax.mail.Message.RecipientType.BCC;
 import static javax.mail.Message.RecipientType.CC;
 import static javax.mail.Message.RecipientType.TO;
 import static org.mule.extension.email.api.EmailContentProcessor.process;
-
 import org.mule.extension.email.api.exception.EmailException;
 
 import java.time.LocalDateTime;

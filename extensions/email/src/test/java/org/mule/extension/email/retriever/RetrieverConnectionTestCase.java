@@ -22,9 +22,9 @@ import static org.mule.extension.email.util.EmailTestUtils.JUANI_EMAIL;
 import static org.powermock.api.mockito.PowerMockito.doNothing;
 import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.when;
-import org.mule.extension.email.internal.retriever.RetrieverConnection;
 import org.mule.extension.email.api.exception.EmailConnectionException;
 import org.mule.extension.email.api.exception.EmailException;
+import org.mule.extension.email.internal.retriever.RetrieverConnection;
 
 import javax.mail.Flags;
 import javax.mail.Folder;
@@ -49,11 +49,9 @@ import org.powermock.modules.junit4.PowerMockRunner;
 public class RetrieverConnectionTestCase
 {
 
+    private static final String RECENT_FOLDER = "Recent";
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
-
-    private static final String RECENT_FOLDER = "Recent";
-
     private Store store;
     private RetrieverConnection connection;
 

@@ -20,10 +20,9 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.runners.Parameterized.Parameters;
 import static org.mule.extension.email.internal.commands.EmailIdConsumerExecutor.NO_ID_ERROR;
-import org.mule.extension.email.api.EmailAttributes;
+import org.mule.extension.email.api.Email;
 import org.mule.extension.email.api.exception.EmailException;
 import org.mule.functional.junit4.runners.RunnerDelegateTo;
-import org.mule.runtime.api.message.MuleMessage;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -73,20 +72,21 @@ public class IMAPTestCase extends AbstractEmailRetrieverTestCase
     @Test
     public void retrieveAndRead() throws Exception
     {
-        List<MuleMessage> messages = runFlowAndGetMessages(RETRIEVE_AND_READ);
-        assertThat(messages, hasSize(10));
-        messages.forEach(m -> {
-            assertBodyContent((String) m.getPayload());
-            assertThat(((EmailAttributes) m.getAttributes()).getFlags().isSeen(), is(true));
-        });
+        List<Email> emails = runFlowAndGetEmails(RETRIEVE_AND_READ);
+        assertThat(emails, hasSize(10));
+        emails.forEach(e ->
+                       {
+                           assertBodyContent(e.getContent().getBody());
+                           assertThat(e.getAttributes().getFlags().isSeen(), is(true));
+                       });
     }
 
     @Test
     public void retrieveAndDontRead() throws Exception
     {
-        List<MuleMessage> messages = runFlowAndGetMessages(RETRIEVE_AND_DONT_READ);
-        assertThat(messages, hasSize(10));
-        messages.forEach(m -> assertThat(((EmailAttributes) m.getAttributes()).getFlags().isSeen(), is(false)));
+        List<Email> emails = runFlowAndGetEmails(RETRIEVE_AND_DONT_READ);
+        assertThat(emails, hasSize(10));
+        emails.forEach(e -> assertThat(e.getAttributes().getFlags().isSeen(), is(false)));
     }
 
     @Test
@@ -153,8 +153,8 @@ public class IMAPTestCase extends AbstractEmailRetrieverTestCase
             message.setFlag(flag, flagState);
         }
 
-        List<MuleMessage> messages = runFlowAndGetMessages(flowName);
+        List<Email> emails = runFlowAndGetEmails(flowName);
         assertThat(server.getReceivedMessages(), arrayWithSize(10));
-        assertThat(messages, hasSize(7));
+        assertThat(emails, hasSize(7));
     }
 }

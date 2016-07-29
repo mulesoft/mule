@@ -19,12 +19,14 @@ import static org.mule.extension.email.util.EmailTestUtils.ALE_EMAIL;
 import static org.mule.extension.email.util.EmailTestUtils.ESTEBAN_EMAIL;
 import static org.mule.extension.email.util.EmailTestUtils.JUANI_EMAIL;
 import static org.mule.extension.email.util.EmailTestUtils.PABLON_EMAIL;
+import org.mule.tck.size.SmallTest;
 
 import javax.mail.Address;
 import javax.mail.internet.InternetAddress;
 
 import org.junit.Test;
 
+@SmallTest
 public class EmailConnectorUtilsTestCase
 {
 
