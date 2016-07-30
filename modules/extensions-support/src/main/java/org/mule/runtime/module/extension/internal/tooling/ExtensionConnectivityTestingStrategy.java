@@ -6,14 +6,13 @@
  */
 package org.mule.runtime.module.extension.internal.tooling;
 
-import static org.mule.runtime.module.tooling.api.connectivity.ConnectionResult.createFailureResult;
-import static org.mule.runtime.module.tooling.api.connectivity.ConnectionResult.createSuccessResult;
+import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
+import org.mule.runtime.api.connection.ConnectionExceptionCode;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
-import org.mule.runtime.module.tooling.api.connectivity.ConnectionResult;
 import org.mule.runtime.module.tooling.api.connectivity.ConnectivityTestingStrategy;
 import org.mule.runtime.module.tooling.api.connectivity.MultipleConnectivityTestingObjectsFoundException;
 
@@ -31,6 +30,23 @@ public class ExtensionConnectivityTestingStrategy implements ConnectivityTesting
     @Inject
     private MuleContext muleContext;
 
+    /**
+     * Used for testing purposes
+     *
+     * @param muleContext the {@code MuleContext}.
+     */
+    ExtensionConnectivityTestingStrategy(MuleContext muleContext)
+    {
+        this.muleContext = muleContext;
+    }
+
+    /**
+     * Constructor used for creation using SPI.
+     */
+    public ExtensionConnectivityTestingStrategy()
+    {
+    }
+
     void setMuleContext(MuleContext muleContext)
     {
         this.muleContext = muleContext;
@@ -40,22 +56,17 @@ public class ExtensionConnectivityTestingStrategy implements ConnectivityTesting
      * {@inheritDoc}
      */
     @Override
-    public ConnectionResult testConnectivity()
+    public ConnectionValidationResult testConnectivity()
     {
         try
         {
             ConnectionProvider connectionProvider = (ConnectionProvider) muleContext.getRegistry().lookupObject(ConfigurationProvider.class).get(null).getConnectionProvider().get();
             Object connection = connectionProvider.connect();
-            ConnectionValidationResult validationResult = connectionProvider.validate(connection);
-            if (!validationResult.isValid())
-            {
-                return createFailureResult("Invalid connection");
-            }
-            return createSuccessResult();
+            return connectionProvider.validate(connection);
         }
         catch (Exception e)
         {
-            return createFailureResult(e.getMessage(), e);
+            return failure(e.getMessage(), ConnectionExceptionCode.UNKNOWN, e);
         }
     }
 

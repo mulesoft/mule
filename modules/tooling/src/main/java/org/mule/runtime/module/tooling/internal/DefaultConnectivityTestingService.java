@@ -6,13 +6,14 @@
  */
 package org.mule.runtime.module.tooling.internal;
 
+import static org.mule.runtime.api.connection.ConnectionExceptionCode.UNKNOWN;
+import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
-import static org.mule.runtime.module.tooling.api.connectivity.ConnectionResult.createFailureResult;
+import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.module.tooling.api.artifact.ToolingArtifact;
-import org.mule.runtime.module.tooling.api.connectivity.ConnectionResult;
+import org.mule.runtime.module.tooling.api.artifact.TemporaryArtifact;
 import org.mule.runtime.module.tooling.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.module.tooling.api.connectivity.ConnectivityTestingStrategy;
 import org.mule.runtime.module.tooling.api.connectivity.NoConnectivityTestingObjectFoundException;
@@ -25,16 +26,16 @@ import java.util.Collection;
 public class DefaultConnectivityTestingService implements ConnectivityTestingService
 {
 
-    private ToolingArtifact toolingArtifact;
+    private TemporaryArtifact temporaryArtifact;
 
     /**
      * Creates a {@code DefaultConnectivityTestingService}.
      *
-     * @param toolingArtifact tooling artifact used to do connectivity testing
+     * @param temporaryArtifact tooling artifact used to do connectivity testing
      */
-    public DefaultConnectivityTestingService(ToolingArtifact toolingArtifact)
+    public DefaultConnectivityTestingService(TemporaryArtifact temporaryArtifact)
     {
-        this.toolingArtifact = toolingArtifact;
+        this.temporaryArtifact = temporaryArtifact;
     }
 
     /**
@@ -43,28 +44,28 @@ public class DefaultConnectivityTestingService implements ConnectivityTestingSer
      * @throws MuleRuntimeException
      */
     @Override
-    public ConnectionResult testConnection()
+    public ConnectionValidationResult testConnection()
     {
-        if (!toolingArtifact.isStarted())
+        if (!temporaryArtifact.isStarted())
         {
             try
             {
-                toolingArtifact.start();
+                temporaryArtifact.start();
             }
             catch (InitialisationException e)
             {
-                return createFailureResult(e.getMessage(), e);
+                return failure(e.getMessage(), UNKNOWN, e);
             }
             catch (ConfigurationException e)
             {
-                return createFailureResult(e.getMessage(), e);
+                return failure(e.getMessage(), UNKNOWN, e);
             }
             catch (Exception e)
             {
                 throw new MuleRuntimeException(e);
             }
         }
-        Collection<ConnectivityTestingStrategy> connectivityTestingStrategies = toolingArtifact.getMuleContext().getRegistry().lookupObjects(ConnectivityTestingStrategy.class);
+        Collection<ConnectivityTestingStrategy> connectivityTestingStrategies = temporaryArtifact.getMuleContext().getRegistry().lookupObjects(ConnectivityTestingStrategy.class);
         for (ConnectivityTestingStrategy connectivityTestingStrategy : connectivityTestingStrategies)
         {
             if (connectivityTestingStrategy.connectionTestingObjectIsPresent())
@@ -75,7 +76,7 @@ public class DefaultConnectivityTestingService implements ConnectivityTestingSer
                 }
                 catch (Exception e)
                 {
-                    return createFailureResult(e.getMessage(), e);
+                    return failure(e.getMessage(), UNKNOWN, e);
                 }
             }
         }

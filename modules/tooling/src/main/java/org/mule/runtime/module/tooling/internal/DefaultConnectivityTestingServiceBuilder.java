@@ -9,23 +9,17 @@ package org.mule.runtime.module.tooling.internal;
 import static java.lang.String.format;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.Preconditions.checkState;
-import static org.mule.runtime.module.tooling.api.connectivity.ConnectionResult.createFailureResult;
 import org.mule.runtime.config.spring.dsl.api.config.ArtifactConfiguration;
 import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.runtime.core.api.config.ConfigurationException;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
-import org.mule.runtime.core.registry.SpiServiceRegistry;
-import org.mule.runtime.core.util.Preconditions;
 import org.mule.runtime.module.repository.api.BundleDescriptor;
 import org.mule.runtime.module.repository.api.RepositoryService;
 import org.mule.runtime.module.tooling.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.module.tooling.api.connectivity.ConnectivityTestingServiceBuilder;
 import org.mule.runtime.module.tooling.api.connectivity.ConnectivityTestingStrategy;
-import org.mule.runtime.module.tooling.api.connectivity.NoConnectivityTestingObjectFoundException;
-import org.mule.runtime.module.tooling.api.artifact.ToolingArtifact;
-import org.mule.runtime.module.tooling.api.artifact.ToolingArtifactBuilderFactory;
-import org.mule.runtime.module.tooling.api.artifact.ToolingArtifactBuilder;
+import org.mule.runtime.module.tooling.api.artifact.TemporaryArtifact;
+import org.mule.runtime.module.tooling.api.artifact.TemporaryArtifactBuilderFactory;
+import org.mule.runtime.module.tooling.api.artifact.TemporaryArtifactBuilder;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -36,19 +30,19 @@ import java.util.List;
  *
  * @since 4.0
  */
-public class DefaultConnectivityTestingServiceBuilder implements ConnectivityTestingServiceBuilder
+class DefaultConnectivityTestingServiceBuilder implements ConnectivityTestingServiceBuilder
 {
 
     private static final String EXTENSION_BUNDLE_TYPE = "zip";
     protected static final String NO_CONNECTIVITY_TESTING_STRATEGY_FOUND = format("No %s instances where found", ConnectivityTestingStrategy.class);
     private final RepositoryService repositoryService;
-    private final ToolingArtifactBuilderFactory artifactBuilderFactory;
+    private final TemporaryArtifactBuilderFactory artifactBuilderFactory;
     private ServiceRegistry serviceRegistry;
     private List<BundleDescriptor> bundleDescriptors = new ArrayList<>();
     private ArtifactConfiguration artifactConfiguration;
-    private ToolingArtifact toolingArtifact;
+    private TemporaryArtifact temporaryArtifact;
 
-    DefaultConnectivityTestingServiceBuilder(RepositoryService repositoryService, ToolingArtifactBuilderFactory artifactBuilderFactory, ServiceRegistry serviceRegistry)
+    DefaultConnectivityTestingServiceBuilder(RepositoryService repositoryService, TemporaryArtifactBuilderFactory artifactBuilderFactory, ServiceRegistry serviceRegistry)
     {
         this.artifactBuilderFactory = artifactBuilderFactory;
         this.repositoryService = repositoryService;
@@ -86,15 +80,15 @@ public class DefaultConnectivityTestingServiceBuilder implements ConnectivityTes
     {
         checkState(artifactConfiguration != null, "artifact configuration cannot be null");
         checkState(!bundleDescriptors.isEmpty(), "no extensions were configured");
-        ToolingArtifact toolingArtifact = buildArtifact();
-        return new DefaultConnectivityTestingService(toolingArtifact);
+        TemporaryArtifact temporaryArtifact = buildArtifact();
+        return new DefaultConnectivityTestingService(temporaryArtifact);
     }
 
-    private ToolingArtifact buildArtifact()
+    private TemporaryArtifact buildArtifact()
     {
-        if (toolingArtifact != null)
+        if (temporaryArtifact != null)
         {
-            return toolingArtifact;
+            return temporaryArtifact;
         }
 
         Collection<ConnectivityTestingStrategy> connectivityTestingStrategies = serviceRegistry.lookupProviders(ConnectivityTestingStrategy.class);
@@ -104,7 +98,7 @@ public class DefaultConnectivityTestingServiceBuilder implements ConnectivityTes
             throw new MuleRuntimeException(createStaticMessage(NO_CONNECTIVITY_TESTING_STRATEGY_FOUND));
         }
 
-        ToolingArtifactBuilder temporaryArtifactBuilder = artifactBuilderFactory.newBuilder()
+        TemporaryArtifactBuilder temporaryArtifactBuilder = artifactBuilderFactory.newBuilder()
                 .setArtifactConfiguration(artifactConfiguration);
 
         connectivityTestingStrategies.stream()
@@ -112,8 +106,8 @@ public class DefaultConnectivityTestingServiceBuilder implements ConnectivityTes
 
         bundleDescriptors.stream()
                 .forEach(bundleDescriptor -> temporaryArtifactBuilder.addArtifactPluginFile(repositoryService.lookupBundle(bundleDescriptor)));
-        toolingArtifact = temporaryArtifactBuilder.build();
-        return toolingArtifact;
+        temporaryArtifact = temporaryArtifactBuilder.build();
+        return temporaryArtifact;
     }
 
 }

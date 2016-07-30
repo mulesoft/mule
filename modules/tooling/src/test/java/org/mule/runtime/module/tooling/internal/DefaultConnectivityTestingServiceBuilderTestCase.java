@@ -17,7 +17,7 @@ import org.mule.runtime.config.spring.dsl.api.config.ArtifactConfiguration;
 import org.mule.runtime.config.spring.dsl.api.config.ComponentConfiguration;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.module.repository.api.RepositoryService;
-import org.mule.runtime.module.tooling.api.artifact.ToolingArtifactBuilderFactory;
+import org.mule.runtime.module.tooling.api.artifact.TemporaryArtifactBuilderFactory;
 import org.mule.runtime.module.tooling.api.connectivity.ConnectivityTestingStrategy;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -33,7 +33,7 @@ public class DefaultConnectivityTestingServiceBuilderTestCase extends AbstractMu
     public ExpectedException expectedException = none();
 
     private RepositoryService mockRepositoryService = mock(RepositoryService.class, RETURNS_DEEP_STUBS);
-    private ToolingArtifactBuilderFactory mockArtifactBuilderFactory = mock(ToolingArtifactBuilderFactory.class, RETURNS_DEEP_STUBS);
+    private TemporaryArtifactBuilderFactory mockArtifactBuilderFactory = mock(TemporaryArtifactBuilderFactory.class, RETURNS_DEEP_STUBS);
     private ServiceRegistry mockServiceRegistry = mock(ServiceRegistry.class);
     private DefaultConnectivityTestingServiceBuilder builder;
 

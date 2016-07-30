@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.tooling.api.connectivity;
 
+import org.mule.runtime.api.connection.ConnectionValidationResult;
+
 /**
  * An strategy for doing connectivity testing.
  *
@@ -30,8 +32,8 @@ public interface ConnectivityTestingStrategy
     /**
      * Does test connectivity over the mule configuration.
      *
-     * @return a {@code ConnectionResult} describing the test connectivity result.
+     * @return a {@code ConnectionValidationResult} describing the test connectivity result.
      */
-    ConnectionResult testConnectivity();
+    ConnectionValidationResult testConnectivity();
 
 }

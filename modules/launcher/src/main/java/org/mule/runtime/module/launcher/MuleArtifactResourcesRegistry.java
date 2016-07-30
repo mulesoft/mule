@@ -28,7 +28,7 @@ import org.mule.runtime.module.launcher.service.ReflectionServiceResolver;
 import org.mule.runtime.module.launcher.service.ServiceClassLoaderFactory;
 
 /**
- * Registry of mule artifact resource required to construct new artifacts.
+ * Registry of mule artifact resources required to construct new artifacts.
  *
  * @since 4.0
  */

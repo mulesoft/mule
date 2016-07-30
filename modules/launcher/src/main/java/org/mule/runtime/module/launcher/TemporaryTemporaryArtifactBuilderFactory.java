@@ -20,9 +20,9 @@ import org.mule.runtime.module.launcher.application.DefaultArtifactPlugin;
 import org.mule.runtime.module.launcher.artifact.ArtifactMuleContextBuilder;
 import org.mule.runtime.module.launcher.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.reboot.MuleContainerBootstrapUtils;
-import org.mule.runtime.module.tooling.api.artifact.ToolingArtifact;
-import org.mule.runtime.module.tooling.api.artifact.ToolingArtifactBuilderFactory;
-import org.mule.runtime.module.tooling.api.artifact.ToolingArtifactBuilder;
+import org.mule.runtime.module.tooling.api.artifact.TemporaryArtifact;
+import org.mule.runtime.module.tooling.api.artifact.TemporaryArtifactBuilderFactory;
+import org.mule.runtime.module.tooling.api.artifact.TemporaryArtifactBuilder;
 import org.mule.runtime.module.tooling.api.connectivity.ConnectivityTestingStrategy;
 
 import java.io.File;
@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
  *
  * @since 4.0
  */
-public class TemporaryToolingArtifactBuilderFactory implements ToolingArtifactBuilderFactory
+public class TemporaryTemporaryArtifactBuilderFactory implements TemporaryArtifactBuilderFactory
 {
 
     private final MuleArtifactResourcesRegistry muleArtifactResourcesRegistry;
@@ -49,7 +49,7 @@ public class TemporaryToolingArtifactBuilderFactory implements ToolingArtifactBu
      *
      * @param muleArtifactResourcesRegistry registry of mule artifact resources
      */
-    public TemporaryToolingArtifactBuilderFactory(MuleArtifactResourcesRegistry muleArtifactResourcesRegistry)
+    public TemporaryTemporaryArtifactBuilderFactory(MuleArtifactResourcesRegistry muleArtifactResourcesRegistry)
     {
         this.muleArtifactResourcesRegistry = muleArtifactResourcesRegistry;
     }
@@ -58,11 +58,11 @@ public class TemporaryToolingArtifactBuilderFactory implements ToolingArtifactBu
      * {@inheritDoc}
      */
     @Override
-    public ToolingArtifactBuilder newBuilder()
+    public TemporaryArtifactBuilder newBuilder()
     {
-        return new ToolingArtifactBuilder()
+        return new TemporaryArtifactBuilder()
         {
-            private Logger logger = LoggerFactory.getLogger(ToolingArtifactBuilder.class);
+            private Logger logger = LoggerFactory.getLogger(TemporaryArtifactBuilder.class);
 
             private ArtifactMuleContextBuilder artifactMuleContextBuilder;
             private MuleDeployableArtifactClassLoader temporaryContextClassLoader;
@@ -72,14 +72,14 @@ public class TemporaryToolingArtifactBuilderFactory implements ToolingArtifactBu
             private List<Class<? extends ConnectivityTestingStrategy>> connectivityTestingStrategyTypes = new ArrayList<>();
 
             @Override
-            public ToolingArtifactBuilder addConnectivityTestingStrategyType(Class<? extends ConnectivityTestingStrategy> connectionTestingServiceType)
+            public TemporaryArtifactBuilder addConnectivityTestingStrategyType(Class<? extends ConnectivityTestingStrategy> connectionTestingServiceType)
             {
                 connectivityTestingStrategyTypes.add(connectionTestingServiceType);
                 return this;
             }
 
             @Override
-            public ToolingArtifactBuilder addArtifactPluginFile(File artifactPluginFile)
+            public TemporaryArtifactBuilder addArtifactPluginFile(File artifactPluginFile)
             {
                 artifactPluginFiles.add(artifactPluginFile);
                 return this;
@@ -111,7 +111,7 @@ public class TemporaryToolingArtifactBuilderFactory implements ToolingArtifactBu
             }
 
             @Override
-            public ToolingArtifact build()
+            public TemporaryArtifact build()
             {
                 try
                 {
@@ -157,7 +157,7 @@ public class TemporaryToolingArtifactBuilderFactory implements ToolingArtifactBu
                             .setArtifactConfiguration(artifactConfiguration)
                             .setMuleContextListener(createMuleContextListener());
 
-                    return new ToolingArtifact()
+                    return new TemporaryArtifact()
                     {
                         public MuleContext muleContext;
 
@@ -222,7 +222,7 @@ public class TemporaryToolingArtifactBuilderFactory implements ToolingArtifactBu
              * {@inheritDoc}
              */
             @Override
-            public ToolingArtifactBuilder setArtifactConfiguration(ArtifactConfiguration artifactConfiguration)
+            public TemporaryArtifactBuilder setArtifactConfiguration(ArtifactConfiguration artifactConfiguration)
             {
                 this.artifactConfiguration = artifactConfiguration;
                 return this;

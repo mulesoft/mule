@@ -16,7 +16,7 @@ import java.io.File;
  *
  * @since 4.0
  */
-public interface ToolingArtifactBuilder
+public interface TemporaryArtifactBuilder
 {
 
     /**
@@ -25,7 +25,7 @@ public interface ToolingArtifactBuilder
      * @param connectionTestingServiceType class that creates instance of {@code ConnectivityTestingStrategy}
      * @return the builder
      */
-    ToolingArtifactBuilder addConnectivityTestingStrategyType(Class<? extends ConnectivityTestingStrategy> connectionTestingServiceType);
+    TemporaryArtifactBuilder addConnectivityTestingStrategyType(Class<? extends ConnectivityTestingStrategy> connectionTestingServiceType);
 
     /**
      * Allows to add an extensions to be used in the tooling artifact. The file type must be zip and be an extension.
@@ -33,7 +33,7 @@ public interface ToolingArtifactBuilder
      * @param artifactPluginFile a file pointer to an extension file
      * @return the builder
      */
-    ToolingArtifactBuilder addArtifactPluginFile(File artifactPluginFile);
+    TemporaryArtifactBuilder addArtifactPluginFile(File artifactPluginFile);
 
     /**
      * Allows to configure the set of mule components to be used by the artifact.
@@ -41,12 +41,12 @@ public interface ToolingArtifactBuilder
      * @param artifactConfiguration the mule configuration used by the artifact
      * @return the builder
      */
-    ToolingArtifactBuilder setArtifactConfiguration(ArtifactConfiguration artifactConfiguration);
+    TemporaryArtifactBuilder setArtifactConfiguration(ArtifactConfiguration artifactConfiguration);
 
     /**
      * Builds a {@code ToolingArtifact} with the provided configuration.
      * @return a {@code ToolingArtifact}
      */
-    ToolingArtifact build();
+    TemporaryArtifact build();
 
 }

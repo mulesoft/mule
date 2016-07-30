@@ -9,8 +9,9 @@ package org.mule.runtime.module.tooling.internal;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.module.repository.api.RepositoryService;
 import org.mule.runtime.module.tooling.api.ToolingService;
+import org.mule.runtime.module.tooling.api.artifact.TemporaryArtifact;
 import org.mule.runtime.module.tooling.api.connectivity.ConnectivityTestingServiceBuilder;
-import org.mule.runtime.module.tooling.api.artifact.ToolingArtifactBuilderFactory;
+import org.mule.runtime.module.tooling.api.artifact.TemporaryArtifactBuilderFactory;
 
 /**
  * Default implementation of {@code ToolingService}.
@@ -20,14 +21,14 @@ import org.mule.runtime.module.tooling.api.artifact.ToolingArtifactBuilderFactor
 public class DefaultToolingService implements ToolingService
 {
 
-    private final ToolingArtifactBuilderFactory artifactBuilderFactory;
+    private final TemporaryArtifactBuilderFactory artifactBuilderFactory;
     private RepositoryService repositoryService;
 
     /**
      * @param repositoryService a {@code RepositoryService} which will be used to find extensions required for the service.
-     * @param artifactBuilderFactory factory for building a {@link org.mule.runtime.module.tooling.api.artifact.ToolingArtifact} that will be used as context for the tooling services.
+     * @param artifactBuilderFactory factory for building a {@link TemporaryArtifact} that will be used as context for the tooling services.
      */
-    public DefaultToolingService(RepositoryService repositoryService, ToolingArtifactBuilderFactory artifactBuilderFactory)
+    public DefaultToolingService(RepositoryService repositoryService, TemporaryArtifactBuilderFactory artifactBuilderFactory)
     {
         this.repositoryService = repositoryService;
         this.artifactBuilderFactory = artifactBuilderFactory;

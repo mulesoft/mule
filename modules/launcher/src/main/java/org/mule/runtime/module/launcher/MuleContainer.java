@@ -17,7 +17,6 @@ import org.mule.runtime.core.config.i18n.Message;
 import org.mule.runtime.core.util.MuleUrlStreamHandlerFactory;
 import org.mule.runtime.core.util.StringMessageUtils;
 import org.mule.runtime.core.util.SystemUtils;
-import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.launcher.coreextension.ClasspathMuleCoreExtensionDiscoverer;
 import org.mule.runtime.module.launcher.coreextension.DefaultMuleCoreExtensionManagerServer;
 import org.mule.runtime.module.launcher.coreextension.MuleCoreExtensionManagerServer;
@@ -108,7 +107,7 @@ public class MuleContainer
         this.deploymentService = new MuleDeploymentService(artifactResourcesRegistry.getDomainFactory(), artifactResourcesRegistry.getApplicationFactory());
         this.repositoryService = new RepositoryServiceFactory().createRepositoryService();
 
-        this.toolingService = new DefaultToolingService(repositoryService, new TemporaryToolingArtifactBuilderFactory(artifactResourcesRegistry));
+        this.toolingService = new DefaultToolingService(repositoryService, new TemporaryTemporaryArtifactBuilderFactory(artifactResourcesRegistry));
         this.coreExtensionManager = new DefaultMuleCoreExtensionManagerServer(new ClasspathMuleCoreExtensionDiscoverer(artifactResourcesRegistry.getContainerClassLoader()), new ReflectionMuleCoreExtensionDependencyResolver());
 
         init(args);

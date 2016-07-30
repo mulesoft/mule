@@ -21,7 +21,7 @@ import org.mule.runtime.core.api.lifecycle.Startable;
  *
  * @since 4.0
  */
-public interface ToolingArtifact extends Startable, Disposable
+public interface TemporaryArtifact extends Startable, Disposable
 {
 
     /**

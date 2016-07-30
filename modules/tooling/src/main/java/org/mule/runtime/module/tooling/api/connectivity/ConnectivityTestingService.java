@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.tooling.api.connectivity;
 
+import org.mule.runtime.api.connection.ConnectionValidationResult;
+
 /**
  * Service for doing connectivity testing.
  *
@@ -21,6 +23,6 @@ public interface ConnectivityTestingService
      *
      * @return connectivity testing result.
      */
-    ConnectionResult testConnection();
+    ConnectionValidationResult testConnection();
 
 }

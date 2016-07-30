@@ -14,18 +14,13 @@ import static org.mockito.Mockito.when;
 import org.mule.runtime.config.spring.dsl.api.config.ArtifactConfiguration;
 import org.mule.runtime.config.spring.dsl.api.config.ComponentConfiguration;
 import org.mule.runtime.module.launcher.MuleArtifactResourcesRegistry;
-import org.mule.runtime.module.launcher.TemporaryToolingArtifactBuilderFactory;
+import org.mule.runtime.module.launcher.TemporaryTemporaryArtifactBuilderFactory;
 import org.mule.runtime.module.repository.api.BundleNotFoundException;
 import org.mule.runtime.module.repository.api.RepositoryService;
 import org.mule.runtime.module.tooling.api.ToolingService;
-import org.mule.runtime.module.tooling.api.connectivity.ConnectionResult;
 import org.mule.runtime.module.tooling.api.connectivity.ConnectivityTestingService;
-import org.mule.runtime.module.tooling.api.connectivity.MultipleConnectivityTestingObjectsFoundException;
-import org.mule.runtime.module.tooling.api.connectivity.NoConnectivityTestingObjectFoundException;
 import org.mule.runtime.module.tooling.internal.DefaultToolingService;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-
-import java.io.IOException;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -57,7 +52,7 @@ public class ToolingServiceTestCase extends AbstractMuleTestCase
     {
         ArtifactConfiguration artifactConfiguration = new ArtifactConfiguration(asList(componentConfigurations));
         MuleArtifactResourcesRegistry muleArtifactResourcesRegistry = new MuleArtifactResourcesRegistry();
-        ToolingService toolingService = new DefaultToolingService(createFakeRepositorySystem(), new TemporaryToolingArtifactBuilderFactory(muleArtifactResourcesRegistry));
+        ToolingService toolingService = new DefaultToolingService(createFakeRepositorySystem(), new TemporaryTemporaryArtifactBuilderFactory(muleArtifactResourcesRegistry));
 
         return toolingService.newConnectivityTestingServiceBuilder()
                 .setArtifactConfiguration(artifactConfiguration)

@@ -14,25 +14,20 @@ import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.module.tooling.api.connectivity.ConnectionResult.Status.FAILURE;
-import static org.mule.runtime.module.tooling.api.connectivity.ConnectionResult.Status.SUCCESS;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
-import org.mule.runtime.module.tooling.api.connectivity.ConnectionResult;
 import org.mule.runtime.module.tooling.api.connectivity.MultipleConnectivityTestingObjectsFoundException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-@Ignore
 public class ExtensionConnectivityTestingStrategyTestCase extends AbstractMuleTestCase
 {
 
@@ -72,20 +67,18 @@ public class ExtensionConnectivityTestingStrategyTestCase extends AbstractMuleTe
     @Test
     public void connectionProviderInConfigWithInvalidConnection() throws RegistrationException
     {
-        ConnectionResult connectionResult = testConnectivityWithConnectionProvider(false);
-        assertThat(connectionResult.getStatus(), is(FAILURE));
-        assertThat(connectionResult.getException().isPresent(), is(false));
+        ConnectionValidationResult connectionResult = testConnectivityWithConnectionProvider(false);
+        assertThat(connectionResult.isValid(), is(false));
     }
 
     @Test
     public void connectionProviderInConfigWithValidConnection() throws RegistrationException
     {
-        ConnectionResult connectionResult = testConnectivityWithConnectionProvider(true);
-        assertThat(connectionResult.getStatus(), is(SUCCESS));
-        assertThat(connectionResult.getException().isPresent(), is(false));
+        ConnectionValidationResult connectionResult = testConnectivityWithConnectionProvider(true);
+        assertThat(connectionResult.isValid(), is(true));
     }
 
-    private ConnectionResult testConnectivityWithConnectionProvider(boolean isValidConnection) throws RegistrationException
+    private ConnectionValidationResult testConnectivityWithConnectionProvider(boolean isValidConnection) throws RegistrationException
     {
         when(mockMuleContext.getRegistry().lookupObject(ConfigurationProvider.class)).thenReturn(mockConfigurationProvider);
         assertThat(extensionConnectivityTestingStrategy.connectionTestingObjectIsPresent(), is(true));
@@ -93,7 +86,7 @@ public class ExtensionConnectivityTestingStrategyTestCase extends AbstractMuleTe
         when(mockConfigurationInstance.getConnectionProvider()).thenReturn(of(mockConnectionProvider));
         when(mockConnectionProvider.validate(any())).thenReturn(mockConnectionValidationResult);
         when(mockConnectionValidationResult.isValid()).thenReturn(isValidConnection);
-        ConnectionResult connectionResult = extensionConnectivityTestingStrategy.testConnectivity();
+        ConnectionValidationResult connectionResult = extensionConnectivityTestingStrategy.testConnectivity();
         return connectionResult;
     }
 
