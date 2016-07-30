@@ -28,7 +28,7 @@
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-tooling</artifactId>
+            <artifactId>mule-module-tooling-support</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
