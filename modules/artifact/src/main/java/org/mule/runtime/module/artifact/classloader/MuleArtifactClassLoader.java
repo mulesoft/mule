@@ -9,6 +9,7 @@ package org.mule.runtime.module.artifact.classloader;
 import static java.lang.Integer.toHexString;
 import static java.lang.String.format;
 import static java.lang.System.identityHashCode;
+import static org.apache.commons.io.IOUtils.closeQuietly;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 
 import org.mule.runtime.core.util.IOUtils;
@@ -107,16 +108,22 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
 
     protected ResourceReleaser createResourceReleaserInstance()
     {
+        InputStream classStream = null;
         try
         {
-            InputStream classStream = this.getClass().getResourceAsStream(resourceReleaserClassLocation);
+            classStream = this.getClass().getResourceAsStream(resourceReleaserClassLocation);
             byte[] classBytes = IOUtils.toByteArray(classStream);
-            Class clazz = this.defineClass(null, classBytes, 0, classBytes.length);
+            classStream.close();
+            Class clazz = defineClass(null, classBytes, 0, classBytes.length);
             return (ResourceReleaser) clazz.newInstance();
         }
         catch (Exception e)
         {
             throw new RuntimeException("Can not create resource releaser instance from resource: " + resourceReleaserClassLocation, e);
+        }
+        finally
+        {
+            closeQuietly(classStream);
         }
     }
 

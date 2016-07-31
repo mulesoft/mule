@@ -7,6 +7,7 @@
 package org.mule.runtime.core.api.security.tls;
 
 
+import static org.mule.runtime.core.util.PropertiesUtils.loadProperties;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.StringUtils;
 
@@ -38,7 +39,6 @@ public class TlsProperties
 
     public void load(String fileName)
     {
-        Properties properties = new Properties();
         try
         {
             InputStream config = IOUtils.getResourceAsStream(fileName, TlsProperties.class);
@@ -50,7 +50,7 @@ public class TlsProperties
             else
             {
                 logger.info(String.format("Loading configuration file: %s", fileName));
-                properties.load(config);
+                Properties properties = loadProperties(config);
 
                 String enabledCipherSuitesProperty = properties.getProperty("enabledCipherSuites");
                 String enabledProtocolsProperty = properties.getProperty("enabledProtocols");

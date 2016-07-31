@@ -8,6 +8,7 @@
 package org.mule.runtime.module.launcher.plugin;
 
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.util.PropertiesUtils.loadProperties;
 import static org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter.EXPORTED_CLASS_PACKAGES_PROPERTY;
 import static org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter.EXPORTED_RESOURCE_PACKAGES_PROPERTY;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter;
@@ -16,7 +17,6 @@ import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorCreateExcep
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorFactory;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -55,10 +55,10 @@ public class ArtifactPluginDescriptorFactory implements ArtifactDescriptorFactor
         final File pluginPropsFile = new File(pluginFolder, PLUGIN_PROPERTIES);
         if (pluginPropsFile.exists())
         {
-            Properties props = new Properties();
+            Properties props;
             try
             {
-                props.load(new FileReader(pluginPropsFile));
+                props = loadProperties(pluginPropsFile.toURI().toURL());
             }
             catch (IOException e)
             {

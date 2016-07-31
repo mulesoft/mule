@@ -7,6 +7,7 @@
 package org.mule.runtime.module.launcher.coreextension;
 
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.util.PropertiesUtils.loadProperties;
 import org.mule.runtime.container.api.MuleCoreExtension;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.util.ClassUtils;
@@ -63,9 +64,7 @@ public class ClasspathMuleCoreExtensionDiscoverer implements MuleCoreExtensionDi
                 {
                     logger.debug("Reading extension file: " + url.toString());
                 }
-                Properties p = new Properties();
-                p.load(url.openStream());
-                extensions.add(p);
+                extensions.add(loadProperties(url.openStream()));
             }
             catch (Exception ex)
             {

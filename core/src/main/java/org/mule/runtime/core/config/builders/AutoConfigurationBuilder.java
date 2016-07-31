@@ -6,7 +6,8 @@
  */
 package org.mule.runtime.core.config.builders;
 
-import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
+import static org.mule.runtime.core.util.ClassUtils.getResource;
+import static org.mule.runtime.core.util.PropertiesUtils.loadProperties;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
@@ -78,8 +79,7 @@ public class AutoConfigurationBuilder extends AbstractResourceConfigurationBuild
 
         try
         {
-            Properties props = new Properties();
-            props.load(ClassUtils.getResource("configuration-builders.properties", this.getClass()).openStream());
+            Properties props = loadProperties(getResource("configuration-builders.properties", this.getClass()).openStream());
 
             for (Map.Entry<String, List<ConfigResource>> e : configsMap.entrySet())
             {
