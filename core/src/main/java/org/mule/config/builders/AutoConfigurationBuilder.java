@@ -6,6 +6,8 @@
  */
 package org.mule.config.builders;
 
+import static org.mule.util.ClassUtils.getResource;
+import static org.mule.util.PropertiesUtils.loadProperties;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.ConfigurationBuilder;
@@ -71,8 +73,7 @@ public class AutoConfigurationBuilder extends AbstractResourceConfigurationBuild
 
         try
         {
-            Properties props = new Properties();
-            props.load(ClassUtils.getResource("configuration-builders.properties", this.getClass()).openStream());
+            Properties props = loadProperties(getResource("configuration-builders.properties", this.getClass()).openStream());
 
             for (Map.Entry<String, List<ConfigResource>> e : configsMap.entrySet())
             {

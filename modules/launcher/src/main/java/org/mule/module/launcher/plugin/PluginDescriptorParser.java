@@ -6,13 +6,13 @@
  */
 package org.mule.module.launcher.plugin;
 
+import static org.mule.util.PropertiesUtils.loadProperties;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
 import org.mule.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.util.FileUtils;
 import org.mule.util.StringUtils;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
@@ -64,8 +64,7 @@ public class PluginDescriptorParser
             final File pluginPropsFile = new File(tmpDir, "plugin.properties");
             if (pluginPropsFile.exists())
             {
-                Properties props = new Properties();
-                props.load(new FileReader(pluginPropsFile));
+                Properties props = loadProperties(pluginPropsFile.toURI().toURL());
 
                 final String overrideString = props.getProperty(PROPERTY_LOADER_OVERRIDE);
                 if (StringUtils.isNotBlank(overrideString))
