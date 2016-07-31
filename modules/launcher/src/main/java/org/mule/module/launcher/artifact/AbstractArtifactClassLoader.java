@@ -6,6 +6,7 @@
  */
 package org.mule.module.launcher.artifact;
 
+import static org.apache.commons.io.IOUtils.closeQuietly;
 import org.mule.module.launcher.DirectoryResourceLocator;
 import org.mule.module.launcher.FineGrainedControlClassLoader;
 import org.mule.module.launcher.LocalResourceLocator;
@@ -91,16 +92,22 @@ public abstract class AbstractArtifactClassLoader extends FineGrainedControlClas
 
     protected ResourceReleaser createResourceReleaserInstance()
     {
+        InputStream classStream = null;
         try
         {
-            InputStream classStream = this.getClass().getResourceAsStream(resourceReleaserClassLocation);
+            classStream = this.getClass().getResourceAsStream(resourceReleaserClassLocation);
             byte[] classBytes = IOUtils.toByteArray(classStream);
-            Class clazz = this.defineClass(null, classBytes, 0, classBytes.length);
+            classStream.close();
+            Class clazz = defineClass(null, classBytes, 0, classBytes.length);
             return (ResourceReleaser) clazz.newInstance();
         }
         catch (Exception e)
         {
             throw new RuntimeException("Can not create resource releaser instance from resource: " + resourceReleaserClassLocation, e);
+        }
+        finally
+        {
+            closeQuietly(classStream);
         }
     }
 
