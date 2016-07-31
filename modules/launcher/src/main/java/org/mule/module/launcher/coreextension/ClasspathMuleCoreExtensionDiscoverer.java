@@ -6,6 +6,7 @@
  */
 package org.mule.module.launcher.coreextension;
 
+import static org.mule.util.PropertiesUtils.loadProperties;
 import org.mule.MuleCoreExtension;
 import org.mule.api.DefaultMuleException;
 import org.mule.util.ClassUtils;
@@ -50,9 +51,7 @@ public class ClasspathMuleCoreExtensionDiscoverer implements MuleCoreExtensionDi
                 {
                     logger.debug("Reading extension file: " + url.toString());
                 }
-                Properties p = new Properties();
-                p.load(url.openStream());
-                extensions.add(p);
+                extensions.add(loadProperties(url.openStream()));
             }
             catch (Exception ex)
             {
