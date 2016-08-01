@@ -6,47 +6,34 @@
  */
 package org.mule.test.components;
 
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.transport.NullPayload;
-
-import java.util.Arrays;
-import java.util.Collection;
-
-import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
-
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertThat;
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.api.MuleMessage;
 
-public class ComponentReturningNullFlowTestCase extends AbstractServiceAndFlowTestCase
+import org.junit.Test;
+
+public class ComponentReturningNullFlowTestCase extends FunctionalTestCase
 {
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/components/component-returned-null-service.xml"},
-            {ConfigVariant.FLOW, "org/mule/test/components/component-returned-null-flow.xml"}});
-    }
 
-    public ComponentReturningNullFlowTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
+        return "org/mule/test/components/component-returned-null-flow.xml";
     }
 
     @Test
     public void testNullReturnStopsFlow() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
-
-        MuleMessage msg = client.send("vm://in", "test data", null);
+        MuleMessage msg = flowRunner("StopFlowService").withPayload(TEST_PAYLOAD).run().getMessage();
         assertNotNull(msg);
-        final String payload = msg.getPayloadAsString();
+        final String payload = getPayloadAsString(msg);
         assertNotNull(payload);
         assertFalse("ERROR".equals(payload));
-        assertTrue(msg.getPayload() instanceof NullPayload);
+        assertThat(msg.getPayload(), is(nullValue()));
     }
 
     public static final class ComponentReturningNull

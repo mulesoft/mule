@@ -7,30 +7,37 @@
 package org.mule.test.tck;
 
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import org.mule.MessageExchangePattern;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.expression.ExpressionManager;
-import org.mule.expression.DefaultExpressionManager;
-import org.mule.tck.SensingNullMessageProcessor;
-import org.mule.tck.functional.AssertionMessageProcessor;
-import org.mule.tck.functional.ResponseAssertionMessageProcessor;
-import org.mule.tck.functional.TestNonBlockingProcessor;
-import org.mule.tck.junit4.AbstractMuleTestCase;
 
+import org.mule.functional.functional.ResponseAssertionMessageProcessor;
+import org.mule.runtime.core.MessageExchangePattern;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.tck.SensingNullMessageProcessor;
+import org.mule.tck.processor.TestNonBlockingProcessor;
+
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 public class ResponseAssertionMessageProcessorTestCase extends AssertionMessageProcessorTestCase
 {
+
+    private TestNonBlockingProcessor testNonBlockingProcessor;
+
+    @Before
+    public void before() throws InitialisationException
+    {
+        testNonBlockingProcessor = new TestNonBlockingProcessor();
+        testNonBlockingProcessor.initialise();
+    }
+
+    @After
+    public void after()
+    {
+        testNonBlockingProcessor.dispose();
+    }
+
+    @Override
     protected ResponseAssertionMessageProcessor createAssertionMessageProcessor()
     {
         ResponseAssertionMessageProcessor mp = new ResponseAssertionMessageProcessor();
@@ -45,7 +52,7 @@ public class ResponseAssertionMessageProcessorTestCase extends AssertionMessageP
         when(mockEvent.getExchangePattern()).thenReturn(MessageExchangePattern.REQUEST_RESPONSE);
 
         ResponseAssertionMessageProcessor asp = createAssertionMessageProcessor();
-        asp.setListener(new TestNonBlockingProcessor());
+        asp.setListener(testNonBlockingProcessor);
         asp.setFlowConstruct(flowConstruct);
         asp.setExpression(TRUE_EXPRESSION);
         asp.setResponseExpression(TRUE_EXPRESSION);
@@ -67,7 +74,7 @@ public class ResponseAssertionMessageProcessorTestCase extends AssertionMessageP
         when(mockEvent.getExchangePattern()).thenReturn(MessageExchangePattern.REQUEST_RESPONSE);
 
         ResponseAssertionMessageProcessor asp = createAssertionMessageProcessor();
-        asp.setListener(new TestNonBlockingProcessor());
+        asp.setListener(testNonBlockingProcessor);
         asp.setFlowConstruct(flowConstruct);
         asp.setExpression(TRUE_EXPRESSION);
         asp.setResponseExpression(TRUE_EXPRESSION);

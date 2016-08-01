@@ -6,8 +6,9 @@
  */
 package org.mule.test.integration.exceptions;
 
-import org.mule.api.MuleEvent;
-import org.mule.exception.AbstractMessagingExceptionStrategy;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.exception.AbstractMessagingExceptionStrategy;
 
 public class TestExceptionStrategy extends AbstractMessagingExceptionStrategy
 {
@@ -20,7 +21,7 @@ public class TestExceptionStrategy extends AbstractMessagingExceptionStrategy
     public MuleEvent handleException(Exception exception, MuleEvent event)
     {
         MuleEvent result = super.handleException(exception, event);
-        result.getMessage().setPayload("Ka-boom!");
+        result.setMessage(MuleMessage.builder(result.getMessage()).payload("Ka-boom!").build());
         return result;
     }
 

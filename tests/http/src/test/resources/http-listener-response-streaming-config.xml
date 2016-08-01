@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
+
+    <configuration>
+        <expression-language>
+            <import class="org.mule.test.module.http.functional.listener.HttpListenerResponseStreamingTestCase"/>
+            <alias name="inputStreamPayload" expression="new ByteArrayInputStream(HttpListenerResponseStreamingTestCase.TEST_BODY.getBytes())"/>
+            <alias name="stringPayload" expression="HttpListenerResponseStreamingTestCase.TEST_BODY"/>
+        </expression-language>
+    </configuration>
+
+    <httpn:listener-config name="listenerConfig">
+        <httpn:listener-connection host="localhost" port="${port}"/>
+    </httpn:listener-config>
+
+    <flow name="stringFlow">
+        <httpn:listener config-ref="listenerConfig" path="/string"/>
+        <set-payload value="#[stringPayload]"/>
+    </flow>
+
+    <flow name="stringWithContentLengthHeaderFlow">
+        <httpn:listener config-ref="listenerConfig" path="/stringWithContentLengthHeader">
+            <httpn:response-builder>
+                <httpn:headers>
+                    <httpn:header key="Content-Length" value="${stringPayloadLength}"/>
+                </httpn:headers>
+            </httpn:response-builder>
+        </httpn:listener>
+        <set-payload value="#[stringPayload]"/>
+    </flow>
+
+    <flow name="stringWithTransferEncodingFlow">
+        <httpn:listener config-ref="listenerConfig" path="/stringWithTransferEncodingHeader">
+            <httpn:response-builder>
+                <httpn:headers>
+                    <httpn:header key="Transfer-Encoding" value="chunked"/>
+                </httpn:headers>
+            </httpn:response-builder>
+        </httpn:listener>
+        <set-payload value="#[stringPayload]"/>
+    </flow>
+
+    <flow name="stringWithTransferEncodingAndContentLengthFlow">
+        <httpn:listener config-ref="listenerConfig" path="/stringWithTransferEncodingAndContentLengthHeader">
+            <httpn:response-builder>
+                <httpn:headers>
+                    <httpn:header key="Transfer-Encoding" value="chunked"/>
+                    <httpn:header key="Content-Length" value="${stringPayloadLength}"/>
+                </httpn:headers>
+            </httpn:response-builder>
+        </httpn:listener>
+        <set-payload value="#[stringPayload]"/>
+    </flow>
+
+    <flow name="inputStreamFlow">
+        <httpn:listener config-ref="listenerConfig" path="/inputStream"/>
+        <set-payload value="#[inputStreamPayload]"/>
+    </flow>
+
+    <flow name="inputStreamWithContentLengthHeaderFlow">
+        <httpn:listener config-ref="listenerConfig" path="/inputStreamWithContentLengthHeader">
+            <httpn:response-builder>
+                <httpn:headers>
+                    <httpn:header key="Content-Length" value="${stringPayloadLength}"/>
+                </httpn:headers>
+            </httpn:response-builder>
+        </httpn:listener>
+        <set-payload value="#[inputStreamPayload]"/>
+    </flow>
+
+    <flow name="inputStreamWithTransferEncodingFlow">
+        <httpn:listener config-ref="listenerConfig" path="/inputStreamWithTransferEncodingHeader">
+            <httpn:response-builder>
+                <httpn:headers>
+                    <httpn:header key="Transfer-Encoding" value="chunked"/>
+                </httpn:headers>
+            </httpn:response-builder>
+        </httpn:listener>
+        <set-payload value="#[inputStreamPayload]"/>
+    </flow>
+
+    <flow name="inputStreamWithTransferEncodingAndContentLengthFlow">
+        <httpn:listener config-ref="listenerConfig" path="/inputStreamWithTransferEncodingAndContentLengthHeader">
+            <httpn:response-builder>
+                <httpn:headers>
+                    <httpn:header key="Transfer-Encoding" value="chunked"/>
+                    <httpn:header key="Content-Length" value="${stringPayloadLength}"/>
+                </httpn:headers>
+            </httpn:response-builder>
+        </httpn:listener>
+        <set-payload value="#[inputStreamPayload]"/>
+    </flow>
+
+    <flow name="neverStringFlow">
+        <httpn:listener config-ref="listenerConfig" path="/neverString" responseStreamingMode="NEVER"/>
+        <set-payload value="#[stringPayload]"/>
+    </flow>
+
+    <flow name="neverStringTransferEncodingHeaderFlow">
+        <httpn:listener config-ref="listenerConfig" path="/neverStringTransferEncodingHeader" responseStreamingMode="NEVER">
+            <httpn:response-builder>
+                <httpn:headers>
+                    <httpn:header key="Transfer-Encoding" value="chunked"/>
+                </httpn:headers>
+            </httpn:response-builder>
+        </httpn:listener>
+        <set-payload value="#[stringPayload]"/>
+    </flow>
+
+    <flow name="neverInputStreamFlow">
+        <httpn:listener config-ref="listenerConfig" path="/neverInputStream"  responseStreamingMode="NEVER"/>
+        <set-payload value="#[inputStreamPayload]"/>
+    </flow>
+
+    <flow name="neverInputStreamTransferEncodingHeaderFlow">
+        <httpn:listener config-ref="listenerConfig" path="/neverInputStreamTransferEncodingHeader"  responseStreamingMode="NEVER">
+            <httpn:response-builder>
+                <httpn:headers>
+                    <httpn:header key="Transfer-Encoding" value="chunked"/>
+                </httpn:headers>
+            </httpn:response-builder>
+        </httpn:listener>
+        <set-payload value="#[inputStreamPayload]"/>
+    </flow>
+
+    <flow name="alwaysStringFlow">
+        <httpn:listener config-ref="listenerConfig" path="/alwaysString"  responseStreamingMode="ALWAYS"/>
+        <set-payload value="#[stringPayload]"/>
+    </flow>
+
+    <flow name="alwaysStringContentLengthHeaderFlow">
+        <httpn:listener config-ref="listenerConfig" path="/alwaysStringContentLengthHeader" responseStreamingMode="ALWAYS">
+            <httpn:response-builder>
+                <httpn:headers>
+                    <httpn:header key="Content-Length" value="${stringPayloadLength}"/>
+                </httpn:headers>
+            </httpn:response-builder>
+        </httpn:listener>
+        <set-payload value="#[stringPayload]"/>
+    </flow>
+
+    <flow name="alwaysInputStreamFlow">
+        <httpn:listener config-ref="listenerConfig" path="/alwaysInputStream" responseStreamingMode="ALWAYS"/>
+        <set-payload value="#[inputStreamPayload]"/>
+    </flow>
+
+    <flow name="alwaysInputStreamContentLengthHeaderFlow">
+        <httpn:listener config-ref="listenerConfig" path="/alwaysInputStreamContentLengthHeader" responseStreamingMode="ALWAYS">
+            <httpn:response-builder>
+                <httpn:headers>
+                    <httpn:header key="Content-Length" value="${stringPayloadLength}"/>
+                </httpn:headers>
+            </httpn:response-builder>
+        </httpn:listener>
+        <set-payload value="#[inputStreamPayload]"/>
+    </flow>
+
+</mule>

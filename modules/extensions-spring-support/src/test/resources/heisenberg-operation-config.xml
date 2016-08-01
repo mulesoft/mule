@@ -9,15 +9,18 @@
 
     <context:property-placeholder location="heisenberg.properties"/>
 
+    <heisenberg:door victim="Top Level Skyler" address="308 Negra Arroyo Lane" name="door"/>
+
+    <heisenberg:door victim="#[victim]" address="308 Negra Arroyo Lane" name="dynamicDoor"/>
+
     <heisenberg:config name="heisenberg"
-                       myName="Heisenberg"
+                       myName="heisenberg"
                        age="50"
                        cancer="true"
                        dateOfBirth="1959-09-07T00:00:00"
                        dateOfDeath="2011-09-07T00:00:00-05:00"
                        money="1000000"
                        recipe="recipes"
-                       initialHealth="CANCER"
                        finalHealth="CANCER"
                        candidateDoors="candidateDoors">
         <heisenberg:enemies>
@@ -25,37 +28,49 @@
             <heisenberg:enemy value="Hank"/>
         </heisenberg:enemies>
         <heisenberg:ricin-packs>
-            <heisenberg:ricin-pack microgramsPerKilo="22">
+            <heisenberg:ricin microgramsPerKilo="22">
                 <heisenberg:destination victim="Lidia" address="Stevia coffe shop"/>
-            </heisenberg:ricin-pack>
+            </heisenberg:ricin>
         </heisenberg:ricin-packs>
         <heisenberg:next-door address="pollos hermanos" victim="Gustavo Fring">
-            <heisenberg:previous victim="Krazy-8" address="Jesse's"/>
+                <heisenberg:previous victim="Krazy-8" address="Jesse's"/>
         </heisenberg:next-door>
+        <heisenberg:monthly-incomes>
+            <heisenberg:monthly-income value="12000"/>
+            <heisenberg:monthly-income value="500"/>
+        </heisenberg:monthly-incomes>
     </heisenberg:config>
 
     <flow name="sayMyName">
-        <heisenberg:say-my-name />
+        <heisenberg:say-my-name/>
+    </flow>
+
+    <flow name="sayMyNameOnTarget">
+        <heisenberg:say-my-name target="myFace"/>
     </flow>
 
     <flow name="die">
-        <heisenberg:die />
+        <heisenberg:die/>
     </flow>
 
     <flow name="getFixedEnemy">
         <heisenberg:get-enemy index="0"/>
     </flow>
 
+    <flow name="getDefaultEnemy">
+        <heisenberg:get-enemy/>
+    </flow>
+
     <flow name="expressionEnemy">
         <heisenberg:get-enemy index="#[flowVars['enemy']]"/>
     </flow>
 
-    <flow name="hideInEvent">
-        <heisenberg:hide-meth-in-event />
+    <flow name="collectFromEvent">
+        <heisenberg:get-payment-from-event/>
     </flow>
 
-    <flow name="hideInMessage">
-        <heisenberg:hide-meth-in-message />
+    <flow name="collectFromMessage">
+        <heisenberg:get-payment-from-message/>
     </flow>
 
     <flow name="killFromPayload">
@@ -72,7 +87,7 @@
     </flow>
 
     <flow name="killMany">
-        <heisenberg:kill-many  reason="I'm the one who knocks">
+        <heisenberg:kill-many reason="I'm the one who knocks">
             <heisenberg:kill-operations>
                 <heisenberg:kill-with-custom-message victim="Gustavo Fring" goodbyeMessage="bye bye"/>
                 <heisenberg:kill-with-custom-message victim="Frank" goodbyeMessage="bye bye"/>
@@ -82,7 +97,7 @@
     </flow>
 
     <flow name="killManyButOnlyOneProvided">
-        <heisenberg:kill-many  reason="I'm the one who knocks">
+        <heisenberg:kill-many reason="I'm the one who knocks">
             <heisenberg:kill-operations>
                 <heisenberg:kill-with-custom-message victim="Gustavo Fring" goodbyeMessage="bye bye"/>
             </heisenberg:kill-operations>
@@ -90,7 +105,7 @@
     </flow>
 
     <flow name="killOne">
-        <heisenberg:kill-one  reason="I'm the one who knocks">
+        <heisenberg:kill-one reason="I'm the one who knocks">
             <heisenberg:kill-operation>
                 <heisenberg:kill-with-custom-message victim="Gustavo Fring" goodbyeMessage="bye bye"/>
             </heisenberg:kill-operation>
@@ -98,11 +113,108 @@
     </flow>
 
     <flow name="injectedExtensionManager">
-        <heisenberg:get-injected-extension-manager />
+        <heisenberg:get-injected-extension-manager/>
     </flow>
 
     <flow name="alias">
-        <heisenberg:alias greeting="Howdy!" myName="Walter White" age="52"  />
+        <heisenberg:alias greeting="Howdy!" myName="Walter White" age="52"/>
     </flow>
 
+    <flow name="knockStaticInlineDoor">
+        <heisenberg:knock>
+            <heisenberg:knocked-door victim="Inline Skyler" address="308 Negra Arroyo Lane"/>
+        </heisenberg:knock>
+    </flow>
+
+    <flow name="knockStaticTopLevelDoor">
+        <heisenberg:knock knockedDoor="door"/>
+    </flow>
+
+    <flow name="knockDynamicTopLevelDoor">
+        <heisenberg:knock knockedDoor="dynamicDoor"/>
+    </flow>
+
+    <flow name="knockDynamicInlineDoor">
+        <heisenberg:knock>
+            <heisenberg:knocked-door victim="#[victim]" address="308 Negra Arroyo Lane"/>
+        </heisenberg:knock>
+    </flow>
+
+    <flow name="knockManyWithInlineList">
+        <heisenberg:knock-many>
+            <heisenberg:doors>
+                <heisenberg:door victim="Inline Skyler" address="308 Negra Arroyo Lane"/>
+                <heisenberg:door victim="#[victim]" address="308 Negra Arroyo Lane"/>
+            </heisenberg:doors>
+        </heisenberg:knock-many>
+    </flow>
+
+    <flow name="knockManyByExpression">
+        <heisenberg:knock-many doors="#[doors]"/>
+    </flow>
+
+    <flow name="callSaul">
+        <heisenberg:call-saul/>
+    </flow>
+
+    <flow name="killWithWeapon">
+        <heisenberg:kill-with-weapon weapon="#[weapon]" type="MELEE_WEAPON">
+            <heisenberg:attributes-of-weapon brand="Pizza on the rooftop"/>
+        </heisenberg:kill-with-weapon>
+    </flow>
+
+    <flow name="killWithMultipleWeapons">
+        <heisenberg:kill-with-multiples-weapons weaponList="#[weapons]"/>
+    </flow>
+
+    <flow name="killWithMultipleWildCardWeapons">
+        <heisenberg:kill-with-multiple-wild-card-weapons wildCardWeapons="#[weapons]"/>
+    </flow>
+
+    <flow name="killWithRicinDefaultPayload">
+        <heisenberg:kill-with-ricins/>
+    </flow>
+
+    <flow name="killWithRicinAsChildElement">
+        <heisenberg:kill-with-ricins>
+            <heisenberg:ricin-list>
+                <heisenberg:ricin microgramsPerKilo="20">
+                    <heisenberg:destination victim="Lidia" address="Stevia coffe shop"/>
+                </heisenberg:ricin>
+                <heisenberg:ricin microgramsPerKilo="22">
+                    <heisenberg:destination address="pollos hermanos" victim="Gustavo Fring"/>
+                </heisenberg:ricin>
+            </heisenberg:ricin-list>
+        </heisenberg:kill-with-ricins>
+    </flow>
+
+    <flow name="callGus">
+        <heisenberg:call-gus-fring/>
+    </flow>
+
+    <flow name="cureCancer">
+        <heisenberg:cure-cancer/>
+    </flow>
+
+    <flow name="getSaulNumber">
+        <heisenberg:get-saul-phone/>
+    </flow>
+
+    <flow name="literalEcho">
+        <heisenberg:literal-echo literalExpression="#[money]"/>
+    </flow>
+
+    <flow name="getMedicalHistory">
+        <heisenberg:get-medical-history>
+            <heisenberg:health-by-years>
+                <heisenberg:health-by-year key="2013" value="HEALTHY"/>
+                <heisenberg:health-by-year key="2014" value="CANCER"/>
+                <heisenberg:health-by-year key="2015" value="DEAD"/>
+            </heisenberg:health-by-years>
+        </heisenberg:get-medical-history>
+    </flow>
+
+    <flow name="getGramsInStorage">
+        <heisenberg:get-grams-in-storage/>
+    </flow>
 </mule>

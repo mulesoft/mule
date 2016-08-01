@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes"
+      xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg"
+      xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+      http://www.mulesoft.org/schema/mule/heisenberg http://www.mulesoft.org/schema/mule/heisenberg/current/mule-heisenberg.xsd
+      http://www.mulesoft.org/schema/mule/vegan http://www.mulesoft.org/schema/mule/vegan/current/mule-vegan.xsd
+      http://www.mulesoft.org/schema/mule/subtypes http://www.mulesoft.org/schema/mule/subtypes/current/mule-subtypes.xsd">
+
+    <subtypes:config name="config" >
+        <subtypes:connection>
+            <subtypes:abstract-shape>
+                <subtypes:triangle-alias height="2" area="1"/>
+            </subtypes:abstract-shape>
+            <subtypes:door-interface>
+                <subtypes:house-door isLocked="true"/>
+            </subtypes:door-interface>
+            <subtypes:doors>
+                <subtypes:car-door color="red"/>
+                <subtypes:house-door isLocked="true"/>
+            </subtypes:doors>
+        </subtypes:connection>
+        <subtypes:abstract-shape>
+            <subtypes:square side="1" area="1"/>
+        </subtypes:abstract-shape>
+        <subtypes:door-interface>
+            <subtypes:car-door color="red"/>
+        </subtypes:door-interface>
+        <subtypes:explicit-square side="2" area="4"/>
+        <subtypes:final-pojo someString="message"/>
+        <subtypes:ricin microgramsPerKilo="2"/>
+        <subtypes:extensible-weapon>
+            <heisenberg:ricin microgramsPerKilo="22">
+                <heisenberg:destination victim="Krazy-8" address="Jesse's"/>
+            </heisenberg:ricin>
+        </subtypes:extensible-weapon>
+        <subtypes:triangle>
+            <subtypes:triangle-alias height="4" area="2"/>
+        </subtypes:triangle>
+        <subtypes:pojo-list-one>
+            <subtypes:pojo-for-list id="inner"/>
+        </subtypes:pojo-list-one>
+        <subtypes:weapon-list>
+            <subtypes:revolver bullets="6"/>
+            <heisenberg:ricin microgramsPerKilo="10">
+                <heisenberg:destination victim="Krazy-8" address="Jesse's"/>
+            </heisenberg:ricin>
+            <heisenberg:ricin microgramsPerKilo="20">
+                <heisenberg:destination victim="Lidia" address="Stevia coffe shop"/>
+            </heisenberg:ricin>
+            <subtypes:revolver bullets="0"/>
+        </subtypes:weapon-list>
+        <subtypes:weapon-maps>
+            <subtypes:weapon-map key="ricinChild">
+                <heisenberg:ricin microgramsPerKilo="20">
+                    <heisenberg:destination victim="Lidia" address="Stevia coffe shop"/>
+                </heisenberg:ricin>
+            </subtypes:weapon-map>
+            <subtypes:weapon-map key="revolverChild">
+                <subtypes:revolver bullets="1"/>
+            </subtypes:weapon-map>
+            <subtypes:weapon-map key="revolverRef" value="remington"/>
+            <subtypes:weapon-map key="revolverMEL" value="#[new org.mule.test.subtypes.extension.Revolver()]"/>
+        </subtypes:weapon-maps>
+    </subtypes:config>
+
+    <heisenberg:config name="heisenberg"
+                       cancer="true"
+                       dateOfBirth="1959-09-07T00:00:00"
+                       dateOfDeath="2011-09-07T00:00:00-05:00"
+                       money="1000000"
+                       finalHealth="DEAD"
+                       enemies="enemies"
+                       labAddress="#['Pollos Hermanos']"
+                       monthlyIncomes="monthlyIncomes">
+        <heisenberg:wild-card-weapons>
+            <heisenberg:ricin microgramsPerKilo="10">
+                <heisenberg:destination victim="Krazy-8" address="Jesse's"/>
+            </heisenberg:ricin>
+            <subtypes:revolver bullets="3"/>
+        </heisenberg:wild-card-weapons>
+    </heisenberg:config>
+
+    <flow name="shapeRetriever">
+        <subtypes:shape-retriever>
+            <subtypes:shape>
+                <subtypes:parent-shape area="16"/>
+            </subtypes:shape>
+        </subtypes:shape-retriever>
+    </flow>
+
+    <flow name="doorRetriever">
+        <subtypes:door-retriever>
+            <subtypes:door>
+                <subtypes:car-door color="blue"/>
+            </subtypes:door>
+        </subtypes:door-retriever>
+    </flow>
+
+    <flow name="configRetriever">
+        <subtypes:config-retriever/>
+    </flow>
+
+    <flow name="connectionRetriever">
+        <subtypes:connection-retriever/>
+    </flow>
+
+    <flow name="subtypedAndConcreteParameters">
+        <subtypes:subtyped-and-concrete-parameters>
+            <subtypes:base-shape>
+                <subtypes:parent-shape area="2"/>
+            </subtypes:base-shape>
+            <subtypes:door>
+                <subtypes:house-door isLocked="false"/>
+            </subtypes:door>
+            <subtypes:final-pojo someString="asChild"/>
+            <subtypes:cook-book>
+                <vegan:vegan-cook-book numberOfPages="1"/>
+            </subtypes:cook-book>
+            <subtypes:square-shape>
+                <subtypes:square side="4" area="16"/>
+            </subtypes:square-shape>
+            <subtypes:triangle>
+                <subtypes:triangle-alias height="4" area="2"/>
+            </subtypes:triangle>
+        </subtypes:subtyped-and-concrete-parameters>
+    </flow>
+
+    <subtypes:car-door name="global-car-door" color="white"/>
+    <subtypes:house-door name="global-house-door" isLocked="true"/>
+    <subtypes:parent-shape name="global-shape" area="9"/>
+    <subtypes:square name="global-square" side="3" area="9"/>
+    <subtypes:triangle-alias name="global-triangle" height="6" area="3"/>
+    <subtypes:final-pojo name="global-final-pojo" someString="globalString"/>
+    <vegan:vegan-cook-book name="global-cookbook" numberOfPages="10"/>
+    <subtypes:revolver name="remington" bullets="6"/>
+
+    <flow name="subtypedAndConcreteParametersAsAttributes">
+        <subtypes:subtyped-and-concrete-parameters
+                door="global-car-door"
+                baseShape="global-shape"
+                squareShape="global-square"
+                triangle="global-triangle"
+                finalPojo="global-final-pojo"
+                cookBook="global-cookbook"
+        />
+    </flow>
+
+    <flow name="sourceWithParameterMapping" initialState="stopped">
+        <subtypes:subtypes-source>
+            <subtypes:door-param>
+                <subtypes:house-door isLocked="false"/>
+            </subtypes:door-param>
+        </subtypes:subtypes-source>
+        <set-payload value="100"/>
+    </flow>
+</mule>

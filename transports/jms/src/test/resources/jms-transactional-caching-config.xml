@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
-      xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/transport/vm"
+      xmlns:jms="http://www.mulesoft.org/schema/mule/transport/jms"
       xmlns:spring="http://www.springframework.org/schema/beans"
       xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
-       http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd">
+       http://www.mulesoft.org/schema/mule/transport/vm http://www.mulesoft.org/schema/mule/transport/vm/current/mule-transport-vm.xsd
+       http://www.mulesoft.org/schema/mule/transport/jms http://www.mulesoft.org/schema/mule/transport/jms/current/mule-transport-jms.xsd">
 
     <spring:bean name="connectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
         <spring:property name="brokerURL" value="vm://localhost?broker.persistent=false&amp;broker.useJmx=false"/>
@@ -31,7 +31,7 @@
             <jms:outbound-endpoint queue="testQueue" connector-ref="JMS"/>
 
             <component>
-                <singleton-object class="org.mule.transport.jms.JmsTransactionalCachingTestCase$AbortMessageOnEventCount"/>
+                <singleton-object class="org.mule.compatibility.transport.jms.JmsTransactionalCachingTestCase$AbortMessageOnEventCount"/>
             </component>
         </transactional>
     </flow>

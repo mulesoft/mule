@@ -2,16 +2,10 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:db="http://www.mulesoft.org/schema/mule/db"
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-            http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
-            http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+            http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
     <flow name="defaultQueryRequestResponse">
-        <vm:inbound-endpoint path="testIn" exchange-pattern="request-response">
-            <xa-transaction action="ALWAYS_BEGIN"/>
-        </vm:inbound-endpoint>
-
         <set-variable variableName="dataSourceUrl" value="jdbc:derby:muleEmbeddedDB;create=true"/>
 
         <db:select config-ref="pooledJdbcConfig" maxRows="2">

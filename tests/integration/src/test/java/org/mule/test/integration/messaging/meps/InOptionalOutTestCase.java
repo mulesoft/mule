@@ -6,39 +6,33 @@
  */
 package org.mule.test.integration.messaging.meps;
 
-import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.util.StringUtils;
+import static java.lang.String.format;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.runtime.core.util.StringUtils;
 
-import java.util.Arrays;
-import java.util.Collection;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
-//START SNIPPET: full-class
-public class InOptionalOutTestCase extends AbstractServiceAndFlowTestCase
+public class InOptionalOutTestCase extends FunctionalTestCase
 {
     public static final long TIMEOUT = 3000;
 
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/integration/messaging/meps/pattern_In-Optional-Out-service.xml"},
-            {ConfigVariant.FLOW, "org/mule/test/integration/messaging/meps/pattern_In-Optional-Out-flow.xml"}
-        });
-    }
+    @Rule
+    public DynamicPort port = new DynamicPort("port1");
 
-    public InOptionalOutTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
+        return "org/mule/test/integration/messaging/meps/pattern_In-Optional-Out-flow.xml";
     }
 
     @Test
@@ -46,14 +40,15 @@ public class InOptionalOutTestCase extends AbstractServiceAndFlowTestCase
     {
         MuleClient client = muleContext.getClient();
 
-        MuleMessage result = client.send("inboundEndpoint", "some data", null);
+        String listenerUrl = format("http://localhost:%s/", port.getNumber());
+        MuleMessage result = client.send(listenerUrl, "some data", null);
         assertNotNull(result);
-        assertEquals(StringUtils.EMPTY, result.getPayloadAsString());
+        assertEquals(StringUtils.EMPTY, getPayloadAsString(result));
 
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Serializable> props = new HashMap<>();
         props.put("foo", "bar");
-        result = client.send("inboundEndpoint", "some data", props);
+        result = client.send(listenerUrl, "some data", props);
         assertNotNull(result);
-        assertEquals("foo header received", result.getPayloadAsString());
+        assertEquals("foo header received", getPayloadAsString(result));
     }
 }

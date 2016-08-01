@@ -1,2 +1,0 @@
-http\://www.mulesoft.org/schema/mule/rmi=org.mule.transport.rmi.config.RmiNamespaceHandler
-http\://www.mulesoft.org/schema/mule/jnp=org.mule.transport.jnp.config.JnpNamespaceHandler

@@ -12,11 +12,11 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.util.Base64;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.util.Base64;
 
 import java.util.List;
 import java.util.Random;
@@ -74,7 +74,7 @@ public class DefaultEntryPointResolverSetMultithreadingTestCase extends Function
         }
     }
 
-    private static class ClientRequest extends Thread
+    private class ClientRequest extends Thread
     {
         final MuleClient client;
         int requestCount;
@@ -94,7 +94,7 @@ public class DefaultEntryPointResolverSetMultithreadingTestCase extends Function
             {
                 try
                 {
-                    final MuleMessage outbound = client.send("vm://test.inbound.sync", payload, null);
+                    final MuleMessage outbound = flowRunner("flowTestSync").withPayload(payload).run().getMessage();
                     assertNull(outbound.getExceptionPayload());
                     assertNotNull(outbound.getPayload());
                     byte[] bytes = null;

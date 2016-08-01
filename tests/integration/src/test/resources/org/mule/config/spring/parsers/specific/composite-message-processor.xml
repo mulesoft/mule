@@ -10,7 +10,7 @@
         <append-string-transformer message="1" />
         <append-string-transformer message="2" />
         <append-string-transformer message="3" />
-        <custom-interceptor class="org.mule.interceptor.LoggingInterceptor"/>
+        <custom-interceptor class="org.mule.runtime.core.interceptor.LoggingInterceptor"/>
     </processor-chain>
 
     <processor-chain name="composite2">
@@ -22,10 +22,4 @@
         </processor-chain>
         <append-string-transformer message="2" />
     </processor-chain>
-
-    <endpoint name="endpoint" address="test://test">
-        <processor ref="composite1" />
-        <processor ref="composite2" />
-    </endpoint>
-
 </mule>

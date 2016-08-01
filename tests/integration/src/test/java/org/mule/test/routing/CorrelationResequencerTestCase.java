@@ -9,35 +9,25 @@ package org.mule.test.routing;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.api.MuleEventContext;
-import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.tck.functional.EventCallback;
-import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.functional.functional.EventCallback;
+import org.mule.functional.functional.FunctionalTestComponent;
+import org.mule.functional.junit4.FunctionalTestCase;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class CorrelationResequencerTestCase extends AbstractServiceAndFlowTestCase
+public class CorrelationResequencerTestCase extends FunctionalTestCase
 {
     private CountDownLatch receiveLatch = new CountDownLatch(6);
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "correlation-resequencer-test-service.xml"},
-            {ConfigVariant.FLOW, "correlation-resequencer-test-flow.xml"}});
-    }
-
-    public CorrelationResequencerTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
+        return "correlation-resequencer-test-flow.xml";
     }
 
     @Override
@@ -45,7 +35,7 @@ public class CorrelationResequencerTestCase extends AbstractServiceAndFlowTestCa
     {
         super.doSetUp();
 
-        FunctionalTestComponent testComponent = getFunctionalTestComponent("test validator");
+        FunctionalTestComponent testComponent = getFunctionalTestComponent("sorted");
         testComponent.setEventCallback(new EventCallback()
         {
             @Override
@@ -59,12 +49,11 @@ public class CorrelationResequencerTestCase extends AbstractServiceAndFlowTestCa
     @Test
     public void testResequencer() throws Exception
     {
-        MuleClient client = muleContext.getClient();
-        client.dispatch("vm://splitter", Arrays.asList("a", "b", "c", "d", "e", "f"), null);
+        flowRunner("splitter").withPayload(Arrays.asList("a", "b", "c", "d", "e", "f")).asynchronously().run();
 
-        FunctionalTestComponent resequencer = getFunctionalTestComponent("test validator");
+        FunctionalTestComponent resequencer = getFunctionalTestComponent("sorted");
 
-        assertTrue(receiveLatch.await(30, TimeUnit.SECONDS));
+        assertTrue(receiveLatch.await(3000, TimeUnit.SECONDS));
 
         assertEquals("Wrong number of messages received.", 6, resequencer.getReceivedMessagesCount());
         assertEquals("Sequence wasn't reordered.", "a", resequencer.getReceivedMessage(1));

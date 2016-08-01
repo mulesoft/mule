@@ -13,7 +13,7 @@ target/
 *.iml
 *.ipr
 *.iws
-/.idea
+*.idea
 
 # Mac
 .DS_Store
@@ -23,7 +23,6 @@ objectstore/
 .mule/
 *.log
 temp/
-repository/
 muleEmbeddedDB/
 activemq-data/
 testdir/

@@ -8,9 +8,7 @@
 
     <db:derby-config name="jdbcConfig2" url="jdbc:derby:muleEmbeddedDB;create=true"/>
 
-    <flow name="bulkUpdateRequestResponse">
-        <inbound-endpoint address="vm://testRequestResponse" exchange-pattern="request-response"/>
-
+    <flow name="testFlow">
         <db:bulk-execute>
             update PLANET set NAME='Mercury' where POSITION=0
         </db:bulk-execute>

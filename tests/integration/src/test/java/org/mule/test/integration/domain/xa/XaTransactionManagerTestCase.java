@@ -6,13 +6,38 @@
  */
 package org.mule.test.integration.domain.xa;
 
-import org.mule.api.MuleRuntimeException;
-import org.mule.tck.junit4.DomainFunctionalTestCase;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
+import static org.mule.runtime.core.config.ExceptionHelper.getRootException;
 
+import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.functional.junit4.DomainFunctionalTestCase;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+
+import org.hamcrest.Description;
+import org.hamcrest.Factory;
+import org.hamcrest.Matcher;
+import org.hamcrest.TypeSafeMatcher;
+import org.hamcrest.core.IsInstanceOf;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.springframework.beans.factory.NoUniqueBeanDefinitionException;
 
 public class XaTransactionManagerTestCase extends DomainFunctionalTestCase
 {
+
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
+    @Override
+    public void setUpMuleContexts() throws Exception
+    {
+        thrown.expect(InitialisationException.class);
+        thrown.expect(hasMessage(containsString("No qualifying bean of type [org.mule.runtime.core.api.transaction.TransactionManagerFactory] is defined: expected single matching bean but found 2:")));
+        thrown.expect(ThrowableRootCauseMatcher.hasRootCause(IsInstanceOf.<ConfigurationException> instanceOf(NoUniqueBeanDefinitionException.class)));
+        super.setUpMuleContexts();
+    }
 
     public static final String APPLICATION_NAME = "app";
 
@@ -30,9 +55,48 @@ public class XaTransactionManagerTestCase extends DomainFunctionalTestCase
         };
     }
 
-    @Test(expected = MuleRuntimeException.class)
+    @Test
     public void validateOnlyOneTxManagerCanBeUsed()
     {
-         getMuleContextForApp(APPLICATION_NAME).getTransactionManager();
+        // This is never called since the exception is thrown during init.
+        getMuleContextForApp(APPLICATION_NAME).getTransactionManager();
+    }
+
+    public static class ThrowableRootCauseMatcher<T extends Throwable> extends
+        TypeSafeMatcher<T>
+    {
+
+        private final Matcher<T> fMatcher;
+
+        public ThrowableRootCauseMatcher(Matcher<T> matcher)
+        {
+            fMatcher = matcher;
+        }
+
+        @Override
+        public void describeTo(Description description)
+        {
+            description.appendText("exception with root cause ");
+            description.appendDescriptionOf(fMatcher);
+        }
+
+        @Override
+        protected boolean matchesSafely(T item)
+        {
+            return fMatcher.matches(getRootException(item));
+        }
+
+        @Override
+        protected void describeMismatchSafely(T item, Description description)
+        {
+            description.appendText("root cause ");
+            fMatcher.describeMismatch(getRootException(item), description);
+        }
+
+        @Factory
+        public static <T extends Throwable> Matcher<T> hasRootCause(final Matcher<T> matcher)
+        {
+            return new ThrowableRootCauseMatcher<T>(matcher);
+        }
     }
 }

@@ -2,19 +2,15 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns:ws="http://www.mulesoft.org/schema/mule/ws"
       xsi:schemaLocation="
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
-               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
                http://www.mulesoft.org/schema/mule/ws http://www.mulesoft.org/schema/mule/ws/current/mule-ws.xsd">
 
-    <configuration>
-        <http:config useTransportForUris="${useTransportForUris}"/>
-    </configuration>
+    <http:listener-config name="listenerConfig" host="localhost" port="${port}"/>
 
     <ws:consumer-config serviceAddress="http://localhost:${port}/services/Test" wsdlLocation="Test.wsdl"
                         service="TestService" port="TestPort" name="configValidCredentialsText">
@@ -25,8 +21,6 @@
     </ws:consumer-config>
 
     <flow name="clientWithValidCredentialsText">
-        <inbound-endpoint address="vm://clientWithValidCredentialsText" exchange-pattern="request-response"/>
-
         <ws:consumer  operation="echo" config-ref="configValidCredentialsText" />
     </flow>
 
@@ -40,8 +34,6 @@
 
 
     <flow name="clientWithValidCredentialsDigest">
-        <inbound-endpoint address="vm://clientWithValidCredentialsDigest" exchange-pattern="request-response"/>
-
         <ws:consumer operation="echo" config-ref="configValidCredentialsDigest" />
     </flow>
 
@@ -54,8 +46,6 @@
     </ws:consumer-config>
 
     <flow name="clientWithInvalidCredentials">
-        <inbound-endpoint address="vm://clientWithInvalidCredentials" exchange-pattern="request-response"/>
-
         <ws:consumer operation="echo" config-ref="configInvalidCredentials" />
     </flow>
 
@@ -64,8 +54,6 @@
                         service="TestService" port="TestPort" name="configWithoutCredentials" />
 
     <flow name="clientWithoutCredentials">
-        <inbound-endpoint address="vm://clientWithoutCredentials" exchange-pattern="request-response"/>
-
         <ws:consumer operation="echo" config-ref="configWithoutCredentials" />
     </flow>
 
@@ -74,19 +62,17 @@
         <cxf:ws-config>
             <cxf:property key="action" value="UsernameToken"/>
             <cxf:property key="passwordCallbackClass"
-                          value="org.mule.module.ws.functional.UsernameTokenSecurityFunctionalTestCase$ServerPasswordCallback"/>
+                          value="org.mule.runtime.module.ws.functional.UsernameTokenSecurityFunctionalTestCase$ServerPasswordCallback"/>
         </cxf:ws-config>
     </cxf:ws-security>
 
 
     <flow name="server">
-        <inbound-endpoint address="http://localhost:${port}/services/Test"
-                          exchange-pattern="request-response">
-            <cxf:jaxws-service serviceClass="org.mule.module.ws.consumer.TestService">
-                <cxf:ws-security ref="inboundConfig"/>
-            </cxf:jaxws-service>
-        </inbound-endpoint>
-        <component class="org.mule.module.ws.consumer.TestService"/>
+        <http:listener path="/services/Test" config-ref="listenerConfig"/>
+        <cxf:jaxws-service serviceClass="org.mule.runtime.module.ws.consumer.TestService">
+            <cxf:ws-security ref="inboundConfig"/>
+        </cxf:jaxws-service>
+        <component class="org.mule.runtime.module.ws.consumer.TestService"/>
     </flow>
 
 </mule>

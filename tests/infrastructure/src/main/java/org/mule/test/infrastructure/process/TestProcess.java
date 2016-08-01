@@ -6,7 +6,7 @@
  */
 package org.mule.test.infrastructure.process;
 
-import org.mule.util.concurrent.Latch;
+import org.mule.runtime.core.util.concurrent.Latch;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -16,13 +16,13 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TestProcess implements CommandServer.CommandListener
 {
 
-    private Log logger = LogFactory.getLog(TestProcess.class);
+    private Logger logger = LoggerFactory.getLogger(TestProcess.class);
 
     private final Latch clientSocketAcceptedLatch = new Latch();
     private final Latch contextStartedLatch = new Latch();

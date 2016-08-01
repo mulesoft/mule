@@ -12,16 +12,15 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
-import org.mule.api.MuleEvent;
-import org.mule.config.i18n.Message;
 import org.mule.extension.validation.api.ValidationException;
-import org.mule.extension.validation.internal.ValidationExtension;
+import org.mule.extension.validation.api.ValidationExtension;
 import org.mule.extension.validation.internal.ValidationMessages;
-import org.mule.tck.junit4.ExtensionsFunctionalTestCase;
-import org.mule.util.ExceptionUtils;
+import org.mule.functional.junit4.ExtensionFunctionalTestCase;
+import org.mule.functional.junit4.FlowRunner;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.config.i18n.Message;
 
-abstract class ValidationTestCase extends ExtensionsFunctionalTestCase
+abstract class ValidationTestCase extends ExtensionFunctionalTestCase
 {
 
     static final String VALID_URL = "http://localhost:8080";
@@ -44,26 +43,19 @@ abstract class ValidationTestCase extends ExtensionsFunctionalTestCase
         messages = new ValidationMessages();
     }
 
-    protected void assertValid(String flowName, MuleEvent event) throws Exception
+    protected void assertValid(FlowRunner runner) throws MuleException, Exception
     {
-        MuleEvent responseEvent = runFlow(flowName, event);
-        assertThat(responseEvent.getMessage().getExceptionPayload(), is(nullValue()));
+        assertThat(runner.run().getMessage().getExceptionPayload(), is(nullValue()));
+        runner.reset();
     }
 
-    protected void assertInvalid(String flowName, MuleEvent event, Message expectedMessage) throws Exception
+    protected void assertInvalid(FlowRunner runner, Message expectedMessage) throws Exception
     {
-        try
-        {
-            runFlow(flowName, event);
-            fail("Was expecting a failure");
-        }
-        catch (Exception e)
-        {
-            Throwable rootCause = ExceptionUtils.getRootCause(e);
-            assertThat(rootCause, is(instanceOf(ValidationException.class)));
-            assertThat(rootCause.getMessage(), is(expectedMessage.getMessage()));
-            // assert that all placeholders were replaced in message
-            assertThat(rootCause.getMessage(), not(containsString("${")));
-        }
+        Exception e = runner.runExpectingException();
+        assertThat(e, is(instanceOf(ValidationException.class)));
+        assertThat(e.getMessage(), is(expectedMessage.getMessage()));
+        // assert that all placeholders were replaced in message
+        assertThat(e.getMessage(), not(containsString("${")));
+        runner.reset();
     }
 }

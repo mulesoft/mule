@@ -12,9 +12,9 @@
     <xsd:import namespace="http://www.springframework.org/schema/beans"
                 schemaLocation="http://www.springframework.org/schema/beans/spring-beans-3.1.xsd"/>
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/core"
-                schemaLocation="http://www.mulesoft.org/schema/mule/core/3.7/mule.xsd"/>
+                schemaLocation="http://www.mulesoft.org/schema/mule/core/3.8/mule.xsd"/>
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/schemadoc"
-                schemaLocation="http://www.mulesoft.org/schema/mule/schemadoc/3.7/mule-schemadoc.xsd"/>
+                schemaLocation="http://www.mulesoft.org/schema/mule/schemadoc/3.8/mule-schemadoc.xsd"/>
 
     <xsd:annotation>
         <xsd:documentation>
@@ -42,96 +42,6 @@
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-
-    <xsd:element name="jxpath-filter" type="jxpathFilterType" substitutionGroup="mule:abstract-filter">
-        <xsd:annotation>
-            <xsd:documentation>
-                Filters messages based on XPath expressions using JXPath.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:complexType name="jxpathFilterType">
-        <xsd:annotation>
-            <xsd:documentation>
-                Filters messages based on XPath expressions using JXPath.
-            </xsd:documentation>
-        </xsd:annotation>
-        <xsd:complexContent>
-            <xsd:extension base="mule:patternFilterType">
-                <xsd:sequence>
-                    <xsd:element name="namespace" type="namespaceType" minOccurs="0" maxOccurs="unbounded">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                A namespace declaration, expressed as {{prefix}} and {{uri}} attributes. The prefix can then be used inside the expression.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:element>
-                    <xsd:element name="context-property" type="spring:entryType" minOccurs="0" maxOccurs="unbounded">
-                        <xsd:annotation>
-                            <xsd:documentation>A property that will be made available to the filter context. Expression Evaluators can be used to grab these properties from the message at runtime.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:element>
-                </xsd:sequence>
-                <xsd:attribute name="lenient" type="mule:substitutableBoolean" default="true">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Whether or not errors are thrown if the XPath expression doesn't exist.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="expectedValue" type="xsd:string">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The expected value of the XPath expression evaluation. If the expected value matches the evaluation, the filter returns true.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:element name="jaxen-filter" type="jaxenFilterType" substitutionGroup="mule:abstract-filter">
-        <xsd:annotation>
-            <xsd:documentation>
-The Jaxen filter allows you to route messages based on XPath expressions. The Jaxen filter is generally faster than the JXPath filter and should be considered the first choice when using an XPath filter.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:complexType name="jaxenFilterType">
-        <xsd:annotation>
-            <xsd:documentation>
-                The Jaxen filter allows you to route messages based on XPath expressions.
-            </xsd:documentation>
-        </xsd:annotation>
-        <xsd:complexContent>
-            <xsd:extension base="mule:patternFilterType">
-                <xsd:sequence>
-                    <xsd:element name="namespace" type="namespaceType" minOccurs="0" maxOccurs="unbounded">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                A namespace declaration, expressed as {{prefix}} and {{uri}} attributes. The prefix can then be used inside the expression.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:element>
-                    <xsd:element name="context-property" type="spring:entryType" minOccurs="0" maxOccurs="unbounded">
-                        <xsd:annotation>
-                            <xsd:documentation>A property that wil be made available to the filter context. Expression Evaluators can be used to grab these properties from the message at runtime.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:element>
-                </xsd:sequence>
-                <xsd:attribute name="expectedValue" type="xsd:string">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The expected value of the XPath expression evaluation. If the expected value matches the evaluation, the filter returns true.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
     <xsd:element name="xpath-filter" type="xpathFilterType" substitutionGroup="mule:abstract-filter">
         <xsd:annotation>
             <xsd:documentation>
@@ -197,7 +107,7 @@ The Jaxen filter allows you to route messages based on XPath expressions. The Ja
                 <xsd:attribute name="resourceResolver-ref" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Reference to a Spring bean that implements <code>org.w3c.dom.ls.LSResourceResolver</code>. By default a <code>oorg.mule.module.xml.util.MuleResourceResolver</code> instance will be used to resolve from the file system, from a URL, or from the classpath, in that specific order.
+                            Reference to a Spring bean that implements <code>org.w3c.dom.ls.LSResourceResolver</code>. By default a <code>oorg.mule.runtime.module.xml.util.MuleResourceResolver</code> instance will be used to resolve from the file system, from a URL, or from the classpath, in that specific order.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -497,7 +407,7 @@ The Jaxen filter allows you to route messages based on XPath expressions. The Ja
 
     <xsd:element name="xslt-transformer" type="xsltTransformerType" substitutionGroup="mule:abstract-transformer">
         <xsd:annotation>
-            <xsd:documentation>The XSLT transformer uses XSLT to transform the message payload. Transformation objects are pooled for better performance. You can set transformation context properties on the transformer and can pull these properties from the message using Expression Evaluators.
+            <xsd:documentation>The XSLT transformer uses XSLT to transform the message payload. Transformation objects are pooled for better performance. You can set transformation context properties on the transformer and can pull these properties from the message using an Expression.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -514,7 +424,7 @@ The Jaxen filter allows you to route messages based on XPath expressions. The Ja
                     </xsd:element>
                     <xsd:element name="context-property" type="spring:entryType" minOccurs="0" maxOccurs="unbounded">
                         <xsd:annotation>
-                            <xsd:documentation>A property that wil be made available to the transform context. Expression Evaluators can be used to grab these properties from the message at runtime.
+                            <xsd:documentation>A property that wil be made available to the transform context. An expression can be used to grab these properties from the message at runtime.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
@@ -555,7 +465,7 @@ The Jaxen filter allows you to route messages based on XPath expressions. The Ja
 
     <xsd:element name="xquery-transformer" type="xqueryTransformerType" substitutionGroup="mule:abstract-transformer">
         <xsd:annotation>
-            <xsd:documentation>An Xml transformer uses XQuery to transform the message payload. Transformation objects are pooled for better performance. You can set transformation context properties on the transformer and can pull these properties from the message using Expression Evaluators.
+            <xsd:documentation>An Xml transformer uses XQuery to transform the message payload. Transformation objects are pooled for better performance. You can set transformation context properties on the transformer and can pull these properties from the message using an expression.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -566,7 +476,7 @@ The Jaxen filter allows you to route messages based on XPath expressions. The Ja
                 <xsd:sequence>
                     <xsd:element name="context-property" type="spring:entryType" minOccurs="0" maxOccurs="unbounded">
                         <xsd:annotation>
-                            <xsd:documentation>A property that wil be made available to the XQuery transform context. Expression Evaluators can be used to grab these properties from the message at runtime.
+                            <xsd:documentation>A property that wil be made available to the XQuery transform context. An expression can be used to grab these properties from the message at runtime.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>

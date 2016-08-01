@@ -12,11 +12,11 @@ import static org.mule.extension.validation.ValidationTestCase.INVALID_EMAIL;
 import static org.mule.extension.validation.ValidationTestCase.INVALID_URL;
 import static org.mule.extension.validation.ValidationTestCase.VALID_EMAIL;
 import static org.mule.extension.validation.ValidationTestCase.VALID_URL;
-import org.mule.api.MuleEvent;
-import org.mule.api.el.ExpressionLanguage;
-import org.mule.extension.validation.internal.validator.NumberType;
+import org.mule.extension.validation.api.NumberType;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.transport.NullPayload;
 
 import com.google.common.collect.ImmutableList;
 
@@ -61,13 +61,13 @@ public class ValidationElTestCase extends AbstractMuleContextTestCase
 
         assertValid(expression, event);
 
-        event.getMessage().setPayload("TRUE");
+        event.setMessage(MuleMessage.builder(event.getMessage()).payload("TRUE").build());
         assertValid(expression, event);
 
         event.setFlowVariable("caseSensitive", true);
         assertInvalid(expression, event);
 
-        event.getMessage().setPayload("tTrue");
+        event.setMessage(MuleMessage.builder(event.getMessage()).payload("tTrue").build());
         assertInvalid(expression, event);
     }
 
@@ -142,16 +142,14 @@ public class ValidationElTestCase extends AbstractMuleContextTestCase
         final String expression = "#[validator.isNotNull(payload)]";
         assertValid(expression, getTestEvent(""));
 
-        assertInvalid(expression, getTestEvent(null));
-        assertInvalid(expression, getTestEvent(NullPayload.getInstance()));
+        assertInvalid(expression, getTestEvent((MuleMessage.builder().nullPayload().build())));
     }
 
     @Test
     public void isNull() throws Exception
     {
         final String expression = "#[validator.isNull(payload)]";
-        assertValid(expression, getTestEvent(null));
-        assertValid(expression, getTestEvent(NullPayload.getInstance()));
+        assertValid(expression, getTestEvent(MuleMessage.builder().nullPayload().build()));
 
         assertInvalid(expression, getTestEvent(""));
     }

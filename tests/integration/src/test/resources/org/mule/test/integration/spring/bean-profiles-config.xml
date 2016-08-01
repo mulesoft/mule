@@ -2,9 +2,11 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xsi:schemaLocation="
       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
-      http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+      http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+      http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
 	<spring:beans profile="one">
 		<mule>
@@ -19,10 +21,8 @@
 	</spring:beans>
 
     <flow name="service">
-        <inbound-endpoint address="vm://in">
-        </inbound-endpoint>
         <transformer ref="append"/>
-        <outbound-endpoint address="vm://out"/>
+        <test:queue name="out"/>
     </flow>   
 
 </mule>

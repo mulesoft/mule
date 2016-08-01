@@ -6,8 +6,6 @@
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
     <flow name="multiplyIntsFlow">
-        <inbound-endpoint address="vm://multiplyInts" exchange-pattern="request-response"/>
-
         <db:stored-procedure config-ref="dbConfig">
             <db:parameterized-query>{ call multiplyInts(:int1, :int2, :result1, :int3, :result2) }</db:parameterized-query>
             <db:in-param name="int1" value="3"/>
@@ -19,8 +17,6 @@
     </flow>
 
     <flow name="concatenateStringsFlow">
-        <inbound-endpoint address="vm://concatenateStrings" exchange-pattern="request-response"/>
-
         <db:stored-procedure config-ref="dbConfig">
             <db:parameterized-query>{ call concatenateStrings(:s1, :s2, :result) }</db:parameterized-query>
             <db:in-param name="s1" value="foo"/>

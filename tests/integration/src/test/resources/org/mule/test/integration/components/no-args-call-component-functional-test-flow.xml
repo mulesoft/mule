@@ -1,20 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:spring="http://www.springframework.org/schema/beans" xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+    xmlns:spring="http://www.springframework.org/schema/beans" xmlns:test="http://www.mulesoft.org/schema/mule/test"
     xsi:schemaLocation="
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
-
-    <vm:connector name="VmConnector" />
+               http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
     <spring:bean name="containerDelegate" class="org.mule.tck.testmodels.fruit.Apple" />
 
 
     <flow name="WORMS">
-
-        <inbound-endpoint address="vm://in"
-            connector-ref="VmConnector" exchange-pattern="one-way" />
 
         <component>
             <no-arguments-entry-point-resolver>
@@ -23,15 +18,11 @@
             <singleton-object class="org.mule.tck.testmodels.fruit.Apple" />
         </component>
 
-        <outbound-endpoint address="vm://out"
-            connector-ref="VmConnector" exchange-pattern="one-way" />
+        <test:queue name="out"/>
 
     </flow>
 
     <flow name="TIRANA">
-
-        <inbound-endpoint address="vm://invokeWithInjected"
-            connector-ref="VmConnector" exchange-pattern="one-way" />
 
         <component>
             <no-arguments-entry-point-resolver>
@@ -40,9 +31,7 @@
             <spring-object bean="containerDelegate" />
         </component>
 
-
-        <outbound-endpoint address="vm://outWithInjected"
-            connector-ref="VmConnector" exchange-pattern="one-way" />
+        <test:queue name="outWithInjected"/>
 
     </flow>
 

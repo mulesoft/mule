@@ -2,39 +2,24 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:mxml="http://www.mulesoft.org/schema/mule/xml"
-       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+       xmlns:test="http://www.mulesoft.org/schema/mule/test"
     xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd
-       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
     <mxml:object-to-xml-transformer name="objectToXml"/>
     <mxml:xml-to-object-transformer name="xmlToObject"/>
 
-    <vm:endpoint name="xml-in" path="xml-in" exchange-pattern="one-way"/>
-    <vm:endpoint name="object-in" path="object-in" exchange-pattern="one-way"/>
-
-    <vm:endpoint name="xml-object-out" path="xml-object-out"
-        exchange-pattern="one-way"/>
-    <vm:endpoint name="object-xml-out" path="object-xml-out"
-        exchange-pattern="one-way"/>
-
-    
     <flow name="xml to object">        
-        <inbound-endpoint ref="xml-in"/>
-
             <!-- MULE-5038 -->
-        <vm:outbound-endpoint ref="xml-object-out">
-            <transformer ref="xmlToObject"/>
-        </vm:outbound-endpoint>
+        <transformer ref="xmlToObject"/>
+        <test:queue name="xml-object-out"/>
     </flow>
 
     <flow name="object to xml">
-        <inbound-endpoint ref="object-in"/>                
-        
-        <vm:outbound-endpoint ref="object-xml-out">
-            <transformer ref="objectToXml"/>
-        </vm:outbound-endpoint>        
+        <transformer ref="objectToXml"/>
+        <test:queue name="object-xml-out"/>
     </flow>
 
 </mule>

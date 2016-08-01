@@ -2,24 +2,19 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:mule="http://www.mulesoft.org/schema/mule/core"
-      xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+      xmlns:jms="http://www.mulesoft.org/schema/mule/transport/jms"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns:transports="http://www.mulesoft.org/schema/mule/transports"
       xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
-       http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd">
+       http://www.mulesoft.org/schema/mule/transport/jms http://www.mulesoft.org/schema/mule/transport/jms/current/mule-transport-jms.xsd
+       http://www.mulesoft.org/schema/mule/transports http://www.mulesoft.org/schema/mule/transports/current/mule-transports.xsd">
 
-    <model name="test">
-        <service name="PassThrough">
-            <inbound>
-                <inbound-endpoint ref="in"/>
-            </inbound>
-            <test:component/>
-            <outbound>
-                <pass-through-router>
-                    <outbound-endpoint ref="out"/>
-                </pass-through-router>
-            </outbound>
-        </service>
-    </model>
+    <flow name="PassThrough">
+        <transports:inbound-endpoint ref="in"/>
+        <test:component/>
+        <transports:outbound-endpoint ref="out"/>
+    </flow>
+
 </mule>

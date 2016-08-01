@@ -12,17 +12,17 @@
            ">
 
 
-    <custom-transformer name="holderTransformer" class="org.mule.module.cxf.HolderNonBlockingTestCase$HolderTransformer"/>
-    <custom-transformer name="holderTransformer2" class="org.mule.module.cxf.HolderNonBlockingTestCase$HolderTransformer2"/>
-    <custom-transformer name="holderTransformer3" class="org.mule.module.cxf.HolderNonBlockingTestCase$HolderTransformer3"/>
+    <custom-transformer name="holderTransformer" class="org.mule.runtime.module.cxf.HolderNonBlockingTestCase$HolderTransformer"/>
+    <custom-transformer name="holderTransformer2" class="org.mule.runtime.module.cxf.HolderNonBlockingTestCase$HolderTransformer2"/>
+    <custom-transformer name="holderTransformer3" class="org.mule.runtime.module.cxf.HolderNonBlockingTestCase$HolderTransformer3"/>
 
     <http:listener-config name="listenerConfig" host="localhost" port="${port1}"/>
     <http:request-config name="requestConfig" host="localhost" port="${port1}"/>
 
     <flow name="echoService" processingStrategy="non-blocking">
         <http:listener path="echo" config-ref="listenerConfig"/>
-        <cxf:jaxws-service serviceClass="org.mule.module.cxf.HolderService"/>
-        <component class="org.mule.module.cxf.HolderServiceImplForNonBlocking" />
+        <cxf:jaxws-service serviceClass="org.mule.runtime.module.cxf.HolderService"/>
+        <component class="org.mule.runtime.module.cxf.HolderServiceImplForNonBlocking" />
     </flow>
 
 
@@ -31,7 +31,11 @@
         <http:listener path="/echoClient" config-ref="listenerConfig" allowedMethods="POST" />
         <transformer ref="holderTransformer"/>
         <processor ref="sensingRequestResponseProcessorEcho" />
-        <cxf:jaxws-client serviceClass="org.mule.module.cxf.HolderService" operation="echo"/>
+        <response>
+            <!-- Ensure message owner is correct, test will fail otherwise -->
+            <set-property propertyName="foo" value="bar"/>
+        </response>
+        <cxf:jaxws-client serviceClass="org.mule.runtime.module.cxf.HolderService" operation="echo"/>
         <http:request path="echo" method="POST" config-ref="requestConfig"/>
     </flow>
 
@@ -40,7 +44,11 @@
         <http:listener path="/echoClientProxy" config-ref="listenerConfig" allowedMethods="POST" />
         <transformer ref="holderTransformer"/>
         <processor ref="sensingRequestResponseProcessorEchoProxy" />
-        <cxf:jaxws-client clientClass="org.mule.module.cxf.HolderServiceService" port="HolderServicePort" operation="echo" wsdlLocation="echoHolder.wsdl"/>
+        <response>
+            <!-- Ensure message owner is correct, test will fail otherwise -->
+            <set-property propertyName="foo" value="bar"/>
+        </response>
+        <cxf:jaxws-client clientClass="org.mule.runtime.module.cxf.HolderServiceService" port="HolderServicePort" operation="echo" wsdlLocation="echoHolder.wsdl"/>
         <http:request path="echo" method="POST" config-ref="requestConfig"/>
     </flow>
 
@@ -50,7 +58,11 @@
         <http:listener path="/echo2Client" config-ref="listenerConfig" allowedMethods="POST" />
         <transformer ref="holderTransformer2"/>
         <processor ref="sensingRequestResponseProcessorEcho2" />
-        <cxf:jaxws-client serviceClass="org.mule.module.cxf.HolderService" operation="echo2"/>
+        <response>
+            <!-- Ensure message owner is correct, test will fail otherwise -->
+            <set-property propertyName="foo" value="bar"/>
+        </response>
+        <cxf:jaxws-client serviceClass="org.mule.runtime.module.cxf.HolderService" operation="echo2"/>
         <http:request path="echo" method="POST" config-ref="requestConfig"/>
     </flow>
 
@@ -59,7 +71,11 @@
         <http:listener path="/echo2ClientProxy" config-ref="listenerConfig" allowedMethods="POST" />
         <transformer ref="holderTransformer2"/>
         <processor ref="sensingRequestResponseProcessorEchoProxy2" />
-        <cxf:jaxws-client clientClass="org.mule.module.cxf.HolderServiceService" port="HolderServicePort" operation="echo2" wsdlLocation="echoHolder.wsdl"/>
+        <response>
+            <!-- Ensure message owner is correct, test will fail otherwise -->
+            <set-property propertyName="foo" value="bar"/>
+        </response>
+        <cxf:jaxws-client clientClass="org.mule.runtime.module.cxf.HolderServiceService" port="HolderServicePort" operation="echo2" wsdlLocation="echoHolder.wsdl"/>
         <http:request path="echo" method="POST" config-ref="requestConfig"/>
     </flow>
 
@@ -69,7 +85,11 @@
         <http:listener path="/echo3Client" config-ref="listenerConfig" allowedMethods="POST" />
         <transformer ref="holderTransformer3"/>
         <processor ref="sensingRequestResponseProcessorEcho3" />
-        <cxf:jaxws-client serviceClass="org.mule.module.cxf.HolderService" operation="echo3"/>
+        <response>
+            <!-- Ensure message owner is correct, test will fail otherwise -->
+            <set-property propertyName="foo" value="bar"/>
+        </response>
+        <cxf:jaxws-client serviceClass="org.mule.runtime.module.cxf.HolderService" operation="echo3"/>
         <http:request path="echo" method="POST" config-ref="requestConfig"/>
     </flow>
 
@@ -78,7 +98,11 @@
         <http:listener path="/echo3ClientProxy" config-ref="listenerConfig" allowedMethods="POST" />
         <transformer ref="holderTransformer3"/>
         <processor ref="sensingRequestResponseProcessorEchoProxy3" />
-        <cxf:jaxws-client clientClass="org.mule.module.cxf.HolderServiceService" port="HolderServicePort" operation="echo3" wsdlLocation="echoHolder.wsdl"/>
+        <response>
+            <!-- Ensure message owner is correct, test will fail otherwise -->
+            <set-property propertyName="foo" value="bar"/>
+        </response>
+        <cxf:jaxws-client clientClass="org.mule.runtime.module.cxf.HolderServiceService" port="HolderServicePort" operation="echo3" wsdlLocation="echoHolder.wsdl"/>
         <http:request path="echo" method="POST" config-ref="requestConfig"/>
     </flow>
 

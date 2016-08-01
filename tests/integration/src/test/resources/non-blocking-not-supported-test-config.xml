@@ -2,35 +2,19 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xmlns:spring="http://www.springframework.org/schema/beans"
       xsi:schemaLocation="
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
-               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd">
 
-    <configuration>
+    <configuration defaultProcessingStrategy="non-blocking">
         <expression-language>
             <global-functions>
                 def assertPayload(){payload == org.mule.tck.junit4.AbstractMuleContextTestCase.TEST_MESSAGE}
             </global-functions>
         </expression-language>
     </configuration>
-
-    <flow name="catchExceptionStrategy">
-        <test:assert-intercepting responseSameThread="true" responseExpression="#[assertPayload()]"/>
-        <flow-ref name="catchExceptionStrategyChild"/>
-    </flow>
-    <flow name="catchExceptionStrategyChild">
-        <test:component throwException="true"/>
-        <catch-exception-strategy>
-            <test:assert-intercepting responseSameThread="true" responseExpression="#[assertPayload()]"/>
-            <set-variable variableName="beforeThread" value="#[Thread.currentThread()]"/>
-            <test:non-blocking-processor/>
-            <test:assert count="1" expression="#[Thread.currentThread()==beforeThread  and assertPayload()]"/>
-        </catch-exception-strategy>
-    </flow>
 
     <flow name="splitter">
         <test:assert-intercepting responseSameThread="true"/>
@@ -39,7 +23,7 @@
         <test:non-blocking-processor/>
     </flow>
 
-    <spring:bean id="objectStore" class="org.mule.util.store.SimpleMemoryObjectStore"/>
+    <spring:bean id="objectStore" class="org.mule.runtime.core.util.store.SimpleMemoryObjectStore"/>
 
     <flow name="untilSuccessful">
         <test:assert-intercepting responseSameThread="true"/>
@@ -95,13 +79,9 @@
 
     <flow name="requestReply">
         <test:assert-intercepting responseSameThread="true"/>
-        <request-reply>
-            <vm:outbound-endpoint address="vm://request" exchange-pattern="one-way"/>
-            <vm:inbound-endpoint address="vm://reply" exchange-pattern="one-way"/>
-        </request-reply>
+            <flow-ref name="requestReplyChild"/>
     </flow>
     <flow name="requestReplyChild">
-        <vm:inbound-endpoint address="vm://request" exchange-pattern="one-way"/>
         <echo-component/>
     </flow>
 
@@ -112,7 +92,7 @@
         <test:non-blocking-processor/>
     </flow>
 
-    <flow name="poll">
+    <flow name="poll" processingStrategy="default">
         <poll frequency="100">
             <processor-chain>
                 <test:assert-intercepting responseSameThread="true"/>
@@ -140,6 +120,32 @@
         </transactional>
         <test:assert-intercepting responseSameThread="true"/>
         <test:non-blocking-processor/>
+    </flow>
+
+    <flow name="catchRollbackExceptionStrategy">
+        <set-variable variableName="beforeThread" value="#[Thread.currentThread()]"/>
+        <flow-ref name="rollbackExceptionStrategyChild"/>
+        <catch-exception-strategy>
+            <test:assert expression="#[Thread.currentThread()==beforeThread and assertPayload()]"/>
+            <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]"/>
+            <test:non-blocking-processor/>
+        </catch-exception-strategy>
+    </flow>
+    <flow name="rollbackRollbackExceptionStrategy">
+        <set-variable variableName="beforeThread" value="#[Thread.currentThread()]"/>
+        <flow-ref name="rollbackExceptionStrategyChild"/>
+        <rollback-exception-strategy>
+            <test:assert expression="#[Thread.currentThread()==beforeThread  and assertPayload()]"/>
+            <test:assert-intercepting responseSameThread="true" responseExpression="#[assertPayload()]"/>
+            <test:non-blocking-processor/>
+        </rollback-exception-strategy>
+    </flow>
+    <flow name="rollbackExceptionStrategyChild">
+        <test:component throwException="true"/>
+        <rollback-exception-strategy>
+            <test:assert-intercepting responseSameThread="true" responseExpression="#[assertPayload()]"/>
+            <test:non-blocking-processor/>
+        </rollback-exception-strategy>
     </flow>
 
 </mule>

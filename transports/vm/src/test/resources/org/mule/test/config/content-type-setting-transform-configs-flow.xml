@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/transport/vm"
+      xmlns:transports="http://www.mulesoft.org/schema/mule/transports"
       xsi:schemaLocation="
           http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-          http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+          http://www.mulesoft.org/schema/mule/transport/vm http://www.mulesoft.org/schema/mule/transport/vm/current/mule-transport-vm.xsd
+          http://www.mulesoft.org/schema/mule/transports http://www.mulesoft.org/schema/mule/transports/current/mule-transports.xsd">
 
     <vm:connector name="vm-in1" />
     <vm:connector name="vm-in2" />
@@ -18,26 +20,26 @@
 
     <flow name="testService1">
         <vm:inbound-endpoint ref="inbound1"/>
-        <outbound-endpoint ref="outbound1">
-            <set-property propertyName="Content-Type" value="text/xml;charset=UTF-8"/>
-        </outbound-endpoint>
+        <transports:outbound-endpoint ref="outbound1">
+            <custom-transformer class="org.mule.compatibility.transport.vm.functional.TransformerContentTypeTestCase$SetXmlMediaTypeTransformer"/>
+        </transports:outbound-endpoint>
     </flow>
 
     <flow name="echo">
         <vm:inbound-endpoint ref="outbound1"/>
-        <component class="org.mule.transport.vm.functional.TransformerContentTypeTestCase$EchoComponent"/>
+        <component class="org.mule.compatibility.transport.vm.functional.TransformerContentTypeTestCase$EchoComponent"/>
     </flow>
 
     <flow name="testService2">
         <vm:inbound-endpoint ref="inbound2"/>
-        <outbound-endpoint ref="outbound2">
-            <set-property propertyName="Content-Type" value="text/plain;charset=UTF-8"/>
-        </outbound-endpoint>
+        <transports:outbound-endpoint ref="outbound2">
+            <custom-transformer class="org.mule.compatibility.transport.vm.functional.TransformerContentTypeTestCase$SetTextMediaTypeTransformer"/>
+        </transports:outbound-endpoint>
     </flow>
 
     <flow name="echo2">
         <vm:inbound-endpoint ref="outbound2"/>
-        <component class="org.mule.transport.vm.functional.TransformerContentTypeTestCase$EchoComponent"/>
+        <component class="org.mule.compatibility.transport.vm.functional.TransformerContentTypeTestCase$EchoComponent"/>
     </flow>
 
 </mule>

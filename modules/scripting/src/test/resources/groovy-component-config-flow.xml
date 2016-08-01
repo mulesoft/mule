@@ -4,47 +4,28 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
-       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
-       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
-
-    <script:script name="myScript" engine="groovy">
-        return "$payload Received"
-    </script:script>
-
-    <flow name="inlineScript">
-        <description>
-            This example demonstrates how to configure a Groovy Script component with an in-line script.
-            </description>
-        <inbound-endpoint address="vm://in1" exchange-pattern="one-way"/>
-        <script:component>
-            <script:script engine="groovy">
-                return "$payload Received"
-                </script:script>
-        </script:component>
-        <outbound-endpoint address="vm://out1" exchange-pattern="one-way"/>
-    </flow>
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
     <flow name="inlineScriptMutateProperty">
         <script:component>
             <script:script engine="groovy">
-                message.setOutboundProperty('foo', 'bar-mutated')                
+                message = org.mule.runtime.core.api.MuleMessage.builder(message).addOutboundProperty('foo', 'bar-mutated').build()
              </script:script>
         </script:component>
-        <test:assert expression="#[groovy:message.getOutboundProperty('foo').equals('bar-mutated')]"/>
+        <test:assert expression="#[message.outboundProperties.foo == 'bar-mutated']"/>
     </flow>
 
     <flow name="inlineScriptAddProperty">
         <script:component>
             <script:script engine="groovy">
-                message.setOutboundProperty('foo', 'bar')                
+                message = org.mule.runtime.core.api.MuleMessage.builder(message).addOutboundProperty('foo', 'bar').build()
              </script:script>
         </script:component>
-        <test:assert expression="#[groovy:message.getOutboundProperty('foo').equals('bar')]"/>
+        <test:assert expression="#[message.outboundProperties.foo == 'bar']"/>
     </flow>
 
     <flow name="inlineScriptMutatePropertiesMap">
@@ -53,26 +34,26 @@
                 outbound = new HashMap()              
              </script:script>
         </script:component>
-        <test:assert expression="#[groovy:message.getOutboundProperty('foo').equals('bar')]"/>
-        <test:assert expression="#[groovy:payload instanceof HashMap]"/>
+        <test:assert expression="#[message.outboundProperties.foo == 'bar']"/>
+        <test:assert expression="#[payload instanceof HashMap]"/>
     </flow>
 
     <flow name="inlineScriptMutateVariable">
         <script:component>
             <script:script engine="groovy">
-                message.setInvocationProperty('foo','bar-mutated')                
+                flowVars['foo'] = 'bar-mutated'
              </script:script>
         </script:component>
-        <test:assert expression="#[groovy:message.getInvocationProperty('foo').equals('bar-mutated')]"/>
+        <test:assert expression="#[flowVars.foo == 'bar-mutated']"/>
     </flow>
     
     <flow name="inlineScriptAddVariable">
         <script:component>
             <script:script engine="groovy">
-                message.setInvocationProperty('foo','bar')                
+                flowVars['foo'] = 'bar'
              </script:script>
         </script:component>
-        <test:assert expression="#[groovy:message.getInvocationProperty('foo').equals('bar')]"/>
+        <test:assert expression="#[flowVars.foo == 'bar']"/>
     </flow>
 
     <flow name="inlineScriptMutateVariablesMap">
@@ -81,10 +62,9 @@
                 flowVars = new HashMap()              
              </script:script>
         </script:component>
-        <test:assert expression="#[groovy:message.getInvocationProperty('foo').equals('bar')]"/>
-        <test:assert expression="#[groovy:payload instanceof HashMap]"/>
+        <test:assert expression="#[flowVars.foo == 'bar']"/>
+        <test:assert expression="#[payload is HashMap]"/>
     </flow>
-    
 
     <flow name="inlineScriptMutatePayload">
         <script:component>
@@ -92,39 +72,21 @@
                 payload = 'bar-mutated'               
              </script:script>
         </script:component>
-        <test:assert expression="#[groovy:payload.equals('bar-mutated')]"/>
+        <test:assert expression="#[payload == 'bar-mutated']"/>
     </flow>
-
-
-    <!--// END SNIPPET: component-example -->
-
-    <flow name="fileBasedScript">
-        <inbound-endpoint address="vm://in2" exchange-pattern="one-way"/>
-        <script:component>
-            <script:script file="simple-script.groovy"/>
-        </script:component>
-        <outbound-endpoint address="vm://out2" exchange-pattern="one-way"/>
-    </flow>
-
-    <flow name="referencedScript">
-        <inbound-endpoint address="vm://in3" exchange-pattern="one-way"/>
-        <script:component script-ref="myScript"/>
-        <outbound-endpoint address="vm://out3" exchange-pattern="one-way"/>
-    </flow>
-
-    <flow name="scriptVariables">
-        <inbound-endpoint address="vm://in4" exchange-pattern="one-way"/>
+    
+    <flow name="scriptExpressionVariables">
         <script:component>
             <script:script engine="groovy">
-                <property key="prop1" value="Received"/>
-                <property key="prop2" value="A-OK"/>
+                <property key="expr1" value="#[flowVars.prop1]"/>
+                <property key="expr2" value="#[flowVars.prop2]"/>
                 <script:text>
-                        return "$payload $prop1 $prop2"
+                        payload = expr1 + expr2
                     </script:text>
             </script:script>
         </script:component>
-        <outbound-endpoint address="vm://out4" exchange-pattern="one-way"/>
+        <test:assert expression="#[payload == 'ReceivedA-OK']"/>
     </flow>
     
 </mule>
-        <!--// END SNIPPET: full-config -->
+

@@ -6,60 +6,54 @@
  */
 package org.mule.test.integration.routing.outbound;
 
+import static java.util.stream.Collectors.toList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.api.MuleMessage;
-import org.mule.api.MuleMessageCollection;
-import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.functional.functional.FlowAssert;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
+import org.mule.tck.testmodels.fruit.Fruit;
 import org.mule.tck.testmodels.fruit.FruitBowl;
 import org.mule.tck.testmodels.fruit.Orange;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class MulticastSyncWithTransformersTestCase extends AbstractServiceAndFlowTestCase
+public class MulticastSyncWithTransformersTestCase extends FunctionalTestCase
 {
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE,
-                "org/mule/test/integration/routing/outbound/multicaster-sync-with-transformers-test-service.xml"},
-            {ConfigVariant.FLOW,
-                "org/mule/test/integration/routing/outbound/multicaster-sync-with-transformers-test-flow.xml"}});
-    }
 
-    public MulticastSyncWithTransformersTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
+        return "org/mule/test/integration/routing/outbound/multicaster-sync-with-transformers-test-flow.xml";
     }
 
     @Test
     public void testSyncMulticast() throws Exception
     {
-        FruitBowl fruitBowl = new FruitBowl(new Apple(), new Banana());
-        fruitBowl.addFruit(new Orange());
+        Apple apple = new Apple();
+        Banana banana = new Banana();
+        Orange orange = new Orange();
+        FruitBowl fruitBowl = new FruitBowl(apple, banana);
+        fruitBowl.addFruit(orange);
 
-        MuleClient client = muleContext.getClient();
-        MuleMessage result = client.send("vm://distributor.queue", fruitBowl, null);
+        MuleMessage result = flowRunner("Distributor").withPayload(fruitBowl).run().getMessage();
 
         assertNotNull(result);
-        assertTrue(result instanceof MuleMessageCollection);
-        MuleMessageCollection coll = (MuleMessageCollection) result;
-        assertEquals(3, coll.size());
-        List<?> results = (List<?>) coll.getPayload();
+        assertTrue(result.getPayload() instanceof List);
+        List<Fruit> results = ((List<MuleMessage>) result.getPayload()).stream().map(msg -> (Fruit) msg.getPayload
+                ()).collect(toList());
+        assertEquals(3, results.size());
 
-        assertTrue(results.contains("Apple Received"));
-        assertTrue(results.contains("Banana Received"));
-        assertTrue(results.contains("Orange Received"));
+        assertTrue(results.contains(apple));
+        assertTrue(results.contains(banana));
+        assertTrue(results.contains(orange));
+
+        FlowAssert.verify();
     }
 }

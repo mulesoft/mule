@@ -6,21 +6,21 @@
  */
 package org.mule.test.config;
 
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import org.mule.api.MuleContext;
-import org.mule.api.ThreadSafeAccess;
-import org.mule.api.config.MuleConfiguration;
-import org.mule.api.config.MuleProperties;
-import org.mule.api.context.MuleContextBuilder;
-import org.mule.config.DefaultMuleConfiguration;
-import org.mule.context.DefaultMuleContextBuilder;
-import org.mule.context.DefaultMuleContextFactory;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.MuleConfiguration;
+import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.context.MuleContextBuilder;
+import org.mule.runtime.core.config.DefaultMuleConfiguration;
+import org.mule.runtime.core.context.DefaultMuleContextBuilder;
+import org.mule.runtime.core.context.DefaultMuleContextFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 public class MuleConfigurationTestCase extends AbstractMuleTestCase
@@ -30,21 +30,12 @@ public class MuleConfigurationTestCase extends AbstractMuleTestCase
     protected String workingDirectory = "target";
     private MuleContext muleContext;
 
-    @Before
-    public void setUp() throws Exception
-    {
-        // fiddling with ThreadSafeAccess must not have side effects on later tests. Store
-        // the current state here and restore it in tearDown
-        failOnMessageScribbling = ThreadSafeAccess.AccessControl.isFailOnMessageScribbling();
-    }
-    
     @After
     public void tearDown() throws Exception
     {
         muleContext.dispose();
         muleContext = null;
-        ThreadSafeAccess.AccessControl.setFailOnMessageScribbling(failOnMessageScribbling);
-    } 
+    }
     
     /** Test for MULE-3092 */
     @Test
@@ -58,13 +49,11 @@ public class MuleConfigurationTestCase extends AbstractMuleTestCase
         config.setDefaultTransactionTimeout(60000);
         config.setWorkingDirectory(workingDirectory);
         config.setClientMode(true);
-        ThreadSafeAccess.AccessControl.setFailOnMessageScribbling(false);
         config.setId("MY_SERVER");
         config.setDomainId("MY_DOMAIN");
         config.setCacheMessageAsBytes(false);
-        config.setCacheMessageOriginalPayload(false);
         config.setEnableStreaming(false);
-        ThreadSafeAccess.AccessControl.setAssertMessageAccess(false);
+        config.setMaxQueueTransactionFilesSize(500);
         config.setAutoWrapMessageAwareTransform(false);
         
         MuleContextBuilder contextBuilder = new DefaultMuleContextBuilder();
@@ -89,13 +78,6 @@ public class MuleConfigurationTestCase extends AbstractMuleTestCase
         System.setProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "workingDirectory", workingDirectory);
         System.setProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "clientMode", "true");
         
-        // this is just to make the test work for now. Since the initialization of the threadsafe
-        // check behaviour in ThreadSafeAccess.AccessControl has already happened at this point in
-        // time (we touched ThreadSafeAccess.AccessControl in setUp) setting the system property 
-        // won't have any effect here
-        // System.setProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "disable.threadsafemessages", "true");
-        ThreadSafeAccess.AccessControl.setFailOnMessageScribbling(false);
-        
         System.setProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "serverId", "MY_SERVER");
         System.setProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "domainId", "MY_DOMAIN");
         System.setProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "message.cacheBytes", "false");
@@ -103,7 +85,7 @@ public class MuleConfigurationTestCase extends AbstractMuleTestCase
         System.setProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "streaming.enable", "false");
         System.setProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "message.assertAccess", "false");
         System.setProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "transform.autoWrap", "false");
-        
+
         muleContext = new DefaultMuleContextFactory().createMuleContext();
         muleContext.start();
 
@@ -194,14 +176,12 @@ public class MuleConfigurationTestCase extends AbstractMuleTestCase
         // on windows this ends up with a c:/ in it
         assertTrue(config.getWorkingDirectory().indexOf(workingDirectory) != -1);
         assertTrue(config.isClientMode());
-        assertFalse(ThreadSafeAccess.AccessControl.isFailOnMessageScribbling());
         assertEquals("MY_SERVER", config.getId());
         assertEquals("MY_DOMAIN", config.getDomainId());
         assertFalse(config.isCacheMessageAsBytes());
-        assertFalse(config.isCacheMessageOriginalPayload());
         assertFalse(config.isEnableStreaming());
-        assertFalse(ThreadSafeAccess.AccessControl.isAssertMessageAccess());
         assertFalse(config.isAutoWrapMessageAwareTransform());
+        assertThat(config.getMaxQueueTransactionFilesSizeInMegabytes(), is(500));
     }
 }
 

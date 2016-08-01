@@ -6,8 +6,6 @@
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
     <flow name="insertDynamicQuery">
-        <inbound-endpoint address="vm://insertDynamicQuery" exchange-pattern="request-response"/>
-
         <db:insert config-ref="dbConfig">
             <db:dynamic-query>INSERT INTO PLANET(POSITION, NAME) VALUES (777, '#[payload]')</db:dynamic-query>
         </db:insert>

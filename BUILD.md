@@ -1,6 +1,6 @@
 # Building Mule
 
-[Maven](http://maven.apache.org/) is the build automation tool used in Mule ESB. To modify or add to Mule source code, it's specially relevant to understand the hierarchy of maven projects that represent the Mule source code.  
+[Maven](http://maven.apache.org/) is the build automation tool used in Mule Runtime. To modify or add to Mule source code, it's specially relevant to understand the hierarchy of maven projects that represent the Mule source code.  
 
 To be able to build Mule you will need Maven among other things. Refer to the [CONTRIBUTING.md](CONTRIBUTING.md) file to find the installation instructions and prerequisites necessary to build Mule.
 
@@ -18,7 +18,7 @@ The Mule source code project is neatly organized into a hierarchy of sub-project
 | `examples`        | examples that come with the full Mule distribution |
 | `modules`         | non-transport extensions to Mule, such as XML processing, Spring extras, or scripting support
 | `tests`           | tests that can be run as part of the Mule build |
-| `tools`           | tools for Mule, such as the transport and project Maven archetypes |
+| `tools`           | tools for Mule |
 | `transports`      | Mule transports such as the JMS, VM, and TCP transports |
  
 
@@ -29,7 +29,11 @@ The following table lists common goals to execute for building Mule. These goals
 |Command | Description |
 |:----------|:-------------|
 | `mvn clean`	 | purges any built artifacts or intermediate files (such as .class) from the target directory |
-| `mvn install` | installs the artifact to your local repository, will run all tests but the ones that have external dependencies. |
+| `mvn install` | installs all modules but the distributions to your local repository, will run all tests but the ones that have external dependencies. |
+| `mvn install -Pdistributions` | installs all modules and distributions to your local repository. |
+| `mvn install -Prelease` | same as `mvn install` including sources, tests, javadocs and GPG signatures. |
+| `mvn install -Prelease -DskipGpg=true` | same as `mvn install -Prelease` without GPG signatures. |
+| `mvn install -Pdistributions,release` | installs all jars, distributions including sources, tests, javadocs and GPG signatures. |
 | `mvn test`    | runs any unit tests for this sub-project |
 | `mvn -DskipTests install` |	By default, Maven runs all unit tests for each project for each build which, depending on the project, can take a long time to complete. If you wish, you can skip the tests using this command.|
  
@@ -43,7 +47,6 @@ In addition to the standard properties, the following ones can change the behavi
 | `skipFunctionalTests`	   | `true`      | Skip flag for functional tests |
 | `skipSystemTests`         | `true`       | Skip flag for container level tests |
 | `skipPerformanceTests`    | `true`       | Skip flag for performance tests |
-| `skipArchetypeTests`      | `true`       | Skip flag for the archetype tests|
 | `skipVerifications`       | `false`      | Skip flag for the license check, version enforce, style checks, etc.|
 | `skipInstalls`            | `false`      | Disable installation of artifacts in the local maven repository|
 | `skipGpg`                 | `true`       | Skip artifact signing, as it does require special setup|

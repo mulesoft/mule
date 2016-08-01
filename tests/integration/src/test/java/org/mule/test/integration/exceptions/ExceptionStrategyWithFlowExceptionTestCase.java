@@ -9,14 +9,14 @@ package org.mule.test.integration.exceptions;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.api.MessagingException;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.message.ExceptionMessage;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.message.ExceptionMessage;
+import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 
@@ -29,11 +29,11 @@ public class ExceptionStrategyWithFlowExceptionTestCase extends FunctionalTestCa
     }
 
     @Test
-    public void testFlowExceptionExceptionStrategy() throws MuleException
+    public void testFlowExceptionExceptionStrategy() throws Exception
     {
+        flowRunner("customException").withPayload(getTestMuleMessage(TEST_MESSAGE)).asynchronously().run();
         MuleClient client = muleContext.getClient();
-        client.dispatch("vm://in", TEST_MESSAGE, null);
-        MuleMessage message = client.request("vm://out", RECEIVE_TIMEOUT);
+        MuleMessage message = client.request("test://out", RECEIVE_TIMEOUT);
 
         assertNotNull("request returned no message", message);
         assertTrue(message.getPayload() instanceof ExceptionMessage);

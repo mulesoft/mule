@@ -7,13 +7,11 @@
 
     <db:template-query name="testInsert">
         <db:parameterized-query>INSERT INTO Alien VALUES (:name, :description)</db:parameterized-query>
-        <db:in-param name="name" defaultValue="#[header:INBOUND:name]" type="VARCHAR"/>
+        <db:in-param name="name" defaultValue="#[message.inboundProperties.name]" type="VARCHAR"/>
         <db:in-param name="description" defaultValue="#[payload]" type="XMLTYPE"/>
     </db:template-query>
 
     <flow name="insertXmlType">
-        <inbound-endpoint address="vm://insertXmlType" exchange-pattern="request-response"/>
-
         <db:insert config-ref="dbConfig">
             <db:template-query-ref name="testInsert" />
         </db:insert>

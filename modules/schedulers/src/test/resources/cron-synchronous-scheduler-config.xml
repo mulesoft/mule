@@ -2,7 +2,6 @@
 
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xmlns:spring="http://www.springframework.org/schema/beans"
       xmlns:schedulers="http://www.mulesoft.org/schema/mule/schedulers"
       xsi:schemaLocation="
@@ -16,7 +15,7 @@
             <schedulers:cron-scheduler expression="0/1 * * * * ?"/>
             <logger message="Logger started"/>
         </poll>
-        <component class="org.mule.modules.schedulers.cron.SynchronousSchedulerTestCase$FooComponent"/>
+        <component class="org.mule.runtime.modules.schedulers.cron.SynchronousSchedulerTestCase$FooComponent"/>
     </flow>
 
 

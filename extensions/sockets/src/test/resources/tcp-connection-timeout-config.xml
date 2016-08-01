@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:sockets="http://www.mulesoft.org/schema/mule/sockets"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+
+       http://www.mulesoft.org/schema/mule/sockets http://www.mulesoft.org/schema/mule/sockets/current/mule-sockets.xsd">
+
+    <sockets:request-config name="tcp-requester">
+        <!--Non-rutable IP address -->
+        <sockets:tcp-requester-connection host="10.255.255.255" port="${port}"
+                                          connectionTimeout="100"
+                                          sendTcpNoDelay="true">
+            <pooling-profile maxActive="1"/>
+        </sockets:tcp-requester-connection>
+    </sockets:request-config>
+
+    <flow name="tcp-connection-timeout">
+        <sockets:send config-ref="tcp-requester" hasResponse="false"/>
+        <set-payload value="Response"/>
+    </flow>
+
+    <!--TODO(gfernandes) MULE-10117 remove this when support for accessing resources is added to runner -->
+    <spring:beans>
+        <spring:bean id="onIncomingConnectionBean" scope="prototype" class="org.mule.extension.socket.SocketExtensionTestCase$OnIncomingConnectionBean"/>
+    </spring:beans>
+
+    <sub-flow name="onIncomingConnection">
+        <component>
+            <spring-object bean="onIncomingConnectionBean"/>
+        </component>
+    </sub-flow>
+
+</mule>

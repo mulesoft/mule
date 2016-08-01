@@ -5,7 +5,6 @@
       xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
       xmlns:cxf-core="http://cxf.apache.org/core"
       xmlns:mule-xml="http://www.mulesoft.org/schema/mule/xml"
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xmlns:http="http://www.mulesoft.org/schema/mule/http"
@@ -15,13 +14,12 @@
                http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
                http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd
                http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
-               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
                http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
                http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd">
 
     <mule-xml:xslt-transformer xsl-file="proxy.xsl"
-        name="TestXslt" returnClass="org.mule.module.xml.transformer.DelayedResult" />
+        name="TestXslt" returnClass="org.mule.runtime.module.xml.transformer.DelayedResult" />
 
 
     <http:listener-config name="listenerConfig" host="localhost" port="${port1}"/>
@@ -134,16 +132,6 @@
     <flow name="serverEcho">
         <http:listener path="/services/Echo" config-ref="listenerConfig" allowedMethods="POST" />
         <cxf:proxy-service />
-
-        <vm:outbound-endpoint path="test"
-            exchange-pattern="request-response" />
-    </flow>
-
-    <flow name="echoService">
-
-        <inbound-endpoint address="vm://test"
-            exchange-pattern="request-response" />
-
         <log-component />
     </flow>
 
@@ -293,21 +281,21 @@
 
     <flow name="asyncService">
         <http:listener path="/services/oneway" config-ref="listenerConfig" allowedMethods="POST" />
-        <cxf:jaxws-service serviceClass="org.mule.module.cxf.testmodels.AsyncService"/>
+        <cxf:jaxws-service serviceClass="org.mule.runtime.module.cxf.testmodels.AsyncService"/>
 
         <component>
             <singleton-object
-                class="org.mule.module.cxf.testmodels.AsyncService" />
+                class="org.mule.runtime.module.cxf.testmodels.AsyncService" />
         </component>
     </flow>
 
     <flow name="asyncServiceWithSoapAction">
         <http:listener path="/services/onewayWithSoapAction" config-ref="listenerConfig" allowedMethods="POST" />
-        <cxf:jaxws-service serviceClass="org.mule.module.cxf.testmodels.AsyncServiceWithSoapAction"/>
+        <cxf:jaxws-service serviceClass="org.mule.runtime.module.cxf.testmodels.AsyncServiceWithSoapAction"/>
 
         <component>
             <singleton-object
-                class="org.mule.module.cxf.testmodels.AsyncServiceWithSoapAction" />
+                class="org.mule.runtime.module.cxf.testmodels.AsyncServiceWithSoapAction" />
         </component>
     </flow>
 
@@ -346,8 +334,6 @@
         </script:component>
     </flow>
 
-
-
     <flow name="proxyEnvelopeWithXSLTTransformation">
         <http:listener path="/services/envelope-xslt-proxy" config-ref="listenerConfig" allowedMethods="POST" />
         <cxf:proxy-service payload="envelope"/>
@@ -355,4 +341,30 @@
         <mule-xml:dom-to-xml-transformer returnClass="java.lang.String"/>
     </flow>
 
+    <flow name="proxyWithSoapJms">
+        <http:listener path="/proxyJms" config-ref="listenerConfig" allowedMethods="POST" />
+        <cxf:proxy-service service="EmployeeDirectory" wsdlLocation="employeeDirectoryJms.wsdl" port="EmployeeDirectoryPort"
+                           namespace="http://employee.example.mule.org/" payload="body" validationEnabled="false" soapVersion="1.2"/>
+        <echo-component/>
+    </flow>
+
+    <flow name="proxyOneWay">
+        <http:listener path="/proxyOneWay" config-ref="listenerConfig" allowedMethods="POST" />
+        <cxf:proxy-service service="EmployeeDirectory" wsdlLocation="employeeDirectoryOneWay.wsdl" port="EmployeeDirectoryPort"
+                           namespace="http://employee.example.mule.org/" payload="body" validationEnabled="false"/>
+                           
+        <echo-component/>
+    </flow>
+
+    <flow name="proxyOneWayFault">
+        <http:listener path="/proxyOneWayFault" config-ref="listenerConfig" allowedMethods="POST" />
+        <cxf:proxy-service service="EmployeeDirectory" wsdlLocation="employeeDirectoryOneWay.wsdl" port="EmployeeDirectoryPort"
+                           namespace="http://employee.example.mule.org/" payload="body" validationEnabled="false"/>
+                           
+        <script:component>
+            <script:script engine="groovy">
+                throw new RuntimeException("ERROR");
+            </script:script>
+        </script:component>
+    </flow>
 </mule>

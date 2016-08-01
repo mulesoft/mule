@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/metadata http://www.mulesoft.org/schema/mule/metadata/current/mule-metadata.xsd">
+
+    <metadata:config name="config" dataWithDefault="staticOverride">
+        <metadata:connection/>
+    </metadata:config>
+
+    <metadata:config name="alternative-config" dataWithDefault="staticOverride">
+        <metadata:connection/>
+    </metadata:config>
+
+    <metadata:config name="dynamic-config" data="#['dynamic']">
+        <metadata:connection/>
+    </metadata:config>
+
+    <flow name="contentMetadataWithKeyId">
+        <metadata:content-metadata-with-key-id config-ref="config" type="PERSON"/>
+    </flow>
+
+    <flow name="outputMetadataWithKeyId">
+        <metadata:output-metadata-with-key-id config-ref="config" type="PERSON"/>
+    </flow>
+
+    <flow name="contentAndOutputMetadataWithKeyId">
+        <metadata:content-and-output-metadata-with-key-id config-ref="config" type="PERSON"/>
+    </flow>
+
+    <flow name="outputOnlyWithoutContentParam">
+        <metadata:output-only-without-content-param config-ref="config" type="PERSON"/>
+    </flow>
+
+    <flow name="contentOnlyIgnoresOutput">
+        <metadata:content-only-ignores-output config-ref="config" type="PERSON"/>
+    </flow>
+
+    <flow name="contentMetadataWithoutKeyId">
+        <metadata:content-metadata-without-key-id config-ref="config"/>
+    </flow>
+
+    <flow name="outputMetadataWithoutKeyId">
+        <metadata:output-metadata-without-key-id config-ref="config"/>
+    </flow>
+
+    <flow name="contentAndOutputMetadataWithoutKeyId">
+        <metadata:content-and-output-metadata-without-key-id config-ref="config"/>
+    </flow>
+
+    <flow name="contentMetadataWithoutKeysWithKeyId">
+        <metadata:content-metadata-without-keys-with-key-id config-ref="config" type="PERSON"/>
+    </flow>
+
+    <flow name="outputMetadataWithoutKeysWithKeyId">
+        <metadata:output-metadata-without-keys-with-key-id config-ref="config" type="PERSON"/>
+    </flow>
+
+    <flow name="failWithResolvingException">
+        <metadata:fail-with-resolving-exception config-ref="config" type="PERSON"/>
+    </flow>
+
+    <flow name="failWithRuntimeException">
+        <metadata:fail-with-runtime-exception config-ref="config" type="PERSON"/>
+    </flow>
+
+    <flow name="keyParamWithoutKeyResolver">
+        <metadata:key-id-without-key-resolver config-ref="config" type="PERSON"/>
+    </flow>
+
+    <flow name="messageAttributesNullTypeMetadata">
+        <metadata:message-attributes-null-type-metadata config-ref="config"/>
+    </flow>
+
+    <flow name="messageAttributesPersonTypeMetadata">
+        <metadata:message-attributes-person-type-metadata config-ref="config" type="PERSON"/>
+    </flow>
+
+    <flow name="contentAndOutputWithCacheResolver">
+        <metadata:content-and-output-cache-resolver config-ref="config" type="PERSON"/>
+    </flow>
+
+    <flow name="contentAndOutputWithCacheResolverWithSpecificConfig">
+        <metadata:content-and-output-cache-resolver config-ref="alternative-config" type="PERSON"/>
+    </flow>
+
+    <flow name="contentOnlyCacheResolver">
+        <metadata:content-only-cache-resolver config-ref="config" type="PERSON"/>
+    </flow>
+
+    <flow name="resolverTypeKeysWithContextClassLoader">
+        <metadata:resolver-type-keys-with-context-class-loader config-ref="config" type="PERSON"/>
+    </flow>
+
+    <flow name="resolverContentWithContextClassLoader">
+        <metadata:resolver-content-with-context-class-loader config-ref="config" type="PERSON"/>
+    </flow>
+
+    <flow name="resolverOutputWithContextClassLoader">
+        <metadata:resolver-output-with-context-class-loader config-ref="config" type="PERSON"/>
+    </flow>
+
+    <flow name="outputAndMetadataKeyCacheResolver">
+        <metadata:output-and-metadata-key-cache-resolver config-ref="config" type="PERSON"/>
+    </flow>
+
+    <flow name="loggerFlow">
+        <logger message="Logger"/>
+        <metadata:output-metadata-without-keys-with-key-id config-ref="config" type="PERSON"/>
+    </flow>
+
+    <flow name="sourceMetadata" initialState="stopped">
+        <metadata:metadata-source config-ref="config" type="PERSON"/>
+        <logger/>
+    </flow>
+
+    <flow name="flowWithoutSource">
+        <logger/>
+    </flow>
+
+    <flow name="shouldInheritOperationResolvers">
+        <metadata:should-inherit-operation-resolvers config-ref="config" type="PERSON"/>
+    </flow>
+
+    <flow name="shouldInheritExtensionResolvers">
+        <metadata:should-inherit-extension-resolvers config-ref="config" type="PERSON"/>
+    </flow>
+
+    <flow name="shouldInheritOperationParentResolvers">
+        <metadata:should-inherit-operation-parent-resolvers config-ref="config" type="PERSON"/>
+    </flow>
+
+    <flow name="outputAttributesWithDeclaredSubtypesMetadata">
+        <metadata:output-attributes-with-declared-subtypes-metadata config-ref="config"/>
+    </flow>
+
+    <flow name="outputAttributesWithDynamicMetadata">
+        <metadata:output-attributes-with-dynamic-metadata config-ref="config" type="PERSON"/>
+    </flow>
+
+    <flow name="simpleMultiLevelKeyResolver">
+        <metadata:simple-multi-level-key-resolver config-ref="config" continent="AMERICA" country="USA" city="SFO"/>
+    </flow>
+
+    <flow name="sourceMetadataWithMultilevel" initialState="stopped">
+        <metadata:metadata-source-with-multilevel config-ref="config" continent="AMERICA" country="ARGENTINA" city="BA"/>
+        <logger/>
+    </flow>
+
+    <flow name="typeWithDeclaredSubtypesMetadata">
+        <metadata:type-with-declared-subtypes-metadata config-ref="config" plainShape="#[new org.mule.test.metadata.extension.model.shapes.Circle()]"
+                                                       rectangleSubtype="#[new org.mule.test.metadata.extension.model.shapes.Rectangle()]"
+                                                       animal="#[new org.mule.test.metadata.extension.model.animals.Bear()"/>
+    </flow>
+
+    <flow name="resolverWithDynamicConfig">
+        <metadata:simple-multi-level-key-resolver config-ref="dynamic-config" continent="AMERICA" country="USA" city="SFO"/>
+    </flow>
+</mule>

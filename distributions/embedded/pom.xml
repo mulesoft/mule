@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.mule.distributions</groupId>
         <artifactId>mule-distributions</artifactId>
-        <version>3.8.0-SNAPSHOT</version>
+        <version>4.0-SNAPSHOT</version>
     </parent>
     <artifactId>mule</artifactId>
     <packaging>pom</packaging>
@@ -64,12 +64,11 @@
                                 <manifestEntries>
                                     <More-Info>For more information go to ${productUrl}</More-Info>
                                     <Support>Get commercial support: ${project.organization.url}/support</Support>
-                                    <Description>Mule ESB and Integration Platform</Description>
+                                    <Description>Mule Runtime and Integration Platform</Description>
                                     <License>CPAL v1.0 http://www.mulesoft.com/CPAL/</License>
                                     <Vendor-Url>${project.organization.url}</Vendor-Url>
                                     <Product-Url>${productUrl}</Product-Url>
                                     <Build-Date>${timestamp}</Build-Date>
-                                    <Dev-List-Email>${dev.list}</Dev-List-Email>
                                     <Supported-Jdks>[1.7.0,1.8)</Supported-Jdks>
                                     <Recommended-Jdks>[1.7.0_60,1.8)</Recommended-Jdks>
                                 </manifestEntries>
@@ -96,14 +95,8 @@
             <type>pom</type>
         </dependency>
         <dependency>
-            <groupId>org.mule.patterns</groupId>
-            <artifactId>mule-patterns-all</artifactId>
-            <version>${project.version}</version>
-            <type>pom</type>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transports-all</artifactId>
+            <groupId>org.mule.extensions</groupId>
+            <artifactId>mule-extensions-all</artifactId>
             <version>${project.version}</version>
             <type>pom</type>
         </dependency>

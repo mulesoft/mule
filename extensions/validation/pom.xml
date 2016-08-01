@@ -6,13 +6,13 @@
     <parent>
         <groupId>org.mule.extensions</groupId>
         <artifactId>mule-extensions</artifactId>
-        <version>3.8.0-SNAPSHOT</version>
+        <version>4.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.mule.modules</groupId>
     <artifactId>mule-module-validation</artifactId>
-    <packaging>jar</packaging>
+    <packaging>mule-extension</packaging>
 
     <name>Mule Validation Extension</name>
     <description>A Mule extension that provides functionality for performing validations</description>
@@ -23,6 +23,20 @@
             <artifactId>commons-validator</artifactId>
             <version>1.4.0</version>
         </dependency>
-    </dependencies>
 
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.reflections</groupId>
+            <artifactId>reflections</artifactId>
+        </dependency>
+    </dependencies>
 </project>

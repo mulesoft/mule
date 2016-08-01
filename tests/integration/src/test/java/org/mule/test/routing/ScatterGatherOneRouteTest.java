@@ -6,30 +6,47 @@
  */
 package org.mule.test.routing;
 
-import org.mule.api.MuleContext;
-import org.mule.api.config.ConfigurationException;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.config.spring.SpringXmlConfigurationBuilder;
-import org.mule.context.DefaultMuleContextFactory;
-import org.mule.routing.ScatterGatherRouter;
+import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.context.DefaultMuleContextFactory;
+import org.mule.runtime.core.routing.ScatterGatherRouter;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import com.yourkit.util.Asserts;
 
 import java.util.Collections;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 public class ScatterGatherOneRouteTest extends AbstractMuleTestCase
 {
+    private MuleContext context;
 
-    @Test(expected = ConfigurationException.class)
+    @Before
+    public void before() throws InitialisationException, ConfigurationException
+    {
+        context = new DefaultMuleContextFactory().createMuleContext();
+    }
+
+    @After
+    public void after()
+    {
+        if (context != null)
+        {
+            context.dispose();
+        }
+    }
+
+    //TODO MULE-10061 - Review once the MuleContext lifecycle is clearly defined
+    @Test(expected = InitialisationException.class)
     public void oneRouteOnXml() throws Exception
     {
-        MuleContext context = new DefaultMuleContextFactory().createMuleContext();
-        SpringXmlConfigurationBuilder builder = new SpringXmlConfigurationBuilder("scatter-gather-one-route-test.xml");
-        builder.configure(context);
+        new DefaultMuleContextFactory().createMuleContext(new SpringXmlConfigurationBuilder("scatter-gather-one-route-test.xml"));
     }
 
     @Test(expected = InitialisationException.class)

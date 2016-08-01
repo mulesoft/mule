@@ -6,88 +6,55 @@
  */
 package org.mule.test.integration.routing.inbound;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertThat;
 
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-
-import java.util.Arrays;
-import java.util.Collection;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class IdempotentRouterWithFilterTestCase extends AbstractServiceAndFlowTestCase
+public class IdempotentRouterWithFilterTestCase extends FunctionalTestCase
 {
-    @Parameters
-    public static Collection<Object[]> parameters()
+
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/integration/routing/inbound/idempotent-router-with-filter-service.xml"},
-            {ConfigVariant.FLOW, "org/mule/test/integration/routing/inbound/idempotent-router-with-filter-flow.xml"}
-        });
+        return "org/mule/test/integration/routing/inbound/idempotent-router-with-filter-flow.xml";
     }
 
-    public IdempotentRouterWithFilterTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
+    /**
+     * This test will pass a message containing a String to the Mule server and verifies that it gets received.
+     * 
+     * @throws Exception
+     */
     @Test
     @SuppressWarnings("null")
-    public void testWithValidData()
+    public void testWithValidData() throws Exception
     {
-        /*
-         * This test will pass a message containing a String to the Mule server and
-         * verifies that it gets received.
-         */
-        MuleClient myClient;
-        DefaultMuleMessage myMessage = new DefaultMuleMessage("Mule is the best!", muleContext);
-        MuleMessage response = null;
-
-        try
-        {
-            myClient = muleContext.getClient();
-            myClient.dispatch("vm://FromTestCase", myMessage);
-            response = myClient.request("vm://ToTestCase", 5000);
-        }
-        catch (MuleException e)
-        {
-            fail(e.getDetailedMessage());
-        }
+        flowRunner("IdempotentPlaceHolder").withPayload("Mule is the best!").asynchronously().run();
+        MuleClient myClient = muleContext.getClient();
+        MuleMessage response = myClient.request("test://ToTestCase", RECEIVE_TIMEOUT);
 
         assertNotNull(response);
         assertNotNull(response.getPayload());
-        assertEquals("Mule is the best!", response.getPayload());
+        assertThat(response.getPayload(), is("Mule is the best!"));
     }
 
+    /**
+     * This test will pass a message containing an Object to the Mule server and verifies that it does not get received.
+     * 
+     * @throws Exception
+     */
     @Test
-    public void testWithInvalidData()
+    public void testWithInvalidData() throws Exception
     {
-        /*
-         * This test will pass a message containing an Object to the Mule server and
-         * verifies that it does not get received.
-         */
-        MuleClient myClient;
-        DefaultMuleMessage myMessage = new DefaultMuleMessage(new Object(), muleContext);
-        MuleMessage response = null;
-
-        try
-        {
-            myClient = muleContext.getClient();
-            myClient.dispatch("vm://FromTestCase", myMessage);
-            response = myClient.request("vm://ToTestCase", 5000);
-        }
-        catch (MuleException e)
-        {
-            fail(e.getDetailedMessage());
-        }
+        flowRunner("IdempotentPlaceHolder").withPayload(new Object()).asynchronously().run();
+        MuleClient myClient = muleContext.getClient();
+        MuleMessage response = myClient.request("test://ToTestCase", RECEIVE_TIMEOUT);
 
         assertNull(response);
     }

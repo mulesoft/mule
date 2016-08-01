@@ -17,16 +17,12 @@
     </db:template-query>
 
     <flow name="overriddenParamsByName">
-        <inbound-endpoint address="vm://overriddenParamsByName" exchange-pattern="request-response"/>
-
         <db:select config-ref="dbConfig">
             <db:template-query-ref name="overridenQueryParamByName"/>
         </db:select>
     </flow>
 
-    <flow name="inlineOverriddenParamByName">
-        <inbound-endpoint address="vm://inlineOverriddenParamsByName" exchange-pattern="request-response"/>
-
+    <flow name="inlineOverriddenParamsByName">
         <db:select config-ref="dbConfig">
             <db:template-query-ref name="namedParamsQueryTemplate"/>
             <!-- Note that parameters are in different order-->

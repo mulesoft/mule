@@ -1,38 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mule="http://www.mulesoft.org/schema/mule/core"
-    xmlns:test="http://www.mulesoft.org/schema/mule/test" xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
-    xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+    xmlns:test="http://www.mulesoft.org/schema/mule/test" xmlns:jms="http://www.mulesoft.org/schema/mule/transport/jms"
+    xmlns:transports="http://www.mulesoft.org/schema/mule/transports"
+    xmlns:vm="http://www.mulesoft.org/schema/mule/transport/vm"
     xmlns:spring="http://www.springframework.org/schema/beans"
     xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-       http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
-       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+       http://www.mulesoft.org/schema/mule/transport/jms http://www.mulesoft.org/schema/mule/transport/jms/current/mule-transport-jms.xsd
+       http://www.mulesoft.org/schema/mule/transports http://www.mulesoft.org/schema/mule/transports/current/mule-transports.xsd
+       http://www.mulesoft.org/schema/mule/transport/vm http://www.mulesoft.org/schema/mule/transport/vm/current/mule-transport-vm.xsd
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd              
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
     <flow name="transactional">
         <append-string-transformer message=" a"/>
         <transactional>
-            <outbound-endpoint ref="out1"/>
-            <outbound-endpoint ref="out2"/>
+            <transports:outbound-endpoint ref="out1"/>
+            <transports:outbound-endpoint ref="out2"/>
         </transactional>
     </flow>
 
     <flow name="transactionalFailInTheMiddle">
         <append-string-transformer message=" b"/>
         <transactional>
-            <outbound-endpoint ref="out1"/>
+            <transports:outbound-endpoint ref="out1"/>
             <test:component throwException="true"/>
-            <outbound-endpoint ref="out2"/>
+            <transports:outbound-endpoint ref="out2"/>
         </transactional>
     </flow>
 
     <flow name="transactionalFailAtEnd">
         <append-string-transformer message=" c"/>
         <transactional>
-            <outbound-endpoint ref="out1"/>
-            <outbound-endpoint ref="out2"/>
+            <transports:outbound-endpoint ref="out1"/>
+            <transports:outbound-endpoint ref="out2"/>
             <test:component throwException="true"/>
         </transactional>
     </flow>
@@ -40,8 +42,8 @@
     <flow name="transactionalFailAfterEnd">
         <append-string-transformer message=" d"/>
         <transactional>
-            <outbound-endpoint ref="out1"/>
-            <outbound-endpoint ref="out2"/>
+            <transports:outbound-endpoint ref="out1"/>
+            <transports:outbound-endpoint ref="out2"/>
         </transactional>
         <test:component throwException="true"/>
     </flow>
@@ -49,9 +51,9 @@
     <flow name="transactionalFailInTheMiddleWithCatchExceptionStrategy">
         <append-string-transformer message=" e"/>
         <transactional>
-            <outbound-endpoint ref="out1"/>
+            <transports:outbound-endpoint ref="out1"/>
             <test:component throwException="true"/>
-            <outbound-endpoint ref="out2"/>
+            <transports:outbound-endpoint ref="out2"/>
             <catch-exception-strategy/>
         </transactional>
     </flow>
@@ -59,8 +61,8 @@
     <flow name="transactionalFailAtEndWithCatchExceptionStrategy">
         <append-string-transformer message=" f"/>
         <transactional>
-            <outbound-endpoint ref="out1"/>
-            <outbound-endpoint ref="out2"/>
+            <transports:outbound-endpoint ref="out1"/>
+            <transports:outbound-endpoint ref="out2"/>
             <test:component throwException="true"/>
             <catch-exception-strategy/>
         </transactional>
@@ -69,27 +71,27 @@
     <flow name="transactionalFailsWithAnotherResourceType">
         <append-string-transformer message=" g"/>
         <transactional>
-            <outbound-endpoint ref="out1"/>
-            <outbound-endpoint ref="out2"/>
-            <outbound-endpoint ref="out3"/>
+            <transports:outbound-endpoint ref="out1"/>
+            <transports:outbound-endpoint ref="out2"/>
+            <transports:outbound-endpoint ref="out3"/>
         </transactional>
     </flow>
 
     <flow name="transactionalDoesntFailWithAnotherResourceType">
         <append-string-transformer message=" h"/>
         <transactional>
-            <outbound-endpoint ref="out1"/>
-            <outbound-endpoint ref="out2"/>
-            <outbound-endpoint ref="out3NotSupported"/>
+            <transports:outbound-endpoint ref="out1"/>
+            <transports:outbound-endpoint ref="out2"/>
+            <transports:outbound-endpoint ref="out3NotSupported"/>
         </transactional>
     </flow>
 
     <flow name="transactionalWithAnotherResourceTypeAndExceptionAtEnd">
         <append-string-transformer message=" i"/>
         <transactional>
-            <outbound-endpoint ref="out1"/>
-            <outbound-endpoint ref="out3NotSupported"/>
-            <outbound-endpoint ref="out2"/>
+            <transports:outbound-endpoint ref="out1"/>
+            <transports:outbound-endpoint ref="out3NotSupported"/>
+            <transports:outbound-endpoint ref="out2"/>
             <test:component throwException="true"/>
         </transactional>
     </flow>
@@ -97,18 +99,18 @@
 
     <flow name="nestedTransactional">
         <transactional>
-            <outbound-endpoint ref="out1"/>
+            <transports:outbound-endpoint ref="out1"/>
             <transactional>
-                <outbound-endpoint ref="out2"/>
+                <transports:outbound-endpoint ref="out2"/>
             </transactional>
         </transactional>
     </flow>
 
     <flow name="nestedTransactionalFail">
         <transactional>
-            <outbound-endpoint ref="out1"/>
+            <transports:outbound-endpoint ref="out1"/>
             <transactional>
-                <outbound-endpoint ref="out2"/>
+                <transports:outbound-endpoint ref="out2"/>
                 <test:component throwException="true"/>
             </transactional>
         </transactional>
@@ -116,9 +118,9 @@
 
     <flow name="nestedTransactionalFailWithCatch">
         <transactional>
-            <outbound-endpoint ref="out1"/>
+            <transports:outbound-endpoint ref="out1"/>
             <transactional>
-                <outbound-endpoint ref="out2"/>
+                <transports:outbound-endpoint ref="out2"/>
                 <test:component throwException="true"/>
                 <catch-exception-strategy/>
             </transactional>
@@ -127,18 +129,18 @@
 
     <flow name="nestedTransactionalWithBeginOrJoin">
         <transactional>
-            <outbound-endpoint ref="out1"/>
+            <transports:outbound-endpoint ref="out1"/>
             <transactional action="BEGIN_OR_JOIN">
-                <outbound-endpoint ref="out2"/>
+                <transports:outbound-endpoint ref="out2"/>
             </transactional>
         </transactional>
     </flow>
 
     <flow name="nestedTransactionalWithBeginOrJoinFail">
         <transactional>
-            <outbound-endpoint ref="out1"/>
+            <transports:outbound-endpoint ref="out1"/>
             <transactional action="BEGIN_OR_JOIN">
-                <outbound-endpoint ref="out2"/>
+                <transports:outbound-endpoint ref="out2"/>
                 <test:component throwException="true"/>
             </transactional>
         </transactional>
@@ -146,9 +148,9 @@
 
     <flow name="nestedTransactionalWithBeginOrJoinFailWithCatch">
         <transactional>
-            <outbound-endpoint ref="out1"/>
+            <transports:outbound-endpoint ref="out1"/>
             <transactional action="BEGIN_OR_JOIN">
-                <outbound-endpoint ref="out2"/>
+                <transports:outbound-endpoint ref="out2"/>
                 <test:component throwException="true"/>
                 <catch-exception-strategy/>
             </transactional>
@@ -157,9 +159,9 @@
 
     <flow name="nestedTransactionalWithBeginOrJoinFailWithCatchAndRollback">
         <transactional>
-            <outbound-endpoint ref="out1"/>
+            <transports:outbound-endpoint ref="out1"/>
             <transactional action="BEGIN_OR_JOIN">
-                <outbound-endpoint ref="out2"/>
+                <transports:outbound-endpoint ref="out2"/>
                 <test:component throwException="true"/>
                 <catch-exception-strategy/>
             </transactional>

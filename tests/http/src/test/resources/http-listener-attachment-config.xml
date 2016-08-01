@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
+
+    <httpn:listener-config name="listenerConfig">
+        <httpn:listener-connection host="localhost" port="${port}"/>
+    </httpn:listener-config>
+
+    <flow name="testFlow1">
+        <httpn:listener config-ref="listenerConfig" path="${formDataPath}">
+            <httpn:response-builder partsRef="#[parts]"/>
+        </httpn:listener>
+        <custom-processor
+                class="org.mule.test.module.http.functional.listener.HttpListenerAttachmentsTestCase$ConvertPartsMessageProcessor"/>
+        <set-payload value="#[message.getAttributes()]"/>
+        <test:queue name="out"/>
+    </flow>
+
+    <flow name="testFlow2">
+        <httpn:listener config-ref="listenerConfig" path="${mixedPath}">
+            <httpn:response-builder partsRef="#[parts]">
+                <httpn:headers>
+                    <httpn:header key="Content-Type" value="multipart/mixed"/>
+                </httpn:headers>
+            </httpn:response-builder>
+        </httpn:listener>
+        <custom-processor
+                class="org.mule.test.module.http.functional.listener.HttpListenerAttachmentsTestCase$ConvertPartsMessageProcessor"/>
+        <set-payload value="#[message.getAttributes()]"/>
+        <test:queue name="out"/>
+    </flow>
+
+    <flow name="testFlow3">
+        <httpn:listener config-ref="listenerConfig" path="${contentLength}">
+            <httpn:response-builder partsRef="#[parts]"/>
+        </httpn:listener>
+        <custom-processor
+                class="org.mule.test.module.http.functional.listener.HttpListenerAttachmentsTestCase$CreatePartMessageProcessor"/>
+        <echo-component/>
+    </flow>
+
+    <flow name="testFlow4">
+        <httpn:listener config-ref="listenerConfig" path="${chunked}" responseStreamingMode="ALWAYS">
+            <httpn:response-builder partsRef="#[parts]"/>
+        </httpn:listener>
+        <custom-processor
+                class="org.mule.test.module.http.functional.listener.HttpListenerAttachmentsTestCase$CreatePartMessageProcessor"/>
+        <echo-component/>
+    </flow>
+
+    <flow name="testFlow5">
+        <httpn:listener config-ref="listenerConfig" path="${filePath}">
+            <httpn:response-builder partsRef="#[parts]"/>
+        </httpn:listener>
+        <custom-processor
+                class="org.mule.test.module.http.functional.listener.HttpListenerAttachmentsTestCase$CreatePartsMessageProcessor"/>
+        <echo-component/>
+    </flow>
+
+
+    <flow name="fixedPart">
+        <httpn:listener config-ref="listenerConfig" path="fixedPart">
+            <httpn:response-builder>
+                <httpn:parts>
+                    <httpn:part id="field1" data="yes" contentType="text/json"/>
+                </httpn:parts>
+            </httpn:response-builder>
+        </httpn:listener>
+        <echo-component/>
+    </flow>
+
+</mule>

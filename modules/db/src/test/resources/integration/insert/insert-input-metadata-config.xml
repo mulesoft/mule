@@ -6,26 +6,20 @@
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
     <flow name="insertMetadataNoParams">
-        <inbound-endpoint address="vm://insertMetadataNoParams" exchange-pattern="request-response"/>
-
         <db:insert config-ref="dbConfig">
             <db:parameterized-query>INSERT INTO PLANET(POSITION, NAME) VALUES (777, 'Pluto')</db:parameterized-query>
         </db:insert>
     </flow>
 
     <flow name="insertMetadataNotSupportedValueParams">
-        <inbound-endpoint address="vm://insertMetadataNotSupportedValueParams" exchange-pattern="request-response"/>
-
         <db:insert config-ref="dbConfig">
             <db:parameterized-query>INSERT INTO PLANET(POSITION, NAME) VALUES (#[payload.position],
-                #[header:OUTBOUND:name])
+                #[message.outboundProperties.name])
             </db:parameterized-query>
         </db:insert>
     </flow>
 
     <flow name="insertMetadataBeanParams">
-        <inbound-endpoint address="vm://insertMetadataBeanParams" exchange-pattern="request-response"/>
-
         <db:insert config-ref="dbConfig">
             <db:parameterized-query>INSERT INTO PLANET(POSITION, NAME) VALUES (#[payload.position], #[payload.name])
             </db:parameterized-query>
@@ -33,8 +27,6 @@
     </flow>
 
     <flow name="insertMetadataMapParams">
-        <inbound-endpoint address="vm://insertMetadataMapParams" exchange-pattern="request-response"/>
-
         <db:insert config-ref="dbConfig">
             <db:parameterized-query>INSERT INTO PLANET(POSITION, NAME) VALUES (#[payload['position']],
                 #[payload['name']])

@@ -1,27 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+    xmlns:test="http://www.mulesoft.org/schema/mule/test"
+    xmlns:transports="http://www.mulesoft.org/schema/mule/transports"
     xsi:schemaLocation="
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+        http://www.mulesoft.org/schema/mule/transports http://www.mulesoft.org/schema/mule/transports/current/mule-transports.xsd">
 
-    <endpoint name="in" address="${inbound.destination}" exchange-pattern="one-way" connector-ref="jmsConnector" />
-    <endpoint name="out" address="${outbound.destination}" exchange-pattern="one-way" connector-ref="jmsConnector"/>
+    <transports:endpoint name="in" address="${inbound.destination}" exchange-pattern="one-way" connector-ref="jmsConnector" />
+    <transports:endpoint name="out" address="${outbound.destination}" exchange-pattern="one-way" connector-ref="jmsConnector"/>
 
-    <flow name="sendToQueueIn">
-        <vm:inbound-endpoint path="in" exchange-pattern="one-way" />
-        <outbound-endpoint ref="in" />
+    <flow name="withMuleCorrelationId">
+        <custom-transformer class="org.mule.compatibility.transport.jms.integration.JmsCorrelationIdPropagationTestCase$SetCorrelationIdTransformer"/>
+        <transports:outbound-endpoint ref="in" />
     </flow>
 
-    <flow name="passFromQueueInToQueueOut">
-        <inbound-endpoint ref="in" />
-        <outbound-endpoint ref="out" />
+    <flow name="withCustomCorrelationId">
+        <transports:outbound-endpoint ref="in" />
+        <expression-message-info-mapping messageIdExpression="#[message.id]" correlationIdExpression="#['custom-cid']"/>
     </flow>
 
-    <flow name="consumeFromQueueOut">
-        <inbound-endpoint ref="out" />
-        <vm:outbound-endpoint path="out" exchange-pattern="one-way" />
+    <flow name="withNoCorrelationId">
+        <transports:outbound-endpoint ref="in" />
     </flow>
 
+    <flow name="withCorrelationIdBridge">
+        <transports:inbound-endpoint ref="in" />
+        <test:assert expression="#[message.correlation.id.get() == 'custom-cid']"/>
+        <test:assert expression="#[message.inboundProperties['JMScorrelationId'] == 'custom-cid']"/>
+        <!-- MULE Correlation ID can be overwritten and will be propagated forward -->
+        <custom-transformer class="org.mule.compatibility.transport.jms.integration.JmsCorrelationIdPropagationTestCase$SetCorrelationId2Transformer"/>
+        <transports:outbound-endpoint ref="out" exchange-pattern="request-response"/>
+        <test:assert expression="#[message.correlation.id.get() == 'custom-cid-2']"/>
+        <test:assert expression="#[message.inboundProperties['JMScorrelationId'] == 'custom-cid-2']"/>
+    </flow>
+
+    <flow name="withCorrelationIdOut">
+        <transports:inbound-endpoint ref="out" />
+        <logger level="WARN" message="withCorrelationIdOut: #[message]"/>
+        <test:assert expression="#[message.correlation.id.get() == 'custom-cid-2']"/>
+        <test:assert expression="#[message.inboundProperties['JMScorrelationId'] == 'custom-cid-2']"/>
+        <!-- Overwritten MULE Correlation ID is not used in ReplyTo message -->
+        <custom-transformer class="org.mule.compatibility.transport.jms.integration.JmsCorrelationIdPropagationTestCase$SetCorrelationId3Transformer"/>
+    </flow>
 </mule>

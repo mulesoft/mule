@@ -13,24 +13,21 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
-import org.mule.api.context.notification.ExceptionStrategyNotificationListener;
-import org.mule.api.context.notification.ServerNotification;
-import org.mule.context.notification.ExceptionStrategyNotification;
-import org.mule.message.ExceptionMessage;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.context.notification.ExceptionStrategyNotificationListener;
+import org.mule.runtime.core.api.context.notification.ServerNotification;
+import org.mule.runtime.core.context.notification.ExceptionStrategyNotification;
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.message.ExceptionMessage;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class ExceptionListenerTestCase extends AbstractServiceAndFlowTestCase
+public class ExceptionListenerTestCase extends FunctionalTestCase
 {
 
     private static final int TIMEOUT_MILLIS = 5000;
@@ -40,18 +37,10 @@ public class ExceptionListenerTestCase extends AbstractServiceAndFlowTestCase
     private ServerNotification exceptionStrategyStartNotification;
     private ServerNotification exceptionStrategyEndNotification;
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][] {
-                {ConfigVariant.SERVICE, "org/mule/test/integration/exceptions/exception-listener-config-service.xml"},
-                {ConfigVariant.FLOW, "org/mule/test/integration/exceptions/exception-listener-config-flow.xml"}
-        });
-    }
-
-    public ExceptionListenerTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
+        return "org/mule/test/integration/exceptions/exception-listener-config-flow.xml";
     }
 
     @Override
@@ -82,13 +71,13 @@ public class ExceptionListenerTestCase extends AbstractServiceAndFlowTestCase
     @Test
     public void testExceptionStrategyFromComponent() throws Exception
     {
-        assertQueueIsEmpty("vm://error.queue");
+        assertQueueIsEmpty("test://error.queue");
 
-        client.send("vm://component.in", "test", null);
+        flowRunner("mycomponent").withPayload(getTestMuleMessage("test")).asynchronously().run();
 
-        assertQueueIsEmpty("vm://component.out");
+        assertQueueIsEmpty("test://component.out");
 
-        MuleMessage message = client.request("vm://error.queue", 2000);
+        MuleMessage message = client.request("test://error.queue", 2000);
         assertNotNull(message);
         Object payload = message.getPayload();
         assertTrue(payload instanceof ExceptionMessage);

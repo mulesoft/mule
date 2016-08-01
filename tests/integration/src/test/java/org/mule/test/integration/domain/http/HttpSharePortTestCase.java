@@ -6,25 +6,20 @@
  */
 package org.mule.test.integration.domain.http;
 
+import static java.lang.String.format;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleMessage;
-import org.mule.module.http.api.client.HttpRequestOptionsBuilder;
-import org.mule.tck.junit4.DomainFunctionalTestCase;
+import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+
+import org.mule.functional.junit4.DomainFunctionalTestCase;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 
-@RunWith(Parameterized.class)
 public class HttpSharePortTestCase extends DomainFunctionalTestCase
 {
 
@@ -35,48 +30,31 @@ public class HttpSharePortTestCase extends DomainFunctionalTestCase
     public DynamicPort dynamicPort = new DynamicPort("port1");
     @Rule
     public SystemProperty endpointScheme = getEndpointSchemeSystemProperty();
-    private String hellowWordAppConfig;
-    private String helloMuleAppConfig;
-    private String domainConfig;
-
-    public HttpSharePortTestCase(String domainConfig, String helloWorldAppConfig, String helloMuleAppConfig)
-    {
-        this.domainConfig = domainConfig;
-        this.hellowWordAppConfig = helloWorldAppConfig;
-        this.helloMuleAppConfig = helloMuleAppConfig;
-    }
-
-    @Parameterized.Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][] {
-                {"domain/http/transport/http-shared-connector.xml", "domain/http/transport/http-hello-world-app.xml", "domain/http/transport/http-hello-mule-app.xml"},
-                {"domain/http/http-shared-listener-config.xml", "domain/http/http-hello-world-app.xml", "domain/http/http-hello-mule-app.xml"}});
-    }
 
     @Override
     protected String getDomainConfig()
     {
-        return domainConfig;
+        return "domain/http/http-shared-listener-config.xml";
     }
 
     @Override
     public ApplicationConfig[] getConfigResources()
     {
-        return new ApplicationConfig[] {new ApplicationConfig(HELLO_WORLD_SERVICE_APP, new String[] {hellowWordAppConfig}),
-                new ApplicationConfig(HELLO_MULE_SERVICE_APP, new String[] {helloMuleAppConfig})
+        return new ApplicationConfig[] {new ApplicationConfig(HELLO_WORLD_SERVICE_APP, new String[] {"domain/http/http-hello-world-app.xml"}),
+                new ApplicationConfig(HELLO_MULE_SERVICE_APP, new String[] {"domain/http/http-hello-mule-app.xml"})
         };
     }
 
     @Test
     public void bothServicesBindCorrectly() throws Exception
     {
-        MuleMessage helloWorldServiceResponse = getMuleContextForApp(HELLO_WORLD_SERVICE_APP).getClient().send(String.format("%s://localhost:%d/service/helloWorld",
-                                 endpointScheme.getValue(), dynamicPort.getNumber()), new DefaultMuleMessage("test-data", getMuleContextForApp(HELLO_WORLD_SERVICE_APP)), getOptionsBuilder().build());
-        assertThat(helloWorldServiceResponse.getPayloadAsString(), is("hello world"));
-        MuleMessage helloMuleServiceResponse = getMuleContextForApp(HELLO_MULE_SERVICE_APP).getClient().send(String.format("%s://localhost:%d/service/helloMule",
-                                 endpointScheme.getValue(), dynamicPort.getNumber()), new DefaultMuleMessage("test-data", getMuleContextForApp(HELLO_MULE_SERVICE_APP)), getOptionsBuilder().build());
-        assertThat(helloMuleServiceResponse.getPayloadAsString(), is("hello mule"));
+        MuleMessage helloWorldServiceResponse = getMuleContextForApp(HELLO_WORLD_SERVICE_APP).getClient().send(format("%s://localhost:%d/service/helloWorld",
+                endpointScheme.getValue(), dynamicPort.getNumber()), MuleMessage.builder().payload("test-data").build(), getOptionsBuilder().build());
+        assertThat(getPayloadAsString(helloWorldServiceResponse, getMuleContextForApp(HELLO_WORLD_SERVICE_APP)), is("hello world"));
+
+        MuleMessage helloMuleServiceResponse = getMuleContextForApp(HELLO_MULE_SERVICE_APP).getClient().send(format("%s://localhost:%d/service/helloMule",
+                endpointScheme.getValue(), dynamicPort.getNumber()), MuleMessage.builder().payload("test-data").build(), getOptionsBuilder().build());
+        assertThat(getPayloadAsString(helloMuleServiceResponse, getMuleContextForApp(HELLO_MULE_SERVICE_APP)), is("hello mule"));
     }
 
     protected SystemProperty getEndpointSchemeSystemProperty()

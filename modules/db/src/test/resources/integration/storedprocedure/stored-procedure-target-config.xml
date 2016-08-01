@@ -6,9 +6,7 @@
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
     <flow name="storedProcedureCustomTarget">
-        <inbound-endpoint address="vm://storedProcedureCustomTarget" exchange-pattern="request-response"/>
-
-        <db:stored-procedure config-ref="dbConfig" target="#[header:OUTBOUND:statementResult]">
+        <db:stored-procedure config-ref="dbConfig" target="#[message.outboundProperties.statementResult]">
             <db:parameterized-query>{ call updateTestType1() }</db:parameterized-query>
         </db:stored-procedure>
     </flow>

@@ -6,23 +6,27 @@
  */
 package org.mule.test.spring.config;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
 import org.mule.common.MuleArtifact;
 import org.mule.common.MuleArtifactFactoryException;
 import org.mule.common.Testable;
 import org.mule.common.config.XmlConfigurationCallback;
-import org.mule.config.spring.SpringXmlConfigurationMuleArtifactFactory;
+import org.mule.runtime.config.spring.SpringXmlConfigurationMuleArtifactFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.HashMap;
 
-import junit.framework.Assert;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Namespace;
 import org.dom4j.QName;
 import org.dom4j.io.DOMWriter;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -30,24 +34,41 @@ import org.w3c.dom.Element;
 
 public class MessageSourceMuleArtifactTestCase extends AbstractMuleTestCase
 {
-    private static final String VM_SCHEMA_URL = "http://www.mulesoft.org/schema/mule/vm";
+    private static final String TEST_SCHEMA_URL = "http://www.mulesoft.org/schema/mule/test";
+
+    private SpringXmlConfigurationMuleArtifactFactory factory;
+    private MuleArtifact artifact;
+
+    @Before
+    public void before()
+    {
+        factory = new SpringXmlConfigurationMuleArtifactFactory();
+    }
+
+    @After
+    public void after()
+    {
+        if (factory != null)
+        {
+            factory.returnArtifact(artifact);
+        }
+    }
 
     @Test
     public void createsMessageSourceArtifact() throws MuleArtifactFactoryException, DocumentException
     {
-        SpringXmlConfigurationMuleArtifactFactory factory = new SpringXmlConfigurationMuleArtifactFactory();
         XmlConfigurationCallback callback = mock(XmlConfigurationCallback.class);
-        HashMap<String, String> map = new HashMap<String, String>();
+        HashMap<String, String> map = new HashMap<>();
         map.put("test", "test1");
         when(callback.getEnvironmentProperties()).thenReturn(map);
         when(callback.getPropertyPlaceholders()).thenReturn(new Element[] {});
-        when(callback.getSchemaLocation(VM_SCHEMA_URL)).thenReturn("http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd");
-        Element element = createElement("inbound-endpoint", VM_SCHEMA_URL, "vm");
-        element.setAttribute("path", "/test");
+        when(callback.getSchemaLocation(TEST_SCHEMA_URL)).thenReturn("http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd");
+        Element element = createElement("component", TEST_SCHEMA_URL, "test");
+        element.setAttribute("throwException", "true");
 
-        MuleArtifact artifact = factory.getArtifactForMessageProcessor(element, callback);
+        artifact = factory.getArtifactForMessageProcessor(element, callback);
 
-        Assert.assertFalse(artifact.hasCapability(Testable.class));
+        assertThat(artifact.hasCapability(Testable.class), is(false));
     }
 
     private Element createElement(String name, String namespace, String prefix) throws DocumentException

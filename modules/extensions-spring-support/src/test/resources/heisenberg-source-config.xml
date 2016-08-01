@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/heisenberg http://www.mulesoft.org/schema/mule/heisenberg/current/mule-heisenberg.xsd">
+
+    <heisenberg:config name="heisenberg"
+                       myName="Heisenberg"
+                       age="50"
+                       cancer="true"
+                       dateOfBirth="1959-09-07T00:00:00"
+                       dateOfDeath="2011-09-07T00:00:00-05:00"
+                       money="0"
+                       recipe="recipes"
+                       initialHealth="CANCER"
+                       finalHealth="CANCER"
+                       monthlyIncomes="monthlyIncomes"
+                       candidateDoors="candidateDoors"
+                       enemies="#[[]]">
+    </heisenberg:config>
+
+    <flow name="source" initialState="stopped">
+        <heisenberg:listen-payments initialBatchNumber="0"/>
+
+        <set-payload value="#[java.lang.Long.valueOf('100')]"/>
+    </flow>
+
+    <flow name="sourceFailed" initialState="stopped">
+        <heisenberg:listen-payments initialBatchNumber="0"/>
+
+        <!--invalid expression results in exception-->
+        <set-payload value="#[new java.lang.Long.valueOf('100')]"/>
+    </flow>
+
+    <flow name="sourceFailedOnRuntime" initialState="stopped">
+        <!--invalid initialBatchNumber with negative value -->
+        <heisenberg:listen-payments initialBatchNumber="-1"/>
+
+        <set-payload value="100"/>
+    </flow>
+
+    <flow name="sourceFailedOnStart" initialState="stopped">
+        <!--invalid corePoolSize with negative value -->
+        <heisenberg:listen-payments initialBatchNumber="1" corePoolSize="-1"/>
+
+        <set-payload value="100"/>
+    </flow>
+
+</mule>

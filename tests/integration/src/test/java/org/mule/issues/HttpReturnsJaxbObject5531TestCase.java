@@ -6,23 +6,25 @@
  */
 package org.mule.issues;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import org.mule.api.MuleEventContext;
-import org.mule.api.client.MuleClient;
-import org.mule.api.lifecycle.Callable;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
+import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.lifecycle.Callable;
+import org.mule.runtime.core.transformer.simple.ObjectToString;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.transformer.simple.ObjectToString;
 
-import java.util.Arrays;
-import java.util.Collection;
-
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class HttpReturnsJaxbObject5531TestCase extends AbstractServiceAndFlowTestCase
+@Ignore("See MULE-9196")
+public class HttpReturnsJaxbObject5531TestCase extends FunctionalTestCase
 {
     private static final String ZIP_RESPONSE = "<?xml version='1.0' encoding='utf-8'?><soap:Envelope xmlns:soap='http://schemas.xmlsoap.org/soap/envelope/' "
                                                + "xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xmlns:xsd='http://www.w3.org/2001/XMLSchema'>"
@@ -36,28 +38,20 @@ public class HttpReturnsJaxbObject5531TestCase extends AbstractServiceAndFlowTes
     @Rule
     public DynamicPort port1 = new DynamicPort("port1");
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE,
-            "org/mule/issues/http-returns-jaxb-object-mule-5531-test.xml"}
-
-        });
-    }
-
-    public HttpReturnsJaxbObject5531TestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
+        return "org/mule/issues/http-returns-jaxb-object-mule-5531-test.xml";
     }
 
     @Test
     public void testGetWeather() throws Exception
     {
-        String testUrl = "http://localhost:" + port1.getNumber() + "/test/weather";
+        String testUrl = "http://localhost:" + port1.getNumber() + "/test";
         MuleClient client = muleContext.getClient();
-        Object response = client.send(testUrl, getTestMuleMessage("hello"));
+        Object response = client.send(testUrl, getTestMuleMessage("hello"), newOptions().method(POST.name()).build());
         assertNotNull(response);
-        String stringResponse = (String) new ObjectToString().transform(response, "UTF-8");
+        String stringResponse = (String) new ObjectToString().transform(response, UTF_8);
         assertTrue(stringResponse.contains("<Success>true</Success>"));
     }
 

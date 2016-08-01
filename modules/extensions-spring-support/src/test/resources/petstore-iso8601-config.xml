@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:petstore="http://www.mulesoft.org/schema/mule/petstore"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/petstore http://www.mulesoft.org/schema/mule/petstore/current/mule-petstore.xsd">
+
+    <petstore:config name="petstoreWithTimeZone">
+        <petstore:connection username="john" password="doe" openingDate="2008-09-15T15:53:23+05:00"/>
+    </petstore:config>
+
+    <petstore:config name="petstoreWithDateTime">
+        <petstore:connection username="john" password="doe" openingDate="2008-09-15T15:53:23"/>
+    </petstore:config>
+
+    <petstore:config name="petstoreWithDate">
+        <petstore:connection username="john" password="doe" openingDate="2008-09-15"/>
+    </petstore:config>
+
+    <petstore:config name="petstoreWithTimeZoneNoSeconds">
+        <petstore:connection username="john" password="doe" openingDate="2008-09-15T15:53+05:00"/>
+    </petstore:config>
+
+    <petstore:config name="petstoreWithTimeZoneNoMinutes">
+        <petstore:connection username="john" password="doe" openingDate="2008-09-15T15+05:00"/>
+    </petstore:config>
+
+    <flow name="getWithTimeZone">
+        <petstore:get-client config-ref="petstoreWithTimeZone" />
+    </flow>
+
+    <flow name="getWithDateTime">
+        <petstore:get-client config-ref="petstoreWithDateTime" />
+    </flow>
+
+    <flow name="getWithDate">
+        <petstore:get-client config-ref="petstoreWithDate" />
+    </flow>
+
+    <flow name="getWithTimeZoneNoSeconds">
+        <petstore:get-client config-ref="petstoreWithTimeZoneNoSeconds" />
+    </flow>
+
+    <flow name="getWithTimeZoneNoMinutes">
+        <petstore:get-client config-ref="petstoreWithTimeZoneNoMinutes" />
+    </flow>
+
+
+</mule>

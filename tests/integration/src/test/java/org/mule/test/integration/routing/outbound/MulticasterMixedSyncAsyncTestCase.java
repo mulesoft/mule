@@ -6,53 +6,42 @@
  */
 package org.mule.test.integration.routing.outbound;
 
+import static java.util.stream.Collectors.toList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.api.MuleMessage;
-import org.mule.api.MuleMessageCollection;
-import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.functional.functional.FlowAssert;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class MulticasterMixedSyncAsyncTestCase extends AbstractServiceAndFlowTestCase
+public class MulticasterMixedSyncAsyncTestCase extends FunctionalTestCase
 {
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/integration/routing/outbound/multicaster-mixed-sync-async-test-service.xml"},
-            {ConfigVariant.FLOW, "org/mule/test/integration/routing/outbound/multicaster-mixed-sync-async-test-flow.xml"}
-        });
-    }
 
-    public MulticasterMixedSyncAsyncTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
+        return "org/mule/test/integration/routing/outbound/multicaster-mixed-sync-async-test-flow.xml";
     }
 
     @Test
     public void testMixedMulticast() throws Exception
     {
-        MuleClient client = muleContext.getClient();
-        MuleMessage result = client.send("vm://distributor.queue", new Apple(), null);
+        Apple apple = new Apple();
+
+        MuleMessage result = flowRunner("Distributor").withPayload(apple).run().getMessage();
 
         assertNotNull(result);
-        assertTrue(result instanceof MuleMessageCollection);
-        MuleMessageCollection coll = (MuleMessageCollection) result;
-        assertEquals(2, coll.size());
-        List<?> results = (List<?>) coll.getPayload();
+        assertTrue(result.getPayload() instanceof List);
+        List<Apple> results = ((List<MuleMessage>) result.getPayload()).stream().map(msg -> (Apple) msg.getPayload
+                ()).collect(toList());
+        assertEquals(2, results.size());
 
-        //ServiceTwo endpoint is async
-        assertTrue(results.contains("Apple Received in ServiceOne"));
-        assertTrue(results.contains("Apple Received in ServiceThree"));
+        FlowAssert.verify();
     }
 }

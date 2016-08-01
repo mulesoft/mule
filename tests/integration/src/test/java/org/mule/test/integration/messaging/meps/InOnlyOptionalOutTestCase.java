@@ -6,39 +6,23 @@
  */
 package org.mule.test.integration.messaging.meps;
 
-import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 
-public class InOnlyOptionalOutTestCase extends AbstractServiceAndFlowTestCase
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.functional.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+public class InOnlyOptionalOutTestCase extends FunctionalTestCase
 {
-    public static final long TIMEOUT = 3000;
-
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE,
-                "org/mule/test/integration/messaging/meps/pattern_In-Only_Optional-Out-service.xml"},
-            {ConfigVariant.FLOW,
-                "org/mule/test/integration/messaging/meps/pattern_In-Only_Optional-Out-flow.xml"}});
-    }
-
-    public InOnlyOptionalOutTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
+        return "org/mule/test/integration/messaging/meps/pattern_In-Only_Optional-Out-flow.xml";
     }
 
     @Test
@@ -46,16 +30,19 @@ public class InOnlyOptionalOutTestCase extends AbstractServiceAndFlowTestCase
     {
         MuleClient client = muleContext.getClient();
 
-        client.dispatch("inboundEndpoint", "some data", null);
-        Map<String, Object> props = new HashMap<String, Object>();
-        props.put("foo", "bar");
-        client.dispatch("inboundEndpoint", "some data", props);
+        flowRunner("In-Only_Optional-Out--Service").withPayload("some data")
+                                                   .asynchronously()
+                                                   .run();
+        flowRunner("In-Only_Optional-Out--Service").withPayload("some data")
+                                                   .withInboundProperty("foo", "bar")
+                                                   .asynchronously()
+                                                   .run();
 
-        MuleMessage result = client.request("receivedEndpoint", TIMEOUT);
+        MuleMessage result = client.request("test://received", RECEIVE_TIMEOUT);
         assertNotNull(result);
-        assertEquals("foo header received", result.getPayloadAsString());
+        assertThat(getPayloadAsString(result), is("foo header received"));
 
-        result = client.request("notReceivedEndpoint", TIMEOUT);
+        result = client.request("test://notReceived", RECEIVE_TIMEOUT);
         assertNull(result);
     }
 }

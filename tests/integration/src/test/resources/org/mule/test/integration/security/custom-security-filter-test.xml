@@ -17,7 +17,7 @@
     </mule-ss:security-manager>
 
     <spring:beans>
-        <spring:bean class="org.mule.module.spring.security.PreAuthenticatedAuthenticationProvider" name="authenticationProvider"/>
+        <spring:bean class="org.mule.runtime.module.spring.security.PreAuthenticatedAuthenticationProvider" name="authenticationProvider"/>
 
         <ss:authentication-manager alias="authenticationManager">
             <ss:authentication-provider>
@@ -30,10 +30,9 @@
     </spring:beans>
 
     <flow name="test">
-        <inbound-endpoint address="vm://test" exchange-pattern="request-response"/>
-        <custom-security-filter class="org.mule.security.UsernamePasswordAuthenticationFilter">
-            <spring:property name="password" value="#[header:inbound:pass]"/>
+        <custom-security-filter class="org.mule.runtime.core.security.UsernamePasswordAuthenticationFilter">
+            <spring:property name="password" value="#[message.inboundProperties.pass]"/>
         </custom-security-filter>
-        <component class="org.mule.component.simple.EchoComponent"/>
+        <component class="org.mule.runtime.core.component.simple.EchoComponent"/>
     </flow>
 </mule>

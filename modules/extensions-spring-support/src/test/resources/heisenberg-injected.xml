@@ -21,9 +21,9 @@
             <heisenberg:enemy value="Hank"/>
         </heisenberg:enemies>
         <heisenberg:ricin-packs>
-            <heisenberg:ricin-pack microgramsPerKilo="22">
+            <heisenberg:ricin microgramsPerKilo="22">
                 <heisenberg:destination victim="Lidia" address="Stevia coffe shop"/>
-            </heisenberg:ricin-pack>
+            </heisenberg:ricin>
         </heisenberg:ricin-packs>
         <heisenberg:next-door address="pollos hermanos" victim="Gustavo Fring">
             <heisenberg:previous victim="Krazy-8" address="Jesse's"/>
@@ -46,14 +46,16 @@
             <heisenberg:enemy value="Hank"/>
         </heisenberg:enemies>
         <heisenberg:ricin-packs>
-            <heisenberg:ricin-pack microgramsPerKilo="22">
+            <heisenberg:ricin microgramsPerKilo="22">
                 <heisenberg:destination victim="Lidia" address="Stevia coffe shop"/>
-            </heisenberg:ricin-pack>
+            </heisenberg:ricin>
         </heisenberg:ricin-packs>
         <heisenberg:next-door address="pollos hermanos" victim="Gustavo Fring">
             <heisenberg:previous victim="Krazy-8" address="Jesse's"/>
         </heisenberg:next-door>
+        <heisenberg:monthly-incomes>
+            <heisenberg:monthly-income value="12000"/>
+            <heisenberg:monthly-income value="500"/>
+        </heisenberg:monthly-incomes>
     </heisenberg:config>
-
-
 </mule>

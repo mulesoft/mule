@@ -19,13 +19,8 @@ import groovy.transform.Field
 @Field String settings
 @Field deploySignatures = true
 @Field packagingExceptions = ['geomail': 'war']
-@Field deployExceptions = ['archetypes', 'integration-axis', 'loanbroker-legacy']
-@Field artifactIdExceptions = ['jboss-transactions'      : 'mule-module-jbossts',
-                               'bobberplus'              : 'bobberplus',
-                               'mule-transport-archetype': 'mule-transport-archetype',
-                               'mule-project-archetype'  : 'mule-project-archetype',
-                               'mule-module-archetype'   : 'mule-module-archetype',
-                               'mule-catalog-archetype'  : 'mule-catalog-archetype']
+@Field deployExceptions = []
+@Field artifactIdExceptions = ['jboss-transactions'      : 'mule-module-jbossts']
 
 parseArguments(args)
 deployJars()
@@ -53,7 +48,7 @@ private OptionAccessor parseOptions(arguments)
     def cliBuilder = new CliBuilder(usage: 'deploy_mule_artifacts [options]\n\n')
     cliBuilder.r(longOpt: "local-repository", required: false, args: 1, "Maven 2 repository to get artifacts from.")
     cliBuilder.s(longOpt: "settings", required: false, args: 1, "Maven settings.xml.")
-    cliBuilder.v(longOpt: "version", required: true, args: 1, "Mule ESB version")
+    cliBuilder.v(longOpt: "version", required: true, args: 1, "Mule Runtime version")
     cliBuilder.h(longOpt: "help", "show usage info")
     cliBuilder.d(longOpt: "deploy-distributions", "Deploy Distribution Artifacts")
     cliBuilder.ce(longOpt: "ce-repository", required: true, args: 1, "CE Remote repository (id::repository)")
@@ -64,6 +59,8 @@ private OptionAccessor parseOptions(arguments)
 def deployJars()
 {
     deployToRemote(ceRepoUrl, ceRepoId, 'org.mule', 'mule', version, 'pom')
+    deployToRemote(ceRepoUrl, ceRepoId, 'org.mule.extensions', 'mule-extensions', version, 'pom')
+    deployToRemote(ceRepoUrl, ceRepoId, 'org.mule.modules', 'mule-module-validation', version, 'jar')
     deployToRemote(ceRepoUrl, ceRepoId, 'org.mule', 'mule-core', version, 'jar')
     [
             'modules',
@@ -204,4 +201,3 @@ class Artifact
         return clone;
     }
 }
-

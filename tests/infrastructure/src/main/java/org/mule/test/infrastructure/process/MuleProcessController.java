@@ -69,6 +69,20 @@ public class MuleProcessController
         return controller.isDeployed(appName);
     }
 
+    public boolean isDomainDeployed(String domainName)
+    {
+        return controller.isDomainDeployed(domainName);
+    }
+
+    public void undeploy(String application)
+    {
+        controller.undeploy(application);
+    }
+
+    public void undeployDomain(String domain)
+    {
+        controller.undeployDomain(domain);
+    }
 
     public void undeployAll()
     {

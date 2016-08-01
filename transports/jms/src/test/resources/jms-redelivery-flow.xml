@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+      xmlns:jms="http://www.mulesoft.org/schema/mule/transport/jms"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
-       http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd">
+       http://www.mulesoft.org/schema/mule/transport/jms http://www.mulesoft.org/schema/mule/transport/jms/current/mule-transport-jms.xsd">
 
     <jms:activemq-connector name="jmsConnectorLimitedRedelivery" maxRedelivery="${maxRedelivery}" />
     <jms:activemq-connector name="jmsConnectorNoRedelivery" maxRedelivery="-1" />
@@ -20,15 +20,15 @@
             <jms:transaction action="ALWAYS_JOIN" />
         </jms:outbound-endpoint>
         <default-exception-strategy>
-            <commit-transaction exception-pattern="org.mule.transport.jms.redelivery.MessageRedeliveredException"/>
+            <commit-transaction exception-pattern="org.mule.compatibility.transport.jms.redelivery.MessageRedeliveredException"/>
             <choice>
-                <when evaluator="groovy" expression='payload.getException().getClass().getName().equals("org.mule.transport.jms.redelivery.MessageRedeliveredException")'>
+                <when expression="#[payload.exception instanceof org.mule.compatibility.transport.jms.redelivery.MessageRedeliveredException]">
                     <jms:outbound-endpoint queue="dead.letter" connector-ref="jmsConnectorLimitedRedelivery">
                         <jms:transaction action="ALWAYS_JOIN" />
                     </jms:outbound-endpoint>
                 </when>
                 <otherwise>
-                    <logger/>
+                    <logger message="#[payload.exception.class]" level="WARN"/>
                 </otherwise>
             </choice>
         </default-exception-strategy>

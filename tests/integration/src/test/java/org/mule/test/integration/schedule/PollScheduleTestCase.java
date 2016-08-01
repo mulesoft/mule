@@ -9,10 +9,10 @@ package org.mule.test.integration.schedule;
 
 import static org.junit.Assert.assertEquals;
 
-import org.mule.api.MuleException;
-import org.mule.api.schedule.Scheduler;
-import org.mule.api.schedule.Schedulers;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.schedule.Scheduler;
+import org.mule.runtime.core.api.schedule.Schedulers;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;

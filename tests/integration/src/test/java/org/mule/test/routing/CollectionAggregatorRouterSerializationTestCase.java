@@ -6,22 +6,25 @@
  */
 package org.mule.test.routing;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertNotNull;
-import org.mule.api.MuleMessageCollection;
-import org.mule.api.client.MuleClient;
-import org.mule.api.config.MuleProperties;
-import org.mule.api.store.ObjectStoreException;
-import org.mule.routing.EventGroup;
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.util.store.SimpleMemoryObjectStore;
+import static org.junit.Assert.assertThat;
+
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.serialization.SerializationException;
+import org.mule.runtime.core.api.store.ObjectStoreException;
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.routing.EventGroup;
+import org.mule.runtime.core.util.store.SimpleMemoryObjectStore;
 
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang.SerializationUtils;
-import org.hibernate.type.SerializationException;
 import org.junit.Test;
 
 public class CollectionAggregatorRouterSerializationTestCase extends FunctionalTestCase
@@ -38,12 +41,14 @@ public class CollectionAggregatorRouterSerializationTestCase extends FunctionalT
     {
         muleContext.getRegistry().registerObject(MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME,
                                                  new EventGroupSerializerObjectStore<Serializable>());
-        MuleClient client = muleContext.getClient();
         List<String> list = Arrays.asList("first", "second");
-        client.dispatch("vm://splitter", list, null);
-        MuleMessageCollection request = (MuleMessageCollection) client.request("vm://out?connector=queue", 10000);
+        flowRunner("splitter").withPayload(list).asynchronously().run();
+
+        MuleClient client = muleContext.getClient();
+        MuleMessage request = client.request("test://out", RECEIVE_TIMEOUT);
         assertNotNull(request);
-        assertEquals(list.size(), request.size());
+        assertThat(request.getPayload(), instanceOf(List.class));
+        assertThat(((List<MuleMessage>) request.getPayload()), hasSize(list.size()));
     }
 
     private class EventGroupSerializerObjectStore<T extends Serializable> extends SimpleMemoryObjectStore<Serializable>

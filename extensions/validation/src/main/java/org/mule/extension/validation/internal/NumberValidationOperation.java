@@ -6,18 +6,18 @@
  */
 package org.mule.extension.validation.internal;
 
-import org.mule.api.MuleEvent;
-import org.mule.extension.annotations.Operation;
-import org.mule.extension.annotations.ParameterGroup;
-import org.mule.extension.annotations.param.UseConfig;
-import org.mule.extension.annotations.param.Optional;
+import org.mule.extension.validation.api.ValidationExtension;
+import org.mule.extension.validation.api.ValidationOptions;
 import org.mule.extension.validation.api.Validator;
-import org.mule.extension.validation.internal.validator.NumberType;
+import org.mule.extension.validation.api.NumberType;
 import org.mule.extension.validation.internal.validator.NumberValidator;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.extension.api.annotation.ParameterGroup;
+import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.UseConfig;
 
 import java.util.Locale;
-
-import org.apache.commons.lang.StringUtils;
 
 /**
  * Defines operations to validate numbers
@@ -40,7 +40,6 @@ public class NumberValidationOperation extends ValidationSupport
      * @param options    the {@link ValidationOptions}
      * @param event      the current {@link MuleEvent}
      */
-    @Operation
     public void isNumber(String value,
                          @Optional String locale,
                          @Optional String pattern,

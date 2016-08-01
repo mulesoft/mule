@@ -9,4 +9,8 @@
         <implicit:get-config />
     </flow>
 
+    <flow name="implicitConnection">
+        <implicit:get-connection />
+    </flow>
+
 </mule>

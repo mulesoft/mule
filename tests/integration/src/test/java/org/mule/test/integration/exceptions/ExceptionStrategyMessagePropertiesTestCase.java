@@ -10,34 +10,20 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
-import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.client.MuleClient;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class ExceptionStrategyMessagePropertiesTestCase extends AbstractServiceAndFlowTestCase
+public class ExceptionStrategyMessagePropertiesTestCase extends FunctionalTestCase
 {
     private final int numMessages = 100;
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/integration/exceptions/exception-strategy-message-properties-service.xml"},
-            {ConfigVariant.FLOW, "org/mule/test/integration/exceptions/exception-strategy-message-properties-flow.xml"}
-        });
-    }
-
-    public ExceptionStrategyMessagePropertiesTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
+        return "org/mule/test/integration/exceptions/exception-strategy-message-properties-flow.xml";
     }
 
     @Test
@@ -52,9 +38,9 @@ public class ExceptionStrategyMessagePropertiesTestCase extends AbstractServiceA
         MuleMessage msg;
         for (int i = 0; i < numMessages; ++i)
         {
-            msg = client.request("vm://error", 5000);
+            msg = client.request("test://out", 5000);
             assertNotNull(msg);
-            assertEquals("bar", msg.getInboundProperty("foo"));
+            assertEquals("bar", msg.getOutboundProperty("prop"));
         }
     }
 
@@ -65,13 +51,12 @@ public class ExceptionStrategyMessagePropertiesTestCase extends AbstractServiceA
         {
             try
             {
-                MuleClient client = muleContext.getClient();
-
-                Map<String, Object> props = new HashMap<String, Object>();
-                props.put("foo", "bar");
                 for (int i = 0; i < numMessages; ++i)
                 {
-                    client.dispatch("vm://in", "test", props);
+                    flowRunner("inbound").withPayload(TEST_PAYLOAD)
+                                         .withInboundProperty("foo", "bar")
+                                         .asynchronously()
+                                         .run();
                 }
             }
             catch (Exception e)

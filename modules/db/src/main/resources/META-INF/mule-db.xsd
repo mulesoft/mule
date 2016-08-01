@@ -8,7 +8,7 @@
 
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/core"
-                schemaLocation="http://www.mulesoft.org/schema/mule/core/3.7/mule.xsd"/>
+                schemaLocation="http://www.mulesoft.org/schema/mule/core/3.8/mule.xsd"/>
     <xsd:import namespace="http://www.springframework.org/schema/beans"
                 schemaLocation="http://www.springframework.org/schema/beans/spring-beans-3.1.xsd"/>
 
@@ -56,6 +56,13 @@
             <xsd:annotation>
                 <xsd:documentation>
                     Indicates how the message processor handles transactions.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="queryTimeout" type="xsd:integer" default="0">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Indicates the minimum amount of time in seconds before the JDBC driver attempts to cancel a running statement. No timeout is used by default.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -702,6 +709,13 @@
                     <xsd:annotation>
                         <xsd:documentation>
                             Type identifier used by the JDBC driver.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="className" type="xsd:string" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Indicates which Java class must be used to map the DB type.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>

@@ -6,8 +6,6 @@
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
     <flow name="updateDynamicQuery">
-        <inbound-endpoint address="vm://updateDynamicQuery" exchange-pattern="request-response"/>
-
         <set-variable variableName="data" value="Mercury"/>
         <set-variable variableName="type" value="4"/>
 

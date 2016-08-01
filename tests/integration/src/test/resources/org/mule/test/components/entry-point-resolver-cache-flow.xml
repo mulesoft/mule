@@ -1,28 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" 
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:spring="http://www.springframework.org/schema/beans" 
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xsi:schemaLocation="
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
-        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
     <spring:beans>
         <spring:bean id="RefDataServiceOne" class="org.mule.test.components.EntryPointResolverCacheTestCase$RefDataServiceOne"/>
         <spring:bean id="RefDataServiceTwo" class="org.mule.test.components.EntryPointResolverCacheTestCase$RefDataServiceTwo"/>
     </spring:beans>
 
-
-    <vm:connector name="vmSync"/>
-
-    <vm:endpoint name="refOneInbound" path="refOne.in" exchange-pattern="request-response" connector-ref="vmSync"/>
-
-    <vm:endpoint name="refTwoInbound" path="refTwo.in" exchange-pattern="request-response" connector-ref="vmSync"/>
-
     <flow name="refServiceOne">
-        <inbound-endpoint ref="refOneInbound"/>
         <component>
             <entry-point-resolver-set>
                 <property-entry-point-resolver property="method"/>
@@ -33,7 +22,6 @@
     </flow>
 
     <flow name="refServiceTwo">
-        <inbound-endpoint ref="refTwoInbound"/>
         <component>
             <entry-point-resolver-set>
                 <property-entry-point-resolver property="method"/>

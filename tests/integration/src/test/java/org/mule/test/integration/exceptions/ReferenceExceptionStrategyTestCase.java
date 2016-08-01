@@ -8,20 +8,20 @@ package org.mule.test.integration.exceptions;
 
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
+import static org.hamcrest.core.IsNull.notNullValue;
+import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
-
-import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
-import org.mule.api.exception.MessagingExceptionHandler;
-import org.mule.exception.AbstractExceptionListener;
-import org.mule.exception.ChoiceMessagingExceptionStrategy;
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.transport.NullPayload;
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.component.ComponentException;
+import org.mule.runtime.core.exception.AbstractExceptionListener;
+import org.mule.runtime.core.exception.ChoiceMessagingExceptionStrategy;
 
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.hamcrest.core.IsNot;
-import org.hamcrest.core.IsNull;
 import org.junit.Test;
 
 public class ReferenceExceptionStrategyTestCase extends FunctionalTestCase
@@ -39,12 +39,11 @@ public class ReferenceExceptionStrategyTestCase extends FunctionalTestCase
     @Test
     public void testFlowUsingGlobalExceptionStrategy() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://in", JSON_REQUEST, null, 5000);
-        assertThat(response, IsNull.<Object>notNullValue());
+        MuleMessage response = flowRunner("referenceExceptionStrategyFlow").withPayload(JSON_REQUEST).run().getMessage();
+        assertThat(response, notNullValue());
         // compare the structure and values but not the attributes' order
         ObjectMapper mapper = new ObjectMapper();
-        JsonNode actualJsonNode = mapper.readTree(response.getPayloadAsString());
+        JsonNode actualJsonNode = mapper.readTree(getPayloadAsString(response));
         JsonNode expectedJsonNode = mapper.readTree(JSON_RESPONSE);
         assertThat(actualJsonNode, is(expectedJsonNode));
     }
@@ -52,11 +51,11 @@ public class ReferenceExceptionStrategyTestCase extends FunctionalTestCase
     @Test
     public void testFlowUsingConfiguredExceptionStrategy() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://in2", JSON_REQUEST, null, 5000);
-        assertThat(response, IsNull.<Object>notNullValue());
-        assertThat((NullPayload) response.getPayload(), is(NullPayload.getInstance()));
-        assertThat(response.getExceptionPayload(), IsNull.<Object>notNullValue());
+        MessagingException e = flowRunner("configuredExceptionStrategyFlow").withPayload(JSON_REQUEST).runExpectingException();
+        assertThat(e, instanceOf(ComponentException.class));
+        assertThat(e.getEvent().getMessage(), notNullValue());
+        assertThat(e.getEvent().getMessage().getPayload(), is(nullValue()));
+        assertThat(e.getEvent().getMessage().getExceptionPayload(), notNullValue());
     }
 
     @Test

@@ -12,8 +12,10 @@
         This configuration uses an HTTP endpoint to receive requests.
     </description>
 
+    <http:listener-config name="listenerConfig" host="localhost" port="${port}"/>
+
     <flow name="HelloWorld">
-        <http:inbound-endpoint exchange-pattern="request-response" host="localhost" port="${port}"/>
+        <http:listener path="*" config-ref="listenerConfig"/>
         <message-filter>
             <json:json-schema-validation-filter schemaLocations="match-schema.json"/>
         </message-filter>

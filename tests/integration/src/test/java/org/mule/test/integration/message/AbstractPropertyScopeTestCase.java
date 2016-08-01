@@ -6,34 +6,31 @@
  */
 package org.mule.test.integration.message;
 
-import static org.junit.Assert.assertEquals;
-import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.junit.Rule;
 import org.junit.Test;
 
-public abstract class AbstractPropertyScopeTestCase extends AbstractServiceAndFlowTestCase
+public abstract class AbstractPropertyScopeTestCase extends FunctionalTestCase
 {
     @Rule
     public DynamicPort port1 = new DynamicPort("port1");
 
-    public AbstractPropertyScopeTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
     @Test
     public void testRequestResponse() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
-        MuleMessage message = getTestMuleMessage();
-        message.setOutboundProperty("foo", "fooValue");
+        MuleMessage result = flowRunner("foo").withPayload(TEST_PAYLOAD)
+                                              .withInboundProperty("foo", "fooValue")
+                                              .run()
+                                              .getMessage();
 
-        MuleMessage result = client.send("inbound", message);
-        assertEquals("test bar", result.getPayloadAsString());
-        assertEquals("fooValue", result.<Object> getInboundProperty("foo"));
+        assertThat(result.getPayload(), is("test bar"));
+        assertThat(result.getOutboundProperty("foo"), is("fooValue"));
     }
+
 }

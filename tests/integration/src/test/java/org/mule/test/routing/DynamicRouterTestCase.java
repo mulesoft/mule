@@ -9,10 +9,10 @@ package org.mule.test.routing;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
-import org.mule.api.MessagingException;
-import org.mule.api.MuleEvent;
-import org.mule.construct.Flow;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.construct.Flow;
+import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -35,15 +35,14 @@ public abstract class DynamicRouterTestCase extends FunctionalTestCase
     @Test(expected = MessagingException.class)
     public void noRoutes() throws Exception
     {
-        Flow flow = getTestFlow(getFlowName());
-        flow.process(getTestEvent(TEST_MESSAGE));
+        flowRunner(getFlowName()).withPayload(TEST_MESSAGE).run();
     }
 
     public abstract String getFlowName();
 
-    protected MuleEvent runFlowAndAssertResponse(Flow flow, Object expectedMessage) throws Exception
+    protected MuleEvent runFlowAndAssertResponse(String flowName, Object expectedMessage) throws Exception
     {
-        MuleEvent event = flow.process(getTestEvent(TEST_MESSAGE));
+        MuleEvent event = flowRunner(flowName).withPayload(TEST_MESSAGE).run();
         assertThat(event.getMessageAsString(), is(expectedMessage));
         return event;
     }

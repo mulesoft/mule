@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <wsdl:definitions xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/"
-                  xmlns:tns="http://consumer.ws.module.mule.org/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
-                  xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" targetNamespace="http://consumer.ws.module.mule.org/"
+                  xmlns:tns="http://consumer.ws.module.runtime.mule.org/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+                  xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" targetNamespace="http://consumer.ws.module.runtime.mule.org/"
                   xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
     <wsdl:types>
-        <s:schema elementFormDefault="qualified" targetNamespace="http://consumer.ws.module.mule.org/">
+        <s:schema elementFormDefault="qualified" targetNamespace="http://consumer.ws.module.runtime.mule.org/">
             <s:element name="TestMessage">
                 <s:complexType />
             </s:element>

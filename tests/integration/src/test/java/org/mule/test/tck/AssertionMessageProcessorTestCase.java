@@ -16,17 +16,16 @@ import org.mockito.runners.MockitoJUnitRunner;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.expression.ExpressionManager;
-import org.mule.expression.DefaultExpressionManager;
-import org.mule.tck.functional.AssertionMessageProcessor;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.expression.ExpressionManager;
+import org.mule.runtime.core.expression.DefaultExpressionManager;
+import org.mule.functional.functional.AssertionMessageProcessor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -50,7 +49,6 @@ public class AssertionMessageProcessorTestCase extends AbstractMuleTestCase
     public void initialise()
     {
         when(mockEvent.getMessage()).thenReturn(muleMessage);
-        when(muleMessage.getMuleContext()).thenReturn(muleContext);
         expressionManager = mock(DefaultExpressionManager.class);
         when(expressionManager.isValidExpression(anyString())).thenReturn(true);
         when(expressionManager.evaluateBoolean(eq(TRUE_EXPRESSION), any(MuleEvent.class), anyBoolean(), anyBoolean()))

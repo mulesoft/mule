@@ -8,8 +8,6 @@
     <db:derby-config name="dynamicDbConfig" url="#[dataSourceUrl]" driverClassName="org.apache.derby.jdbc.EmbeddedDriver"/>
 
     <flow name="defaultQueryRequestResponse">
-        <inbound-endpoint address="vm://testRequestResponse" exchange-pattern="request-response"/>
-
         <set-variable variableName="dataSourceUrl" value="jdbc:derby:muleEmbeddedDB;create=true"/>
 
         <db:select config-ref="dynamicDbConfig">

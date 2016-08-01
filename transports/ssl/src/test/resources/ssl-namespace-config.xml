@@ -2,11 +2,11 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:spring="http://www.springframework.org/schema/beans"
-       xmlns:ssl="http://www.mulesoft.org/schema/mule/ssl"
+       xmlns:ssl="http://www.mulesoft.org/schema/mule/transport/ssl"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-       http://www.mulesoft.org/schema/mule/ssl http://www.mulesoft.org/schema/mule/ssl/current/mule-ssl.xsd">
+       http://www.mulesoft.org/schema/mule/transport/ssl http://www.mulesoft.org/schema/mule/transport/ssl/current/mule-transport-ssl.xsd">
 
     <ssl:connector name="sslConnector" sendBufferSize="1024" receiveBufferSize="2048" keepAlive="true">
         <ssl:client

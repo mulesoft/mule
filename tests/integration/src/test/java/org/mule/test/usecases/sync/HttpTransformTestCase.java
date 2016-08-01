@@ -6,59 +6,55 @@
  */
 package org.mule.test.usecases.sync;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNotNull;
-import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import static org.junit.Assert.assertThat;
+import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
+import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.transformer.compression.GZipUncompressTransformer;
+import org.mule.runtime.core.transformer.simple.ByteArrayToSerializable;
+import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.transformer.compression.GZipUncompressTransformer;
-import org.mule.transformer.simple.ByteArrayToSerializable;
-import org.mule.transformer.types.DataTypeFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class HttpTransformTestCase extends AbstractServiceAndFlowTestCase
+public class HttpTransformTestCase extends FunctionalTestCase
 {
 
+    public static final HttpRequestOptions HTTP_REQUEST_OPTIONS = newOptions().method(POST.name()).build();
     @Rule
     public DynamicPort httpPort1 = new DynamicPort("port1");
 
     @Rule
     public DynamicPort httpPort2 = new DynamicPort("port2");
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/usecases/sync/http-transform-service.xml"},
-            {ConfigVariant.FLOW, "org/mule/test/usecases/sync/http-transform-flow.xml"}
-        });
-    }
-
-    public HttpTransformTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
+        return "org/mule/test/usecases/sync/http-transform-flow.xml";
     }
 
     @Test
     public void testTransform() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        MuleMessage message = client.send(String.format("http://localhost:%d/RemoteService", httpPort1.getNumber()), getTestMuleMessage("payload"));
+        MuleMessage message = client.send(String.format("http://localhost:%d/RemoteService", httpPort1.getNumber()), getTestMuleMessage("payload"), HTTP_REQUEST_OPTIONS);
         assertNotNull(message);
         GZipUncompressTransformer gu = new GZipUncompressTransformer();
         gu.setMuleContext(muleContext);
-        gu.setReturnDataType(DataTypeFactory.STRING);
+        gu.setReturnDataType(DataType.STRING);
         assertNotNull(message.getPayload());
-        String result = (String)gu.transform(message.getPayloadAsBytes());
-        assertEquals("<string>payload</string>", result);
+        String result = (String)gu.transform(getPayloadAsBytes(message));
+        assertThat(result, is("<string>payload</string>"));
     }
 
     @Test
@@ -68,14 +64,14 @@ public class HttpTransformTestCase extends AbstractServiceAndFlowTestCase
         ArrayList<Integer> payload = new ArrayList<Integer>();
         payload.add(42);
         MuleMessage message = client.send(String.format("http://localhost:%d/RemoteService", httpPort2.getNumber()),
-                                          muleContext.getObjectSerializer().serialize(payload),
-                                          null);
+                                          getTestMuleMessage(muleContext.getObjectSerializer().serialize(payload)),
+                                          HTTP_REQUEST_OPTIONS);
         assertNotNull(message);
         ByteArrayToSerializable bas = new ByteArrayToSerializable();
         bas.setMuleContext(muleContext);
         assertNotNull(message.getPayload());
         Object result = bas.transform(message.getPayload());
-        assertEquals(payload, result);
+        assertThat(result, is(payload));
     }
 
     @Test
@@ -83,12 +79,12 @@ public class HttpTransformTestCase extends AbstractServiceAndFlowTestCase
     {
         MuleClient client = muleContext.getClient();
         Object payload = Arrays.asList(42);
-        MuleMessage message = client.send("vm://LocalService", getTestMuleMessage(payload));
+        MuleMessage message = flowRunner("LocalService").withPayload(payload).run().getMessage();
         assertNotNull(message);
         ByteArrayToSerializable bas = new ByteArrayToSerializable();
         bas.setMuleContext(muleContext);
         assertNotNull(message.getPayload());
         Object result = bas.transform(message.getPayload());
-        assertEquals(payload, result);
+        assertThat(result, is(payload));
     }
 }

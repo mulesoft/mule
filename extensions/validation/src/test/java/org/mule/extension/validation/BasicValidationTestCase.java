@@ -11,17 +11,15 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import static org.mule.extension.validation.api.ValidationExtension.DEFAULT_LOCALE;
 import static org.mule.extension.validation.internal.ImmutableValidationResult.error;
-import static org.mule.extension.validation.internal.ValidationExtension.DEFAULT_LOCALE;
-
-import org.mule.api.MuleEvent;
 import org.mule.extension.validation.api.MultipleValidationException;
 import org.mule.extension.validation.api.MultipleValidationResult;
 import org.mule.extension.validation.api.ValidationResult;
 import org.mule.extension.validation.api.Validator;
+import org.mule.functional.junit4.FlowRunner;
 import org.mule.mvel2.compiler.BlankLiteral;
-import org.mule.util.ExceptionUtils;
+import org.mule.runtime.core.api.MuleEvent;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
@@ -48,7 +46,7 @@ public class BasicValidationTestCase extends ValidationTestCase
     @Test
     public void email() throws Exception
     {
-        assertValid(EMAIL_VALIDATION_FLOW, getTestEvent(VALID_EMAIL));
+        assertValid(flowRunner(EMAIL_VALIDATION_FLOW).withPayload(VALID_EMAIL));
         assertInvalidEmail(INVALID_EMAIL);
         assertInvalidEmail(" " + VALID_EMAIL);
         assertInvalidEmail(VALID_EMAIL + " ");
@@ -57,31 +55,31 @@ public class BasicValidationTestCase extends ValidationTestCase
     @Test
     public void ip() throws Exception
     {
-        assertValid("ip", getTestEvent("127.0.0.1"));
-        assertValid("ip", getTestEvent("FE80:0000:0000:0000:0202:B3FF:FE1E:8329"));
-        assertValid("ip", getTestEvent("FE80::0202:B3FF:FE1E:8329"));
-        assertValid("ip", getTestEvent("0.0.0.0"));
-        assertValid("ip", getTestEvent("0.0.0.1"));
-        assertValid("ip", getTestEvent("10.0.0.0"));
-        assertValid("ip", getTestEvent("192.168.0.0"));
-        assertValid("ip", getTestEvent("172.16.0.0"));
-        assertInvalid("ip", getTestEvent("1.1.256.0"), messages.invalidIp("1.1.256.0"));
-        assertInvalid("ip", getTestEvent("0.0.0.a"), messages.invalidIp("0.0.0.a"));
-        assertInvalid("ip", getTestEvent("12.1.2."), messages.invalidIp("12.1.2."));
-        assertInvalid("ip", getTestEvent("192.168.100.0/24"), messages.invalidIp("192.168.100.0/24"));
-        assertInvalid("ip", getTestEvent(0), messages.invalidIp("0"));
+        assertValid(flowRunner("ip").withPayload("127.0.0.1"));
+        assertValid(flowRunner("ip").withPayload("FE80:0000:0000:0000:0202:B3FF:FE1E:8329"));
+        assertValid(flowRunner("ip").withPayload("FE80::0202:B3FF:FE1E:8329"));
+        assertValid(flowRunner("ip").withPayload("0.0.0.0"));
+        assertValid(flowRunner("ip").withPayload("0.0.0.1"));
+        assertValid(flowRunner("ip").withPayload("10.0.0.0"));
+        assertValid(flowRunner("ip").withPayload("192.168.0.0"));
+        assertValid(flowRunner("ip").withPayload("172.16.0.0"));
+        assertInvalid(flowRunner("ip").withPayload("1.1.256.0"), messages.invalidIp("1.1.256.0"));
+        assertInvalid(flowRunner("ip").withPayload("0.0.0.a"), messages.invalidIp("0.0.0.a"));
+        assertInvalid(flowRunner("ip").withPayload("12.1.2."), messages.invalidIp("12.1.2."));
+        assertInvalid(flowRunner("ip").withPayload("192.168.100.0/24"), messages.invalidIp("192.168.100.0/24"));
+        assertInvalid(flowRunner("ip").withPayload(0), messages.invalidIp("0"));
         String invalidIp = "12.1.2";
-        assertInvalid("ip", getTestEvent(invalidIp), messages.invalidIp(invalidIp));
+        assertInvalid(flowRunner("ip").withPayload(invalidIp), messages.invalidIp(invalidIp));
         invalidIp = "FE80:0000:0000";
-        assertInvalid("ip", getTestEvent(invalidIp), messages.invalidIp(invalidIp));
+        assertInvalid(flowRunner("ip").withPayload(invalidIp), messages.invalidIp(invalidIp));
     }
 
     @Test
     public void url() throws Exception
     {
-        assertValid("url", getTestEvent(VALID_URL));
-        assertValid("url", getTestEvent("http://username:password@example.com:8042/over/there/index.dtb?type=animal&name=narwhal#nose"));
-        assertInvalid("url", getTestEvent(INVALID_URL), messages.invalidUrl("here"));
+        assertValid(flowRunner("url").withPayload(VALID_URL));
+        assertValid(flowRunner("url").withPayload("http://username:password@example.com:8042/over/there/index.dtb?type=animal&name=narwhal#nose"));
+        assertInvalid(flowRunner("url").withPayload(INVALID_URL), messages.invalidUrl("here"));
     }
 
     @Test
@@ -89,39 +87,34 @@ public class BasicValidationTestCase extends ValidationTestCase
     {
         final String time = "12:08 PM";
 
-        assertValid("time", getTimeEvent(time, "h:mm a"));
-        assertValid("time", getTimeEvent("Wed, Jul 4, '01", "EEE, MMM d, ''yy"));
+        assertValid(configureTimeRunner(flowRunner("time"), time, "h:mm a"));
+        assertValid(configureTimeRunner(flowRunner("time"), "Wed, Jul 4, '01", "EEE, MMM d, ''yy"));
         final String invalidPattern = "yyMMddHHmmssZ";
-        assertInvalid("time", getTimeEvent(time, invalidPattern), messages.invalidTime(time, DEFAULT_LOCALE, invalidPattern));
+        assertInvalid(configureTimeRunner(flowRunner("time"), time, invalidPattern), messages.invalidTime(time, DEFAULT_LOCALE, invalidPattern));
     }
 
-    private MuleEvent getTimeEvent(String time, String pattern) throws Exception
+    private FlowRunner configureTimeRunner(FlowRunner runner, String time, String pattern)
     {
-        MuleEvent event = getTestEvent(time);
-        event.setFlowVariable("pattern", pattern);
-        return event;
+        return runner.withPayload(time).withFlowVariable("pattern", pattern);
     }
 
     @Test
     public void matchesRegex() throws Exception
     {
         final String regex = "[tT]rue";
-        MuleEvent event = getTestEvent("true");
-        event.setFlowVariable("regexp", regex);
-        event.setFlowVariable("caseSensitive", false);
 
-        assertValid("matchesRegex", event);
+        FlowRunner runner = flowRunner("matchesRegex").withPayload("true")
+                                                      .withFlowVariable("regexp", regex)
+                                                      .withFlowVariable("caseSensitive", false);
+        assertValid(runner);
 
         String testValue = "TRUE";
-        event.getMessage().setPayload(testValue);
-        assertValid("matchesRegex", event);
+        assertValid(runner.withPayload(testValue));
 
-        event.setFlowVariable("caseSensitive", true);
-        assertInvalid("matchesRegex", event, messages.regexDoesNotMatch(testValue, regex));
+        assertInvalid(runner.withFlowVariable("caseSensitive", true), messages.regexDoesNotMatch(testValue, regex));
 
         testValue = "tTrue";
-        event.getMessage().setPayload(testValue);
-        assertInvalid("matchesRegex", event, messages.regexDoesNotMatch(testValue, regex));
+        assertInvalid(runner.withPayload(testValue), messages.regexDoesNotMatch(testValue, regex));
     }
 
     @Test
@@ -142,15 +135,15 @@ public class BasicValidationTestCase extends ValidationTestCase
     @Test
     public void isTrue() throws Exception
     {
-        assertValid("isTrue", getTestEvent(true));
-        assertInvalid("isTrue", getTestEvent(false), messages.failedBooleanValidation(false, true));
+        assertValid(flowRunner("isTrue").withPayload(true));
+        assertInvalid(flowRunner("isTrue").withPayload(false), messages.failedBooleanValidation(false, true));
     }
 
     @Test
     public void isFalse() throws Exception
     {
-        assertValid("isFalse", getTestEvent(false));
-        assertInvalid("isFalse", getTestEvent(true), messages.failedBooleanValidation(true, false));
+        assertValid(flowRunner("isFalse").withPayload(false));
+        assertInvalid(flowRunner("isFalse").withPayload(true), messages.failedBooleanValidation(true, false));
     }
 
     @Test
@@ -158,18 +151,18 @@ public class BasicValidationTestCase extends ValidationTestCase
     {
         final String flow = "notEmpty";
 
-        assertValid(flow, getTestEvent("a"));
-        assertValid(flow, getTestEvent(Arrays.asList("a")));
-        assertValid(flow, getTestEvent(new String[] {"a"}));
-        assertValid(flow, getTestEvent(ImmutableMap.of("a", "A")));
-        assertInvalid(flow, getTestEvent(null), messages.valueIsNull());
-        assertInvalid(flow, getTestEvent(""), messages.stringIsBlank());
-        assertInvalid(flow, getTestEvent(ImmutableList.of()), messages.collectionIsEmpty());
-        assertInvalid(flow, getTestEvent(new String[] {}), messages.arrayIsEmpty());
-        assertInvalid(flow, getTestEvent(new Object[] {}), messages.arrayIsEmpty());
-        assertInvalid(flow, getTestEvent(new int[] {}), messages.arrayIsEmpty());
-        assertInvalid(flow, getTestEvent(new HashMap<String, String>()), messages.mapIsEmpty());
-        assertInvalid(flow, getTestEvent(BlankLiteral.INSTANCE), messages.valueIsBlankLiteral());
+        assertValid(flowRunner(flow).withPayload("a"));
+        assertValid(flowRunner(flow).withPayload(Arrays.asList("a")));
+        assertValid(flowRunner(flow).withPayload(new String[] {"a"}));
+        assertValid(flowRunner(flow).withPayload(ImmutableMap.of("a", "A")));
+        assertInvalid(flowRunner(flow).withPayload(null), messages.valueIsNull());
+        assertInvalid(flowRunner(flow).withPayload(""), messages.stringIsBlank());
+        assertInvalid(flowRunner(flow).withPayload(ImmutableList.of()), messages.collectionIsEmpty());
+        assertInvalid(flowRunner(flow).withPayload(new String[] {}), messages.arrayIsEmpty());
+        assertInvalid(flowRunner(flow).withPayload(new Object[] {}), messages.arrayIsEmpty());
+        assertInvalid(flowRunner(flow).withPayload(new int[] {}), messages.arrayIsEmpty());
+        assertInvalid(flowRunner(flow).withPayload(new HashMap<String, String>()), messages.mapIsEmpty());
+        assertInvalid(flowRunner(flow).withPayload(BlankLiteral.INSTANCE), messages.valueIsBlankLiteral());
     }
 
     @Test
@@ -177,77 +170,66 @@ public class BasicValidationTestCase extends ValidationTestCase
     {
         final String flow = "empty";
 
-        assertValid(flow, getTestEvent(""));
-        assertValid(flow, getTestEvent(ImmutableList.of()));
-        assertValid(flow, getTestEvent(new String[] {}));
-        assertValid(flow, getTestEvent(new HashMap<String, String>()));
-        assertInvalid(flow, getTestEvent("a"), messages.stringIsNotBlank());
-        assertInvalid(flow, getTestEvent(Arrays.asList("a")), messages.collectionIsNotEmpty());
-        assertInvalid(flow, getTestEvent(new String[] {"a"}), messages.arrayIsNotEmpty());
-        assertInvalid(flow, getTestEvent(new Object[] {new Object()}), messages.arrayIsNotEmpty());
-        assertInvalid(flow, getTestEvent(new int[] {0}), messages.arrayIsNotEmpty());
-        assertInvalid(flow, getTestEvent(ImmutableMap.of("a", "a")), messages.mapIsNotEmpty());
+        assertValid(flowRunner(flow).withPayload(""));
+        assertValid(flowRunner(flow).withPayload(ImmutableList.of()));
+        assertValid(flowRunner(flow).withPayload(new String[] {}));
+        assertValid(flowRunner(flow).withPayload(new HashMap<String, String>()));
+        assertInvalid(flowRunner(flow).withPayload("a"), messages.stringIsNotBlank());
+        assertInvalid(flowRunner(flow).withPayload(Arrays.asList("a")), messages.collectionIsNotEmpty());
+        assertInvalid(flowRunner(flow).withPayload(new String[] {"a"}), messages.arrayIsNotEmpty());
+        assertInvalid(flowRunner(flow).withPayload(new Object[] {new Object()}), messages.arrayIsNotEmpty());
+        assertInvalid(flowRunner(flow).withPayload(new int[] {0}), messages.arrayIsNotEmpty());
+        assertInvalid(flowRunner(flow).withPayload(ImmutableMap.of("a", "a")), messages.mapIsNotEmpty());
     }
 
     @Test
     public void keepsPayloadWhenAllValidationsPass() throws Exception
     {
-        MuleEvent event = getAllEvent(VALID_EMAIL, VALID_URL);
-        MuleEvent responseEvent = runFlow("all", event);
-        assertThat(event.getMessage().getPayload(), is(sameInstance(responseEvent.getMessage().getPayload())));
+        FlowRunner runner = flowRunner("all");
+        cofigureGetAllRunner(runner, VALID_EMAIL, VALID_URL);
+
+        assertThat(runner.buildEvent().getMessage().getPayload(), is(sameInstance(runner.run().getMessage().getPayload())));
     }
 
     @Test
     public void twoFailuresInAllWithoutException() throws Exception
     {
-        try
+        FlowRunner runner = flowRunner("all");
+        cofigureGetAllRunner(runner, INVALID_EMAIL, INVALID_URL);
+        Exception e = runner.runExpectingException();
+        assertThat(e, is(instanceOf(MultipleValidationException.class)));
+        MultipleValidationResult result = ((MultipleValidationException) e).getMultipleValidationResult();
+        assertThat(result.getFailedValidationResults(), hasSize(2));
+        assertThat(result.isError(), is(true));
+
+        String expectedMessage = Joiner.on('\n').join(messages.invalidUrl(INVALID_URL),
+                messages.invalidEmail(INVALID_EMAIL));
+
+        assertThat(result.getMessage(), is(expectedMessage));
+
+        for (ValidationResult failedValidationResult : result.getFailedValidationResults())
         {
-            runFlow("all", getAllEvent(INVALID_EMAIL, INVALID_URL));
-            fail("was expecting a failure");
-        }
-        catch (Exception e)
-        {
-            Throwable root = ExceptionUtils.getRootCause(e);
-            assertThat(root, is(instanceOf(MultipleValidationException.class)));
-            MultipleValidationResult result = ((MultipleValidationException) root).getMultipleValidationResult();
-            assertThat(result.getFailedValidationResults(), hasSize(2));
-            assertThat(result.isError(), is(true));
-
-            String expectedMessage = Joiner.on('\n').join(messages.invalidUrl(INVALID_URL),
-                                                          messages.invalidEmail(INVALID_EMAIL));
-
-            assertThat(result.getMessage(), is(expectedMessage));
-
-            for (ValidationResult failedValidationResult : result.getFailedValidationResults())
-            {
-                assertThat(failedValidationResult.isError(), is(true));
-            }
+            assertThat(failedValidationResult.isError(), is(true));
         }
     }
 
     @Test
     public void oneFailInAll() throws Exception
     {
-        try
-        {
-            runFlow("all", getAllEvent(INVALID_EMAIL, VALID_URL));
-            fail("was expecting a failure");
-        }
-        catch (Exception e)
-        {
-            Throwable root = ExceptionUtils.getRootCause(e);
-            assertThat(root, is(instanceOf(MultipleValidationException.class)));
-            MultipleValidationResult result = ((MultipleValidationException) root).getMultipleValidationResult();
-            assertThat(result.getFailedValidationResults(), hasSize(1));
-            assertThat(result.isError(), is(true));
-            assertThat(result.getMessage(), is(messages.invalidEmail(INVALID_EMAIL).getMessage()));
-        }
+        FlowRunner runner = flowRunner("all");
+        cofigureGetAllRunner(runner, INVALID_EMAIL, VALID_URL);
+        Exception e = runner.runExpectingException();
+        assertThat(e, is(instanceOf(MultipleValidationException.class)));
+        MultipleValidationResult result = ((MultipleValidationException) e).getMultipleValidationResult();
+        assertThat(result.getFailedValidationResults(), hasSize(1));
+        assertThat(result.isError(), is(true));
+        assertThat(result.getMessage(), is(messages.invalidEmail(INVALID_EMAIL).getMessage()));
     }
 
     @Test
     public void customValidationByClass() throws Exception
     {
-        assertCustomValidator("customValidationByClass", null, CUSTOM_VALIDATOR_MESSAGE);
+        assertCustomValidator("customValidationByClass", CUSTOM_VALIDATOR_MESSAGE, CUSTOM_VALIDATOR_MESSAGE);
     }
 
     @Test
@@ -268,38 +250,26 @@ public class BasicValidationTestCase extends ValidationTestCase
     {
         final String flowName = "choice";
 
-        assertThat(runFlow(flowName, getTestEvent(VALID_EMAIL)).getMessage().getPayloadAsString(), is("valid"));
-        assertThat(runFlow(flowName, getTestEvent(INVALID_EMAIL)).getMessage().getPayloadAsString(), is("invalid"));
+        assertThat(getPayloadAsString(flowRunner(flowName).withPayload(VALID_EMAIL).run().getMessage()), is("valid"));
+        assertThat(getPayloadAsString(flowRunner(flowName).withPayload(INVALID_EMAIL).run().getMessage()), is("invalid"));
     }
 
     private void assertCustomValidator(String flowName,String customMessage, String expectedMessage) throws Exception
     {
-        MuleEvent event = getTestEvent("");
-        event.setFlowVariable("customMessage", customMessage);
-        try
-        {
-            runFlow(flowName, event);
-            fail("was expecting a failure");
-        }
-        catch (Exception e)
-        {
-            Throwable cause = ExceptionUtils.getRootCause(e);
-            assertThat(cause.getMessage(), is(expectedMessage));
-        }
+        Exception e = flowRunner(flowName).withPayload("").withFlowVariable("customMessage", customMessage).runExpectingException();
+        assertThat(e.getMessage(), is(expectedMessage));
     }
 
-    private MuleEvent getAllEvent(String email, String url) throws Exception
+    private void cofigureGetAllRunner(FlowRunner runner, String email, String url)
     {
-        MuleEvent event = getTestEvent("");
-        event.setFlowVariable("url", url);
-        event.setFlowVariable(EMAIL_VALIDATION_FLOW, email);
-
-        return event;
+        runner.withPayload("")
+              .withFlowVariable("url", url)
+              .withFlowVariable(EMAIL_VALIDATION_FLOW, email);
     }
 
     private void assertInvalidEmail(String address) throws Exception
     {
-        assertInvalid(EMAIL_VALIDATION_FLOW, getTestEvent(address), messages.invalidEmail(address));
+        assertInvalid(flowRunner(EMAIL_VALIDATION_FLOW).withPayload(address), messages.invalidEmail(address));
     }
 
     private void assertSize(Object value) throws Exception
@@ -309,25 +279,25 @@ public class BasicValidationTestCase extends ValidationTestCase
         int minLength = 0;
         int maxLength = 3;
 
-        assertValid(flowName, getSizeValidationEvent(value, minLength, maxLength));
+        assertValid(configureSizeValidationRunner(flowRunner(flowName), value, minLength, maxLength));
         minLength = 3;
-        assertValid(flowName, getSizeValidationEvent(value, minLength, maxLength));
+        assertValid(configureSizeValidationRunner(flowRunner(flowName), value, minLength, maxLength));
 
         maxLength = 2;
-        assertInvalid(flowName, getSizeValidationEvent(value, minLength, maxLength), messages.greaterThanMaxSize(value, maxLength, expectedSize));
+        assertInvalid(configureSizeValidationRunner(flowRunner(flowName), value, minLength, maxLength), messages.greaterThanMaxSize(value, maxLength, expectedSize));
 
         minLength = 5;
         maxLength = 10;
-        assertInvalid(flowName, getSizeValidationEvent(value, minLength, maxLength), messages.lowerThanMinSize(value, minLength, expectedSize));
+        assertInvalid(configureSizeValidationRunner(flowRunner(flowName), value, minLength, maxLength), messages.lowerThanMinSize(value, minLength, expectedSize));
     }
 
-    private MuleEvent getSizeValidationEvent(Object value, int minLength, int maxLength) throws Exception
+    private FlowRunner configureSizeValidationRunner(FlowRunner runner, Object value, int minLength, int maxLength) throws Exception
     {
-        MuleEvent event = getTestEvent(value);
-        event.setFlowVariable("minLength", minLength);
-        event.setFlowVariable("maxLength", maxLength);
+        runner.withPayload(value)
+              .withFlowVariable("minLength", minLength)
+              .withFlowVariable("maxLength", maxLength);
 
-        return event;
+        return runner;
     }
 
     public static class TestCustomValidator implements Validator

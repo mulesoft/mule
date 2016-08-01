@@ -160,15 +160,15 @@ Ensure that all source files contain the following header.
 | Convention           | Example      | Notes  |
 |:--------------------------|:-------------|:-------------|
 | Names representing packages should be in all lower case.	 | `org.mule.application`      | Package naming convention used by Sun for the Java core packages. The initial package name representing the domain name must be in lower case. |
-| Package names should be singular rather than plural.	 | `org.mule.transformer`, `org.mule.transport`      |  |
-| The 'org.mule.api' package tree should be used for all interfaces that make up the API/SPI.	 | `org.mule.api.lifecycle.Callable`      |  |
+| Package names should be singular rather than plural.	 | `org.mule.runtime.core.transformer`, `org.mule.runtime.core.processor`      |  |
+| The 'org.mule.runtime.api' package tree should be used for all interfaces that make up the API/SPI.	 | `org.mule.runtime.core.api.lifecycle.Callable`      |  |
 
 
 ## Interfaces/Classes
 
 | Convention           | Example      | Notes  |
 |:--------------------------|:-------------|:-------------|
-| Names representing types must be nouns and written in mixed case starting with upper case.	 | `EsbMessage`, `OrderService` | Common practice in the Java development community and also the type naming convention used by Sun for the Java core packages. |
+| Names representing types must be nouns and written in mixed case starting with upper case.	 | `MuleMessage`, `OrderService` | Common practice in the Java development community and also the type naming convention used by Sun for the Java core packages. |
 | Interface and class names should avoid abbreviations, be descriptive and be camel-cased.	 | `interface OrderService` 
 NOT: `interface OrderServ`      |  |
 | Abstact classes should be prefixed with 'Abstract'.	 | `class AbstractOrderService implements OrderService` 
@@ -178,7 +178,7 @@ NOT: `EngineFailure extends Exception` | |
 | Interface implementations should ideally be prefixed with something meaningful in the context. e.g. 'Simple', 'Generic' is possible. | `GenericLifeCycleManager`, `SingletonObjectFactory`  |  |
 | Default interface implementations can be prefixed by 'Default'. | `class DefaultOrderService implements OrderService` 
 NOT: `class OrderServiceImpl implements OrderService` | It is not uncommon to create a simplistic class implementation of an interface providing default behaviour to the interface methods. The convention of prefixing these classes by Default has been adopted by Sun for the Java library. |
-| Test classes should be suffixed with 'TestCase' | `LoanBrokerESBTestCase`  |  |
+| Test classes should be suffixed with 'TestCase' | `LoanBrokerMuleTestCase`  |  |
 
 ## Methods/Variables
 

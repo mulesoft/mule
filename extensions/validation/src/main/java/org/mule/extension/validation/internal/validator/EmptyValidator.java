@@ -7,12 +7,11 @@
 package org.mule.extension.validation.internal.validator;
 
 import static org.mule.extension.validation.internal.ImmutableValidationResult.ok;
-import org.mule.api.MuleEvent;
-import org.mule.config.i18n.Message;
 import org.mule.extension.validation.api.ValidationResult;
 import org.mule.extension.validation.internal.ValidationContext;
-import org.mule.transport.NullPayload;
-import org.mule.util.ArrayUtils;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.util.ArrayUtils;
 
 import java.util.Collection;
 import java.util.Map;
@@ -44,7 +43,7 @@ public class EmptyValidator extends AbstractValidator
     @Override
     public ValidationResult validate(MuleEvent event)
     {
-        if (value == null || value instanceof NullPayload)
+        if (value == null)
         {
             return ok();
         }

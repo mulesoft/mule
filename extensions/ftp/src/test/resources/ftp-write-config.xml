@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:ftp="http://www.mulesoft.org/schema/mule/ftp"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+      http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+        http://www.mulesoft.org/schema/mule/ftp http://www.mulesoft.org/schema/mule/ftp/current/mule-ftp.xsd">
+
+    <spring:beans>
+        <spring:import resource="ftp-read-config.xml"/>
+    </spring:beans>
+
+    <flow name="write">
+        <ftp:write path="#[path]" mode="#[mode]" createParentDirectories="#[createParent]" encoding="#[encoding]" />
+    </flow>
+
+    <flow name="writeStaticContent">
+        <ftp:write path="#[path]" mode="#[mode]" content="Hello World!" createParentDirectories="#[createParent]"/>
+    </flow>
+
+    <flow name="readAndWrite">
+        <ftp:read path="#[path]" />
+        <set-payload value="Hello World!" />
+        <ftp:write mode="OVERWRITE"/>
+    </flow>
+
+</mule>

@@ -2,24 +2,22 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:db="http://www.mulesoft.org/schema/mule/db"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+            http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
     <flow name="jdbcUpdate">
-        <inbound-endpoint address="vm://updateRequestResponse" exchange-pattern="request-response"/>
-
         <db:update config-ref="dbConfig">
             <db:parameterized-query>update PLANET set NAME='Mercury' where POSITION=4</db:parameterized-query>
         </db:update>
     </flow>
 
-    <flow name="jdbcUpdateOneWay">
-        <inbound-endpoint address="vm://updateOneWay"/>
-
+    <flow name="jdbcUpdateOneWay" processingStrategy="asynchronous">
         <db:update config-ref="dbConfig">
             <db:parameterized-query>update PLANET set NAME='Mercury' where POSITION=4</db:parameterized-query>
         </db:update>
 
-        <outbound-endpoint address="vm://testOut" exchange-pattern="one-way"/>
+        <test:queue name="testOut"/>
     </flow>
 </mule>

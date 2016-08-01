@@ -6,61 +6,48 @@
  */
 package org.mule.test.integration.messaging.meps;
 
-import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.functional.junit4.FlowRunner;
+import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
-//START SNIPPET: full-class
-public class InOutOutOnlyTestCase extends AbstractServiceAndFlowTestCase
+public class InOutOutOnlyTestCase extends FunctionalTestCase
 {
-    public static final long TIMEOUT = 3000;
-
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE,
-                "org/mule/test/integration/messaging/meps/pattern_In-Out_Out-Only-service.xml"},
-            {ConfigVariant.FLOW, "org/mule/test/integration/messaging/meps/pattern_In-Out_Out-Only-flow.xml"}});
-    }
-
-    public InOutOutOnlyTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
+        return "org/mule/test/integration/messaging/meps/pattern_In-Out_Out-Only-flow.xml";
     }
 
     @Test
     public void testExchange() throws Exception
     {
         MuleClient client = muleContext.getClient();
+        FlowRunner baseRunner = flowRunner("In-Out_Out-Only-Service").withPayload("some data");
 
-        MuleMessage result = client.send("inboundEndpoint", "some data", null);
+        MuleMessage result = baseRunner.run().getMessage();
         assertNotNull(result);
-        assertEquals("foo header not received", result.getPayloadAsString());
+        assertThat(getPayloadAsString(result), is("foo header not received"));
 
-        Map<String, Object> props = new HashMap<String, Object>();
-        props.put("foo", "bar");
-        result = client.send("inboundEndpoint", "some data", props);
+        baseRunner.reset();
+        result = baseRunner.withInboundProperty("foo", "bar")
+                           .run()
+                           .getMessage();
         assertNotNull(result);
-        assertEquals("foo header received", result.getPayloadAsString());
+        assertThat(getPayloadAsString(result), is("foo header received"));
 
-        result = client.request("receivedEndpoint", TIMEOUT);
+        result = client.request("test://received", RECEIVE_TIMEOUT);
         assertNotNull(result);
-        assertEquals("foo header received", result.getPayloadAsString());
+        assertThat(getPayloadAsString(result), is("foo header received"));
 
-        result = client.request("notReceivedEndpoint", TIMEOUT);
+        result = client.request("test://notReceived", RECEIVE_TIMEOUT);
         assertNotNull(result);
-        assertEquals("foo header not received", result.getPayloadAsString());
+        assertThat(getPayloadAsString(result), is("foo header not received"));
     }
 }

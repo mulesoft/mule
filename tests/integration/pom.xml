@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.mule.tests</groupId>
 		<artifactId>mule-tests</artifactId>
-		<version>3.8.0-SNAPSHOT</version>
+		<version>4.0-SNAPSHOT</version>
 	</parent>
 	<artifactId>mule-tests-integration</artifactId>
 	<name>Integration Tests</name>
@@ -37,6 +37,13 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
+			<groupId>org.mule</groupId>
+			<artifactId>mule-core-tests</artifactId>
+			<version>${project.version}</version>
+			<type>test-jar</type>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
 			<groupId>org.mule.tests</groupId>
 			<artifactId>mule-tests-functional</artifactId>
 			<version>${project.version}</version>
@@ -60,22 +67,29 @@
             <artifactId>mule-module-db</artifactId>
             <version>${project.version}</version>
         </dependency>
-		<!-- Include all Mule Transports -->
 		<dependency>
-			<groupId>org.mule.transports</groupId>
-			<artifactId>mule-transports-all</artifactId>
+			<groupId>org.mule.modules</groupId>
+			<artifactId>mule-module-db</artifactId>
+			<version>${project.version}</version>
+			<type>test-jar</type>
+		</dependency>
+
+		<!-- Include all Mule Extensions -->
+		<dependency>
+			<groupId>org.mule.extensions</groupId>
+			<artifactId>mule-extensions-all</artifactId>
 			<version>${project.version}</version>
 			<type>pom</type>
 			<scope>test</scope>
 		</dependency>
-		<!-- Include all Mule Patterns -->
+		<!-- The ones that are packages as zip (plugins) have to be explicitly added-->
 		<dependency>
-			<groupId>org.mule.patterns</groupId>
-			<artifactId>mule-patterns-all</artifactId>
+			<groupId>org.mule.modules</groupId>
+			<artifactId>mule-module-validation</artifactId>
 			<version>${project.version}</version>
-			<type>pom</type>
 			<scope>test</scope>
 		</dependency>
+
 		<!-- Test jars -->
 		<!-- some tests reference cxf test classes -->
 		<dependency>
@@ -168,13 +182,6 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.mule.transports</groupId>
-			<artifactId>mule-transport-email</artifactId>
-			<version>${project.version}</version>
-			<classifier>tests</classifier>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
 			<groupId>com.icegreen</groupId>
 			<artifactId>greenmail</artifactId>
 			<version>1.3</version>
@@ -185,20 +192,6 @@
 					<artifactId>slf4j-api</artifactId>
 				</exclusion>
 			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.mule.transports</groupId>
-			<artifactId>mule-transport-jdbc</artifactId>
-			<version>${project.version}</version>
-			<classifier>tests</classifier>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.mule.modules</groupId>
-			<artifactId>mule-module-annotations</artifactId>
-			<version>${project.version}</version>
-			<classifier>tests</classifier>
-			<scope>test</scope>
 		</dependency>
         <dependency>
             <groupId>org.mule.tests</groupId>
@@ -211,6 +204,16 @@
             <version>4.3.5</version>
             <scope>test</scope>
         </dependency>
+		<dependency>
+			<groupId>commons-httpclient</groupId>
+			<artifactId>commons-httpclient</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-server</artifactId>
+			<scope>test</scope>
+		</dependency>
 		<!-- Needed for SpringXmlConfigurationBuilder and TestNamespaceHandler -->
 		<dependency>
 			<groupId>org.mule.modules</groupId>
@@ -265,5 +268,17 @@
 			<artifactId>aspectjweaver</artifactId>
 			<scope>test</scope>
 		</dependency>
+        <dependency>
+            <groupId>xalan</groupId>
+            <artifactId>xalan</artifactId>
+            <version>${xalanVersion}</version>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>xerces</groupId>
+                    <artifactId>xercesImpl</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
 	</dependencies>
 </project>

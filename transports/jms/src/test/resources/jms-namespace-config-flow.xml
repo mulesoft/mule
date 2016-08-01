@@ -3,20 +3,20 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:util="http://www.springframework.org/schema/util"
-       xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+       xmlns:jms="http://www.mulesoft.org/schema/mule/transport/jms"
        xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-       http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd">
+       http://www.mulesoft.org/schema/mule/transport/jms http://www.mulesoft.org/schema/mule/transport/jms/current/mule-transport-jms.xsd">
 
     <spring:bean name="txFactory" class="org.mule.tck.testmodels.mule.TestTransactionFactory">
         <spring:property name="value" value="foo"/>
     </spring:bean>
 
-    <spring:bean name="connectionFactory" class="org.mule.transport.jms.test.TestConnectionFactory"/>
+    <spring:bean name="connectionFactory" class="org.mule.compatibility.transport.jms.test.TestConnectionFactory"/>
     
-    <spring:bean name="redeliveryHandlerFactory" class="org.mule.transport.jms.test.TestRedeliveryHandlerFactory"/>
+    <spring:bean name="redeliveryHandlerFactory" class="org.mule.compatibility.transport.jms.test.TestRedeliveryHandlerFactory"/>
     
     <!-- Default config -->
     <jms:connector name="jmsConnectorDefaults"
@@ -40,7 +40,7 @@
                    password="mypass"
                    embeddedMode="true"/>
 
-    <jms:custom-connector name="jmsConnector2" class="org.mule.transport.jms.JmsConnector"
+    <jms:custom-connector name="jmsConnector2" class="org.mule.compatibility.transport.jms.JmsConnector"
                           specification="1.1">
          <spring:property name="connectionFactory" ref="connectionFactory"/>
     </jms:custom-connector>
@@ -87,7 +87,7 @@
     </spring:beans>
     
     <jms:connector name="jmsJndiConnector" 
-                   jndiInitialFactory="org.mule.transport.jms.test.JmsTestContextFactory"
+                   jndiInitialFactory="org.mule.compatibility.transport.jms.test.JmsTestContextFactory"
                    jndiProviderUrl="jndi://test"
                    jndiProviderProperties-ref="providerProperties"
                    connectionFactoryJndiName="jms/connectionFactory" 

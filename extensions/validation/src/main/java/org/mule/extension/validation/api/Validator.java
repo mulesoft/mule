@@ -6,7 +6,7 @@
  */
 package org.mule.extension.validation.api;
 
-import org.mule.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent;
 
 /**
  * A component which performs a validation and expresses

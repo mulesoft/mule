@@ -23,8 +23,6 @@
     </flow>
 
     <flow name="PopulateData">
-        <inbound-endpoint address="vm://test" exchange-pattern="request-response"/>
-
         <cxf:simple-client serviceClass="org.apache.hello_world_soap_http.Greeter" operation="greetMe">
             <!-- Aegis will use file resources/org/apache/hello_world_soap_http/Greeter.aegis.xml to configure the call
                 to the webservice. -->

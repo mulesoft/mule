@@ -6,8 +6,6 @@
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
     <flow name="deleteBulkCustomSource">
-        <inbound-endpoint address="vm://deleteBulkCustomSource" exchange-pattern="request-response"/>
-
         <set-variable variableName="names" value="#[['Venus', 'Mars']]"/>
 
         <db:delete config-ref="dbConfig" bulkMode="true" source="#[names]">

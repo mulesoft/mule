@@ -1,87 +1,84 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:http="http://www.mulesoft.org/schema/mule/http" 
-    xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+    xmlns:http="http://www.mulesoft.org/schema/mule/transport/http" 
+    xmlns:vm="http://www.mulesoft.org/schema/mule/transport/vm"
     xsi:schemaLocation="
-          http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
-          http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+          http://www.mulesoft.org/schema/mule/transport/http http://www.mulesoft.org/schema/mule/transport/http/current/mule-transport-http.xsd
+          http://www.mulesoft.org/schema/mule/transport/vm http://www.mulesoft.org/schema/mule/transport/vm/current/mule-transport-vm.xsd
           http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
           
     <http:connector name="connector" enableCookies="true"/>
 	<flow name="gzipContentType">	    
 	    <vm:inbound-endpoint path="in" exchange-pattern="one-way"/>
 
-		<http:outbound-endpoint  connector-ref="connector" address="http://localhost:${port1}/" exchange-pattern="one-way" method="POST">
+		<http:outbound-endpoint  connector-ref="connector" address="http://localhost:${port1}/" exchange-pattern="one-way" method="POST"
+                contentType="application/gzip">
 			<gzip-compress-transformer/>
-			<message-properties-transformer>
+            
+			<!-- add all request http headers -->
+			<set-property propertyName="Accept" value="gzip"/>
+			<set-property propertyName="Accept-Charset" value="gzip"/>
+			<set-property propertyName="Accept-Encoding" value="gzip"/>
+			<set-property propertyName="Accept-Language" value="gzip"/>
+			<set-property propertyName="Authorization" value="gzip"/>
+			<set-property propertyName="Expect" value="foobar"/>
+			<set-property propertyName="From" value="gzip"/>
+			<set-property propertyName="Host" value="gzip"/>
+			<set-property propertyName="If-Match" value="gzip"/>
+			<set-property propertyName="If-Modified-Since" value="gzip"/>
+			<set-property propertyName="If-None-Match" value="gzip"/>
+			<set-property propertyName="If-Range" value="gzip"/>
+			<set-property propertyName="If-Unmodified-Since" value="gzip"/>
+			<set-property propertyName="Max-Forwards" value="gzip"/>
+			<set-property propertyName="Proxy-Authorization" value="gzip"/>
+			<set-property propertyName="X-Forwarded-For" value="1.1.1.1,2.2.2.2"/>
+			<set-property propertyName="Range" value="gzip"/>
+			<set-property propertyName="Referer" value="gzip"/>
+			<set-property propertyName="TE" value="gzip"/>
+			<set-property propertyName="User-Agent" value="gzip"/>
+			<set-property propertyName="Cookie" value="value1=a; value2=b"/>
+			<set-property propertyName="Slug" value="slug"/>
 			
-				<!-- add all request http headers -->
-				<add-message-property key="Accept" value="gzip"/>
-				<add-message-property key="Accept-Charset" value="gzip"/>
-				<add-message-property key="Accept-Encoding" value="gzip"/>
-				<add-message-property key="Accept-Language" value="gzip"/>
-				<add-message-property key="Authorization" value="gzip"/>
-				<add-message-property key="Expect" value="foobar"/>
-				<add-message-property key="From" value="gzip"/>
-				<add-message-property key="Host" value="gzip"/>
-				<add-message-property key="If-Match" value="gzip"/>
-				<add-message-property key="If-Modified-Since" value="gzip"/>
-				<add-message-property key="If-None-Match" value="gzip"/>
-				<add-message-property key="If-Range" value="gzip"/>
-				<add-message-property key="If-Unmodified-Since" value="gzip"/>
-				<add-message-property key="Max-Forwards" value="gzip"/>
-				<add-message-property key="Proxy-Authorization" value="gzip"/>
-				<add-message-property key="X-Forwarded-For" value="1.1.1.1,2.2.2.2"/>
-				<add-message-property key="Range" value="gzip"/>
-				<add-message-property key="Referer" value="gzip"/>
-				<add-message-property key="TE" value="gzip"/>
-				<add-message-property key="User-Agent" value="gzip"/>
-				<add-message-property key="Cookie" value="value1=a; value2=b"/>
-				<add-message-property key="Slug" value="slug"/>
-				
-				<!-- add all response http headers -->
-				<add-message-property key="Accept-Ranges" value="gzip"/>
-				<add-message-property key="Age" value="gzip"/>
-				<add-message-property key="ETag" value="gzip"/>
-				<add-message-property key="Location" value="gzip"/>
-				<add-message-property key="Proxy-Authenticate" value="gzip"/>
-				<add-message-property key="Retry-After" value="gzip"/>
-				<add-message-property key="Server" value="gzip"/>
-				<add-message-property key="Vary" value="gzip"/>
-				<add-message-property key="WWW-Authenticate" value="gzip"/>
-				<add-message-property key="Set-Cookie" value="gzip"/>
-	
-				<!-- add all general http headers -->
-				<add-message-property key="Cache-Control" value="gzip"/>
-				<add-message-property key="Connection" value="gzip"/>
-				<add-message-property key="Date" value="gzip"/>
-				<add-message-property key="Pragma" value="gzip"/>
-				<add-message-property key="Trailer" value="gzip"/>
-				<add-message-property key="Transfer-Encoding" value="gzip"/>
-				<add-message-property key="Upgrade" value="gzip"/>
-				<add-message-property key="Via" value="gzip"/>
-				<add-message-property key="Warning" value="gzip"/>
-                      
-               	<!-- add all entity http headers -->
-				<add-message-property key="Allow" value="gzip"/>
-				<add-message-property key="Content-Encoding" value="gzip"/>
-				<add-message-property key="Content-Language" value="gzip"/>
-				<add-message-property key="Content-Length" value="gzip"/>
-				<add-message-property key="Content-Location" value="gzip"/>
-				<add-message-property key="Content-MD5" value="gzip"/>
-				<add-message-property key="Content-Range" value="gzip"/>
-				<add-message-property key="Content-Type" value="application/gzip"/>
-				<add-message-property key="Expires" value="gzip"/>
-				<add-message-property key="Last-Modified" value="gzip"/>
-				
-			</message-properties-transformer> 
+			<!-- add all response http headers -->
+			<set-property propertyName="Accept-Ranges" value="gzip"/>
+			<set-property propertyName="Age" value="gzip"/>
+			<set-property propertyName="ETag" value="gzip"/>
+			<set-property propertyName="Location" value="gzip"/>
+			<set-property propertyName="Proxy-Authenticate" value="gzip"/>
+			<set-property propertyName="Retry-After" value="gzip"/>
+			<set-property propertyName="Server" value="gzip"/>
+			<set-property propertyName="Vary" value="gzip"/>
+			<set-property propertyName="WWW-Authenticate" value="gzip"/>
+			<set-property propertyName="Set-Cookie" value="gzip"/>
+
+			<!-- add all general http headers -->
+			<set-property propertyName="Cache-Control" value="gzip"/>
+			<set-property propertyName="Connection" value="gzip"/>
+			<set-property propertyName="Date" value="gzip"/>
+			<set-property propertyName="Pragma" value="gzip"/>
+			<set-property propertyName="Trailer" value="gzip"/>
+			<set-property propertyName="Transfer-Encoding" value="gzip"/>
+			<set-property propertyName="Upgrade" value="gzip"/>
+			<set-property propertyName="Via" value="gzip"/>
+			<set-property propertyName="Warning" value="gzip"/>
+                  
+           	<!-- add all entity http headers -->
+			<set-property propertyName="Allow" value="gzip"/>
+			<set-property propertyName="Content-Encoding" value="gzip"/>
+			<set-property propertyName="Content-Language" value="gzip"/>
+			<set-property propertyName="Content-Length" value="gzip"/>
+			<set-property propertyName="Content-Location" value="gzip"/>
+			<set-property propertyName="Content-MD5" value="gzip"/>
+			<set-property propertyName="Content-Range" value="gzip"/>
+			<set-property propertyName="Expires" value="gzip"/>
+			<set-property propertyName="Last-Modified" value="gzip"/>
 		</http:outbound-endpoint>	
 	</flow>
 	
 	<flow name="sendToVm">
 		<http:inbound-endpoint connector-ref="connector" address="http://localhost:${port1}" method="POST" />
-		 <component class="org.mule.transport.http.functional.HttpOutboundHeadersPropagationComponent"/>
+		 <component class="org.mule.compatibility.transport.http.functional.HttpOutboundHeadersPropagationComponent"/>
 		<vm:outbound-endpoint path="out" exchange-pattern="one-way"/>
 	</flow>
 	

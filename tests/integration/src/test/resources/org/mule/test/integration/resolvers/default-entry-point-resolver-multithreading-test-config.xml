@@ -1,15 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xmlns:spring="http://www.springframework.org/schema/beans"
       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
-        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
     <flow name="flowTestSync">
-        <vm:inbound-endpoint path="test.inbound.sync" exchange-pattern="request-response"/>
-
         <!-- don't use the Mule echo-component; it will corrupt your byte[] messages -->
         <component class="org.mule.test.integration.resolvers.DefaultEntryPointResolverSetMultithreadingTestCase$EchoBytes"/>
     </flow>

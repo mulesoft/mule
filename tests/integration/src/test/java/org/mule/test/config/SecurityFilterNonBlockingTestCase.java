@@ -6,8 +6,14 @@
  */
 package org.mule.test.config;
 
-import org.mule.tck.functional.FlowAssert;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.security.CryptoFailureException;
+import org.mule.runtime.core.api.security.EncryptionStrategyNotFoundException;
+import org.mule.runtime.core.api.security.SecurityProviderNotFoundException;
+import org.mule.runtime.core.api.security.UnknownAuthenticationTypeException;
+import org.mule.runtime.core.security.AbstractAuthenticationFilter;
 
 import org.junit.Test;
 
@@ -26,8 +32,26 @@ public class SecurityFilterNonBlockingTestCase extends FunctionalTestCase
     @Test
     public void securityFilterShouldAllowNonBlocking() throws Exception
     {
-        runFlowNonBlocking("nonBlockingSecurity");
-        FlowAssert.verify();
+        flowRunner("nonBlockingSecurity").withPayload(TEST_MESSAGE).nonBlocking().run();
     }
 
+    /**
+     * Custom security filter class that does nothing at all
+     */
+    public static class CustomSecurityFilter extends AbstractAuthenticationFilter
+    {
+        @Override
+        protected void doInitialise() throws InitialisationException
+        {
+        }
+
+        @Override
+        public void authenticate(MuleEvent event)
+                throws SecurityException, UnknownAuthenticationTypeException, CryptoFailureException,
+                SecurityProviderNotFoundException, EncryptionStrategyNotFoundException, InitialisationException
+        {
+            // TODO Auto-generated method stub
+
+        }
+    }
 }

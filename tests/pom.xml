@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.mule</groupId>
         <artifactId>mule</artifactId>
-        <version>3.8.0-SNAPSHOT</version>
+        <version>4.0-SNAPSHOT</version>
     </parent>
     <groupId>org.mule.tests</groupId>
     <artifactId>mule-tests</artifactId>
@@ -12,12 +12,17 @@
     <name>Mule Tests</name>
 
     <modules>
+        <module>unit</module>
         <module>functional</module>
         <module>infrastructure</module>
         <module>performance</module>
-        <module>archetypes</module>
         <module>integration</module>
-        <module>integration-axis</module>
+        <module>integration-tranports</module>
+        <module>http</module>
+        <module>test-extensions</module>
+        <module>unit-transports</module>
+        <module>functional-transports</module>
+        <module>test-services</module>
     </modules>
 
     <build>

@@ -6,8 +6,8 @@
  */
 package org.mule.test.components;
 
-import org.mule.tck.exceptions.FunctionalTestException;
-import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.functional.exceptions.FunctionalTestException;
+import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.IOException;

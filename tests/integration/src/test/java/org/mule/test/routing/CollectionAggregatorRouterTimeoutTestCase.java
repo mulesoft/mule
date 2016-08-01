@@ -6,36 +6,32 @@
  */
 package org.mule.test.routing;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 
-import org.mule.api.client.MuleClient;
-import org.mule.api.context.notification.RoutingNotificationListener;
-import org.mule.context.notification.RoutingNotification;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.context.notification.RoutingNotificationListener;
+import org.mule.runtime.core.context.notification.RoutingNotification;
+import org.mule.functional.functional.FunctionalTestComponent;
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.tck.probe.PollingProber;
+import org.mule.tck.probe.Probe;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class CollectionAggregatorRouterTimeoutTestCase extends AbstractServiceAndFlowTestCase
+public class CollectionAggregatorRouterTimeoutTestCase extends FunctionalTestCase
 {
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "collection-aggregator-router-timeout-test-service.xml"},
-            {ConfigVariant.FLOW, "collection-aggregator-router-timeout-test-flow.xml"}});
-    }
 
-    public CollectionAggregatorRouterTimeoutTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
+        return "collection-aggregator-router-timeout-test-flow.xml";
     }
 
     @Test
@@ -60,30 +56,42 @@ public class CollectionAggregatorRouterTimeoutTestCase extends AbstractServiceAn
 
         MuleClient client = muleContext.getClient();
         List<String> list = Arrays.asList("first", "second");
-        client.dispatch("vm://splitter", list, null);
 
-        Thread.sleep(5000);
+        flowRunner("splitter").withPayload(list).asynchronously().run();
+
+        Thread.sleep(RECEIVE_TIMEOUT);
 
         // no correlation timeout should ever fire
-        assertEquals("Correlation timeout should not have happened.", 0, correlationTimeoutCount.intValue());
+        assertThat("Correlation timeout should not have happened.", correlationTimeoutCount.intValue(), is(0));
 
         // should receive only the second message
-        assertEquals("Vortex received wrong number of messages.", 1, vortex.getReceivedMessagesCount());
-        assertEquals("Wrong message received", "second", vortex.getLastReceivedMessage());
+        assertThat("Vortex received wrong number of messages.", vortex.getReceivedMessagesCount(), is(1));
+        assertThat("Wrong message received", vortex.getLastReceivedMessage(), is("second"));
 
         // should receive only the first part
-        assertEquals("Aggregator received wrong number of messages.", 1,
-            aggregator.getReceivedMessagesCount());
-        assertEquals("Wrong message received", Arrays.asList("first"), aggregator.getLastReceivedMessage());
+        assertThat("Aggregator received wrong number of messages.", aggregator.getReceivedMessagesCount(), is(1));
+        assertThat("Wrong message received", ((List<MuleMessage>) aggregator.getLastReceivedMessage()).get(0).getPayload(), is("first"));
 
         // wait for the vortex timeout (6000ms for vortext + 2000ms for aggregator
         // timeout + some extra for a test)
-        Thread.sleep(9000);
+        new PollingProber(2 * RECEIVE_TIMEOUT, 200).check(new Probe()
+        {
+            @Override
+            public boolean isSatisfied()
+            {
+                // now get the messages which were lagging behind
+                // it will receive only one (first) as second will be discarded by the worker
+                // because it has already dispatched one with the same group id
+                return aggregator.getReceivedMessagesCount() == 1;
+            }
 
-        // now get the messages which were lagging behind
-        // it will receive only one (first) as second will be discarded by the worker
-        // because it has already dispatched one with the same group id
-        assertEquals("Other messages never received by aggregator.", 1, aggregator.getReceivedMessagesCount());
-        assertNotNull(client.request("vm://out?connector=queue", 10000));
+            @Override
+            public String describeFailure()
+            {
+                return "Other messages never received by aggregator.";
+            }
+        });
+
+        assertNotNull(client.request("test://out", RECEIVE_TIMEOUT));
     }
 }

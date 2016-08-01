@@ -8,19 +8,16 @@ package org.mule.test.integration.streaming;
 
 import static org.junit.Assert.assertTrue;
 
-import org.mule.api.client.MuleClient;
-import org.mule.module.xml.stax.DelegateXMLStreamReader;
-import org.mule.module.xml.stax.StaxSource;
-import org.mule.module.xml.util.XMLUtils;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.module.xml.stax.DelegateXMLStreamReader;
+import org.mule.runtime.module.xml.stax.StaxSource;
+import org.mule.runtime.module.xml.util.XMLUtils;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
-import org.mule.util.concurrent.Latch;
+import org.mule.runtime.core.util.concurrent.Latch;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
 import javax.xml.stream.XMLInputFactory;
@@ -31,38 +28,26 @@ import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamSource;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 import org.xml.sax.InputSource;
 
-public class CloseStreamOnMuleExceptionTestCase extends AbstractServiceAndFlowTestCase
+public class CloseStreamOnMuleExceptionTestCase extends FunctionalTestCase
 {
     private final int timeoutMs = 3000;
     private static Latch inputStreamLatch = new Latch();
     private static Latch streamReaderLatch;
     private String xmlText = "<test attribute=\"1\"/>";
     private TestByteArrayInputStream inputStream;
-    private MuleClient client;
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE,
-            "org/mule/test/integration/streaming/close-stream-on-mule-exception-test-service.xml"},
-            {ConfigVariant.FLOW,
-            "org/mule/test/integration/streaming/close-stream-on-mule-exception-test-flow.xml"}});
-    }
-
-    public CloseStreamOnMuleExceptionTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
+        return "org/mule/test/integration/streaming/close-stream-on-mule-exception-test-flow.xml";
     }
 
     @Override
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-        client = muleContext.getClient();
         inputStream = new TestByteArrayInputStream(xmlText.getBytes());
         streamReaderLatch = new Latch();
     }
@@ -70,7 +55,8 @@ public class CloseStreamOnMuleExceptionTestCase extends AbstractServiceAndFlowTe
     @Test
     public void testCloseStreamOnComponentException() throws Exception
     {
-        client.dispatch("vm://inEcho?connector=vm", inputStream, null);
+        flowRunner("echo").withPayload(inputStream).asynchronously().run();
+
         streamReaderLatch.await(timeoutMs, TimeUnit.MILLISECONDS);
         assertTrue(inputStream.isClosed());
     }
@@ -80,7 +66,7 @@ public class CloseStreamOnMuleExceptionTestCase extends AbstractServiceAndFlowTe
     {
         InputSource stream = new InputSource(inputStream);
 
-        client.dispatch("vm://inEcho?connector=vm", stream, null);
+        flowRunner("echo").withPayload(stream).asynchronously().run();
 
         streamReaderLatch.await(timeoutMs, TimeUnit.MILLISECONDS);
         assertTrue(((TestByteArrayInputStream) stream.getByteStream()).isClosed());
@@ -91,7 +77,7 @@ public class CloseStreamOnMuleExceptionTestCase extends AbstractServiceAndFlowTe
     {
         Source stream = XMLUtils.toXmlSource(XMLInputFactory.newInstance(), false, inputStream);
 
-        client.dispatch("vm://inEcho?connector=vm", stream, null);
+        flowRunner("echo").withPayload(stream).asynchronously().run();
 
         streamReaderLatch.await(timeoutMs, TimeUnit.MILLISECONDS);
         assertTrue(((TestByteArrayInputStream) ((StreamSource) stream).getInputStream()).isClosed());
@@ -103,7 +89,7 @@ public class CloseStreamOnMuleExceptionTestCase extends AbstractServiceAndFlowTe
         TestXMLStreamReader stream = new TestXMLStreamReader(XMLInputFactory.newInstance()
             .createXMLStreamReader(inputStream));
 
-        client.dispatch("vm://inEcho?connector=vm", stream, null);
+        flowRunner("echo").withPayload(stream).asynchronously().run();
 
         streamReaderLatch.await(timeoutMs, TimeUnit.MILLISECONDS);
         assertTrue(stream.isClosed());
@@ -114,7 +100,7 @@ public class CloseStreamOnMuleExceptionTestCase extends AbstractServiceAndFlowTe
     {
         SAXSource stream = new SAXSource(new InputSource(inputStream));
 
-        client.dispatch("vm://inEcho?connector=vm", stream, null);
+        flowRunner("echo").withPayload(stream).asynchronously().run();
 
         verifyInputStreamIsClosed(((TestByteArrayInputStream) stream.getInputSource().getByteStream()));
     }
@@ -122,26 +108,18 @@ public class CloseStreamOnMuleExceptionTestCase extends AbstractServiceAndFlowTe
     @Test
     public void testCloseStaxSourceOnComponentException() throws Exception
     {
-
         StaxSource stream = new StaxSource(new TestXMLStreamReader(XMLInputFactory.newInstance()
             .createXMLStreamReader(inputStream)));
 
-        client.dispatch("vm://inEcho?connector=vm", stream, null);
+        flowRunner("echo").withPayload(stream).asynchronously().run();
 
         verifyInputStreamIsClosed(((TestXMLStreamReader) stream.getXMLStreamReader()));
     }
 
     @Test
-    public void testCloseStreamOnDispatcherException() throws Exception
-    {
-        client.dispatch("vm://dispatcherExceptionBridge?connector=vm", inputStream, null);
-        verifyInputStreamIsClosed(inputStream);
-    }
-
-    @Test
     public void testCloseStreamOnInboundFilterException() throws Exception
     {
-        client.dispatch("vm://inboundFilterExceptionBridge?connector=vm", inputStream, null);
+        flowRunner("inboundFilterExceptionBridge").withPayload(inputStream).asynchronously().run();
 
         verifyInputStreamIsClosed(inputStream);
     }
@@ -174,6 +152,7 @@ public class CloseStreamOnMuleExceptionTestCase extends AbstractServiceAndFlowTe
     {
         private boolean closed;
 
+        @Override
         public boolean isClosed()
         {
             return closed;
@@ -202,6 +181,7 @@ public class CloseStreamOnMuleExceptionTestCase extends AbstractServiceAndFlowTe
     {
         private boolean closed;
 
+        @Override
         public boolean isClosed()
         {
             return closed;

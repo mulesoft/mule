@@ -1,63 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:test="http://www.mulesoft.org/schema/mule/test"
-       xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+       xmlns="http://www.mulesoft.org/schema/mule/core"
        xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
-    <bean name="txFactory" class="org.mule.tck.testmodels.mule.TestTransactionFactory"/>
+    <spring:bean name="txFactory" class="org.mule.tck.testmodels.mule.TestTransactionFactory"/>
 
-    <mule:mule>
-        <mule:model name="main" inherit="true">
-            <mule:service name="appleComponent2">                
-                <mule:inbound>
-                    <mule:inbound-endpoint name="nonTransactedInboundEndpoint" 
-                        address="test://endpoint.in3" exchange-pattern="one-way"/>
-                    <mule:inbound-endpoint name="transactedInboundEndpoint" 
-                        address="test://endpoint.in2" exchange-pattern="request-response">
-                        <mule:custom-transaction action="ALWAYS_BEGIN" factory-ref="txFactory"/>
-                        <mule:properties>
-                            <entry key="testEndpointProperty" value="Prop1"/>
-                        </mule:properties>
-                    </mule:inbound-endpoint>
-                </mule:inbound>
+    <asynchronous-processing-strategy name="customStrategy" maxBufferSize="6" maxThreads="12"
+                                                 poolExhaustedAction="DISCARD" />
 
-                <mule:pooled-component class="org.mule.tck.testmodels.fruit.Apple">
-                    <mule:pooling-profile maxActive="9" maxIdle="6" maxWait="4002" 
-                        exhaustedAction="WHEN_EXHAUSTED_FAIL" initialisationPolicy="INITIALISE_ALL"/>
-                </mule:pooled-component>
-
-                <mule:outbound>
-                    <mule:filtering-router>
-                        <mule:outbound-endpoint name="transactedOutboundEndpoint" 
-                            address="test://endpoint.out" exchange-pattern="request-response">
-                            <!-- mule:transaction action="ALWAYS_BEGIN" -->
-                            <!-- TODO -->
-                            <!-- no support for constraints? -->
-                            <!-- factory required? -->
-                            <!-- /mule:transaction -->
-                        </mule:outbound-endpoint>
-                    </mule:filtering-router>
-                </mule:outbound>
-                <!-- outbound-router>
-                <router className="org.mule.routing.outbound.FilteringOutboundRouter">
-                    <endpoint name="transactedOutboundEndpoint" type="sender" 
-                        address="test://endpoint.out" exchange-pattern="request-response">
-                        <transaction action="ALWAYS_BEGIN">
-                            <constraint batchSize="3" className="org.mule.transaction.constraints.BatchConstraint"/>
-                        </transaction>
-                    </endpoint>
-                </router>
-            </outbound-router -->
-
-                <mule:threading-profile maxBufferSize="6" maxThreadsActive="12" maxThreadsIdle="6" poolExhaustedAction="DISCARD"/>
-                <mule:queue-profile maxOutstandingMessages="102">
-                    <mule:default-persistent-queue-store/>
-                </mule:queue-profile>
-            </mule:service>
-        </mule:model>
-    </mule:mule>
-</beans>
+    <flow name="appleComponent2" processingStrategy="customStrategy">
+        <pooled-component class="org.mule.tck.testmodels.fruit.Apple">
+            <pooling-profile maxActive="9" maxIdle="6" maxWait="4002"
+                             exhaustedAction="WHEN_EXHAUSTED_FAIL" initialisationPolicy="INITIALISE_ALL"/>
+        </pooled-component>
+    </flow>
+</mule>

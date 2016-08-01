@@ -8,8 +8,6 @@
             http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
     <flow name="storedProcedureStreaming">
-        <inbound-endpoint address="vm://storedProcedureStreaming" exchange-pattern="request-response"/>
-
         <db:stored-procedure config-ref="pooledJdbcConfig" streaming="true">
             <db:parameterized-query>{ call getTestRecords() }</db:parameterized-query>
         </db:stored-procedure>
@@ -25,15 +23,13 @@
 
                 <set-payload value="#[results]"/>
             </processor-chain>
-            <enrich target="#[variable:results]"/>
+            <enrich target="#[flowVars.results]"/>
         </enricher>
 
         <set-property propertyName="processedResults" value="#[results]"/>
     </flow>
 
     <flow name="storedProcedureStreamingError">
-        <inbound-endpoint address="vm://storedProcedureStreamingError" exchange-pattern="request-response"/>
-
         <db:stored-procedure config-ref="pooledJdbcConfig" streaming="true">
             <db:parameterized-query>{ call getTestRecords() }</db:parameterized-query>
         </db:stored-procedure>

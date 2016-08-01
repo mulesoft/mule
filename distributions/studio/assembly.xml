@@ -22,6 +22,24 @@
             -->
         </fileSet>
         <fileSet>
+            <directory>target/ce-distribution/${communityArtifact}-${version}/plugins</directory>
+            <outputDirectory>plugins</outputDirectory>
+            <fileMode>0644</fileMode>
+            <directoryMode>0755</directoryMode>
+            <includes>
+                <include>**/*.zip</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>target/ce-distribution/${communityArtifact}-${version}/conf</directory>
+            <outputDirectory>conf</outputDirectory>
+            <fileMode>0644</fileMode>
+            <directoryMode>0755</directoryMode>
+            <includes>
+                <include>tls-*.conf</include>
+            </includes>
+        </fileSet>
+        <fileSet>
             <directory>target/ce-distribution/${communityArtifact}-${version}/src</directory>
             <outputDirectory>src</outputDirectory>
             <includes>

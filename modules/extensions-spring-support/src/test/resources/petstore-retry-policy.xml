@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:petstore="http://www.mulesoft.org/schema/mule/petstore"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/petstore http://www.mulesoft.org/schema/mule/petstore/current/mule-petstore.xsd">
+
+    <petstore:config name="petstore-valid">
+        <petstore:valid-connection username="john" password="doe">
+            <reconnect count="2" frequency="5"/>
+            <pooling-profile/>
+        </petstore:valid-connection>
+        <petstore:pets>
+            <petstore:pet value="Lassie"/>
+            <petstore:pet value="Sapo Pepe"/>
+            <petstore:pet value="My mother's parrot"/>
+        </petstore:pets>
+    </petstore:config>
+
+    <petstore:config name="petstore-invalid">
+        <petstore:invalid-connection username="john" password="doe">
+            <reconnect count="2" frequency="5"/>
+            <pooling-profile/>
+        </petstore:invalid-connection>
+        <petstore:pets>
+            <petstore:pet value="Lassie"/>
+            <petstore:pet value="Sapo Pepe"/>
+            <petstore:pet value="My mother's parrot"/>
+        </petstore:pets>
+    </petstore:config>
+
+    <flow name="fail-operation-with-connection-exception">
+        <petstore:fail-connection config-ref="petstore-valid"/>
+    </flow>
+
+    <flow name="fail-connection-validation">
+        <petstore:fail-connection config-ref="petstore-invalid"/>
+    </flow>
+
+    <flow name="fail-operation-with-not-handled-exception">
+        <petstore:fail-operation-with-exception config-ref="petstore-valid"/>
+    </flow>
+
+    <flow name="fail-operation-with-not-handled-throwable">
+        <petstore:fail-operation-with-throwable config-ref="petstore-valid"/>
+    </flow>
+
+</mule>

@@ -1,26 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:spring="http://www.springframework.org/schema/beans" xmlns:test="http://www.mulesoft.org/schema/mule/test"
-    xmlns:vm="http://www.mulesoft.org/schema/mule/vm" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+    xmlns:spring="http://www.springframework.org/schema/beans" xmlns:test="http://www.mulesoft.org/schema/mule/test" xmlns:http="http://www.mulesoft.org/schema/mule/http"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
-       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
-    <message-properties-transformer scope="invocation" name="addP1">
-        <add-message-property key="P1" value="P1_VALUE" />
-    </message-properties-transformer>
-    <message-properties-transformer scope="invocation" name="addP2">
-        <add-message-property key="P2" value="P2_VALUE" />
-    </message-properties-transformer>
-    <message-properties-transformer scope="invocation" name="addP3">
-        <add-message-property key="P3" value="P3_VALUE" />
-    </message-properties-transformer>
-    <message-properties-transformer scope="invocation" name="addP4">
-        <add-message-property key="P4" value="P4_VALUE" />
-    </message-properties-transformer>
+    <http:listener-config name="listenerConfig3" host="localhost" port="${port3}"/>
+    <http:request-config name="requestConfig3" host="localhost" port="${port3}"/>
+    <http:listener-config name="listenerConfig2" host="localhost" port="${port2}"/>
+    <http:request-config name="requestConfig2" host="localhost" port="${port2}"/>
+    <http:listener-config name="listenerConfig1" host="localhost" port="${port1}"/>
+    <http:request-config name="requestConfig1" host="localhost" port="${port1}"/>
+
+    <set-variable name="addP1" variableName="P1" value="P1_VALUE"/>
+    <set-variable name="addP2" variableName="P2" value="P2_VALUE"/>
+    <set-variable name="addP3" variableName="P3" value="P3_VALUE"/>
+    <set-variable name="addP4" variableName="P4" value="P4_VALUE"/>
 
     <!-- Test Flows -->
 
@@ -33,9 +30,7 @@
     </flow>
 
     <flow name="OverwritePropertyValueInFlow" processingStrategy="synchronous">
-        <message-properties-transformer scope="invocation">
-            <add-message-property key="P1" value="P1_VALUE_NEW" />
-        </message-properties-transformer>
+        <set-variable variableName="P1" value="P1_VALUE_NEW"/>
     </flow>
 
     <flow name="propagationInSameFlow">
@@ -51,37 +46,13 @@
         <test:assert expression="#[P2]" />
     </flow>
 
-    <flow name="noPropagationInDifferentFlowVMOneWay">
-        <processor ref="addP1" />
-        <test:assert expression="#[P1]" />
-        <vm:outbound-endpoint path="noPropagationInDifferentFlowVMOneWay-2"
-            exchange-pattern="one-way" />
-    </flow>
-    <flow name="noPropagationInDifferentFlowVMOneWay-2">
-        <vm:inbound-endpoint path="noPropagationInDifferentFlowVMOneWay-2"
-            exchange-pattern="one-way" />
-        <test:assert expression="#[flowVars['P1'] == null]" />
-    </flow>
-
-    <flow name="noPropagationInDifferentFlowVMRequestResponse">
-        <processor ref="addP1" />
-        <test:assert expression="#[P1]" />
-        <vm:outbound-endpoint path="noPropagationInDifferentFlowVMRequestResponse-2"
-            exchange-pattern="request-response" />
-    </flow>
-    <flow name="noPropagationInDifferentFlowVMRequestResponse-2">
-        <vm:inbound-endpoint path="noPropagationInDifferentFlowVMRequestResponse-2"
-            exchange-pattern="request-response" />
-        <test:assert expression="#[flowVars['P1'] == null]" />
-    </flow>
-
     <flow name="noPropagationInDifferentFlowHttp">
         <processor ref="addP1" />
         <test:assert expression="#[P1]" />
-        <http:outbound-endpoint address="http://localhost:${port2}" />
+        <http:request config-ref="requestConfig2" path="/"/>
     </flow>
     <flow name="noPropagationInDifferentFlowHttp-2">
-        <http:inbound-endpoint address="http://localhost:${port2}" />
+        <http:listener config-ref="listenerConfig2" path="/" />
         <test:assert expression="#[flowVars['P1'] == null]" />
     </flow>
 
@@ -90,26 +61,16 @@
         <processor ref="addP3" />
         <test:assert expression="#[P1]" />
         <test:assert expression="#[P2]" />
-        <test:assert expression="#[header:INVOCATION:P3]" />
-    </flow>
-
-    <flow name="VMRequestResponseEndpointFlowMidFlow">
-        <processor ref="addP1" />
-        <vm:outbound-endpoint path="echo" exchange-pattern="request-response" />
-        <test:assert expression="#[P1]" />
-    </flow>
-    <flow name="VMEchoFlow">
-        <vm:inbound-endpoint path="echo" exchange-pattern="request-response" />
-        <echo-component />
+        <test:assert expression="#[flowVars.P3]" />
     </flow>
 
     <flow name="HTTPRequestResponseEndpointFlowMidFlow">
         <processor ref="addP1" />
-        <http:outbound-endpoint address="http://localhost:${port1}" />
+        <http:request path="/" config-ref="requestConfig1" />
         <test:assert expression="#[P1]" />
     </flow>
     <flow name="HTPPEchoFlow">
-        <http:inbound-endpoint address="http://localhost:${port1}" />
+        <http:listener path="/" config-ref="listenerConfig1" />
         <echo-component />
     </flow>
 
@@ -119,31 +80,31 @@
         <flow-ref name="FlowRef-1" />
         <test:assert expression="#[P1]" />
         <test:assert expression="#[P2]" />
-        <test:assert expression="#[header:INVOCATION:P4]" />
+        <test:assert expression="#[flowVars.P4]" />
         <flow-ref name="FlowRef-2" />
         <test:assert expression="#[P1]" />
         <test:assert expression="#[P2]" />
         <test:assert expression="#[flowVars['P3'] == null]" />
-        <test:assert expression="#[header:INVOCATION:P4]" message="I failed" />
+        <test:assert expression="#[flowVars.P4]" message="I failed" />
     </flow>
     <flow name="FlowRef-1" processingStrategy="synchronous">
         <test:assert expression="#[P1]" />
         <processor ref="addP2" />
         <flow-ref name="FlowRef-3" />
-        <test:assert expression="#[header:INVOCATION:P4]" message="I failed" />
+        <test:assert expression="#[flowVars.P4]" message="I failed" />
     </flow>
-    <flow name="FlowRef-2" processingStrategy="queued-asynchronous">
+    <flow name="FlowRef-2" processingStrategy="asynchronous">
         <test:assert expression="#[P1]" />
         <test:assert expression="#[P2]" />
         <processor ref="addP3" />
         <flow-ref name="FlowRef-3" />
-        <test:assert expression="#[header:INVOCATION:P4]" />
+        <test:assert expression="#[flowVars.P4]" />
     </flow>
     <flow name="FlowRef-3" processingStrategy="synchronous">
         <test:assert expression="#[P1]" />
         <test:assert expression="#[P2]" />
         <processor ref="addP4" />
-        <test:assert expression="#[header:INVOCATION:P4]" />
+        <test:assert expression="#[flowVars.P4]" />
     </flow>
     <flow name="OverwriteInFlowRef">
         <processor ref="addP1" />
@@ -152,9 +113,7 @@
         <test:assert expression="#[P1 == 'P1_VALUE_NEW']" />
     </flow>
     <flow name="OverwriteInFlowRef-1" processingStrategy="synchronous">
-        <message-properties-transformer scope="invocation">
-            <add-message-property key="P1" value="P1_VALUE_NEW" />
-        </message-properties-transformer>
+        <set-variable variableName="P1" value="P1_VALUE_NEW"/>
     </flow>
 
     <flow name="propagationThroughFlowRefToSubFlow">
@@ -166,8 +125,8 @@
         <flow-ref name="SubFlowRef-2" />
         <test:assert expression="#[P1]" />
         <test:assert expression="#[P2]" />
-        <test:assert expression="#[header:INVOCATION:P3]" />
-        <test:assert expression="#[header:INVOCATION:P4]" />
+        <test:assert expression="#[flowVars.P3]" />
+        <test:assert expression="#[flowVars.P4]" />
     </flow>
     <sub-flow name="SubFlowRef-1">
         <test:assert expression="#[P1]" />
@@ -178,12 +137,12 @@
         <test:assert expression="#[P2]" />
         <processor ref="addP3" />
         <flow-ref name="SubFlowRef-3" />
-        <test:assert expression="#[header:INVOCATION:P4]" />
+        <test:assert expression="#[flowVars.P4]" />
     </sub-flow>
     <sub-flow name="SubFlowRef-3">
         <test:assert expression="#[P1]" />
         <test:assert expression="#[P2]" />
-        <test:assert expression="#[header:INVOCATION:P3]" />
+        <test:assert expression="#[flowVars.P3]" />
         <processor ref="addP4" />
     </sub-flow>
     <flow name="OverwriteInSubFlowRef">
@@ -193,9 +152,7 @@
         <test:assert expression="#[P1 == 'P1_VALUE_NEW']" />
     </flow>
     <flow name="OverwriteInSubFlowRef-1" processingStrategy="synchronous">
-        <message-properties-transformer scope="invocation">
-            <add-message-property key="P1" value="P1_VALUE_NEW" />
-        </message-properties-transformer>
+        <set-variable variableName="P1" value="P1_VALUE_NEW"/>
     </flow>
 
     <flow name="propagationThroughAsyncElement">
@@ -237,13 +194,13 @@
     <flow name="propagationThroughEnricher">
         <processor ref="addP1" />
         <test:assert expression="#[P1]" />
-        <enricher target="#[variable:test]">
+        <enricher target="#[flowVars.test]">
             <test:assert expression="#[P1]" />
         </enricher>
         <test:assert expression="#[P1]" />
     </flow>
     <flow name="propertyAddedInEnricherNotAddedinFlow">
-        <enricher target="#[variable:test]">
+        <enricher target="#[flowVars.test]">
             <flow-ref name="Enricher2-2" />
         </enricher>
         <test:assert expression="#[flowVars['P1'] == null]" />
@@ -274,8 +231,8 @@
         <processor ref="addP1" />
         <test:assert expression="#[P1]" />
         <all>
-            <vm:outbound-endpoint path="tmp" />
-            <vm:outbound-endpoint path="tmp2" />
+            <test:queue name="tmp" />
+            <test:queue name="tmp2" />
         </all>
         <test:assert expression="#[P1]" />
     </flow>
@@ -302,7 +259,7 @@
         <all>
             <processor-chain>
                 <processor ref="addP1" />
-                <vm:outbound-endpoint path="tmp3" />
+                <test:queue name="tmp3" />
             </processor-chain>
         </all>
         <test:assert expression="#[P1]" />
@@ -345,7 +302,6 @@
         <flow-ref name="propogationOfPropertiesInMessageSplitWithSplitter" />
         <processor ref="addP2" />
         <collection-aggregator />
-        <test:assert expression="#[groovy:message instanceof org.mule.api.MuleMessageCollection]" />
         <test:assert expression="#[P1]" />
         <test:assert expression="#[P2]" />
     </flow>
@@ -367,33 +323,30 @@
     </flow>
 
     <flow name="defaultExceptionStrategyAfterCallingSubflow">
-        <vm:inbound-endpoint path="in" exchange-pattern="request-response"/>
-        <message-properties-transformer scope="invocation">
-            <add-message-property key="P1" value="P1_VALUE"/>
-        </message-properties-transformer>
+        <set-variable variableName="P1" value="P1_VALUE"/>
         <flow-ref name="TestSubFlow"/>
-        <message-properties-transformer scope="invocation">
-            <add-message-property key="P2" value="P2_VALUE"/>
-        </message-properties-transformer>
+        <set-variable variableName="P2" value="P2_VALUE"/>
         <message-filter throwOnUnaccepted="true">
             <payload-type-filter expectedType="java.lang.NoSuchFieldError"/>
         </message-filter>
         <default-exception-strategy>
            <processor-chain>
                <processor-chain>
-                   <test:assert expression="#[header:INVOCATION:P1]" />
-                   <test:assert expression="#[header:INVOCATION:P2]" />
+                   <test:assert expression="#[flowVars.P1]" />
+                   <test:assert expression="#[flowVars.P2]" />
                </processor-chain>
             </processor-chain>
         </default-exception-strategy>
     </flow>
 
     <sub-flow name="TestSubFlow">
-        <http:outbound-endpoint host="localhost" port="${port3}"/>
+        <http:request config-ref="requestConfig3" path="/" >
+            <http:success-status-code-validator values="0..599"/>
+        </http:request>
     </sub-flow>
 
     <flow name="TestSubFlowServer">
-        <http:inbound-endpoint host="localhost" port="${port3}"/>
+        <http:listener path="/" config-ref="listenerConfig3"/>
         <test:component throwException="true"/>
     </flow>
 

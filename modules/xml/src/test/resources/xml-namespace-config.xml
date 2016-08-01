@@ -12,22 +12,6 @@
         <mulexml:namespace prefix="foo" uri="http://foo.com"/>
     </mulexml:namespace-manager>
 
-    <endpoint name="test.ep1" address="test://ep1">
-        <mulexml:jxpath-filter pattern="/bar:foo/bar:bar">
-            <mulexml:namespace prefix="bar" uri="http://bar.com"/>
-        </mulexml:jxpath-filter>
-    </endpoint>
-
-    <endpoint name="test.ep2" address="test://ep2">
-        <mulexml:jaxen-filter pattern="/car:foo/car:bar">
-            <mulexml:namespace prefix="car" uri="http://car.com"/>
-        </mulexml:jaxen-filter>
-    </endpoint>
-
-    <mulexml:jxpath-extractor-transformer name="jxpath-extractor">
-        <mulexml:namespace prefix="bar" uri="http://bar.com"/>
-    </mulexml:jxpath-extractor-transformer>
-
     <mulexml:jaxb-object-to-xml-transformer name="ObjectToXml" jaxbContext-ref="myJaxb"/>
 
     <mulexml:jaxb-xml-to-object-transformer name="XmlToObject" jaxbContext-ref="myJaxb" returnClass="org.mule.jaxb.model.Person"/>
@@ -41,8 +25,8 @@
     </spring:bean>
     -->
     
-    <spring:bean name="resourceResolver" class="org.mule.module.xml.config.XmlNamespaceTestCase$MockResourceResolver"/>
-    <spring:bean name="errorHandler" class="org.mule.module.xml.config.XmlNamespaceTestCase$MockErrorHandler"/>
+    <spring:bean name="resourceResolver" class="org.mule.runtime.module.xml.config.XmlNamespaceTestCase$MockResourceResolver"/>
+    <spring:bean name="errorHandler" class="org.mule.runtime.module.xml.config.XmlNamespaceTestCase$MockErrorHandler"/>
     
     <mulexml:schema-validation-filter name="SchemaValidationWithResourceResolver" 
         schemaLocations="schema1.xsd" resourceResolver-ref="resourceResolver" 

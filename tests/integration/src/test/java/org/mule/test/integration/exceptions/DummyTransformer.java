@@ -6,16 +6,18 @@
  */
 package org.mule.test.integration.exceptions;
 
-import org.mule.api.MuleMessage;
-import org.mule.api.transformer.TransformerException;
-import org.mule.transformer.AbstractMessageTransformer;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.transformer.AbstractMessageTransformer;
+
+import java.nio.charset.Charset;
 
 public class DummyTransformer extends AbstractMessageTransformer
 {
 
     @Override
-    public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException
+    public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException
     {
-        return message;
+        return event.getMessage();
     }
 }

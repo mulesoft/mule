@@ -10,15 +10,12 @@
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
                http://www.mulesoft.org/schema/mule/ws http://www.mulesoft.org/schema/mule/ws/current/mule-ws.xsd">
 
-    <configuration>
-        <http:config useTransportForUris="${useTransportForUris}"/>
-    </configuration>
+    <http:listener-config name="listenerConfig" host="localhost" port="${port}"/>
 
     <flow name="server">
-        <inbound-endpoint address="http://localhost:${port}/services/TestAttachments" exchange-pattern="request-response">
-            <cxf:jaxws-service serviceClass="org.mule.module.ws.consumer.TestAttachments" mtomEnabled="true"/>
-        </inbound-endpoint>
-        <component class="org.mule.module.ws.consumer.TestAttachments"/>
+        <http:listener path="/services/TestAttachments" config-ref="listenerConfig"/>
+        <cxf:jaxws-service serviceClass="org.mule.runtime.module.ws.consumer.TestAttachments" mtomEnabled="true"/>
+        <component class="org.mule.runtime.module.ws.consumer.TestAttachments"/>
     </flow>
 
     <ws:consumer-config serviceAddress="http://localhost:${port}/services/TestAttachments" wsdlLocation="TestAttachments.wsdl"

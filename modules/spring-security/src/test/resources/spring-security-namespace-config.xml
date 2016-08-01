@@ -3,14 +3,12 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:http="http://www.mulesoft.org/schema/mule/http"
-       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
        xmlns:mule-ss="http://www.mulesoft.org/schema/mule/spring-security"
        xmlns:ss="http://www.springframework.org/schema/security"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
-       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
        http://www.mulesoft.org/schema/mule/spring-security http://www.mulesoft.org/schema/mule/spring-security/current/mule-spring-security.xsd
        http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-current.xsd">
 
@@ -29,13 +27,13 @@
         <mule-ss:delegate-security-provider name="memory-dao" delegate-ref="authenticationManager"/>
     </mule-ss:security-manager>
 
-    <spring:bean name="echoComponent" class="org.mule.component.simple.EchoComponent"/>
+    <spring:bean name="echoComponent" class="org.mule.runtime.core.component.simple.EchoComponent"/>
 
     <!-- this sets the same provider three times, once through spring-security's provider and twice
          through a custom provider.  in normal use it should be set just once, through
          the spring-security schema - this is just for extra test coverage -->
 
-    <spring:bean id="explicitCreation1" class="org.mule.module.spring.security.SpringProviderAdapter">
+    <spring:bean id="explicitCreation1" class="org.mule.runtime.module.spring.security.SpringProviderAdapter">
         <spring:property name="delegate" ref="authenticationManager"/>
         <spring:property name="name" value="customProvider"/>
     </spring:bean>
@@ -44,7 +42,7 @@
         <custom-security-provider name="willNotOverwriteName" provider-ref="explicitCreation1"/>
     </security-manager>
 
-    <spring:bean id="explicitCreation2" class="org.mule.module.spring.security.SpringProviderAdapter">
+    <spring:bean id="explicitCreation2" class="org.mule.runtime.module.spring.security.SpringProviderAdapter">
         <spring:property name="delegate" ref="authenticationManager"/>
     </spring:bean>
 

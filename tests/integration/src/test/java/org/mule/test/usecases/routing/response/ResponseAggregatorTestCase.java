@@ -6,42 +6,40 @@
  */
 package org.mule.test.usecases.routing.response;
 
-import static org.junit.Assert.assertEquals;
+import static java.lang.String.format;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.mule.module.http.api.HttpConstants.Methods.POST;
-import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
-import org.mule.module.http.api.client.HttpRequestOptions;
-import org.mule.routing.requestreply.AbstractAsyncRequestReplyRequester;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.tck.SensingNullMessageProcessor;
-import org.mule.util.store.SimpleMemoryObjectStore;
+import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
+import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 
-import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Collection;
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.routing.requestreply.AbstractAsyncRequestReplyRequester;
+import org.mule.runtime.core.util.store.SimpleMemoryObjectStore;
+import org.mule.runtime.module.http.api.client.HttpRequestOptions;
+import org.mule.tck.SensingNullMessageProcessor;
+import org.mule.tck.junit4.rule.DynamicPort;
+
 import java.util.Map;
 
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class ResponseAggregatorTestCase extends AbstractServiceAndFlowTestCase
+public class ResponseAggregatorTestCase extends FunctionalTestCase
 {
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/usecases/routing/response/response-router-service.xml"},
-            {ConfigVariant.FLOW, "org/mule/test/usecases/routing/response/response-router-flow.xml"}});
-    }
 
-    public ResponseAggregatorTestCase(ConfigVariant variant, String configResources)
+    @Rule
+    public DynamicPort port = new DynamicPort("port1");
+
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
+        return "org/mule/test/usecases/routing/response/response-router-flow.xml";
     }
 
     @Test
@@ -49,9 +47,9 @@ public class ResponseAggregatorTestCase extends AbstractServiceAndFlowTestCase
     {
         MuleClient client = muleContext.getClient();
         final HttpRequestOptions httpRequestOptions = newOptions().method(POST.name()).build();
-        MuleMessage message = client.send("http://localhost:28081", getTestMuleMessage("request"), httpRequestOptions);
+        MuleMessage message = client.send(format("http://localhost:%s", port.getNumber()), MuleMessage.builder().payload("request").build(), httpRequestOptions);
         assertNotNull(message);
-        assertEquals("Received: request", new String(message.getPayloadAsBytes()));
+        assertThat(new String(getPayloadAsBytes(message)), is("Received: request"));
     }
 
     @Test
@@ -62,10 +60,11 @@ public class ResponseAggregatorTestCase extends AbstractServiceAndFlowTestCase
         try
         {
             MuleEvent event = getTestEvent("message1");
-            final MuleMessage message = event.getMessage();
-            final String id = message.getUniqueId();
-            message.setCorrelationId(id);
-            message.setCorrelationGroupSize(1);
+            final MuleMessage message = MuleMessage.builder(event.getMessage())
+                                                   .correlationId(event.getMessage().getUniqueId())
+                                                   .correlationGroupSize(1)
+                                                   .build();
+            event.setMessage(message);
 
             SensingNullMessageProcessor listener = getSensingNullMessageProcessor();
             mp.setListener(listener);
@@ -89,7 +88,7 @@ public class ResponseAggregatorTestCase extends AbstractServiceAndFlowTestCase
     {
         private RelaxedAsyncReplyMP() throws MuleException
         {
-            store = new SimpleMemoryObjectStore<Serializable>();
+            store = new SimpleMemoryObjectStore<>();
             name = "asyncReply";
             start();
         }

@@ -3,14 +3,14 @@
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:spring="http://www.springframework.org/schema/beans"
       xmlns:pgp="http://www.mulesoft.org/schema/mule/pgp"
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
        http://www.mulesoft.org/schema/mule/pgp http://www.mulesoft.org/schema/mule/pgp/current/mule-pgp.xsd">
 
-    <spring:bean id="pgpKeyManager" class="org.mule.module.pgp.PGPKeyRingImpl"
+    <spring:bean id="pgpKeyManager" class="org.mule.runtime.module.pgp.PGPKeyRingImpl"
         init-method="initialise">
         <spring:property name="publicKeyRingFileName"
             value="serverPublic.gpg" />
@@ -21,7 +21,7 @@
     </spring:bean>
 
     <spring:bean id="credentialAccessor"
-        class="org.mule.security.MuleHeaderCredentialsAccessor" />
+        class="org.mule.runtime.core.security.MuleHeaderCredentialsAccessor" />
 
     <pgp:security-manager>
         <pgp:security-provider name="pgpSecurityProvider"
@@ -33,16 +33,13 @@
 
 
     <flow name="echo">
-        <vm:inbound-endpoint path="echo">
-            <pgp:security-filter strategyName="keyBasedEncryptionStrategy"
-                signRequired="true" credentialsAccessor-ref="credentialAccessor"
-                keyManager-ref="pgpKeyManager" />
-        </vm:inbound-endpoint>
+        <pgp:security-filter strategyName="keyBasedEncryptionStrategy"
+                             signRequired="true" credentialsAccessor-ref="credentialAccessor"
+                             keyManager-ref="pgpKeyManager" />
         <echo-component />
-        <vm:outbound-endpoint path="output">
-            <pgp:security-filter strategyName="keyBasedEncryptionStrategy"
-                signRequired="true" credentialsAccessor-ref="credentialAccessor"
-                keyManager-ref="pgpKeyManager"/>
-        </vm:outbound-endpoint>
+        <pgp:security-filter strategyName="keyBasedEncryptionStrategy"
+                             signRequired="true" credentialsAccessor-ref="credentialAccessor"
+                             keyManager-ref="pgpKeyManager"/>
+        <test:queue name="output"/>
     </flow>
 </mule>

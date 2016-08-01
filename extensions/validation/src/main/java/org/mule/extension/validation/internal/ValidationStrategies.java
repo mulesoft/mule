@@ -7,15 +7,15 @@
 package org.mule.extension.validation.internal;
 
 import static org.mule.extension.validation.internal.ImmutableValidationResult.error;
-import org.mule.api.MuleEvent;
-import org.mule.api.NestedProcessor;
-import org.mule.extension.annotations.Operation;
-import org.mule.extension.annotations.RestrictedTo;
+import org.mule.extension.validation.api.ValidationExtension;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.NestedProcessor;
+import org.mule.runtime.extension.api.annotation.RestrictedTo;
 import org.mule.extension.validation.api.MultipleValidationException;
 import org.mule.extension.validation.api.MultipleValidationResult;
 import org.mule.extension.validation.api.ValidationException;
 import org.mule.extension.validation.api.ValidationResult;
-import org.mule.util.ExceptionUtils;
+import org.mule.runtime.core.util.ExceptionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,7 +47,6 @@ public final class ValidationStrategies
      * @return the same {@code muleEvent} that was passed as argument
      * @throws MultipleValidationException if at least one validator fails and {@code throwsException} is {@code true}
      */
-    @Operation
     public void all(@RestrictedTo(ValidationExtension.class) List<NestedProcessor> validations,
                          MuleEvent muleEvent) throws MultipleValidationException
     {
@@ -60,7 +59,12 @@ public final class ValidationStrategies
             }
             catch (Exception e)
             {
-                results.add(error(ExceptionUtils.getRootCause(e).getMessage()));
+                Throwable rootCause = ExceptionUtils.getRootCause(e);
+                if (rootCause == null)
+                {
+                    rootCause = e;
+                }
+                results.add(error(rootCause.getMessage()));
             }
         }
 

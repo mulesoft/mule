@@ -9,70 +9,35 @@ package org.mule.test.integration.messaging.meps;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.service.Service;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 
-import java.util.Arrays;
-import java.util.Collection;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.functional.junit4.FlowRunner;
+import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class InOptionalOutOutOnlyAsyncRouterTestCase extends AbstractServiceAndFlowTestCase
+public class InOptionalOutOutOnlyAsyncRouterTestCase extends FunctionalTestCase
 {
-    public static final long TIMEOUT = 3000;
-
-    public InOptionalOutOutOnlyAsyncRouterTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE,
-                "org/mule/test/integration/messaging/meps/pattern_In-Optional-Out_Out-Only-Async-Router-service.xml"},
-            {ConfigVariant.FLOW,
-                "org/mule/test/integration/messaging/meps/pattern_In-Optional-Out_Out-Only-Async-Router-flow.xml"}
-
-        });
+        return "org/mule/test/integration/messaging/meps/pattern_In-Optional-Out_Out-Only-Async-Router-flow.xml";
     }
 
     @Test
     public void testExchange() throws Exception
     {
-        MuleClient client = muleContext.getClient();
+        FlowRunner baseRunner = flowRunner("In-Out_Out-Only-Async-Service").withPayload("some data");
+        MuleEvent event = baseRunner.run();
+        assertNull(event);
 
-        MuleMessage result = client.send("inboundEndpoint", "some data", null);
-        assertNull(result);
+        baseRunner.reset();
+        MuleMessage result = baseRunner.withInboundProperty("foo", "bar")
+                                       .run()
+                                       .getMessage();
 
-        MuleMessage msg = getTestMuleMessage("some data");
-        msg.setOutboundProperty("foo", "bar");
-        result = client.send("inboundEndpoint", msg);
         assertNotNull(result);
-        assertEquals("got it!", result.getPayloadAsString());
-
-        if (ConfigVariant.SERVICE.equals(variant))
-        {
-            Service async = muleContext.getRegistry().lookupService("In-Out_Out-Only-Async-Service");
-            Service external = muleContext.getRegistry().lookupService("ExternalApp");
-
-            assertEquals(2, async.getStatistics().getProcessedEvents());
-            assertEquals(1, external.getStatistics().getProcessedEvents());
-        }
-        else
-        {
-            FlowConstruct async = muleContext.getRegistry().lookupFlowConstruct(
-                "In-Out_Out-Only-Async-Service");
-            FlowConstruct external = muleContext.getRegistry().lookupFlowConstruct("ExternalApp");
-
-            assertEquals(2, async.getStatistics().getProcessedEvents());
-            assertEquals(1, external.getStatistics().getProcessedEvents());
-        }
-
+        assertEquals("got it!", getPayloadAsString(result));
     }
 }

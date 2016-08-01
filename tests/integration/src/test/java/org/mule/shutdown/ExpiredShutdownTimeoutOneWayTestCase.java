@@ -8,13 +8,10 @@ package org.mule.shutdown;
 
 import static org.junit.Assert.assertTrue;
 
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.tck.junit4.rule.SystemProperty;
-
-import java.util.HashMap;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -33,22 +30,22 @@ public class ExpiredShutdownTimeoutOneWayTestCase extends AbstractShutdownTimeou
     @Test
     public void testStaticComponent() throws Exception
     {
-        doShutDownTest("vm://staticComponent");
+        doShutDownTest("staticComponentFlow");
     }
 
     @Test
     public void testScriptComponent() throws Exception
     {
-        doShutDownTest("vm://scriptComponent");
+        doShutDownTest("scriptComponentFlow");
     }
 
     @Test
     public void testExpressionTransformer() throws Exception
     {
-        doShutDownTest("vm://expressionTransformer");
+        doShutDownTest("expressionTransformerFlow");
     }
 
-    private void doShutDownTest(final String url) throws MuleException, InterruptedException
+    private void doShutDownTest(final String flowName) throws MuleException, InterruptedException
     {
         final MuleClient client = muleContext.getClient();
         final boolean[] results = new boolean[] {false};
@@ -60,10 +57,9 @@ public class ExpiredShutdownTimeoutOneWayTestCase extends AbstractShutdownTimeou
             {
                 try
                 {
-                    DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST_MESSAGE, new HashMap<String, Object>(), muleContext);
-                    client.dispatch(url, muleMessage);
+                    flowRunner(flowName).withPayload(TEST_MESSAGE).asynchronously().run();
 
-                    MuleMessage response = client.request("vm://response", RECEIVE_TIMEOUT);
+                    MuleMessage response = client.request("test://response", RECEIVE_TIMEOUT);
                     results[0] = response == null;
                 }
                 catch (Exception e)

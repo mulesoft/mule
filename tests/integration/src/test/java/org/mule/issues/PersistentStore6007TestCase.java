@@ -8,22 +8,21 @@ package org.mule.issues;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
+import static org.mule.runtime.core.routing.AsynchronousUntilSuccessfulProcessingStrategy.buildQueueKey;
 
-import org.mule.DefaultMuleEvent;
-import org.mule.DefaultMuleMessage;
-import org.mule.MessageExchangePattern;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleEventContext;
-import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
-import org.mule.api.lifecycle.Callable;
-import org.mule.api.store.ListableObjectStore;
-import org.mule.api.store.ObjectStoreException;
-import org.mule.routing.AsynchronousUntilSuccessfulProcessingStrategy;
-import org.mule.session.DefaultMuleSession;
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.util.concurrent.Latch;
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.lifecycle.Callable;
+import org.mule.runtime.core.api.store.ListableObjectStore;
+import org.mule.runtime.core.api.store.ObjectStoreException;
+import org.mule.runtime.core.session.DefaultMuleSession;
+import org.mule.runtime.core.util.concurrent.Latch;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -34,13 +33,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PersistentStore6007TestCase extends FunctionalTestCase
 {
-    private static final Log log = LogFactory.getLog(PersistentStore6007TestCase.class);
+    private static final Logger log = LoggerFactory.getLogger(PersistentStore6007TestCase.class);
 
     private Latch latch;
 
@@ -62,10 +61,10 @@ public class PersistentStore6007TestCase extends FunctionalTestCase
     {
         latch = new Latch();
         Component.latch = latch;
-        PersistentObjectStore.addEvents(muleContext);
+        PersistentObjectStore.addEvents();
         muleContext.start();
         MuleClient client = muleContext.getClient();
-        MuleMessage result = client.send("vm://input", "Hello", null);
+        MuleMessage result = flowRunner("input").withPayload("Hello").run().getMessage();
         assertEquals("Hello", result.getPayload());
         assertTrue(latch.await(5000, TimeUnit.MILLISECONDS));
     }
@@ -73,15 +72,14 @@ public class PersistentStore6007TestCase extends FunctionalTestCase
     /** A store that "persists" events using keys that are not QueueEntry's */
     public static class PersistentObjectStore implements ListableObjectStore<Serializable>
     {
-        private static Map<Serializable, Serializable> events = new HashMap<Serializable, Serializable>();
+        private static Map<Serializable, Serializable> events = new HashMap<>();
 
-        static void addEvents(MuleContext context)
+        static void addEvents() throws Exception
         {
             for (String str : new String[] {"A", "B", "C"})
             {
-                MuleMessage msg = new DefaultMuleMessage(str, context);
-                MuleEvent event = new DefaultMuleEvent(msg, MessageExchangePattern.ONE_WAY, null, new DefaultMuleSession());
-                events.put(AsynchronousUntilSuccessfulProcessingStrategy.buildQueueKey(event), event);
+                MuleEvent event = new DefaultMuleEvent(MuleMessage.builder().payload(str).build(), ONE_WAY, getTestFlow(), new DefaultMuleSession());
+                events.put(buildQueueKey(event), event);
             }
         }
 
@@ -100,7 +98,7 @@ public class PersistentStore6007TestCase extends FunctionalTestCase
         @Override
         public synchronized List<Serializable> allKeys() throws ObjectStoreException
         {
-            return new ArrayList<Serializable>(events.keySet());
+            return new ArrayList<>(events.keySet());
         }
 
         @Override
@@ -142,7 +140,7 @@ public class PersistentStore6007TestCase extends FunctionalTestCase
 
     public static class Component implements Callable
     {
-        private static Set<String> payloads = new HashSet<String>();
+        private static Set<String> payloads = new HashSet<>();
         private static Latch latch;
         private static Object lock = new Object();
 

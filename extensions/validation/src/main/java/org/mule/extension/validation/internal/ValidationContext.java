@@ -6,7 +6,9 @@
  */
 package org.mule.extension.validation.internal;
 
-import org.mule.api.MuleEvent;
+import org.mule.extension.validation.api.ValidationExtension;
+import org.mule.extension.validation.api.ValidationOptions;
+import org.mule.runtime.core.api.MuleEvent;
 
 /**
  * A context object to gather different components that are

@@ -6,12 +6,14 @@
  */
 package org.mule.test.routing;
 
-import org.mule.api.DefaultMuleException;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.routing.DynamicRouteResolver;
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.routing.DynamicRouteResolver;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +21,7 @@ import java.util.List;
 public class CustomRouteResolver implements DynamicRouteResolver
 {
 
-    static List<MessageProcessor> routes = new ArrayList<MessageProcessor>();
+    static List<MessageProcessor> routes = new ArrayList<>();
 
     @Override
     public List<MessageProcessor> resolveRoutes(MuleEvent event)
@@ -42,7 +44,7 @@ public class CustomRouteResolver implements DynamicRouteResolver
         {
             try
             {
-                event.getMessage().setPayload(letter);
+                event.setMessage(MuleMessage.builder(event.getMessage()).payload(letter).build());
                 return event;
             }
             catch (Exception e)
@@ -78,7 +80,9 @@ public class CustomRouteResolver implements DynamicRouteResolver
         {
             try
             {
-                event.getMessage().setPayload(event.getMessage().getPayloadAsString() + letter);
+                event.setMessage(MuleMessage.builder(event.getMessage())
+                                            .payload(event.getMuleContext().getTransformationService().transform(event.getMessage(), DataType.STRING).getPayload() + letter)
+                                            .build());
             }
             catch (Exception e)
             {

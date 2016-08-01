@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd">
+
+    <tls:context name="tlsContext" enabledProtocols="TLSv1" enabledCipherSuites="TLS_DHE_DSS_WITH_AES_128_CBC_SHA">
+        <tls:trust-store path="trustStore" password="mulepassword"
+                         type="jks" algorithm="SunX509" insecure="false"/>
+
+        <tls:key-store path="serverKeystore" keyPassword="mulepassword" password="mulepassword"
+                       algorithm="SunX509" alias="muleserver" type="jks"/>
+    </tls:context>
+
+
+</mule>

@@ -2,18 +2,20 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:spring="http://www.springframework.org/schema/beans"
-       xmlns:http="http://www.mulesoft.org/schema/mule/http"
-       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+       xmlns:http="http://www.mulesoft.org/schema/mule/transport/http"
+       xmlns:vm="http://www.mulesoft.org/schema/mule/transport/vm"
+       xmlns:transports="http://www.mulesoft.org/schema/mule/transports"
         xmlns:test="http://www.mulesoft.org/schema/mule/test"
     xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
-       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+       http://www.mulesoft.org/schema/mule/transport/vm http://www.mulesoft.org/schema/mule/transport/vm/current/mule-transport-vm.xsd
+       http://www.mulesoft.org/schema/mule/transport/http http://www.mulesoft.org/schema/mule/transport/http/current/mule-transport-http.xsd
+       http://www.mulesoft.org/schema/mule/transports http://www.mulesoft.org/schema/mule/transports/current/mule-transports.xsd">
 
     <!-- Try diffent variations of endpoint config -->
-    <endpoint name="base" address="http://localhost:${port1}" exchange-pattern="request-response"/>
+    <transports:endpoint name="base" address="http://localhost:${port1}" exchange-pattern="request-response"/>
 
     <http:endpoint name="response" address="http://localhost:${port2}" exchange-pattern="request-response"/>
 
@@ -29,7 +31,7 @@
     <!-- first, the simple two service model we use in all cases, with no additional transformers -->
     <flow name="baseService1">
         <http:inbound-endpoint ref="base"/>
-        <outbound-endpoint address="vm://echo1" exchange-pattern="request-response"/>
+        <transports:outbound-endpoint address="vm://echo1" exchange-pattern="request-response"/>
     </flow>
 
     <flow name="baseService2">
@@ -41,20 +43,20 @@
 
     <!-- add reponse transformers to the base model should make a difference -->
     <flow name="responseService1">
-        <inbound-endpoint ref="response">
-            <response>
+        <transports:inbound-endpoint ref="response">
+            <transports:response>
                 <transformer ref="appendResponse"/>
-            </response>
-        </inbound-endpoint>
+            </transports:response>
+        </transports:inbound-endpoint>
         <vm:outbound-endpoint path="echo2" exchange-pattern="request-response"/>
     </flow>
 
     <flow name="responseService2">
         <vm:inbound-endpoint path="echo2" exchange-pattern="request-response">
             <object-to-string-transformer/>
-            <response>
+            <transports:response>
                 <transformer ref="appendResponse2"/>
-            </response>
+            </transports:response>
         </vm:inbound-endpoint>
         <test:component appendString=" Received"/>
     </flow>
@@ -64,20 +66,20 @@
         <http:inbound-endpoint ref="both">
             <object-to-string-transformer/>
             <transformer ref="appendString"/>
-            <response>
+            <transports:response>
                 <transformer ref="appendResponse"/>
-            </response>
+            </transports:response>
         </http:inbound-endpoint>
-        <outbound-endpoint address="vm://echo3" exchange-pattern="request-response"/>
+        <transports:outbound-endpoint address="vm://echo3" exchange-pattern="request-response"/>
     </flow>
 
     <flow name="bothService2">
         <vm:inbound-endpoint address="vm://echo3" exchange-pattern="request-response">
             <object-to-string-transformer/>
             <transformer ref="appendString2"/>
-            <response>
+            <transports:response>
                 <transformer ref="appendResponse2"/>
-            </response>
+            </transports:response>
         </vm:inbound-endpoint>
         <test:component appendString=" Received"/>
     </flow>

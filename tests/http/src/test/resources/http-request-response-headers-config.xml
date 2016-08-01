@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
+
+    <httpn:request-config name="config">
+        <httpn:request-connection host="localhost" port="${httpPort}"/>
+    </httpn:request-config>
+
+    <flow name="empty">
+        <httpn:request config-ref="config" path="empty" key="ANY"/>
+        <set-payload value="#[message.getAttributes().getHeaders()['${header}']]"/>
+    </flow>
+
+    <flow name="simple">
+        <httpn:request config-ref="config" path="simple" key="ANY"/>
+        <set-payload value="#[message.getAttributes().getHeaders()['${header}']]"/>
+    </flow>
+
+    <flow name="multipleString">
+        <httpn:request config-ref="config" path="multiple" key="ANY"/>
+        <set-payload value="#[message.getAttributes().getHeaders()['${header}']]"/>
+    </flow>
+
+    <flow name="multipleCollection">
+        <httpn:request config-ref="config" path="multiple" key="ANY"/>
+        <set-payload value="#[message.getAttributes().getHeaders().getAll('${header}').iterator().next()]"/>
+    </flow>
+
+</mule>

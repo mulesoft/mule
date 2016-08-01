@@ -2,15 +2,14 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:spring="http://www.springframework.org/schema/beans"
-       xmlns:http="http://www.mulesoft.org/schema/mule/http"
+       xmlns:http="http://www.mulesoft.org/schema/mule/transport/http"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+       http://www.mulesoft.org/schema/mule/transport/http http://www.mulesoft.org/schema/mule/transport/http/current/mule-transport-http.xsd">
 
     <flow name="httpIn">
-        <http:inbound-endpoint host="localhost" port="${port1}" exchange-pattern="request-response"
-                               name="inHttpIn"/>
+        <http:inbound-endpoint host="localhost" port="${port1}" exchange-pattern="request-response"/>
         <echo-component/>
     </flow>
     

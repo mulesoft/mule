@@ -1,53 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" 
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm" 
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
-       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
-    <vm:connector name="vmConnector"/>
-
     <flow name="testService1">
-        <vm:inbound-endpoint path="in1" exchange-pattern="one-way"/>
         <test:component throwException="true"/>
         <default-exception-strategy>
-            <vm:outbound-endpoint path="out1" exchange-pattern="one-way" connector-ref="vmConnector"/>
+            <test:queue name="out1"/>
         </default-exception-strategy>
     </flow>
 
     <flow name="testService2">
-        <vm:inbound-endpoint path="in2" exchange-pattern="one-way"/>
         <test:component throwException="true"/>
         <default-exception-strategy>
             <all>
-                <vm:outbound-endpoint path="out2" exchange-pattern="one-way" connector-ref="vmConnector"/>
-                <vm:outbound-endpoint path="out3" exchange-pattern="one-way" connector-ref="vmConnector"/>
+                <test:queue name="out2"/>
+                <test:queue name="out3"/>
             </all>
         </default-exception-strategy>
     </flow>
 
     <flow name="testService3">
-        <vm:inbound-endpoint path="in3" exchange-pattern="one-way"/>
         <test:component throwException="true"/>
         <default-exception-strategy>
             <processor-chain>
                 <static-component>
                     <return-data>ERROR!</return-data>
                 </static-component>
-                <vm:outbound-endpoint path="out4" exchange-pattern="one-way" connector-ref="vmConnector"/>
+                <test:queue name="out4"/>
             </processor-chain>
         </default-exception-strategy>
     </flow>
 
     <flow name="testService5">
-        <vm:inbound-endpoint path="in5"/>
         <test:component throwException="true"/>
         <default-exception-strategy stopMessageProcessing="true">
-            <vm:outbound-endpoint path="out5" connector-ref="vmConnector"/>
+            <test:queue name="out5"/>
         </default-exception-strategy>
     </flow>
 
+    <flow name="testService6">
+        <test:component throwException="true"/>
+        <default-exception-strategy>
+            <test:queue name="out6"/>
+        </default-exception-strategy>
+    </flow>
 </mule>

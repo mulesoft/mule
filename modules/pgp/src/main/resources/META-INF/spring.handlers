@@ -1,1 +1,1 @@
-http\://www.mulesoft.org/schema/mule/pgp=org.mule.module.pgp.config.PgpNamespaceHandler
+http\://www.mulesoft.org/schema/mule/pgp=org.mule.runtime.module.pgp.config.PgpNamespaceHandler

@@ -6,22 +6,24 @@
  */
 package org.mule.test.integration.exceptions;
 
-import org.mule.api.client.LocalMuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.tck.testmodels.mule.TestExceptionStrategy;
 import org.mule.tck.testmodels.mule.TestExceptionStrategy.ExceptionCallback;
-import org.mule.util.concurrent.Latch;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class AbstractExceptionStrategyTestCase extends FunctionalTestCase
 {
+
     public static final int LATCH_AWAIT_TIMEOUT = 3000;
-    
+
     protected final AtomicInteger systemExceptionCounter = new AtomicInteger();
     protected final AtomicInteger serviceExceptionCounter = new AtomicInteger();
     protected Latch latch;
-    protected LocalMuleClient client;
+    protected MuleClient client;
 
     @Override
     protected void doSetUp() throws Exception
@@ -38,6 +40,7 @@ public abstract class AbstractExceptionStrategyTestCase extends FunctionalTestCa
         TestExceptionStrategy systemExceptionListener = new TestExceptionStrategy();
         systemExceptionListener.setExceptionCallback(new ExceptionCallback()
         {
+            @Override
             public void onException(Throwable t)
             {
                 systemExceptionCounter.incrementAndGet();
@@ -46,16 +49,18 @@ public abstract class AbstractExceptionStrategyTestCase extends FunctionalTestCa
         });
         muleContext.setExceptionListener(systemExceptionListener);
 
-        TestExceptionStrategy serviceExceptionListener = 
-            (TestExceptionStrategy) muleContext.getRegistry().lookupModel("TestModel").getExceptionListener();
-        serviceExceptionListener.setExceptionCallback(new ExceptionCallback()
+        for (FlowConstruct flow : muleContext.getRegistry().lookupFlowConstructs())
         {
-            public void onException(Throwable t)
+            ((TestExceptionStrategy) flow.getExceptionListener()).setExceptionCallback(new ExceptionCallback()
             {
-                serviceExceptionCounter.incrementAndGet();
-                latch.countDown();
-            }
-        });
+                @Override
+                public void onException(Throwable t)
+                {
+                    serviceExceptionCounter.incrementAndGet();
+                    latch.countDown();
+                }
+            });
+        }
     }
 
     @Override

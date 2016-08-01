@@ -2,35 +2,28 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:spring="http://www.springframework.org/schema/beans"
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/transport/vm"
+      xmlns:transports="http://www.mulesoft.org/schema/mule/transports"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xsi:schemaLocation="
         http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+        http://www.mulesoft.org/schema/mule/transport/vm http://www.mulesoft.org/schema/mule/transport/vm/current/mule-transport-vm.xsd
+        http://www.mulesoft.org/schema/mule/transports http://www.mulesoft.org/schema/mule/transports/current/mule-transports.xsd">
 
-    <endpoint name="out" exchange-pattern="request-response" address="${outbound.destination}"/>
+    <transports:endpoint name="out" exchange-pattern="request-response" address="${outbound.destination}"/>
 
     <vm:connector name="vmConnector"/>
 
-    <model name="Model">
-        <service name="JmsQueueComponent">
-            <inbound>
-                <inbound-endpoint address="vm://in" exchange-pattern="request-response"/>
-            </inbound>
-            <outbound>
-                <pass-through-router>
-                    <outbound-endpoint ref="out"/>
-                </pass-through-router>
-            </outbound>
-        </service>
+    <flow name="JmsQueueComponent">
+        <transports:inbound-endpoint address="vm://in" exchange-pattern="request-response"/>
+        <transports:outbound-endpoint ref="out"/>
+    </flow>
 
-        <service name="EchoComponent">
-            <inbound>
-                <inbound-endpoint ref="out"/>
-            </inbound>
-            <test:component appendString=" Received"/>
-        </service>
-    </model>
+    <flow name="EchoComponent">
+        <transports:inbound-endpoint ref="out"/>
+        <test:component appendString=" Received"/>
+    </flow>
+
 </mule>

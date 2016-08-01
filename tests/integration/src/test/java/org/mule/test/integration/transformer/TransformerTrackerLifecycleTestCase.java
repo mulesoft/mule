@@ -6,41 +6,36 @@
  */
 package org.mule.test.integration.transformer;
 
-import static org.junit.Assert.assertEquals;
-import org.mule.api.MuleMessage;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
+import static org.junit.Assert.assertThat;
 
-import java.util.Arrays;
-import java.util.Collection;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class TransformerTrackerLifecycleTestCase extends AbstractServiceAndFlowTestCase
+public class TransformerTrackerLifecycleTestCase extends FunctionalTestCase
 {
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/transformers/transformer-lifecycle-service.xml"},
-            {ConfigVariant.FLOW, "org/mule/test/transformers/transformer-lifecycle-flow.xml"}});
-    }
 
-    public TransformerTrackerLifecycleTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
+        return "org/mule/test/transformers/transformer-lifecycle-flow.xml";
     }
 
     @Test
     public void testLifecycle() throws Exception
     {
-        final MuleMessage result = muleContext.getClient().send("vm://EchoService.In", "foo", null);
+        final MuleMessage result = flowRunner("EchoService").withPayload("foo").run().getMessage();
 
         final LifecycleTrackerTransformer ltt = (LifecycleTrackerTransformer) result.getPayload();
 
         muleContext.dispose();
 
-        assertEquals("[setProperty, setMuleContext, setMuleContext, initialise, setMuleContext, initialise, start, start, stop, stop, dispose]",
-            ltt.getTracker().toString());
+        assertThat(ltt.getTracker(),
+                contains("setProperty",
+                        "setMuleContext", "setMuleContext",
+                        "initialise", "start",
+                        "stop", "dispose"));
     }
 }

@@ -2,49 +2,35 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:mule="http://www.mulesoft.org/schema/mule/core"
-      xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+      xmlns:jms="http://www.mulesoft.org/schema/mule/transport/jms"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns:transports="http://www.mulesoft.org/schema/mule/transports"
       xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-       http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd">
+       http://www.mulesoft.org/schema/mule/transport/jms http://www.mulesoft.org/schema/mule/transport/jms/current/mule-transport-jms.xsd
+       http://www.mulesoft.org/schema/mule/transports http://www.mulesoft.org/schema/mule/transports/current/mule-transports.xsd">
 
-    <endpoint name="in" address="${inbound.destination}" exchange-pattern="one-way"/>
-    <endpoint name="middle" address="${middle.destination}" exchange-pattern="one-way"/>
-    <endpoint name="out" address="${outbound.destination}" exchange-pattern="one-way"/>
+    <transports:endpoint name="in" address="${inbound.destination}" exchange-pattern="one-way"/>
+    <transports:endpoint name="middle" address="${middle.destination}" exchange-pattern="one-way"/>
+    <transports:endpoint name="out" address="${outbound.destination}" exchange-pattern="one-way"/>
 
-    <model name="jmsTest">
+    <flow name="InputPart">
+        <transports:inbound-endpoint ref="in">
+            <jms:transaction action="NONE"/>
+        </transports:inbound-endpoint>
+        <test:component>
+            <test:return-data>OUTPUT MESSAGE</test:return-data>
+        </test:component>
+        <transports:outbound-endpoint ref="middle"/>
+    </flow>
 
-        <service name="InputPart">
-            <inbound>
-                <inbound-endpoint ref="in">
-                    <jms:transaction action="NONE"/>
-                </inbound-endpoint>
-            </inbound>
-            <test:component>
-                <test:return-data>OUTPUT MESSAGE</test:return-data>
-            </test:component>
-            <outbound>
-                <pass-through-router>
-                    <outbound-endpoint ref="middle"/>
-                </pass-through-router>
-            </outbound>
-        </service>
+    <flow name="OutputPart">
+        <transports:inbound-endpoint ref="middle"/>
+        <test:component>
+            <test:return-data>OUTPUT MESSAGE</test:return-data>
+        </test:component>
+        <transports:outbound-endpoint ref="out"/>
+    </flow>
 
-        <service name="OutputPart">
-            <inbound>
-                <inbound-endpoint ref="middle"/>
-            </inbound>
-            <test:component>
-                <test:return-data>OUTPUT MESSAGE</test:return-data>
-            </test:component>
-            <outbound>
-                <pass-through-router>
-                    <outbound-endpoint ref="out"/>
-                </pass-through-router>
-            </outbound>
-        </service>
-
-
-    </model>
 </mule>

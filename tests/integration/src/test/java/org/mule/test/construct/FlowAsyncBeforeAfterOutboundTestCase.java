@@ -6,16 +6,18 @@
  */
 package org.mule.test.construct;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static java.lang.Thread.currentThread;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.assertThat;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.processor.MessageProcessor;
 
 import org.junit.Test;
 
@@ -32,10 +34,10 @@ public class FlowAsyncBeforeAfterOutboundTestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
 
-        MuleMessage msgSync = client.send("vm://test.before.sync.in", "message", null);
+        MuleMessage msgSync = flowRunner("test-async-block-before-outbound").withPayload("message").run().getMessage();
 
-        MuleMessage msgAsync = client.request("vm://test.before.async.out", RECEIVE_TIMEOUT);
-        MuleMessage msgOut = client.request("vm://test.before.out", RECEIVE_TIMEOUT);
+        MuleMessage msgAsync = client.request("test://test.before.async.out", RECEIVE_TIMEOUT);
+        MuleMessage msgOut = client.request("test://test.before.out", RECEIVE_TIMEOUT);
 
         assertCorrectThreads(msgSync, msgAsync, msgOut);
 
@@ -46,28 +48,23 @@ public class FlowAsyncBeforeAfterOutboundTestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
 
-        MuleMessage msgSync = client.send("vm://test.after.sync.in", "message", null);
+        MuleMessage msgSync = flowRunner("test-async-block-after-outbound").withPayload("message").run().getMessage();
 
-        MuleMessage msgAsync = client.request("vm://test.after.async.out", RECEIVE_TIMEOUT);
-        MuleMessage msgOut = client.request("vm://test.after.out", RECEIVE_TIMEOUT);
+        MuleMessage msgAsync = client.request("test://test.after.async.out", RECEIVE_TIMEOUT);
+        MuleMessage msgOut = client.request("test://test.after.out", RECEIVE_TIMEOUT);
 
         assertCorrectThreads(msgSync, msgAsync, msgOut);
     }
 
     private void assertCorrectThreads(MuleMessage msgSync, MuleMessage msgAsync, MuleMessage msgOut) throws Exception
     {
-        assertNotNull(msgSync);
-        assertNotNull(msgAsync);
-        assertNotNull(msgOut);
+        assertThat(msgSync, not(nullValue()));
+        assertThat(msgAsync, not(nullValue()));
+        assertThat(msgOut, not(nullValue()));
 
-        assertEquals(msgSync.getInboundProperty("request-response-thread"),
-            msgOut.getInboundProperty("request-response-thread"));
-
-        assertTrue(!msgAsync.getInboundProperty("async-thread").
-            equals(msgSync.getInboundProperty("request-response-thread")));
-
-        assertTrue(!msgAsync.getInboundProperty("async-thread").
-            equals(msgOut.getInboundProperty("request-response-thread")));
+        assertThat(msgOut.getInboundProperty("request-response-thread"), equalTo(msgSync.getInboundProperty("request-response-thread")));
+        assertThat(msgSync.getOutboundProperty("request-response-thread"), not(equalTo(msgAsync.getOutboundProperty("async-thread"))));
+        assertThat(msgOut.getOutboundProperty("request-response-thread"), not(equalTo(msgAsync.getOutboundProperty("async-thread"))));
     }
 
     public static class ThreadSensingMessageProcessor implements MessageProcessor
@@ -75,9 +72,9 @@ public class FlowAsyncBeforeAfterOutboundTestCase extends FunctionalTestCase
         @Override
         public MuleEvent process(MuleEvent event) throws MuleException
         {
-            String propName = event.getMessage().getInvocationProperty("property-name");
-
-            event.getMessage().setOutboundProperty(propName, Thread.currentThread().getName());
+            event.setMessage(MuleMessage.builder(event.getMessage())
+                                        .addOutboundProperty(event.getFlowVariable("property-name"), currentThread().getName())
+                                        .build());
             return event;
         }
     }

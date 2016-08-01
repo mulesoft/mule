@@ -9,55 +9,26 @@ package org.mule.test.integration.routing;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
-import org.mule.api.context.notification.ServerNotification;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.tck.functional.FunctionalTestNotificationListener;
-import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.util.concurrent.Latch;
+import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
+import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.concurrent.TimeUnit;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class WireTapCxfTestCase extends AbstractServiceAndFlowTestCase
+public class WireTapCxfTestCase extends FunctionalTestCase
 {
-    private static final Latch tapLatch = new Latch();
-
     @Rule
     public DynamicPort port1 = new DynamicPort("port1");
 
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/integration/routing/wire-tap-cxf-service.xml"},
-            {ConfigVariant.FLOW, "org/mule/test/integration/routing/wire-tap-cxf-flow.xml"}});
-    }
-
-    public WireTapCxfTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
     @Override
-    protected void doSetUp() throws Exception
+    protected String getConfigFile()
     {
-        super.doSetUp();
-
-        muleContext.registerListener(new FunctionalTestNotificationListener()
-        {
-            @Override
-            public void onNotification(ServerNotification notification)
-            {
-                tapLatch.release();
-            }
-        });
+        return "org/mule/test/integration/routing/wire-tap-cxf-flow.xml";
     }
 
     @Test
@@ -68,13 +39,13 @@ public class WireTapCxfTestCase extends AbstractServiceAndFlowTestCase
                      + "<soap:Body><echo><text>foo</text></echo></soap:Body></soap:Envelope>";
 
         MuleClient client = muleContext.getClient();
-        MuleMessage response = client.send(url, getTestMuleMessage(msg));
+        MuleMessage response = client.send(url, getTestMuleMessage(msg), newOptions().method(POST.name()).build());
         assertNotNull(response);
 
-        String responseString = response.getPayloadAsString();
+        String responseString = getPayloadAsString(response);
         assertTrue(responseString.contains("echoResponse"));
         assertFalse(responseString.contains("soap:Fault"));
 
-        assertTrue(tapLatch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
+        assertNotNull(client.request("test://wireTapped", RECEIVE_TIMEOUT));
     }
 }

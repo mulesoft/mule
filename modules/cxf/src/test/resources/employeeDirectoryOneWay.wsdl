@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?><wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns1="http://schemas.xmlsoap.org/soap/http" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://employee.example.mule.org/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="EmployeeDirectory" targetNamespace="http://employee.example.mule.org/">
+  <wsdl:types>
+      <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+          attributeFormDefault="unqualified"
+          elementFormDefault="qualified"
+          targetNamespace="http://employee.example.mule.org/"
+          xmlns:tns="http://employee.example.mule.org/">
+          <xs:complexType name="employee">
+              <xs:sequence>
+                  <xs:element minOccurs="0" name="division"
+                      type="xs:string" />
+                  <xs:element minOccurs="0" name="name"
+                      type="xs:string" />
+                  <xs:element
+                      xmlns:xmime="http://www.w3.org/2005/05/xmlmime"
+                      minOccurs="0" name="picture"
+                      xmime:expectedContentTypes="application/octet-stream"
+                      type="xs:base64Binary" />
+              </xs:sequence>
+          </xs:complexType>
+          <xs:element name="addEmployee" type="tns:addEmployee" />
+          <xs:complexType name="addEmployee">
+              <xs:sequence>
+                  <xs:element minOccurs="0" name="employee"
+                      type="tns:employee" />
+              </xs:sequence>
+          </xs:complexType>
+      </xs:schema>
+  </wsdl:types>
+  <wsdl:message name="addEmployee">
+    <wsdl:part element="tns:addEmployee" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="EmployeeDirectory">
+    <wsdl:operation name="addEmployee">
+      <wsdl:input message="tns:addEmployee" name="addEmployee">
+    </wsdl:input>
+
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="EmployeeDirectorySoapBinding" type="tns:EmployeeDirectory">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="addEmployee">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="addEmployee">
+        <soap:body use="literal"/>
+      </wsdl:input>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="EmployeeDirectory">
+    <wsdl:port binding="tns:EmployeeDirectorySoapBinding" name="EmployeeDirectoryPort">
+      <soap:address location="http://localhost:8080/services/employeeDirectory"/>
+    </wsdl:port>
+
+  </wsdl:service>
+</wsdl:definitions>

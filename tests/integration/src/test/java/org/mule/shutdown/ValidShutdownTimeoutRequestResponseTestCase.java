@@ -8,17 +8,16 @@ package org.mule.shutdown;
 
 import static org.junit.Assert.assertTrue;
 
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.tck.junit4.rule.SystemProperty;
 
-import java.util.HashMap;
-
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
+@Ignore("See MULE-9200")
 public class ValidShutdownTimeoutRequestResponseTestCase extends AbstractShutdownTimeoutRequestResponseTestCase
 {
     @Rule
@@ -66,9 +65,9 @@ public class ValidShutdownTimeoutRequestResponseTestCase extends AbstractShutdow
             {
                 try
                 {
-                    DefaultMuleMessage muleMessage = new DefaultMuleMessage(payload, new HashMap<String, Object>(), muleContext);
+                    MuleMessage muleMessage = MuleMessage.builder().payload(payload).build();
                     MuleMessage result = client.send(url, muleMessage);
-                    results[0] = payload.equals(result.getPayloadAsString());
+                    results[0] = payload.equals(getPayloadAsString(result));
                 }
                 catch (Exception e)
                 {

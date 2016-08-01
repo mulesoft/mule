@@ -10,98 +10,41 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleMessage;
-import org.mule.api.transformer.TransformerException;
-import org.mule.expression.ExpressionConfig;
-import org.mule.expression.transformers.ExpressionArgument;
-import org.mule.expression.transformers.ExpressionTransformer;
+import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.expression.ExpressionConfig;
+import org.mule.runtime.core.expression.transformers.ExpressionArgument;
+import org.mule.runtime.core.expression.transformers.ExpressionTransformer;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import groovyjarjarasm.asm.ClassWriter;
 import groovyjarjarasm.asm.Opcodes;
-
 import org.junit.Test;
 
 public class ExpressionTransformerTestCase extends AbstractMuleContextTestCase
 {
-
-    /**
-     * See: MULE-4797 GroovyExpressionEvaluator script is unable to load user classes when used with hot
-     * deployment.
-     *
-     * @throws TransformerException
-     */
-    @Test
-    public void testExpressionEvaluationClassLoader() throws ClassNotFoundException, TransformerException
-    {
-        ExpressionTransformer transformer = new ExpressionTransformer();
-        transformer.setMuleContext(muleContext);
-        transformer.addArgument(new ExpressionArgument("test", new ExpressionConfig(
-            "payload instanceof org.MyClass", "groovy", null), false));
-
-        ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
-        try
-        {
-            Thread.currentThread().setContextClassLoader(new MyClassClassLoader());
-            transformer.initialise();
-        }
-        catch (Exception e)
-        {
-            fail(e.getMessage());
-        }
-        finally
-        {
-            Thread.currentThread().setContextClassLoader(originalClassLoader);
-        }
-
-        assertFalse((Boolean) transformer.transform("test"));
-    }
 
     @Test
     public void testExpressionEvaluationClassLoaderEL() throws ClassNotFoundException, TransformerException
     {
         ExpressionTransformer transformer = new ExpressionTransformer();
         transformer.setMuleContext(muleContext);
-        transformer.addArgument(new ExpressionArgument("test", new ExpressionConfig("payload is org.MyClass",
-            null, null), false));
+        transformer.addArgument(new ExpressionArgument("test", new ExpressionConfig("payload is org.MyClass"), false));
 
-        ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
-        try
-        {
-            Thread.currentThread().setContextClassLoader(new MyClassClassLoader());
-            transformer.initialise();
-        }
-        catch (Exception e)
-        {
-            fail(e.getMessage());
-        }
-        finally
-        {
-            Thread.currentThread().setContextClassLoader(originalClassLoader);
-        }
+        withContextClassLoader(new MyClassClassLoader(), () -> {
+            try
+            {
+                transformer.initialise();
+            }
+            catch (Exception e)
+            {
+                fail(e.getMessage());
+            }
+        });
 
         assertFalse((Boolean) transformer.transform("test"));
-    }
-
-    @Test
-    public void testNullPayloadIsConsideredAsNullResult() throws Exception
-    {
-        ExpressionTransformer transformer = new ExpressionTransformer();
-        transformer.setMuleContext(muleContext);
-        transformer.setReturnSourceIfNull(true);
-        ExpressionConfig config = new ExpressionConfig("null", "groovy", null);
-        ExpressionArgument argument = new ExpressionArgument("test", config, false);
-        argument.setMuleContext(muleContext);
-        transformer.addArgument(argument);
-
-        MuleMessage message = new DefaultMuleMessage("Test", muleContext);
-        Object result = transformer.transformMessage(message, null);
-        assertTrue(result instanceof MuleMessage);
-        MuleMessage transformedMessage = (MuleMessage) result;
-
-        assertEquals("Test", transformedMessage.getPayload());
     }
 
     @Test
@@ -110,15 +53,15 @@ public class ExpressionTransformerTestCase extends AbstractMuleContextTestCase
         ExpressionTransformer transformer = new ExpressionTransformer();
         transformer.setMuleContext(muleContext);
         transformer.setReturnSourceIfNull(true);
-        ExpressionConfig config = new ExpressionConfig("null", null, null);
+        ExpressionConfig config = new ExpressionConfig("null");
 
         // MVL doesn't return NullPayload but rather null.  So 'optional' needs to be true.
         ExpressionArgument argument = new ExpressionArgument("test", config, true);
         argument.setMuleContext(muleContext);
         transformer.addArgument(argument);
 
-        MuleMessage message = new DefaultMuleMessage("Test", muleContext);
-        Object result = transformer.transformMessage(message, null);
+        MuleEvent event = getTestEvent("Test");
+        Object result = transformer.transformMessage(event, null);
         assertTrue(result instanceof MuleMessage);
         MuleMessage transformedMessage = (MuleMessage) result;
 
@@ -128,6 +71,7 @@ public class ExpressionTransformerTestCase extends AbstractMuleContextTestCase
 
     class MyClassClassLoader extends ClassLoader
     {
+
         @Override
         protected Class<?> findClass(String className) throws ClassNotFoundException
         {

@@ -7,15 +7,15 @@
 
 package org.mule.test.integration.watermark;
 
-import org.mule.api.lifecycle.LifecycleException;
-import org.mule.tck.junit4.ApplicationContextBuilder;
+import org.mule.functional.junit4.ApplicationContextBuilder;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
 
 import org.junit.Test;
 
 public class WatermarkInvalidSelectorExpressionTestCase
 {
 
-    @Test(expected = LifecycleException.class)
+    @Test(expected = InitialisationException.class)
     public void invalidSelectorExpression() throws Exception
     {
         ApplicationContextBuilder builder = new ApplicationContextBuilder();

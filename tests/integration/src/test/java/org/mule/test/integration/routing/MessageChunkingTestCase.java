@@ -9,37 +9,27 @@ package org.mule.test.integration.routing;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.api.client.MuleClient;
-import org.mule.api.context.notification.EndpointMessageNotificationListener;
-import org.mule.api.context.notification.ServerNotification;
-import org.mule.context.notification.EndpointMessageNotification;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.tck.functional.FunctionalTestNotification;
-import org.mule.tck.functional.FunctionalTestNotificationListener;
-import org.mule.util.concurrent.Latch;
+import org.mule.functional.functional.FunctionalTestNotification;
+import org.mule.functional.functional.FunctionalTestNotificationListener;
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.listener.FlowExecutionListener;
+import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.context.notification.ServerNotification;
+import org.mule.runtime.core.util.concurrent.Latch;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.lang.SerializationUtils;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class MessageChunkingTestCase extends AbstractServiceAndFlowTestCase
+public class MessageChunkingTestCase extends FunctionalTestCase
 {
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/integration/routing/message-chunking-service.xml"},
-            {ConfigVariant.FLOW, "org/mule/test/integration/routing/message-chunking-flow.xml"}});
-    }
 
-    public MessageChunkingTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
+        return "org/mule/test/integration/routing/message-chunking-flow.xml";
     }
 
     @Test
@@ -106,21 +96,11 @@ public class MessageChunkingTestCase extends AbstractServiceAndFlowTestCase
 
         // Listen to Message Notifications on the Chunking receiver so we can
         // determine how many message parts have been received
-        muleContext.registerListener(new EndpointMessageNotificationListener<EndpointMessageNotification>()
-        {
-            @Override
-            public void onNotification(EndpointMessageNotification notification)
-            {
-                if (notification.getAction() == EndpointMessageNotification.MESSAGE_RECEIVED)
-                {
-                    messagePartsCount.getAndIncrement();
-                }
-                assertEquals("ChunkingObjectReceiver", notification.getResourceIdentifier());
-            }
-        }, "ChunkingObjectReceiver");
+        FlowExecutionListener flowExecutionListener = new FlowExecutionListener("ChunkingObjectReceiver", muleContext);
+        flowExecutionListener.addListener(source -> messagePartsCount.getAndIncrement());
 
         MuleClient client = muleContext.getClient();
-        client.dispatch("vm://inbound.object.channel", simpleSerializableObject, null);
+        flowRunner("ObjectReceiver").withPayload(simpleSerializableObject).asynchronously().run();
         // Wait for the message to be received and tested (in the listener above)
         assertTrue(chunkingReceiverLatch.await(20L, TimeUnit.SECONDS));
         // Ensure we processed expected number of message parts
@@ -151,21 +131,9 @@ public class MessageChunkingTestCase extends AbstractServiceAndFlowTestCase
 
         // Listen to Message Notifications on the Chunking receiver so we can
         // determine how many message parts have been received
-        muleContext.registerListener(new EndpointMessageNotificationListener<EndpointMessageNotification>()
-        {
-            @Override
-            public void onNotification(EndpointMessageNotification notification)
-            {
-                if (notification.getAction() == EndpointMessageNotification.MESSAGE_RECEIVED)
-                {
-                    messagePartsCount.getAndIncrement();
-                }
-                assertEquals("ChunkingReceiver", notification.getResourceIdentifier());
-            }
-        }, "ChunkingReceiver");
-
-        MuleClient client = muleContext.getClient();
-        client.dispatch("vm://inbound.channel", data, null);
+        FlowExecutionListener flowExecutionListener = new FlowExecutionListener("ChunkingReceiver", muleContext);
+        flowExecutionListener.addListener(source -> messagePartsCount.getAndIncrement());
+        flowRunner("Receiver").withPayload(data).asynchronously().run();
         // Wait for the message to be received and tested (in the listener above)
         assertTrue(chunkingReceiverLatch.await(20L, TimeUnit.SECONDS));
         // Ensure we processed expected number of message parts

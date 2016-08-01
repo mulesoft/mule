@@ -14,8 +14,8 @@
 
     <flow name="helloService" processingStrategy="non-blocking">
         <http:listener path="/hello" config-ref="listenerConfig" allowedMethods="POST" />
-        <cxf:jaxws-service serviceClass="org.mule.module.cxf.example.HelloWorldImpl"/>
-        <component class="org.mule.module.cxf.example.HelloWorldImpl" />
+        <cxf:jaxws-service serviceClass="org.mule.runtime.module.cxf.example.HelloWorldImpl"/>
+        <component class="org.mule.runtime.module.cxf.example.HelloWorldImpl" />
     </flow>
 
     <http:request-config name="requestConfig" host="localhost" port="${port1}" />
@@ -25,11 +25,9 @@
         <http:listener path="/helloClient" config-ref="listenerConfig" allowedMethods="POST" />
         <object-to-string-transformer />
         <processor ref="sensingRequestResponseProcessor" />
-        <cxf:jaxws-client serviceClass="org.mule.module.cxf.example.HelloWorldImpl" operation="sayHi"/>
+        <cxf:jaxws-client serviceClass="org.mule.runtime.module.cxf.example.HelloWorldImpl" operation="sayHi"/>
         <http:request config-ref="requestConfig" path="/hello" method="POST" />
-        <message-properties-transformer scope="outbound">
-            <add-message-property key="contentType" value="#[header:INBOUND:content-type]"/>
-        </message-properties-transformer>
+        <set-property propertyName="contentType" value="#[message.getDataType().getMediaType().toRfcString()]"/>
     </flow>
 
     <spring:bean name="sensingRequestResponseProcessorProxy" class="org.mule.tck.SensingNullRequestResponseMessageProcessor" scope="singleton" />
@@ -37,11 +35,9 @@
         <http:listener path="/helloClientProxy" config-ref="listenerConfig" allowedMethods="POST" />
         <object-to-string-transformer />
         <processor ref="sensingRequestResponseProcessorProxy" />
-        <cxf:jaxws-client serviceClass="org.mule.module.cxf.example.HelloWorldImpl" operation="sayHi"/>
+        <cxf:jaxws-client serviceClass="org.mule.runtime.module.cxf.example.HelloWorldImpl" operation="sayHi"/>
         <http:request config-ref="requestConfig" path="/hello" method="POST" />
-        <message-properties-transformer scope="outbound">
-            <add-message-property key="contentType" value="#[header:INBOUND:content-type]"/>
-        </message-properties-transformer>
+        <set-property propertyName="contentType" value="#[message.getDataType().getMediaType().toRfcString()]"/>
     </flow>
 
 </mule>

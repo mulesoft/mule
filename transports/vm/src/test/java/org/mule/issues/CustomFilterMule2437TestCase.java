@@ -8,32 +8,22 @@ package org.mule.issues;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
 
-import java.util.Arrays;
-import java.util.Collection;
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.client.MuleClient;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class CustomFilterMule2437TestCase extends AbstractServiceAndFlowTestCase
+public class CustomFilterMule2437TestCase extends FunctionalTestCase
 {
+
     private static final long TIMEOUT = 3000L;
 
-    public CustomFilterMule2437TestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "issues/custom-filter-mule-2437-test-service.xml"},
-            {ConfigVariant.FLOW, "issues/custom-filter-mule-2437-test-flow.xml"}
-        });
+        return "issues/custom-filter-mule-2437-test-flow.xml";
     }
 
     @Test
@@ -54,6 +44,6 @@ public class CustomFilterMule2437TestCase extends AbstractServiceAndFlowTestCase
         client.dispatch("vm://in", getTestMuleMessage(message));
         MuleMessage response = client.request(destination, TIMEOUT);
         assertNotNull(response);
-        assertEquals(message, response.getPayloadAsString());
+        assertEquals(message, getPayloadAsString(response));
     }
 }

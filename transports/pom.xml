@@ -1,10 +1,9 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.mule</groupId>
         <artifactId>mule</artifactId>
-        <version>3.8.0-SNAPSHOT</version>
+        <version>4.0-SNAPSHOT</version>
     </parent>
     <groupId>org.mule.transports</groupId>
     <artifactId>mule-transports</artifactId>
@@ -12,28 +11,17 @@
     <name>Mule Transports</name>
 
     <modules>
-        <module>all-transports</module>
-        <module>axis</module>
-        <module>ajax</module>
-        <module>ejb</module>
-        <module>email</module>
+        <module>core</module>
+        <module>core-transports-tests</module>
+
         <module>file</module>
-        <module>ftp</module>
         <module>http</module>
-        <module>jdbc</module>
-        <module>jetty</module>
         <module>jms</module>
-        <module>multicast</module>
-        <module>quartz</module>
-        <module>rmi</module>
-        <module>servlet</module>
-        <module>sftp</module>
+        <module>sockets</module>
         <module>ssl</module>
-        <module>stdio</module>
         <module>tcp</module>
-        <module>udp</module>
         <module>vm</module>
-        <module>xmpp</module>
+        <module>module-support</module>
     </modules>
 
     <build>

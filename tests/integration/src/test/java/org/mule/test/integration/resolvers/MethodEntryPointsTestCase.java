@@ -6,125 +6,67 @@
  */
 package org.mule.test.integration.resolvers;
 
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
-import org.mule.api.config.MuleProperties;
-import org.mule.model.resolvers.EntryPointNotFoundException;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.util.ExceptionUtils;
+import static org.junit.Assert.assertThat;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.model.resolvers.EntryPointNotFoundException;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class MethodEntryPointsTestCase extends AbstractServiceAndFlowTestCase
+public class MethodEntryPointsTestCase extends FunctionalTestCase
 {
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/integration/resolvers/method-entrypoints-config-service.xml"},
-            {ConfigVariant.FLOW, "org/mule/test/integration/resolvers/method-entrypoints-config-flow.xml"}
-        });
-    }
 
-    public MethodEntryPointsTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
+        return "org/mule/test/integration/resolvers/method-entrypoints-config-flow.xml";
     }
 
     @Test
     public void testTooManySatisfiableMethods() throws Exception
     {
-        MuleClient client = muleContext.getClient();
-        MuleMessage message = client.send("vm://service", "hello", null);
-        assertNotNull(message);
-        assertNotNull(message.getExceptionPayload());
-        assertEquals(EntryPointNotFoundException.class, message.getExceptionPayload()
-            .getRootException()
-            .getClass());
-        assertTrue(ExceptionUtils.getRootCauseMessage(message.getExceptionPayload().getException()).indexOf(
-            "Found too many possible methods on object") > -1);
+        try
+        {
+            flowRunner("Service").withPayload("hello").run().getMessage();
+        }
+        catch (Exception e)
+        {
+            assertThat(e.getCause(), instanceOf(EntryPointNotFoundException.class));
+            assertThat(e.getMessage(), containsString("Found too many possible methods on object"));
+        }
     }
 
     @Test
     public void testBadMethodName() throws Exception
     {
-        MuleClient client = muleContext.getClient();
-        MuleMessage message = client.send("vm://service?method=foo", "hello", null);
-        assertNotNull(message);
-        assertNotNull(message.getExceptionPayload());
-        assertEquals(EntryPointNotFoundException.class, message.getExceptionPayload()
-            .getRootException()
-            .getClass());
+        try
+        {
+            flowRunner("Service").withPayload("hello").withInboundProperty("method", "foo").run().getMessage();
+        }
+        catch (Exception e)
+        {
+            assertThat(e.getCause(), instanceOf(EntryPointNotFoundException.class));
+        }
     }
 
     @Test
     public void testValidCallToReverse() throws Exception
     {
-        MuleClient client = muleContext.getClient();
-        MuleMessage msg = getTestMuleMessage("hello");
-        msg.setOutboundProperty("method", "reverseString");
-        MuleMessage message = client.send("vm://service", msg);
+        MuleMessage message = flowRunner("Service").withPayload("hello").withInboundProperty("method", "reverseString").run().getMessage();
         assertNotNull(message);
-        assertEquals("olleh", message.getPayloadAsString());
+        assertEquals("olleh", getPayloadAsString(message));
     }
 
     @Test
     public void testValidCallToUpperCase() throws Exception
     {
-        MuleClient client = muleContext.getClient();
-        MuleMessage msg = getTestMuleMessage("hello");
-        msg.setOutboundProperty("method", "upperCaseString");
-        MuleMessage message = client.send("vm://service", msg);
+        MuleMessage message = flowRunner("Service").withPayload("hello").withInboundProperty("method", "upperCaseString").run().getMessage();
         assertNotNull(message);
-        assertEquals("HELLO", message.getPayloadAsString());
-    }
-
-    @Test
-    public void testValidCallToReverseMethodSetOnEndpoint() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        MuleMessage message = client.send("vm://service2-reverseString", "hello", null);
-        assertNotNull(message);
-        assertEquals("olleh", message.getPayloadAsString());
-    }
-
-    @Test
-    public void testValidCallToUpperCaseMethodSetOnEndpoint() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        MuleMessage message = client.send("vm://service2-upperCaseString", "hello", null);
-        assertNotNull(message);
-        assertEquals(message.getPayloadAsString(), "HELLO");
-    }
-
-    @Test
-    public void testValidCallToReverseMethodSetAsHeader() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        Map<String, Object> props = new HashMap<String, Object>();
-        props.put(MuleProperties.MULE_METHOD_PROPERTY, "reverseString");
-        MuleMessage message = client.send("vm://service", "hello", props);
-        assertNotNull(message);
-        assertEquals("olleh", message.getPayloadAsString());
-    }
-
-    @Test
-    public void testValidCallToUpperCaseMethodSetAsHeader() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        Map<String, Object> props = new HashMap<String, Object>();
-        props.put(MuleProperties.MULE_METHOD_PROPERTY, "upperCaseString");
-        MuleMessage message = client.send("vm://service", "hello", props);
-        assertNotNull(message);
-        assertEquals("HELLO", message.getPayloadAsString());
+        assertEquals("HELLO", getPayloadAsString(message));
     }
 }

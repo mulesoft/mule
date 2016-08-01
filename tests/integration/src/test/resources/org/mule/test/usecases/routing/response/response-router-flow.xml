@@ -1,95 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:spring="http://www.springframework.org/schema/beans"
-    xmlns:file="http://www.mulesoft.org/schema/mule/file"
-    xsi:schemaLocation="
-       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
-       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-       http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xsi:schemaLocation="
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
-    <file:connector name="FileConnector"
-        pollingFrequency="1000" moveToDirectory="/tmp/test-data/out"
-        outputPattern="${DATE}.pdf" />
-
-    <!-- <connector name="MidFileConnector" className="org.mule.transport.file.FileConnector"> -->
-    <!-- <properties> -->
-    <!-- <property name="pollingFrequency" value="1000"/> -->
-    <!-- <property name="moveToDirectory" value="../test-data/out"/> -->
-    <!-- <property name="outputPattern" value="${DATE}${COUNT}.xml"/> -->
-    <!-- <property name="binaryMode" value="false"/> -->
-    <!-- </properties> -->
-    <!-- </connector> -->
-
-    <!-- <transformer name="W10LaszloToW10Report" className="org.mule.transformer.xml.XsltTransformer" -->
-    <!-- returnClass="java.lang.String"> -->
-    <!-- <properties> -->
-    <!-- <property name="xslFile" value="/home/bkalbfu/workspace31/W10_Output/src/w10laszlo_to_w10report.xsl"/> -->
-    <!-- </properties> -->
-    <!-- </transformer> -->
-    <!-- <transformer name="W10ReportToFormattingObjects" className="org.mule.transformer.xml.XsltTransformer" -->
-    <!-- returnClass="java.lang.String"> -->
-    <!-- <properties> -->
-    <!-- <property name="xslFile" value="/home/bkalbfu/workspace31/W10_Output/src/w10report_to_w10fo.xsl"/> -->
-    <!-- </properties> -->
-    <!-- </transformer> -->
-    <!-- <transformer name="FormattingObjectsToPDF" className="org.hhcc.fop.FormattingObjectsToPDF" -->
-    <!-- returnClass="java.lang.Object"/> -->
-    <!-- <transformer name="ByteArrayToString" className="org.mule.transformer.simple.ByteArrayToObject" -->
-    <!-- returnClass="java.lang.String"/> -->
-    <!-- <transformer name="XMLToDOM" className="org.mule.transformer.xml.XmlToDomDocument" -->
-    <!-- returnClass="org.w3c.dom.Document"/> -->
-    <!-- <transformer name="DOMToXML" className="org.mule.transformer.xml.DomDocumentToXml" -->
-    <!-- returnClass="java.lang.String"/> -->
-
+    <http:listener-config name="listenerConfig" host="localhost" port="${port1}"/>
 
     <flow name="getLaszloW10">
-
-        <inbound-endpoint address="http://localhost:28081"
-            exchange-pattern="request-response" />
+        <http:listener path="*" config-ref="listenerConfig"/>
 
         <echo-component />
 
-        <request-reply>
-            <outbound-endpoint address="vm://getReportW10"
-                exchange-pattern="one-way">
-                    <message-properties-transformer scope="outbound">
-                        <delete-message-property key="MULE_REPLYTO"/>
-                    </message-properties-transformer>
-                </outbound-endpoint>
-            <inbound-endpoint address="vm://W10Response"
-                exchange-pattern="one-way" />
-        </request-reply>
-
-
+        <flow-ref name="W10Report"/>
     </flow>
 
     <flow name="W10Report">
-
-        <inbound-endpoint address="vm://getReportW10"
-                          exchange-pattern="one-way" >
-        </inbound-endpoint>
-
         <echo-component />
-
-        <outbound-endpoint address="vm://getFO"
-            exchange-pattern="one-way" />
+        <flow-ref name="W10FO"/>
     </flow>
 
     <flow name="W10FO">
+        <byte-array-to-string-transformer />
 
-        <inbound-endpoint address="vm://getFO"
-            exchange-pattern="one-way">
-            <byte-array-to-string-transformer />
-        </inbound-endpoint>
+        <component class="org.mule.functional.testmodels.services.TestReceiver" />
 
-        <component class="org.mule.tck.testmodels.services.TestReceiver" />
-
-        <all>
-            <outbound-endpoint address="file://temp/test-data/out"
-                exchange-pattern="one-way" />
-            <outbound-endpoint address="vm://W10Response"
-                exchange-pattern="one-way" />
-        </all>
+        <test:queue name="someOtherQueue" />
 
     </flow>
 

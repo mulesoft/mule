@@ -3,7 +3,7 @@
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:mule="http://www.mulesoft.org/schema/mule/core"
       xmlns:spring="http://www.springframework.org/schema/beans"
-      xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+      xmlns:jms="http://www.mulesoft.org/schema/mule/transport/jms"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
       xmlns:http="http://www.mulesoft.org/schema/mule/http"
@@ -11,7 +11,7 @@
        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
        http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
-       http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+       http://www.mulesoft.org/schema/mule/transport/jms http://www.mulesoft.org/schema/mule/transport/jms/current/mule-transport-jms.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd">
 
@@ -21,16 +21,15 @@
         service returns null and there was no error while processing the request, nothing is returned to the callee.
     </description>
 
-    <http:endpoint name="inboundEndpoint" host="localhost" port="63081" exchange-pattern="request-response"/>
+    <http:listener-config name="listenerConfig" host="localhost" port="${port1}"/>
 
-    
     <flow name="In-Optional-Out-Service">
-        
-        <inbound-endpoint ref="inboundEndpoint"/>
-        
+
+        <http:listener config-ref="listenerConfig" path="*" />
+
         <script:component>
             <script:script engine="groovy">
-                if (message.getProperty("foo", org.mule.api.transport.PropertyScope.INBOUND))
+                if (message.getInboundProperty("foo"))
                     return "foo header received"
                 else
                     return null

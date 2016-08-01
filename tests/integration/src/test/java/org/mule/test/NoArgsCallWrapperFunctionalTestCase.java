@@ -6,60 +6,50 @@
  */
 package org.mule.test;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 
-import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-
-import java.util.Arrays;
-import java.util.Collection;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
 /**
  * This test has been re-written to use entry point resolvers.
  */
-public class NoArgsCallWrapperFunctionalTestCase extends AbstractServiceAndFlowTestCase
+public class NoArgsCallWrapperFunctionalTestCase extends FunctionalTestCase
 {
     private static final int RECEIVE_TIMEOUT = 5000;
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "no-args-call-wrapper-config-service.xml"},
-            {ConfigVariant.FLOW, "no-args-call-wrapper-config-flow.xml"}});
-    }
-
-    public NoArgsCallWrapperFunctionalTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
+        return "no-args-call-wrapper-config-flow.xml";
     }
 
     @Test
     public void testNoArgsCallWrapper() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        client.dispatch("vm://invoke", "test", null);
-        MuleMessage reply = client.request("vm://out", RECEIVE_TIMEOUT);
+        flowRunner("WrapperUMO").withPayload("test").asynchronously().run();
+        MuleMessage reply = client.request("test://out", RECEIVE_TIMEOUT);
         assertNotNull(reply);
         assertNull(reply.getExceptionPayload());
-        assertEquals("Just an apple.", reply.getPayload());
+        assertThat(reply.getPayload(), is("Just an apple."));
     }
 
     @Test
     public void testWithInjectedDelegate() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        client.dispatch("vm://invokeWithInjected", "test", null);
-        MuleMessage reply = client.request("vm://outWithInjected", RECEIVE_TIMEOUT);
+        flowRunner("WrapperUMOInjected").withPayload("test").asynchronously().run();
+        MuleMessage reply = client.request("test://outWithInjected", RECEIVE_TIMEOUT);
         assertNotNull(reply);
         assertNull(reply.getExceptionPayload());
         // same as original input
-        assertEquals("test", reply.getPayload());
+        assertThat(reply.getPayload(), is("test"));
     }
 }

@@ -9,14 +9,14 @@ package org.mule.test.integration;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.DefaultMuleContext;
-import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
-import org.mule.construct.Flow;
-import org.mule.context.notification.ClusterNodeNotification;
-import org.mule.source.ClusterizableMessageSourceWrapper;
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.transport.PollingController;
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.DefaultMuleContext;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.connector.PollingController;
+import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.context.notification.ClusterNodeNotification;
+import org.mule.runtime.core.source.ClusterizableMessageSourceWrapper;
 
 import org.junit.Test;
 
@@ -38,8 +38,8 @@ public class ClusterizableMessageSourceFlowTestCase extends FunctionalTestCase
     {
         muleContext.start();
 
-        LocalMuleClient client = muleContext.getClient();
-        MuleMessage response = client.request("vm://testOut", 5000);
+        MuleClient client = muleContext.getClient();
+        MuleMessage response = client.request("test://testOut", RECEIVE_TIMEOUT);
         assertEquals("TEST", response.getPayload());
     }
 
@@ -72,8 +72,8 @@ public class ClusterizableMessageSourceFlowTestCase extends FunctionalTestCase
         pollingController.isPrimary=true;
         muleContext.fireNotification(new ClusterNodeNotification("primary", ClusterNodeNotification.PRIMARY_CLUSTER_NODE_SELECTED));
 
-        LocalMuleClient client = muleContext.getClient();
-        MuleMessage response = client.request("vm://testOut", 5000);
+        MuleClient client = muleContext.getClient();
+        MuleMessage response = client.request("test://testOut", RECEIVE_TIMEOUT);
         assertEquals("TEST", response.getPayload());
     }
 

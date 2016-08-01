@@ -9,19 +9,16 @@ package org.mule.issues;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-
-import java.util.Arrays;
-import java.util.Collection;
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.client.MuleClient;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class ResponseTransformerMule2165TestCase extends AbstractServiceAndFlowTestCase
+public class ResponseTransformerMule2165TestCase extends FunctionalTestCase
 {
+
     public static final long TIMEOUT = 2000L;
     public static final String MESSAGE = "a message";
     // i don't know if this is the "correct" response - it's *one* of the responses in 1.4,
@@ -52,17 +49,10 @@ public class ResponseTransformerMule2165TestCase extends AbstractServiceAndFlowT
     */
     public static final String GLOBAL_RESPONSE = LOCAL_RESPONSE + " response";
 
-    public ResponseTransformerMule2165TestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "issues/response-transformer-mule-2165-test-service.xml"},
-            {ConfigVariant.FLOW, "issues/response-transformer-mule-2165-test-flow.xml"}});
+        return "issues/response-transformer-mule-2165-test-flow.xml";
     }
 
     protected MuleClient send(String endpoint) throws MuleException
@@ -83,8 +73,8 @@ public class ResponseTransformerMule2165TestCase extends AbstractServiceAndFlowT
     {
         MuleMessage message = client.request(endpoint, TIMEOUT);
         assertNotNull("no response from " + endpoint, message);
-        assertNotNull(message.getPayloadAsString());
-        return message.getPayloadAsString();
+        assertNotNull(getPayloadAsString(message));
+        return getPayloadAsString(message);
     }
 
     protected void testTransformered(String endpoint, String response) throws Exception

@@ -7,7 +7,7 @@
 
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/core"
-                schemaLocation="http://www.mulesoft.org/schema/mule/core/3.7/mule.xsd" />
+                schemaLocation="http://www.mulesoft.org/schema/mule/core/3.8/mule.xsd" />
     <xsd:import namespace="http://www.springframework.org/schema/beans"
                 schemaLocation="http://www.springframework.org/schema/beans/spring-beans-3.1.xsd"/>
 
@@ -230,20 +230,6 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="ignoreModelNotifications" type="mule:substitutableBoolean" default="false">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Whether to ignore notifications for state changes on models such as models initializing, starting, and stopping or components being registered or unregistered.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="ignoreComponentNotifications" type="mule:substitutableBoolean" default="false">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Whether to ignore notifications for state changes on components such as when a component is started, stopped, paused, or resumed..
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
                 <xsd:attribute name="ignoreConnectionNotifications" type="mule:substitutableBoolean" default="false">
                     <xsd:annotation>
                         <xsd:documentation>
@@ -304,66 +290,6 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="log4j-notifications" type="log4jNotificationType" substitutionGroup="mule:abstract-agent"/>
-    <xsd:complexType name="log4jNotificationType">
-        <xsd:complexContent>
-            <xsd:extension base="notificationLoggerAgentType">
-                <xsd:sequence>
-                    <xsd:element name="level-mapping" minOccurs="0" maxOccurs="unbounded">
-                        <xsd:complexType>
-                            <xsd:attribute name="severity" type="serveritySimpleType" default="INFO" />
-                            <xsd:attribute name="eventId" type="xsd:string" use="required" />
-                        </xsd:complexType>
-                    </xsd:element>
-                </xsd:sequence>
-                <xsd:attribute name="logName" type="xsd:string" />
-                <xsd:attribute name="logConfigFile" type="xsd:string" />
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:element name="chainsaw-notifications" type="chainsawNotificationType" substitutionGroup="mule:abstract-agent"/>
-    <xsd:complexType name="chainsawNotificationType">
-        <xsd:complexContent>
-            <xsd:extension base="notificationLoggerAgentType">
-                <xsd:sequence>
-                    <xsd:element name="level-mapping" minOccurs="0" maxOccurs="unbounded">
-                        <xsd:complexType>
-                            <xsd:attribute name="severity" type="serveritySimpleType" default="INFO" >
-                                <xsd:annotation>
-                                    <xsd:documentation>
-                                     Specifies the severity level of the notifications you want to send to the Chainsaw console for the corresponding event ID. The severity level can be DEBUG, INFO, WARN, ERROR, or FATAL.
-                                    </xsd:documentation>
-                                </xsd:annotation>
-                            </xsd:attribute>
-                            <xsd:attribute name="eventId" type="xsd:string" use="required" >
-                                <xsd:annotation>
-                                    <xsd:documentation>
-                                     Specifies the type of event to send to the Chainsaw console. The event ID is the notification type plus the action, such as ModelNotification.stop.
-                                    </xsd:documentation>
-                                </xsd:annotation>
-                            </xsd:attribute>
-                        </xsd:complexType>
-                    </xsd:element>
-                </xsd:sequence>
-                <xsd:attribute name="chainsawHost" type="xsd:string" use="required" >
-                    <xsd:annotation>
-                        <xsd:documentation>
-                        The host name of the Chainsaw console.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="chainsawPort" type="mule:substitutablePortNumber" use="required" >
-                    <xsd:annotation>
-                        <xsd:documentation>
-                        The port of the Chainsaw console.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
     <xsd:simpleType name="serveritySimpleType">
         <xsd:restriction base="xsd:NMTOKEN">
             <xsd:enumeration value="DEBUG" />
@@ -373,17 +299,6 @@
             <xsd:enumeration value="FATAL" />
         </xsd:restriction>
     </xsd:simpleType>
-
-    <xsd:element name="publish-notifications" type="publishNotificationType" substitutionGroup="mule:abstract-agent"/>
-    <xsd:complexType name="publishNotificationType">
-        <xsd:complexContent>
-            <xsd:extension base="notificationLoggerAgentType">
-                <xsd:sequence>
-                    <xsd:element ref="mule:abstract-outbound-endpoint" minOccurs="0" maxOccurs="1"/>
-                </xsd:sequence>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
 
     <xsd:element name="yourkit-profiler" substitutionGroup="mule:abstract-agent"/>
 

@@ -1,21 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" 
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-       http://www.mulesoft.org/schema/mule/vm   http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
-
-    <vm:connector name="myVM"/>
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
     <flow name="IdempotentPlaceHolder">
-        <inbound-endpoint address="vm://FromTestCase" exchange-pattern="one-way"/>
         <!-- Only strings should be allowed in -->
         <message-filter>
             <payload-type-filter expectedType="java.lang.String"/>
         </message-filter>
         <idempotent-message-filter/>
-        <outbound-endpoint address="vm://ToTestCase" exchange-pattern="one-way"/>
+        <test:queue name="ToTestCase"/>
     </flow>
 
 </mule>

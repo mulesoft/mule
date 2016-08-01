@@ -12,37 +12,22 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import org.mule.functional.functional.CounterCallback;
+import org.mule.functional.functional.FunctionalTestComponent;
+import org.mule.functional.functional.ResponseWriterCallback;
+import org.mule.functional.junit4.FunctionalTestCase;
+
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
-import org.mule.api.transport.Connector;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.tck.functional.CounterCallback;
-import org.mule.tck.functional.FunctionalTestComponent;
-import org.mule.tck.functional.ResponseWriterCallback;
-import org.mule.tck.testmodels.mule.TestConnector;
-import org.mule.transport.ConfigurableKeyedObjectPool;
-import org.mule.transport.ConfigurableKeyedObjectPoolFactory;
-import org.mule.transport.DefaultConfigurableKeyedObjectPool;
-import org.mule.transport.DefaultConfigurableKeyedObjectPoolFactory;
 
-public class MuleTestNamespaceTestCase extends AbstractServiceAndFlowTestCase
+public class MuleTestNamespaceTestCase extends FunctionalTestCase
 {
-    public MuleTestNamespaceTestCase(ConfigVariant variant, String configResources)
+
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
-    }
-    
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "test-namespace-config-service.xml"},
-            {ConfigVariant.FLOW, "test-namespace-config-flow.xml"}
-        });
+        return "test-namespace-config-flow.xml";
     }
 
     @Test
@@ -97,41 +82,5 @@ public class MuleTestNamespaceTestCase extends AbstractServiceAndFlowTestCase
         assertEquals(" #[context:serviceName]", ftc.getAppendString());
         assertNull(ftc.getReturnData());
         assertNull(ftc.getEventCallback());
-    }
-
-    @Test
-    public void testConnectorUsingDefaultDispatcherPoolFactory()
-    {
-        Connector connector = muleContext.getRegistry().lookupConnector("testConnectorWithDefaultFactory");
-
-        assertTrue(connector instanceof TestConnector);
-        TestConnector testConnector = (TestConnector) connector;
-        assertEquals(DefaultConfigurableKeyedObjectPoolFactory.class, testConnector.getDispatcherPoolFactory().getClass());
-        assertEquals(DefaultConfigurableKeyedObjectPool.class, testConnector.getDispatchers().getClass());
-    }
-
-    @Test
-    public void testConnectorUsingOverriddenDispatcherPoolFactory()
-    {
-        Connector connector = muleContext.getRegistry().lookupConnector("testConnectorWithOverriddenFactory");
-
-        assertTrue(connector instanceof TestConnector);
-        TestConnector testConnector = (TestConnector) connector;
-        assertEquals(StubDispatcherPoolFactory.class, testConnector.getDispatcherPoolFactory().getClass());
-        assertEquals(StubConfigurableKeyedObjectPool.class, testConnector.getDispatchers().getClass());
-    }
-
-    public static class StubConfigurableKeyedObjectPool extends DefaultConfigurableKeyedObjectPool
-    {
-        // no custom methods
-    }
-
-    public static class StubDispatcherPoolFactory implements ConfigurableKeyedObjectPoolFactory
-    {
-        @Override
-        public ConfigurableKeyedObjectPool createObjectPool()
-        {
-            return new StubConfigurableKeyedObjectPool();
-        }
     }
 }

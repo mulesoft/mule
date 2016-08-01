@@ -6,16 +6,19 @@
  */
 package org.mule.test.integration.filter;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.mule.module.http.api.HttpConstants.Methods.POST;
-import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
-import org.mule.module.http.api.client.HttpRequestOptions;
-import org.mule.module.http.api.client.HttpRequestOptionsBuilder;
-import org.mule.tck.junit4.FunctionalTestCase;
+import static org.junit.Assert.assertThat;
+import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
+import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
+
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.module.http.api.client.HttpRequestOptions;
+import org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.transport.http.HttpConnector;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -59,8 +62,8 @@ public class JsonSchemaValidationFilterTestCase extends FunctionalTestCase
         MuleClient client = muleContext.getClient();
         final HttpRequestOptions httpRequestOptions = HttpRequestOptionsBuilder.newOptions().method(POST.name()).build();
         MuleMessage message = client.send("http://localhost:" + dynamicPort.getNumber(), getTestMuleMessage(JSON_ACCEPT), httpRequestOptions);
-        assertEquals(200, message.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));
-        assertEquals("accepted", message.getPayloadAsString());
+        assertThat(message.getInboundProperty(HTTP_STATUS_PROPERTY), is(200));
+        assertEquals("accepted", getPayloadAsString(message));
     }
 
     @Test
@@ -68,8 +71,8 @@ public class JsonSchemaValidationFilterTestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("http://localhost:" + dynamicPort.getNumber(), getTestMuleMessage(JSON_REJECT));
-        assertEquals(200, message.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));
-        assertFalse("accepted".equals(message.getPayloadAsString()));
+        assertThat(message.getInboundProperty(HTTP_STATUS_PROPERTY), is(200));
+        assertFalse("accepted".equals(getPayloadAsString(message)));
     }
 
     @Test
@@ -77,7 +80,7 @@ public class JsonSchemaValidationFilterTestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("http://localhost:" + dynamicPort.getNumber(), getTestMuleMessage(JSON_BROKEN));
-        assertEquals(200, message.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));
-        assertFalse("accepted".equals(message.getPayloadAsString()));
+        assertThat(message.getInboundProperty(HTTP_STATUS_PROPERTY), is(200));
+        assertFalse("accepted".equals(getPayloadAsString(message)));
     }
 }

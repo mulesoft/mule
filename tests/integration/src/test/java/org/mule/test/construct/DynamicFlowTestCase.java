@@ -9,23 +9,23 @@ package org.mule.test.construct;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleEventContext;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.construct.FlowConstructAware;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.lifecycle.Callable;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.Lifecycle;
-import org.mule.api.processor.DynamicPipelineException;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.construct.Flow;
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.transformer.simple.StringAppendTransformer;
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.construct.FlowConstructAware;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.lifecycle.Callable;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.lifecycle.Lifecycle;
+import org.mule.runtime.core.api.processor.DynamicPipelineException;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.transformer.simple.StringAppendTransformer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,17 +53,20 @@ public class DynamicFlowTestCase extends FunctionalTestCase
     @Test
     public void addPreMessageProccesor() throws Exception
     {
-        MuleMessage result = client.send("vm://dynamic", "source->", null);
-        assertEquals("source->(static)", result.getPayloadAsString());
+        MuleEvent muleEvent = flowRunner("dynamicFlow").withPayload("source->").run();
+        MuleMessage result = muleEvent.getMessage();
+        assertEquals("source->(static)", getPayloadAsString(result));
 
         Flow flow = getFlow("dynamicFlow");
         String pipelineId = flow.dynamicPipeline(null).injectBefore(new StringAppendTransformer("(pre)")).resetAndUpdate();
-        result = client.send("vm://dynamic", "source->", null);
-        assertEquals("source->(pre)(static)", result.getPayloadAsString());
+        muleEvent = flowRunner("dynamicFlow").withPayload("source->").run();
+        result = muleEvent.getMessage();
+        assertEquals("source->(pre)(static)", getPayloadAsString(result));
 
         flow.dynamicPipeline(pipelineId).injectBefore(new StringAppendTransformer("(pre1)"), new StringAppendTransformer("(pre2)")).resetAndUpdate();
-        result = client.send("vm://dynamic", "source->", null);
-        assertEquals("source->(pre1)(pre2)(static)", result.getPayloadAsString());
+        muleEvent = flowRunner("dynamicFlow").withPayload("source->").run();
+        result = muleEvent.getMessage();
+        assertEquals("source->(pre1)(pre2)(static)", getPayloadAsString(result));
     }
 
     @Test
@@ -73,52 +76,50 @@ public class DynamicFlowTestCase extends FunctionalTestCase
         String pipelineId = flow.dynamicPipeline(null).injectBefore(new StringAppendTransformer("(pre)"))
                 .injectAfter(new StringAppendTransformer("(post)"))
                 .resetAndUpdate();
-        MuleMessage result = client.send("vm://dynamic", "source->", null);
-        assertEquals("source->(pre)(static)(post)", result.getPayloadAsString());
+        MuleEvent muleEvent = flowRunner("dynamicFlow").withPayload("source->").run();
+        MuleMessage result = muleEvent.getMessage();
+        assertEquals("source->(pre)(static)(post)", getPayloadAsString(result));
 
         flow.dynamicPipeline(pipelineId).injectBefore(new StringAppendTransformer("(pre)"))
                 .injectAfter(new StringAppendTransformer("(post1)"), new StringAppendTransformer("(post2)"))
                 .resetAndUpdate();
-        result = client.send("vm://dynamic", "source->", null);
-        assertEquals("source->(pre)(static)(post1)(post2)", result.getPayloadAsString());
+        muleEvent = flowRunner("dynamicFlow").withPayload("source->").run();
+        result = muleEvent.getMessage();
+        assertEquals("source->(pre)(static)(post1)(post2)", getPayloadAsString(result));
     }
 
     @Test
     public void dynamicComponent() throws Exception
     {
         //invocation #1
-        MuleMessage result = client.send("vm://dynamicComponent", "source->", null);
-        assertEquals("source->(static)", result.getPayloadAsString());
+        MuleMessage result = flowRunner("dynamicComponentFlow").withPayload("source->").run().getMessage();
+        assertEquals("source->(static)", getPayloadAsString(result));
 
         //invocation #2
-        result = client.send("vm://dynamicComponent", "source->", null);
-        assertEquals("source->chain update #1(static)", result.getPayloadAsString());
+        result = flowRunner("dynamicComponentFlow").withPayload("source->").run().getMessage();
+        assertEquals("source->chain update #1(static)", getPayloadAsString(result));
 
         //invocation #3
-        result = client.send("vm://dynamicComponent", "source->", null);
-        assertEquals("source->chain update #2(static)", result.getPayloadAsString());
+        result = flowRunner("dynamicComponentFlow").withPayload("source->").run().getMessage();
+        assertEquals("source->chain update #2(static)", getPayloadAsString(result));
     }
 
     @Test
     public void exceptionOnInjectedMessageProcessor() throws Exception
     {
-        List<MessageProcessor> preList = new ArrayList<MessageProcessor>();
-        List<MessageProcessor> postList = new ArrayList<MessageProcessor>();
+        List<MessageProcessor> preList = new ArrayList<>();
+        List<MessageProcessor> postList = new ArrayList<>();
 
         Flow flow = getFlow("exceptionFlow");
         preList.add(new StringAppendTransformer("(pre)"));
-        preList.add(new MessageProcessor()
+        preList.add(event ->
         {
-            @Override
-            public MuleEvent process(MuleEvent event) throws MuleException
-            {
-                throw new RuntimeException("force exception!");
-            }
+            throw new RuntimeException("force exception!");
         });
         postList.add(new StringAppendTransformer("(post)"));
         flow.dynamicPipeline(null).injectBefore(preList).injectAfter(postList).resetAndUpdate();
-        MuleMessage result = client.send("vm://exception", "source->", null);
-        assertEquals("source->(pre)(handled)", result.getPayloadAsString());
+        MuleMessage result = flowRunner("exceptionFlow").withPayload("source->").run().getMessage();
+        assertEquals("source->(pre)(handled)", getPayloadAsString(result));
     }
 
     @Test
@@ -129,19 +130,22 @@ public class DynamicFlowTestCase extends FunctionalTestCase
         Flow flow = getFlow("dynamicFlow");
         LifecycleMessageProcessor lifecycleMessageProcessor = new LifecycleMessageProcessor();
         String pipelineId = flow.dynamicPipeline(null).injectBefore(lifecycleMessageProcessor).resetAndUpdate();
-        MuleMessage result = client.send("vm://dynamic", "source->", null);
-        assertEquals("source->(pre)(static)", result.getPayloadAsString());
+        MuleEvent muleEvent = flowRunner("dynamicFlow").withPayload("source->").run();
+        MuleMessage result = muleEvent.getMessage();
+        assertEquals("source->(pre)(static)", getPayloadAsString(result));
         assertEquals(expected.append("ISP").toString(), lifecycleMessageProcessor.getSteps());
 
-        result = client.send("vm://dynamic", "source->", null);
-        assertEquals("source->(pre)(static)", result.getPayloadAsString());
+        muleEvent = flowRunner("dynamicFlow").withPayload("source->").run();
+        result = muleEvent.getMessage();
+        assertEquals("source->(pre)(static)", getPayloadAsString(result));
         assertEquals(expected.append("P").toString(), lifecycleMessageProcessor.getSteps());
 
         flow.dynamicPipeline(pipelineId).reset();
         assertEquals(expected.append("TD").toString(), lifecycleMessageProcessor.getSteps());
 
-        result = client.send("vm://dynamic", "source->", null);
-        assertEquals("source->(static)", result.getPayloadAsString());
+        muleEvent = flowRunner("dynamicFlow").withPayload("source->").run();
+        result = muleEvent.getMessage();
+        assertEquals("source->(static)", getPayloadAsString(result));
         assertEquals(expected.toString(), lifecycleMessageProcessor.getSteps());
     }
 
@@ -151,8 +155,9 @@ public class DynamicFlowTestCase extends FunctionalTestCase
         Flow flow = getFlow("dynamicFlow");
         UberAwareMessageProcessor awareMessageProcessor = new UberAwareMessageProcessor();
         flow.dynamicPipeline(null).injectBefore(awareMessageProcessor).resetAndUpdate();
-        MuleMessage result = client.send("vm://dynamic", "source->", null);
-        assertEquals("source->(pre)(static)", result.getPayloadAsString());
+        final MuleEvent muleEvent = flowRunner("dynamicFlow").withPayload("source->").run();
+        MuleMessage result = muleEvent.getMessage();
+        assertEquals("source->(pre)(static)", getPayloadAsString(result));
         assertNotNull(awareMessageProcessor.getFlowConstruct());
         assertNotNull(awareMessageProcessor.getMuleContext());
     }
@@ -218,7 +223,7 @@ public class DynamicFlowTestCase extends FunctionalTestCase
         public MuleEvent process(MuleEvent event) throws MuleException
         {
             steps.append("P");
-            event.getMessage().setPayload(event.getMessage().getPayload() + "(pre)");
+            event.setMessage(MuleMessage.builder().payload(event.getMessage().getPayload() + "(pre)").build());
             return event;
         }
 
@@ -250,7 +255,7 @@ public class DynamicFlowTestCase extends FunctionalTestCase
         @Override
         public MuleEvent process(MuleEvent event) throws MuleException
         {
-            event.getMessage().setPayload(event.getMessage().getPayload() + "(pre)");
+            event.setMessage(MuleMessage.builder().payload(event.getMessage().getPayload() + "(pre)").build());
             return event;
         }
 

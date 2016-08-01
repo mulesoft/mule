@@ -1,25 +1,15 @@
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+       xmlns:beans="http://www.springframework.org/schema/beans"
        xsi:schemaLocation="
          http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
          http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
-    <mule:mule>
-        <mule:custom-transaction-manager class="org.mule.tck.testmodels.mule.TestTransactionManagerFactory">
-            <mule:environment>
-                <entry key="property1" value="true"/>
-                <entry key="property2" value="Test"/>
-            </mule:environment>
-        </mule:custom-transaction-manager>
-        
-        <!-- 
-        <mule:weblogic-transaction-manager>
-            <mule:environment>
-                <entry key="java.naming.factory.initial" value="weblogic.jndi.WLInitialContextFactory"/>
-                <entry key="java.naming.provider.url" value="t3://localhost:7001"/>
-            </mule:environment>
-        </mule:weblogic-transaction-manager>
-        -->
-    </mule:mule>
-</beans>
+    <custom-transaction-manager class="org.mule.tck.testmodels.mule.TestTransactionManagerFactory">
+        <environment>
+            <beans:entry key="property1" value="true"/>
+            <beans:entry key="property2" value="Test"/>
+        </environment>
+    </custom-transaction-manager>
+
+</mule>

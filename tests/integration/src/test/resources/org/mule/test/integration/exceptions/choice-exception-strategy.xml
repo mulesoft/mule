@@ -1,14 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
-
-       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
        http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd">
 
@@ -17,7 +14,6 @@
     </catch-exception-strategy>
 
     <flow name="matchesCorrectExceptionStrategyUsingExceptionType">
-        <vm:inbound-endpoint path="in" exchange-pattern="request-response"/>
         <test:component/>
         <choice-exception-strategy>
             <catch-exception-strategy when="#[exception.causedBy(java.lang.IllegalArgumentException)]">
@@ -35,7 +31,7 @@
             <catch-exception-strategy when="#[exception.causeMatches('(.*)mule.test.integration.(.*).ChoiceExceptionStrategyTestCase(.*)MyException')]">
                 <append-string-transformer message=" catch-5"/>
             </catch-exception-strategy>
-            <catch-exception-strategy when="#[groovy:payload == 'groovy']">
+            <catch-exception-strategy when="#[payload == 'groovy']">
                 <append-string-transformer message=" catch-6"/>
             </catch-exception-strategy>
             <catch-exception-strategy when="#[exception.causeMatches('org.mule.test.integration.exceptions.ChoiceExceptionStrategyTestCase$StartsWith*')]">
@@ -51,7 +47,7 @@
 		            </script:script>
 		        </script:component>
             </catch-exception-strategy>
-            <catch-exception-strategy when="#[exception.causeMatches('*') &amp;&amp; !exception.causedBy(java.lang.ArithmeticException) &amp;&amp; !exception.causedBy(org.mule.api.registry.ResolverException)]">
+            <catch-exception-strategy when="#[exception.causeMatches('*') &amp;&amp; !exception.causedBy(java.lang.ArithmeticException) &amp;&amp; !exception.causedBy(org.mule.runtime.core.api.registry.ResolverException)]">
                 <append-string-transformer message=" catch-9"/>
             </catch-exception-strategy>
             <exception-strategy ref="global-catch"/>

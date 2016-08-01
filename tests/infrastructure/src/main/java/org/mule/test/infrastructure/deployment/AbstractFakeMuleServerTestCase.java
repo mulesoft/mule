@@ -6,7 +6,7 @@
  */
 package org.mule.test.infrastructure.deployment;
 
-import org.mule.MuleCoreExtension;
+import org.mule.runtime.container.api.MuleCoreExtension;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.LinkedList;
@@ -27,7 +27,7 @@ public class AbstractFakeMuleServerTestCase extends AbstractMuleTestCase
 
     protected List<MuleCoreExtension> getCoreExtensions()
     {
-        return new LinkedList<MuleCoreExtension>();
+        return new LinkedList<>();
     }
 
     @Before

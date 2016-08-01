@@ -8,13 +8,13 @@ package org.mule.test.transformers;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.api.config.MuleProperties.MULE_ENCODING_PROPERTY;
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleMessage;
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.util.Base64;
 
-import java.io.IOException;
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.util.Base64;
+
+import java.nio.charset.Charset;
 
 import org.junit.Test;
 
@@ -33,34 +33,29 @@ public class TransformerEncodingTestCase extends FunctionalTestCase
     @Test
     public void encodingFromTransformer() throws Exception
     {
-        MuleMessage message = getMuleMessage();
-        testEncoding("vm://base64decode", message);
-    }
-
-    @Test
-    public void encodingFromSetProperty() throws Exception
-    {
-        MuleMessage message = getMuleMessage();
-        testEncoding("vm://base64decode2", message);
+        testEncoding("base64decode");
     }
 
     @Test
     public void encodingFromMessage() throws Exception
     {
-        MuleMessage message = getMuleMessage();
-        message.setOutboundProperty(MULE_ENCODING_PROPERTY, UTF_16_LE);
-        testEncoding("vm://base64decode", message);
+        testEncoding("base64decode", UTF_16_LE);
     }
 
-    private void testEncoding(String endpointUrl, MuleMessage message) throws Exception
+    private void testEncoding(String flowName) throws Exception
     {
-        MuleMessage response = muleContext.getClient().send(endpointUrl, message);
-        assertThat(response.getPayloadAsString(), is(PAYLOAD));
+        assertPayload(flowRunner(flowName).withPayload(Base64.encodeBytes(PAYLOAD.getBytes(UTF_16_LE))).run());
     }
 
-    private MuleMessage getMuleMessage() throws IOException
+    private void testEncoding(String flowName, String charset) throws Exception
     {
-        return new DefaultMuleMessage(Base64.encodeBytes(PAYLOAD.getBytes(UTF_16_LE)), muleContext);
+        assertPayload(flowRunner(flowName).withPayload(Base64.encodeBytes(PAYLOAD.getBytes(UTF_16_LE)))
+                                          .withMediaType(MediaType.ANY.withCharset(Charset.forName(charset)))
+                                          .run());
     }
 
+    protected void assertPayload(final MuleEvent muleEvent) throws Exception
+    {
+        assertThat(getPayloadAsString(muleEvent.getMessage()), is(PAYLOAD));
+    }
 }

@@ -7,20 +7,25 @@
 package org.mule.issues;
 
 import static org.junit.Assert.assertEquals;
-import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.transformer.AbstractMessageTransformer;
 
+import org.mule.functional.junit4.FlowRunner;
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.transformer.AbstractMessageTransformer;
+import org.mule.tck.junit4.rule.DynamicPort;
+
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
+@Ignore("See MULE-9195")
 public class MessageRootIdPropagationTestCase extends FunctionalTestCase
 {
     @Rule
@@ -36,12 +41,11 @@ public class MessageRootIdPropagationTestCase extends FunctionalTestCase
     public void testRootIDs() throws Exception
     {
         RootIDGatherer.initialize();
-        MuleClient client = muleContext.getClient();
 
-        MuleMessage msg = getTestMuleMessage("Hello");
-        msg.setOutboundProperty("where", "client");
-        RootIDGatherer.process(msg);
-        client.send("vm://vmin", msg);
+        FlowRunner runner = flowRunner("flow1").withPayload("Hello").withOutboundProperty("where", "client");
+
+        RootIDGatherer.process(runner.buildEvent().getMessage());
+        runner.run();
         Thread.sleep(1000);
         assertEquals(6, RootIDGatherer.getMessageCount());
         assertEquals(1, RootIDGatherer.getIds().size());
@@ -56,7 +60,7 @@ public class MessageRootIdPropagationTestCase extends FunctionalTestCase
 
         public static void initialize()
         {
-            idMap = new HashMap<String, String>();
+            idMap = new HashMap<>();
             messageCount = 0;
         }
 
@@ -73,15 +77,15 @@ public class MessageRootIdPropagationTestCase extends FunctionalTestCase
         }
 
         @Override
-        public Object transformMessage(MuleMessage msg, String outputEncoding)
+        public Object transformMessage(MuleEvent event, Charset outputEncoding)
         {
-            process(msg);
-            return msg.getPayload();
+            process(event.getMessage());
+            return event.getMessage().getPayload();
         }
 
         public static Set<String> getIds()
         {
-            return new HashSet<String>(idMap.values());
+            return new HashSet<>(idMap.values());
         }
 
         public static int getMessageCount()

@@ -6,15 +6,14 @@
  */
 package org.mule.extension.validation;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
-
-import org.apache.commons.lang.exception.ExceptionUtils;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 public class LocalizedValidationMessageTestCase extends ValidationTestCase
 {
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     @Override
     protected String getConfigFile()
@@ -25,16 +24,8 @@ public class LocalizedValidationMessageTestCase extends ValidationTestCase
     @Test
     public void localizedMessage() throws Exception
     {
-        try
-        {
-            runFlow("localizedMessage");
-            fail("was expecting a failure");
-        }
-        catch (Exception e)
-        {
-            Throwable cause = ExceptionUtils.getRootCause(e);
-            assertThat(cause.getMessage(), is("Se esperaba que el valor fuera true pero fue false"));
-        }
+        expectedException.expectMessage("Se esperaba que el valor fuera true pero fue false");
+        flowRunner("localizedMessage").run();
     }
 
 }

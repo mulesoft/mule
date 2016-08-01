@@ -6,53 +6,37 @@
  */
 package org.mule.test.integration.interceptor;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
-import org.mule.api.interceptor.Interceptor;
-import org.mule.processor.AbstractInterceptingMessageProcessor;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-
-import java.util.Arrays;
-import java.util.Collection;
-
-import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
-
 import static org.junit.Assert.assertEquals;
 
-public class SharedInterceptorStackTestCase extends AbstractServiceAndFlowTestCase
-{
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "shared-interceptor-stack-service.xml"},
-            {ConfigVariant.FLOW, "shared-interceptor-stack-flow.xml"}
-        });
-    }
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.interceptor.Interceptor;
+import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
 
-    public SharedInterceptorStackTestCase(ConfigVariant variant, String configResources)
+import org.junit.Test;
+
+public class SharedInterceptorStackTestCase extends FunctionalTestCase
+{
+
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
+        return "shared-interceptor-stack-flow.xml";
     }
 
     @Test
-    public void testSharedInterceptorOnServiceOne() throws MuleException
+    public void testSharedInterceptorOnServiceOne() throws Exception
     {
-        MuleClient client = muleContext.getClient();
-
-        MuleMessage response = client.send("vm://stackOne", TEST_MESSAGE, null);
+        MuleMessage response = flowRunner("serviceOne").withPayload(TEST_MESSAGE).run().getMessage();
         assertEquals(TEST_MESSAGE + " CustomInterceptor ComponentOne", response.getPayload());
     }
 
     @Test
-    public void testSharedInterceptorOnServiceTwo() throws MuleException
+    public void testSharedInterceptorOnServiceTwo() throws Exception
     {
-        MuleClient client = muleContext.getClient();
-
-        MuleMessage response = client.send("vm://stackTwo", TEST_MESSAGE, null);
+        MuleMessage response = flowRunner("serviceTwo").withPayload(TEST_MESSAGE).run().getMessage();
         assertEquals(TEST_MESSAGE + " CustomInterceptor ComponentTwo", response.getPayload());
     }
 
@@ -63,7 +47,7 @@ public class SharedInterceptorStackTestCase extends AbstractServiceAndFlowTestCa
         {
             MuleMessage message = event.getMessage();
             String payload = message.getPayload().toString();
-            message.setPayload(payload + " CustomInterceptor");
+            event.setMessage(MuleMessage.builder(event.getMessage()).payload(payload + " CustomInterceptor").build());
             return processNext(event);
         }
     }

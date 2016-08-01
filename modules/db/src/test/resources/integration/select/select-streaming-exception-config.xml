@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:db="http://www.mulesoft.org/schema/mule/db"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+            http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+
+    <flow name="selectStreamingException">
+        <db:select config-ref="pooledJdbcConfig" streaming="true">
+            <db:parameterized-query>select * from NOT_EXISTS order by ID</db:parameterized-query>
+        </db:select>
+    </flow>
+
+    <flow name="selectExceptionClosesPreviousResultSets">
+        <transactional>
+            <db:select config-ref="pooledJdbcConfig" target="#[flowVars.planets]" streaming="true">
+                <db:parameterized-query>select * from PLANET order by ID</db:parameterized-query>
+            </db:select>
+            <db:select config-ref="pooledJdbcConfig">
+                <db:parameterized-query>select * from NOT_EXISTS order by ID</db:parameterized-query>
+            </db:select>
+        </transactional>
+        <set-payload value="#[true]"/>
+        <catch-exception-strategy>
+            <set-payload value="#[flowVars.planets.hasNext()]"/>
+        </catch-exception-strategy>
+    </flow>
+</mule>

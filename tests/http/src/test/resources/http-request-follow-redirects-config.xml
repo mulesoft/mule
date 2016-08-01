@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
+               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
+
+    <httpn:request-config name="noFollowRedirects">
+        <httpn:request-connection host="localhost" port="${httpPort}"/>
+    </httpn:request-config>
+
+    <httpn:request-config name="withFollowRedirects" followRedirects="false">
+        <httpn:request-connection host="localhost" port="${httpPort}"/>
+    </httpn:request-config>
+
+    <httpn:request-config name="withFollowRedirectsExpression" followRedirects="#[redirect]">
+        <httpn:request-connection host="localhost" port="${httpPort}"/>
+    </httpn:request-config>
+
+    <httpn:request-config name="httpsConfig">
+        <httpn:request-connection protocol="HTTPS" host="localhost" port="${httpsPort}">
+            <tls:context>
+                <tls:trust-store path="tls/trustStore" password="mulepassword"/>
+                <tls:key-store path="tls/clientKeystore" keyPassword="mulepassword" password="mulepassword"/>
+            </tls:context>
+        </httpn:request-connection>
+    </httpn:request-config>
+
+    <flow name="default">
+        <httpn:request config-ref="noFollowRedirects" path="testPath" key="ANY"/>
+    </flow>
+
+    <flow name="followRedirects">
+        <httpn:request config-ref="noFollowRedirects" path="testPath" followRedirects="true" key="ANY"/>
+    </flow>
+
+    <flow name="dontFollowRedirects">
+        <httpn:request config-ref="noFollowRedirects" path="testPath" followRedirects="false" key="ANY"/>
+    </flow>
+
+    <flow name="followRedirectsExpression">
+        <httpn:request config-ref="noFollowRedirects" path="testPath" followRedirects="#[redirect]" key="ANY"/>
+    </flow>
+
+    <flow name="fromConfig">
+        <httpn:request config-ref="withFollowRedirects" path="testPath" key="ANY"/>
+    </flow>
+
+    <flow name="overrideConfig">
+        <httpn:request config-ref="withFollowRedirects" path="testPath" followRedirects="true" key="ANY"/>
+    </flow>
+
+    <flow name="fromConfigExpression">
+        <httpn:request config-ref="withFollowRedirectsExpression" path="testPath" key="ANY"/>
+    </flow>
+
+    <flow name="followRedirectsHttps">
+        <httpn:request config-ref="httpsConfig" path="testPath" followRedirects="true" key="ANY"/>
+    </flow>
+</mule>

@@ -6,35 +6,43 @@
  */
 package org.mule.test.infrastructure.deployment;
 
+import static org.apache.commons.io.FileUtils.copyURLToFile;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import org.mule.MuleCoreExtension;
-import org.mule.api.DefaultMuleException;
-import org.mule.api.MuleException;
-import org.mule.api.MuleRuntimeException;
-import org.mule.api.config.MuleProperties;
-import org.mule.module.launcher.DeploymentListener;
-import org.mule.module.launcher.DeploymentService;
-import org.mule.module.launcher.MuleDeploymentService;
-import org.mule.module.launcher.MulePluginClassLoaderManager;
-import org.mule.module.launcher.application.Application;
-import org.mule.module.launcher.coreextension.DefaultMuleCoreExtensionManager;
-import org.mule.module.launcher.coreextension.MuleCoreExtensionDiscoverer;
-import org.mule.module.launcher.coreextension.ReflectionMuleCoreExtensionDependencyResolver;
+import org.mule.runtime.container.api.MuleCoreExtension;
+import org.mule.runtime.container.internal.ContainerClassLoaderFactory;
+import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.util.FileUtils;
+import org.mule.runtime.core.util.FilenameUtils;
+import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.launcher.DeploymentListener;
+import org.mule.runtime.module.launcher.DeploymentService;
+import org.mule.runtime.module.launcher.MuleDeploymentService;
+import org.mule.runtime.module.launcher.application.Application;
+import org.mule.runtime.module.launcher.coreextension.DefaultMuleCoreExtensionManagerServer;
+import org.mule.runtime.module.launcher.coreextension.MuleCoreExtensionDiscoverer;
+import org.mule.runtime.module.launcher.coreextension.ReflectionMuleCoreExtensionDependencyResolver;
+import org.mule.runtime.module.launcher.service.MuleServiceManager;
+import org.mule.runtime.module.launcher.service.DefaultServiceDiscoverer;
+import org.mule.runtime.module.launcher.service.FileSystemServiceProviderDiscoverer;
+import org.mule.runtime.module.launcher.service.ReflectionServiceResolver;
+import org.mule.runtime.module.launcher.service.ReflectionServiceProviderResolutionHelper;
+import org.mule.runtime.module.launcher.service.ServiceClassLoaderFactory;
+import org.mule.runtime.module.launcher.service.ServiceManager;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
-import org.mule.util.FileUtils;
-import org.mule.util.FilenameUtils;
-import org.mule.util.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
@@ -49,7 +57,7 @@ public class FakeMuleServer
     private File appsDir;
     private File domainsDir;
     private File logsDir;
-    private File pluginsDir;
+    private File serverPluginsDir;
 
     private final DeploymentService deploymentService;
     private final DeploymentListener deploymentListener;
@@ -67,16 +75,25 @@ public class FakeMuleServer
         }
     }
 
-    private DefaultMuleCoreExtensionManager coreExtensionManager;
+    private DefaultMuleCoreExtensionManagerServer coreExtensionManager;
+    private final ArtifactClassLoader containerClassLoader;
+    private ServiceManager serviceManager;
 
     public FakeMuleServer(String muleHomePath)
     {
-        this(muleHomePath, new LinkedList<MuleCoreExtension>());
+        this(muleHomePath, new LinkedList<>());
     }
 
     public FakeMuleServer(String muleHomePath, List<MuleCoreExtension> intialCoreExtensions)
     {
+        final ContainerClassLoaderFactory containerClassLoaderFactory = new ContainerClassLoaderFactory();
+        containerClassLoader = containerClassLoaderFactory.createContainerClassLoader(getClass().getClassLoader());
+
         this.coreExtensions = intialCoreExtensions;
+        for (MuleCoreExtension extension : coreExtensions)
+        {
+            extension.setContainerClassLoader(containerClassLoader);
+        }
 
         muleHome = new File(muleHomePath);
         muleHome.deleteOnExit();
@@ -98,11 +115,12 @@ public class FakeMuleServer
             throw new RuntimeException(e);
         }
 
-        deploymentService = new MuleDeploymentService(new MulePluginClassLoaderManager());
+        serviceManager = new MuleServiceManager(new DefaultServiceDiscoverer(new FileSystemServiceProviderDiscoverer(containerClassLoader, new ServiceClassLoaderFactory()), new ReflectionServiceResolver(new ReflectionServiceProviderResolutionHelper())));
+        deploymentService = new MuleDeploymentService(containerClassLoader, serviceManager);
         deploymentListener = mock(DeploymentListener.class);
         deploymentService.addDeploymentListener(deploymentListener);
 
-        coreExtensionManager = new DefaultMuleCoreExtensionManager(
+        coreExtensionManager = new DefaultMuleCoreExtensionManagerServer(
                 new MuleCoreExtensionDiscoverer()
                 {
                     @Override
@@ -118,7 +136,7 @@ public class FakeMuleServer
     public void stop() throws MuleException
     {
         deploymentService.stop();
-
+        serviceManager.stop();
         coreExtensionManager.stop();
         coreExtensionManager.dispose();
     }
@@ -127,7 +145,7 @@ public class FakeMuleServer
     {
         coreExtensionManager.initialise();
         coreExtensionManager.start();
-
+        serviceManager.start();
         deploymentService.start();
     }
 
@@ -225,12 +243,13 @@ public class FakeMuleServer
     {
         appsDir = createFolder("apps");
         logsDir = createFolder("logs");
-        pluginsDir = createFolder("plugins");
+        serverPluginsDir = createFolder("server-plugins");
         domainsDir = createFolder("domains");
+        createFolder("domains/default");
 
         File confDir = createFolder("conf");
         URL log4jFile = getClass().getResource("/log4j2-test.xml");
-        FileUtils.copyURLToFile(log4jFile, new File(confDir, "log4j2-test.xml"));
+        copyURLToFile(log4jFile, new File(confDir, "log4j2-test.xml"));
 
         createFolder("lib/shared/default");
     }
@@ -265,10 +284,31 @@ public class FakeMuleServer
         deploy(resource, appName);
     }
 
+    /**
+     * Deploys an application from a classpath resource
+     *
+     * @param resource points to the resource to deploy. Non null.
+     * @param targetAppName application name used to deploy the resource. Null to
+     *                      maintain the original resource name
+     * @throws IOException if the resource cannot be accessed
+     */
     public void deploy(String resource, String targetAppName) throws IOException
     {
         URL url = getClass().getResource(resource);
-        addAppArchive(url, targetAppName + ".zip");
+        deploy(url, targetAppName);
+    }
+
+    /**
+     * Deploys an application from an URL
+     *
+     * @param resource points to the resource to deploy. Non null.
+     * @param targetAppName application name used to deploy the resource. Null to
+     *                      maintain the original resource name
+     * @throws IOException if the URL cannot be accessed
+     */
+    public void deploy(URL resource, String targetAppName) throws IOException
+    {
+        addAppArchive(resource, targetAppName + ".zip");
         assertDeploymentSuccess(targetAppName);
     }
 
@@ -280,7 +320,7 @@ public class FakeMuleServer
         // copy is not atomic, copy to a temp file and rename instead (rename is atomic)
         final String tempFileName = new File((targetFile == null ? url.getFile() : targetFile) + ".part").getName();
         final File tempFile = new File(appsDir, tempFileName);
-        FileUtils.copyURLToFile(url, tempFile);
+        copyURLToFile(url, tempFile);
         boolean renamed = tempFile.renameTo(new File(StringUtils.removeEnd(tempFile.getAbsolutePath(), ".part")));
         if (!renamed)
         {
@@ -288,12 +328,28 @@ public class FakeMuleServer
         }
     }
 
-    public void addZippedPlugin(String resource) throws IOException, URISyntaxException
+    /**
+     * Adds a server plugin file to the Mule server.
+     *
+     * @param plugin plugin file to add. Non null.
+     * @throws IOException if the plugin file cannot be accessed
+     */
+    public void addZippedServerPlugin(File plugin) throws IOException
     {
-        URL url = getClass().getClassLoader().getResource(resource).toURI().toURL();
-        String baseName = FilenameUtils.getName(url.getPath());
-        File tempFile = new File(getPluginsDir(), baseName);
-        FileUtils.copyURLToFile(url, tempFile);
+        addZippedServerPlugin(plugin.toURI().toURL());
+    }
+
+    /**
+     * Adds a server plugin to the Mule server .
+     *
+     * @param resource points to the plugin to add. Non null.
+     * @throws IOException if the plugin URL cannot be accessed
+     */
+    public void addZippedServerPlugin(URL resource) throws IOException
+    {
+        String baseName = FilenameUtils.getName(resource.getPath());
+        File tempFile = new File(getServerPluginsDir(), baseName);
+        copyURLToFile(resource, tempFile);
     }
 
     public File getMuleHome()
@@ -316,9 +372,9 @@ public class FakeMuleServer
         return domainsDir;
     }
 
-    public File getPluginsDir()
+    public File getServerPluginsDir()
     {
-        return pluginsDir;
+        return serverPluginsDir;
     }
 
     public void resetDeploymentListener()
@@ -328,6 +384,7 @@ public class FakeMuleServer
 
     public void addCoreExtension(MuleCoreExtension coreExtension)
     {
+        coreExtension.setContainerClassLoader(containerClassLoader);
         coreExtensions.add(coreExtension);
     }
 

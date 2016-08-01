@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.mule.tests</groupId>
         <artifactId>mule-tests</artifactId>
-        <version>3.8.0-SNAPSHOT</version>
+        <version>4.0-SNAPSHOT</version>
     </parent>
     <artifactId>mule-tests-functional</artifactId>
     <packaging>jar</packaging>
@@ -105,6 +105,18 @@
             <version>${project.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-artifact</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-container</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
         <!-- needed for org.springframework.beans.factory.FactoryBean interface -->
         <dependency>
             <groupId>org.springframework</groupId>
@@ -130,6 +142,14 @@
             <artifactId>commons-net</artifactId>
         </dependency>
         <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-collections</groupId>
+            <artifactId>commons-collections</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.apache.ftpserver</groupId>
             <artifactId>ftpserver-core</artifactId>
             <version>${testFtpServerVersion}</version>
@@ -152,7 +172,7 @@
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-jdk16</artifactId>
+            <artifactId>bcprov-jdk15on</artifactId>
             <version>${bouncycastleVersion}</version>
         </dependency>
         <dependency>
@@ -167,13 +187,11 @@
             <artifactId>reflections</artifactId>
         </dependency>
 
-
         <!-- Unit tests -->
         <dependency>
-            <groupId>org.mule</groupId>
-            <artifactId>mule-core</artifactId>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-tests-unit</artifactId>
             <version>${project.version}</version>
-            <type>test-jar</type>
         </dependency>
         <!-- required for ConfigurationBuilders at runtime -->
         <dependency>

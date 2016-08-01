@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
+
+    <configuration>
+        <expression-language>
+            <import class="org.mule.test.module.http.functional.listener.HttpListenerResponseStreamingExceptionStrategyTestCase"/>
+            <alias name="inputStreamPayload" expression="HttpListenerResponseStreamingExceptionStrategyTestCase.stream"/>
+        </expression-language>
+    </configuration>
+
+    <httpn:listener-config name="listenerConfig">
+        <httpn:listener-connection host="localhost" port="${port}"/>
+    </httpn:listener-config>
+
+    <flow name="exceptionBuildingResponse">
+        <httpn:listener config-ref="listenerConfig" path="/exceptionBuildingResponse" responseStreamingMode="NEVER"/>
+        <set-payload value="#[inputStreamPayload]"/>
+
+        <catch-exception-strategy>
+            <custom-processor class="org.mule.test.module.http.functional.listener.HttpListenerResponseStreamingExceptionStrategyTestCase$TrackPassageMessageProcessor"/>
+            <set-payload value="#['Exception Handled']"/>
+        </catch-exception-strategy>
+    </flow>
+
+    <flow name="exceptionSendingResponse">
+        <httpn:listener config-ref="listenerConfig" path="/exceptionSendingResponse" responseStreamingMode="ALWAYS"/>
+        <set-payload value="#[inputStreamPayload]"/>
+
+        <catch-exception-strategy>
+            <custom-processor class="org.mule.test.module.http.functional.listener.HttpListenerResponseStreamingExceptionStrategyTestCase$TrackPassageMessageProcessor"/>
+            <set-payload value="#['Exception Handled']"/>
+        </catch-exception-strategy>
+    </flow>
+
+    <flow name="exceptionBuildingResponseFailAgain">
+        <httpn:listener config-ref="listenerConfig" path="/exceptionBuildingResponseFailAgain" responseStreamingMode="NEVER"/>
+        <set-payload value="#[inputStreamPayload]"/>
+
+        <catch-exception-strategy>
+            <custom-processor class="org.mule.test.module.http.functional.listener.HttpListenerResponseStreamingExceptionStrategyTestCase$TrackPassageMessageProcessor"/>
+            <set-payload value="#[inputStreamPayload]"/>
+        </catch-exception-strategy>
+    </flow>
+
+    <flow name="exceptionSendingResponseFailAgain">
+        <httpn:listener config-ref="listenerConfig" path="/exceptionSendingResponseFailAgain" responseStreamingMode="ALWAYS"/>
+        <set-payload value="#[inputStreamPayload]"/>
+
+        <catch-exception-strategy>
+            <custom-processor class="org.mule.test.module.http.functional.listener.HttpListenerResponseStreamingExceptionStrategyTestCase$TrackPassageMessageProcessor"/>
+            <set-payload value="#[inputStreamPayload]"/>
+        </catch-exception-strategy>
+    </flow>
+</mule>

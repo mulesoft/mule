@@ -6,22 +6,34 @@
  */
 package org.mule.test.routing;
 
-import org.mule.api.MuleContext;
-import org.mule.api.config.ConfigurationException;
-import org.mule.config.spring.SpringXmlConfigurationBuilder;
-import org.mule.context.DefaultMuleContextFactory;
+import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.context.DefaultMuleContextFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
+import org.junit.After;
 import org.junit.Test;
 
 public class UntilSuccessfulInvalidConfigTestCase extends AbstractMuleTestCase
 {
 
-    @Test(expected = ConfigurationException.class)
+    private MuleContext context;
+
+    @After
+    public void after()
+    {
+        if (context != null)
+        {
+            context.dispose();
+        }
+    }
+
+    //TODO MULE-10061 - Review once the MuleContext lifecycle is clearly defined
+    @Test(expected = InitialisationException.class)
     public void exclusiveWaitConfig() throws Exception
     {
-        MuleContext context = new DefaultMuleContextFactory().createMuleContext();
-        SpringXmlConfigurationBuilder builder = new SpringXmlConfigurationBuilder("until-successful-invalid-wait-test.xml");
-        builder.configure(context);
+        context = new DefaultMuleContextFactory().createMuleContext(new SpringXmlConfigurationBuilder("until-successful-invalid-wait-test.xml"));
     }
 }

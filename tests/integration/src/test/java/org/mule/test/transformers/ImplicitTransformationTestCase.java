@@ -6,18 +6,19 @@
  */
 package org.mule.test.transformers;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
-import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
-import org.mule.api.transformer.TransformerException;
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.transformer.AbstractTransformer;
-import org.mule.transformer.types.DataTypeFactory;
-import org.mule.util.IOUtils;
-import org.mule.util.StringUtils;
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.transformer.AbstractTransformer;
+import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.core.util.StringUtils;
 
 import java.io.InputStream;
+import java.nio.charset.Charset;
 
 import org.apache.tools.ant.filters.StringInputStream;
 import org.junit.Test;
@@ -34,50 +35,44 @@ public class ImplicitTransformationTestCase extends FunctionalTestCase
     public void testImplicitInputStreamToStringConversion() throws Exception
     {
         InputStream inputStream = new StringInputStream("TEST");
-        LocalMuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://stringInput", inputStream, null);
-        assertEquals("TSET", response.getPayload());
+        MuleMessage response = flowRunner("StringEchoService").withPayload(inputStream).run().getMessage();
+        assertThat(response.getPayload(), is("TSET"));
     }
 
     @Test
     public void testImplicitByteArrayToStringConversion() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://stringInput",  "TEST".getBytes(), null);
-        assertEquals("TSET", response.getPayload());
+        MuleMessage response = flowRunner("StringEchoService").withPayload("TEST".getBytes()).run().getMessage();
+        assertThat(response.getPayload(), is("TSET"));
     }
 
     @Test
     public void testImplicitInputStreamToByteArrayConversion() throws Exception
     {
         InputStream inputStream = new StringInputStream("TEST");
-        LocalMuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://byteArrayInput", inputStream, null);
-        assertEquals("TSET", response.getPayload());
+        MuleMessage response = flowRunner("ByteArrayEchoService").withPayload(inputStream).run().getMessage();
+        assertThat(response.getPayload(), is("TSET"));
     }
 
     @Test
     public void testImplicitStringToByteArrayConversion() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://byteArrayInput",  "TEST", null);
-        assertEquals("TSET", response.getPayload());
+        MuleMessage response = flowRunner("ByteArrayEchoService").withPayload("TEST").run().getMessage();
+        assertThat(response.getPayload(), is("TSET"));
     }
 
     @Test
     public void testImplicitStringToInputStreamConversion() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://inputStreamInput", "TEST", null);
-        assertEquals("TSET", response.getPayload());
+        MuleMessage response = flowRunner("InputStreamEchoService").withPayload("TEST").run().getMessage();
+        assertThat(response.getPayload(), is("TSET"));
     }
 
     @Test
     public void testImplicitByteArrayToInputStreamConversion() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://inputStreamInput",  "TEST".getBytes(), null);
-        assertEquals("TSET", response.getPayload());
+        MuleMessage response = flowRunner("InputStreamEchoService").withPayload("TEST".getBytes()).run().getMessage();
+        assertThat(response.getPayload(), is("TSET"));
     }
 
     public static class TestStringTransformer extends AbstractTransformer
@@ -86,12 +81,12 @@ public class ImplicitTransformationTestCase extends FunctionalTestCase
         public TestStringTransformer()
         {
             super();
-            registerSourceType(DataTypeFactory.STRING);
-            setReturnDataType(DataTypeFactory.STRING);
+            registerSourceType(DataType.STRING);
+            setReturnDataType(DataType.STRING);
         }
 
         @Override
-        protected Object doTransform(Object src, String enc) throws TransformerException
+        protected Object doTransform(Object src, Charset enc) throws TransformerException
         {
             return StringUtils.reverse((String) src);
         }
@@ -103,12 +98,12 @@ public class ImplicitTransformationTestCase extends FunctionalTestCase
         public TestByteArrayTransformer()
         {
             super();
-            registerSourceType(DataTypeFactory.BYTE_ARRAY);
-            setReturnDataType(DataTypeFactory.STRING);
+            registerSourceType(DataType.BYTE_ARRAY);
+            setReturnDataType(DataType.STRING);
         }
 
         @Override
-        protected Object doTransform(Object src, String enc) throws TransformerException
+        protected Object doTransform(Object src, Charset enc) throws TransformerException
         {
             return StringUtils.reverse(new String((byte[]) src));
         }
@@ -120,12 +115,12 @@ public class ImplicitTransformationTestCase extends FunctionalTestCase
         public TestInputStreamTransformer()
         {
             super();
-            registerSourceType(DataTypeFactory.INPUT_STREAM);
-            setReturnDataType(DataTypeFactory.STRING);
+            registerSourceType(DataType.INPUT_STREAM);
+            setReturnDataType(DataType.STRING);
         }
 
         @Override
-        protected Object doTransform(Object src, String enc) throws TransformerException
+        protected Object doTransform(Object src, Charset enc) throws TransformerException
         {
 
             InputStream input = (InputStream) src;

@@ -28,17 +28,11 @@
             name="memory-dao" delegate-ref="authenticationManager" />
     </mule-ss:security-manager>
 
-    <http:connector name="HttpConnector" />
-
+    <http:listener-config name="listenerConfig" host="localhost" port="${port1}"/>
 
     <flow name="SecureUMO">
-
-        <inbound-endpoint address="http://localhost:${port1}"
-            exchange-pattern="request-response" connector-ref="HttpConnector">
-            <mule-ss:http-security-filter
-                realm="mule-realm" />
-        </inbound-endpoint>
-
+        <http:listener path="*" config-ref="listenerConfig"/>
+        <http:basic-security-filter realm="mule-realm" />
         <test:component>
             <test:return-data>foo</test:return-data>
         </test:component>

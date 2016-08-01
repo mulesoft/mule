@@ -10,8 +10,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.api.construct.FlowConstruct;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
 
 import org.junit.Test;

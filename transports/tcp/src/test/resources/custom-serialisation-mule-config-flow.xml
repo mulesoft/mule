@@ -1,27 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:spring="http://www.springframework.org/schema/beans"
-       xmlns:tcp="http://www.mulesoft.org/schema/mule/tcp"
-       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
-       xsi:schemaLocation="
-               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
-               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
-               http://www.mulesoft.org/schema/mule/tcp http://www.mulesoft.org/schema/mule/tcp/current/mule-tcp.xsd">
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:tcp="http://www.mulesoft.org/schema/mule/transport/tcp"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/transport/vm"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/transport/vm http://www.mulesoft.org/schema/mule/transport/vm/current/mule-transport-vm.xsd
+               http://www.mulesoft.org/schema/mule/transport/tcp http://www.mulesoft.org/schema/mule/transport/tcp/current/mule-transport-tcp.xsd">
 
     <vm:connector name="quedvm"/>
 
     <tcp:connector name="tcpConnector">
-        <tcp:custom-protocol class="org.mule.transport.tcp.integration.CustomSerializationProtocol"/>
+        <tcp:custom-protocol class="org.mule.compatibility.transport.tcp.integration.CustomSerializationProtocol"/>
     </tcp:connector>
 
-    <custom-transformer name="NoAction" class="org.mule.tck.transformer.NoActionTransformer"/>
+    <custom-transformer name="NoAction" class="org.mule.functional.transformer.NoActionTransformer"/>
 
     <flow name="BridgeIn">
         <vm:inbound-endpoint path="in" exchange-pattern="one-way"/>
         <tcp:outbound-endpoint host="localhost" port="${port1}" exchange-pattern="one-way">
-            <custom-transformer class="org.mule.tck.transformer.NoActionTransformer"/>
+            <custom-transformer class="org.mule.functional.transformer.NoActionTransformer"/>
         </tcp:outbound-endpoint>
     </flow>
 

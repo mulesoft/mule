@@ -6,16 +6,11 @@
  */
 package org.mule.test.integration;
 
-import org.mule.api.MuleException;
-import org.mule.api.endpoint.EndpointBuilder;
-import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.lifecycle.StartException;
-import org.mule.endpoint.DefaultEndpointFactory;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
-import org.mule.tck.util.endpoint.InboundEndpointWrapper;
 
 import java.util.concurrent.CountDownLatch;
 
@@ -85,6 +80,7 @@ public class CompositeSourceStartDelayTestCase extends FunctionalTestCase
 
         private final HttpClient httpClient = new HttpClient();
 
+        @Override
         public boolean isSatisfied()
         {
             GetMethod method = new GetMethod("http://localhost:" + httpPort.getValue());
@@ -94,7 +90,7 @@ public class CompositeSourceStartDelayTestCase extends FunctionalTestCase
                 int statusCode = httpClient.executeMethod(method);
                 String response = method.getResponseBodyAsString();
 
-                return 200 == statusCode && "/Processed".equals(response);
+                return 200 == statusCode && "Processed".equals(response);
             }
             catch (Exception e)
             {
@@ -102,56 +98,10 @@ public class CompositeSourceStartDelayTestCase extends FunctionalTestCase
             }
         }
 
+        @Override
         public String describeFailure()
         {
             return "Unable to process message when composite source was not completely started";
         }
     }
-
-    public static class DelayedStartEndpointFactory extends DefaultEndpointFactory
-    {
-
-        public InboundEndpoint getInboundEndpoint(EndpointBuilder builder) throws MuleException
-        {
-            InboundEndpoint endpoint = builder.buildInboundEndpoint();
-
-            if (endpoint.getName().equals("sleepingTestIn"))
-            {
-                InboundEndpointWrapper wrappedEndpoint = new DelayedStartInboundEndpointWrapper(endpoint);
-
-                return wrappedEndpoint;
-            }
-            else
-            {
-                return endpoint;
-            }
-        }
-    }
-
-    public static class DelayedStartInboundEndpointWrapper extends InboundEndpointWrapper
-    {
-
-        public DelayedStartInboundEndpointWrapper(InboundEndpoint delegate)
-        {
-            super(delegate);
-        }
-
-        @Override
-        public void start() throws MuleException
-        {
-            try
-            {
-                startLatch.await();
-            }
-            catch (InterruptedException e)
-            {
-                Thread.currentThread().interrupt();
-                throw new StartException(e, this);
-            }
-
-            super.start();
-        }
-    }
 }
-
-

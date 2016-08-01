@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:spring="http://www.springframework.org/schema/beans" xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
-    xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+    xmlns:test="http://www.mulesoft.org/schema/mule/test"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
-       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
     <script:transformer name="stringReplace">
         <script:script engine="groovy">
@@ -28,64 +28,46 @@
 
 
     <flow name="inlineScript">
-        <inbound-endpoint address="vm://in1" exchange-pattern="one-way" />
-        <echo-component />
-        <outbound-endpoint address="vm://out1" exchange-pattern="one-way">
-            <script:transformer>
-                <script:script engine="groovy">
-                    return src.toString().replaceAll("l", "x")
-                            </script:script>
-            </script:transformer>
-        </outbound-endpoint>
+        <script:transformer>
+            <script:script engine="groovy">
+                return src.toString().replaceAll("l", "x")
+            </script:script>
+        </script:transformer>
+        <test:queue name="inlineScriptTestOut"/>
     </flow>
 
     <flow name="fileBasedScript">
-        <inbound-endpoint address="vm://in2" exchange-pattern="one-way" />
-        <echo-component />
-        <outbound-endpoint address="vm://out2" exchange-pattern="one-way">
-            <script:transformer>
-                <script:script file="simple-transformer.groovy" />
-            </script:transformer>
-        </outbound-endpoint>
+        <script:transformer>
+            <script:script file="simple-transformer.groovy" />
+        </script:transformer>
+        <test:queue name="fileBasedScriptTestOut"/>
     </flow>
 
     <flow name="referencedTransformer">
-        <inbound-endpoint address="vm://in3" exchange-pattern="one-way" />
-        <echo-component />
-        <outbound-endpoint address="vm://out3" exchange-pattern="one-way">
-            <transformer ref="stringReplace" />
-        </outbound-endpoint>
+        <transformer ref="stringReplace" />
+        <test:queue name="referencedTransformerTestOut"/>
     </flow>
 
     <flow name="referencedTransformerWithParameters">
-        <inbound-endpoint address="vm://in4" />
-        <echo-component />
-        <outbound-endpoint address="vm://out4" exchange-pattern="one-way">
-            <transformer ref="stringReplaceWithParams" />
-        </outbound-endpoint>
+        <transformer ref="stringReplaceWithParams" />
+        <test:queue name="referencedTransformerWithParametersTestOut"/>
     </flow>
 
     <flow name="transformByAssigningPayload">
-        <inbound-endpoint address="vm://in5" exchange-pattern="request-response">
-            <script:transformer>
-                <script:script engine="groovy">
-                    payload = 'bar'
-                </script:script>
-            </script:transformer>
-        </inbound-endpoint>
-        <echo-component />
+        <script:transformer>
+            <script:script engine="groovy">
+                payload = 'bar'
+            </script:script>
+        </script:transformer>
     </flow>
 
-    <flow name="transformByAssigningProperty">
-        <inbound-endpoint address="vm://in6" exchange-pattern="request-response">
-            <script:transformer>
-                <script:script engine="groovy">
-                    message.setOutboundProperty('foo','bar')
-                    return payload
-                </script:script>
-            </script:transformer>
-        </inbound-endpoint>
-        <echo-component />
+     <flow name="transformByAssigningProperty">
+        <script:transformer>
+            <script:script engine="groovy">
+                message = org.mule.runtime.core.api.MuleMessage.builder(message).addOutboundProperty('foo', 'bar').build()
+                return payload
+            </script:script>
+        </script:transformer>
     </flow>
 
 </mule>

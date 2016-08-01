@@ -6,44 +6,30 @@
  */
 package org.mule.test.integration.messaging.meps;
 
-import org.mule.api.client.MuleClient;
-import org.mule.api.context.notification.ServerNotification;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.tck.functional.FunctionalTestNotificationListener;
-import org.mule.util.concurrent.Latch;
+import static org.junit.Assert.assertTrue;
 
-import java.util.Arrays;
-import java.util.Collection;
+import org.mule.runtime.core.api.context.notification.ServerNotification;
+import org.mule.functional.functional.FunctionalTestNotificationListener;
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.util.concurrent.Latch;
+
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-import static org.junit.Assert.assertTrue;
-
-// START SNIPPET: full-class
-public class InOnlyTestCase extends AbstractServiceAndFlowTestCase
+public class InOnlyTestCase extends FunctionalTestCase
 {
     public static final long TIMEOUT = 3000;
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/integration/messaging/meps/pattern_In-Only-service.xml"},
-            {ConfigVariant.FLOW, "org/mule/test/integration/messaging/meps/pattern_In-Only-flow.xml"}});
-    }
-
-    public InOnlyTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
+        return "org/mule/test/integration/messaging/meps/pattern_In-Only-flow.xml";
     }
 
     @Test
     public void testExchange() throws Exception
     {
-        MuleClient client = muleContext.getClient();
-
         final Latch latch = new Latch();
         muleContext.registerListener(new FunctionalTestNotificationListener()
         {
@@ -54,7 +40,7 @@ public class InOnlyTestCase extends AbstractServiceAndFlowTestCase
             }
         });
 
-        client.dispatch("inboundEndpoint", "some data", null);
+        flowRunner("In-Only-Service").withPayload(getTestMuleMessage()).asynchronously().run();
         assertTrue(latch.await(TIMEOUT, TimeUnit.MILLISECONDS));
     }
 }

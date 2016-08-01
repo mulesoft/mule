@@ -6,10 +6,10 @@
  */
 package org.mule.test.infrastructure.process;
 
-import org.mule.api.config.MuleProperties;
+import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.util.UUID;
 import org.mule.tck.junit4.rule.FreePortFinder;
 import org.mule.test.infrastructure.deployment.FakeMuleServer;
-import org.mule.util.UUID;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,13 +18,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MuleContextProcessBuilder implements Cloneable, ConfigurableProcessBuilder
 {
 
-    protected transient final static Log logger = LogFactory.getLog(MuleContextProcessBuilder.class);
+    protected transient final static Logger logger = LoggerFactory.getLogger(MuleContextProcessBuilder.class);
 
     public static final String MULE_CONTEXT_CONFIGURATION_ID_KEY = MuleProperties.SYSTEM_PROPERTY_PREFIX + "serverId";
     public static final String CONFIG_FILE_KEY = "configFile";

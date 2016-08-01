@@ -52,7 +52,7 @@
     </mule-ss:security-manager>
 
     <spring:beans>
-        <spring:bean class="org.mule.module.spring.security.PreAuthenticatedAuthenticationProvider" name="authenticationProvider"/>
+        <spring:bean class="org.mule.runtime.module.spring.security.PreAuthenticatedAuthenticationProvider" name="authenticationProvider"/>
 
         <ss:authentication-manager alias="authenticationManager">
             <ss:authentication-provider>
@@ -66,9 +66,9 @@
 
     <flow name="server">
         <http:listener config-ref="listenerConfig" path="/services/Test" />
-        <mule-ss:http-security-filter realm="mule-realm"/>
-        <cxf:jaxws-service serviceClass="org.mule.module.ws.consumer.TestService"/>
-        <component class="org.mule.module.ws.consumer.TestService"/>
+        <http:basic-security-filter realm="mule-realm"/>
+        <cxf:jaxws-service serviceClass="org.mule.runtime.module.ws.consumer.TestService"/>
+        <component class="org.mule.runtime.module.ws.consumer.TestService"/>
     </flow>
 
     <flow name="serverEmptyResponse">

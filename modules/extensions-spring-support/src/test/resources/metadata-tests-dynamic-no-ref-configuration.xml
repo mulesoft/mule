@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/metadata http://www.mulesoft.org/schema/mule/metadata/current/mule-metadata.xsd">
+
+    <metadata:config name="config" data="#['makeThisConfigDynamic!']">
+        <metadata:connection/>
+    </metadata:config>
+
+    <flow name="resolverWithImplicitDynamicConfig">
+        <metadata:simple-multi-level-key-resolver continent="AMERICA" country="USA" city="SFO"/>
+    </flow>
+</mule>

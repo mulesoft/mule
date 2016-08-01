@@ -8,7 +8,7 @@ package org.mule.test.el;
 
 import static org.junit.Assert.fail;
 
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -40,7 +40,7 @@ public class ExpressionLanguageConcurrencyTestCase extends FunctionalTestCase
                     try
                     {
                         start.await();
-                        testFlow("slowRequestHandler", getTestEvent("foo"));
+                        flowRunner("slowRequestHandler").withPayload("foo").run();
                     }
                     catch (Exception e)
                     {

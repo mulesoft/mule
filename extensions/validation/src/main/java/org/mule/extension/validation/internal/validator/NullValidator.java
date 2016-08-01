@@ -7,16 +7,14 @@
 package org.mule.extension.validation.internal.validator;
 
 import static org.mule.extension.validation.internal.ImmutableValidationResult.ok;
-import org.mule.api.MuleEvent;
-import org.mule.config.i18n.Message;
 import org.mule.extension.validation.api.ValidationResult;
 import org.mule.extension.validation.internal.ValidationContext;
-import org.mule.transport.NullPayload;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.config.i18n.Message;
 
 /**
  * An {@link AbstractValidator} which verifies that
- * a {@link #value} is {@code null} or an instance
- * of {@link NullPayload}
+ * a {@link #value} is {@code null}.
  *
  * @since 3.7.0
  */
@@ -34,7 +32,7 @@ public class NullValidator extends AbstractValidator
     @Override
     public ValidationResult validate(MuleEvent event)
     {
-        return value == null || value instanceof NullPayload
+        return value == null
                ? ok()
                : fail();
     }

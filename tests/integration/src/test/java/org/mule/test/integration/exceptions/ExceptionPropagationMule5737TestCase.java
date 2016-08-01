@@ -6,26 +6,33 @@
  */
 package org.mule.test.integration.exceptions;
 
+import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.api.MessagingException;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.client.MuleClient;
-import org.mule.api.construct.FlowConstruct;
-import org.mule.exception.AbstractMessagingExceptionStrategy;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.exceptions.FunctionalTestException;
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.component.ComponentException;
+import org.mule.runtime.core.exception.AbstractMessagingExceptionStrategy;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 /**
- * Assert that flows do not propagate exceptions via vm request-response endpoints or use of flow-ref. Also
+ * Assert that flows do not propagate exceptions via runFlow or use of flow-ref. Also
  * assert that a sub-flow/processor-chain does not handle it's own exception but they are rather handled by
  * calling flow.
  */
 public class ExceptionPropagationMule5737TestCase extends FunctionalTestCase
 {
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
+
     @Override
     protected String getConfigFile()
     {
@@ -33,45 +40,42 @@ public class ExceptionPropagationMule5737TestCase extends FunctionalTestCase
     }
 
     @Test
-    public void testVMRequestResponseEndpointExceptionPropagation() throws MuleException
+    public void testRequestResponseEndpointExceptionPropagation() throws Exception
     {
-        MuleClient client = muleContext.getClient();
-        client.send("vm://flow-in", "", null);
+        expectedException.expect(ComponentException.class);
+        expectedException.expectCause(instanceOf(FunctionalTestException.class));
+        runFlow("flow");
     }
 
     @Test
-    public void testFlowWithChildFlowExceptionPropagation() throws MuleException
+    public void testFlowWithChildFlowExceptionPropagation() throws Exception
     {
-        MuleClient client = muleContext.getClient();
         FlowConstruct flow = muleContext.getRegistry().lookupFlowConstruct("flowWithChildFlow");
         FlowConstruct childFlow = muleContext.getRegistry().lookupFlowConstruct("childFlow");
         SensingExceptionStrategy parentES = (SensingExceptionStrategy) flow.getExceptionListener();
         SensingExceptionStrategy childFlowES = (SensingExceptionStrategy) childFlow.getExceptionListener();
 
-        client.send("vm://flowWithChildFlow-in", "", null);
+        runFlow("flowWithChildFlow");
 
         assertFalse(parentES.caught);
         assertTrue(childFlowES.caught);
-
     }
 
     @Test
-    public void testFlowWithSubFlowExceptionPropagation() throws MuleException
+    public void testFlowWithSubFlowExceptionPropagation() throws Exception
     {
-        MuleClient client = muleContext.getClient();
         SensingExceptionStrategy parentES = (SensingExceptionStrategy) muleContext.getRegistry()
             .lookupFlowConstruct("flowWithSubFlow")
             .getExceptionListener();
 
-        client.send("vm://flowWithSubFlow-in", "", null);
+        runFlow("flowWithSubFlow");
 
         assertTrue(parentES.caught);
     }
 
     @Test
-    public void testFlowWithChildServiceExceptionPropagation() throws MuleException
+    public void testFlowWithChildServiceExceptionPropagation() throws Exception
     {
-        MuleClient client = muleContext.getClient();
         SensingExceptionStrategy parentES = (SensingExceptionStrategy) muleContext.getRegistry()
             .lookupFlowConstruct("flowWithChildService")
             .getExceptionListener();
@@ -79,7 +83,7 @@ public class ExceptionPropagationMule5737TestCase extends FunctionalTestCase
             .lookupFlowConstruct("childService")
             .getExceptionListener();
 
-        client.send("vm://flowWithChildService-in", "", null);
+        runFlow("flowWithChildService");
 
         assertFalse(parentES.caught);
         assertTrue(childServiceES.caught);
@@ -100,7 +104,9 @@ public class ExceptionPropagationMule5737TestCase extends FunctionalTestCase
         {
             caught = true;
             MuleEvent resultEvent = super.handleException(e, event);
-            resultEvent.getMessage().setExceptionPayload(null);
+            event.setMessage(MuleMessage.builder(event.getMessage())
+                                        .exceptionPayload(null)
+                                        .build());
             ((MessagingException)e).setHandled(true);
             return resultEvent;
         }

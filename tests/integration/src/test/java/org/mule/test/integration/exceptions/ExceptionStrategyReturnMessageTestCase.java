@@ -6,14 +6,17 @@
  */
 package org.mule.test.integration.exceptions;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
-import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.transport.NullPayload;
+import static org.junit.Assert.assertThat;
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.component.ComponentException;
+import org.mule.runtime.core.exception.AbstractMessagingExceptionStrategy;
 
 import org.junit.Test;
 
@@ -28,22 +31,20 @@ public class ExceptionStrategyReturnMessageTestCase extends FunctionalTestCase
     @Test
     public void testReturnPayloadDefaultStrategy() throws Exception
     {
-        MuleClient client = muleContext.getClient();
-        MuleMessage msg = client.send("vm://in-default-strategy", "Test Message", null);
-
-        assertNotNull(msg);
-        assertNotNull(msg.getExceptionPayload());
-        assertEquals("Functional Test Service Exception", msg.getExceptionPayload().getMessage());
-
-        assertNotNull(msg.getPayload());
-        assertTrue(msg.getPayload() instanceof NullPayload);
+        try
+        {
+            flowRunner("InputService2").withPayload("Test Message").run();
+        }
+        catch(ComponentException e)
+        {
+            assertThat(e.getEvent().getMessage().getPayload(), is(nullValue()));
+        }
     }
 
     @Test
     public void testReturnPayloadCustomStrategy() throws Exception
     {
-        MuleClient client = muleContext.getClient();
-        MuleMessage msg = client.send("vm://in-custom-strategy", "Test Message", null);
+        MuleMessage msg = flowRunner("InputService").withPayload(getTestMuleMessage("Test Message")).run().getMessage();
 
         assertNotNull(msg);
         assertNotNull(msg.getExceptionPayload());
@@ -52,4 +53,21 @@ public class ExceptionStrategyReturnMessageTestCase extends FunctionalTestCase
         assertNotNull(msg.getPayload());
         assertEquals("Ka-boom!", msg.getPayload());
     }
+
+    public static class TestExceptionStrategy extends AbstractMessagingExceptionStrategy
+    {
+        @Override
+        public MuleEvent handleException(Exception exception, MuleEvent event)
+        {
+            MuleEvent result = super.handleException(exception, event);
+            event.setMessage(MuleMessage.builder(event.getMessage()).payload("Ka-boom!").build());
+            if (exception instanceof MessagingException)
+            {
+                ((MessagingException)exception).setHandled(true);
+            }
+
+            return result;
+        }
+    }
+
 }

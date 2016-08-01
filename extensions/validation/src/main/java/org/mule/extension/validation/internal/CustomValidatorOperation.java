@@ -6,12 +6,13 @@
  */
 package org.mule.extension.validation.internal;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.registry.MuleRegistry;
-import org.mule.extension.annotations.Operation;
-import org.mule.extension.annotations.ParameterGroup;
-import org.mule.extension.annotations.param.UseConfig;
-import org.mule.extension.introspection.declaration.fluent.Descriptor;
+import org.mule.extension.validation.api.ObjectSource;
+import org.mule.extension.validation.api.ValidationExtension;
+import org.mule.extension.validation.api.ValidationOptions;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.registry.MuleRegistry;
+import org.mule.runtime.extension.api.annotation.ParameterGroup;
+import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.extension.validation.api.Validator;
 
 import com.google.common.cache.CacheBuilder;
@@ -26,7 +27,7 @@ import com.google.common.cache.LoadingCache;
  * named reference to it.
  * <p/>
  * If the user provided a classname, then the {@link Class} that it represents
- * is expected to have a default public {@link Descriptor} which can be used to
+ * is expected to have a default public constructor which can be used to
  * instantiate it.
  * <p/>
  * If the {@link Validator} is provided via a reference, then a lookup
@@ -51,7 +52,6 @@ public final class CustomValidatorOperation extends ValidationSupport
         }
     });
 
-    @Operation
     public void customValidator(@ParameterGroup ObjectSource<Validator> source,
                                 @ParameterGroup ValidationOptions options,
                                 MuleEvent event,

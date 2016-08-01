@@ -10,41 +10,25 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.tck.junit4.rule.ForceXalanTransformerFactory;
-import org.mule.tck.junit4.rule.SystemProperty;
-import org.mule.util.IOUtils;
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.util.IOUtils;
 
-import java.util.Arrays;
-import java.util.Collection;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.custommonkey.xmlunit.XMLUnit;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class XSLTWikiDocsTestCase extends AbstractServiceAndFlowTestCase
+public class XSLTWikiDocsTestCase extends FunctionalTestCase
 {
 
-    @Rule
-    public SystemProperty useXalan = new ForceXalanTransformerFactory();
-
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/integration/xml/xslt-functional-test-service.xml"},
-            {ConfigVariant.FLOW, "org/mule/test/integration/xml/xslt-functional-test-flow.xml"}
-        });
-    }
-
-    public XSLTWikiDocsTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
+        return "org/mule/test/integration/xml/xslt-functional-test-flow.xml";
     }
 
     @Test
@@ -61,20 +45,22 @@ public class XSLTWikiDocsTestCase extends AbstractServiceAndFlowTestCase
         String resultData = IOUtils.getResourceAsString(
                 "org/mule/test/integration/xml/cd-catalog-result-with-params.xml", getClass());
 
-        //Create a new Mule Client
-        MuleClient client = muleContext.getClient();
-
-        //These are the message roperties that will get passed into the XQuery context
-        Map<String, Object> props = new HashMap<String, Object>();
+        //These are the message properties that will get passed into the XQuery context
+        Map<String, Serializable> props = new HashMap<>();
         props.put("ListTitle", "MyList");
         props.put("ListRating", new Integer(6));
 
         //Invoke the service
-        MuleMessage message = client.send("vm://test.in", srcData, props);
+        final MuleEvent muleEvent = flowRunner("Echo").withPayload(srcData).withInboundProperties(props).run();
+        MuleMessage message = muleEvent.getMessage();
         assertNotNull(message);
         assertNull(message.getExceptionPayload());
         //Compare results
 
-        assertTrue(XMLUnit.compareXML(message.getPayloadAsString(), resultData).similar());
+        String result = getPayloadAsString(message);
+        // remove namespace information so that it doesn't interferes with XMLUnit test
+        result = result.replaceAll("xmlns=\"http://www.mulesoft.org/schema/mule/core\"", "");
+
+        assertTrue(XMLUnit.compareXML(result, resultData).similar());
     }
 }

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
+               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
+
+    <tls:context name="globalTlsContext" >
+        <tls:trust-store path="tls/ssltest-cacerts.jks" password="changeit"/>
+        <tls:key-store path="tls/ssltest-keystore.jks" keyPassword="changeit" password="changeit"/>
+    </tls:context>
+
+    <httpn:listener-config name="globalConfig">
+        <httpn:listener-connection protocol="HTTPS" host="localhost" port="${port1}" tlsContext="globalTlsContext"/>
+    </httpn:listener-config>
+
+    <httpn:listener-config name="nestedConfig">
+        <httpn:listener-connection protocol="HTTPS" host="localhost" port="${port2}">
+            <tls:context>
+                <tls:trust-store path="tls/ssltest-cacerts.jks" password="changeit"/>
+                <tls:key-store path="tls/ssltest-keystore.jks" keyPassword="changeit" password="changeit"/>
+            </tls:context>
+        </httpn:listener-connection>
+    </httpn:listener-config>
+
+    <httpn:request-config name="clientGlobalConfig">
+        <httpn:request-connection protocol="HTTPS" host="localhost" port="${port}" tlsContext="globalTlsContext"/>
+    </httpn:request-config>
+
+    <flow name="testFlowGlobalContext">
+        <httpn:listener config-ref="globalConfig" path="/" allowedMethods="GET"/>
+        <expression-component>payload = 'ok'</expression-component>
+    </flow>
+
+    <flow name="testFlowNestedContext">
+        <httpn:listener config-ref="nestedConfig" path="/" allowedMethods="POST"/>
+        <expression-component>payload = 'all right'</expression-component>
+    </flow>
+
+
+    <flow name="testFlowGlobalContextClient">
+        <httpn:request config-ref="clientGlobalConfig" port="${port1}" path="/" method="GET" key="ANY"/>
+    </flow>
+
+    <flow name="testFlowNestedContextClient">
+        <httpn:request config-ref="clientGlobalConfig" port="${port2}" path="/" method="POST" key="ANY"/>
+    </flow>
+
+</mule>

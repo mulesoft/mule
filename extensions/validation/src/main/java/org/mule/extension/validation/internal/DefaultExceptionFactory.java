@@ -8,13 +8,13 @@ package org.mule.extension.validation.internal;
 
 import static org.reflections.ReflectionUtils.getConstructors;
 import static org.reflections.ReflectionUtils.withParameters;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleRuntimeException;
-import org.mule.config.i18n.MessageFactory;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.config.i18n.MessageFactory;
 import org.mule.extension.validation.api.ExceptionFactory;
 import org.mule.extension.validation.api.ValidationResult;
-import org.mule.util.ClassUtils;
-import org.mule.util.CollectionUtils;
+import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.util.CollectionUtils;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;

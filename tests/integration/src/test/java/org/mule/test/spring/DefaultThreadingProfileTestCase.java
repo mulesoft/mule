@@ -9,17 +9,18 @@ package org.mule.test.spring;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import org.mule.api.config.ThreadingProfile;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.runtime.core.api.config.ThreadingProfile;
+import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 
 public class DefaultThreadingProfileTestCase extends FunctionalTestCase
 {
+
     @Override
-    protected String getConfigFile()
+    protected String[] getConfigFiles()
     {
-        return "";
+        return new String[0];
     }
 
     @Test

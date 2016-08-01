@@ -1,0 +1,10 @@
+org.mule.runtime.module.extension.internal.introspection.enricher.DataTypeModelEnricher
+org.mule.runtime.module.extension.internal.introspection.enricher.ConnectionModelEnricher
+org.mule.runtime.module.extension.internal.introspection.enricher.StudioModelEnricher
+org.mule.runtime.module.extension.internal.introspection.enricher.ConfigNameModelEnricher
+org.mule.runtime.module.extension.internal.introspection.enricher.ClassLoaderModelEnricher
+org.mule.runtime.module.extension.internal.introspection.enricher.ExportModelEnricher
+org.mule.runtime.module.extension.internal.introspection.enricher.XmlModelEnricher
+org.mule.runtime.module.extension.internal.introspection.enricher.ImportedTypesModelEnricher
+org.mule.runtime.module.extension.internal.introspection.enricher.SubTypesModelEnricher
+org.mule.runtime.module.extension.internal.introspection.enricher.DisplayModelEnricher

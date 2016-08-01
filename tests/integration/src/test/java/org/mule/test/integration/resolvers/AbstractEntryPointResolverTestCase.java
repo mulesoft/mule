@@ -6,30 +6,25 @@
  */
 package org.mule.test.integration.resolvers;
 
+import static java.util.Collections.emptyMap;
 import static org.junit.Assert.assertEquals;
 
-import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.api.MuleMessage;
 
 import java.util.Map;
 
-public abstract class AbstractEntryPointResolverTestCase extends AbstractServiceAndFlowTestCase
+public abstract class AbstractEntryPointResolverTestCase extends FunctionalTestCase
 {
-    public AbstractEntryPointResolverTestCase(ConfigVariant variant, String configResources)
+
+    protected void doTest(String flowName, Object payload, String result) throws Exception
     {
-        super(variant, configResources);
+        doTest(flowName, payload, result, emptyMap());
     }
 
-    protected void doTest(String path, Object payload, String result) throws Exception
+    protected void doTest(String flowName, Object payload, String result, Map properties) throws Exception
     {
-        doTest(path, payload, result, null);
-    }
-
-    protected void doTest(String path, Object payload, String result, Map properties) throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://" + path, payload, properties);
-        assertEquals(result, response.getPayloadAsString());
+        MuleMessage response = flowRunner(flowName).withPayload(payload).withInboundProperties(properties).run().getMessage();
+        assertEquals(result, getPayloadAsString(response));
     }
 }

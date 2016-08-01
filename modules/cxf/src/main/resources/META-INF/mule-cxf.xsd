@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <xsd:schema xmlns="http://www.mulesoft.org/schema/mule/cxf"
-            xmlns:cxf="http://cxf.apache.org/core"
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
             xmlns:mule="http://www.mulesoft.org/schema/mule/core"
             xmlns:schemadoc="http://www.mulesoft.org/schema/mule/schemadoc"
@@ -13,11 +12,9 @@
     <xsd:import namespace="http://www.springframework.org/schema/beans"
                 schemaLocation="http://www.springframework.org/schema/beans/spring-beans-3.1.xsd"/>
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/core"
-                schemaLocation="http://www.mulesoft.org/schema/mule/core/3.7/mule.xsd"/>
-    <xsd:import namespace="http://cxf.apache.org/core"
-                schemaLocation="http://cxf.apache.org/schemas/core.xsd"/>
+                schemaLocation="http://www.mulesoft.org/schema/mule/core/3.8/mule.xsd"/>
     <xsd:import namespace = "http://www.mulesoft.org/schema/mule/schemadoc"
-                schemaLocation = "http://www.mulesoft.org/schema/mule/schemadoc/3.7/mule-schemadoc.xsd"/>
+                schemaLocation = "http://www.mulesoft.org/schema/mule/schemadoc/3.8/mule-schemadoc.xsd"/>
 
     <xsd:annotation>
         <xsd:documentation>
@@ -172,13 +169,6 @@
                     <xsd:annotation>
                         <xsd:documentation>
                             The class CXF should use to construct its service model for the client. 
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="decoupledEndpoint" type="xsd:string">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The reply to endpoint for clients which have WS-Addressing enabled. 
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -503,49 +493,6 @@
         </xsd:sequence>
     </xsd:complexType>
 
-    <xsd:element name="wrapper-component" type="wrapperComponentType" substitutionGroup="mule:abstract-component">
-        <xsd:annotation>
-            <xsd:documentation>
-                The WebServiceWrapperComponent class allows you to send the result of a web service call to another endpoint. 
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-
-    <xsd:complexType name="wrapperComponentType">
-        <xsd:complexContent>
-            <xsd:extension base="mule:abstractComponentType">
-                <xsd:attribute name="address" type="xsd:string">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The URL of the web service.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="addressFromMessage" type="mule:substitutableBoolean">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Specifies that the URL of the web service will be obtained from the message itself.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="wsdlPort" type="xsd:string">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The WSDL port you want to use to communicate to the service.
-                         </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="operation" type="xsd:string">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The operation you want to invoke on the outbound endpoint.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-    
     <xsd:element name="stax">
         <xsd:complexType>
             <xsd:complexContent>

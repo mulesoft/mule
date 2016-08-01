@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:https="http://www.mulesoft.org/schema/mule/https"
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:https="http://www.mulesoft.org/schema/mule/transport/https"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/transport/vm"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
     xsi:schemaLocation="
         http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
-        http://www.mulesoft.org/schema/mule/https http://www.mulesoft.org/schema/mule/https/current/mule-https.xsd">
+        http://www.mulesoft.org/schema/mule/transport/vm http://www.mulesoft.org/schema/mule/transport/vm/current/mule-transport-vm.xsd
+        http://www.mulesoft.org/schema/mule/transport/https http://www.mulesoft.org/schema/mule/transport/https/current/mule-transport-https.xsd">
 
     <https:connector name="httpsConnector">
         <https:tls-client path="clientKeystore" storePassword="mulepassword"/>

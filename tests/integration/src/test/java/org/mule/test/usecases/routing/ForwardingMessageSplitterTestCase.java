@@ -6,35 +6,26 @@
  */
 package org.mule.test.usecases.routing;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertThat;
 
-import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.functional.junit4.FunctionalTestCase;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class ForwardingMessageSplitterTestCase extends AbstractServiceAndFlowTestCase
+public class ForwardingMessageSplitterTestCase extends FunctionalTestCase
 {
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/usecases/routing/forwarding-message-splitter-service.xml"},
-            {ConfigVariant.FLOW, "org/mule/test/usecases/routing/forwarding-message-splitter-flow.xml"}
-        });
-    }
 
-    public ForwardingMessageSplitterTestCase(ConfigVariant variant, String configResources)
+    @Override
+    protected String getConfigFile()
     {
-        super(variant, configResources);
+        return "org/mule/test/usecases/routing/forwarding-message-splitter-flow.xml";
     }
 
     @Test
@@ -46,16 +37,16 @@ public class ForwardingMessageSplitterTestCase extends AbstractServiceAndFlowTes
         payload.add("hello");
         payload.add(new Integer(3));
         payload.add(new Exception());
-        client.send("vm://in.queue", payload, null);
-        MuleMessage m = client.request("vm://component.1", 2000);
+        flowRunner("forwardingSplitter").withPayload(payload).asynchronously().run();
+        MuleMessage m = client.request("test://component.1", RECEIVE_TIMEOUT);
         assertNotNull(m);
-        assertTrue(m.getPayload() instanceof String);
-        m = client.request("vm://component.2", 2000);
+        assertThat(m.getPayload(), instanceOf(String.class));
+        m = client.request("test://component.2", RECEIVE_TIMEOUT);
         assertNotNull(m);
-        assertTrue(m.getPayload() instanceof Integer);
+        assertThat(m.getPayload(), instanceOf(Integer.class));
 
-        m = client.request("vm://error.queue", 2000);
+        m = client.request("test://error.queue", RECEIVE_TIMEOUT);
         assertNotNull(m);
-        assertTrue(m.getPayload() instanceof Exception);
+        assertThat(m.getPayload(), instanceOf(Exception.class));
     }
 }

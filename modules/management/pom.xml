@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.mule.modules</groupId>
         <artifactId>mule-modules</artifactId>
-        <version>3.8.0-SNAPSHOT</version>
+        <version>4.0-SNAPSHOT</version>
     </parent>
     <artifactId>mule-module-management</artifactId>
     <packaging>jar</packaging>
@@ -31,23 +31,30 @@
             <artifactId>mule-module-xml</artifactId>
             <version>${project.version}</version>
         </dependency>
-         <dependency>
+        
+        <!-- TODO MULE-9814 Remove this dependency -->
+        <dependency>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-j2ee-management_1.1_spec</artifactId>
+            <version>1.0.1</version>
+        </dependency>
+        <dependency>
             <groupId>mx4j</groupId>
             <artifactId>mx4j-jmx</artifactId>
         </dependency>
-         <dependency>
+        <dependency>
             <groupId>mx4j</groupId>
             <artifactId>mx4j-impl</artifactId>
         </dependency>
-         <dependency>
+        <dependency>
             <groupId>mx4j</groupId>
             <artifactId>mx4j-tools</artifactId>
         </dependency>
-         <dependency>
+        <dependency>
             <groupId>mx4j</groupId>
             <artifactId>mx4j-remote</artifactId>
         </dependency>
-         <dependency>
+        <dependency>
             <groupId>com.yourkit</groupId>
             <artifactId>yjp-controller-api-redist</artifactId>
         </dependency>
@@ -56,12 +63,6 @@
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-functional</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-vm</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
@@ -76,6 +77,17 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

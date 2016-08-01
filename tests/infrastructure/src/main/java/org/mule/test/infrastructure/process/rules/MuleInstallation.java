@@ -6,50 +6,63 @@
  */
 package org.mule.test.infrastructure.process.rules;
 
+import static java.lang.Boolean.parseBoolean;
 import static java.lang.System.getProperty;
+import static org.apache.commons.io.FileUtils.deleteDirectory;
+import static org.apache.commons.io.FileUtils.deleteQuietly;
+import static org.apache.commons.io.FileUtils.moveDirectory;
+import static org.apache.commons.lang.StringUtils.isEmpty;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.Enumeration;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
-import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.junit.rules.ExternalResource;
+import org.junit.runner.Description;
+import org.junit.runners.model.Statement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * This is a JUnit rule to install Mule ESB during tests. Usage:
- *
+ * This is a JUnit rule to install Mule Runtime during tests. Usage:
+ * <p>
  * <pre>
- * public static class MuleEsbInstallationTest {
+ * public class MuleRuntimeInstallationTest {
  *  &#064;Rule
  *  public MuleInstallation installation = new MuleInstallation(&quot;/path/to/packed/distribution.zip&quot;);
  *
  *  &#064;Test
- *  public void usingMuleEsb() throws IOException {
+ *  public void usingMuleRuntime() throws IOException {
  *      String muleHomePath = installation.getMuleHome();
  *      MuleProcessController mule = new MuleProcessController(muleHomePath);
  *      mule.start();
  *     }
  * }
  * </pre>
- *
  */
 public class MuleInstallation extends ExternalResource
 {
 
+    private static final String DISTRIBUTION_PROPERTY = "mule.distribution";
     private static final File WORKING_DIRECTORY = new File(getProperty("user.dir"));
-    private static final int BUFFER = 2048;
-
+    private static final String DELETE_ON_EXIT = getProperty("mule.test.deleteOnExit");
+    private static final String zippedDistributionFromProperty = getProperty(DISTRIBUTION_PROPERTY);
+    private static Logger logger = LoggerFactory.getLogger(MuleInstallation.class);
+    protected String testname;
     private File distribution;
     private File muleHome;
 
+    public MuleInstallation()
+    {
+        this(zippedDistributionFromProperty);
+    }
+
     public MuleInstallation(String zippedDistribution)
     {
+        if (StringUtils.isEmpty(zippedDistribution))
+        {
+            logger.error("You must configure the location for Mule distribution in the system property: " + DISTRIBUTION_PROPERTY);
+        }
         distribution = new File(zippedDistribution);
         if (!distribution.exists())
         {
@@ -63,53 +76,38 @@ public class MuleInstallation extends ExternalResource
     }
 
     @Override
+    public Statement apply(final Statement base, final Description description)
+    {
+        testname = description.getTestClass().getSimpleName();
+        return super.apply(base, description);
+    }
+
+    @Override
     protected void before() throws Throwable
     {
-        unzip(distribution, WORKING_DIRECTORY);
+        logger.info("Unpacking Mule Distribution: " + distribution);
+        muleHome = new DistroUnzipper(distribution, WORKING_DIRECTORY).unzip().muleHome();
     }
 
     @Override
     protected void after()
     {
-        try
+        File dest = new File(new File("logs"), testname);
+        deleteQuietly(dest);
+        if (isEmpty(DELETE_ON_EXIT) || parseBoolean(DELETE_ON_EXIT))
         {
-            FileUtils.deleteDirectory(muleHome);
-        }
-        catch (IOException e)
-        {
-            throw new RuntimeException("Couldn't delete directory [" + muleHome + "], delete it manually.", e);
-        }
-    }
-
-    private void unzip(File file, File destDir) throws IOException
-    {
-        ZipFile zip = new ZipFile(file);
-        Enumeration<? extends ZipEntry> zipFileEntries = zip.entries();
-        ZipEntry root = zipFileEntries.nextElement();
-        muleHome = new File(destDir, root.getName());
-        muleHome.mkdirs();
-        chmodRwx(muleHome);
-        while (zipFileEntries.hasMoreElements())
-        {
-            ZipEntry entry = zipFileEntries.nextElement();
-            File destFile = new File(entry.getName());
-            if (entry.isDirectory())
+            try
             {
-                destFile.mkdir();
+                logger.info("Deleting Mule Installation");
+                File logs = new File(muleHome, "logs");
+                moveDirectory(logs, dest);
+                deleteDirectory(muleHome);
             }
-            else
+            catch (IOException e)
             {
-                FileUtils.copyInputStreamToFile(zip.getInputStream(entry), destFile);
-                chmodRwx(destFile);
+                throw new RuntimeException("Couldn't delete directory [" + muleHome + "], delete it manually.", e);
             }
         }
-    }
-
-    private void chmodRwx(File destFile)
-    {
-        destFile.setExecutable(true, false);
-        destFile.setWritable(true, false);
-        destFile.setReadable(true, false);
     }
 
 }

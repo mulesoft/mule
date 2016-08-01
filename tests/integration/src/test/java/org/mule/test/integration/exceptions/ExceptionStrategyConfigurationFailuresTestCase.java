@@ -6,28 +6,66 @@
  */
 package org.mule.test.integration.exceptions;
 
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.config.ConfigurationBuilder;
+import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.api.context.MuleContextBuilder;
+import org.mule.runtime.core.api.context.MuleContextFactory;
+import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
+import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.context.DefaultMuleContextBuilder;
+import org.mule.runtime.core.context.DefaultMuleContextFactory;
+import org.mule.runtime.core.context.notification.MuleContextNotification;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.junit4.rule.ForceXalanTransformerFactory;
+import org.mule.tck.junit4.rule.SystemProperty;
+import org.mule.runtime.core.util.concurrent.Latch;
+
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.junit.Rule;
 import org.junit.Test;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
-import org.mule.api.config.ConfigurationBuilder;
-import org.mule.api.config.ConfigurationException;
-import org.mule.api.context.MuleContextBuilder;
-import org.mule.api.context.MuleContextFactory;
-import org.mule.api.context.notification.MuleContextNotificationListener;
-import org.mule.config.spring.SpringXmlConfigurationBuilder;
-import org.mule.context.DefaultMuleContextBuilder;
-import org.mule.context.DefaultMuleContextFactory;
-import org.mule.context.notification.MuleContextNotification;
-import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.util.concurrent.Latch;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
+@RunWith(Parameterized.class)
 public class ExceptionStrategyConfigurationFailuresTestCase extends AbstractMuleTestCase
 {
+
+    @Rule
+    public SystemProperty useXalan;
+
+    /**
+     * Verify that regardless of the XML library used, validation errors are handled correctly.
+     * @return
+     */
+    @Parameterized.Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][] {
+                {false},
+                {true}
+        });
+    }
+
+    public ExceptionStrategyConfigurationFailuresTestCase(boolean isUseXalan)
+    {
+        if (isUseXalan)
+        {
+            useXalan = new ForceXalanTransformerFactory();
+        }
+        else
+        {
+            useXalan = null;
+        }
+    }
 
     @Test(expected = ConfigurationException.class)
     public void testNamedFlowExceptionStrategyFails() throws Exception
@@ -35,13 +73,8 @@ public class ExceptionStrategyConfigurationFailuresTestCase extends AbstractMule
         loadConfiguration("org/mule/test/integration/exceptions/named-flow-exception-strategy.xml");
     }
 
-    @Test(expected = ConfigurationException.class)
-    public void testNamedServiceExceptionStrategyFails() throws Exception
-    {
-        loadConfiguration("org/mule/test/integration/exceptions/named-service-exception-strategy.xml");
-    }
-
-    @Test(expected = ConfigurationException.class)
+    //TODO MULE-10061 - Review once the MuleContext lifecycle is clearly definedWatermarkInvalidExpressionTestCase
+    @Test(expected = InitialisationException.class)
     public void testReferenceExceptionStrategyAsGlobalExceptionStrategy() throws Exception
     {
         loadConfiguration("org/mule/test/integration/exceptions/reference-global-exception-strategy.xml");
@@ -65,13 +98,15 @@ public class ExceptionStrategyConfigurationFailuresTestCase extends AbstractMule
         loadConfiguration("org/mule/test/integration/exceptions/default-es-as-referenced-exception-strategy.xml");
     }
 
-    @Test(expected = ConfigurationException.class)
+    //TODO MULE-10061 - Review once the MuleContext lifecycle is clearly defined
+    @Test(expected = InitialisationException.class)
     public void testDefaultExceptionStrategyReferencesNonExistentExceptionStrategy() throws Exception
     {
         loadConfiguration("org/mule/test/integration/exceptions/default-exception-strategy-reference-non-existent-es.xml");
     }
 
-    @Test(expected = ConfigurationException.class)
+    //TODO MULE-10061 - Review once the MuleContext lifecycle is clearly defined
+    @Test(expected = InitialisationException.class)
     public void testDefaultExceptionStrategyReferencesExceptionStrategyWithExpression() throws Exception
     {
         loadConfiguration("org/mule/test/integration/exceptions/default-exception-strategy-reference-has-expression.xml");
@@ -81,12 +116,6 @@ public class ExceptionStrategyConfigurationFailuresTestCase extends AbstractMule
     public void testChoiceExceptionStrategyWithMultipleHandleRedeliveryExceptionStrategies() throws Exception
     {
         loadConfiguration("org/mule/test/integration/exceptions/choice-exception-strategy-multiple-rollback.xml");
-    }
-
-    @Test(expected = ConfigurationException.class)
-    public void testChoiceExceptionStrategyWithMultipleHandleRedeliveryExceptionStrategiesWithGlobalAndDefault() throws Exception
-    {
-        loadConfiguration("org/mule/test/integration/exceptions/choice-exception-strategy-multiple-rollback-global.xml");
     }
 
     @Test(expected = ConfigurationException.class)

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
+
+    <httpn:request-config name="persistentRequestConfig">
+        <httpn:request-connection usePersistentConnections="true" connectionIdleTimeout="100" host="localhost" port="${httpPort}"/>
+    </httpn:request-config>
+    <flow name="persistent">
+        <httpn:request config-ref="persistentRequestConfig" path="testPath"  key="ANY"/>
+    </flow>
+
+    <httpn:request-config name="nonPersistentRequestConfig">
+        <httpn:request-connection usePersistentConnections="false" host="localhost" port="${httpPort}"/>
+    </httpn:request-config>
+    <flow name="nonPersistent">
+        <httpn:request config-ref="nonPersistentRequestConfig" path="testPath"  key="ANY"/>
+    </flow>
+
+</mule>

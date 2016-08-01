@@ -6,12 +6,13 @@
  */
 package org.mule.test.usecases.routing.lookup;
 
-import org.mule.api.transformer.TransformerException;
-import org.mule.config.i18n.MessageFactory;
-import org.mule.transformer.AbstractTransformer;
-import org.mule.util.IOUtils;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.transformer.AbstractTransformer;
+import org.mule.runtime.core.util.IOUtils;
 
 import java.io.InputStream;
+import java.nio.charset.Charset;
 
 /**
  * Throws an exception if the message does not contain "success".  In the real world, we might use XPath to 
@@ -20,7 +21,7 @@ import java.io.InputStream;
 public class ValidateResponse extends AbstractTransformer
 {
     @Override
-    protected Object doTransform(Object src, String encoding) throws TransformerException
+    protected Object doTransform(Object src, Charset encoding) throws TransformerException
     {
         String response = null;
         if (src instanceof InputStream)

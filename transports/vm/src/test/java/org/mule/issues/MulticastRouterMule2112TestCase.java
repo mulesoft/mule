@@ -9,11 +9,11 @@ package org.mule.issues;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.api.MuleEventContext;
-import org.mule.api.client.MuleClient;
-import org.mule.tck.functional.EventCallback;
-import org.mule.tck.functional.FunctionalTestComponent;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.functional.EventCallback;
+import org.mule.functional.functional.FunctionalTestComponent;
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.runtime.core.api.client.MuleClient;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -48,6 +48,7 @@ public class MulticastRouterMule2112TestCase  extends FunctionalTestCase
         final AtomicBoolean hop2made = new AtomicBoolean(false);
         EventCallback callback2 = new EventCallback()
         {
+            @Override
             public void eventReceived(final MuleEventContext context, final Object component) throws Exception
             {
                 assertTrue(hop2made.compareAndSet(false, true));

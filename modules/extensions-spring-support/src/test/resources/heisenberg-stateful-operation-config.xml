@@ -14,6 +14,7 @@
                        money="100000"
                        recipe="recipes"
                        initialHealth="CANCER"
+                       monthlyIncomes="monthlyIncomes"
                        finalHealth="CANCER" />
 
     <heisenberg:config name="staticHeisenberg"
@@ -25,6 +26,7 @@
                        money="100000"
                        recipe="recipes"
                        initialHealth="CANCER"
+                       monthlyIncomes="monthlyIncomes"
                        finalHealth="CANCER" />
 
 

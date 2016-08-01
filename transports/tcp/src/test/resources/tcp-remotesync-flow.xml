@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:spring="http://www.springframework.org/schema/beans"
-    xmlns:tcp="http://www.mulesoft.org/schema/mule/tcp" xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+    xmlns:tcp="http://www.mulesoft.org/schema/mule/transport/tcp" xmlns:vm="http://www.mulesoft.org/schema/mule/transport/vm"
     xsi:schemaLocation="
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-               http://www.mulesoft.org/schema/mule/tcp http://www.mulesoft.org/schema/mule/tcp/current/mule-tcp.xsd
-               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+               http://www.mulesoft.org/schema/mule/transport/tcp http://www.mulesoft.org/schema/mule/transport/tcp/current/mule-transport-tcp.xsd
+               http://www.mulesoft.org/schema/mule/transport/vm http://www.mulesoft.org/schema/mule/transport/vm/current/mule-transport-vm.xsd">
 
 
     <flow name="Echo1">
 
         <tcp:inbound-endpoint host="localhost"
-            port="${port1}" exchange-pattern="request-response" name="echoInTcp" />
+            port="${port1}" exchange-pattern="request-response" />
 
 
         <tcp:outbound-endpoint host="localhost"
@@ -23,7 +23,7 @@
     <flow name="Echo2">
 
         <tcp:inbound-endpoint host="localhost"
-            port="${port3}" exchange-pattern="request-response" name="echo2InTcp" />
+            port="${port3}" exchange-pattern="request-response" />
 
         <vm:outbound-endpoint path="sync"
             exchange-pattern="request-response" />
@@ -39,7 +39,7 @@
                 exchange-pattern="request-response" />
         </composite-source>
 
-        <component class="org.mule.tck.testmodels.services.TestComponent" />
+        <component class="org.mule.functional.testmodels.services.TestComponent" />
     </flow>
 
 </mule>

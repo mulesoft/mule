@@ -8,20 +8,14 @@ package org.mule.test.integration.exceptions;
 
 import static org.junit.Assert.assertNotNull;
 
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
-
-import java.util.Arrays;
-import java.util.Collection;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 
-public class AsyncExceptionHandlingTestCase extends AbstractServiceAndFlowTestCase
+public class AsyncExceptionHandlingTestCase extends FunctionalTestCase
 {
 
     @Rule
@@ -29,26 +23,17 @@ public class AsyncExceptionHandlingTestCase extends AbstractServiceAndFlowTestCa
     @Rule
     public DynamicPort dynamicPort2 = new DynamicPort("port2");
 
-    @Parameters
-    public static Collection<Object[]> parameters()
+    @Override
+    protected String getConfigFile()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/integration/exceptions/async-exception-handling-service.xml"},
-            {ConfigVariant.FLOW, "org/mule/test/integration/exceptions/async-exception-handling-flow.xml"}
-        });
-    }
-
-    public AsyncExceptionHandlingTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
+        return "org/mule/test/integration/exceptions/async-exception-handling-flow.xml";
     }
 
     @Test
     public void testAsyncExceptionHandlingTestCase() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        DefaultMuleMessage msg1 = new DefaultMuleMessage("Hello World", muleContext);
-        MuleMessage response1 = client.send("search.inbound.endpoint", msg1, 300000);
-        assertNotNull(response1);
+        flowRunner("SearchWebServiceBridge").runExpectingException();
+        assertNotNull(client.request("test://back-channel", RECEIVE_TIMEOUT));
     }
 }

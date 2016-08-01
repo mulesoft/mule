@@ -9,13 +9,15 @@ package org.mule.test.transformers;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
-import org.mule.api.transformer.DiscoverableTransformer;
-import org.mule.api.transformer.TransformerException;
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.transformer.AbstractTransformer;
-import org.mule.transformer.types.SimpleDataType;
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.transformer.AbstractTransformer;
+
+import java.nio.charset.Charset;
 
 import org.junit.Test;
 
@@ -62,8 +64,8 @@ public class GraphTransformerResolutionTestCase extends FunctionalTestCase
     @Test
     public void resolvesNonDirectTransformation() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://testInput", new A("Hello"), null);
+        final MuleEvent muleEvent = flowRunner("stringEchoService").withPayload(new A("Hello")).run();
+        MuleMessage response = muleEvent.getMessage();
         assertTrue(response.getPayload() instanceof C);
         assertEquals("HelloAFromB", ((C)response.getPayload()).value);
     }
@@ -72,12 +74,12 @@ public class GraphTransformerResolutionTestCase extends FunctionalTestCase
     {
         public AtoBConverter()
         {
-            registerSourceType(new SimpleDataType<Object>(A.class));
-            setReturnDataType(new SimpleDataType<Object>(B.class));
+            registerSourceType(DataType.fromType(A.class));
+            setReturnDataType(DataType.fromType(B.class));
         }
 
         @Override
-        protected Object doTransform(Object src, String enc) throws TransformerException
+        protected Object doTransform(Object src, Charset enc) throws TransformerException
         {
             return new B(((A) src).value + "A");
         }
@@ -99,12 +101,12 @@ public class GraphTransformerResolutionTestCase extends FunctionalTestCase
 
         public BtoCConverter()
         {
-            registerSourceType(new SimpleDataType<Object>(B.class));
-            setReturnDataType(new SimpleDataType<Object>(C.class));
+            registerSourceType(DataType.fromType(B.class));
+            setReturnDataType(DataType.fromType(C.class));
         }
 
         @Override
-        protected Object doTransform(Object src, String enc) throws TransformerException
+        protected Object doTransform(Object src, Charset enc) throws TransformerException
         {
             return new C(((B) src).value + "FromB");
         }
