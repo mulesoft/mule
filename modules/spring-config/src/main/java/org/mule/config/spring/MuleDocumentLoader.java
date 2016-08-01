@@ -14,6 +14,7 @@ import org.mule.util.SystemUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.util.LinkedHashMap;
 import java.util.Stack;
 
@@ -78,7 +79,10 @@ final class MuleDocumentLoader implements DocumentLoader
                                  ErrorHandler errorHandler, int validationMode, boolean namespaceAware) throws Exception
     {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        IOUtils.copy(inputSource.getByteStream(), output);
+        try (InputStream inputStream = inputSource.getByteStream())
+        {
+            IOUtils.copy(inputStream, output);
+        }
 
         InputSource defaultInputSource = new InputSource(new ByteArrayInputStream(output.toByteArray()));
         InputSource enrichInputSource = new InputSource(new ByteArrayInputStream(output.toByteArray()));
