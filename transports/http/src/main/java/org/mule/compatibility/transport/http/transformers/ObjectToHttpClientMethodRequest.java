@@ -32,7 +32,9 @@ import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.ObjectUtils;
 import org.mule.runtime.core.util.StringUtils;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -62,8 +64,9 @@ import org.apache.commons.httpclient.methods.multipart.ByteArrayPartSource;
 import org.apache.commons.httpclient.methods.multipart.FilePart;
 import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.Part;
-import org.apache.commons.httpclient.methods.multipart.StringPart;
+import org.apache.commons.httpclient.methods.multipart.PartBase;
 import org.apache.commons.httpclient.params.HttpMethodParams;
+import org.apache.commons.httpclient.util.EncodingUtil;
 
 /**
  * <code>ObjectToHttpClientMethodRequest</code> transforms a MuleMessage into a
@@ -71,6 +74,9 @@ import org.apache.commons.httpclient.params.HttpMethodParams;
  */
 public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer implements EndpointAwareTransformer
 {
+
+    public static final String CHARSET_PARAM_NAME = "charset";
+
     public ObjectToHttpClientMethodRequest()
     {
         setReturnDataType(DataType.fromType(HttpMethod.class));
@@ -350,7 +356,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer 
             }
 
             if (encoding != null && !UTF_8.equals(encoding)
-                && outboundMimeType.indexOf("charset") == -1)
+                && outboundMimeType.indexOf(CHARSET_PARAM_NAME) == -1)
             {
                 outboundMimeType += "; charset=" + encoding.name();
             }
@@ -469,7 +475,10 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer 
             if (dh.getDataSource() instanceof StringDataSource)
             {
                 final StringDataSource ds = (StringDataSource) dh.getDataSource();
-                parts[i] = new StringPart(ds.getName(), IOUtils.toString(ds.getInputStream()));
+                final MediaType mediaType = MediaType.parse(ds.getContentType());
+                final String charset = mediaType.getCharset().isPresent() ? mediaType.getCharset().get().name() : null;
+                final String contentType = mediaType.getPrimaryType() + "/" + mediaType.getSubType();
+                parts[i] = new CustomStringPart(ds.getName(), IOUtils.toString(ds.getInputStream()), charset, contentType);
             }
             else
             {
@@ -523,5 +532,63 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer 
     public void setEndpoint(ImmutableEndpoint endpoint)
     {
         this.endpoint = endpoint;
+    }
+
+    /**
+     * Replaces {@link org.apache.commons.httpclient.methods.multipart.StringPart} which does not let us
+     * change the content type of the part.
+     */
+    private static class CustomStringPart extends PartBase
+    {
+
+        public static final String DEFAULT_CONTENT_TYPE = "text/plain";
+        public static final String DEFAULT_CHARSET = "US-ASCII";
+        public static final String DEFAULT_TRANSFER_ENCODING = "8bit";
+
+        private byte[] content;
+        private String value;
+
+        public CustomStringPart(String name, String value, String charset, String contentType)
+        {
+            super(name, contentType, charset == null ? DEFAULT_CHARSET : charset, DEFAULT_TRANSFER_ENCODING);
+            if (value == null)
+            {
+                throw new IllegalArgumentException("Value may not be null");
+            }
+            else if (value.indexOf(0) != -1)
+            {
+                throw new IllegalArgumentException("NULs may not be present in string parts");
+            }
+            else
+            {
+                this.value = value;
+            }
+        }
+
+        private byte[] getContent()
+        {
+            if (this.content == null)
+            {
+                this.content = EncodingUtil.getBytes(this.value, this.getCharSet());
+            }
+
+            return this.content;
+        }
+
+        protected void sendData(OutputStream out) throws IOException
+        {
+            out.write(this.getContent());
+        }
+
+        protected long lengthOfData() throws IOException
+        {
+            return (long) this.getContent().length;
+        }
+
+        public void setCharSet(String charSet)
+        {
+            super.setCharSet(charSet);
+            this.content = null;
+        }
     }
 }
