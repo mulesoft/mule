@@ -22,7 +22,7 @@
     </httpn:request-config>
 
     <httpn:listener-config name="listenerConfig">
-        <httpn:listener-connection host="0.0.0.0" port="${httpPort}" protocol="HTTPS" usePersistentConnections="false">
+        <httpn:listener-connection host="0.0.0.0" port="${httpPort}" protocol="HTTPS">
             <tls:context>
                 <tls:key-store path="${keyStorePath}" keyPassword="changeit" password="changeit"/>
             </tls:context>
