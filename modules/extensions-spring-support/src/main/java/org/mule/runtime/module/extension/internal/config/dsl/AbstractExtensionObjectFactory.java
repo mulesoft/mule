@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.config.dsl;
 
 import static com.google.common.collect.ImmutableList.copyOf;
 import static java.lang.String.format;
+import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinitionParser.CHILD_ELEMENT_KEY_PREFIX;
 import static org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinitionParser.CHILD_ELEMENT_KEY_SUFFIX;
@@ -23,6 +24,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -30,7 +32,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Base class for {@link ObjectFactory} implementation which create
@@ -64,14 +65,14 @@ public abstract class AbstractExtensionObjectFactory<T> implements ObjectFactory
      * Constructs a {@link ResolverSet} from the output of {@link #getParameters()},
      * using {@link #toValueResolver(Object)} to process the values.
      *
-     * @throws {@link ConfigurationException} if the exclusiveness condition between parameters is not honored
      * @return a {@link ResolverSet}
+     * @throws {@link ConfigurationException} if the exclusiveness condition between parameters is not honored
      */
     protected ResolverSet getParametersAsResolverSet(EnrichableModel model) throws ConfigurationException
     {
         ResolverSet resolverSet = new ResolverSet();
         getParameters().forEach((key, value) -> resolverSet.add(key, toValueResolver(value)));
-        checkParameterGroupExclusivenessForModel(model, resolverSet);
+        checkParameterGroupExclusivenessForModel(model, getParameters().keySet());
         return resolverSet;
     }
 
@@ -146,39 +147,30 @@ public abstract class AbstractExtensionObjectFactory<T> implements ObjectFactory
         return key.replaceAll(CHILD_ELEMENT_KEY_PREFIX, "").replaceAll(CHILD_ELEMENT_KEY_SUFFIX, "");
     }
 
-    private void checkParameterGroupExclusivenessForModel(EnrichableModel model, ResolverSet resolverSet) throws ConfigurationException
+    private void checkParameterGroupExclusivenessForModel(EnrichableModel model, Set<String> resolverKeys) throws ConfigurationException
     {
         Optional<ParameterGroupModelProperty> parameterGroupModelProperty = model.getModelProperty(ParameterGroupModelProperty.class);
         if (parameterGroupModelProperty.isPresent() && parameterGroupModelProperty.get().hasExclusion())
         {
-            checkParameterGroupExclusiveness(parameterGroupModelProperty.get(), resolverSet);
+            checkParameterGroupExclusiveness(parameterGroupModelProperty.get(), resolverKeys);
         }
     }
 
-    private void checkParameterGroupExclusiveness(ParameterGroupModelProperty parameterGroupModelProperty, ResolverSet resolverSet) throws ConfigurationException
+    private void checkParameterGroupExclusiveness(ParameterGroupModelProperty parameterGroupModelProperty, Set<String> resolverKeys) throws ConfigurationException
     {
-        Set<String> resolverKeys = resolverSet.getResolvers().keySet();
         for (ParameterGroup group : parameterGroupModelProperty.getGroups())
         {
-            Set<String> parameterGroupFields = group.getParameters().stream().map(f -> f.getName()).collect(Collectors.toSet());
+            Set<String> parametersFromGroup = group.getParameters().stream()
+                    .map(p -> p.getName())
+                    .filter(name -> resolverKeys.contains(name))
+                    .collect(toSet());
 
-            Optional<String> foundParameter = Optional.empty();
-            for (String parameterName : resolverKeys)
+            if (parametersFromGroup.size() > 1)
             {
-                if (parameterGroupFields.contains(parameterName))
-                {
-                    if (!foundParameter.isPresent())
-                    {
-                        foundParameter = Optional.of(parameterName);
-                    }
-                    else
-                    {
-                        throw new ConfigurationException(createStaticMessage(format("Parameters '%s' and '%s' from class '%s' are exclusive between each other and cannot be both present at the same time", parameterName, foundParameter.get(), group.getType().getName())));
-                    }
-                }
+                throw new ConfigurationException(createStaticMessage(format("Only one of the following parameters [%s] from class '%s' can be present due to its exclusive relation", Arrays.toString(parametersFromGroup.toArray()), group.getType().getName())));
             }
 
-            if (group.atLeastOneIsRequired() && !foundParameter.isPresent())
+            if (group.oneRequired() && parametersFromGroup.isEmpty())
             {
                 throw new ConfigurationException((createStaticMessage(format("Parameter group class '%s' requires that at least one of its parameter should be present but all of them are missing", group.getType().getName()))));
             }
