@@ -450,14 +450,13 @@ public final class AnnotationsBasedDescriber implements Describer
 
     /**
      * Parameters inside a group annotated with {@link Exclusion} are all considered as optionals.
-     * @param clazz of a {@link Field} considered a parameter container
+     *
+     * @param clazz      of a {@link Field} considered a parameter container
      * @param parameters contained inside the container
      */
     private void enforceOptionalIfExclusive(Class<?> clazz, Set<ParameterDeclarer> parameters)
     {
-        Exclusion exclusion = getAnnotation(clazz, Exclusion.class);
-
-        if (exclusion != null)
+        if (getAnnotation(clazz, Exclusion.class) != null)
         {
             parameters.stream().forEach(p -> p.getDeclaration().setRequired(false));
         }

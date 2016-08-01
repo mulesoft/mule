@@ -8,9 +8,8 @@ package org.mule.test.petstore.extension;
 
 import org.mule.runtime.extension.api.annotation.Exclusion;
 import org.mule.runtime.extension.api.annotation.Parameter;
-import org.mule.runtime.extension.api.annotation.param.Optional;
 
-@Exclusion(atLeastOneIsRequired = true)
+@Exclusion(oneRequired = true)
 public class ExclusivePetBreeder
 {
     @Parameter

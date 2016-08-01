@@ -137,10 +137,10 @@ public class ParameterGroup implements EnrichableModel
     /**
      * Whether the class is annotated with {@link Exclusion} and {@link Exclusion#atLeastOneIsRequired()} is set
      */
-    public boolean atLeastOneIsRequired()
+    public boolean oneRequired()
     {
         Exclusion annotation = getAnnotation(type, Exclusion.class);
-        return annotation != null ? annotation.atLeastOneIsRequired() : false;
+        return annotation != null ? annotation.oneRequired() : false;
     }
 
 
