@@ -17,6 +17,7 @@ import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.connection.ConnectionProviderWrapper;
 import org.mule.runtime.core.util.ValueHolder;
+import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.core.work.SerialWorkManager;
 import org.mule.runtime.extension.api.introspection.Interceptable;
 import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
@@ -30,13 +31,12 @@ import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
 import org.mule.runtime.module.extension.internal.runtime.config.MutableConfigurationStats;
 import org.mule.runtime.module.extension.internal.runtime.exception.ExceptionEnricherManager;
 
-import com.google.common.collect.ImmutableList;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -273,17 +273,10 @@ public final class DefaultExecutionMediator implements ExecutionMediator
 
     private List<Interceptor> collectInterceptors(Object... interceptableCandidates)
     {
-        ImmutableList.Builder<Interceptor> interceptors = ImmutableList.builder();
-
-        for (Object interceptableCandidate : interceptableCandidates)
-        {
-            if (interceptableCandidate instanceof Interceptable)
-            {
-                interceptors.addAll(((Interceptable) interceptableCandidate).getInterceptors());
-            }
-        }
-
-        return interceptors.build();
+        return Stream.of(interceptableCandidates)
+                .filter(candidate -> candidate instanceof Interceptable)
+                .flatMap(interceptable -> ((Interceptable) interceptable).getInterceptors().stream())
+                .collect(new ImmutableListCollector<>());
     }
 
     private class OperationRetryCallBack implements RetryCallback

@@ -24,41 +24,33 @@ import java.util.Date;
 
 import javax.inject.Inject;
 
-public abstract class PetStoreConnectionProvider implements ConnectionProvider<PetStoreClient>, Lifecycle
+public abstract class PetStoreConnectionProvider<T extends PetStoreClient> implements ConnectionProvider<T>, Lifecycle
 {
 
-    private int initialise, start, stop, dispose = 0;
-
     @Inject
-    private MuleContext muleContext;
-
+    protected MuleContext muleContext;
     @ConfigName
-    private String configName;
-
+    protected String configName;
     @Parameter
-    private String username;
-
+    protected String username;
     @Parameter
     @Password
-    private String password;
-
+    protected String password;
     @Parameter
     @Optional
-    private TlsContextFactory tls;
-
+    protected TlsContextFactory tls;
     @Parameter
     @Optional
-    private ThreadingProfile threadingProfile;
-
+    protected ThreadingProfile threadingProfile;
     @Optional
     @Parameter
-    private Date openingDate;
-
+    protected Date openingDate;
+    private int initialise, start, stop, dispose = 0;
 
     @Override
-    public PetStoreClient connect()
+    public T connect()
     {
-        return new PetStoreClient(username, password, tls, threadingProfile, configName, openingDate);
+        return (T) new PetStoreClient(username, password, tls, threadingProfile, configName, openingDate);
     }
 
     @Override
@@ -137,14 +129,14 @@ public abstract class PetStoreConnectionProvider implements ConnectionProvider<P
         return username;
     }
 
-    public String getPassword()
-    {
-        return password;
-    }
-
     public void setUsername(String username)
     {
         this.username = username;
+    }
+
+    public String getPassword()
+    {
+        return password;
     }
 
     public void setPassword(String password)

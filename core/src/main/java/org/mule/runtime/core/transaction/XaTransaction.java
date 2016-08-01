@@ -39,7 +39,7 @@ public class XaTransaction extends AbstractTransaction
     /**
      * Map of enlisted resources
      */
-    private Map<ResourceKey, Object> resources = new HashMap<ResourceKey, Object>();
+    private Map<ResourceKey, Object> resources = new HashMap<>();
 
     protected TransactionManager txManager;
 
@@ -456,7 +456,7 @@ public class XaTransaction extends AbstractTransaction
         }
     }
 
-    public static interface MuleXaObject
+    public interface MuleXaObject
     {
 
         void close() throws Exception;

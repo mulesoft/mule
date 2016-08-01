@@ -28,8 +28,10 @@ import org.mule.runtime.module.extension.internal.runtime.OperationContextAdapte
 import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionFactory;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.test.petstore.extension.PetStoreClient;
+import org.mule.test.petstore.extension.PetStoreConnectionProvider;
 import org.mule.test.petstore.extension.PetStoreConnector;
 import org.mule.test.petstore.extension.SimplePetStoreConnectionProvider;
+import org.mule.test.petstore.extension.TransactionalPetStoreConnectionProvider;
 
 import java.util.Optional;
 
@@ -53,26 +55,33 @@ public class ConnectionInterceptorTestCase extends AbstractMuleContextTestCase
     @Mock
     private PetStoreConnector config;
 
-    private SimplePetStoreConnectionProvider connectionProvider = spy(new SimplePetStoreConnectionProvider());
+    private PetStoreConnectionProvider<? extends PetStoreClient> connectionProvider;
     private ConnectionInterceptor interceptor;
 
     @Before
     public void before() throws Exception
     {
         when(operationContext.getConfiguration().getValue()).thenReturn(config);
-        when(operationContext.getConfiguration().getConnectionProvider()).thenReturn(Optional.of(connectionProvider));
+        setupConnectionProvider(new SimplePetStoreConnectionProvider());
+
         when(operationContext.getVariable(CONNECTION_PARAM)).thenReturn(null);
         when(operationContext.getTransactionConfig()).thenReturn(empty());
 
+        interceptor = new ConnectionInterceptor();
+        muleContext.getInjector().inject(interceptor);
+    }
+
+    private void setupConnectionProvider(PetStoreConnectionProvider<?> aConnectionProvider) throws Exception
+    {
+        this.connectionProvider = spy(aConnectionProvider);
+        when(operationContext.getConfiguration().getConnectionProvider()).thenReturn(Optional.of(connectionProvider));
         connectionProvider.setUsername(USER);
         connectionProvider.setPassword(PASSWORD);
 
         ConnectionManager connectionManager = muleContext.getRegistry().lookupObject(ConnectionManager.class);
         connectionManager.bind(config, connectionProvider);
-
-        interceptor = new ConnectionInterceptor();
-        muleContext.getInjector().inject(interceptor);
     }
+
 
     @Test
     public void setConnection() throws Exception
@@ -109,6 +118,8 @@ public class ConnectionInterceptorTestCase extends AbstractMuleContextTestCase
     @Test
     public void alwaysReturnSameConnectionWhileInTransaction() throws Exception
     {
+        setupConnectionProvider(new TransactionalPetStoreConnectionProvider());
+
         MuleTransactionConfig txConfig = new MuleTransactionConfig();
         txConfig.setFactory(new ExtensionTransactionFactory());
         txConfig.setAction(ACTION_ALWAYS_BEGIN);
@@ -130,7 +141,7 @@ public class ConnectionInterceptorTestCase extends AbstractMuleContextTestCase
         interceptor.before(operationContext);
 
         verify(operationContext, atLeastOnce()).setVariable(same(CONNECTION_PARAM), connectionCaptor.capture());
-        ConnectionHandler<PetStoreClient> connectionHandler = connectionCaptor.getValue();
+        ConnectionHandler<? extends PetStoreClient> connectionHandler = connectionCaptor.getValue();
         return connectionHandler.getConnection();
     }
 }

@@ -35,11 +35,10 @@ public class PetStoreRetryPolicyConnectionTestCase extends ExtensionFunctionalTe
 
     public static final String CONNECTION_FAIL = "Connection fail";
     public static final String CONNECTION_FAIL_DOT = "Connection fail.";
-
-    public PetStoreRetryPolicyConnectionTestCase(){}
-
     @Rule
     public ExpectedException exception = ExpectedException.none();
+
+    public PetStoreRetryPolicyConnectionTestCase(){}
 
     @Override
     protected String getConfigFile()
@@ -98,13 +97,13 @@ public class PetStoreRetryPolicyConnectionTestCase extends ExtensionFunctionalTe
     }
 
     @Alias("valid")
-    public static class PooledPetStoreConnectionProviderWithValidConnection extends PetStoreConnectionProvider implements PoolingConnectionProvider<PetStoreClient>
+    public static class PooledPetStoreConnectionProviderWithValidConnection extends PetStoreConnectionProvider<PetStoreClient> implements PoolingConnectionProvider<PetStoreClient>
     {
 
     }
 
     @Alias("invalid")
-    public static class PooledPetStoreConnectionProviderWithFailureInvalidConnection extends PetStoreConnectionProvider
+    public static class PooledPetStoreConnectionProviderWithFailureInvalidConnection extends PetStoreConnectionProvider<PetStoreClient>
             implements PoolingConnectionProvider<PetStoreClient>
     {
         @Override

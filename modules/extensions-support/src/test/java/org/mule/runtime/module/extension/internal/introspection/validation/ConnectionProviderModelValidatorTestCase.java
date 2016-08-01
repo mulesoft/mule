@@ -6,10 +6,14 @@
  */
 package org.mule.runtime.module.extension.internal.introspection.validation;
 
+import static org.mockito.Mockito.mock;
+import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
 import static org.mule.runtime.core.config.MuleManifest.getProductVersion;
+import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
+import org.mule.runtime.api.connection.PoolingConnectionProvider;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Configuration;
@@ -18,6 +22,7 @@ import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.connector.Providers;
 import org.mule.runtime.extension.api.annotation.param.Connection;
+import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.introspection.ExtensionFactory;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
@@ -49,13 +54,42 @@ public class ConnectionProviderModelValidatorTestCase extends AbstractMuleTestCa
     @Test(expected = IllegalModelDefinitionException.class)
     public void invalidConnectedOperation()
     {
-        validate(InvalidConnectedOperationTestConnector.class);
+        validate(InvalidConfigConnectionProviderTestConnector.class);
     }
 
     @Test(expected = IllegalConnectionProviderModelDefinitionException.class)
     public void invalidConnectionTypeProviderTestConnector()
     {
         validate(InvalidConnectionTypeProviderTestConnector.class);
+    }
+
+    @Test(expected = IllegalConnectionProviderModelDefinitionException.class)
+    public void invalidTransactionalProvider()
+    {
+        validate(InvalidTransactionalProviderConnector.class);
+    }
+
+    @Test
+    public void validTransactionalProvider()
+    {
+        validate(ValidTransactionalProviderConnector.class);
+    }
+
+    private ExtensionModel modelFor(Class<?> connectorClass)
+    {
+        DescribingContext context = new DefaultDescribingContext(connectorClass.getClassLoader());
+        return extensionFactory.createFrom(new AnnotationsBasedDescriber(connectorClass, new StaticVersionResolver(getProductVersion()))
+                                                   .describe(context), context);
+    }
+
+    private void validate(Class<?> connectorClass)
+    {
+        validator.validate(modelFor(connectorClass));
+    }
+
+    interface Config
+    {
+
     }
 
     @Extension(name = "validatorTest")
@@ -106,6 +140,20 @@ public class ConnectionProviderModelValidatorTestCase extends AbstractMuleTestCa
 
     }
 
+    @Extension(name = "invalidTransactionalProvider")
+    @Providers({TestConnectionProvider.class, TestConnectionProvider2.class, InvalidTransactionalProvider.class})
+    public static class InvalidTransactionalProviderConnector
+    {
+
+    }
+
+    @Extension(name = "validTransactionalProvider")
+    @Providers({TestConnectionProvider.class, TestConnectionProvider2.class, ValidTransactionalProvider.class})
+    public static class ValidTransactionalProviderConnector
+    {
+
+    }
+
     @Extension(name = "validatorTest")
     @Configurations({TestConfig.class, TestConfig2.class})
     @Operations(ValidTestOperations.class)
@@ -146,7 +194,7 @@ public class ConnectionProviderModelValidatorTestCase extends AbstractMuleTestCa
         @Override
         public ConnectionValidationResult validate(ValidatorTestConnection validatorTestConnection)
         {
-            return ConnectionValidationResult.success();
+            return success();
         }
     }
 
@@ -157,25 +205,25 @@ public class ConnectionProviderModelValidatorTestCase extends AbstractMuleTestCa
     }
 
     @Alias("invalidConfig")
-    public static class InvalidConfigConnectionProvider implements ConnectionProvider<ValidatorTestConnection>
+    public static class InvalidConfigConnectionProvider implements ConnectionProvider<Apple>
     {
 
         @Override
-        public ValidatorTestConnection connect() throws ConnectionException
+        public Apple connect() throws ConnectionException
         {
-            return new ValidatorTestConnection();
+            return new Apple();
         }
 
         @Override
-        public void disconnect(ValidatorTestConnection connection)
+        public void disconnect(Apple connection)
         {
 
         }
 
         @Override
-        public ConnectionValidationResult validate(ValidatorTestConnection validatorTestConnection)
+        public ConnectionValidationResult validate(Apple validatorTestConnection)
         {
-            return ConnectionValidationResult.success();
+            return success();
         }
     }
 
@@ -198,29 +246,56 @@ public class ConnectionProviderModelValidatorTestCase extends AbstractMuleTestCa
         @Override
         public ConnectionValidationResult validate(Apple apple)
         {
-            return ConnectionValidationResult.success();
+            return success();
         }
     }
 
-    interface Config
+    public static class ValidTransactionalProvider implements PoolingConnectionProvider<TransactionalConnection>
     {
 
+        @Override
+        public TransactionalConnection connect() throws ConnectionException
+        {
+            return mock(TransactionalConnection.class);
+        }
+
+        @Override
+        public void disconnect(TransactionalConnection connection)
+        {
+
+        }
+
+        @Override
+        public ConnectionValidationResult validate(TransactionalConnection connection)
+        {
+            return success();
+        }
+    }
+
+    public static class InvalidTransactionalProvider implements CachedConnectionProvider<TransactionalConnection>
+    {
+
+        @Override
+        public TransactionalConnection connect() throws ConnectionException
+        {
+            return mock(TransactionalConnection.class);
+        }
+
+        @Override
+        public void disconnect(TransactionalConnection connection)
+        {
+
+        }
+
+        @Override
+        public ConnectionValidationResult validate(TransactionalConnection connection)
+        {
+            return success();
+        }
     }
 
     public static class ValidatorTestConnection
     {
 
-    }
-
-    private ExtensionModel modelFor(Class<?> connectorClass)
-    {
-        DescribingContext context = new DefaultDescribingContext(connectorClass.getClassLoader());
-        return extensionFactory.createFrom(new AnnotationsBasedDescriber(connectorClass, new StaticVersionResolver(getProductVersion()))
-                                                   .describe(context), context);
-    }
-
-    private void validate(Class<?> connectorClass)
-    {
-        validator.validate(modelFor(connectorClass));
     }
 }

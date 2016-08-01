@@ -6,16 +6,36 @@
  */
 package org.mule.runtime.module.extension.internal.introspection.validation;
 
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getOperationsConnectionType;
+import static java.lang.String.format;
+import static org.apache.commons.collections.CollectionUtils.isEmpty;
+import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
+import org.mule.runtime.api.connection.CachedConnectionProvider;
+import org.mule.runtime.api.connection.ConnectionProvider;
+import org.mule.runtime.extension.api.ExtensionWalker;
+import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
+import org.mule.runtime.extension.api.introspection.ComponentModel;
+import org.mule.runtime.extension.api.introspection.EnrichableModel;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.config.ConfigurationModel;
 import org.mule.runtime.extension.api.introspection.connection.ConnectionProviderModel;
+import org.mule.runtime.extension.api.introspection.connection.HasConnectionProviderModels;
 import org.mule.runtime.extension.api.introspection.connection.RuntimeConnectionProviderModel;
 import org.mule.runtime.extension.api.introspection.operation.OperationModel;
+import org.mule.runtime.extension.api.introspection.parameter.ParameterizedModel;
+import org.mule.runtime.extension.api.introspection.source.SourceModel;
 import org.mule.runtime.module.extension.internal.exception.IllegalConnectionProviderModelDefinitionException;
+import org.mule.runtime.module.extension.internal.model.property.ConnectivityModelProperty;
+import org.mule.runtime.module.extension.internal.model.property.ImplementingTypeModelProperty;
+import org.mule.runtime.module.extension.internal.util.IdempotentExtensionWalker;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import com.sun.org.apache.xpath.internal.ExtensionsProvider;
+
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * {@link ModelValidator} which applies to {@link ExtensionModel}s which either contains
@@ -36,32 +56,121 @@ public final class ConnectionProviderModelValidator implements ModelValidator
     @Override
     public void validate(ExtensionModel extensionModel) throws IllegalModelDefinitionException
     {
-        Class<?> connectionType = getOperationsConnectionType(extensionModel);
-        validateConnectionProviders(extensionModel, connectionType);
-    }
+        Set<ConnectionProviderModel> globalConnectionProviders = new HashSet<>();
+        Multimap<ConfigurationModel, ConnectionProviderModel> configLevelConnectionProviders = HashMultimap.create();
 
-    private void validateConnectionProviders(ExtensionModel extensionModel, Class<?> connectionType)
-    {
-        extensionModel.getConnectionProviders().stream().forEach(providerModel -> {
-            if (connectionType != null)
-            {
-                validateConnectionTypes((RuntimeConnectionProviderModel) providerModel, extensionModel, connectionType);
-            }
-        });
-    }
-
-    private void validateConnectionTypes(RuntimeConnectionProviderModel providerModel, ExtensionModel extensionModel, Class<?> connectionType)
-    {
-        final Class extensionConnectionType = providerModel.getConnectionType();
-        if (!connectionType.isAssignableFrom(extensionConnectionType))
+        new ExtensionWalker()
         {
-            throw new IllegalConnectionProviderModelDefinitionException(String.format("Extension '%s' defines a connection provider of name '%s' which yields connections of type '%s'. " +
-                                                                                      "However, the extension's operations expect connections of type '%s'. Please make sure that all connection " +
-                                                                                      "providers in the extension can be used with all its operations",
-                                                                                      extensionModel.getName(),
-                                                                                      providerModel.getName(),
-                                                                                      extensionConnectionType.getName(),
-                                                                                      connectionType.getName()));
+
+            @Override
+            public void onConnectionProvider(HasConnectionProviderModels owner, ConnectionProviderModel model)
+            {
+                validateTransactions(extensionModel, (RuntimeConnectionProviderModel) model);
+                if (owner instanceof ConfigurationModel)
+                {
+                    configLevelConnectionProviders.put((ConfigurationModel) owner, model);
+                }
+                else
+                {
+                    globalConnectionProviders.add(model);
+                }
+            }
+        }.walk(extensionModel);
+
+        validateGlobalConnectionTypes(extensionModel, globalConnectionProviders);
+        validateConfigLevelConnectionTypes(extensionModel, configLevelConnectionProviders);
+    }
+
+    private void validateTransactions(ExtensionModel extensionModel, RuntimeConnectionProviderModel connectionProviderModel)
+    {
+        Class<ConnectionProvider> providerType = (Class<ConnectionProvider>) connectionProviderModel.getModelProperty(ImplementingTypeModelProperty.class)
+                .map(ImplementingTypeModelProperty::getType)
+                .orElse(null);
+
+        if (providerType != null && CachedConnectionProvider.class.isAssignableFrom(providerType) && TransactionalConnection.class.isAssignableFrom(connectionProviderModel.getConnectionType()))
+        {
+            throw new IllegalConnectionProviderModelDefinitionException(format("Extension '%s' contains a cached connection provider of name '%s' which provides connections of " +
+                                                                               "transactional type '%s'. Transactional connections cannot be produced by cached providers, since the " +
+                                                                               "same connection cannot join two different transactions at once",
+                                                                               extensionModel.getName(), connectionProviderModel.getName(), connectionProviderModel.getConnectionType().getName()));
         }
+    }
+
+    private void validateGlobalConnectionTypes(ExtensionModel extensionModel, Set<ConnectionProviderModel> globalConnectionProviders)
+    {
+        if (isEmpty(globalConnectionProviders))
+        {
+            return;
+        }
+
+        for (ConnectionProviderModel model : globalConnectionProviders)
+        {
+            RuntimeConnectionProviderModel connectionProviderModel = (RuntimeConnectionProviderModel) model;
+            final Class<?> connectionType = connectionProviderModel.getConnectionType();
+
+            new IdempotentExtensionWalker()
+            {
+                @Override
+                protected void onOperation(OperationModel operationModel)
+                {
+                    validateConnectionTypes(extensionModel, connectionProviderModel, operationModel, connectionType);
+                }
+
+                @Override
+                protected void onSource(SourceModel sourceModel)
+                {
+                    validateConnectionTypes(extensionModel, connectionProviderModel, sourceModel, connectionType);
+                }
+            }.walk(extensionModel);
+
+        }
+    }
+
+    private void validateConfigLevelConnectionTypes(ExtensionModel extensionModel,
+                                                    Multimap<ConfigurationModel, ConnectionProviderModel> configLevelConnectionProviders)
+    {
+        configLevelConnectionProviders.asMap().forEach((configModel, providerModels) ->
+                                                       {
+                                                           for (ConnectionProviderModel providerModel : providerModels)
+                                                           {
+                                                               Class<?> connectionType = ((RuntimeConnectionProviderModel) providerModel).getConnectionType();
+                                                               configModel.getOperationModels().forEach(operationModel -> validateConnectionTypes(extensionModel, providerModel, operationModel, connectionType));
+                                                           }
+                                                       });
+    }
+
+    private <T> Optional<Class<T>> getConnectionType(EnrichableModel model)
+    {
+        Optional<ConnectivityModelProperty> connectivityProperty = model.getModelProperty(ConnectivityModelProperty.class);
+        if (!connectivityProperty.isPresent()) {
+            if (model instanceof ParameterizedModel)
+            {
+                connectivityProperty = ((ParameterizedModel) model).getParameterModels().stream()
+                        .map(p -> p.getModelProperty(ConnectivityModelProperty.class).orElse(null))
+                        .filter(p -> p != null)
+                        .findFirst();
+            }
+
+        }
+
+        return connectivityProperty.map(property -> getType(property.getConnectionType()));
+    }
+
+    private void validateConnectionTypes(ExtensionModel extensionModel, ConnectionProviderModel providerModel, ComponentModel componentModel, Class<?> providerConnectionType)
+    {
+        getConnectionType(componentModel).ifPresent(connectionType ->
+                                                    {
+                                                        if (!connectionType.isAssignableFrom(providerConnectionType))
+                                                        {
+                                                            throw new IllegalConnectionProviderModelDefinitionException(format("Extension '%s' defines component '%s' which requires a connection of type '%s'. However, it also defines connection provider " +
+                                                                                                                               "'%s' which yields connections of incompatible type '%s'",
+                                                                                                                               extensionModel.getName(),
+                                                                                                                               componentModel.getName(),
+                                                                                                                               connectionType.getName(),
+                                                                                                                               providerModel.getName(),
+                                                                                                                               providerConnectionType.getName()));
+                                                        }
+                                                    });
+
     }
 }

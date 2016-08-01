@@ -6,11 +6,15 @@
  */
 package org.mule.test.petstore.extension;
 
-import org.mule.runtime.api.connection.PoolingConnectionProvider;
 import org.mule.runtime.extension.api.annotation.Alias;
 
-@Alias("pooled")
-public class PooledPetStoreConnectionProvider extends PetStoreConnectionProvider<PetStoreClient> implements PoolingConnectionProvider<PetStoreClient>
+@Alias("transactional")
+public class TransactionalPetStoreConnectionProvider extends PetStoreConnectionProvider<TransactionalPetStoreClient>
 {
 
+    @Override
+    public TransactionalPetStoreClient connect()
+    {
+        return new TransactionalPetStoreClient(username, password, tls, threadingProfile, configName, openingDate);
+    }
 }

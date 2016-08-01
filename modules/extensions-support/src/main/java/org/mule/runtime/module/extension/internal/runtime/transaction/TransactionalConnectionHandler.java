@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.runtime.connectivity;
+package org.mule.runtime.module.extension.internal.runtime.transaction;
 
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -13,7 +13,6 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.transaction.TransactionException;
 import org.mule.runtime.core.internal.connection.ConnectionHandlerAdapter;
 import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
-import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionalResource;
 
 /**
  * A {@link ConnectionHandlerAdapter} to be used when a {@link TransactionalConnection}
@@ -22,7 +21,7 @@ import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionT
  * @param <T> The generic type of the {@link TransactionalConnection}
  * @since 4.0
  */
-final class TransactionalConnectionHandler<T extends TransactionalConnection> implements ConnectionHandlerAdapter<T>
+public final class TransactionalConnectionHandler<T extends TransactionalConnection> implements ConnectionHandlerAdapter<T>
 {
 
     private final ExtensionTransactionalResource<T> resource;

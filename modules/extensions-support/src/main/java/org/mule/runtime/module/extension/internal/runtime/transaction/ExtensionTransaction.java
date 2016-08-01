@@ -83,7 +83,7 @@ public class ExtensionTransaction extends AbstractSingleResourceTransaction
         {
             try
             {
-                boundResource.get().getConnection().commit();
+                boundResource.get().commit();
             }
             catch (Exception e)
             {
@@ -102,7 +102,7 @@ public class ExtensionTransaction extends AbstractSingleResourceTransaction
         {
             try
             {
-                boundResource.get().getConnection().rollback();
+                boundResource.get().rollback();
             }
             catch (Exception e)
             {

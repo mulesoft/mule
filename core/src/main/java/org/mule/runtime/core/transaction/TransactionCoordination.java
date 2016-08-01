@@ -28,9 +28,9 @@ public final class TransactionCoordination
      * {@link #bindTransaction(Transaction)}, it may be more consistent to have it as
      * an instance variable.
      */
-    private final ThreadLocal<Transaction> transactions = new ThreadLocal<Transaction>();
-    private final ThreadLocal<Transaction> suspendedTransaction = new ThreadLocal<Transaction>();
-    private final ThreadLocal<ArrayStack>  isolatedTransactions = new ThreadLocal<ArrayStack>();
+    private final ThreadLocal<Transaction> transactions = new ThreadLocal<>();
+    private final ThreadLocal<Transaction> suspendedTransaction = new ThreadLocal<>();
+    private final ThreadLocal<ArrayStack>  isolatedTransactions = new ThreadLocal<>();
 
     /** Lock variable that is used to access {@link #txCounter}. */
     private final Object txCounterLock = new Object();
