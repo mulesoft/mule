@@ -10,7 +10,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
-import org.mule.test.AbstractIntegrationTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleEvent;
 
 import java.util.ArrayList;
@@ -18,7 +18,7 @@ import java.util.List;
 
 import org.junit.Test;
 
-public class SessionPropertiesInExceptionStrategyTestCase extends AbstractIntegrationTestCase
+public class SessionPropertiesInExceptionStrategyTestCase extends FunctionalTestCase
 {
     @Override
     protected String getConfigFile()

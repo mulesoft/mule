@@ -9,9 +9,10 @@ package org.mule.test.routing;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
-import org.mule.test.AbstractIntegrationTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
@@ -26,9 +27,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang.RandomStringUtils;
 import org.junit.Test;
 
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-
-public class ForEachSessionVarTestCase extends AbstractIntegrationTestCase
+public class ForEachSessionVarTestCase extends FunctionalTestCase
 {
 
     protected static MuleEvent event;

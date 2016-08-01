@@ -6,8 +6,6 @@
  */
 package org.mule.compatibility.config.spring.parsers;
 
-import org.mule.test.config.spring.parsers.AbstractBadConfigTestCase;
-
 import org.junit.Test;
 
 public class MuleElementRequiredTestCase extends AbstractBadConfigTestCase
