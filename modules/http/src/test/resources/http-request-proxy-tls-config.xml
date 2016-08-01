@@ -17,7 +17,7 @@
         <http:proxy host="localhost" port="${proxyPort}" />
     </http:request-config>
 
-    <http:listener-config name="listenerConfig" host="0.0.0.0" port="${httpPort}" protocol="HTTPS" usePersistentConnections="false">
+    <http:listener-config name="listenerConfig" host="0.0.0.0" port="${httpPort}" protocol="HTTPS">
         <tls:context>
             <tls:key-store path="${keyStorePath}" keyPassword="changeit" password="changeit"/>
         </tls:context>
