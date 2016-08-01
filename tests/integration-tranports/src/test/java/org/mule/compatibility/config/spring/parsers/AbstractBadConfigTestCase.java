@@ -9,11 +9,11 @@ package org.mule.compatibility.config.spring.parsers;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.context.DefaultMuleContextFactory;
-import org.mule.test.AbstractIntegrationTestCase;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +21,8 @@ import org.slf4j.LoggerFactory;
 /**
  * A stripped-down version of FunctionalTestCase that allows us to test the parsing of a bad configuration. 
  */
-public abstract class AbstractBadConfigTestCase extends AbstractIntegrationTestCase
+//TODO(gfernandes): remove this class and use the one from it tests once transport it test are migrated to use isolation runner
+public abstract class AbstractBadConfigTestCase extends FunctionalTestCase
 {
     protected final transient Logger logger = LoggerFactory.getLogger(getClass());
 
