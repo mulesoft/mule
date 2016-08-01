@@ -117,7 +117,7 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
             classStream = this.getClass().getResourceAsStream(resourceReleaserClassLocation);
             byte[] classBytes = IOUtils.toByteArray(classStream);
             classStream.close();
-            Class clazz = defineClass(null, classBytes, 0, classBytes.length);
+            Class clazz = this.defineClass(null, classBytes, 0, classBytes.length);
             return (ResourceReleaser) clazz.newInstance();
         }
         catch (Exception e)

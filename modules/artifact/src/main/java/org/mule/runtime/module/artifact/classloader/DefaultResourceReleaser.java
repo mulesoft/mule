@@ -26,7 +26,7 @@ public class DefaultResourceReleaser implements ResourceReleaser
 {
 
     public static final String DIAGNOSABILITY_BEAN_NAME = "diagnosability";
-    private Logger logger = LoggerFactory.getLogger(getClass());
+    private final transient Logger logger = LoggerFactory.getLogger(getClass());
 
     @Override
     public void release()
@@ -66,7 +66,8 @@ public class DefaultResourceReleaser implements ResourceReleaser
         ClassLoader driverClassLoader = driver.getClass().getClassLoader();
         while (driverClassLoader != null)
         {
-            if (driverClassLoader.equals(getClass().getClassLoader()))
+            // It has to be the same reference not equals to
+            if (driverClassLoader == getClass().getClassLoader())
             {
                 return true;
             }
@@ -80,7 +81,10 @@ public class DefaultResourceReleaser implements ResourceReleaser
     {
         try
         {
-            logger.debug("Deregistering driver: {}", driver.getClass());
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Deregistering driver: {}", driver.getClass());
+            }
             deregisterDriver(driver);
 
             if (isOracleDriver(driver))
@@ -101,9 +105,9 @@ public class DefaultResourceReleaser implements ResourceReleaser
 
     private void deregisterOracleDiagnosabilityMBean()
     {
-        final ClassLoader cl = this.getClass().getClassLoader();
-        final MBeanServer mBeanServer = getPlatformMBeanServer();
-        final Hashtable<String, String> keys = new Hashtable<>();
+        ClassLoader cl = this.getClass().getClassLoader();
+        MBeanServer mBeanServer = getPlatformMBeanServer();
+        final Hashtable<String, String> keys = new Hashtable<String, String>();
         keys.put("type", DIAGNOSABILITY_BEAN_NAME);
         keys.put("name", cl.getClass().getName() + "@" + toHexString(cl.hashCode()).toLowerCase());
 
