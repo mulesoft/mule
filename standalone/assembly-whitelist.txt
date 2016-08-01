@@ -189,7 +189,7 @@
 /mule-standalone-${productVersion}/lib/opt/asm-tree-3.1.jar
 /mule-standalone-${productVersion}/lib/opt/aspectjrt-1.8.5.jar
 /mule-standalone-${productVersion}/lib/opt/aspectjweaver-1.8.5.jar
-/mule-standalone-${productVersion}/lib/opt/async-http-client-1.9.37.jar
+/mule-standalone-${productVersion}/lib/opt/async-http-client-1.9.39.jar
 /mule-standalone-${productVersion}/lib/opt/bcpg-jdk15on-1.54.jar
 /mule-standalone-${productVersion}/lib/opt/bcprov-ext-jdk15on-1.54.jar
 /mule-standalone-${productVersion}/lib/opt/bcprov-jdk15on-1.54.jar
@@ -220,7 +220,6 @@
 /mule-standalone-${productVersion}/lib/opt/jibx-run-1.2.5.jar
 /mule-standalone-${productVersion}/lib/opt/xpp3-1.1.3.4.O.jar
 /mule-standalone-${productVersion}/lib/opt/c3p0-0.9.5.2.jar
-/mule-standalone-${productVersion}/lib/opt/connection-pool-2.3.25.jar
 /mule-standalone-${productVersion}/lib/opt/cxf-rt-frontend-jaxws-2.7.18.jar
 /mule-standalone-${productVersion}/lib/opt/cxf-rt-frontend-simple-2.7.18.jar
 /mule-standalone-${productVersion}/lib/opt/cxf-rt-transports-local-2.7.18.jar
@@ -238,10 +237,11 @@
 /mule-standalone-${productVersion}/lib/opt/geronimo-jta_1.1_spec-1.1.1.jar
 /mule-standalone-${productVersion}/lib/opt/geronimo-servlet_3.0_spec-1.0.jar
 /mule-standalone-${productVersion}/lib/opt/grabbag-1.8.1.jar
-/mule-standalone-${productVersion}/lib/opt/grizzly-framework-2.3.25.jar
-/mule-standalone-${productVersion}/lib/opt/grizzly-http-2.3.25.jar
-/mule-standalone-${productVersion}/lib/opt/grizzly-http-server-2.3.25.jar
-/mule-standalone-${productVersion}/lib/opt/grizzly-websockets-2.3.25.jar
+/mule-standalone-${productVersion}/lib/opt/grizzly-framework-2.3.26.jar
+/mule-standalone-${productVersion}/lib/opt/grizzly-http-2.3.26.jar
+/mule-standalone-${productVersion}/lib/opt/grizzly-http-server-2.3.26.jar
+/mule-standalone-${productVersion}/lib/opt/grizzly-websockets-2.3.26.jar
+/mule-standalone-${productVersion}/lib/opt/connection-pool-2.3.26.jar
 /mule-standalone-${productVersion}/lib/opt/gson-2.6.2.jar
 /mule-standalone-${productVersion}/lib/opt/groovy-all-2.4.4-indy.jar
 /mule-standalone-${productVersion}/lib/opt/guava-18.0.jar
