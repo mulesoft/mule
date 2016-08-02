@@ -27,6 +27,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
  */
 public class ConnectionProviderObjectFactory extends AbstractExtensionObjectFactory<ConnectionProviderResolver>
 {
+    private static final String COMPONENT = "provider";
     private final RuntimeConnectionProviderModel providerModel;
     private MuleContext muleContext;
 
@@ -43,7 +44,7 @@ public class ConnectionProviderObjectFactory extends AbstractExtensionObjectFact
     @Override
     public ConnectionProviderResolver getObject() throws Exception
     {
-        ResolverSet resolverSet = getParametersAsResolverSet(providerModel);
+        ResolverSet resolverSet = getParametersAsResolverSet(providerModel, COMPONENT, providerModel.getName());
         return new ConnectionProviderResolver(new ConnectionProviderObjectBuilder(providerModel, resolverSet, poolingProfile, disableValidation, retryPolicyTemplate, getConnectionManager()));
     }
 

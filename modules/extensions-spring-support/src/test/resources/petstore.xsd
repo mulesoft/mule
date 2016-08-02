@@ -42,6 +42,7 @@
                     <xs:attribute type="xs:string" use="optional" name="tlsContext"></xs:attribute>
                     <xs:attribute type="mule:expressionList" use="optional" name="pets"></xs:attribute>
                     <xs:attribute type="xs:string" use="optional" name="cage"></xs:attribute>
+                    <xs:attribute type="mule:expressionString" use="required" name="cashierName"></xs:attribute>
                     <xs:attribute type="mule:expressionString" use="optional" name="rothIRA"></xs:attribute>
                     <xs:attribute type="mule:expressionString" use="optional" name="pensionPlan"></xs:attribute>
                 </xs:extension>
@@ -144,6 +145,25 @@
                 </xs:attribute>
                 <xs:attribute type="mule:expressionString" use="optional" name="mammals"></xs:attribute>
                 <xs:attribute type="mule:expressionString" use="optional" name="birds"></xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/petstore" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="GetBreederType" substitutionGroup="mule:abstract-message-processor" name="get-breeder"></xs:element>
+    <xs:complexType name="GetBreederType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+                <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
+                    <xs:annotation>
+                        <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" name="mammals"></xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" name="birds"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="target">
+                    <xs:annotation>
+                        <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>

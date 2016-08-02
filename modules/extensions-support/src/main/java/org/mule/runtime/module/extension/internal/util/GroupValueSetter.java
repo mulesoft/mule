@@ -6,9 +6,12 @@
  */
 package org.mule.runtime.module.extension.internal.util;
 
+import static java.lang.String.format;
+import static org.mule.runtime.core.config.i18n.CoreMessages.createStaticMessage;
 import static org.springframework.util.ReflectionUtils.setField;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.extension.api.introspection.EnrichableModel;
 import org.mule.runtime.module.extension.internal.introspection.ParameterGroup;
@@ -83,7 +86,14 @@ public final class GroupValueSetter implements ValueSetter
         group.getParameters().forEach(field -> groupBuilder.addPropertyResolver(field, new StaticValueResolver<>(result.get(field.getName()))));
 
         Object groupValue = groupBuilder.build(VoidMuleEvent.getInstance());
-        setField(group.getField(), target, groupValue);
+        if (group.getField().isPresent())
+        {
+            setField(group.getField().get(), target, groupValue);
+        }
+        else
+        {
+            throw new MuleRuntimeException(createStaticMessage(format("Could not set value for parameter group '%s'", group.getType().getName())));
+        }
 
         for (ValueSetter childSetter : childSetters)
         {

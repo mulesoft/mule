@@ -8,11 +8,12 @@ package org.mule.runtime.module.extension.internal.introspection.validation;
 
 import static org.mule.runtime.core.config.MuleManifest.getProductVersion;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
-import org.mule.runtime.extension.api.annotation.Exclusion;
+import org.mule.runtime.extension.api.annotation.ExclusiveOptionals;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.ParameterGroup;
+import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.introspection.ExtensionFactory;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
@@ -54,11 +55,22 @@ public class ExclusiveParameterModelValidatorTestCase extends AbstractMuleTestCa
     }
 
     @Test(expected = IllegalModelDefinitionException.class)
+    public void invalidExclusionWithOneOptionalParameter() throws Exception
+    {
+        validate(InvalidExtensionWithoOneOptionalParameters.class);
+    }
+
+    @Test(expected = IllegalModelDefinitionException.class)
     public void invalidExclusionWithNestedCollection() throws Exception
     {
         validate(InvalidExtensionWithNestedCollection.class);
     }
 
+    @Test(expected = IllegalModelDefinitionException.class)
+    public void invalidExclusionOperationParameter() throws Exception
+    {
+        validate(InvalidOperationExtension.class);
+    }
 
     @Extension(name = "InvalidExtensionWithNestedCollection")
     public static class InvalidExtensionWithNestedCollection
@@ -66,6 +78,14 @@ public class ExclusiveParameterModelValidatorTestCase extends AbstractMuleTestCa
 
         @ParameterGroup
         ExclusionWithNestedCollection group;
+    }
+
+    @Extension(name = "InvalidExtensionWithoOneOptionalParameters")
+    public static class InvalidExtensionWithoOneOptionalParameters
+    {
+
+        @ParameterGroup
+        ExclusionWithoutOneOptionalParameters group;
     }
 
     @Extension(name = "InvalidExtensionWithNestedPojo")
@@ -84,7 +104,15 @@ public class ExclusiveParameterModelValidatorTestCase extends AbstractMuleTestCa
         ExclusionWithNestedParameterGroup group;
     }
 
-    @Extension(name = "validExtension")
+    @Extension(name = "InvalidOperationExtension")
+    @Operations({InvalidOperation.class})
+    public static class InvalidOperationExtension
+    {
+
+    }
+
+
+    @Extension(name = "ValidExtension")
     @Operations({ValidOperation.class})
     public static class ValidExtension
     {
@@ -94,7 +122,21 @@ public class ExclusiveParameterModelValidatorTestCase extends AbstractMuleTestCa
     }
 
 
-    @Exclusion
+
+    @ExclusiveOptionals
+    public static class ValidExclusion
+    {
+
+        @Parameter
+        @Optional
+        private String validType;
+
+        @Parameter
+        @Optional
+        private String anotherValidType;
+    }
+
+    @ExclusiveOptionals
     public static class ExclusionWithNestedCollection
     {
 
@@ -105,37 +147,48 @@ public class ExclusiveParameterModelValidatorTestCase extends AbstractMuleTestCa
         private List<String> complexType;
     }
 
-    @Exclusion
-    public static class ValidExclusion
-    {
-
-        @Parameter
-        private String validType;
-
-        @Parameter
-        private String anotherValidType;
-    }
-
-    @Exclusion
+    @ExclusiveOptionals
     public static class ExclusionWithNestedPojo
     {
 
         @Parameter
+        @Optional
         private String validType;
 
         @Parameter
+        @Optional
         private SimplePojo complexField;
+
+        // Required parameters should be ignored
+        @Parameter
+        private SimplePojo requiredPojo;
     }
 
-    @Exclusion
+    @ExclusiveOptionals
     public static class ExclusionWithNestedParameterGroup
     {
 
         @Parameter
+        @Optional
         private String validType;
+
+        @Parameter
+        @Optional
+        private Integer otherValidType;
 
         @ParameterGroup
         private SimplePojo nesterGroup;
+    }
+
+    @ExclusiveOptionals
+    public static class ExclusionWithoutOneOptionalParameters
+    {
+        @Parameter
+        private String requiredParameter;
+
+        @Parameter
+        @Optional
+        private Integer lonelyOptional;
     }
 
     public static class SimplePojo
@@ -150,6 +203,15 @@ public class ExclusiveParameterModelValidatorTestCase extends AbstractMuleTestCa
     {
 
         public void validOperationWithExclusion(@ParameterGroup ValidExclusion exclusiveParameter)
+        {
+
+        }
+    }
+
+    public static class InvalidOperation
+    {
+
+        public void invalidOperationWithExclusion(@ParameterGroup ExclusionWithoutOneOptionalParameters invalidExclusionParameter)
         {
 
         }

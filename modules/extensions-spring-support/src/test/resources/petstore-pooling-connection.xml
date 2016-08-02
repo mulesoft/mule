@@ -11,7 +11,7 @@
         <spring:import resource="petstore.xml"/>
     </spring:beans>
 
-    <petstore:config name="defaultPoolingPoolable">
+    <petstore:config name="defaultPoolingPoolable" cashierName="jim">
         <petstore:pooled-connection username="john" password="doe"/>
         <petstore:pets>
             <petstore:pet value="Lassie" />
@@ -20,7 +20,7 @@
         </petstore:pets>
     </petstore:config>
 
-    <petstore:config name="customPoolingPoolable">
+    <petstore:config name="customPoolingPoolable" cashierName="jim">
         <petstore:pooled-connection username="john" password="doe">
             <pooling-profile maxActive="3" exhaustedAction="WHEN_EXHAUSTED_FAIL" />
         </petstore:pooled-connection>
@@ -31,7 +31,7 @@
         </petstore:pets>
     </petstore:config>
 
-    <petstore:config name="noPooling">
+    <petstore:config name="noPooling" cashierName="jim">
         <petstore:pooled-connection username="john" password="doe">
             <pooling-profile disabled="true" />
         </petstore:pooled-connection>

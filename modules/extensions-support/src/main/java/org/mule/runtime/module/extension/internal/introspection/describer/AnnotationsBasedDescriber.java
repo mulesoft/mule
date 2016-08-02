@@ -53,7 +53,6 @@ import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.Configurations;
-import org.mule.runtime.extension.api.annotation.Exclusion;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.Extensible;
 import org.mule.runtime.extension.api.annotation.Extension;
@@ -423,8 +422,6 @@ public final class AnnotationsBasedDescriber implements Describer
 
             Set<ParameterDeclarer> parameters = declareSingleParameters(getExposedFields(field.getType()), parameterDeclarer);
 
-            enforceOptionalIfExclusive(field.getType(), parameters);
-
             if (!parameters.isEmpty())
             {
                 ParameterGroup group = new ParameterGroup(field.getType(), field);
@@ -446,20 +443,6 @@ public final class AnnotationsBasedDescriber implements Describer
         }
 
         return groups;
-    }
-
-    /**
-     * Parameters inside a group annotated with {@link Exclusion} are all considered as optionals.
-     *
-     * @param clazz      of a {@link Field} considered a parameter container
-     * @param parameters contained inside the container
-     */
-    private void enforceOptionalIfExclusive(Class<?> clazz, Set<ParameterDeclarer> parameters)
-    {
-        if (getAnnotation(clazz, Exclusion.class) != null)
-        {
-            parameters.stream().forEach(p -> p.getDeclaration().setRequired(false));
-        }
     }
 
     private ParameterDeclaration inheritGroupParentDisplayProperties(ParameterGroup parent, Field field, ParameterGroup group, ParameterDeclarer parameterDeclarer)
@@ -706,7 +689,7 @@ public final class AnnotationsBasedDescriber implements Describer
 
     private void declareOperationParameters(Method method, OperationDeclarer operation, MetadataScopeAdapter metadataScope)
     {
-        List<ParsedParameter> descriptors = parseParameters(method, typeLoader);
+        List<ParsedParameter> descriptors = parseParameters(method, typeLoader, operation);
 
         //TODO: MULE-9220
         checkAnnotationsNotUsedMoreThanOnce(method, operation, UseConfig.class, Connection.class, MetadataKeyId.class, Content.class);
