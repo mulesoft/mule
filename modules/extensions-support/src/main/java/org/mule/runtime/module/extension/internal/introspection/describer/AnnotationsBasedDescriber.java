@@ -361,7 +361,7 @@ public final class AnnotationsBasedDescriber implements Describer
 
     private void declareSourceConnection(Class<? extends Source> sourceType, SourceDeclarer source)
     {
-        getAnnotatedFields(sourceType, Connection.class).forEach(f -> addConnectionTypeModelProperty(typeLoader.load(f.getDeclaringClass()), source));
+        getAnnotatedFields(sourceType, Connection.class).forEach(f -> addConnectionTypeModelProperty(typeLoader.load(f.getType()), source));
     }
 
     private void declareMetadataKeyId(Class<?> sourceType, SourceDeclarer source)

@@ -7,11 +7,11 @@
 package org.mule.test.transactional;
 
 import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
-import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
+import org.mule.runtime.api.connection.PoolingConnectionProvider;
 
-public class LocalTransactionProvider implements CachedConnectionProvider<TestTransactionalConnection>
+public class LocalTransactionProvider implements PoolingConnectionProvider<TestTransactionalConnection>
 {
 
     @Override

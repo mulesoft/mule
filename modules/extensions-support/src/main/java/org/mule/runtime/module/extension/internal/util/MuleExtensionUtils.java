@@ -7,7 +7,6 @@
 package org.mule.runtime.module.extension.internal.util;
 
 import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_ALWAYS_JOIN;
@@ -17,8 +16,6 @@ import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.REQUIRED;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.SUPPORTED;
 import static org.springframework.util.ReflectionUtils.setField;
-import org.mule.metadata.java.api.utils.JavaTypeUtils;
-import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -57,7 +54,6 @@ import org.mule.runtime.module.extension.internal.model.property.ImplementingMet
 import org.mule.runtime.module.extension.internal.model.property.RequireNameField;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
-import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 
 import java.lang.reflect.AccessibleObject;
@@ -67,7 +63,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.Callable;
 
 /**
@@ -176,30 +171,6 @@ public class MuleExtensionUtils
                 .addAll(configurationModel.getConnectionProviders())
                 .addAll(configurationModel.getExtensionModel().getConnectionProviders())
                 .build();
-    }
-
-    public static Class<?> getOperationsConnectionType(ExtensionModel extensionModel)
-    {
-        Set<Class<?>> connectionTypes = extensionModel.getOperationModels().stream()
-                .map(operation -> operation.getModelProperty(ConnectivityModelProperty.class).map(ConnectivityModelProperty::getConnectionType).orElse(null))
-                .filter(type -> type != null)
-                .map(JavaTypeUtils::getType)
-                .collect(toSet());
-
-        if (isEmpty(connectionTypes))
-        {
-            return null;
-        }
-        else if (connectionTypes.size() > 1)
-        {
-            throw new IllegalModelDefinitionException(String.format("Extension '%s' has operation which require connections of different types ([%s]). " +
-                                                                    "Please standarize on one single connection type to ensure that all operations work with any compatible %s",
-                                                                    extensionModel.getName(), Joiner.on(", ").join(connectionTypes), ConnectionProvider.class.getSimpleName()));
-        }
-        else
-        {
-            return connectionTypes.stream().findFirst().get();
-        }
     }
 
     /**

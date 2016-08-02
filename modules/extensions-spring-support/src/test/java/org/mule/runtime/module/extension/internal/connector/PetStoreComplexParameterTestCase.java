@@ -36,7 +36,7 @@ public class PetStoreComplexParameterTestCase extends ExtensionFunctionalTestCas
     @Test
     public void configWithConfigReferences() throws Exception
     {
-        PetCage cage = (PetCage) flowRunner("getCageWithReferences").run().getMessage().getPayload();
+        PetCage cage = flowRunner("getCageWithReferences").run().getMessage().getPayload();
         assertBirds(cage.getBirds());
         assertAmmenities(cage.getAmmenities());
     }
@@ -44,7 +44,7 @@ public class PetStoreComplexParameterTestCase extends ExtensionFunctionalTestCas
     @Test
     public void configWithConfigMELReferences() throws Exception
     {
-        PetCage cage = (PetCage) flowRunner("getCageWithMELReferences").run().getMessage().getPayload();
+        PetCage cage = flowRunner("getCageWithMELReferences").run().getMessage().getPayload();
         assertBirds(cage.getBirds());
         assertAmmenities(cage.getAmmenities());
     }
@@ -52,7 +52,7 @@ public class PetStoreComplexParameterTestCase extends ExtensionFunctionalTestCas
     @Test
     public void configWithConfigChildElements() throws Exception
     {
-        PetCage cage = (PetCage) flowRunner("getCageWithChildElements").run().getMessage().getPayload();
+        PetCage cage = flowRunner("getCageWithChildElements").run().getMessage().getPayload();
         assertBirds(cage.getBirds());
         assertAmmenities(cage.getAmmenities());
     }

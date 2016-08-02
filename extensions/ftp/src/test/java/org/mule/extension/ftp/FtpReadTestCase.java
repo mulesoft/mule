@@ -56,7 +56,7 @@ public class FtpReadTestCase extends FtpConnectorTestCase
         assertThat(message.getDataType().getMediaType().getPrimaryType(), is(JSON.getPrimaryType()));
         assertThat(message.getDataType().getMediaType().getSubType(), is(JSON.getSubType()));
 
-        AbstractFileInputStream payload = (AbstractFileInputStream) message.getPayload();
+        AbstractFileInputStream payload = message.getPayload();
         assertThat(payload.isLocked(), is(false));
         assertThat(getPayloadAsString(message), is(HELLO_WORLD));
     }
@@ -71,7 +71,7 @@ public class FtpReadTestCase extends FtpConnectorTestCase
         assertThat(response.getDataType().getMediaType().getPrimaryType(), is(MediaType.BINARY.getPrimaryType()));
         assertThat(response.getDataType().getMediaType().getSubType(), is(MediaType.BINARY.getSubType()));
 
-        AbstractFileInputStream payload = (AbstractFileInputStream) response.getPayload();
+        AbstractFileInputStream payload = response.getPayload();
         assertThat(payload.isLocked(), is(false));
 
         byte[] readContent = new byte[new Long(HELLO_WORLD.length()).intValue()];
