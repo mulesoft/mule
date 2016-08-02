@@ -40,15 +40,7 @@ public class FunctionalTestNotification extends CustomNotification
 
     static
     {
-        //TODO(pablo.kraan): find a better way to manage this situation.
-        try
-        {
-            registerAction("event received", EVENT_RECEIVED);
-        }
-        catch (IllegalStateException e)
-        {
-            // Ignore
-        }
+        registerAction("event received", EVENT_RECEIVED);
     }
 
     private final Object replyMessage;

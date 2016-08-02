@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
 import org.junit.Ignore;
 import org.junit.Test;
 
-@Ignore("ArtifactClassloaderTestRunner groovy error")
+@Ignore("MULE-10184 - ArtifactClassLoaderRunner: groovy issue")
 public class InOnlyTestCase extends AbstractIntegrationTestCase
 {
     public static final long TIMEOUT = 3000;

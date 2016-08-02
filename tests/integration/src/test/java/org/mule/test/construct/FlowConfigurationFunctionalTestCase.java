@@ -137,7 +137,7 @@ public class FlowConfigurationFunctionalTestCase extends AbstractIntegrationTest
     }
 
     @Test
-    @Ignore("ArtifactClassLoaderRunner: groovy issue")
+    @Ignore("MULE-10184 - ArtifactClassLoaderRunner: groovy issue")
     public void testSplitAggregateFlow() throws Exception
     {
         final Apple apple = new Apple();
@@ -176,7 +176,7 @@ public class FlowConfigurationFunctionalTestCase extends AbstractIntegrationTest
     }
 
     @Test
-    @Ignore("ArtifactClassLoaderRunner: groovy issue")
+    @Ignore("MULE-10184 - ArtifactClassLoaderRunner: groovy issue")
     public void testSplitAggregateListFlow() throws Exception
     {
         final Apple apple = new Apple();
@@ -205,7 +205,7 @@ public class FlowConfigurationFunctionalTestCase extends AbstractIntegrationTest
     }
 
     @Test
-    @Ignore("ArtifactClassLoaderRunner: groovy issue")
+    @Ignore("MULE-10184 - ArtifactClassLoaderRunner: groovy issue")
     public void testSplitAggregateListFlowSingleItem() throws Exception
     {
         final Apple apple = new Apple();
@@ -229,7 +229,7 @@ public class FlowConfigurationFunctionalTestCase extends AbstractIntegrationTest
     }
 
     @Test
-    @Ignore("ArtifactClassLoaderRunner: groovy issue")
+    @Ignore("MULE-10184 - ArtifactClassLoaderRunner: groovy issue")
     public void testSplitAggregateResponseListFlow() throws Exception
     {
         final Apple apple = new Apple();
@@ -256,7 +256,7 @@ public class FlowConfigurationFunctionalTestCase extends AbstractIntegrationTest
     }
 
     @Test
-    @Ignore("ArtifactClassLoaderRunner: groovy issue")
+    @Ignore("MULE-10184 - ArtifactClassLoaderRunner: groovy issue")
     public void testSplitAggregateResponseListFlowSingleItem() throws Exception
     {
         final Apple apple = new Apple();
@@ -276,7 +276,7 @@ public class FlowConfigurationFunctionalTestCase extends AbstractIntegrationTest
     }
 
     @Test
-    @Ignore("ArtifactClassLoaderRunner: groovy issue")
+    @Ignore("MULE-10184 - ArtifactClassLoaderRunner: groovy issue")
     public void testSplitAggregateMapFlow() throws Exception
     {
         Map<String, Fruit> map = new HashMap<>();

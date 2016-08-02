@@ -24,7 +24,7 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
 
-@Ignore("ArtifactClassLoaderRunner CXF issue when running all tests, works when executed isolated")
+@Ignore("MULE-10185 - ArtifactClassLoaderRunner CXF issue when running all tests, works when executed isolated")
 public class MessageProcessorNotificationTestCase extends AbstractMessageProcessorNotificationTestCase
 {
     @Rule

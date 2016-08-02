@@ -16,11 +16,11 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.junit.Rule;
 import org.junit.Test;
 
-//TODO(gfernandes): remove this class and use the one from it tests once transport it test are migrated to use isolation runner
+//TODO(gfernandes): MULE-10183 remove this class and use the one from IT tests once transport IT test are migrated to use isolation runner
 public abstract class AbstractPropertyScopeTestCase extends FunctionalTestCase
 {
     @Rule
-    public DynamicPort port1 = new DynamicPort("port1");
+    public DynamicPort port = new DynamicPort("port");
 
     @Test
     public void testRequestResponse() throws Exception

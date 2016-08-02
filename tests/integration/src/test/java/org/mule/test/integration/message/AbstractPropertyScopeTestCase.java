@@ -18,7 +18,7 @@ import org.junit.Test;
 public abstract class AbstractPropertyScopeTestCase extends AbstractIntegrationTestCase
 {
     @Rule
-    public DynamicPort port1 = new DynamicPort("port1");
+    public DynamicPort port = new DynamicPort("port");
 
     @Test
     public void testRequestResponse() throws Exception

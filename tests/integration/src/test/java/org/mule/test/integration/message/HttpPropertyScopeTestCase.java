@@ -24,6 +24,6 @@ public class HttpPropertyScopeTestCase extends AbstractPropertyScopeTestCase
 
     protected MuleMessage sendRequest(MuleClient client, MuleMessage message) throws MuleException
     {
-        return client.send(format("http://localhost:%s/foo", port1.getNumber()), message, newOptions().method(POST.name()).build());
+        return client.send(format("http://localhost:%s/foo", port.getNumber()), message, newOptions().method(POST.name()).build());
     }
 }

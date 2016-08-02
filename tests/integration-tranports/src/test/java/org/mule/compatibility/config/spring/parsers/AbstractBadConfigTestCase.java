@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 /**
  * A stripped-down version of FunctionalTestCase that allows us to test the parsing of a bad configuration. 
  */
-//TODO(gfernandes): remove this class and use the one from it tests once transport it test are migrated to use isolation runner
+//TODO(gfernandes): MULE-10183 remove this class and use the one from IT tests once transport IT test are migrated to use isolation runner
 public abstract class AbstractBadConfigTestCase extends FunctionalTestCase
 {
     protected final transient Logger logger = LoggerFactory.getLogger(getClass());
