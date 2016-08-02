@@ -58,7 +58,7 @@ public class DefaultConnectivityTestingServiceTestCase extends AbstractMuleTestC
         when(mockTemporaryArtifact.isStarted()).thenReturn(false);
         doThrow(InitialisationException.class).when(mockTemporaryArtifact).start();
 
-        ConnectionValidationResult connectionResult = connectivityTestingService.testConnection(null);
+        ConnectionValidationResult connectionResult = connectivityTestingService.testConnection(COMPONENT_IDENTIFIER);
         assertThat(connectionResult.isValid(), is(false));
         assertThat(connectionResult.getException(), instanceOf(InitialisationException.class));
     }
