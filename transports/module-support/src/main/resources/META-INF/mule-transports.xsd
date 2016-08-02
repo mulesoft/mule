@@ -142,6 +142,53 @@
         </xsd:annotation>
     </xsd:element>
 
+    <xsd:element name="set-attachment" type="setAttachmentType" substitutionGroup="mule:abstract-transformer">
+        <xsd:annotation>
+            <xsd:documentation>
+                A transformer that adds an attachment to the outbound scope.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="setAttachmentType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:commonMessagePartTransformerType">
+                <xsd:attribute name="attachmentName" type="mule:attributeType" use="required"/>
+                <xsd:attribute name="value" type="mule:attributeType" use="required"/>
+                <xsd:attribute name="contentType" type="mule:attributeType" use="required"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="remove-attachment" type="removeAttachmentType" substitutionGroup="mule:abstract-transformer">
+        <xsd:annotation>
+            <xsd:documentation>
+                A transformer that removes an attachment in the outbound scope.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="removeAttachmentType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:commonMessagePartTransformerType">
+                <xsd:attribute name="attachmentName" type="mule:attributeType" use="required"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="copy-attachments" type="copyAttachmentType" substitutionGroup="mule:abstract-transformer">
+        <xsd:annotation>
+            <xsd:documentation>
+                A transformer that copy inbound attachment to outbound attachment scope by name or regular expression.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="copyAttachmentType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:commonMessagePartTransformerType">
+                <xsd:attribute name="attachmentName" type="mule:attributeType" use="required"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
     <!--==============================================================-->
     <!--   Endpoint elements                                          -->
     <!--==============================================================-->

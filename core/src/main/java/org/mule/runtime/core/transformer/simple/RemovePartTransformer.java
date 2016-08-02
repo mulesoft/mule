@@ -6,24 +6,32 @@
  */
 package org.mule.runtime.core.transformer.simple;
 
+import static java.util.stream.Collectors.toList;
+import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.MuleMessage.Builder;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.message.AttachmentAttributes;
+import org.mule.runtime.core.message.MultiPartPayload;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 import org.mule.runtime.core.util.AttributeEvaluator;
 import org.mule.runtime.core.util.WildcardAttributeEvaluator;
 
 import java.nio.charset.Charset;
 
-public class RemoveAttachmentTransformer extends AbstractMessageTransformer
+/**
+ * TODO MULE-10179
+ */
+@Deprecated
+public class RemovePartTransformer extends AbstractMessageTransformer
 {
     private AttributeEvaluator nameEvaluator;
     private WildcardAttributeEvaluator wildcardAttributeEvaluator;
 
-    public RemoveAttachmentTransformer()
+    public RemovePartTransformer()
     {
         registerSourceType(DataType.OBJECT);
         setReturnDataType(DataType.OBJECT);
@@ -40,22 +48,34 @@ public class RemoveAttachmentTransformer extends AbstractMessageTransformer
     public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException
     {
         MuleMessage message = event.getMessage();
+        final Object payload = message.getPayload();
+
+        if (!(payload instanceof MultiPartPayload))
+        {
+            throw new TransformerException(createStaticMessage("Cannot remove attachments/part from non-multipart payload."), this);
+        }
+
         try
         {
             if (wildcardAttributeEvaluator.hasWildcards())
             {
-                final Builder builder = MuleMessage.builder(event.getMessage());
-                wildcardAttributeEvaluator.processValues(message.getOutboundAttachmentNames(),
-                        matchedValue -> builder.removeOutboundAttachment(matchedValue));
-                event.setMessage(builder.build());
+                event.setMessage(MuleMessage.builder(message)
+                                            .payload(((MultiPartPayload) payload).getParts()
+                                                                                 .stream()
+                                                                                 .filter(p -> !wildcardAttributeEvaluator.matches(((AttachmentAttributes) p.getAttributes()).getName()))
+                                                                                 .collect(toList()))
+                                            .build());
             }
             else
             {
                 Object keyValue = nameEvaluator.resolveValue(event);
                 if (keyValue != null)
                 {
-                    event.setMessage(MuleMessage.builder(event.getMessage())
-                                                .removeOutboundAttachment(keyValue.toString())
+                    event.setMessage(MuleMessage.builder(message)
+                                                .payload(((MultiPartPayload) payload).getParts()
+                                                                                     .stream()
+                                                                                     .filter(p -> !((AttachmentAttributes) p.getAttributes()).getName().equals(keyValue.toString()))
+                                                                                     .collect(toList()))
                                                 .build());
                 }
                 else
@@ -74,7 +94,7 @@ public class RemoveAttachmentTransformer extends AbstractMessageTransformer
     @Override
     public Object clone() throws CloneNotSupportedException
     {
-        RemoveAttachmentTransformer clone = (RemoveAttachmentTransformer) super.clone();
+        RemovePartTransformer clone = (RemovePartTransformer) super.clone();
         clone.setAttachmentName(this.nameEvaluator.getRawValue());
         return clone;
     }

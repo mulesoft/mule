@@ -6,6 +6,10 @@
  */
 package org.mule.extension.email.internal.commands;
 
+import static java.lang.String.format;
+import static org.mule.extension.email.internal.util.EmailConnectorUtils.getAttributesFromMessage;
+import static org.mule.extension.email.internal.util.EmailConnectorUtils.mapToEmailAttachments;
+
 import org.mule.extension.email.api.EmailAttachment;
 import org.mule.extension.email.api.EmailAttributes;
 import org.mule.extension.email.api.EmailContent;
@@ -15,10 +19,6 @@ import org.mule.runtime.api.message.MuleMessage;
 
 import java.util.List;
 import java.util.Map;
-
-import static java.lang.String.format;
-import static org.mule.extension.email.internal.util.EmailConnectorUtils.getAttributesFromMessage;
-import static org.mule.extension.email.internal.util.EmailConnectorUtils.mapToEmailAttachments;
 
 /**
  * Represents the forward operation.
@@ -72,7 +72,7 @@ public final class ForwardCommand
         EmailContent forwardContent = content != null
                                       ? new EmailContent(forwardBody, content.getContentType(), content.getCharset())
                                       : new EmailContent(forwardBody, defaultCharset);
-        List<EmailAttachment> emailAttachments = mapToEmailAttachments(attributes.getAttachments());
+        List<EmailAttachment> emailAttachments = mapToEmailAttachments(muleMessage.getPayload());
         sendCommand.send(connection, forwardContent, subject, toAddresses, from, defaultCharset, ccAddresses, bccAddresses, headers, emailAttachments);
 
     }

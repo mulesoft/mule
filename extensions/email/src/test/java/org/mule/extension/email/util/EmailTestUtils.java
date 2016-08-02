@@ -13,12 +13,14 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.metadata.MediaType.TEXT;
 
+import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.core.message.MultiPartPayload;
 import org.mule.runtime.core.util.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.Map;
+import java.util.List;
 import java.util.Properties;
 
 import javax.activation.DataHandler;
@@ -31,7 +33,6 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
-import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetup;
 
 public class EmailTestUtils
@@ -91,10 +92,12 @@ public class EmailTestUtils
         return message;
     }
 
-    public static void assertAttachmentContent(Map<String, DataHandler> attachments, String attachmentKey, Object expectedResult) throws IOException
+    public static void assertAttachmentContent(List<MuleMessage> attachments, String attachmentKey, Object expectedResult) throws IOException
     {
-        DataHandler attachment = attachments.get(attachmentKey);
-        String attachmentAsString = IOUtils.toString((InputStream) attachment.getContent());
+        final MultiPartPayload multiPartPayload = new MultiPartPayload(attachments);
+
+        MuleMessage attachment = multiPartPayload.getPart(attachmentKey);
+        String attachmentAsString = IOUtils.toString((InputStream) attachment.getPayload());
         assertThat(attachmentAsString, is(expectedResult));
     }
 

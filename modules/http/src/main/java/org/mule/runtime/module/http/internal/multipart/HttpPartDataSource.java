@@ -6,11 +6,16 @@
  */
 package org.mule.runtime.module.http.internal.multipart;
 
+import static org.mule.runtime.module.http.internal.HttpParser.parseMultipartContent;
+
+import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.message.AttachmentAttributes;
+import org.mule.runtime.core.message.MultiPartPayload;
 import org.mule.runtime.core.message.ds.ByteArrayDataSource;
-import org.mule.runtime.core.message.ds.StringDataSource;
-import org.mule.runtime.module.http.internal.HttpParam;
 import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.module.http.internal.domain.MultipartHttpEntity;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -19,12 +24,13 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.activation.FileDataSource;
-import javax.servlet.http.Part;
 
 public class HttpPartDataSource implements DataSource
 {
@@ -79,26 +85,6 @@ public class HttpPartDataSource implements DataSource
         return part.getName();
     }
 
-    public static Collection<HttpPartDataSource> createFrom(Collection<HttpPart> parts)
-    {
-        final ArrayList<HttpPartDataSource> httpParts = new ArrayList<>(parts.size());
-        for (HttpPart part : parts)
-        {
-            httpParts.add(new HttpPartDataSource(part));
-        }
-        return httpParts;
-    }
-
-    public static Map<String, DataHandler> createDataHandlerFrom(Collection<HttpPart> parts)
-    {
-        final Map<String, DataHandler> httpParts = new HashMap<>(parts.size());
-        for (HttpPart part : parts)
-        {
-            httpParts.put(part.getName(), new DataHandler(new HttpPartDataSource(part)));
-        }
-        return httpParts;
-    }
-
     public static Collection<HttpPart> createFrom(Map<String, DataHandler> parts) throws IOException
     {
         final ArrayList<HttpPart> httpParts = new ArrayList<>(parts.size());
@@ -122,6 +108,48 @@ public class HttpPartDataSource implements DataSource
             }
         }
         return httpParts;
+    }
+
+    public static MultiPartPayload multiPartPayloadForAttachments(MultipartHttpEntity entity) throws IOException
+    {
+        return multiPartPayloadForAttachments(entity.getParts());
+    }
+
+    public static MultiPartPayload multiPartPayloadForAttachments(String responseContentType, InputStream responseInputStream) throws IOException
+    {
+        return multiPartPayloadForAttachments(parseMultipartContent(responseInputStream, responseContentType));
+    }
+
+    private static MultiPartPayload multiPartPayloadForAttachments(Collection<HttpPart> httpParts) throws IOException
+    {
+        List<org.mule.runtime.api.message.MuleMessage> parts = new ArrayList<>();
+
+        int partNumber = 1;
+        for (HttpPart httpPart : httpParts)
+        {
+            Map<String, LinkedList<String>> headers = new HashMap<>();
+            for (String headerName : httpPart.getHeaderNames())
+            {
+                if (!headers.containsKey(headerName))
+                {
+                    headers.put(headerName, new LinkedList<>());
+                }
+                headers.get(headerName).addAll(httpPart.getHeaders(headerName));
+            }
+
+            parts.add(MuleMessage.builder()
+                                 .payload(httpPart.getInputStream())
+                                 .mediaType(MediaType.parse(httpPart.getContentType()))
+                                 .attributes(new AttachmentAttributes(httpPart.getName() != null ? httpPart.getName() : "part_" + partNumber,
+                                         httpPart.getFileName(),
+                                         httpPart.getSize(),
+                                         headers))
+                                 .build());
+
+            partNumber++;
+        }
+
+        return new MultiPartPayload(parts);
     }
 
     public HttpPart getPart()

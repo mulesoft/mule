@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.transformer.simple;
 
-import static org.mule.runtime.core.util.IOUtils.toDataHandler;
+import static org.mule.runtime.core.util.IOUtils.toMuleMessagePart;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
@@ -14,19 +14,25 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.message.AttachmentAttributes;
+import org.mule.runtime.core.message.MultiPartPayload;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 import org.mule.runtime.core.util.AttributeEvaluator;
 
 import java.nio.charset.Charset;
 import java.text.MessageFormat;
 
-public class AddAttachmentTransformer extends AbstractMessageTransformer
+/**
+ * TODO MULE-10179
+ */
+@Deprecated
+public class AddPartTransformer extends AbstractMessageTransformer
 {
     private AttributeEvaluator nameEvaluator;
     private AttributeEvaluator valueEvaluator;
     private AttributeEvaluator contentTypeEvaluator;
 
-    public AddAttachmentTransformer()
+    public AddPartTransformer()
     {
         registerSourceType(DataType.OBJECT);
         setReturnDataType(DataType.OBJECT);
@@ -64,8 +70,15 @@ public class AddAttachmentTransformer extends AbstractMessageTransformer
                 else
                 {
                     MediaType contentType = DataType.builder().mediaType(contentTypeEvaluator.resolveStringValue(event)).build().getMediaType();
-                    event.setMessage(MuleMessage.builder(event.getMessage())
-                                                .addOutboundAttachment(key, toDataHandler(key, value, contentType))
+                    final MuleMessage message = event.getMessage();
+                    event.setMessage(MuleMessage.builder(message)
+                                                .payload(new MultiPartPayload(
+                                                        MuleMessage.builder()
+                                                                   .payload(message.getPayload())
+                                                                   .mediaType(message.getDataType().getMediaType())
+                                                                   .attributes(new AttachmentAttributes(key))
+                                                                   .build(),
+                                                        toMuleMessagePart(key, value, contentType)))
                                                 .build());
                 }
             }
@@ -81,7 +94,7 @@ public class AddAttachmentTransformer extends AbstractMessageTransformer
     @Override
     public Object clone() throws CloneNotSupportedException
     {
-        AddAttachmentTransformer clone = (AddAttachmentTransformer) super.clone();
+        AddPartTransformer clone = (AddPartTransformer) super.clone();
         clone.setName(this.nameEvaluator.getRawValue());
         clone.setValue(this.valueEvaluator.getRawValue());
         return clone;

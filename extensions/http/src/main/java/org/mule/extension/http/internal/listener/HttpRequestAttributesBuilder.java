@@ -10,6 +10,7 @@ import static org.mule.runtime.module.http.internal.HttpParser.decodeQueryString
 import static org.mule.runtime.module.http.internal.HttpParser.decodeUriParams;
 import static org.mule.runtime.module.http.internal.HttpParser.extractPath;
 import static org.mule.runtime.module.http.internal.HttpParser.extractQueryParams;
+
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.runtime.module.http.internal.ParameterMap;
 import org.mule.runtime.module.http.internal.domain.request.ClientConnection;
@@ -19,9 +20,6 @@ import org.mule.runtime.module.http.internal.listener.ListenerPath;
 
 import java.security.cert.Certificate;
 import java.util.Collection;
-import java.util.Map;
-
-import javax.activation.DataHandler;
 
 /**
  * Creates {@link HttpRequestAttributes} based on an {@link HttpRequestContext}, it's parts and a {@link ListenerPath}.
@@ -30,7 +28,6 @@ public class HttpRequestAttributesBuilder
 {
     private HttpRequestContext requestContext;
     private ListenerPath listenerPath;
-    private Map<String, DataHandler> parts;
 
     public HttpRequestAttributesBuilder setRequestContext(HttpRequestContext requestContext)
     {
@@ -41,12 +38,6 @@ public class HttpRequestAttributesBuilder
     public HttpRequestAttributesBuilder setListenerPath(ListenerPath listenerPath)
     {
         this.listenerPath = listenerPath;
-        return this;
-    }
-
-    public HttpRequestAttributesBuilder setParts(Map<String, DataHandler> parts)
-    {
-        this.parts = parts;
         return this;
     }
 
@@ -73,7 +64,7 @@ public class HttpRequestAttributesBuilder
         {
             headers.put(headerName, request.getHeaderValues(headerName));
         }
-        return new HttpRequestAttributes(headers, parts, listenerPath, relativePath, version, scheme, method,
+        return new HttpRequestAttributes(headers, listenerPath, relativePath, version, scheme, method,
                                          path, uri, queryString, queryParams, uriParams, remoteHostAddress,
                                          clientCertificate);
     }

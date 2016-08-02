@@ -10,32 +10,26 @@ import static java.util.Collections.emptyMap;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.core.message.NullAttributes.NULL_ATTRIBUTES;
+
 import org.mule.runtime.api.message.Attributes;
-import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.util.IOUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Orange;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.activation.DataHandler;
-
 import org.junit.Test;
+
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.hamcrest.collection.IsEmptyCollection.empty;
 
 public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase
 {
@@ -96,99 +90,6 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase
         assertThat(payload.getOutboundPropertyNames(), empty());
 
         //See http://www.mulesoft.org/jira/browse/MULE-4968 for additional test needed here
-    }
-
-    private void assertInboundAndOutboundMessageProperties(MuleMessage original)
-    {
-        assertOutboundMessageProperty("MuleMessage", original);
-        assertEquals("MessageProperties", original.getInboundProperty("MessageProperties"));
-    }
-
-    //
-    // attachments
-    //
-    @Test
-    public void testLegacyAddingAttachment() throws Exception
-    {
-        DataHandler handler = new DataHandler("this is the attachment", "text/plain");
-        MuleMessage message = MuleMessage.builder().payload(TEST_MESSAGE).addOutboundAttachment("attachment", handler).build();
-
-        assertTrue(message.getOutboundAttachmentNames().contains("attachment"));
-        assertEquals(handler, message.getOutboundAttachment("attachment"));
-    }
-
-    @Test
-    public void testAddingOutboundAttachment() throws Exception
-    {
-        DataHandler handler = new DataHandler("this is the attachment", "text/plain");
-        MuleMessage message = MuleMessage.builder().payload(TEST_MESSAGE).addOutboundAttachment("attachment", handler).build();
-
-        assertTrue(message.getOutboundAttachmentNames().contains("attachment"));
-        assertEquals(handler, message.getOutboundAttachment("attachment"));
-        assertEquals(0, message.getInboundAttachmentNames().size());
-
-        message = MuleMessage.builder(message).removeOutboundAttachment("attachment").build();
-        assertEquals(0, message.getOutboundAttachmentNames().size());
-
-        message = MuleMessage.builder(message)
-                             .addOutboundAttachment("spi-props", IOUtils.toDataHandler("spi-props", IOUtils.getResourceAsUrl("test-spi.properties", getClass()), MediaType.TEXT))
-                             .build();
-
-
-        assertTrue(message.getOutboundAttachmentNames().contains("spi-props"));
-        handler = message.getOutboundAttachment("spi-props");
-        assertEquals(MediaType.TEXT.getPrimaryType(), handler.getContentType().split("/")[0]);
-        assertEquals(MediaType.TEXT.getSubType(), handler.getContentType().split("/")[1]);
-        assertEquals(1, message.getOutboundAttachmentNames().size());
-
-        message = MuleMessage.builder(message)
-                             .addOutboundAttachment("dummy", IOUtils.toDataHandler("dummy", IOUtils.getResourceAsUrl("dummy.xml", getClass()), null))
-                             .build();
-        handler = message.getOutboundAttachment("dummy");
-        assertEquals(MediaType.APPLICATION_XML.getPrimaryType(), handler.getContentType().split("/")[0]);
-        assertEquals(MediaType.APPLICATION_XML.getSubType(), handler.getContentType().split("/")[1]);
-        assertEquals(2, message.getOutboundAttachmentNames().size());
-
-
-    }
-
-    @Test
-    public void testAddingInboundAttachment() throws Exception
-    {
-        Map<String, DataHandler> attachments = new HashMap<>();
-
-        String attachmentData = "this is the attachment";
-        DataHandler dh = new DataHandler(attachmentData, "text/plain");
-        attachments.put("attachment", dh);
-        MuleMessage message = MuleMessage.builder().payload(TEST_MESSAGE).inboundAttachments(attachments).build();
-
-        assertTrue(message.getInboundAttachmentNames().contains("attachment"));
-        assertEquals(dh, message.getInboundAttachment("attachment"));
-        assertEquals(0, message.getOutboundAttachmentNames().size());
-
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ObjectOutputStream oos = new ObjectOutputStream(baos);
-        RequestContext.setEvent(new DefaultMuleEvent(message, getTestFlow()));
-        oos.writeObject(message);
-        oos.flush();
-        ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(baos.toByteArray()));
-        MuleMessage message2 = (MuleMessage) ois.readObject();
-        assertTrue(message2.getInboundAttachmentNames().contains("attachment"));
-        assertEquals(message2.getInboundAttachment("attachment").getContent(), attachmentData);
-        assertEquals(0, message2.getOutboundAttachmentNames().size());
-
-    }
-
-    @Test
-    public void testNewMuleMessageFromMuleMessageWithAttachment() throws Exception
-    {
-        MuleMessage previous = createMuleMessage();
-
-        DataHandler handler = new DataHandler("this is the attachment", "text/plain");
-        MuleMessage message = MuleMessage.builder(previous).payload(TEST_MESSAGE).addOutboundAttachment("attachment", handler).build();
-
-        assertTrue(message.getOutboundAttachmentNames().contains("attachment"));
-        assertEquals(handler, message.getOutboundAttachment("attachment"));
     }
 
     //

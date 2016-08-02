@@ -16,7 +16,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
-import javax.activation.DataHandler;
 import javax.mail.Folder;
 import javax.mail.Message;
 
@@ -109,13 +108,6 @@ public class EmailAttributes extends BaseAttributes
     private final EmailFlags flags;
 
     /**
-     * The attachments that the email carries.
-     * <p>
-     * Each attachment contains a fileName which is the key of the attachment.
-     */
-    private Map<String, DataHandler> attachments;
-
-    /**
      * Creates a new instance.
      *
      * @param id               the id of the email.
@@ -126,7 +118,6 @@ public class EmailAttributes extends BaseAttributes
      * @param ccAddresses      the carbon copy addresses to deliver the email.
      * @param replyToAddresses the addresses to reply to this message.
      * @param headers          the header of the email.
-     * @param attachments      the attachments on the content of the email.
      * @param receivedDate     the received date of the email.
      * @param flags            the {@link EmailFlags} setted on the email.
      */
@@ -138,7 +129,6 @@ public class EmailAttributes extends BaseAttributes
                            List<String> ccAddresses,
                            List<String> replyToAddresses,
                            Map<String, String> headers,
-                           Map<String, DataHandler> attachments,
                            LocalDateTime receivedDate,
                            LocalDateTime sentDate,
                            EmailFlags flags)
@@ -147,7 +137,6 @@ public class EmailAttributes extends BaseAttributes
         this.subject = subject;
         this.sentDate = sentDate;
         this.receivedDate = receivedDate;
-        this.attachments = ImmutableMap.copyOf(attachments);
         this.toAddresses = ImmutableList.copyOf(toAddresses);
         this.ccAddresses = ImmutableList.copyOf(ccAddresses);
         this.bccAddresses = ImmutableList.copyOf(bccAddresses);
@@ -251,24 +240,7 @@ public class EmailAttributes extends BaseAttributes
     }
 
     /**
-     * Get the attachments of the email, there are returned as a {@link Map}
-     * name/content in which the name is represented with a {@link String} and
-     * the content with a {@link DataHandler}.
-     * <p>
-     * If there is no attachments the an empty {@link Map} will be returned.
-     * No attachments means that the content was not opened or the email message
-     * has no attachments.
-     *
-     * @return a {@link Map} with the attachments of the email message.
-     */
-    public Map<String, DataHandler> getAttachments()
-    {
-        return attachments;
-    }
-
-    /**
-     * @return an {@link EmailFlags} object containing the flags setted
-     * in the email.
+     * @return an {@link EmailFlags} object containing the flags setted in the email.
      */
     public EmailFlags getFlags()
     {

@@ -6,10 +6,7 @@
  */
 package org.mule.runtime.core.util;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 
 public class WildcardAttributeEvaluator
 {
@@ -49,7 +46,7 @@ public class WildcardAttributeEvaluator
         }
     }
 
-    private boolean matches(String value)
+    public boolean matches(String value)
     {
         if (value == null)
         {

@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.http.internal.request;
 
-import static java.util.Collections.EMPTY_MAP;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_REASON_PROPERTY;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
@@ -14,8 +13,10 @@ import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.SET_COOKIE;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.SET_COOKIE2;
 import static org.mule.runtime.module.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
+import static org.mule.runtime.module.http.internal.multipart.HttpPartDataSource.multiPartPayloadForAttachments;
 import static org.mule.runtime.module.http.internal.request.DefaultHttpRequester.DEFAULT_PAYLOAD_EXPRESSION;
 import static org.mule.runtime.module.http.internal.util.HttpToMuleMessage.getMediaType;
+
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MessagingException;
@@ -29,7 +30,6 @@ import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.module.http.internal.HttpParser;
 import org.mule.runtime.module.http.internal.domain.InputStreamHttpEntity;
 import org.mule.runtime.module.http.internal.domain.response.HttpResponse;
-import org.mule.runtime.module.http.internal.multipart.HttpPartDataSource;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,8 +41,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.activation.DataHandler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,7 +82,6 @@ public class HttpResponseToMuleEvent
         Charset encoding = getMediaType(responseContentType, getDefaultEncoding(muleContext)).getCharset().get();
 
         Map<String, Serializable> inboundProperties = getInboundProperties(response);
-        Map<String, DataHandler> inboundAttachments = EMPTY_MAP;
         Object payload = responseInputStream;
 
         if (responseContentType != null && parseResponse.resolveBooleanValue(muleEvent))
@@ -93,8 +90,7 @@ public class HttpResponseToMuleEvent
             {
                 try
                 {
-                    inboundAttachments = getInboundAttachments(responseInputStream, responseContentType);
-                    payload = null;
+                    payload = multiPartPayloadForAttachments(responseContentType, responseInputStream);
                 }
                 catch (IOException e)
                 {
@@ -112,11 +108,10 @@ public class HttpResponseToMuleEvent
 
         // Setting uniqueId and rootId in order to correlate messages from request to response generated.
         final Builder builder = MuleMessage.builder()
-                                         .payload(muleEvent.getMessage().getPayload())
-                                         .id(requestMessageId)
-                                         .rootId(requestMessageRootId)
-                                         .inboundProperties(inboundProperties)
-                                         .inboundAttachments(inboundAttachments);
+                                           .payload(muleEvent.getMessage().getPayload())
+                                           .id(requestMessageId)
+                                           .rootId(requestMessageRootId)
+                                           .inboundProperties(inboundProperties);
         
         if (StringUtils.isEmpty(responseContentType))
         {
@@ -137,7 +132,6 @@ public class HttpResponseToMuleEvent
             processCookies(response, uri);
         }
     }
-
 
     private Map<String, Serializable> getInboundProperties(HttpResponse response)
     {
@@ -166,19 +160,6 @@ public class HttpResponseToMuleEvent
             return new ArrayList<>(headerValues);
         }
         return response.getHeaderValue(headerName);
-    }
-
-    private Map<String, DataHandler> getInboundAttachments(InputStream responseInputStream, String responseContentType) throws IOException
-    {
-        Collection<HttpPartDataSource> httpParts = HttpPartDataSource.createFrom(HttpParser.parseMultipartContent(responseInputStream, responseContentType));
-        Map<String, DataHandler> attachments = new HashMap<>();
-
-        for (HttpPartDataSource httpPart : httpParts)
-        {
-            attachments.put(httpPart.getName(), new DataHandler(httpPart));
-        }
-
-        return attachments;
     }
 
     /**

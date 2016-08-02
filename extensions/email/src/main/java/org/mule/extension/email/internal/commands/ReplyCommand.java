@@ -6,6 +6,10 @@
  */
 package org.mule.extension.email.internal.commands;
 
+import static org.apache.commons.collections.CollectionUtils.isEmpty;
+import static org.mule.extension.email.internal.util.EmailConnectorUtils.getAttributesFromMessage;
+import static org.mule.extension.email.internal.util.EmailConnectorUtils.mapToEmailAttachments;
+
 import org.mule.extension.email.api.EmailAttachment;
 import org.mule.extension.email.api.EmailAttributes;
 import org.mule.extension.email.api.EmailContent;
@@ -17,10 +21,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static org.apache.commons.collections.CollectionUtils.isEmpty;
-import static org.mule.extension.email.internal.util.EmailConnectorUtils.getAttributesFromMessage;
-import static org.mule.extension.email.internal.util.EmailConnectorUtils.mapToEmailAttachments;
 
 /**
  * Represents the reply operation.
@@ -82,7 +82,7 @@ public final class ReplyCommand
         headers.put(IN_REPLY_TO_HEADER, Integer.toString(attributes.getId()));
         headers.putAll(attributes.getHeaders());
         List<String> ccAddresses = replyToAll ? attributes.getCcAddresses() : new ArrayList<>();
-        List<EmailAttachment> emailAttachments = mapToEmailAttachments(attributes.getAttachments());
+        List<EmailAttachment> emailAttachments = mapToEmailAttachments(muleMessage.getPayload());
         sendCommand.send(connection, content, subject, replyTo, from, defaultCharset, ccAddresses, new ArrayList<>(), headers, emailAttachments);
     }
 }

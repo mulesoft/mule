@@ -9,8 +9,9 @@ package org.mule.extension.http.internal.listener;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.runtime.module.http.internal.HttpParser.decodeUrlEncodedBody;
-import static org.mule.runtime.module.http.internal.multipart.HttpPartDataSource.createDataHandlerFrom;
+import static org.mule.runtime.module.http.internal.multipart.HttpPartDataSource.multiPartPayloadForAttachments;
 import static org.mule.runtime.module.http.internal.util.HttpToMuleMessage.getMediaType;
+
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.api.metadata.MediaType;
@@ -26,10 +27,7 @@ import org.mule.runtime.module.http.internal.domain.request.HttpRequestContext;
 import org.mule.runtime.module.http.internal.listener.HttpRequestParsingException;
 import org.mule.runtime.module.http.internal.listener.ListenerPath;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.activation.DataHandler;
+import java.io.IOException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,7 +47,6 @@ public class HttpRequestToMuleMessage
 
         final MediaType mediaType = getMediaType(request.getHeaderValueIgnoreCase(CONTENT_TYPE), getDefaultEncoding(muleContext));
 
-        final Map<String, DataHandler> parts = new HashMap<>();
         Object payload = null;
         if (parseRequest)
         {
@@ -58,7 +55,14 @@ public class HttpRequestToMuleMessage
             {
                 if (entity instanceof MultipartHttpEntity)
                 {
-                    parts.putAll(createDataHandlerFrom(((MultipartHttpEntity) entity).getParts()));
+                    try
+                    {
+                        payload = multiPartPayloadForAttachments((MultipartHttpEntity) entity);
+                    }
+                    catch (IOException e)
+                    {
+                        throw new HttpRequestParsingException(e.getMessage(), e);
+                    }
                 }
                 else
                 {
@@ -97,7 +101,8 @@ public class HttpRequestToMuleMessage
         }
 
         HttpRequestAttributes attributes = new HttpRequestAttributesBuilder().setRequestContext(requestContext)
-                .setListenerPath(listenerPath).setParts(parts).build();
+                                                                             .setListenerPath(listenerPath)
+                                                                             .build();
         return MuleMessage.builder().payload(payload).mediaType(mediaType).attributes(attributes).build();
     }
 

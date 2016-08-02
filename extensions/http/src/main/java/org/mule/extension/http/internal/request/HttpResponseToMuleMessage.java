@@ -11,11 +11,14 @@ import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.SET_COOKIE;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.SET_COOKIE2;
 import static org.mule.runtime.module.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
+import static org.mule.runtime.module.http.internal.multipart.HttpPartDataSource.multiPartPayloadForAttachments;
 import static org.mule.runtime.module.http.internal.util.HttpToMuleMessage.getMediaType;
+
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.internal.request.builder.HttpResponseAttributesBuilder;
 import org.mule.extension.http.internal.request.validator.HttpRequesterConfig;
 import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.MuleMessage.Builder;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MessagingException;
@@ -25,7 +28,6 @@ import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.module.http.internal.HttpParser;
 import org.mule.runtime.module.http.internal.domain.InputStreamHttpEntity;
 import org.mule.runtime.module.http.internal.domain.response.HttpResponse;
-import org.mule.runtime.module.http.internal.multipart.HttpPartDataSource;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -36,8 +38,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.activation.DataHandler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,16 +74,13 @@ public class HttpResponseToMuleMessage
         Charset encoding = getMediaType(responseContentType, getDefaultEncoding(muleEvent.getMuleContext())).getCharset().get();
 
         Object payload = responseInputStream;
-        Map<String, DataHandler> parts = new HashMap<>();
         if (responseContentType != null && parseResponse)
         {
             if (responseContentType.startsWith(MULTI_PART_PREFIX))
             {
                 try
                 {
-                    parts = processParts(responseInputStream, responseContentType);
-                    // TODO MULE-9986 Use multi-part payload
-                    payload = null;
+                    payload = multiPartPayloadForAttachments(responseContentType, responseInputStream);
                 }
                 catch (IOException e)
                 {
@@ -101,30 +98,26 @@ public class HttpResponseToMuleMessage
             processCookies(response, uri);
         }
 
-        HttpResponseAttributes responseAttributes = createAttributes(response, parts);
+        HttpResponseAttributes responseAttributes = createAttributes(response);
 
         dataType = DataType.builder(dataType).charset(encoding).build();
-        return MuleMessage.builder(muleEvent.getMessage()).payload(payload).mediaType(dataType.getMediaType())
-                .attributes(responseAttributes).build();
-    }
+        final Builder builder = MuleMessage.builder(muleEvent.getMessage()).payload(payload);
 
-    private HttpResponseAttributes createAttributes(HttpResponse response, Map<String, DataHandler> parts)
-    {
-        return new HttpResponseAttributesBuilder().setResponse(response).setParts(parts).build();
-    }
-
-    private Map<String, DataHandler> processParts(InputStream responseInputStream, String responseContentType) throws IOException
-    {
-        Collection<HttpPartDataSource> httpParts = HttpPartDataSource.createFrom(HttpParser.parseMultipartContent(responseInputStream, responseContentType));
-        Map<String, DataHandler> attachments = new HashMap<>();
-
-        for (HttpPartDataSource httpPart : httpParts)
+        if (StringUtils.isEmpty(responseContentType))
         {
-            String name = httpPart.getName();
-            attachments.put(name == null ? "null" : name, new DataHandler(httpPart));
+            builder.mediaType(dataType.getMediaType());
+        }
+        else
+        {
+            builder.mediaType(MediaType.parse(responseContentType));
         }
 
-        return attachments;
+        return builder.attributes(responseAttributes).build();
+    }
+
+    private HttpResponseAttributes createAttributes(HttpResponse response)
+    {
+        return new HttpResponseAttributesBuilder().setResponse(response).build();
     }
 
     private void processCookies(HttpResponse response, String uri)

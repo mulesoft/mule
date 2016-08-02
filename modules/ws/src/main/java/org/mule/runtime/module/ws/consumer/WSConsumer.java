@@ -8,12 +8,17 @@
 package org.mule.runtime.module.ws.consumer;
 
 import static java.util.Collections.emptyMap;
+import static java.util.Collections.singletonList;
+import static org.mule.runtime.core.util.IOUtils.toDataHandler;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
+
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MuleMessage.Builder;
 import org.mule.runtime.core.api.connector.DispatchException;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Disposable;
@@ -24,6 +29,8 @@ import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.message.AttachmentAttributes;
+import org.mule.runtime.core.message.MultiPartPayload;
 import org.mule.runtime.core.processor.AbstractRequestResponseMessageProcessor;
 import org.mule.runtime.core.processor.NonBlockingMessageProcessor;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
@@ -41,7 +48,8 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -434,23 +442,38 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
      * Reads outbound attachments from the MuleMessage and sets the CxfConstants.ATTACHMENTS invocation
      * properties with a set of CXF Attachment objects.
      */
-    private void copyAttachmentsRequest(MuleEvent event)
+    private void copyAttachmentsRequest(MuleEvent event) throws MessagingException
     {
         MuleMessage message = event.getMessage();
 
-        if (!message.getOutboundAttachmentNames().isEmpty())
+        final Builder builder = MuleMessage.builder(event.getMessage());
+
+        List<Attachment> attachments = new ArrayList<>();
+        for (String outboundAttachmentName : event.getMessage().getOutboundAttachmentNames())
         {
-            Collection<Attachment> attachments = new HashSet<Attachment>(message.getOutboundAttachmentNames().size());
-
-            for (String outboundAttachmentName : message.getOutboundAttachmentNames())
-            {
-                Attachment attachment = new AttachmentImpl(outboundAttachmentName, message.getOutboundAttachment(outboundAttachmentName));
-                attachments.add(attachment);
-            }
-            event.setFlowVariable(CxfConstants.ATTACHMENTS, attachments);
-
-            event.setMessage(MuleMessage.builder(event.getMessage()).outboundAttachments(emptyMap()).build());
+            attachments.add(new AttachmentImpl(outboundAttachmentName, event.getMessage().getOutboundAttachment(outboundAttachmentName)));
         }
+
+        try
+        {
+            if (event.getMessage().getPayload() instanceof MultiPartPayload)
+            {
+                for (org.mule.runtime.api.message.MuleMessage part : ((MultiPartPayload) event.getMessage().getPayload()).getParts())
+                {
+                    final String partName = ((AttachmentAttributes) part.getAttributes()).getName();
+                    attachments.add(new AttachmentImpl(partName, toDataHandler(partName, part.getPayload(), part.getDataType().getMediaType())));
+                }
+                builder.nullPayload();
+            }
+        }
+        catch (IOException e)
+        {
+            throw new MessagingException(CoreMessages.createStaticMessage("Exception processing attachments."), event, e, this);
+        }
+
+        event.setFlowVariable(CxfConstants.ATTACHMENTS, attachments);
+
+        event.setMessage(builder.outboundAttachments(emptyMap()).build());
     }
 
     /**
@@ -465,17 +488,40 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
         {
             Collection<Attachment> attachments = event.getFlowVariable(CxfConstants.ATTACHMENTS);
             MuleMessage.Builder builder = MuleMessage.builder(message);
-            for (Attachment attachment : attachments)
+
+            if (!attachments.isEmpty())
             {
-                try
+                List<org.mule.runtime.api.message.MuleMessage> parts = new ArrayList<>();
+                parts.add(MuleMessage.builder()
+                                     .payload(message.getPayload())
+                                     .mediaType(message.getDataType().getMediaType())
+                                     .build());
+
+                for (Attachment attachment : attachments)
                 {
-                    builder.addInboundAttachment(attachment.getId(), attachment.getDataHandler());
+                    Map<String, LinkedList<String>> headers = new HashMap<>();
+                    for (Iterator<String> iterator = attachment.getHeaderNames(); iterator.hasNext();)
+                    {
+                        String headerName = iterator.next();
+                        headers.put(headerName, new LinkedList<>(singletonList(attachment.getHeader(headerName))));
+                    }
+
+                    try
+                    {
+                        parts.add(MuleMessage.builder()
+                                             .payload(attachment.getDataHandler().getInputStream())
+                                             .mediaType(MediaType.parse(attachment.getDataHandler().getContentType()))
+                                             .attributes(new AttachmentAttributes(attachment.getId()))
+                                             .build());
+                    }
+                    catch (Exception e)
+                    {
+                        throw new MessagingException(CoreMessages.createStaticMessage("Could not set inbound attachment %s",
+                                attachment.getId()), event, e, this);
+                    }
                 }
-                catch (Exception e)
-                {
-                    throw new MessagingException(CoreMessages.createStaticMessage("Could not set inbound attachment %s",
-                                                                                  attachment.getId()), event, e, this);
-                }
+
+                builder.payload(new MultiPartPayload(parts));
             }
             event.setMessage(builder.build());
         }

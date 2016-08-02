@@ -18,7 +18,6 @@
         </httpn:listener>
         <custom-processor
                 class="org.mule.test.module.http.functional.listener.HttpListenerAttachmentsTestCase$ConvertPartsMessageProcessor"/>
-        <set-payload value="#[message.getAttributes()]"/>
         <test:queue name="out"/>
     </flow>
 
@@ -32,7 +31,6 @@
         </httpn:listener>
         <custom-processor
                 class="org.mule.test.module.http.functional.listener.HttpListenerAttachmentsTestCase$ConvertPartsMessageProcessor"/>
-        <set-payload value="#[message.getAttributes()]"/>
         <test:queue name="out"/>
     </flow>
 

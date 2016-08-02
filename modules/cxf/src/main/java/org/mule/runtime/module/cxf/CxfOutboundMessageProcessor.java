@@ -6,7 +6,10 @@
  */
 package org.mule.runtime.module.cxf;
 
+import static java.util.Arrays.asList;
+import static org.mule.runtime.core.util.IOUtils.toDataHandler;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
+
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
@@ -22,19 +25,20 @@ import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.ExceptionHelper;
 import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.message.AttachmentAttributes;
+import org.mule.runtime.core.message.MultiPartPayload;
 import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
 import org.mule.runtime.module.cxf.i18n.CxfMessages;
 import org.mule.runtime.module.cxf.security.WebServiceSecurityException;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.activation.DataHandler;
 import javax.xml.namespace.QName;
@@ -83,9 +87,7 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
 
     protected Object[] getArgs(MuleEvent event) throws TransformerException
     {
-        Object payload;
-
-        payload = event.getMessage().getPayload();
+        Object payload = event.getMessage().getPayload();
 
         if (proxy)
         {
@@ -94,16 +96,30 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
 
         Object[] args = payloadToArguments.payloadToArrayOfArguments(payload);
 
-        MuleMessage message = event.getMessage();
-        Set<?> attachmentNames = message.getInboundAttachmentNames();
-        if (attachmentNames != null && !attachmentNames.isEmpty())
+        List<DataHandler> attachments = new ArrayList<>();
+        for (String inboundAttachmentName : event.getMessage().getInboundAttachmentNames())
         {
-            List<DataHandler> attachments = new ArrayList<DataHandler>();
-            for (Object attachmentName : attachmentNames)
+            attachments.add(event.getMessage().getInboundAttachment(inboundAttachmentName));
+        }
+
+        try
+        {
+            if (event.getMessage().getPayload() instanceof MultiPartPayload)
             {
-                attachments.add(message.getInboundAttachment((String)attachmentName));
+                for (org.mule.runtime.api.message.MuleMessage part : ((MultiPartPayload) event.getMessage().getPayload()).getParts())
+                {
+                    attachments.add(toDataHandler(((AttachmentAttributes) part.getAttributes()).getName(), part.getPayload(), part.getDataType().getMediaType()));
+                }
             }
-            List<Object> temp = new ArrayList<Object>(Arrays.asList(args));
+        }
+        catch (IOException e)
+        {
+            throw new TransformerException(MessageFactory.createStaticMessage("Exception processing attachments."), e);
+        }
+
+        if (!attachments.isEmpty())
+        {
+            List<Object> temp = new ArrayList<>(asList(args));
             temp.add(attachments.toArray(new DataHandler[attachments.size()]));
             args = temp.toArray();
         }
@@ -181,7 +197,7 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
 
         Map<String, Object> props = getInovcationProperties(event);
 
-        Holder<MuleEvent> responseHolder = new Holder<MuleEvent>();
+        Holder<MuleEvent> responseHolder = new Holder<>();
         props.put("holder", responseHolder);
 
         // Set custom soap action if set on the event or endpoint
@@ -226,10 +242,10 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
         Map<String, Object> props = getInovcationProperties(event);
 
         // Holds the response from the transport
-        final Holder<MuleEvent> responseHolder = new Holder<MuleEvent>();
+        final Holder<MuleEvent> responseHolder = new Holder<>();
         props.put("holder", responseHolder);
 
-        Map<String, Object> ctx = new HashMap<String, Object>();
+        Map<String, Object> ctx = new HashMap<>();
         ctx.put(Client.REQUEST_CONTEXT, props);
         ctx.put(Client.RESPONSE_CONTEXT, props);
 
@@ -417,7 +433,7 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
 
     private Map<String, Object> getInovcationProperties(MuleEvent event)
     {
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Object> props = new HashMap<>();
         props.put(CxfConstants.MULE_EVENT, event);
         props.put(CxfConstants.CXF_OUTBOUND_MESSAGE_PROCESSOR, this);
         //props.put(org.apache.cxf.message.Message.ENDPOINT_ADDRESS, endpoint.getEndpointURI().toString());
@@ -473,7 +489,7 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
 
     protected Object[] addHoldersToResponse(Object response, Object[] args)
     {
-        List<Object> responseWithHolders = new ArrayList<Object>();
+        List<Object> responseWithHolders = new ArrayList<>();
         responseWithHolders.add(response);
 
         if(args != null)

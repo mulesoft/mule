@@ -13,7 +13,6 @@ import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.mule.runtime.api.metadata.DataType.BOOLEAN;
 import static org.mule.runtime.api.metadata.DataType.HTML_STRING;
 import static org.mule.runtime.api.metadata.DataType.STRING;
@@ -23,6 +22,7 @@ import static org.mule.runtime.api.metadata.MediaType.HTML;
 import static org.mule.runtime.api.metadata.MediaType.TEXT;
 import static org.mule.runtime.api.metadata.MediaType.XML;
 import static org.mule.runtime.core.message.NullAttributes.NULL_ATTRIBUTES;
+
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleMessage;
@@ -37,6 +37,8 @@ import java.util.Map;
 import javax.activation.DataHandler;
 
 import org.junit.Test;
+
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 
 /**
  *
@@ -266,85 +268,6 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase
         assertThat(message.getOutboundPropertyDataType(PROPERTY_KEY), equalTo(HTML_STRING));
         assertThat(message.getOutboundPropertyNames(), hasSize(1));
         assertThat(message.getOutboundPropertyNames(), hasItem(PROPERTY_KEY));
-    }
-
-    @Test
-    public void inboundAttachmentMap()
-    {
-        final DataHandler attachmentValue = new DataHandler(ATTACHMENT_VALUE, TEXT.toString());
-        Map<String, DataHandler> inboundAttachments = singletonMap(ATTACHMENT_KEY, attachmentValue);
-        MuleMessage message = new DefaultMuleMessageBuilder().payload(TEST_PAYLOAD).inboundAttachments(inboundAttachments).build();
-
-        assertThat(message.getInboundAttachment(ATTACHMENT_KEY), equalTo(attachmentValue));
-        assertThat(message.getInboundAttachmentNames(), hasSize(1));
-        assertThat(message.getInboundAttachmentNames(), hasItem(ATTACHMENT_KEY));
-    }
-
-    @Test
-    public void inboundAttachmentMapCopy()
-    {
-        final DataHandler attachmentValue = new DataHandler(ATTACHMENT_VALUE, TEXT.toString());
-        Map<String, DataHandler> inboundAttachments = singletonMap(ATTACHMENT_KEY, attachmentValue);
-        MuleMessage copy = new DefaultMuleMessageBuilder(new DefaultMuleMessageBuilder().payload(TEST_PAYLOAD)
-                                                                                        .inboundAttachments(inboundAttachments)
-                                                                                        .build()).build();
-
-        assertThat(copy.getInboundAttachment(ATTACHMENT_KEY), equalTo(attachmentValue));
-        assertThat(copy.getInboundAttachmentNames(), hasSize(1));
-        assertThat(copy.getInboundAttachmentNames(), hasItem(ATTACHMENT_KEY));
-    }
-
-    @Test
-    public void outboundAttachmentMap()
-    {
-        final DataHandler attachmentValue = new DataHandler(ATTACHMENT_VALUE, TEXT.toString());
-        Map<String, DataHandler> outboundAttachments = singletonMap(ATTACHMENT_KEY, attachmentValue);
-        MuleMessage message = new DefaultMuleMessageBuilder().payload(TEST_PAYLOAD).outboundAttachments(outboundAttachments).build();
-
-        assertThat(message.getOutboundAttachment(ATTACHMENT_KEY), equalTo(attachmentValue));
-        assertThat(message.getOutboundAttachmentNames(), hasSize(1));
-        assertThat(message.getOutboundAttachmentNames(), hasItem(ATTACHMENT_KEY));
-    }
-
-    @Test
-    public void outboundAttachmentMapCopy()
-    {
-        final DataHandler attachmentValue = new DataHandler(ATTACHMENT_VALUE, TEXT.toString());
-        Map<String, DataHandler> outboundAttachments = singletonMap(ATTACHMENT_KEY, attachmentValue);
-        MuleMessage copy = new DefaultMuleMessageBuilder(new DefaultMuleMessageBuilder().payload(TEST_PAYLOAD)
-                                                                                        .outboundAttachments(outboundAttachments)
-                                                                                        .build())
-                                                                                                 .build();
-
-        assertThat(copy.getOutboundAttachment(ATTACHMENT_KEY), equalTo(attachmentValue));
-        assertThat(copy.getOutboundAttachmentNames(), hasSize(1));
-        assertThat(copy.getOutboundAttachmentNames(), hasItem(ATTACHMENT_KEY));
-    }
-
-    @Test
-    public void inboundAttachment()
-    {
-        final DataHandler attachmentValue = new DataHandler(ATTACHMENT_VALUE, TEXT.toString());
-        MuleMessage message = new DefaultMuleMessageBuilder().payload(TEST_PAYLOAD)
-                                                             .addInboundAttachment(ATTACHMENT_KEY, attachmentValue)
-                                                             .build();
-
-        assertThat(message.getInboundAttachment(ATTACHMENT_KEY), equalTo(attachmentValue));
-        assertThat(message.getInboundAttachmentNames(), hasSize(1));
-        assertThat(message.getInboundAttachmentNames(), hasItem(ATTACHMENT_KEY));
-    }
-
-    @Test
-    public void outboundAttachment()
-    {
-        final DataHandler attachmentValue = new DataHandler(ATTACHMENT_VALUE, TEXT.toString());
-        MuleMessage message = new DefaultMuleMessageBuilder().payload(TEST_PAYLOAD)
-                                                             .addOutboundAttachment(ATTACHMENT_KEY, attachmentValue)
-                                                             .build();
-
-        assertThat(message.getOutboundAttachment(ATTACHMENT_KEY), equalTo(attachmentValue));
-        assertThat(message.getOutboundAttachmentNames(), hasSize(1));
-        assertThat(message.getOutboundAttachmentNames(), hasItem(ATTACHMENT_KEY));
     }
 
     @Test
