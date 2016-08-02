@@ -7,7 +7,6 @@
 package org.mule.test.core.context.notification.processors;
 
 import static org.junit.Assert.assertNotNull;
-
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.processor.MessageProcessor;
@@ -17,7 +16,6 @@ import org.mule.runtime.core.component.ComponentException;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.test.core.context.notification.Node;
 import org.mule.test.core.context.notification.RestrictedNode;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.Arrays;
 import java.util.List;
@@ -26,7 +24,7 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
 
-@Ignore("ArtifactClassloaderTestRunner CXF issue when running all tests, works when executed isolated")
+@Ignore("ArtifactClassLoaderRunner CXF issue when running all tests, works when executed isolated")
 public class MessageProcessorNotificationTestCase extends AbstractMessageProcessorNotificationTestCase
 {
     @Rule
@@ -42,35 +40,35 @@ public class MessageProcessorNotificationTestCase extends AbstractMessageProcess
     public void doTest() throws Exception
     {
         List<String> testList = Arrays.asList("test", "with", "collection");
-        assertNotNull(flowRunner("singleMP").withPayload(AbstractMuleContextTestCase.TEST_PAYLOAD).run());
-        assertNotNull(flowRunner("processorChain").withPayload(AbstractMuleContextTestCase.TEST_PAYLOAD).run());
-        assertNotNull(flowRunner("customProcessor").withPayload(AbstractMuleContextTestCase.TEST_PAYLOAD).run());
-        assertNotNull(flowRunner("choice").withPayload(AbstractMuleContextTestCase.TEST_PAYLOAD).run());
-        assertNotNull(flowRunner("scatterGather").withPayload(AbstractMuleContextTestCase.TEST_PAYLOAD).run());
+        assertNotNull(flowRunner("singleMP").withPayload(TEST_PAYLOAD).run());
+        assertNotNull(flowRunner("processorChain").withPayload(TEST_PAYLOAD).run());
+        assertNotNull(flowRunner("customProcessor").withPayload(TEST_PAYLOAD).run());
+        assertNotNull(flowRunner("choice").withPayload(TEST_PAYLOAD).run());
+        assertNotNull(flowRunner("scatterGather").withPayload(TEST_PAYLOAD).run());
 
-        assertNotNull(flowRunner("foreach").withPayload(AbstractMuleContextTestCase.TEST_PAYLOAD).run());
-        assertNotNull(flowRunner("enricher").withPayload(AbstractMuleContextTestCase.TEST_PAYLOAD).run());
+        assertNotNull(flowRunner("foreach").withPayload(TEST_PAYLOAD).run());
+        assertNotNull(flowRunner("enricher").withPayload(TEST_PAYLOAD).run());
         //assertNotNull(runFlow("in-async", TEST_PAYLOAD));
-        assertNotNull(flowRunner("filters").withPayload(AbstractMuleContextTestCase.TEST_PAYLOAD).run());
-        assertNotNull(flowRunner("idempotent-msg-filter").withPayload(AbstractMuleContextTestCase.TEST_PAYLOAD).run());
-        assertNotNull(flowRunner("idempotent-secure-hash-msg-filter").withPayload(AbstractMuleContextTestCase.TEST_PAYLOAD).run());
-        assertNotNull(flowRunner("subflow").withPayload(AbstractMuleContextTestCase.TEST_PAYLOAD).run());
-        assertNotNull(flowRunner("catch-es").withPayload(AbstractMuleContextTestCase.TEST_PAYLOAD).run());
+        assertNotNull(flowRunner("filters").withPayload(TEST_PAYLOAD).run());
+        assertNotNull(flowRunner("idempotent-msg-filter").withPayload(TEST_PAYLOAD).run());
+        assertNotNull(flowRunner("idempotent-secure-hash-msg-filter").withPayload(TEST_PAYLOAD).run());
+        assertNotNull(flowRunner("subflow").withPayload(TEST_PAYLOAD).run());
+        assertNotNull(flowRunner("catch-es").withPayload(TEST_PAYLOAD).run());
         expectedException.expect(ComponentException.class);
-        flowRunner("rollback-es").withPayload(AbstractMuleContextTestCase.TEST_PAYLOAD).run();
-        assertNotNull(flowRunner("choice-es").withPayload(AbstractMuleContextTestCase.TEST_PAYLOAD).run());
-        CompositeMessageSource composite = (CompositeMessageSource) ((Flow) AbstractMuleContextTestCase.muleContext.getRegistry().lookupFlowConstruct("composite-source")).getMessageSource();
-        assertNotNull(((TestMessageSource) composite.getSources().get(0)).fireEvent(AbstractMuleContextTestCase.getTestEvent(AbstractMuleContextTestCase.TEST_PAYLOAD)));
-        assertNotNull(((TestMessageSource) composite.getSources().get(1)).fireEvent(AbstractMuleContextTestCase.getTestEvent(AbstractMuleContextTestCase.TEST_PAYLOAD)));
-        assertNotNull(flowRunner("first-successful").withPayload(AbstractMuleContextTestCase.TEST_PAYLOAD).run());
-        assertNotNull(flowRunner("round-robin").withPayload(AbstractMuleContextTestCase.TEST_PAYLOAD).run());
+        flowRunner("rollback-es").withPayload(TEST_PAYLOAD).run();
+        assertNotNull(flowRunner("choice-es").withPayload(TEST_PAYLOAD).run());
+        CompositeMessageSource composite = (CompositeMessageSource) ((Flow) muleContext.getRegistry().lookupFlowConstruct("composite-source")).getMessageSource();
+        assertNotNull(((TestMessageSource) composite.getSources().get(0)).fireEvent(getTestEvent(TEST_PAYLOAD)));
+        assertNotNull(((TestMessageSource) composite.getSources().get(1)).fireEvent(getTestEvent(TEST_PAYLOAD)));
+        assertNotNull(flowRunner("first-successful").withPayload(TEST_PAYLOAD).run());
+        assertNotNull(flowRunner("round-robin").withPayload(TEST_PAYLOAD).run());
         assertNotNull(flowRunner("collectionAggregator").withPayload(testList).run());
         assertNotNull(flowRunner("customAggregator").withPayload(testList).run());
-        assertNotNull(flowRunner("chunkAggregator").withPayload(AbstractMuleContextTestCase.TEST_PAYLOAD).run());
-        assertNotNull(flowRunner("wire-tap").withPayload(AbstractMuleContextTestCase.TEST_PAYLOAD).run());
-        assertNotNull(flowRunner("until-successful").withPayload(AbstractMuleContextTestCase.TEST_PAYLOAD).run());
-        assertNotNull(flowRunner("until-successful-with-processor-chain").withPayload(AbstractMuleContextTestCase.TEST_PAYLOAD).run());
-        assertNotNull(flowRunner("until-successful-with-enricher").withPayload(AbstractMuleContextTestCase.TEST_PAYLOAD).run());
+        assertNotNull(flowRunner("chunkAggregator").withPayload(TEST_PAYLOAD).run());
+        assertNotNull(flowRunner("wire-tap").withPayload(TEST_PAYLOAD).run());
+        assertNotNull(flowRunner("until-successful").withPayload(TEST_PAYLOAD).run());
+        assertNotNull(flowRunner("until-successful-with-processor-chain").withPayload(TEST_PAYLOAD).run());
+        assertNotNull(flowRunner("until-successful-with-enricher").withPayload(TEST_PAYLOAD).run());
     }
 
     @Override

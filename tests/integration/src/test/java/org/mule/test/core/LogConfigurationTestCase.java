@@ -9,10 +9,9 @@ package org.mule.test.core;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
-
+import org.mule.rule.UseMuleLog4jContextFactory;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.module.launcher.application.Application;
-import org.mule.rule.UseMuleLog4jContextFactory;
 import org.mule.test.infrastructure.deployment.AbstractFakeMuleServerTestCase;
 
 import java.util.LinkedList;
@@ -26,14 +25,12 @@ import org.apache.logging.log4j.core.Appender;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.appender.ConsoleAppender;
 import org.apache.logging.log4j.core.appender.RollingFileAppender;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
 /**
  * Checks log4j configuration for application and domains
  */
-@Ignore("ArtifactClassloaderTestRunner")
 public class LogConfigurationTestCase extends AbstractFakeMuleServerTestCase
 {
 

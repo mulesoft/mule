@@ -9,15 +9,13 @@ package org.mule.test.integration.messaging.meps;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.functional.junit4.FlowRunner;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.test.AbstractIntegrationTestCase;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
-@Ignore("ArtifactClassloaderTestRunner groovy classCastExceptionerror")
 public class InOptionalOutOutOnlyAsyncRouterTestCase extends AbstractIntegrationTestCase
 {
     @Override

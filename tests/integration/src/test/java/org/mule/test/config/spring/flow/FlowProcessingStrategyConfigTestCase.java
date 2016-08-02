@@ -156,7 +156,7 @@ public class FlowProcessingStrategyConfigTestCase extends AbstractIntegrationTes
                                         MessageProcessorChainBuilder chainBuilder,
                                         MuleContext muleContext)
         {
-            // TODO Auto-generated method stub
+            // Nothing to do
         }
 
         public void setFoo(String foo)

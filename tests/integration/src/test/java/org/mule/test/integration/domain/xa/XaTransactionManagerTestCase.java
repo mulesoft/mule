@@ -9,9 +9,8 @@ package org.mule.test.integration.domain.xa;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
 import static org.mule.runtime.core.config.ExceptionHelper.getRootException;
-
-import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.functional.junit4.DomainFunctionalTestCase;
+import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 
 import org.hamcrest.Description;
@@ -19,13 +18,11 @@ import org.hamcrest.Factory;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 import org.hamcrest.core.IsInstanceOf;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.springframework.beans.factory.NoUniqueBeanDefinitionException;
 
-@Ignore
 public class XaTransactionManagerTestCase extends DomainFunctionalTestCase
 {
 

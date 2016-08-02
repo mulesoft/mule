@@ -10,14 +10,12 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
-import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.functional.junit4.FlowRunner;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.test.AbstractIntegrationTestCase;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
-@Ignore("ArtifactClassloaderTestRunner groovy classcastException")
 public class InOptionalOutOutOnlyTestCase extends AbstractIntegrationTestCase
 {
     @Override

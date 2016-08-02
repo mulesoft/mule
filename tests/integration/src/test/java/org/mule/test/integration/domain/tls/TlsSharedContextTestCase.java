@@ -9,7 +9,6 @@ package org.mule.test.integration.domain.tls;
 import static java.lang.String.format;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-
 import org.mule.functional.junit4.DomainFunctionalTestCase;
 import org.mule.functional.junit4.FlowRunner;
 import org.mule.runtime.api.tls.TlsContextFactory;
@@ -21,11 +20,9 @@ import org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder;
 import org.mule.runtime.module.http.api.requester.HttpRequesterConfig;
 import org.mule.tck.junit4.rule.DynamicPort;
 
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
-@Ignore
 public class TlsSharedContextTestCase extends DomainFunctionalTestCase
 {
 

@@ -6,10 +6,6 @@
  */
 package org.mule.test.config.spring.parsers.specific;
 
-/**
- * TODO
- */
-
 public interface DummyBinding
 {
     String doSomething(String foo);

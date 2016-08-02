@@ -6,9 +6,6 @@
  */
 package org.mule.test.config.spring.parsers.specific;
 
-/**
- * TODO
- */
 public class DummyComponentWithBinding
 {
     private DummyBinding binding;

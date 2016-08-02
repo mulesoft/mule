@@ -19,8 +19,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mule.functional.junit4.TransactionConfigEnum.ACTION_NONE;
-
-import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -39,6 +37,7 @@ import org.mule.tck.testmodels.fruit.Fruit;
 import org.mule.tck.testmodels.fruit.FruitBowl;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.tck.testmodels.mule.TestTransactionFactory;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import java.util.HashMap;
 import java.util.List;
@@ -138,7 +137,7 @@ public class FlowConfigurationFunctionalTestCase extends AbstractIntegrationTest
     }
 
     @Test
-    @Ignore("ArtifactClassloaderTestRunner")
+    @Ignore("ArtifactClassLoaderRunner: groovy issue")
     public void testSplitAggregateFlow() throws Exception
     {
         final Apple apple = new Apple();
@@ -177,7 +176,7 @@ public class FlowConfigurationFunctionalTestCase extends AbstractIntegrationTest
     }
 
     @Test
-    @Ignore("ArtifactClassloaderTestRunner")
+    @Ignore("ArtifactClassLoaderRunner: groovy issue")
     public void testSplitAggregateListFlow() throws Exception
     {
         final Apple apple = new Apple();
@@ -206,7 +205,7 @@ public class FlowConfigurationFunctionalTestCase extends AbstractIntegrationTest
     }
 
     @Test
-    @Ignore("ArtifactClassloaderTestRunner")
+    @Ignore("ArtifactClassLoaderRunner: groovy issue")
     public void testSplitAggregateListFlowSingleItem() throws Exception
     {
         final Apple apple = new Apple();
@@ -230,7 +229,7 @@ public class FlowConfigurationFunctionalTestCase extends AbstractIntegrationTest
     }
 
     @Test
-    @Ignore("ArtifactClassloaderTestRunner")
+    @Ignore("ArtifactClassLoaderRunner: groovy issue")
     public void testSplitAggregateResponseListFlow() throws Exception
     {
         final Apple apple = new Apple();
@@ -257,7 +256,7 @@ public class FlowConfigurationFunctionalTestCase extends AbstractIntegrationTest
     }
 
     @Test
-    @Ignore("ArtifactClassloaderTestRunner")
+    @Ignore("ArtifactClassLoaderRunner: groovy issue")
     public void testSplitAggregateResponseListFlowSingleItem() throws Exception
     {
         final Apple apple = new Apple();
@@ -277,7 +276,7 @@ public class FlowConfigurationFunctionalTestCase extends AbstractIntegrationTest
     }
 
     @Test
-    @Ignore("ArtifactClassloaderTestRunner: groovy issue")
+    @Ignore("ArtifactClassLoaderRunner: groovy issue")
     public void testSplitAggregateMapFlow() throws Exception
     {
         Map<String, Fruit> map = new HashMap<>();

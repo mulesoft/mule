@@ -13,20 +13,21 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.collection.IsArrayWithSize.arrayWithSize;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.LocatedMuleException.INFO_LOCATION_KEY;
-
 import org.mule.functional.functional.FlowAssert;
-import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.tck.junit4.rule.SystemProperty;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -41,9 +42,6 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
-
-import static org.hamcrest.collection.IsArrayWithSize.arrayWithSize;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 
 public class ForeachTestCase extends AbstractIntegrationTestCase
 {
@@ -88,7 +86,6 @@ public class ForeachTestCase extends AbstractIntegrationTestCase
     }
 
     @Test
-    @Ignore("ArtifactClassloaderTestRunner groovy error")
     public void defaultConfigurationPlusMP() throws Exception
     {
         final Collection<String> payload = new ArrayList<>();
@@ -266,7 +263,6 @@ public class ForeachTestCase extends AbstractIntegrationTestCase
     }
 
     @Test
-    @Ignore("ArtifactClassloaderTestRunner groovy error")
     public void jsonUpdate() throws Exception
     {
         String json = "{\"order\": {\"name\": \"Ellen\", \"email\": \"ellen@mail.com\", \"items\": [{\"key1\": \"value1\"}, {\"key2\": \"value2\"}] } }";
@@ -275,7 +271,6 @@ public class ForeachTestCase extends AbstractIntegrationTestCase
     }
 
     @Test
-    @Ignore("ArtifactClassloaderTestRunner groovy error")
     public void arrayPayload() throws Exception
     {
         String[] payload = {"uno", "dos", "tres"};

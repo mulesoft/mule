@@ -7,13 +7,12 @@
 package org.mule.test.integration.domain.classloader;
 
 import static org.junit.Assert.assertThat;
-
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleException;
 import org.mule.functional.listener.Callback;
 import org.mule.functional.listener.FlowExecutionListener;
 import org.mule.rule.UseMuleLog4jContextFactory;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.infrastructure.deployment.AbstractFakeMuleServerTestCase;
@@ -22,11 +21,9 @@ import org.mule.test.infrastructure.deployment.FakeMuleServer;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.hamcrest.core.Is;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
-@Ignore
 public class ConnectorLevelMessageDispatchingTestCase extends AbstractFakeMuleServerTestCase
 {
 
