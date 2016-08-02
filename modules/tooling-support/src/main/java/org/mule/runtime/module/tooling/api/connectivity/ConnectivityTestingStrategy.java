@@ -35,5 +35,5 @@ public interface ConnectivityTestingStrategy
      * @param connectivityTestingObject object over the one connectivity testing must be done
      * @return true if this strategy can do connectivity testing over the provided component, false otherwise.
      */
-    boolean supportsObject(Object connectivityTestingObject);
+    boolean accepts(Object connectivityTestingObject);
 }

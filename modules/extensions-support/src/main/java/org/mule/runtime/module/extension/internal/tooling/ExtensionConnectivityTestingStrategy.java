@@ -73,7 +73,7 @@ public class ExtensionConnectivityTestingStrategy implements ConnectivityTesting
      * @return true whenever there's a {@code ConfigurationProvider} in the configuration, false otherwise.
      */
     @Override
-    public boolean supportsObject(Object connectivityTestingObject)
+    public boolean accepts(Object connectivityTestingObject)
     {
         return connectivityTestingObject instanceof ConnectionProviderResolver;
     }

@@ -9,10 +9,12 @@ package org.mule.runtime.module.tooling.internal;
 import static org.mule.runtime.api.connection.ConnectionExceptionCode.UNKNOWN;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.util.Preconditions;
 import org.mule.runtime.module.tooling.api.artifact.TemporaryArtifact;
 import org.mule.runtime.module.tooling.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.module.tooling.api.connectivity.ConnectivityTestingStrategy;
@@ -47,6 +49,7 @@ public class DefaultConnectivityTestingService implements ConnectivityTestingSer
     @Override
     public ConnectionValidationResult testConnection(String identifier)
     {
+        checkArgument(identifier != null, "identifier cannot be null");
         if (!temporaryArtifact.isStarted())
         {
             try
@@ -74,7 +77,7 @@ public class DefaultConnectivityTestingService implements ConnectivityTestingSer
         Collection<ConnectivityTestingStrategy> connectivityTestingStrategies = temporaryArtifact.getMuleContext().getRegistry().lookupObjects(ConnectivityTestingStrategy.class);
         for (ConnectivityTestingStrategy connectivityTestingStrategy : connectivityTestingStrategies)
         {
-            if (connectivityTestingStrategy.supportsObject(connectivityTestingObject))
+            if (connectivityTestingStrategy.accepts(connectivityTestingObject))
             {
                 try
                 {

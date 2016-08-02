@@ -46,6 +46,12 @@ public class DefaultConnectivityTestingServiceTestCase extends AbstractMuleTestC
         connectivityTestingService = new DefaultConnectivityTestingService(mockTemporaryArtifact);
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void componentIdentifierMustBeNotNull() throws Exception
+    {
+        connectivityTestingService.testConnection(null);
+    }
+
     @Test
     public void initialisationExceptionDuringArtifactStartup() throws MuleException
     {
@@ -64,7 +70,7 @@ public class DefaultConnectivityTestingServiceTestCase extends AbstractMuleTestC
         doThrow(MuleRuntimeException.class).when(mockTemporaryArtifact).start();
 
         expectedException.expect(MuleRuntimeException.class);
-        connectivityTestingService.testConnection(null);
+        connectivityTestingService.testConnection(COMPONENT_IDENTIFIER);
     }
 
     @Test
