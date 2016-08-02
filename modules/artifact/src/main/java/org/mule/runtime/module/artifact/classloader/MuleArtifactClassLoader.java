@@ -89,6 +89,9 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
             }
         }
 
+        // Clean up references to shutdown listeners in order to avoid class loader leaks
+        shutdownListeners.clear();
+
         try
         {
             createResourceReleaserInstance().release();
