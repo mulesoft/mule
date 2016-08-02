@@ -69,6 +69,9 @@ public abstract class AbstractArtifactClassLoader extends FineGrainedControlClas
             }
         }
 
+        // Clean up references to shutdown listeners in order to avoid class loader leaks
+        shutdownListeners.clear();
+
         try
         {
             createResourceReleaserInstance().release();
