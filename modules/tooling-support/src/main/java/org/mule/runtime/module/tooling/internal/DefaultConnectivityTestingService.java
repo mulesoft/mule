@@ -16,7 +16,8 @@ import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.module.tooling.api.artifact.TemporaryArtifact;
 import org.mule.runtime.module.tooling.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.module.tooling.api.connectivity.ConnectivityTestingStrategy;
-import org.mule.runtime.module.tooling.api.connectivity.NoConnectivityTestingObjectFoundException;
+import org.mule.runtime.module.tooling.api.connectivity.ConnectivityTestingObjectNotFoundException;
+import org.mule.runtime.module.tooling.api.connectivity.UnsupportedConnectivityTestingObjectException;
 
 import java.util.Collection;
 
@@ -44,7 +45,7 @@ public class DefaultConnectivityTestingService implements ConnectivityTestingSer
      * @throws MuleRuntimeException
      */
     @Override
-    public ConnectionValidationResult testConnection()
+    public ConnectionValidationResult testConnection(String identifier)
     {
         if (!temporaryArtifact.isStarted())
         {
@@ -65,14 +66,19 @@ public class DefaultConnectivityTestingService implements ConnectivityTestingSer
                 throw new MuleRuntimeException(e);
             }
         }
+        Object connectivityTestingObject = temporaryArtifact.getMuleContext().getRegistry().get(identifier);
+        if (connectivityTestingObject == null)
+        {
+            throw new ConnectivityTestingObjectNotFoundException(createStaticMessage("It was not possible to find an object to do connectivity testing"));
+        }
         Collection<ConnectivityTestingStrategy> connectivityTestingStrategies = temporaryArtifact.getMuleContext().getRegistry().lookupObjects(ConnectivityTestingStrategy.class);
         for (ConnectivityTestingStrategy connectivityTestingStrategy : connectivityTestingStrategies)
         {
-            if (connectivityTestingStrategy.connectionTestingObjectIsPresent())
+            if (connectivityTestingStrategy.supportsObject(connectivityTestingObject))
             {
                 try
                 {
-                    return connectivityTestingStrategy.testConnectivity();
+                    return connectivityTestingStrategy.testConnectivity(connectivityTestingObject);
                 }
                 catch (Exception e)
                 {
@@ -80,6 +86,6 @@ public class DefaultConnectivityTestingService implements ConnectivityTestingSer
                 }
             }
         }
-        throw new NoConnectivityTestingObjectFoundException(createStaticMessage("It was not possible to find an object to do connectivity testing"));
+        throw new UnsupportedConnectivityTestingObjectException(createStaticMessage("Could not do connectivity testing over object of type " + connectivityTestingObject.getClass().getName()));
     }
 }

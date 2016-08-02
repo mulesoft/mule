@@ -337,11 +337,12 @@ class ComponentConfigurationBuilder
         public void onConfigurationParameter(String parameterName, Object defaultValue, Optional<TypeConverter> typeConverter)
         {
             Object parameterValue = simpleParameters.get(parameterName);
+            simpleParameters.remove(parameterName);
+            parameterValue = parameterValue != null ? parameterValue : defaultValue;
             if (parameterValue != null)
             {
-                parameterValue = typeConverter.isPresent() ? typeConverter.get().convert(parameterValue) : parameterValue;
+                parameterValue =  typeConverter.isPresent() ? typeConverter.get().convert(parameterValue) : parameterValue;
             }
-            simpleParameters.remove(parameterName);
             this.value = Optional.ofNullable(parameterValue).orElse(defaultValue);
         }
 

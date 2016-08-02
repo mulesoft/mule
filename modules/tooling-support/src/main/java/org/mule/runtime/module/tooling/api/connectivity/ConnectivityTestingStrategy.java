@@ -22,18 +22,18 @@ public interface ConnectivityTestingStrategy
 {
 
     /**
-     * Determines if this {@code ConnectivityTestingStrategy} must be applied over the mule configuration.
-     *
-     * @return true if this strategy can do connectivity testing over the components in the configuration, false otherwise.
-     * throws a {@link MultipleConnectivityTestingObjectsFoundException} when the strategy founds in the context more than one connectivity testing object.
-     */
-    boolean connectionTestingObjectIsPresent();
-
-    /**
-     * Does test connectivity over the mule configuration.
+     * Does test connectivity over the provided mule component.
      *
      * @return a {@code ConnectionValidationResult} describing the test connectivity result.
+     * @param connectivityTestingObject object over the one connectivity testing must be done
      */
-    ConnectionValidationResult testConnectivity();
+    ConnectionValidationResult testConnectivity(Object connectivityTestingObject);
 
+    /**
+     * Determines if this {@code ConnectivityTestingStrategy} must be applied over the provided object.
+     *
+     * @param connectivityTestingObject object over the one connectivity testing must be done
+     * @return true if this strategy can do connectivity testing over the provided component, false otherwise.
+     */
+    boolean supportsObject(Object connectivityTestingObject);
 }

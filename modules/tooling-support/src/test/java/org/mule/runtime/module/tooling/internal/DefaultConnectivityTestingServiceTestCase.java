@@ -19,8 +19,9 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.module.tooling.api.artifact.TemporaryArtifact;
+import org.mule.runtime.module.tooling.api.connectivity.ConnectivityTestingObjectNotFoundException;
 import org.mule.runtime.module.tooling.api.connectivity.ConnectivityTestingStrategy;
-import org.mule.runtime.module.tooling.api.connectivity.NoConnectivityTestingObjectFoundException;
+import org.mule.runtime.module.tooling.api.connectivity.UnsupportedConnectivityTestingObjectException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Before;
@@ -30,6 +31,8 @@ import org.junit.rules.ExpectedException;
 
 public class DefaultConnectivityTestingServiceTestCase extends AbstractMuleTestCase
 {
+
+    private static final String COMPONENT_IDENTIFIER = "anyComponent";
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
@@ -49,7 +52,7 @@ public class DefaultConnectivityTestingServiceTestCase extends AbstractMuleTestC
         when(mockTemporaryArtifact.isStarted()).thenReturn(false);
         doThrow(InitialisationException.class).when(mockTemporaryArtifact).start();
 
-        ConnectionValidationResult connectionResult = connectivityTestingService.testConnection();
+        ConnectionValidationResult connectionResult = connectivityTestingService.testConnection(null);
         assertThat(connectionResult.isValid(), is(false));
         assertThat(connectionResult.getException(), instanceOf(InitialisationException.class));
     }
@@ -61,17 +64,28 @@ public class DefaultConnectivityTestingServiceTestCase extends AbstractMuleTestC
         doThrow(MuleRuntimeException.class).when(mockTemporaryArtifact).start();
 
         expectedException.expect(MuleRuntimeException.class);
-        connectivityTestingService.testConnection();
+        connectivityTestingService.testConnection(null);
     }
 
     @Test
-    public void noConnectivityTestingObjectFound() throws MuleException
+    public void noConnectivityObjectFound() throws MuleException
     {
         when(mockTemporaryArtifact.isStarted()).thenReturn(true);
         when(mockTemporaryArtifact.getMuleContext().getRegistry().lookupObjects(ConnectivityTestingStrategy.class)).thenReturn(emptyList());
 
-        expectedException.expect(NoConnectivityTestingObjectFoundException.class);
-        connectivityTestingService.testConnection();
+        expectedException.expect(UnsupportedConnectivityTestingObjectException.class);
+        connectivityTestingService.testConnection(COMPONENT_IDENTIFIER);
+    }
+
+    @Test
+    public void connectivityTestingObjectNotFound() throws Exception
+    {
+        when(mockTemporaryArtifact.isStarted()).thenReturn(true);
+        when(mockTemporaryArtifact.getMuleContext().getRegistry().lookupObjects(ConnectivityTestingStrategy.class)).thenReturn(emptyList());
+        when(mockTemporaryArtifact.getMuleContext().getRegistry().get(COMPONENT_IDENTIFIER)).thenReturn(null);
+
+        expectedException.expect(ConnectivityTestingObjectNotFoundException.class);
+        connectivityTestingService.testConnection(COMPONENT_IDENTIFIER);
     }
 
 }

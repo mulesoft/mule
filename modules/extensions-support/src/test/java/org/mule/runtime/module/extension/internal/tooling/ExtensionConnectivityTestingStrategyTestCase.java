@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.tooling;
 
-import static java.util.Optional.of;
 import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
@@ -17,10 +17,8 @@ import static org.mockito.Mockito.when;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
-import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
-import org.mule.runtime.module.tooling.api.connectivity.MultipleConnectivityTestingObjectsFoundException;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderResolver;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Before;
@@ -36,9 +34,8 @@ public class ExtensionConnectivityTestingStrategyTestCase extends AbstractMuleTe
 
     private ExtensionConnectivityTestingStrategy extensionConnectivityTestingStrategy;
     private MuleContext mockMuleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS.get());
-    private ConfigurationProvider mockConfigurationProvider = mock(ConfigurationProvider.class, RETURNS_DEEP_STUBS.get());
+    private ConnectionProviderResolver mockConnectionProviderResolver = mock(ConnectionProviderResolver.class, RETURNS_DEEP_STUBS.get());
     private ConnectionValidationResult mockConnectionValidationResult = mock(ConnectionValidationResult.class, RETURNS_DEEP_STUBS.get());
-    private ConfigurationInstance mockConfigurationInstance = mock(ConfigurationInstance.class, RETURNS_DEEP_STUBS.get());
     private ConnectionProvider mockConnectionProvider = mock(ConnectionProvider.class, RETURNS_DEEP_STUBS.get());
 
 
@@ -50,43 +47,34 @@ public class ExtensionConnectivityTestingStrategyTestCase extends AbstractMuleTe
     }
 
     @Test
-    public void multipleConnectionProvidersInConfig() throws RegistrationException
-    {
-        when(mockMuleContext.getRegistry().lookupObject(ConfigurationProvider.class)).thenThrow(RegistrationException.class);
-        expectedException.expect(MultipleConnectivityTestingObjectsFoundException.class);
-        extensionConnectivityTestingStrategy.connectionTestingObjectIsPresent();
-    }
-
-    @Test
-    public void noConnectionProviderInConfig() throws RegistrationException
-    {
-        when(mockMuleContext.getRegistry().lookupObject(ConfigurationProvider.class)).thenReturn(null);
-        assertThat(extensionConnectivityTestingStrategy.connectionTestingObjectIsPresent(), is(false));
-    }
-
-    @Test
-    public void connectionProviderInConfigWithInvalidConnection() throws RegistrationException
+    public void connectionProviderInConfigWithInvalidConnection() throws MuleException
     {
         ConnectionValidationResult connectionResult = testConnectivityWithConnectionProvider(false);
         assertThat(connectionResult.isValid(), is(false));
     }
 
     @Test
-    public void connectionProviderInConfigWithValidConnection() throws RegistrationException
+    public void connectionProviderInConfigWithValidConnection() throws MuleException
     {
         ConnectionValidationResult connectionResult = testConnectivityWithConnectionProvider(true);
         assertThat(connectionResult.isValid(), is(true));
     }
 
-    private ConnectionValidationResult testConnectivityWithConnectionProvider(boolean isValidConnection) throws RegistrationException
+    @Test
+    public void connectionProviderThrowsExceprtion() throws MuleException
     {
-        when(mockMuleContext.getRegistry().lookupObject(ConfigurationProvider.class)).thenReturn(mockConfigurationProvider);
-        assertThat(extensionConnectivityTestingStrategy.connectionTestingObjectIsPresent(), is(true));
-        when(mockConfigurationProvider.get(null)).thenReturn(mockConfigurationInstance);
-        when(mockConfigurationInstance.getConnectionProvider()).thenReturn(of(mockConnectionProvider));
+        when(mockConnectionProviderResolver.resolve(any())).thenThrow(mock(RuntimeException.class));
+        ConnectionValidationResult connectionResult = extensionConnectivityTestingStrategy.testConnectivity(mockConnectionProviderResolver);
+        assertThat(connectionResult.isValid(), is(false));
+        assertThat(connectionResult.getException(), instanceOf(RuntimeException.class));
+    }
+
+    private ConnectionValidationResult testConnectivityWithConnectionProvider(boolean isValidConnection) throws MuleException
+    {
+        when(mockConnectionProviderResolver.resolve(any())).thenReturn(mockConnectionProvider);
         when(mockConnectionProvider.validate(any())).thenReturn(mockConnectionValidationResult);
         when(mockConnectionValidationResult.isValid()).thenReturn(isValidConnection);
-        ConnectionValidationResult connectionResult = extensionConnectivityTestingStrategy.testConnectivity();
+        ConnectionValidationResult connectionResult = extensionConnectivityTestingStrategy.testConnectivity(mockConnectionProviderResolver);
         return connectionResult;
     }
 

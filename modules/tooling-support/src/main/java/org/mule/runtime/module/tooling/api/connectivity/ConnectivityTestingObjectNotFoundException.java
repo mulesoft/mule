@@ -7,22 +7,21 @@
 package org.mule.runtime.module.tooling.api.connectivity;
 
 import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.config.i18n.Message;
 
 /**
- * Exception type that represents a failure due to multiple connectivity testing objects
- * present in the mule configuration.
+ * Exception type for representing a failure due to connectivity object not found.
  *
  * @since 4.0
  */
-public class MultipleConnectivityTestingObjectsFoundException extends MuleRuntimeException
+public class ConnectivityTestingObjectNotFoundException extends MuleRuntimeException
 {
 
     /**
      * {@inheritDoc}
      */
-    public MultipleConnectivityTestingObjectsFoundException(Throwable cause)
+    public ConnectivityTestingObjectNotFoundException(Message message)
     {
-        super(cause);
+        super(message);
     }
-
 }

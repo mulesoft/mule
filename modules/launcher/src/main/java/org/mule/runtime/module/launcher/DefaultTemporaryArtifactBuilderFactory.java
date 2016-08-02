@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
  *
  * @since 4.0
  */
-public class TemporaryTemporaryArtifactBuilderFactory implements TemporaryArtifactBuilderFactory
+public class DefaultTemporaryArtifactBuilderFactory implements TemporaryArtifactBuilderFactory
 {
 
     private final MuleArtifactResourcesRegistry muleArtifactResourcesRegistry;
@@ -49,7 +49,7 @@ public class TemporaryTemporaryArtifactBuilderFactory implements TemporaryArtifa
      *
      * @param muleArtifactResourcesRegistry registry of mule artifact resources
      */
-    public TemporaryTemporaryArtifactBuilderFactory(MuleArtifactResourcesRegistry muleArtifactResourcesRegistry)
+    public DefaultTemporaryArtifactBuilderFactory(MuleArtifactResourcesRegistry muleArtifactResourcesRegistry)
     {
         this.muleArtifactResourcesRegistry = muleArtifactResourcesRegistry;
     }

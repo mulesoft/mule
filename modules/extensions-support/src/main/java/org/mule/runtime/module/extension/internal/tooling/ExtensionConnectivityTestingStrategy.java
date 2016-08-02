@@ -7,14 +7,13 @@
 package org.mule.runtime.module.extension.internal.tooling;
 
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
 import org.mule.runtime.api.connection.ConnectionExceptionCode;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderResolver;
 import org.mule.runtime.module.tooling.api.connectivity.ConnectivityTestingStrategy;
-import org.mule.runtime.module.tooling.api.connectivity.MultipleConnectivityTestingObjectsFoundException;
 
 import javax.inject.Inject;
 
@@ -56,11 +55,11 @@ public class ExtensionConnectivityTestingStrategy implements ConnectivityTesting
      * {@inheritDoc}
      */
     @Override
-    public ConnectionValidationResult testConnectivity()
+    public ConnectionValidationResult testConnectivity(Object connectivityTestingObject)
     {
         try
         {
-            ConnectionProvider connectionProvider = (ConnectionProvider) muleContext.getRegistry().lookupObject(ConfigurationProvider.class).get(null).getConnectionProvider().get();
+            ConnectionProvider connectionProvider = ((ConnectionProviderResolver) connectivityTestingObject).resolve(getInitialiserEvent(muleContext));
             Object connection = connectionProvider.connect();
             return connectionProvider.validate(connection);
         }
@@ -72,24 +71,11 @@ public class ExtensionConnectivityTestingStrategy implements ConnectivityTesting
 
     /**
      * @return true whenever there's a {@code ConfigurationProvider} in the configuration, false otherwise.
-     * @throws MultipleConnectivityTestingObjectsFoundException when there's more than one {@code ConfigurationProvider} in the configuration
      */
     @Override
-    public boolean connectionTestingObjectIsPresent()
+    public boolean supportsObject(Object connectivityTestingObject)
     {
-        return lookupConnectionTestingObject() != null;
-    }
-
-    private ConfigurationProvider lookupConnectionTestingObject()
-    {
-        try
-        {
-            return muleContext.getRegistry().lookupObject(ConfigurationProvider.class);
-        }
-        catch (RegistrationException e)
-        {
-            throw new MultipleConnectivityTestingObjectsFoundException(e);
-        }
+        return connectivityTestingObject instanceof ConnectionProviderResolver;
     }
 
 }
