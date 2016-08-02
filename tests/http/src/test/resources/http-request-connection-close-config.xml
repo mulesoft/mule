@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+  ~ The software in this package is published under the terms of the CPAL v1.0
+  ~ license, a copy of which has been included with this distribution in the
+  ~ LICENSE.txt file.
+  -->
+
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd
+               http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd">
+
+    <httpn:request-config name="httpsConfig">
+        <httpn:request-connection protocol="HTTPS" host="localhost" port="${httpsPort}">
+            <tls:context>
+                <tls:trust-store path="tls/trustStore" password="mulepassword"/>
+                <tls:key-store path="tls/clientKeystore" keyPassword="mulepassword" password="mulepassword"/>
+            </tls:context>
+        </httpn:request-connection>
+    </httpn:request-config>
+
+    <flow name="testFlowHttps">
+        <httpn:request path="testPath" config-ref="httpsConfig" key="ANY"/>
+    </flow>
+
+</mule>
