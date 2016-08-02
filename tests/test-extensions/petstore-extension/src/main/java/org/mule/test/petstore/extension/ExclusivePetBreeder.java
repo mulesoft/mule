@@ -6,15 +6,18 @@
  */
 package org.mule.test.petstore.extension;
 
-import org.mule.runtime.extension.api.annotation.Exclusion;
+import org.mule.runtime.extension.api.annotation.ExclusiveOptionals;
 import org.mule.runtime.extension.api.annotation.Parameter;
+import org.mule.runtime.extension.api.annotation.param.Optional;
 
-@Exclusion(oneRequired = true)
+@ExclusiveOptionals(oneRequired = true)
 public class ExclusivePetBreeder
 {
+    @Optional
     @Parameter
-    String mammals;
+    private String mammals;
 
+    @Optional
     @Parameter
-    String birds;
+    private String birds;
 }

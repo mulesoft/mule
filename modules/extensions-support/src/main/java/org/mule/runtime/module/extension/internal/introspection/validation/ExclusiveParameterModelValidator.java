@@ -12,21 +12,19 @@ import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.SimpleType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
-import org.mule.runtime.extension.api.ExtensionWalker;
-import org.mule.runtime.extension.api.annotation.Exclusion;
+import org.mule.runtime.extension.api.annotation.ExclusiveOptionals;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.introspection.EnrichableModel;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.config.ConfigurationModel;
 import org.mule.runtime.extension.api.introspection.connection.ConnectionProviderModel;
-import org.mule.runtime.extension.api.introspection.connection.HasConnectionProviderModels;
 import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
-import org.mule.runtime.extension.api.introspection.operation.HasOperationModels;
 import org.mule.runtime.extension.api.introspection.operation.OperationModel;
-import org.mule.runtime.extension.api.introspection.source.HasSourceModels;
 import org.mule.runtime.extension.api.introspection.source.SourceModel;
+import org.mule.runtime.module.extension.internal.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.module.extension.internal.introspection.ParameterGroup;
 import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
+import org.mule.runtime.module.extension.internal.util.IdempotentExtensionWalker;
 
 import java.util.Optional;
 
@@ -53,30 +51,30 @@ public final class ExclusiveParameterModelValidator implements ModelValidator
     @Override
     public void validate(ExtensionModel model) throws IllegalModelDefinitionException
     {
-        new ExtensionWalker()
+        new IdempotentExtensionWalker()
         {
             @Override
-            public void onOperation(HasOperationModels owner, OperationModel model)
+            protected void onOperation(OperationModel model)
             {
-                validateExclusiveParameterGroups(model, OPERATION);
+                validateExclusiveParameterGroups(model, OPERATION, model.getName());
             }
 
             @Override
             public void onConfiguration(ConfigurationModel model)
             {
-                validateExclusiveParameterGroups(model, CONFIG);
+                validateExclusiveParameterGroups(model, CONFIG, model.getName());
             }
 
             @Override
-            public void onConnectionProvider(HasConnectionProviderModels owner, ConnectionProviderModel model)
+            protected void onConnectionProvider(ConnectionProviderModel model)
             {
-                validateExclusiveParameterGroups(model, PROVIDER);
+                validateExclusiveParameterGroups(model, PROVIDER, model.getName());
             }
 
             @Override
-            public void onSource(HasSourceModels owner, SourceModel model)
+            protected void onSource(SourceModel model)
             {
-                validateExclusiveParameterGroups(model, SOURCE);
+                validateExclusiveParameterGroups(model, SOURCE, model.getName());
             }
         }.walk(model);
     }
@@ -85,37 +83,43 @@ public final class ExclusiveParameterModelValidator implements ModelValidator
      * @param model         to be validated
      * @param componentName of the model
      * @throws IllegalModelDefinitionException if there is a nested {@link ParameterGroup} or
-     * the parameter {@link MetadataType} is not a {@link SimpleType}
+     *                                         the parameter {@link MetadataType} is not a {@link SimpleType}
      */
-    private void validateExclusiveParameterGroups(EnrichableModel model, String componentName) throws IllegalModelDefinitionException
+    private void validateExclusiveParameterGroups(EnrichableModel model, String component, String componentName) throws IllegalModelDefinitionException
     {
 
-        Optional<ParameterGroupModelProperty> parameterGroupModelProperty = model.getModelProperty(ParameterGroupModelProperty.class);
-        if (parameterGroupModelProperty.isPresent() && parameterGroupModelProperty.get().hasExclusion())
-        {
-            for (ParameterGroup pg : parameterGroupModelProperty.get().getGroups())
+        model.getModelProperty(ParameterGroupModelProperty.class).filter(mp -> mp.hasExclusion()).ifPresent(property -> {
+            for (ParameterGroup pg : property.getGroups())
             {
                 Optional<ParameterGroupModelProperty> nestedParameterGroup = pg.getModelProperty(ParameterGroupModelProperty.class);
                 if (nestedParameterGroup.isPresent())
                 {
                     throw new IllegalModelDefinitionException(format("Parameter group of class '%s' is annotated with '%s' so it cannot contain any nested parameter group on its inside.",
-                                                                     pg.getType().getName(), Exclusion.class.getName(), componentName));
+                                                                     pg.getType().getName(), ExclusiveOptionals.class.getName(), componentName));
                 }
 
-                pg.getParameters().stream().forEach(f -> getFieldMetadataType(f, typeLoader).accept(new MetadataTypeVisitor()
+                long optionalParametersCount = pg.getParameters().stream().filter(p -> p.getAnnotation(org.mule.runtime.extension.api.annotation.param.Optional.class) != null).count();
+                if (optionalParametersCount <= 1)
                 {
-                    @Override
-                    protected void defaultVisit(MetadataType metadataType)
-                    {
-                        throw new IllegalModelDefinitionException(format("Parameter group of class '%s' using exclusion cannot contain any complex type inside but '%s' was found", pg.getType().getName(), f.getType().getName()));
-                    }
+                    throw new IllegalParameterModelDefinitionException(format("In %s '%s', parameter group '%s' should contain more than one field marked as optional inside but %d was/were found", component, componentName, pg.getType().getName(), optionalParametersCount));
+                }
 
-                    @Override
-                    public void visitSimpleType(SimpleType simpleType)
-                    {
-                    }
-                }));
+                pg.getParameters().stream()
+                        .filter(p -> p.getAnnotation(org.mule.runtime.extension.api.annotation.param.Optional.class) != null)
+                        .forEach(f -> getFieldMetadataType(f, typeLoader).accept(new MetadataTypeVisitor()
+                        {
+                            @Override
+                            protected void defaultVisit(MetadataType metadataType)
+                            {
+                                throw new IllegalModelDefinitionException(format("In %s '%s', parameter group '%s' uses exclusion and cannot contain any complex field inside but '%s' was found", component, componentName, pg.getType().getName(), f.getType().getName()));
+                            }
+
+                            @Override
+                            public void visitSimpleType(SimpleType simpleType)
+                            {
+                            }
+                        }));
             }
-        }
+        });
     }
 }

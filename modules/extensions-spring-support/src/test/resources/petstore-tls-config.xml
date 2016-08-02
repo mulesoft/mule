@@ -12,7 +12,7 @@
         <tls:key-store path="ssltest-keystore.jks" keyPassword="changeit" password="changeit"/>
     </tls:context>
 
-    <petstore:config name="globalTls" tlsContext="globalTlsContext">
+    <petstore:config name="globalTls" tlsContext="globalTlsContext" cashierName="jim">
         <petstore:connection username="john" password="doe" />
         <petstore:pets>
             <petstore:pet value="Lassie" />
@@ -21,7 +21,7 @@
         </petstore:pets>
     </petstore:config>
 
-    <petstore:config name="inlineTls">
+    <petstore:config name="inlineTls" cashierName="jim">
         <petstore:connection username="john" password="doe" />
         <tls:context>
             <tls:trust-store path="ssltest-cacerts.jks" password="changeit"/>

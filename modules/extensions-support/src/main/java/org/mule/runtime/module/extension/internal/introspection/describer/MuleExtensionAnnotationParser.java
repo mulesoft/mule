@@ -14,7 +14,6 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMethodArgumentTypes;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isParameterContainer;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getDefaultValue;
-
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.message.MuleMessage;
@@ -36,6 +35,7 @@ import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Text;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.BaseDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.HasModelProperties;
+import org.mule.runtime.extension.api.introspection.declaration.fluent.OperationDeclarer;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ParameterDeclarer;
 import org.mule.runtime.extension.api.introspection.property.LayoutModelProperty;
 import org.mule.runtime.extension.api.introspection.property.LayoutModelPropertyBuilder;
@@ -44,6 +44,7 @@ import org.mule.runtime.extension.api.introspection.property.MetadataKeyPartMode
 import org.mule.runtime.module.extension.internal.model.property.ConfigTypeModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ConnectivityModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.DeclaringMemberModelProperty;
+import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 
 import com.google.common.collect.ImmutableList;
@@ -96,7 +97,7 @@ public final class MuleExtensionAnnotationParser
         return extension;
     }
 
-    static List<ParsedParameter> parseParameters(Method method, ClassTypeLoader typeLoader)
+    static List<ParsedParameter> parseParameters(Method method, ClassTypeLoader typeLoader, OperationDeclarer operation)
     {
         List<String> paramNames = getParamNames(method);
 
@@ -109,12 +110,13 @@ public final class MuleExtensionAnnotationParser
         Annotation[][] parameterAnnotations = method.getParameterAnnotations();
 
         List<ParsedParameter> parsedParameters = new LinkedList<>();
+        List<org.mule.runtime.module.extension.internal.introspection.ParameterGroup> groups = new LinkedList<>();
         for (int i = 0; i < paramNames.size(); i++)
         {
             Map<Class<? extends Annotation>, Annotation> annotations = toMap(parameterAnnotations[i]);
             if (isParameterContainer(annotations.keySet(), parameterTypes[i]))
             {
-                parseGroupParameters(parameterTypes[i], parsedParameters, typeLoader);
+                groups.add(parseGroupParameters(parameterTypes[i], parsedParameters, typeLoader));
             }
             else
             {
@@ -122,6 +124,11 @@ public final class MuleExtensionAnnotationParser
                 parsedParameter.setImplementingParameter(method.getParameters()[i]);
                 parsedParameters.add(parsedParameter);
             }
+        }
+
+        if (!groups.isEmpty())
+        {
+            operation.withModelProperty(new ParameterGroupModelProperty(groups));
         }
 
         return parsedParameters;
@@ -151,24 +158,36 @@ public final class MuleExtensionAnnotationParser
         return annotationDeclarations;
     }
 
-    private static void parseGroupParameters(MetadataType parameterType, List<ParsedParameter> parsedParameters, ClassTypeLoader typeLoader)
+    private static org.mule.runtime.module.extension.internal.introspection.ParameterGroup parseGroupParameters(MetadataType parameterType, List<ParsedParameter> parsedParameters, ClassTypeLoader typeLoader)
     {
+        org.mule.runtime.module.extension.internal.introspection.ParameterGroup group = new org.mule.runtime.module.extension.internal.introspection.ParameterGroup(getType(parameterType, typeLoader.getClassLoader()));
+        List<org.mule.runtime.module.extension.internal.introspection.ParameterGroup> childGroups = new LinkedList<>();
+
         stream(getType(parameterType).getDeclaredFields())
                 .filter(MuleExtensionAnnotationParser::isParameterOrParameterContainer)
                 .forEach(field ->
                          {
+                             group.addParameter(field);
+
                              final Map<Class<? extends Annotation>, Annotation> annotations = toMap(field.getAnnotations());
                              final MetadataType fieldType = typeLoader.load(field.getType());
 
                              if (isParameterContainer(annotations.keySet(), fieldType))
                              {
-                                 parseGroupParameters(getFieldMetadataType(field, typeLoader), parsedParameters, typeLoader);
+                                 childGroups.add(parseGroupParameters(getFieldMetadataType(field, typeLoader), parsedParameters, typeLoader));
                              }
                              else
                              {
                                  parsedParameters.add(doParseParameter(field.getName(), fieldType, annotations, typeLoader.getClassLoader()));
                              }
                          });
+
+        if (!childGroups.isEmpty())
+        {
+            group.addModelProperty(new ParameterGroupModelProperty(childGroups));
+        }
+
+        return group;
     }
 
     private static boolean isParameterOrParameterContainer(Field paramField)

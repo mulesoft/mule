@@ -24,7 +24,6 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -32,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.StringJoiner;
 
 /**
  * Base class for {@link ObjectFactory} implementation which create
@@ -68,11 +68,11 @@ public abstract class AbstractExtensionObjectFactory<T> implements ObjectFactory
      * @return a {@link ResolverSet}
      * @throws {@link ConfigurationException} if the exclusiveness condition between parameters is not honored
      */
-    protected ResolverSet getParametersAsResolverSet(EnrichableModel model) throws ConfigurationException
+    protected ResolverSet getParametersAsResolverSet(EnrichableModel model, String component, String componentName) throws ConfigurationException
     {
         ResolverSet resolverSet = new ResolverSet();
         getParameters().forEach((key, value) -> resolverSet.add(key, toValueResolver(value)));
-        checkParameterGroupExclusivenessForModel(model, getParameters().keySet());
+        checkParameterGroupExclusivenessForModel(model, component, componentName, getParameters().keySet());
         return resolverSet;
     }
 
@@ -147,32 +147,35 @@ public abstract class AbstractExtensionObjectFactory<T> implements ObjectFactory
         return key.replaceAll(CHILD_ELEMENT_KEY_PREFIX, "").replaceAll(CHILD_ELEMENT_KEY_SUFFIX, "");
     }
 
-    private void checkParameterGroupExclusivenessForModel(EnrichableModel model, Set<String> resolverKeys) throws ConfigurationException
+    private void checkParameterGroupExclusivenessForModel(EnrichableModel model, String component, String componentName, Set<String> resolverKeys) throws ConfigurationException
     {
         Optional<ParameterGroupModelProperty> parameterGroupModelProperty = model.getModelProperty(ParameterGroupModelProperty.class);
         if (parameterGroupModelProperty.isPresent() && parameterGroupModelProperty.get().hasExclusion())
         {
-            checkParameterGroupExclusiveness(parameterGroupModelProperty.get(), resolverKeys);
+            checkParameterGroupExclusiveness(parameterGroupModelProperty.get(), component, componentName, resolverKeys);
         }
     }
 
-    private void checkParameterGroupExclusiveness(ParameterGroupModelProperty parameterGroupModelProperty, Set<String> resolverKeys) throws ConfigurationException
+    private void checkParameterGroupExclusiveness(ParameterGroupModelProperty parameterGroupModelProperty, String component, String componentName, Set<String> resolverKeys) throws ConfigurationException
     {
         for (ParameterGroup group : parameterGroupModelProperty.getGroups())
         {
             Set<String> parametersFromGroup = group.getParameters().stream()
+                    .filter(p -> p.getAnnotation(org.mule.runtime.extension.api.annotation.param.Optional.class) != null)
                     .map(p -> p.getName())
                     .filter(name -> resolverKeys.contains(name))
                     .collect(toSet());
 
             if (parametersFromGroup.size() > 1)
             {
-                throw new ConfigurationException(createStaticMessage(format("Only one of the following parameters [%s] from class '%s' can be present due to its exclusive relation", Arrays.toString(parametersFromGroup.toArray()), group.getType().getName())));
+                StringJoiner joiner = new StringJoiner(", ");
+                parametersFromGroup.stream().forEach(p -> joiner.add(p));
+                throw new ConfigurationException(createStaticMessage(format("In %s '%s', parameter group '%s' has been set with the following parameters [%s] but only one should be set at any time due to its exclusive relation", component, componentName, group.getType().getName(), joiner.toString())));
             }
 
             if (group.oneRequired() && parametersFromGroup.isEmpty())
             {
-                throw new ConfigurationException((createStaticMessage(format("Parameter group class '%s' requires that at least one of its parameter should be present but all of them are missing", group.getType().getName()))));
+                throw new ConfigurationException((createStaticMessage(format("Parameter group '%s' requires that one of its optional parameters should be set but all of them are missing", group.getType().getName()))));
             }
         }
     }

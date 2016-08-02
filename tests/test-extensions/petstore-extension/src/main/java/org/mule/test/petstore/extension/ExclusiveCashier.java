@@ -6,18 +6,22 @@
  */
 package org.mule.test.petstore.extension;
 
-import org.mule.runtime.extension.api.annotation.Exclusion;
+import org.mule.runtime.extension.api.annotation.ExclusiveOptionals;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 
-@Exclusion
+@ExclusiveOptionals
 public class ExclusiveCashier
 {
-    // @Optional not added intentionally to test the enforcement of optionality inside an @Exclusion class
+
     @Parameter
-    String rothIRA;
+    private String cashierName;
 
     @Parameter
     @Optional
-    String pensionPlan;
+    private String rothIRA;
+
+    @Parameter
+    @Optional
+    private String pensionPlan;
 }

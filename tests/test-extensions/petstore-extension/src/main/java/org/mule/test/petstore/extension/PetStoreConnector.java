@@ -43,7 +43,7 @@ public class PetStoreConnector
     private PetCage cage;
 
     @ParameterGroup
-    ExclusiveCashier cashier;
+    private ExclusiveCashier cashier;
 
     public List<String> getPets()
     {

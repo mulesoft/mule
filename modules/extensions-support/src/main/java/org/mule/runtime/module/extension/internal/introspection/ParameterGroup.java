@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.introspection;
 
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotation;
-import org.mule.runtime.extension.api.annotation.Exclusion;
+import org.mule.runtime.extension.api.annotation.ExclusiveOptionals;
 import org.mule.runtime.extension.api.introspection.EnrichableModel;
 import org.mule.runtime.extension.api.introspection.ModelProperty;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclaration;
@@ -48,10 +48,10 @@ public class ParameterGroup implements EnrichableModel
     private final Class<?> type;
 
     /**
-     * The {@link Field} in which the generated value of
-     * {@link #type} is to be assigned
+     * The {@link Field} in which the generated value of {@link #type} is to be assigned.
+     * If the {@link ParameterGroup} is used as an argument of an operation this fill will be {@link Optional#empty()}
      */
-    private final Field field;
+    private final Optional<Field> field;
 
     /**
      * A {@link Map} in which the keys are parameter names
@@ -71,8 +71,15 @@ public class ParameterGroup implements EnrichableModel
         checkArgument(field != null, "field cannot be null");
 
         this.type = type;
-        this.field = field;
         field.setAccessible(true);
+        this.field = Optional.of(field);
+    }
+
+    public ParameterGroup(Class<?> type)
+    {
+        checkArgument(type != null, "type cannot be null");
+        this.type = type;
+        this.field = Optional.empty();
     }
 
     /**
@@ -92,7 +99,7 @@ public class ParameterGroup implements EnrichableModel
         return type;
     }
 
-    public Field getField()
+    public Optional<Field> getField()
     {
         return field;
     }
@@ -127,19 +134,19 @@ public class ParameterGroup implements EnrichableModel
     }
 
     /**
-     * Whether the class is annotated with {@link Exclusion} or not
+     * Whether the class is annotated with {@link ExclusiveOptionals} or not
      */
     public boolean hasExclusiveParameters()
     {
-        return getAnnotation(type, Exclusion.class) != null;
+        return getAnnotation(type, ExclusiveOptionals.class) != null;
     }
 
     /**
-     * Whether the class is annotated with {@link Exclusion} and {@link Exclusion#atLeastOneIsRequired()} is set
+     * Whether the class is annotated with {@link ExclusiveOptionals} and {@link ExclusiveOptionals#oneRequired()} is set
      */
     public boolean oneRequired()
     {
-        Exclusion annotation = getAnnotation(type, Exclusion.class);
+        ExclusiveOptionals annotation = getAnnotation(type, ExclusiveOptionals.class);
         return annotation != null ? annotation.oneRequired() : false;
     }
 

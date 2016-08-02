@@ -27,7 +27,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
  */
 public class OperationMessageProcessorObjectFactory extends AbstractExtensionObjectFactory<OperationMessageProcessor>
 {
-
+    private static final String COMPONENT = "operation";
     private final RuntimeExtensionModel extensionModel;
     private final RuntimeOperationModel operationModel;
     private final MuleContext muleContext;
@@ -49,7 +49,7 @@ public class OperationMessageProcessorObjectFactory extends AbstractExtensionObj
         {
             try
             {
-                ResolverSet resolverSet = getParametersAsResolverSet(operationModel);
+                ResolverSet resolverSet = getParametersAsResolverSet(operationModel, COMPONENT, operationModel.getName());
                 OperationMessageProcessor processor = createMessageProcessor(resolverSet);
 
                 //TODO: MULE-5002 this should not be necessary but lifecycle issues when injecting message processors automatically

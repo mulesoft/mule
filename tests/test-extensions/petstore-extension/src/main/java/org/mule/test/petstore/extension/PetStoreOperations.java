@@ -8,6 +8,7 @@ package org.mule.test.petstore.extension;
 
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.util.concurrent.Latch;
+import org.mule.runtime.extension.api.annotation.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 
@@ -25,6 +26,11 @@ public class PetStoreOperations
     public PetStoreClient getClient(@Connection PetStoreClient client)
     {
         return client;
+    }
+
+    public ExclusivePetBreeder getBreeder(@ParameterGroup ExclusivePetBreeder breeder)
+    {
+        return breeder;
     }
 
     public PetStoreClient getClientOnLatch(@Connection PetStoreClient client, MuleEvent event) throws Exception

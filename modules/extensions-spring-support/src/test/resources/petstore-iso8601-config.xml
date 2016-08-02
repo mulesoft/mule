@@ -5,23 +5,23 @@
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/petstore http://www.mulesoft.org/schema/mule/petstore/current/mule-petstore.xsd">
 
-    <petstore:config name="petstoreWithTimeZone">
+    <petstore:config name="petstoreWithTimeZone" cashierName="jim">
         <petstore:connection username="john" password="doe" openingDate="2008-09-15T15:53:23+05:00"/>
     </petstore:config>
 
-    <petstore:config name="petstoreWithDateTime">
+    <petstore:config name="petstoreWithDateTime" cashierName="jim">
         <petstore:connection username="john" password="doe" openingDate="2008-09-15T15:53:23"/>
     </petstore:config>
 
-    <petstore:config name="petstoreWithDate">
+    <petstore:config name="petstoreWithDate" cashierName="jim">
         <petstore:connection username="john" password="doe" openingDate="2008-09-15"/>
     </petstore:config>
 
-    <petstore:config name="petstoreWithTimeZoneNoSeconds">
+    <petstore:config name="petstoreWithTimeZoneNoSeconds" cashierName="jim">
         <petstore:connection username="john" password="doe" openingDate="2008-09-15T15:53+05:00"/>
     </petstore:config>
 
-    <petstore:config name="petstoreWithTimeZoneNoMinutes">
+    <petstore:config name="petstoreWithTimeZoneNoMinutes" cashierName="jim">
         <petstore:connection username="john" password="doe" openingDate="2008-09-15T15+05:00"/>
     </petstore:config>
 
