@@ -9,11 +9,14 @@ package org.mule.runtime.module.launcher.artifact;
 import static org.mule.runtime.core.api.config.MuleProperties.APP_HOME_DIRECTORY_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.APP_NAME_PROPERTY;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
+import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.util.Preconditions.checkState;
 import static org.mule.runtime.core.util.UUID.getUUID;
 import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
+import org.mule.runtime.config.spring.dsl.api.config.ArtifactConfiguration;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
@@ -53,6 +56,7 @@ public class ArtifactMuleContextBuilder
     private List<ArtifactPlugin> artifactPlugins = new ArrayList<>();
     private ArtifactType artifactType = APP;
     private String[] configurationFiles = new String[0];
+    private ArtifactConfiguration artifactConfiguration;
     private Map<String, String> artifactProperties = new HashMap<>();
     private String artifactName = getUUID();
     private MuleContextBuilder muleContextBuilder;
@@ -86,6 +90,16 @@ public class ArtifactMuleContextBuilder
     public ArtifactMuleContextBuilder setConfigurationFiles(String... configurationFiles)
     {
         this.configurationFiles = configurationFiles;
+        return this;
+    }
+
+    /**
+     * @param artifactConfiguration
+     * @return
+     */
+    public ArtifactMuleContextBuilder setArtifactConfiguration(ArtifactConfiguration artifactConfiguration)
+    {
+        this.artifactConfiguration = artifactConfiguration;
         return this;
     }
 
@@ -211,42 +225,61 @@ public class ArtifactMuleContextBuilder
     /**
      * @return the {@code MuleContext} created with the provided configuration
      * @throws ConfigurationException when there's a problem creating the {@code MuleContext}
+     * @throws InitialisationException when a certain configuration component failed during initialisation phase
      */
-    public MuleContext build() throws ConfigurationException
+    public MuleContext build() throws InitialisationException, ConfigurationException
     {
         checkState(executionClassLoader != null, EXECUTION_CLASSLOADER_WAS_NOT_SET);
         checkState(APP.equals(artifactType) || parentContext == null, ONLY_APPLICATIONS_ARE_ALLOWED_TO_HAVE_A_PARENT_CONTEXT);
-        List<ConfigurationBuilder> builders = new LinkedList<>();
-        builders.add(new ApplicationExtensionsManagerConfigurationBuilder(artifactPlugins));
-        builders.add(createConfigurationBuilderFromApplicationProperties());
-        SpringXmlConfigurationBuilder mainBuilder = new SpringXmlConfigurationBuilder(configurationFiles, artifactProperties, artifactType);
-        mainBuilder.addServiceConfigurator(new ContainerServicesMuleContextConfigurator(serviceRepository));
-        if (parentContext != null)
-        {
-            mainBuilder.setParentContext(parentContext);
-        }
-        builders.add(mainBuilder);
-        DefaultMuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
-        if (muleContextListener != null)
-        {
-            muleContextFactory.addListener(muleContextListener);
-        }
-        if (APP.equals(artifactType))
-        {
-            muleContextBuilder = new ApplicationMuleContextBuilder(artifactName, artifactProperties, defaultEncoding);
-        }
-        else
-        {
-            muleContextBuilder = new DomainMuleContextBuilder(artifactName);
-        }
-        muleContextBuilder.setExecutionClassLoader(this.executionClassLoader);
         try
         {
-            return muleContextFactory.createMuleContext(builders, muleContextBuilder);
+            return withContextClassLoader(executionClassLoader, () -> {
+                List<ConfigurationBuilder> builders = new LinkedList<>();
+                builders.add(new ApplicationExtensionsManagerConfigurationBuilder(artifactPlugins));
+                builders.add(createConfigurationBuilderFromApplicationProperties());
+                SpringXmlConfigurationBuilder mainBuilder = new SpringXmlConfigurationBuilder(configurationFiles, artifactConfiguration, artifactProperties, artifactType);
+                mainBuilder.addServiceConfigurator(new ContainerServicesMuleContextConfigurator(serviceRepository));
+                if (parentContext != null)
+                {
+                    mainBuilder.setParentContext(parentContext);
+                }
+                builders.add(mainBuilder);
+                DefaultMuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
+                if (muleContextListener != null)
+                {
+                    muleContextFactory.addListener(muleContextListener);
+                }
+                if (APP.equals(artifactType))
+                {
+                    muleContextBuilder = new ApplicationMuleContextBuilder(artifactName, artifactProperties, defaultEncoding);
+                }
+                else
+                {
+                    muleContextBuilder = new DomainMuleContextBuilder(artifactName);
+                }
+                muleContextBuilder.setExecutionClassLoader(this.executionClassLoader);
+                try
+                {
+                    return muleContextFactory.createMuleContext(builders, muleContextBuilder);
+                }
+                catch (InitialisationException e)
+                {
+                    throw new ConfigurationException(e);
+                }
+            });
         }
-        catch (InitialisationException e)
+        catch (MuleRuntimeException e)
         {
-            throw new ConfigurationException(e);
+            //We need this exception to be thrown as they are since the are possible causes of connectivity errors
+            if (e.getCause() instanceof InitialisationException)
+            {
+                throw (InitialisationException) e.getCause();
+            }
+            if (e.getCause() instanceof ConfigurationException)
+            {
+                throw (ConfigurationException) e.getCause();
+            }
+            throw e;
         }
     }
 

@@ -77,6 +77,6 @@ public class DefaultRepositoryService implements RepositoryService
 
     private DefaultArtifact toArtifact(BundleDescriptor bundleDescriptor)
     {
-        return new DefaultArtifact(bundleDescriptor.getGroupId(), bundleDescriptor.getArtifactId(), "jar", bundleDescriptor.getVersion());
+        return new DefaultArtifact(bundleDescriptor.getGroupId(), bundleDescriptor.getArtifactId(), bundleDescriptor.getType(), bundleDescriptor.getVersion());
     }
 }

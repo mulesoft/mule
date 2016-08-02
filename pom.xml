@@ -191,6 +191,7 @@
         <jettyVersion>9.0.7.v20131107</jettyVersion>
         <jodaTimeVersion>2.9.1</jodaTimeVersion>
         <jschVersion>0.1.53</jschVersion>
+        <jsonVersion>20140107</jsonVersion>
         <junitVersion>4.11</junitVersion>
         <log4jVersion>2.5</log4jVersion>
         <disruptorVersion>3.3.0</disruptorVersion>
@@ -221,6 +222,7 @@
         <staxonVersion>1.2</staxonVersion>
         <testFtpServerVersion>1.0.6</testFtpServerVersion>
         <tomcatVersion>6.0.44</tomcatVersion>
+        <unirestVersion>1.4.9</unirestVersion>
         <woodstoxVersion>4.4.1</woodstoxVersion>
         <wrapperVersion>3.2.3</wrapperVersion>
         <xalanVersion>2.7.2</xalanVersion>

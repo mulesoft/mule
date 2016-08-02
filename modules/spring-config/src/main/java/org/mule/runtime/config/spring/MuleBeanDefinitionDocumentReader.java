@@ -6,7 +6,9 @@
  */
 package org.mule.runtime.config.spring;
 
+import static java.util.Collections.emptyList;
 import static org.mule.runtime.config.spring.parsers.AbstractMuleBeanDefinitionParser.getConfigFileIdentifier;
+import org.mule.runtime.config.spring.dsl.api.config.ArtifactConfiguration;
 import org.mule.runtime.config.spring.dsl.model.ApplicationModel;
 import org.mule.runtime.config.spring.dsl.processor.ArtifactConfig;
 import org.mule.runtime.config.spring.dsl.processor.ConfigFile;
@@ -86,7 +88,7 @@ public class MuleBeanDefinitionDocumentReader extends DefaultBeanDefinitionDocum
             List<ConfigLine> configLines = new ArrayList<>();
             configLines.add(xmlApplicationParser.parse(root).get());
             ArtifactConfig artifactConfig = new ArtifactConfig.Builder().addConfigFile(new ConfigFile(getConfigFileIdentifier(getReaderContext().getResource()), configLines)).build();
-            applicationModelStack.push(new ApplicationModel(artifactConfig));
+            applicationModelStack.push(new ApplicationModel(artifactConfig, new ArtifactConfiguration(emptyList())));
         }
         catch (Exception e)
         {

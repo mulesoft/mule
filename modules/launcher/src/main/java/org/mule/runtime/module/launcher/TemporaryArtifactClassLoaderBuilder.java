@@ -7,11 +7,12 @@
 package org.mule.runtime.module.launcher;
 
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
-import org.mule.runtime.module.artifact.classloader.DeployableArtifactClassLoaderFactory;
+import org.mule.runtime.module.artifact.classloader.MuleDeployableArtifactClassLoader;
+import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.launcher.application.ArtifactPluginFactory;
-import org.mule.runtime.module.launcher.plugin.ArtifactPluginDescriptorLoader;
 import org.mule.runtime.module.launcher.plugin.ArtifactPluginRepository;
+
+import java.io.IOException;
 
 /**
  * {@link ArtifactClassLoader} builder for class loaders used by mule artifacts such as domains or applications.
@@ -21,27 +22,40 @@ import org.mule.runtime.module.launcher.plugin.ArtifactPluginRepository;
  *
  * @since 4.0
  */
-public class ArtifactClassLoaderBuilder extends AbstractArtifactClassLoaderBuilder<ArtifactClassLoaderBuilder>
+public class TemporaryArtifactClassLoaderBuilder extends AbstractArtifactClassLoaderBuilder<TemporaryArtifactClassLoaderBuilder>
 {
 
     private ArtifactClassLoader parentClassLoader;
 
     /**
-     * {@inheritDoc}
+     * Creates an {@link TemporaryArtifactClassLoaderBuilder}.
+     *
+     * @param artifactPluginRepository   repository of plugins contained by the runtime. Must be not null.
+     * @param artifactPluginFactory      factory for creating artifact plugins. Must be not null.
      */
-    public ArtifactClassLoaderBuilder(DeployableArtifactClassLoaderFactory artifactClassLoaderFactory, ArtifactPluginRepository artifactPluginRepository, ArtifactPluginFactory artifactPluginFactory, ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader)
+    public TemporaryArtifactClassLoaderBuilder(ArtifactPluginRepository artifactPluginRepository, ArtifactPluginFactory artifactPluginFactory)
     {
-        super(artifactClassLoaderFactory, artifactPluginRepository, artifactPluginFactory, artifactPluginDescriptorLoader);
+        super(new TemporaryArtifactClassLoaderFactory(), artifactPluginRepository, artifactPluginFactory);
     }
 
     /**
      * @param parentClassLoader parent class loader for the artifact class loader.
      * @return the builder
      */
-    public ArtifactClassLoaderBuilder setParentClassLoader(ArtifactClassLoader parentClassLoader)
+    public TemporaryArtifactClassLoaderBuilder setParentClassLoader(ArtifactClassLoader parentClassLoader)
     {
         this.parentClassLoader = parentClassLoader;
         return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public MuleDeployableArtifactClassLoader build() throws IOException
+    {
+        setArtifactDescriptor(new ArtifactDescriptor());
+        return (MuleDeployableArtifactClassLoader) super.build();
     }
 
     /**

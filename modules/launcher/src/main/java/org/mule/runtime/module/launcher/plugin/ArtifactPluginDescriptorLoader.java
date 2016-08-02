@@ -10,8 +10,6 @@ import static org.apache.commons.lang.StringUtils.removeEnd;
 import static org.mule.runtime.core.util.FileUtils.unzip;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 
-import org.mule.runtime.core.util.Preconditions;
-
 import java.io.File;
 import java.io.IOException;
 
@@ -42,7 +40,7 @@ public class ArtifactPluginDescriptorLoader
     {
         checkArgument(pluginZip != null, "plugin zip cannot be null");
         checkArgument(unpackDestination != null, "unpack destination cannot be null");
-        checkArgument(pluginZip.getName().endsWith("zip"), "plugin zip must be a zip file ending with .zip");
+        checkArgument(pluginZip.getName().endsWith("zip"), "plugin zip must be a zip file ending with .zip, but the file name was " + pluginZip.getAbsolutePath());
 
         final String pluginName = removeEnd(pluginZip.getName(), ".zip");
         // must unpack as there's no straightforward way for a ClassLoader to use a jar within another jar/zip

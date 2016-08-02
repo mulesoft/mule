@@ -14,9 +14,6 @@ import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessa
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.util.Preconditions.checkState;
 import static org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy.PARENT_FIRST;
-import static org.mule.runtime.module.reboot.MuleContainerBootstrapUtils.getMuleTmpDir;
-import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.core.util.UUID;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
@@ -32,7 +29,6 @@ import org.mule.runtime.module.launcher.application.CompositeArtifactClassLoader
 import org.mule.runtime.module.launcher.application.FilePackageDiscoverer;
 import org.mule.runtime.module.launcher.application.PackageDiscoverer;
 import org.mule.runtime.module.launcher.plugin.ArtifactPluginDescriptor;
-import org.mule.runtime.module.launcher.plugin.ArtifactPluginDescriptorLoader;
 import org.mule.runtime.module.launcher.plugin.ArtifactPluginRepository;
 
 import java.io.File;
@@ -63,9 +59,7 @@ public abstract class AbstractArtifactClassLoaderBuilder<T extends AbstractArtif
     private final PackageDiscoverer packageDiscoverer = new FilePackageDiscoverer();
     private final ArtifactPluginRepository artifactPluginRepository;
     private final ArtifactPluginFactory artifactPluginFactory;
-    private File[] applicationPluginDependencies = new File[0];
     private Set<ArtifactPluginDescriptor> artifactPluginDescriptors = new HashSet<>();
-    private ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader;
     private File pluginsSharedLibFolder;
     private String artifactId = UUID.getUUID();
     private ArtifactDescriptor artifactDescriptor;
@@ -75,24 +69,20 @@ public abstract class AbstractArtifactClassLoaderBuilder<T extends AbstractArtif
     /**
      * Creates an {@link AbstractArtifactClassLoaderBuilder}.
      *
-     * @param artifactClassLoaderFactory     factory for the classloader specific to the artifact resource and classes. Must be not null.
-     * @param artifactPluginRepository       repository of plugins contained by the runtime. Must be not null.
-     * @param artifactPluginFactory          factory for creating artifact plugins. Must be not null.
-     * @param artifactPluginDescriptorLoader loader for plugin zip files into their descriptors. Must be not null.
+     * @param artifactClassLoaderFactory factory for the classloader specific to the artifact resource and classes. Must be not null.
+     * @param artifactPluginRepository   repository of plugins contained by the runtime. Must be not null.
+     * @param artifactPluginFactory      factory for creating artifact plugins. Must be not null.
      */
     public AbstractArtifactClassLoaderBuilder(DeployableArtifactClassLoaderFactory artifactClassLoaderFactory,
                                               ArtifactPluginRepository artifactPluginRepository,
-                                              ArtifactPluginFactory artifactPluginFactory,
-                                              ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader)
+                                              ArtifactPluginFactory artifactPluginFactory)
     {
         checkArgument(artifactClassLoaderFactory != null, "artifact class loader factory cannot be null");
         checkArgument(artifactPluginRepository != null, "artifact plugin repository cannot be null");
         checkArgument(artifactPluginFactory != null, "artifact plugin factory cannot be null");
-        checkArgument(artifactPluginDescriptorLoader != null, "artifact plugin descriptor loader cannot be null");
         this.artifactClassLoaderFactory = artifactClassLoaderFactory;
         this.artifactPluginRepository = artifactPluginRepository;
         this.artifactPluginFactory = artifactPluginFactory;
-        this.artifactPluginDescriptorLoader = artifactPluginDescriptorLoader;
     }
 
     /**
@@ -161,12 +151,6 @@ public abstract class AbstractArtifactClassLoaderBuilder<T extends AbstractArtif
         checkState(parentClassLoader != null, "parent class loader cannot be null");
 
         parentClassLoader = getSharedLibClassLoader(parentClassLoader);
-
-        for (File applicationPluginDependency : applicationPluginDependencies)
-        {
-            ArtifactPluginDescriptor artifactPluginDescriptor = artifactPluginDescriptorLoader.load(applicationPluginDependency, new File(getMuleTmpDir(), UUID.getUUID()));
-            artifactPluginDescriptors.add(artifactPluginDescriptor);
-        }
 
         List<ArtifactPluginDescriptor> effectiveArtifactPluginDescriptors = createContainerApplicationPlugins();
         effectiveArtifactPluginDescriptors.addAll(artifactPluginDescriptors);

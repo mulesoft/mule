@@ -17,9 +17,11 @@ import static org.mule.runtime.config.spring.dsl.processor.xml.CoreXmlNamespaceI
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.from;
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.to;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import org.mule.runtime.config.spring.dsl.api.config.ArtifactConfiguration;
+import org.mule.runtime.config.spring.dsl.api.config.ComponentConfiguration;
+import org.mule.runtime.config.spring.dsl.processor.ArtifactConfig;
 import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.extension.api.util.NameUtils.pluralize;
-import org.mule.runtime.config.spring.dsl.processor.ArtifactConfig;
 import org.mule.runtime.config.spring.dsl.processor.ConfigFile;
 import org.mule.runtime.config.spring.dsl.processor.ConfigLine;
 import org.mule.runtime.config.spring.dsl.processor.SimpleConfigAttribute;
@@ -180,13 +182,49 @@ public class ApplicationModel
      * A set of validations are applied that may make creation fail.
      *
      * @param artifactConfig the mule artifact configuration content.
+     * @param artifactConfiguration
      * @throws Exception when the application configuration has semantic errors.
      */
-    public ApplicationModel(ArtifactConfig artifactConfig) throws Exception
+    public ApplicationModel(ArtifactConfig artifactConfig, ArtifactConfiguration artifactConfiguration) throws Exception
     {
         configurePropertyPlaceholderResolver(artifactConfig);
         convertConfigFileToComponentModel(artifactConfig);
+        convertArtifactConfigurationToComponentModel(artifactConfiguration);
         validateModel();
+    }
+
+    private void convertArtifactConfigurationToComponentModel(ArtifactConfiguration artifactConfiguration)
+    {
+        if (artifactConfiguration != null)
+        {
+            for (ComponentConfiguration componentConfiguration : artifactConfiguration.getComponentConfiguration())
+            {
+                ComponentModel componentModel = convertComponentConfiguration(componentConfiguration, true);
+                this.muleComponentModels.add(componentModel);
+            }
+        }
+    }
+
+    private ComponentModel convertComponentConfiguration(ComponentConfiguration componentConfiguration, boolean isRoot)
+    {
+        ComponentModel.Builder builder = new ComponentModel.Builder()
+                .setIdentifier(new ComponentIdentifier.Builder()
+                                       .withName(componentConfiguration.getIdentifier())
+                                       .withNamespace(componentConfiguration.getNamespace()).build());
+        if (isRoot)
+        {
+            builder.markAsRootComponent();
+        }
+        for (Map.Entry<String, String> parameter : componentConfiguration.getParameters().entrySet())
+        {
+            builder.addParameter(parameter.getKey(), parameter.getValue(), false);
+        }
+        for (ComponentConfiguration childComponentConfiguration : componentConfiguration.getNestedComponentConfiguration())
+        {
+            builder.addChildComponentModel(convertComponentConfiguration(childComponentConfiguration, false));
+        }
+        return builder.build();
+
     }
 
     private void configurePropertyPlaceholderResolver(ArtifactConfig artifactConfig)

@@ -431,6 +431,11 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
     public static Map<QName, Object> processMetadataAnnotationsHelper(Element element, String configFileIdentifier, BeanDefinitionBuilder builder)
     {
         Map<QName, Object> annotations = new HashMap<>();
+        //TODO MULE-9638 - Remove once we don't use the old parsing mechanism anymore.
+        if (element == null)
+        {
+            return annotations;
+        }
         // Ensure we have a placeholder for internally generated annotations, even if the XML config doesn't have any
         // defined for this element.
         if (AnnotatedObject.class.isAssignableFrom(builder.getBeanDefinition().getBeanClass()))

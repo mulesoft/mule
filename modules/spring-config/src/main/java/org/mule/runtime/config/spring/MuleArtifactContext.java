@@ -10,6 +10,7 @@ import static java.util.Arrays.asList;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.ArrayUtils.addAll;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.CONFIGURATION_IDENTIFIER;
+import static org.mule.runtime.config.spring.parsers.generic.AutoIdUtils.uniqueValue;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
@@ -18,6 +19,7 @@ import static org.springframework.context.annotation.AnnotationConfigUtils.AUTOW
 import static org.springframework.context.annotation.AnnotationConfigUtils.CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME;
 import static org.springframework.context.annotation.AnnotationConfigUtils.REQUIRED_ANNOTATION_PROCESSOR_BEAN_NAME;
 import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinitionProvider;
+import org.mule.runtime.config.spring.dsl.api.config.ArtifactConfiguration;
 import org.mule.runtime.config.spring.dsl.api.xml.StaticXmlNamespaceInfo;
 import org.mule.runtime.config.spring.dsl.api.xml.StaticXmlNamespaceInfoProvider;
 import org.mule.runtime.config.spring.dsl.api.xml.XmlNamespaceInfo;
@@ -32,6 +34,7 @@ import org.mule.runtime.config.spring.dsl.processor.ConfigLine;
 import org.mule.runtime.config.spring.dsl.processor.xml.XmlApplicationParser;
 import org.mule.runtime.config.spring.dsl.spring.BeanDefinitionFactory;
 import org.mule.runtime.config.spring.editors.MulePropertyEditorRegistrar;
+import org.mule.runtime.config.spring.parsers.generic.AutoIdUtils;
 import org.mule.runtime.config.spring.processors.ContextExclusiveInjectorProcessor;
 import org.mule.runtime.config.spring.processors.DiscardedOptionalBeanPostProcessor;
 import org.mule.runtime.config.spring.processors.LifecycleStatePostProcessor;
@@ -98,6 +101,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
     private final ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry = new ComponentBuildingDefinitionRegistry();
     private final OptionalObjectsController optionalObjectsController;
     private final Map<String, String> artifactProperties;
+    private final ArtifactConfiguration artifactConfiguration;
     private ApplicationModel applicationModel;
     private MuleContext muleContext;
     private Resource[] artifactConfigResources;
@@ -114,16 +118,16 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
      * the spring ApplicationContext
      *
      * @param muleContext               the {@link MuleContext} that own this context
-     * @param optionalObjectsController the {@link OptionalObjectsController} to use. Cannot be {@code null}
-     * @see org.mule.runtime.config.spring.SpringRegistry
+     * @param artifactConfiguration     the mule configuration defined programmatically
+     * @param optionalObjectsController the {@link OptionalObjectsController} to use. Cannot be {@code null}  @see org.mule.runtime.config.spring.SpringRegistry
      * @since 3.7.0
      */
-    public MuleArtifactContext(MuleContext muleContext, ConfigResource[] artifactConfigResources, OptionalObjectsController optionalObjectsController, Map<String, String> artifactProperties, ArtifactType artifactType) throws BeansException
+    public MuleArtifactContext(MuleContext muleContext, ConfigResource[] artifactConfigResources, ArtifactConfiguration artifactConfiguration, OptionalObjectsController optionalObjectsController, Map<String, String> artifactProperties, ArtifactType artifactType) throws BeansException
     {
-        this(muleContext, convert(artifactConfigResources), optionalObjectsController, artifactProperties, artifactType);
+        this(muleContext, convert(artifactConfigResources), artifactConfiguration, optionalObjectsController, artifactProperties, artifactType);
     }
 
-    public MuleArtifactContext(MuleContext muleContext, Resource[] artifactConfigResources, OptionalObjectsController optionalObjectsController, Map<String, String> artifactProperties, ArtifactType artifactType)
+    public MuleArtifactContext(MuleContext muleContext, Resource[] artifactConfigResources, ArtifactConfiguration artifactConfiguration, OptionalObjectsController optionalObjectsController, Map<String, String> artifactProperties, ArtifactType artifactType)
     {
         checkArgument(optionalObjectsController != null, "optionalObjectsController cannot be null");
         this.muleContext = muleContext;
@@ -131,6 +135,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
         this.optionalObjectsController = optionalObjectsController;
         this.artifactProperties = artifactProperties;
         this.artifactType = artifactType;
+        this.artifactConfiguration = artifactConfiguration;
 
         serviceRegistry.lookupProviders(ComponentBuildingDefinitionProvider.class).forEach(componentBuildingDefinitionProvider -> {
             componentBuildingDefinitionProvider.init(muleContext);
@@ -177,7 +182,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
                 applicationConfigBuilder.addConfigFile(new ConfigFile(getFilename(springResource), asList(mainConfigLine)));
             }
             applicationConfigBuilder.setApplicationName(muleContext.getConfiguration().getId());
-            applicationModel = new ApplicationModel(applicationConfigBuilder.build());
+            applicationModel = new ApplicationModel(applicationConfigBuilder.build(), artifactConfiguration);
         }
         catch (Exception e)
         {
@@ -293,6 +298,11 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
                                                                                   if (resolvedComponentModel.getIdentifier().equals(CONFIGURATION_IDENTIFIER))
                                                                                   {
                                                                                       nameAttribute = OBJECT_MULE_CONFIGURATION;
+                                                                                  }
+                                                                                  else if (nameAttribute == null)
+                                                                                  {
+                                                                                      //This may be a configuration that does not requires a name.
+                                                                                      nameAttribute = uniqueValue(resolvedComponentModel.getBeanDefinition().getBeanClassName());
                                                                                   }
                                                                                   registry.registerBeanDefinition(nameAttribute, resolvedComponentModel.getBeanDefinition());
                                                                               }
