@@ -11,6 +11,7 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.message.Correlation;
 import org.mule.runtime.core.message.DefaultMuleMessageBuilderFactory;
+import org.mule.runtime.core.message.MultiPartPayload;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -218,29 +219,37 @@ public interface MuleMessage extends org.mule.runtime.api.message.MuleMessage, M
         Builder removeOutboundProperty(String key);
 
         /**
+         * @deprecated use {@link MultiPartPayload} instead.
          * @param key
          * @param value
          * @return
          */
+        @Deprecated
         Builder addInboundAttachment(String key, DataHandler value);
 
         /**
+         * @deprecated use {@link MultiPartPayload} instead.
          * @param key
          * @param value
          * @return
          */
+        @Deprecated
         Builder addOutboundAttachment(String key, DataHandler value);
 
         /**
+         * @deprecated use {@link MultiPartPayload} instead.
          * @param key
          * @return
          */
+        @Deprecated
         Builder removeInboundAttachment(String key);
 
         /**
+         * @deprecated use {@link MultiPartPayload} instead.
          * @param key
          * @return
          */
+        @Deprecated
         Builder removeOutboundAttachment(String key);
 
         /**
@@ -256,15 +265,19 @@ public interface MuleMessage extends org.mule.runtime.api.message.MuleMessage, M
         Builder outboundProperties(Map<String, Serializable> outboundProperties);
 
         /**
+         * @deprecated use {@link MultiPartPayload} instead.
          * @param inboundAttachments
          * @return
          */
+        @Deprecated
         Builder inboundAttachments(Map<String, DataHandler> inboundAttachments);
 
         /**
+         * @deprecated use {@link MultiPartPayload} instead.
          * @param outbundAttachments
          * @return
          */
+        @Deprecated
         Builder outboundAttachments(Map<String, DataHandler> outbundAttachments);
 
         @Override

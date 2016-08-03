@@ -273,11 +273,11 @@ public class IOUtils extends org.apache.commons.io.IOUtils
     /**
      * Transforms an Object into a DataHandler of its corresponding type.
      *
-     * @param name        the name of the attachment being handled
-     * @param object      the attachment to be handled
+     * @param name the name of the attachment being handled
+     * @param object the attachment to be handled
      * @param contentType the Content-Type of the attachment that is being handled
      * @return a {@link DataHandler} of the corresponding attachment
-     * @throws Exception if the transformation fails.
+     * @throws IOException if the transformation fails.
      */
     public static DataHandler toDataHandler(String name, Object object, MediaType contentType) throws IOException
     {
@@ -337,9 +337,9 @@ public class IOUtils extends org.apache.commons.io.IOUtils
      * @param object the attachment to be handled
      * @param contentType the Content-Type of the attachment that is being handled
      * @return a {@link MuleMessage} of the corresponding attachment
-     * @throws Exception if the transformation fails.
+     * @throws IOException if the transformation fails.
      */
-    public static MuleMessage toMuleMessagePart(String name, Object object, MediaType contentType) throws Exception
+    public static MuleMessage toMuleMessagePart(String name, Object object, MediaType contentType) throws IOException
     {
         final Builder builder;
 

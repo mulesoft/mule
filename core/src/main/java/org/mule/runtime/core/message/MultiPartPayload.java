@@ -33,7 +33,7 @@ public class MultiPartPayload implements Serializable
     /**
      * The name of a part that does <b>not</b> represent an attachment.
      */
-    public static String BODY_PART_NAME = "_body";
+    public static final String BODY_PART_NAME = "_body";
 
     private List<MuleMessage> parts;
 
