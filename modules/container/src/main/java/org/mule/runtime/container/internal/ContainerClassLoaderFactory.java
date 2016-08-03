@@ -7,6 +7,8 @@
 
 package org.mule.runtime.container.internal;
 
+import static org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy.PARENT_FIRST;
+import static org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy.PARENT_ONLY;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy;
@@ -78,44 +80,22 @@ public class ContainerClassLoaderFactory
      */
     public static final Set<String> BOOT_PACKAGES = ImmutableSet.of(
             "java",
-            "javax.accessibility",
-            "javax.activation",
-            "javax.activity",
-            "javax.annotation",
-            "javax.crypto",
-            "javax.imageio",
-            "javax.jws",
-            "javax.lang.model",
-            "javax.management",
-            "javax.naming",
-            "javax.net",
-            "javax.print",
-            "javax.rmi",
-            "javax.script",
-            "javax.security",
             "javax.smartcardio",
-            "javax.sound",
-            "javax.sql",
-            "javax.swing",
-            "javax.tools",
-            "javax.transaction",
-            "javax.resource",
-            "javax.xml",
             //Java EE
-            "javax.jms",
+            "javax.resource",
             "javax.servlet",
             "javax.ws",
             "javax.mail",
             "javax.inject",
-            "org.xml.sax", "org.apache.xerces",
+            "org.apache.xerces",
             "org.apache.logging.log4j", "org.slf4j", "org.apache.commons.logging", "org.apache.log4j",
-            "org.dom4j", "org.w3c.dom",
+            "org.dom4j",
             "com.sun", "sun",
             "org.springframework",
             "org.mule.mvel2"
     );
 
-    private ModuleDiscoverer moduleDiscoverer = new ClasspathModuleDiscoverer(this.getClass().getClassLoader());
+    private ModuleDiscoverer moduleDiscoverer = new ContainerModuleDiscoverer(this.getClass().getClassLoader());
 
     /**
      * Creates the classLoader to represent the Mule container.
@@ -142,7 +122,6 @@ public class ContainerClassLoaderFactory
     {
         final Set<String> parentOnlyPackages = new HashSet<>(getBootPackages());
         parentOnlyPackages.addAll(SYSTEM_PACKAGES);
-
         final Map<String, ClassLoaderLookupStrategy> lookupStrategies = buildClassLoaderLookupStrategy(muleModules);
         return new MuleClassLoaderLookupPolicy(lookupStrategies, parentOnlyPackages);
     }
@@ -169,7 +148,7 @@ public class ContainerClassLoaderFactory
      * Creates a {@link Map<String, ClassLoaderLookupStrategy>} with PARENT_ONLY strategy for the packages
      * exported by the mule modules.
      *
-     * @param muleModules to be used for colleting the exported packages
+     * @param muleModules to be used for collecting the exported packages
      * @return a {@link Map<String, ClassLoaderLookupStrategy>} for the exported packages as PARENT_ONLY
      */
     private Map<String, ClassLoaderLookupStrategy> buildClassLoaderLookupStrategy(List<MuleModule> muleModules)
@@ -179,11 +158,17 @@ public class ContainerClassLoaderFactory
         {
             for (String exportedPackage : muleModule.getExportedPackages())
             {
-                result.put(exportedPackage, ClassLoaderLookupStrategy.PARENT_ONLY);
+                result.put(exportedPackage, getLookupStrategyFor(exportedPackage));
             }
         }
 
         return result;
+    }
+
+    private ClassLoaderLookupStrategy getLookupStrategyFor(String exportedPackage)
+    {
+        // Lets artifacts to extend javax package
+        return exportedPackage.startsWith("javax.") ? PARENT_FIRST : PARENT_ONLY;
     }
 
     /**

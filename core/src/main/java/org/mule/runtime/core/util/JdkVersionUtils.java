@@ -18,8 +18,10 @@ import org.slf4j.LoggerFactory;
 
 public class JdkVersionUtils
 {
-    
-    public static class JdkVersion implements Comparable<JdkVersion>
+
+	public static final String JAVA_VERSION_PROPERTY = "java.version";
+
+	public static class JdkVersion implements Comparable<JdkVersion>
     {
     	private Integer major;
     	private Integer minor;
@@ -250,7 +252,7 @@ public class JdkVersionUtils
     
     public static JdkVersion getJdkVersion()
     {
-    	return new JdkVersion(System.getProperty("java.version"));
+    	return new JdkVersion(System.getProperty(JAVA_VERSION_PROPERTY));
     }
     
     public static String getSupportedJdks()
