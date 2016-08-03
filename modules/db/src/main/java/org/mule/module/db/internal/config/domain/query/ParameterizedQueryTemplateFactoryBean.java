@@ -48,6 +48,7 @@ public class ParameterizedQueryTemplateFactoryBean implements FactoryBean<QueryT
         QueryTemplate queryTemplate = queryParser.parse(sqlText);
 
         List<QueryParam> resolvedParams = new LinkedList<QueryParam>();
+        List<QueryParam> unresolvedQueryParams = new LinkedList<>(queryParams);
 
         for (QueryParam templateParam : queryTemplate.getParams())
         {
@@ -59,11 +60,34 @@ public class ParameterizedQueryTemplateFactoryBean implements FactoryBean<QueryT
             }
             else
             {
+                unresolvedQueryParams.remove(param);
                 resolvedParams.add(overrideParam(templateParam, param));
             }
         }
 
+        if (!unresolvedQueryParams.isEmpty())
+        {
+            throw new IllegalStateException(buildUnresolvedParamErrorMsg(unresolvedQueryParams));
+        }
+
         return new QueryTemplate(queryTemplate.getSqlText(), queryTemplate.getType(), resolvedParams);
+    }
+
+    private String buildUnresolvedParamErrorMsg(List<QueryParam> unresolvedQueryParams)
+    {
+        StringBuilder errorMsgBuilder = new StringBuilder();
+
+        for (QueryParam queryParam : unresolvedQueryParams)
+        {
+            if (errorMsgBuilder.length() > 0)
+            {
+                errorMsgBuilder.append(", ");
+            }
+            errorMsgBuilder.append("'").append(queryParam.getName()).append("'");
+        }
+        errorMsgBuilder.insert(0, "There is at least a query parameter that does not match the name of any parameter defined in the query text. Unresolved parameters: ");
+
+        return errorMsgBuilder.toString();
     }
 
     private QueryParam overrideParam(QueryParam templateParam, QueryParam queryParam)
