@@ -15,8 +15,6 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.net.URLStreamHandler;
 import java.net.URLStreamHandlerFactory;
-import java.util.Collection;
-import java.util.jar.JarFile;
 
 import sun.net.www.protocol.jar.Handler;
 
@@ -41,39 +39,20 @@ public class GoodCitizenClassLoader extends URLClassLoader implements Disposable
     }
 
     /**
-     * A workaround for http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=5041014
+     * Disposes the {@link ClassLoader} by closing all the resources opened by this {@link ClassLoader}.
+     * See {@link URLClassLoader#close()}.
      */
     @Override
     public void dispose()
     {
-        // jars
         try
         {
-            Class<URLClassLoader> clazz = URLClassLoader.class;
-            Field ucp = clazz.getDeclaredField("ucp");
-            ucp.setAccessible(true);
-            Object urlClassPath = ucp.get(this);
-            Field loaders = urlClassPath.getClass().getDeclaredField("loaders");
-            loaders.setAccessible(true);
-            Collection<?> jarLoaders = (Collection<?>) loaders.get(urlClassPath);
-            for (Object jarLoader : jarLoaders)
-            {
-                try
-                {
-                    Field loader = jarLoader.getClass().getDeclaredField("jar");
-                    loader.setAccessible(true);
-                    Object jarFile = loader.get(jarLoader);
-                    ((JarFile) jarFile).close();
-                }
-                catch (Throwable t)
-                {
-                    // if we got this far, this is probably not a JAR loader so skip it
-                }
-            }
+            // Java 7 added support for closing a URLClassLoader, it will close any resources opened by this classloader
+            close();
         }
-        catch (Throwable t)
+        catch (IOException e)
         {
-            // probably not a SUN VM
+            // ignore
         }
 
         try
