@@ -8,8 +8,11 @@ package org.mule.runtime.module.extension.internal.capability.xml.schema.builder
 
 import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.ZERO;
+import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
+import static org.mule.metadata.utils.MetadataTypeUtils.getDefaultValue;
+import static org.mule.runtime.extension.api.introspection.declaration.type.TypeUtils.getExpressionSupport;
 import static org.mule.runtime.extension.api.util.NameUtils.getTopLevelTypeName;
 import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.extension.api.util.NameUtils.sanitizeName;
@@ -19,8 +22,6 @@ import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MUL
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
-import org.mule.metadata.utils.MetadataTypeUtils;
-import org.mule.runtime.extension.api.introspection.declaration.type.TypeUtils;
 import org.mule.runtime.extension.api.introspection.parameter.ImmutableParameterModel;
 import org.mule.runtime.extension.xml.dsl.api.DslElementSyntax;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ComplexContent;
@@ -33,7 +34,6 @@ import org.mule.runtime.module.extension.internal.capability.xml.schema.model.To
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.TopLevelElement;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -287,9 +287,9 @@ final class ObjectTypeSchemaDelegate
     {
         return new ImmutableParameterModel(field.getKey().getName().getLocalPart(), "",
                                            field.getValue(), false, field.isRequired(),
-                                           TypeUtils.getExpressionSupport(field),
-                                           MetadataTypeUtils.getDefaultValue(field).orElse(null),
-                                           Collections.emptySet());
+                                           getExpressionSupport(field),
+                                           getDefaultValue(field).orElse(null),
+                                           emptySet());
     }
 
     private ExplicitGroup getOrCreateSequenceGroup(ExtensionType extension)

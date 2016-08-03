@@ -17,8 +17,8 @@ import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Co
 final class ComplexTypeHolder
 {
 
-    private ComplexType complexType;
-    private MetadataType type;
+    private final ComplexType complexType;
+    private final MetadataType type;
 
     ComplexTypeHolder(ComplexType complexType, MetadataType type)
     {
