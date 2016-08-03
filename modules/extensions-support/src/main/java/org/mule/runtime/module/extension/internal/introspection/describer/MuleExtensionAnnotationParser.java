@@ -10,7 +10,6 @@ import static java.util.Arrays.stream;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.core.util.Preconditions.checkState;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldMetadataType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMethodArgumentTypes;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isParameterContainer;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getDefaultValue;
@@ -116,7 +115,7 @@ public final class MuleExtensionAnnotationParser
             Map<Class<? extends Annotation>, Annotation> annotations = toMap(parameterAnnotations[i]);
             if (isParameterContainer(annotations.keySet(), parameterTypes[i]))
             {
-                groups.add(parseGroupParameters(parameterTypes[i], parsedParameters, typeLoader));
+                groups.add(parseGroupParameters(parameterTypes[i], parsedParameters, typeLoader, method.getParameters()[i]));
             }
             else
             {
@@ -158,9 +157,9 @@ public final class MuleExtensionAnnotationParser
         return annotationDeclarations;
     }
 
-    private static org.mule.runtime.module.extension.internal.introspection.ParameterGroup parseGroupParameters(MetadataType parameterType, List<ParsedParameter> parsedParameters, ClassTypeLoader typeLoader)
+    private static org.mule.runtime.module.extension.internal.introspection.ParameterGroup parseGroupParameters(MetadataType parameterType, List<ParsedParameter> parsedParameters, ClassTypeLoader typeLoader, Object container)
     {
-        org.mule.runtime.module.extension.internal.introspection.ParameterGroup group = new org.mule.runtime.module.extension.internal.introspection.ParameterGroup(getType(parameterType, typeLoader.getClassLoader()));
+        org.mule.runtime.module.extension.internal.introspection.ParameterGroup group = new org.mule.runtime.module.extension.internal.introspection.ParameterGroup(getType(parameterType, typeLoader.getClassLoader()), container);
         List<org.mule.runtime.module.extension.internal.introspection.ParameterGroup> childGroups = new LinkedList<>();
 
         stream(getType(parameterType).getDeclaredFields())
@@ -174,7 +173,7 @@ public final class MuleExtensionAnnotationParser
 
                              if (isParameterContainer(annotations.keySet(), fieldType))
                              {
-                                 childGroups.add(parseGroupParameters(getFieldMetadataType(field, typeLoader), parsedParameters, typeLoader));
+                                 childGroups.add(parseGroupParameters(fieldType, parsedParameters, typeLoader, field));
                              }
                              else
                              {

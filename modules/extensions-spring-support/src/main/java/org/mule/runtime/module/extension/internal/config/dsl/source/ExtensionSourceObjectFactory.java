@@ -42,7 +42,6 @@ import javax.inject.Inject;
  */
 public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory<ExtensionMessageSource>
 {
-    private static final String COMPONENT = "source";
     private final RuntimeExtensionModel extensionModel;
     private final RuntimeSourceModel sourceModel;
     private final MuleContext muleContext;
@@ -63,7 +62,7 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
     @Override
     public ExtensionMessageSource getObject() throws ConfigurationException
     {
-        ResolverSet resolverSet = getParametersAsResolverSet(sourceModel, COMPONENT, sourceModel.getName());
+        ResolverSet resolverSet = getParametersAsResolverSet(sourceModel);
         if (resolverSet.isDynamic())
         {
             throw dynamicParameterException(resolverSet, sourceModel);

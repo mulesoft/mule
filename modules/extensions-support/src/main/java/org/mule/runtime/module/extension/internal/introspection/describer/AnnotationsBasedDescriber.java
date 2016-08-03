@@ -424,13 +424,12 @@ public final class AnnotationsBasedDescriber implements Describer
 
             if (!parameters.isEmpty())
             {
-                ParameterGroup group = new ParameterGroup(field.getType(), field);
+                ParameterGroup<Field> group = new ParameterGroup(field.getType(), field);
                 groups.add(group);
 
                 for (ParameterDeclarer descriptor : parameters)
                 {
                     ParameterDeclaration parameter = inheritGroupParentDisplayProperties(parent, field, group, descriptor);
-
                     group.addParameter(getField(field.getType(), getMemberName(parameter, parameter.getName())));
                 }
 
@@ -445,7 +444,7 @@ public final class AnnotationsBasedDescriber implements Describer
         return groups;
     }
 
-    private ParameterDeclaration inheritGroupParentDisplayProperties(ParameterGroup parent, Field field, ParameterGroup group, ParameterDeclarer parameterDeclarer)
+    private ParameterDeclaration inheritGroupParentDisplayProperties(ParameterGroup<Field> parent, Field field, ParameterGroup<Field> group, ParameterDeclarer parameterDeclarer)
     {
         ParameterDeclaration parameter = parameterDeclarer.getDeclaration();
         Optional<LayoutModelProperty> parameterDisplayProperty = parameterDeclarer.getDeclaration().getModelProperty(LayoutModelProperty.class);

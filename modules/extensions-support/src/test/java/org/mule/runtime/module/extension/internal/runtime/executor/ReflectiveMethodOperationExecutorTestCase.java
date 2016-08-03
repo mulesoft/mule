@@ -31,6 +31,7 @@ import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationM
 import org.mule.runtime.extension.api.introspection.operation.RuntimeOperationModel;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.operation.OperationResult;
+import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.DefaultOperationContext;
 import org.mule.runtime.module.extension.internal.runtime.OperationContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.config.LifecycleAwareConfigurationInstance;
@@ -95,6 +96,7 @@ public class ReflectiveMethodOperationExecutorTestCase extends AbstractMuleTestC
         initHeisenberg();
         configurationInstance = new LifecycleAwareConfigurationInstance<>(CONFIG_NAME, configurationModel, config, emptyList(), Optional.empty());
         when(muleEvent.getMessage().getDataType()).thenReturn(DATA_TYPE);
+        when(operationModel.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(Optional.empty());
         operationContext = new DefaultOperationContext(configurationInstance, parameters, operationModel, muleEvent, muleContext);
         operationContext = spy(operationContext);
     }

@@ -18,11 +18,13 @@ import org.mule.runtime.module.extension.internal.model.property.ParameterGroupM
 import com.google.common.collect.ImmutableSet;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * A metadata class that groups a set of parameters together.
@@ -39,7 +41,7 @@ import java.util.Set;
  *
  * @since 3.7.0
  */
-public class ParameterGroup implements EnrichableModel
+public class ParameterGroup<T> implements EnrichableModel
 {
 
     /**
@@ -48,10 +50,11 @@ public class ParameterGroup implements EnrichableModel
     private final Class<?> type;
 
     /**
-     * The {@link Field} in which the generated value of {@link #type} is to be assigned.
-     * If the {@link ParameterGroup} is used as an argument of an operation this fill will be {@link Optional#empty()}
+     * The class in which the generated value of {@link #type} is to be assigned. For {@link ParameterGroup} used
+     * as fields of a class, this container should be parameterized as a {@link Field}. And if it is used as
+     * an argument of an operation it should the corresponding {@link Method}'s {@link java.lang.reflect.Parameter}.
      */
-    private final Optional<Field> field;
+    private final T container;
 
     /**
      * A {@link Map} in which the keys are parameter names
@@ -65,21 +68,21 @@ public class ParameterGroup implements EnrichableModel
     private Map<Class<? extends ModelProperty>, ModelProperty> modelProperties = new HashMap<>();
 
 
-    public ParameterGroup(Class<?> type, Field field)
+    public ParameterGroup(Class<?> type, T container)
     {
         checkArgument(type != null, "type cannot be null");
-        checkArgument(field != null, "field cannot be null");
+        checkArgument(container != null, "container cannot be null");
 
         this.type = type;
-        field.setAccessible(true);
-        this.field = Optional.of(field);
+        this.container = container;
     }
 
-    public ParameterGroup(Class<?> type)
+    /**
+     * @return parameterized container of the {@link ParameterGroup}
+     */
+    public T getContainer()
     {
-        checkArgument(type != null, "type cannot be null");
-        this.type = type;
-        this.field = Optional.empty();
+        return container;
     }
 
     /**
@@ -90,6 +93,7 @@ public class ParameterGroup implements EnrichableModel
      */
     public ParameterGroup addParameter(Field field)
     {
+        field.setAccessible(true);
         parameters.add(field);
         return this;
     }
@@ -99,23 +103,27 @@ public class ParameterGroup implements EnrichableModel
         return type;
     }
 
-    public Optional<Field> getField()
-    {
-        return field;
-    }
-
     public Set<Field> getParameters()
     {
         return ImmutableSet.copyOf(parameters);
     }
 
     /**
+     *
+     * @return set of optional {@link Field}s
+     */
+    public Set<Field> getOptionalParameters()
+    {
+        return parameters.stream().filter(f -> f.getAnnotation(org.mule.runtime.extension.api.annotation.param.Optional.class) != null).collect(Collectors.toSet());
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
-    public <T extends ModelProperty> Optional<T> getModelProperty(Class<T> propertyType)
+    public <G extends ModelProperty> Optional<G> getModelProperty(Class<G> propertyType)
     {
-        return Optional.ofNullable((T) modelProperties.get(propertyType));
+        return Optional.ofNullable((G) modelProperties.get(propertyType));
     }
 
     /**
@@ -149,6 +157,4 @@ public class ParameterGroup implements EnrichableModel
         ExclusiveOptionals annotation = getAnnotation(type, ExclusiveOptionals.class);
         return annotation != null ? annotation.oneRequired() : false;
     }
-
-
 }

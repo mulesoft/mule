@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.util;
 
+import static java.lang.String.format;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
@@ -41,12 +42,17 @@ import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.introspection.ComponentModel;
 import org.mule.runtime.extension.api.introspection.EnrichableModel;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
+import org.mule.runtime.extension.api.introspection.Named;
+import org.mule.runtime.extension.api.introspection.config.ConfigurationModel;
+import org.mule.runtime.extension.api.introspection.connection.ConnectionProviderModel;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ParameterDeclaration;
+import org.mule.runtime.extension.api.introspection.operation.OperationModel;
 import org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterizedModel;
 import org.mule.runtime.extension.api.introspection.property.MetadataContentModelProperty;
 import org.mule.runtime.extension.api.introspection.property.MetadataKeyPartModelProperty;
+import org.mule.runtime.extension.api.introspection.source.SourceModel;
 import org.mule.runtime.extension.api.runtime.operation.InterceptingCallback;
 import org.mule.runtime.extension.api.runtime.operation.OperationResult;
 import org.mule.runtime.extension.api.runtime.source.Source;
@@ -83,6 +89,11 @@ import org.springframework.core.ResolvableType;
  */
 public final class IntrospectionUtils
 {
+
+    private static final String CONFIGURATION = "configuration";
+    private static final String OPERATION = "operation";
+    private static final String CONNECTION_PROVIDER = "connection provider";
+    private static final String SOURCE = "source";
 
     private IntrospectionUtils()
     {
@@ -298,7 +309,7 @@ public final class IntrospectionUtils
 
         if (interfaceType == null)
         {
-            throw new IllegalArgumentException(String.format("Class '%s' does not implement the '%s' interface", type.getName(), implementedInterface.getName()));
+            throw new IllegalArgumentException(format("Class '%s' does not implement the '%s' interface", type.getName(), implementedInterface.getName()));
         }
 
         List<? super Class<?>> generics = toRawClasses(interfaceType.getGenerics());
@@ -338,7 +349,7 @@ public final class IntrospectionUtils
     {
         Class<?> searchClass = type;
 
-        checkArgument(searchClass.getSuperclass().equals(superClass), String.format("Class '%s' does not extend the '%s' class", type.getName(), superClass.getName()));
+        checkArgument(searchClass.getSuperclass().equals(superClass), format("Class '%s' does not extend the '%s' class", type.getName(), superClass.getName()));
 
         while (!Object.class.equals(searchClass))
         {
@@ -364,7 +375,7 @@ public final class IntrospectionUtils
     {
         if (!isInstantiable(declaringClass, requireDefaultConstructor))
         {
-            throw new IllegalArgumentException(String.format("Class %s cannot be instantiated.", declaringClass));
+            throw new IllegalArgumentException(format("Class %s cannot be instantiated.", declaringClass));
         }
     }
 
@@ -633,4 +644,39 @@ public final class IntrospectionUtils
                 .filter(field -> isMultiLevelMetadataKeyId(field, field.getType(), typeLoader))
                 .collect(new ImmutableListCollector<>());
     }
+
+    public static String getComponentModelTypeName(Object component)
+    {
+        if (component instanceof OperationModel)
+        {
+            return OPERATION;
+        }
+        else if (component instanceof ConfigurationModel)
+        {
+            return CONFIGURATION;
+        }
+        else if (component instanceof ConnectionProviderModel)
+        {
+            return CONNECTION_PROVIDER;
+        }
+        else if (component instanceof SourceModel)
+        {
+            return SOURCE;
+        }
+
+        throw new IllegalArgumentException(format("Component '%s' is not an instance of any known model type [%s, %s, %s, %s]",
+                                                  component.toString(),
+                                                  CONFIGURATION, CONNECTION_PROVIDER, OPERATION, SOURCE));
+    }
+
+    public static String getModelName(Object model)
+    {
+        if (model instanceof Named)
+        {
+            return ((Named) model).getName();
+        }
+
+        throw new IllegalArgumentException(format("Model '%s' is not a named type"));
+    }
+
 }

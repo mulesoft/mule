@@ -77,7 +77,7 @@ public class ExclusiveParameterModelValidatorTestCase extends AbstractMuleTestCa
     {
 
         @ParameterGroup
-        ExclusionWithNestedCollection group;
+        private ExclusionWithNestedCollection group;
     }
 
     @Extension(name = "InvalidExtensionWithoOneOptionalParameters")
@@ -85,7 +85,7 @@ public class ExclusiveParameterModelValidatorTestCase extends AbstractMuleTestCa
     {
 
         @ParameterGroup
-        ExclusionWithoutOneOptionalParameters group;
+        private ExclusionWithoutOneOptionalParameters group;
     }
 
     @Extension(name = "InvalidExtensionWithNestedPojo")
@@ -93,7 +93,7 @@ public class ExclusiveParameterModelValidatorTestCase extends AbstractMuleTestCa
     {
 
         @ParameterGroup
-        ExclusionWithNestedPojo group;
+        private ExclusionWithNestedPojo group;
     }
 
     @Extension(name = "InvalidExtensionWithNestedGroup")
@@ -101,7 +101,7 @@ public class ExclusiveParameterModelValidatorTestCase extends AbstractMuleTestCa
     {
 
         @ParameterGroup
-        ExclusionWithNestedParameterGroup group;
+        private ExclusionWithNestedParameterGroup group;
     }
 
     @Extension(name = "InvalidOperationExtension")
@@ -118,7 +118,7 @@ public class ExclusiveParameterModelValidatorTestCase extends AbstractMuleTestCa
     {
 
         @ParameterGroup
-        ValidExclusion group;
+        private ValidExclusion group;
     }
 
 

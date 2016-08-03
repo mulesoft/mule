@@ -12,6 +12,8 @@ import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinitionParser.CHILD_ELEMENT_KEY_PREFIX;
 import static org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinitionParser.CHILD_ELEMENT_KEY_SUFFIX;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getComponentModelTypeName;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getModelName;
 import org.mule.runtime.config.spring.dsl.api.ObjectFactory;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
@@ -24,6 +26,8 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
+import com.google.common.base.Joiner;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -31,7 +35,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.StringJoiner;
 
 /**
  * Base class for {@link ObjectFactory} implementation which create
@@ -68,11 +71,11 @@ public abstract class AbstractExtensionObjectFactory<T> implements ObjectFactory
      * @return a {@link ResolverSet}
      * @throws {@link ConfigurationException} if the exclusiveness condition between parameters is not honored
      */
-    protected ResolverSet getParametersAsResolverSet(EnrichableModel model, String component, String componentName) throws ConfigurationException
+    protected ResolverSet getParametersAsResolverSet(EnrichableModel model) throws ConfigurationException
     {
         ResolverSet resolverSet = new ResolverSet();
         getParameters().forEach((key, value) -> resolverSet.add(key, toValueResolver(value)));
-        checkParameterGroupExclusivenessForModel(model, component, componentName, getParameters().keySet());
+        checkParameterGroupExclusivenessForModel(model, getParameters().keySet());
         return resolverSet;
     }
 
@@ -147,30 +150,27 @@ public abstract class AbstractExtensionObjectFactory<T> implements ObjectFactory
         return key.replaceAll(CHILD_ELEMENT_KEY_PREFIX, "").replaceAll(CHILD_ELEMENT_KEY_SUFFIX, "");
     }
 
-    private void checkParameterGroupExclusivenessForModel(EnrichableModel model, String component, String componentName, Set<String> resolverKeys) throws ConfigurationException
+    private void checkParameterGroupExclusivenessForModel(EnrichableModel model, Set<String> resolverKeys) throws ConfigurationException
     {
-        Optional<ParameterGroupModelProperty> parameterGroupModelProperty = model.getModelProperty(ParameterGroupModelProperty.class);
-        if (parameterGroupModelProperty.isPresent() && parameterGroupModelProperty.get().hasExclusion())
+        Optional<ParameterGroupModelProperty> parameterGroupModelProperty = model.getModelProperty(ParameterGroupModelProperty.class).filter(mp -> mp.hasExclusion());
+        if (parameterGroupModelProperty.isPresent())
         {
-            checkParameterGroupExclusiveness(parameterGroupModelProperty.get(), component, componentName, resolverKeys);
+            checkParameterGroupExclusiveness(model, parameterGroupModelProperty.get(), resolverKeys);
         }
     }
 
-    private void checkParameterGroupExclusiveness(ParameterGroupModelProperty parameterGroupModelProperty, String component, String componentName, Set<String> resolverKeys) throws ConfigurationException
+    private void checkParameterGroupExclusiveness(EnrichableModel model, ParameterGroupModelProperty parameterGroupModelProperty, Set<String> resolverKeys) throws ConfigurationException
     {
-        for (ParameterGroup group : parameterGroupModelProperty.getGroups())
+        for (ParameterGroup<?> group : parameterGroupModelProperty.getGroups())
         {
-            Set<String> parametersFromGroup = group.getParameters().stream()
-                    .filter(p -> p.getAnnotation(org.mule.runtime.extension.api.annotation.param.Optional.class) != null)
+            Set<String> parametersFromGroup = group.getOptionalParameters().stream()
                     .map(p -> p.getName())
                     .filter(name -> resolverKeys.contains(name))
                     .collect(toSet());
 
             if (parametersFromGroup.size() > 1)
             {
-                StringJoiner joiner = new StringJoiner(", ");
-                parametersFromGroup.stream().forEach(p -> joiner.add(p));
-                throw new ConfigurationException(createStaticMessage(format("In %s '%s', parameter group '%s' has been set with the following parameters [%s] but only one should be set at any time due to its exclusive relation", component, componentName, group.getType().getName(), joiner.toString())));
+                throw new ConfigurationException(createStaticMessage(format("In %s '%s', parameter group '%s' has been set with the following parameters [%s] but only one should be set at any time due to its exclusive relation", getComponentModelTypeName(model), getModelName(model), group.getType().getName(), Joiner.on(", ").join(parametersFromGroup))));
             }
 
             if (group.oneRequired() && parametersFromGroup.isEmpty())
