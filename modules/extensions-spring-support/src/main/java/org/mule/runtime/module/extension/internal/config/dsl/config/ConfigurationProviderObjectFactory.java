@@ -37,7 +37,6 @@ import javax.inject.Inject;
  */
 class ConfigurationProviderObjectFactory extends AbstractExtensionObjectFactory<ConfigurationProvider<Object>> implements ObjectFactory<ConfigurationProvider<Object>>
 {
-    private static final String COMPONENT = "configuration";
     private final String name;
     private final RuntimeConfigurationModel configurationModel;
     private final ConfigurationProviderFactory configurationProviderFactory = new DefaultConfigurationProviderFactory();
@@ -73,7 +72,7 @@ class ConfigurationProviderObjectFactory extends AbstractExtensionObjectFactory<
 
     private ConfigurationProvider<Object> createInnerInstance() throws ConfigurationException
     {
-        ResolverSet resolverSet = getParametersAsResolverSet(configurationModel, COMPONENT, configurationModel.getName());
+        ResolverSet resolverSet = getParametersAsResolverSet(configurationModel);
         final ValueResolver<ConnectionProvider> connectionProviderResolver = getConnectionProviderResolver();
 
         ConfigurationProvider<Object> configurationProvider;

@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime.executor;
 
 import static org.apache.commons.lang.ArrayUtils.isEmpty;
 import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.toMap;
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ParameterGroupArgumentResolver.getResolversForModel;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isParameterContainer;
 import org.mule.metadata.java.api.JavaTypeLoader;
 import org.mule.runtime.api.message.MuleMessage;
@@ -26,8 +27,10 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.EventArgument
 import org.mule.runtime.module.extension.internal.runtime.resolver.MessageArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterGroupArgumentResolver;
 
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.util.List;
 import java.util.Map;
 
@@ -38,7 +41,7 @@ import java.util.Map;
  *
  * @since 3.7.0
  */
-final class MethodArgumentResolverDelegate implements ArgumentResolverDelegate
+public final class MethodArgumentResolverDelegate implements ArgumentResolverDelegate
 {
 
     private static final ArgumentResolver<Object> CONFIGURATION_ARGUMENT_RESOLVER = new ConfigurationArgumentResolver();
@@ -50,6 +53,8 @@ final class MethodArgumentResolverDelegate implements ArgumentResolverDelegate
     private final Method method;
     private final JavaTypeLoader typeLoader = new JavaTypeLoader(this.getClass().getClassLoader());
     private ArgumentResolver<? extends Object>[] argumentResolvers;
+    private Map<java.lang.reflect.Parameter, ParameterGroupArgumentResolver<? extends Object>> parameterGroupResolvers;
+    private boolean initialized = false;
 
     /**
      * Creates a new instance for the given {@code method}
@@ -59,12 +64,12 @@ final class MethodArgumentResolverDelegate implements ArgumentResolverDelegate
     public MethodArgumentResolverDelegate(Method method)
     {
         this.method = method;
-        initArgumentResolvers();
     }
 
-    private void initArgumentResolvers()
+    private void initArgumentResolvers(OperationModel model)
     {
         final Class<?>[] parameterTypes = method.getParameterTypes();
+
         if (isEmpty(parameterTypes))
         {
             argumentResolvers = new ArgumentResolver[] {};
@@ -73,6 +78,8 @@ final class MethodArgumentResolverDelegate implements ArgumentResolverDelegate
 
         argumentResolvers = new ArgumentResolver[parameterTypes.length];
         Annotation[][] parameterAnnotations = method.getParameterAnnotations();
+        Parameter[] parameters = method.getParameters();
+        parameterGroupResolvers = (Map<Parameter, ParameterGroupArgumentResolver<? extends Object>>) getResolversForModel(model);
         final List<String> paramNames = MuleExtensionAnnotationParser.getParamNames(method);
 
         for (int i = 0; i < parameterTypes.length; i++)
@@ -100,7 +107,7 @@ final class MethodArgumentResolverDelegate implements ArgumentResolverDelegate
             }
             else if (isParameterContainer(annotations.keySet(), typeLoader.load(parameterType)))
             {
-                argumentResolver = new ParameterGroupArgumentResolver(parameterType);
+                argumentResolver = parameterGroupResolvers.get(parameters[i]);
             }
             else
             {
@@ -114,6 +121,11 @@ final class MethodArgumentResolverDelegate implements ArgumentResolverDelegate
     @Override
     public Object[] resolve(OperationContext operationContext, Class<?>[] parameterTypes)
     {
+        if (!initialized)
+        {
+            initArgumentResolvers(operationContext.getOperationModel());
+        }
+
         Object[] parameterValues = new Object[argumentResolvers.length];
         int i = 0;
         for (ArgumentResolver<?> argumentResolver : argumentResolvers)

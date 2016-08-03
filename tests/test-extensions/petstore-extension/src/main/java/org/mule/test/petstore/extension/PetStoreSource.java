@@ -16,7 +16,7 @@ public class PetStoreSource extends Source<String, Attributes>
 {
 
     @ParameterGroup
-    ExclusivePetBreeder breeder;
+    private ExclusivePetBreeder breeder;
 
     @Override
     public void start() throws Exception

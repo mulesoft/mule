@@ -9,6 +9,8 @@ package org.mule.runtime.module.extension.internal.connector;
 import org.mule.functional.junit4.InvalidExtensionConfigTestCase;
 import org.mule.test.petstore.extension.PetStoreConnector;
 
+import org.junit.Test;
+
 public class PetStoreExclusiveParameterOperationTestCase extends InvalidExtensionConfigTestCase
 {
 
@@ -22,5 +24,11 @@ public class PetStoreExclusiveParameterOperationTestCase extends InvalidExtensio
     protected String getConfigFile()
     {
         return "petstore-exclusive-parameters-operation.xml";
+    }
+
+    @Test
+    public void getBreederOperation() throws Exception
+    {
+        runFlow("getBreederOperation");
     }
 }
