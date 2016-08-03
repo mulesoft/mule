@@ -9,11 +9,9 @@ package org.mule.runtime.core.message;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.core.message.MultiPartPayload.BODY_PART_NAME;
 import static org.mule.runtime.core.util.IOUtils.getResourceAsUrl;
 import static org.mule.runtime.core.util.IOUtils.toMuleMessagePart;
 
@@ -105,8 +103,8 @@ public class MultiPartPayloadTestCase extends AbstractMuleContextTestCase
                 bodyPart,
                 attachmentPart)).build();
 
-        assertThat(((MultiPartPayload) message.getPayload()).getPartsNames(), hasItem(BODY_PART_NAME));
-        assertThat(((MultiPartPayload) message.getPayload()).getPart(BODY_PART_NAME), sameInstance(bodyPart));
+        assertThat(((MultiPartPayload) message.getPayload()).hasBodyPart(), is(true));
+        assertThat(((MultiPartPayload) message.getPayload()).getBodyPart(), sameInstance(bodyPart));
     }
 
     @Test
@@ -127,7 +125,7 @@ public class MultiPartPayloadTestCase extends AbstractMuleContextTestCase
                 attachmentPart1,
                 attachmentPart2)).build();
 
-        assertThat(((MultiPartPayload) message.getPayload()).getPartsNames(), not(hasItem(BODY_PART_NAME)));
+        assertThat(((MultiPartPayload) message.getPayload()).hasBodyPart(), is(false));
     }
 
     @Test

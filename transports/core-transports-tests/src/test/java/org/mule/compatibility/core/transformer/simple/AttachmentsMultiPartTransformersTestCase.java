@@ -8,13 +8,12 @@ package org.mule.compatibility.core.transformer.simple;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.message.MultiPartPayload.BODY_PART_NAME;
 
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.DefaultMuleEvent;
@@ -124,7 +123,7 @@ public class AttachmentsMultiPartTransformersTestCase extends AbstractMuleContex
 
         assertThat(response.getPayload(), instanceOf(MultiPartPayload.class));
         assertThat(((MultiPartPayload) response.getPayload()).getParts(), hasSize(2));
-        assertThat(((MultiPartPayload) response.getPayload()).getPartsNames(), hasItem(BODY_PART_NAME));
+        assertThat(((MultiPartPayload) response.getPayload()).hasBodyPart(), is(true));
         assertThat(((MultiPartPayload) response.getPayload()).getPartsNames(), hasItem("attachment"));
     }
 
@@ -139,7 +138,7 @@ public class AttachmentsMultiPartTransformersTestCase extends AbstractMuleContex
 
         assertThat(response.getPayload(), instanceOf(MultiPartPayload.class));
         assertThat(((MultiPartPayload) response.getPayload()).getParts(), hasSize(1));
-        assertThat(((MultiPartPayload) response.getPayload()).getPartsNames(), not(hasItem(BODY_PART_NAME)));
+        assertThat(((MultiPartPayload) response.getPayload()).hasBodyPart(), is(false));
         assertThat(((MultiPartPayload) response.getPayload()).getPartsNames(), hasItem("attachment"));
     }
 

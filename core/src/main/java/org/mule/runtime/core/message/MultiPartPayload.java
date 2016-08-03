@@ -20,7 +20,7 @@ import java.util.NoSuchElementException;
 
 /**
  * Represents a payload of a {@link MuleMessage} composed of many different parts. Each parts is in itself a
- * {@link MuleMessage}, and has {@code attributes} specific to that parts (such as http part headers).
+ * {@link MuleMessage}, and has {@code attributes} specific to that parts (such as the headers of a single http part).
  * <p>
  * This is useful for representing attachments as part of the payload of a message.
  * 
@@ -33,7 +33,7 @@ public class MultiPartPayload implements Serializable
     /**
      * The name of a part that does <b>not</b> represent an attachment.
      */
-    public static final String BODY_PART_NAME = "_body";
+    private static final String BODY_PART_NAME = "_body";
 
     private List<MuleMessage> parts;
 
@@ -113,6 +113,36 @@ public class MultiPartPayload implements Serializable
                     })
                     .findFirst()
                     .get();
+    }
+
+    /**
+     * Looks up the part that represents the body (not an attachment) of the message.
+     * 
+     * @return the part for the body.
+     */
+    public MuleMessage getBodyPart()
+    {
+        return parts.stream()
+                    .filter(m ->
+                    {
+                        return !(m.getAttributes() instanceof AttachmentAttributes);
+                    })
+                    .findFirst()
+                    .orElse(null);
+    }
+
+    /**
+     * Checks for the presence of the part that represents the body (not an attachment) of the message.
+     * 
+     * @return {@code true} if the part for the body is present.
+     */
+    public boolean hasBodyPart()
+    {
+        return parts.stream()
+                    .anyMatch(m ->
+                    {
+                        return !(m.getAttributes() instanceof AttachmentAttributes);
+                    });
     }
 
     @Override
