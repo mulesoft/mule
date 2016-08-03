@@ -8,16 +8,16 @@ package org.mule.test.integration.config;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import org.junit.Rule;
 import org.junit.Test;
 
-public class DisableTimeoutsConfigTestCase extends FunctionalTestCase
+public class DisableTimeoutsConfigTestCase extends AbstractIntegrationTestCase
 {
     @Rule
     public DynamicPort dynamicPort1 = new DynamicPort("port1");

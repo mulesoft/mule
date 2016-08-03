@@ -6,20 +6,19 @@
  */
 package org.mule.test.config.spring.parsers;
 
-import org.mule.test.config.spring.parsers.beans.AbstractBean;
-import org.mule.functional.junit4.FunctionalTestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.util.ClassUtils;
+import org.mule.test.config.spring.parsers.beans.AbstractBean;
 
 import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
-public abstract class AbstractNamespaceTestCase extends FunctionalTestCase
+public abstract class AbstractNamespaceTestCase extends AbstractIntegrationTestCase
 {
 
     @Test

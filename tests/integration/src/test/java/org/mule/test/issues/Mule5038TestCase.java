@@ -7,17 +7,16 @@
 package org.mule.test.issues;
 
 import static org.junit.Assert.assertNotSame;
-
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.routing.MessageFilter;
-import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 
-public class Mule5038TestCase extends FunctionalTestCase
+public class Mule5038TestCase extends AbstractIntegrationTestCase
 {
     @Override
     protected String getConfigFile()

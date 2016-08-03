@@ -13,6 +13,7 @@ import static org.mockito.Matchers.same;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
@@ -20,7 +21,6 @@ import org.mule.runtime.core.api.registry.TransformerResolver;
 import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.core.registry.MuleRegistryHelper;
-import org.mule.functional.junit4.FunctionalTestCase;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -30,7 +30,7 @@ import java.util.Set;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
-public class ConvertersNotRegisteredTwiceTestCase extends FunctionalTestCase
+public class ConvertersNotRegisteredTwiceTestCase extends AbstractIntegrationTestCase
 {
 
     private MuleRegistryHelper registryHelper;

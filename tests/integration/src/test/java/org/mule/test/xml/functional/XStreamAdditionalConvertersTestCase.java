@@ -8,10 +8,10 @@ package org.mule.test.xml.functional;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.FunctionalTestComponent;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.test.AbstractIntegrationTestCase;
+import org.mule.runtime.core.api.MuleEventContext;
 
 import com.thoughtworks.xstream.converters.extended.ISO8601DateConverter;
 
@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 
-public class XStreamAdditionalConvertersTestCase extends FunctionalTestCase
+public class XStreamAdditionalConvertersTestCase extends AbstractIntegrationTestCase
 {
 
     public static final String FLOW_NAME = "ObjectToXml";

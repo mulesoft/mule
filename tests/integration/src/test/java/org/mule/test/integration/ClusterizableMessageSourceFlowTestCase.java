@@ -8,8 +8,7 @@ package org.mule.test.integration;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
@@ -20,7 +19,7 @@ import org.mule.runtime.core.source.ClusterizableMessageSourceWrapper;
 
 import org.junit.Test;
 
-public class ClusterizableMessageSourceFlowTestCase extends FunctionalTestCase
+public class ClusterizableMessageSourceFlowTestCase extends AbstractIntegrationTestCase
 {
     public ClusterizableMessageSourceFlowTestCase()
     {

@@ -9,8 +9,7 @@ package org.mule.test.integration.xml;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.util.IOUtils;
@@ -22,7 +21,7 @@ import java.util.Map;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Test;
 
-public class XSLTWikiDocsTestCase extends FunctionalTestCase
+public class XSLTWikiDocsTestCase extends AbstractIntegrationTestCase
 {
 
     @Override

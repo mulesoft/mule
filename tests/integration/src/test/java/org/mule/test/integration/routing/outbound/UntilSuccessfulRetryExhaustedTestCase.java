@@ -7,17 +7,16 @@
 package org.mule.test.integration.routing.outbound;
 
 import static org.junit.Assert.fail;
-
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.context.notification.ExceptionNotificationListener;
 import org.mule.runtime.core.context.notification.ExceptionNotification;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.util.concurrent.Latch;
 
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 
-public class UntilSuccessfulRetryExhaustedTestCase extends FunctionalTestCase
+public class UntilSuccessfulRetryExhaustedTestCase extends AbstractIntegrationTestCase
 {
     @Override
     protected String getConfigFile()

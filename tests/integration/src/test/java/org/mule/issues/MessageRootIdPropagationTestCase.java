@@ -9,9 +9,9 @@ package org.mule.issues;
 import static org.junit.Assert.assertEquals;
 
 import org.mule.functional.junit4.FlowRunner;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -26,7 +26,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 @Ignore("See MULE-9195")
-public class MessageRootIdPropagationTestCase extends FunctionalTestCase
+public class MessageRootIdPropagationTestCase extends AbstractIntegrationTestCase
 {
     @Rule
     public DynamicPort port1 = new DynamicPort("port1");

@@ -8,7 +8,7 @@ package org.mule.test.integration.exceptions;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -16,11 +16,10 @@ import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.exception.TemplateMessagingExceptionStrategy;
-import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 
-public class ExceptionStrategyLifecycleTestCase extends FunctionalTestCase
+public class ExceptionStrategyLifecycleTestCase extends AbstractIntegrationTestCase
 {
     @Override
     protected String getConfigFile()

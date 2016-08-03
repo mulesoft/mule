@@ -7,11 +7,10 @@
 package org.mule.test.el;
 
 import static org.junit.Assert.assertEquals;
-
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.runtime.core.api.expression.ExpressionManager;
-import org.mule.functional.junit4.FunctionalTestCase;
 
 import java.text.DateFormat;
 import java.util.Locale;
@@ -19,7 +18,7 @@ import java.util.Locale;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ExpressionLanguageConfigTestCase extends FunctionalTestCase
+public class ExpressionLanguageConfigTestCase extends AbstractIntegrationTestCase
 {
     ExpressionLanguage el;
     ExpressionManager em;

@@ -10,10 +10,9 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
-
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.test.filters.FilterCounter;
 
 import org.junit.Test;
@@ -23,7 +22,7 @@ import org.junit.Test;
  * filter is only applied once in the positive case, plus make sure it doesn't get
  * filtered at all when the message does not meet the filter criteria
  */
-public class Mule4412TestCase extends FunctionalTestCase
+public class Mule4412TestCase extends AbstractIntegrationTestCase
 {
     @Override
     protected String getConfigFile()

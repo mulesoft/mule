@@ -9,8 +9,7 @@ package org.mule.test.integration.routing;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
-
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
@@ -24,7 +23,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.Before;
 import org.junit.Test;
 
-public class UntilSuccessfulExceptionStrategyTestCase extends FunctionalTestCase
+public class UntilSuccessfulExceptionStrategyTestCase extends AbstractIntegrationTestCase
 {
 
     private static final int TIMEOUT = 10;

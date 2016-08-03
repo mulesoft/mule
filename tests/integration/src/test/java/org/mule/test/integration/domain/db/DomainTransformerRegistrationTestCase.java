@@ -10,10 +10,9 @@ package org.mule.test.integration.domain.db;
 import static java.lang.Boolean.TRUE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;
-
-import org.mule.runtime.core.api.MuleMessage;
 import org.mule.functional.junit4.DomainFunctionalTestCase;
 import org.mule.functional.junit4.FlowRunner;
+import org.mule.runtime.core.api.MuleMessage;
 
 import org.junit.Test;
 

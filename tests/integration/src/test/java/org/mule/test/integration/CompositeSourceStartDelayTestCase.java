@@ -6,7 +6,7 @@
  */
 package org.mule.test.integration;
 
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.probe.PollingProber;
@@ -19,7 +19,7 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class CompositeSourceStartDelayTestCase extends FunctionalTestCase
+public class CompositeSourceStartDelayTestCase extends AbstractIntegrationTestCase
 {
 
     public static final CountDownLatch startLatch = new CountDownLatch(1);

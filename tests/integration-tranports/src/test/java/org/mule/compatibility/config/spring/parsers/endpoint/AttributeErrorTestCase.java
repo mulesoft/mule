@@ -6,8 +6,8 @@
  */
 package org.mule.compatibility.config.spring.parsers.endpoint;
 
+import org.mule.compatibility.config.spring.parsers.AbstractBadConfigTestCase;
 import org.mule.compatibility.core.config.builders.TransportsConfigurationBuilder;
-import org.mule.test.config.spring.parsers.AbstractBadConfigTestCase;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 
 import java.util.List;

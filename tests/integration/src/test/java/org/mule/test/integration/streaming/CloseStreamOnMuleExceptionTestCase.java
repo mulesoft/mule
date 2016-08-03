@@ -7,14 +7,13 @@
 package org.mule.test.integration.streaming;
 
 import static org.junit.Assert.assertTrue;
-
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.test.AbstractIntegrationTestCase;
+import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.runtime.module.xml.stax.DelegateXMLStreamReader;
 import org.mule.runtime.module.xml.stax.StaxSource;
 import org.mule.runtime.module.xml.util.XMLUtils;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
-import org.mule.runtime.core.util.concurrent.Latch;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -30,7 +29,7 @@ import javax.xml.transform.stream.StreamSource;
 import org.junit.Test;
 import org.xml.sax.InputSource;
 
-public class CloseStreamOnMuleExceptionTestCase extends FunctionalTestCase
+public class CloseStreamOnMuleExceptionTestCase extends AbstractIntegrationTestCase
 {
     private final int timeoutMs = 3000;
     private static Latch inputStreamLatch = new Latch();

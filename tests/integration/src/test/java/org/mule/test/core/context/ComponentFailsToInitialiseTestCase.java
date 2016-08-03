@@ -8,15 +8,15 @@ package org.mule.test.core.context;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.hamcrest.CoreMatchers;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-public class ComponentFailsToInitialiseTestCase extends FunctionalTestCase
+public class ComponentFailsToInitialiseTestCase extends AbstractIntegrationTestCase
 {
 
     @Rule

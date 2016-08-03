@@ -8,20 +8,19 @@ package org.mule.test.config;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
+import org.mule.test.AbstractIntegrationTestCase;
+import org.mule.functional.security.MockEncryptionStrategy;
+import org.mule.functional.security.TestSingleUserSecurityProvider;
 import org.mule.runtime.core.api.EncryptionStrategy;
 import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.security.PasswordBasedEncryptionStrategy;
 import org.mule.runtime.core.security.SecretKeyEncryptionStrategy;
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.functional.security.MockEncryptionStrategy;
-import org.mule.functional.security.TestSingleUserSecurityProvider;
 
 import java.util.Iterator;
 
 import org.junit.Test;
 
-public class SecurityNamespaceHandlerTestCase extends FunctionalTestCase
+public class SecurityNamespaceHandlerTestCase extends AbstractIntegrationTestCase
 {
     @Override
     protected String getConfigFile()

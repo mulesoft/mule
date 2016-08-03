@@ -9,11 +9,10 @@ package org.mule.test.integration.routing.outbound;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
-
+import org.mule.functional.functional.FlowAssert;
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.functional.functional.FlowAssert;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 
 import java.util.ArrayList;
@@ -21,7 +20,7 @@ import java.util.List;
 
 import org.junit.Test;
 
-public class MulticasterAsyncTestCase extends FunctionalTestCase
+public class MulticasterAsyncTestCase extends AbstractIntegrationTestCase
 {
 
     @Override

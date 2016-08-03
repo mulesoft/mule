@@ -9,9 +9,8 @@ package org.mule.test.integration.schedule;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.util.Predicate;
 
 import org.junit.Test;
@@ -22,7 +21,7 @@ import org.junit.Test;
  *
  * It also shows the way users can add a new Scheduler as a spring bean.
  */
-public class RunningScheduleTestCase extends FunctionalTestCase
+public class RunningScheduleTestCase extends AbstractIntegrationTestCase
 {
     public static final String SCHEDULER_NAME = "testScheduler";
 

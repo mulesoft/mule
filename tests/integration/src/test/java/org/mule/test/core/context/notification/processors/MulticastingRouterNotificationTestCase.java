@@ -9,11 +9,13 @@ package org.mule.test.core.context.notification.processors;
 import static org.junit.Assert.assertNotNull;
 import org.mule.test.core.context.notification.Node;
 import org.mule.test.core.context.notification.RestrictedNode;
-import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.Arrays;
 import java.util.List;
 
+import org.junit.Ignore;
+
+@Ignore("MULE-10185 - ArtifactClassLoaderRunner CXF issue when running all tests, works when executed isolated")
 public class MulticastingRouterNotificationTestCase extends AbstractMessageProcessorNotificationTestCase
 {
 
@@ -26,10 +28,10 @@ public class MulticastingRouterNotificationTestCase extends AbstractMessageProce
     @Override
     public void doTest() throws Exception
     {
-        List<String> testList = Arrays.asList(AbstractMuleTestCase.TEST_PAYLOAD);
-        assertNotNull(flowRunner("all").withPayload(AbstractMuleTestCase.TEST_PAYLOAD).run());
+        List<String> testList = Arrays.asList(TEST_PAYLOAD);
+        assertNotNull(flowRunner("all").withPayload(TEST_PAYLOAD).run());
         assertNotNull(flowRunner("all2").withPayload(testList).run());
-        assertNotNull(flowRunner("all3").withPayload(AbstractMuleTestCase.TEST_PAYLOAD).run());
+        assertNotNull(flowRunner("all3").withPayload(TEST_PAYLOAD).run());
     }
 
 

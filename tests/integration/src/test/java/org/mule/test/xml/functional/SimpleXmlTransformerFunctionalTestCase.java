@@ -11,14 +11,14 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 
 import org.junit.Test;
 
-public class SimpleXmlTransformerFunctionalTestCase extends FunctionalTestCase
+public class SimpleXmlTransformerFunctionalTestCase extends AbstractIntegrationTestCase
 {
     public static final String SERIALIZED = "<org.mule.test.xml.functional.SimpleXmlTransformerFunctionalTestCase_-Parent>\n" +
             "  <child>\n" +

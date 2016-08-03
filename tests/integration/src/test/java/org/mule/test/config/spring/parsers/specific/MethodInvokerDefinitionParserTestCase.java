@@ -7,14 +7,13 @@
 package org.mule.test.config.spring.parsers.specific;
 
 import static org.junit.Assert.assertEquals;
-
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Ignore;
 import org.junit.Test;
 
 @Ignore("Test appears to be incorrectly written.")
-public class MethodInvokerDefinitionParserTestCase extends FunctionalTestCase
+public class MethodInvokerDefinitionParserTestCase extends AbstractIntegrationTestCase
 {
     @Test
     public void testPojoFlow() throws Exception

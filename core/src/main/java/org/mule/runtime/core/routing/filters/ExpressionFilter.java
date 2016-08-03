@@ -47,12 +47,6 @@ public class ExpressionFilter implements Filter, MuleContextAware
     private MuleContext muleContext;
 
     /**
-     * The class-loader that should be used to load any classes used in scripts. Default to the classloader
-     * used to load this filter
-     **/
-    private ClassLoader expressionEvaluationClassLoader = Thread.currentThread().getContextClassLoader();
-
-    /**
      * For evaluators that are not expression languages we can delegate the execution to another filter
      */
     private Filter delegateFilter;
@@ -106,13 +100,7 @@ public class ExpressionFilter implements Filter, MuleContextAware
     @Override
     public boolean accept(MuleEvent event)
     {
-        // MULE-4797 Because there is no way to specify the class-loader that script
-        // engines use and because scripts when used for expressions are compiled in
-        // runtime rather than at initialization the only way to ensure the correct
-        // class-loader to used is to switch it out here. We may want to consider
-        // passing the class-loader to the ExpressionManager and only doing this for
-        // certain ExpressionEvaluators further in.
-        return withContextClassLoader(expressionEvaluationClassLoader, () ->
+        return withContextClassLoader(muleContext.getExecutionClassLoader(), () ->
                 muleContext.getExpressionManager().evaluateBoolean(getFullExpression(), event, nullReturnsTrue, !nullReturnsTrue));
     }
 

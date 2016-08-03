@@ -10,17 +10,15 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
-
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 
 /**
  * This test has been re-written to use entry point resolvers.
  */
-public class NoArgsCallWrapperFunctionalTestCase extends FunctionalTestCase
+public class NoArgsCallWrapperFunctionalTestCase extends AbstractIntegrationTestCase
 {
     private static final int RECEIVE_TIMEOUT = 5000;
 

@@ -12,8 +12,8 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.api.meta.AnnotatedObject;
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.component.DefaultJavaComponent;
@@ -26,7 +26,7 @@ import org.junit.Test;
 /**
  * Test that configuration-based annotations are propagated to the appropriate runtime objects
  */
-public class ConfigurationAnnotationsTestCase extends FunctionalTestCase
+public class ConfigurationAnnotationsTestCase extends AbstractIntegrationTestCase
 {
 
     @Override

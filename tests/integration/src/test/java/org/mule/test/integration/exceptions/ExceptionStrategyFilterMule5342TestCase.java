@@ -6,14 +6,14 @@
  */
 package org.mule.test.integration.exceptions;
 
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.routing.filter.FilterUnacceptedException;
-import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 
-public class ExceptionStrategyFilterMule5342TestCase extends FunctionalTestCase
+public class ExceptionStrategyFilterMule5342TestCase extends AbstractIntegrationTestCase
 {
     @Override
     protected String getConfigFile()

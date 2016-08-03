@@ -10,13 +10,12 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
-
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.serialization.SerializationException;
 import org.mule.runtime.core.api.store.ObjectStoreException;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.routing.EventGroup;
 import org.mule.runtime.core.util.store.SimpleMemoryObjectStore;
 
@@ -27,7 +26,7 @@ import java.util.List;
 import org.apache.commons.lang.SerializationUtils;
 import org.junit.Test;
 
-public class CollectionAggregatorRouterSerializationTestCase extends FunctionalTestCase
+public class CollectionAggregatorRouterSerializationTestCase extends AbstractIntegrationTestCase
 {
 
     @Override

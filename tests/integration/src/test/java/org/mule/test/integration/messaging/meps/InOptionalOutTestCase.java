@@ -11,9 +11,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.runtime.core.util.StringUtils;
+import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -22,7 +22,7 @@ import java.util.Map;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class InOptionalOutTestCase extends FunctionalTestCase
+public class InOptionalOutTestCase extends AbstractIntegrationTestCase
 {
     public static final long TIMEOUT = 3000;
 

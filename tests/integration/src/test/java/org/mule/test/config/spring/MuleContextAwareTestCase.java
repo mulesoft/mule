@@ -6,14 +6,14 @@
  */
 package org.mule.test.config.spring;
 
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Test;
 
 /**
  * This tests that we can have references to management context aware objects within a config
  */
-public class MuleContextAwareTestCase extends FunctionalTestCase
+public class MuleContextAwareTestCase extends AbstractIntegrationTestCase
 {
 
     @Override

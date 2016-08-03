@@ -9,11 +9,10 @@ package org.mule.test.integration.security;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
-
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.config.ExceptionHelper;
-import org.mule.functional.junit4.FunctionalTestCase;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -25,7 +24,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 /**
  * See MULE-4916: spring beans inside a security filter
  */
-public class CustomSecurityFilterTestCase extends FunctionalTestCase
+public class CustomSecurityFilterTestCase extends AbstractIntegrationTestCase
 {
     @Override
     protected String getConfigFile()

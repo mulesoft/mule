@@ -8,10 +8,9 @@ package org.mule.test.integration.routing;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.functional.functional.FunctionalTestNotification;
 import org.mule.functional.functional.FunctionalTestNotificationListener;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.functional.listener.FlowExecutionListener;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
@@ -23,7 +22,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.commons.lang.SerializationUtils;
 import org.junit.Test;
 
-public class MessageChunkingTestCase extends FunctionalTestCase
+public class MessageChunkingTestCase extends AbstractIntegrationTestCase
 {
 
     @Override

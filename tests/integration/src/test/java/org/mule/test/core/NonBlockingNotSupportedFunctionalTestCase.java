@@ -13,8 +13,8 @@ import static org.mule.functional.functional.FlowAssert.verify;
 
 import org.mule.functional.exceptions.FunctionalTestException;
 import org.mule.functional.functional.FunctionalTestComponent;
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.functional.junit4.FlowRunner;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.component.ComponentException;
 import org.mule.runtime.core.util.concurrent.Latch;
@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 
-public class NonBlockingNotSupportedFunctionalTestCase extends FunctionalTestCase
+public class NonBlockingNotSupportedFunctionalTestCase extends AbstractIntegrationTestCase
 {
 
     @Override

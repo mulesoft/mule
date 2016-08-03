@@ -9,9 +9,9 @@ package org.mule.test.integration.components;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 
@@ -19,7 +19,7 @@ import org.junit.Test;
  * This test re-written to use entry point resolvers.  As a consequence, some tests, which verified
  * implementation details rather than functionality, were dropped.
  */
-public class NoArgsCallComponentTestCase extends FunctionalTestCase
+public class NoArgsCallComponentTestCase extends AbstractIntegrationTestCase
 {
     public static final String INPUT_DC_FLOW_NAME = "WORMS";
     public static final String OUTPUT_DC_QUEUE_NAME = "test://out";

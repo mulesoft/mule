@@ -11,17 +11,16 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.util.ExceptionUtils;
 
 import java.io.FileNotFoundException;
 
 import org.junit.Test;
 
-public class MuleTestNamespaceFunctionalTestCase extends FunctionalTestCase
+public class MuleTestNamespaceFunctionalTestCase extends AbstractIntegrationTestCase
 {
 
     @Override

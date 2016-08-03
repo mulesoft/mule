@@ -7,8 +7,7 @@
 package org.mule.test.config.spring.flow;
 
 import static org.junit.Assert.assertEquals;
-
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
@@ -25,7 +24,7 @@ import java.util.List;
 
 import org.junit.Test;
 
-public class FlowProcessingStrategyConfigTestCase extends FunctionalTestCase
+public class FlowProcessingStrategyConfigTestCase extends AbstractIntegrationTestCase
 {
     @Override
     protected String getConfigFile()

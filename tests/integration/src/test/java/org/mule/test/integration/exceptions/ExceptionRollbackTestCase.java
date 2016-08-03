@@ -8,7 +8,6 @@ package org.mule.test.integration.exceptions;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.config.i18n.CoreMessages;

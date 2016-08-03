@@ -10,14 +10,13 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
-
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 
-public class IdempotentRouterWithFilterTestCase extends FunctionalTestCase
+public class IdempotentRouterWithFilterTestCase extends AbstractIntegrationTestCase
 {
 
     @Override

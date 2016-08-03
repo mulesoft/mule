@@ -7,16 +7,16 @@
 
 package org.mule.test.core.context.notification;
 
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.context.notification.ExceptionNotificationListener;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
 
 import org.junit.Test;
 
-public class FailingNotificationListenerTestCase extends FunctionalTestCase
+public class FailingNotificationListenerTestCase extends AbstractIntegrationTestCase
 {
     private static int count = 0;
     private static final Object lock = new Object();

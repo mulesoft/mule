@@ -8,11 +8,10 @@ package org.mule.test.integration.schedule;
 
 
 import static org.junit.Assert.assertEquals;
-
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.schedule.Scheduler;
 import org.mule.runtime.core.api.schedule.Schedulers;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
@@ -27,7 +26,7 @@ import org.junit.Test;
 /**
  * This is a test for poll with schedulers. It validates that the polls can be executed, stopped, run.
  */
-public class PollScheduleTestCase extends FunctionalTestCase
+public class PollScheduleTestCase extends AbstractIntegrationTestCase
 {
     private static List<String> foo = new ArrayList<String>();
     private static List<String> bar = new ArrayList<String>();

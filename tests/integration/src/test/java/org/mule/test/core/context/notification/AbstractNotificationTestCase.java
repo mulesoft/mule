@@ -7,7 +7,7 @@
 package org.mule.test.core.context.notification;
 
 import static org.junit.Assert.fail;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
@@ -19,7 +19,7 @@ import org.junit.Test;
 /**
  * Tests must define a "notificationLogger" listener
  */
-public abstract class AbstractNotificationTestCase extends FunctionalTestCase
+public abstract class AbstractNotificationTestCase extends AbstractIntegrationTestCase
 {
     private NotificationLogger notificationLogger;
 

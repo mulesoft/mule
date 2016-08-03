@@ -7,15 +7,14 @@
 package org.mule.test.integration.exceptions;
 
 import static org.junit.Assert.assertNotNull;
-
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.junit.Rule;
 import org.junit.Test;
 
-public class AsyncExceptionHandlingTestCase extends FunctionalTestCase
+public class AsyncExceptionHandlingTestCase extends AbstractIntegrationTestCase
 {
 
     @Rule

@@ -10,17 +10,16 @@ import static java.util.stream.Collectors.toList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
-import org.mule.runtime.core.api.MuleMessage;
 import org.mule.functional.functional.FlowAssert;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.test.AbstractIntegrationTestCase;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.tck.testmodels.fruit.Apple;
 
 import java.util.List;
 
 import org.junit.Test;
 
-public class MulticasterMixedSyncAsyncTestCase extends FunctionalTestCase
+public class MulticasterMixedSyncAsyncTestCase extends AbstractIntegrationTestCase
 {
 
     @Override

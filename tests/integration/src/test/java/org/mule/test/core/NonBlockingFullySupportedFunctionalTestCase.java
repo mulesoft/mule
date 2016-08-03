@@ -11,8 +11,8 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.functional.functional.FlowAssert.verify;
-
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.test.AbstractIntegrationTestCase;
+import org.mule.functional.junit4.runners.RunnerDelegateTo;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
@@ -26,12 +26,11 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-@RunWith(Parameterized.class)
-public class NonBlockingFullySupportedFunctionalTestCase extends FunctionalTestCase
+@RunnerDelegateTo(Parameterized.class)
+public class NonBlockingFullySupportedFunctionalTestCase extends AbstractIntegrationTestCase
 {
 
     public static String FOO = "foo";

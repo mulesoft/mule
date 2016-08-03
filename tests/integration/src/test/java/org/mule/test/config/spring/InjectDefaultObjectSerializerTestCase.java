@@ -9,11 +9,12 @@ package org.mule.test.config.spring;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
+import org.mule.functional.junit4.runners.RunnerDelegateTo;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.serialization.DefaultObjectSerializer;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.serialization.internal.AbstractObjectSerializer;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import java.io.InputStream;
 import java.util.Arrays;
@@ -22,11 +23,10 @@ import java.util.Collection;
 import javax.inject.Inject;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-@RunWith(Parameterized.class)
-public class InjectDefaultObjectSerializerTestCase extends FunctionalTestCase
+@RunnerDelegateTo(Parameterized.class)
+public class InjectDefaultObjectSerializerTestCase extends AbstractIntegrationTestCase
 {
 
     @Parameterized.Parameters(name = "{0}")

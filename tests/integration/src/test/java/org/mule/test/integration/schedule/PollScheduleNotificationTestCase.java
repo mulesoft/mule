@@ -7,21 +7,21 @@
 package org.mule.test.integration.schedule;
 
 
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.context.notification.ConnectorMessageNotificationListener;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.context.notification.ConnectorMessageNotification;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.source.polling.PollingMessageSource;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
-import org.mule.runtime.core.source.polling.PollingMessageSource;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
 
-public class PollScheduleNotificationTestCase extends FunctionalTestCase
+public class PollScheduleNotificationTestCase extends AbstractIntegrationTestCase
 {
     private Prober prober = new PollingProber(5000, 100l);
 

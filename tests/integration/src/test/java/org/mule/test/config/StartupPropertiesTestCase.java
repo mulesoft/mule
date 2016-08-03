@@ -8,14 +8,13 @@ package org.mule.test.config;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import java.util.Properties;
 
 import org.junit.Test;
 
-public class StartupPropertiesTestCase extends FunctionalTestCase
+public class StartupPropertiesTestCase extends AbstractIntegrationTestCase
 {
     private String STARTUP_PROPERTY_1_KEY = "startupProperty1";
     private String STARTUP_PROPERTY_2_KEY = "startupProperty2";

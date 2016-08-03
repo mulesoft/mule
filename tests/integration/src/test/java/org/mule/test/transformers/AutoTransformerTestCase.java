@@ -7,18 +7,18 @@
 package org.mule.test.transformers;
 
 import static org.junit.Assert.assertTrue;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.test.AbstractIntegrationTestCase;
+import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.FruitBasket;
 import org.mule.tck.testmodels.fruit.FruitBowl;
-import org.mule.runtime.core.util.concurrent.Latch;
 
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 
-public class AutoTransformerTestCase extends FunctionalTestCase
+public class AutoTransformerTestCase extends AbstractIntegrationTestCase
 {
     private static Latch latch;
 

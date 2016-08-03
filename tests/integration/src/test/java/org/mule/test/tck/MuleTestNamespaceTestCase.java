@@ -11,17 +11,16 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.functional.functional.CounterCallback;
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.functional.functional.ResponseWriterCallback;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import java.io.IOException;
 
 import org.junit.Test;
 
-public class MuleTestNamespaceTestCase extends FunctionalTestCase
+public class MuleTestNamespaceTestCase extends AbstractIntegrationTestCase
 {
 
     @Override

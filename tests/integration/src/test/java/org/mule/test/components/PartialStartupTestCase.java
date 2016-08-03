@@ -7,7 +7,7 @@
 package org.mule.test.components;
 
 import static org.junit.Assert.fail;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 
@@ -18,7 +18,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 @Ignore
-public class PartialStartupTestCase extends FunctionalTestCase
+public class PartialStartupTestCase extends AbstractIntegrationTestCase
 {
 
     public PartialStartupTestCase()

@@ -7,18 +7,17 @@
 package org.mule.test.config.spring;
 
 import static org.junit.Assert.assertTrue;
-
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.component.JavaComponent;
 import org.mule.runtime.core.api.object.ObjectFactory;
 import org.mule.runtime.core.construct.Flow;
-import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 
 /**
  * Test to ensure that Mule always uses the real
  */
-public class SpringAOPSpringBeanLookupTestCase extends FunctionalTestCase
+public class SpringAOPSpringBeanLookupTestCase extends AbstractIntegrationTestCase
 {
     @Override
     protected String getConfigFile()

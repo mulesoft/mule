@@ -10,16 +10,15 @@ import static java.util.stream.Collectors.toList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.functional.junit4.FunctionalTestCase;
 
 import java.util.List;
 
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Test;
 
-public class ExpressionSplitterXPathTestCase extends FunctionalTestCase
+public class ExpressionSplitterXPathTestCase extends AbstractIntegrationTestCase
 {
 
     private final String MESSAGE = "<Batch xmlns=\"http://acme.com\">\n" +

@@ -8,13 +8,12 @@ package org.mule.test.spring;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.config.ThreadingProfile;
-import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 
-public class DefaultThreadingProfileTestCase extends FunctionalTestCase
+public class DefaultThreadingProfileTestCase extends AbstractIntegrationTestCase
 {
 
     @Override

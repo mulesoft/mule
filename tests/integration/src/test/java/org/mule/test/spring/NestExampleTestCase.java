@@ -6,11 +6,11 @@
  */
 package org.mule.test.spring;
 
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Test;
 
-public class NestExampleTestCase extends FunctionalTestCase
+public class NestExampleTestCase extends AbstractIntegrationTestCase
 {
     @Override
     protected String getConfigFile()

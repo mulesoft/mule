@@ -13,8 +13,8 @@ import static org.junit.Assert.assertThat;
 
 import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.FunctionalTestComponent;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleMessage.Builder;
@@ -26,7 +26,7 @@ import javax.activation.DataHandler;
 
 import org.junit.Test;
 
-public class AttachmentsPropagationTestCase extends FunctionalTestCase implements EventCallback
+public class AttachmentsPropagationTestCase extends AbstractIntegrationTestCase implements EventCallback
 {
     private static final String ATTACHMENT_CONTENT = "<content>";
 

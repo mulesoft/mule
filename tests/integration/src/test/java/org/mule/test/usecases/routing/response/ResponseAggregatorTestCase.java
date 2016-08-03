@@ -13,8 +13,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
@@ -30,7 +29,7 @@ import java.util.Map;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class ResponseAggregatorTestCase extends FunctionalTestCase
+public class ResponseAggregatorTestCase extends AbstractIntegrationTestCase
 {
 
     @Rule

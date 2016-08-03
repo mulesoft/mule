@@ -8,14 +8,14 @@ package org.mule.test.xml.functional;
 
 
 import static org.junit.Assert.assertNotNull;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.commons.io.IOUtils;
 
-public abstract class AbstractXmlFunctionalTestCase extends FunctionalTestCase
+public abstract class AbstractXmlFunctionalTestCase extends AbstractIntegrationTestCase
 {
     public static final long TIMEOUT = 3000L;
     

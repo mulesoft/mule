@@ -9,14 +9,13 @@ package org.mule.test.integration.exceptions;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
-
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Test;
 
-public class ExceptionStrategyMessagePropertiesTestCase extends FunctionalTestCase
+public class ExceptionStrategyMessagePropertiesTestCase extends AbstractIntegrationTestCase
 {
     private final int numMessages = 100;
 

@@ -10,7 +10,8 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_DEFAULT_PROCESSING_STRATEGY;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.test.AbstractIntegrationTestCase;
+import org.mule.functional.junit4.runners.RunnerDelegateTo;
 import org.mule.runtime.config.spring.util.ProcessingStrategyUtils;
 import org.mule.runtime.core.api.processor.ProcessingStrategy;
 import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategy;
@@ -22,11 +23,10 @@ import java.util.Collection;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-@RunWith(Parameterized.class)
-public class SystemPropertyProcessingStrategyConfigTestCase extends FunctionalTestCase
+@RunnerDelegateTo(Parameterized.class)
+public class SystemPropertyProcessingStrategyConfigTestCase extends AbstractIntegrationTestCase
 {
 
     @Parameterized.Parameters(name = "{0}")

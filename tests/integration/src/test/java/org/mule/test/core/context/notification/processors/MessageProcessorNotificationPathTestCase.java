@@ -6,11 +6,11 @@
  */
 package org.mule.test.core.context.notification.processors;
 
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.IsCollectionContaining.hasItems;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.util.NotificationUtils.buildPathResolver;
-
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.processor.DefaultMessageProcessorPathElement;
@@ -21,12 +21,10 @@ import java.util.Set;
 
 import org.junit.Test;
 
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-
 /**
  *
  */
-public class MessageProcessorNotificationPathTestCase extends FunctionalTestCase
+public class MessageProcessorNotificationPathTestCase extends AbstractIntegrationTestCase
 {
     @Override
     protected String getConfigFile()

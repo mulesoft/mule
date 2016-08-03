@@ -7,7 +7,6 @@
 package org.mule.test.integration.domain.http;
 
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
-
 import org.mule.functional.junit4.ApplicationContextBuilder;
 import org.mule.functional.junit4.DomainContextBuilder;
 import org.mule.runtime.core.api.MuleContext;

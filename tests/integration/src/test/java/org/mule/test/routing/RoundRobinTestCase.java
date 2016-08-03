@@ -7,17 +7,16 @@
 package org.mule.test.routing;
 
 import static org.junit.Assert.assertNotNull;
-
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.functional.junit4.FunctionalTestCase;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
 
-public class RoundRobinTestCase extends FunctionalTestCase
+public class RoundRobinTestCase extends AbstractIntegrationTestCase
 {
     private static final int NUMBER_OF_MESSAGES = 10;
     private static final int NUMBER_OF_WRITERS = 10;

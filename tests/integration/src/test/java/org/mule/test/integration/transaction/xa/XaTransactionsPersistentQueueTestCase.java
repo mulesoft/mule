@@ -10,14 +10,13 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.functional.junit4.TransactionConfigEnum.ACTION_ALWAYS_BEGIN;
-
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.transaction.XaTransactionFactory;
 
 import org.junit.Test;
 
-public class XaTransactionsPersistentQueueTestCase extends FunctionalTestCase
+public class XaTransactionsPersistentQueueTestCase extends AbstractIntegrationTestCase
 {
     private static final String TEST_MESSAGE = "TEST_MESSAGE";
 

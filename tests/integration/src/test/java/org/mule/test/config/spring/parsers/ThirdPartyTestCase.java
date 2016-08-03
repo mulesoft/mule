@@ -7,13 +7,12 @@
 package org.mule.test.config.spring.parsers;
 
 import static org.junit.Assert.assertNotNull;
-
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.test.config.spring.parsers.beans.ThirdPartyContainer;
-import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 
-public class ThirdPartyTestCase extends FunctionalTestCase
+public class ThirdPartyTestCase extends AbstractIntegrationTestCase
 {
     @Override
     protected String getConfigFile()
@@ -24,7 +23,7 @@ public class ThirdPartyTestCase extends FunctionalTestCase
     @Test
     public void testContainer()
     {
-        ThirdPartyContainer container = (ThirdPartyContainer) muleContext.getRegistry().lookupObject("container");
+        ThirdPartyContainer container = muleContext.getRegistry().lookupObject("container");
         assertNotNull(container);
         assertNotNull(container.getThing());
     }

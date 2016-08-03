@@ -11,7 +11,7 @@ import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
@@ -24,7 +24,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.hamcrest.core.IsNot;
 import org.junit.Test;
 
-public class ReferenceExceptionStrategyTestCase extends FunctionalTestCase
+public class ReferenceExceptionStrategyTestCase extends AbstractIntegrationTestCase
 {
     public static final int TIMEOUT = 5000;
     public static final String JSON_RESPONSE = "{\"errorMessage\":\"error processing news\",\"userId\":15,\"title\":\"News title\"}";
