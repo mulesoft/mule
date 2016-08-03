@@ -8,8 +8,9 @@
 package org.mule.functional.classloading.isolation.classloader;
 
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
-import org.mule.runtime.container.internal.ClasspathModuleDiscoverer;
 import org.mule.runtime.container.internal.ContainerClassLoaderFactory;
+import org.mule.runtime.container.internal.ContainerModuleDiscoverer;
+import org.mule.runtime.container.internal.JreModuleDiscoverer;
 import org.mule.runtime.container.internal.MuleModule;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
@@ -47,7 +48,7 @@ public class TestContainerClassLoaderFactory extends ContainerClassLoaderFactory
      */
     public TestContainerClassLoaderFactory(final Set<String> extraBootPackages, final URL[] urls)
     {
-        this.extraBootPackages = ImmutableSet.<String>builder().addAll(super.getBootPackages()).addAll(extraBootPackages).build();
+        this.extraBootPackages = ImmutableSet.<String>builder().addAll(super.getBootPackages()).addAll(extraBootPackages).addAll(new JreModuleDiscoverer().discover().get(0).getExportedPackages()).build();
         this.urls = urls;
         this.classLoader = new URLClassLoader(urls, null);
     }
@@ -96,7 +97,7 @@ public class TestContainerClassLoaderFactory extends ContainerClassLoaderFactory
      */
     private List<MuleModule> discoverModules()
     {
-        return new ClasspathModuleDiscoverer(Thread.currentThread().getContextClassLoader()).discover();
+        return new ContainerModuleDiscoverer(Thread.currentThread().getContextClassLoader()).discover();
     }
 
 }
