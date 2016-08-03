@@ -47,7 +47,7 @@ public class NewDatabaseMuleArtifactTestCase extends XmlConfigurationMuleArtifac
         Document document = XMLUnit.buildControlDocument(config);
 
         String configRef = "<db:generic-config name=\"mysql-config\" url=\"jdbc:mysql://localhost/test?user=myUser&amp;password=secret\" driverClassName=\"com.mysql.jdbc.Driver\" xmlns:db=\"http://www.mulesoft.org/schema/mule/db\" />";
-        String templateRef = "<db:template-query name=\"template\" xmlns:db=\"http://www.mulesoft.org/schema/mule/db\"><db:parameterized-query><![CDATA[SELECT * FROM Users]]></db:parameterized-query><db:in-param name=\"myParameter1\" defaultValue=\"lala\"/><db:in-param name=\"myParameter2\" defaultValue=\"#[payload.parameter2]\"/></db:template-query>";
+        String templateRef = "<db:template-query name=\"template\" xmlns:db=\"http://www.mulesoft.org/schema/mule/db\"><db:parameterized-query><![CDATA[SELECT * FROM Users where name = :myParameter1 && lastname= :myParameter2]]></db:parameterized-query><db:in-param name=\"myParameter1\" defaultValue=\"lala\"/><db:in-param name=\"myParameter2\" defaultValue=\"#[payload.parameter2]\"/></db:template-query>";
 
         Map<String, String> callbackData = new HashMap<String, String>();
         callbackData.put("mysql-config", configRef);
@@ -82,7 +82,7 @@ public class NewDatabaseMuleArtifactTestCase extends XmlConfigurationMuleArtifac
 
         String configRef = "<db:generic-config name=\"mysql-config\" url=\"jdbc:mysql://localhost/test?user=myUser&amp;password=secret\" driverClassName=\"com.mysql.jdbc.Driver\" xmlns:db=\"http://www.mulesoft.org/schema/mule/db\" />";
         String templateRef1 = "<db:template-query name=\"template1\" xmlns:db=\"http://www.mulesoft.org/schema/mule/db\"><db:template-query-ref name=\"template2\"/><db:in-param name=\"myParameter1\" defaultValue=\"jeje\"/></db:template-query>";
-        String templateRef2 = "<db:template-query name=\"template2\" xmlns:db=\"http://www.mulesoft.org/schema/mule/db\"><db:parameterized-query><![CDATA[SELECT username, password FROM Users]]></db:parameterized-query><db:in-param name=\"myParameter1\" defaultValue=\"jeje\"/><db:in-param name=\"myParameter2\" defaultValue=\"#[payload.parameter]\"/></db:template-query>";
+        String templateRef2 = "<db:template-query name=\"template2\" xmlns:db=\"http://www.mulesoft.org/schema/mule/db\"><db:parameterized-query><![CDATA[SELECT username, password FROM Users where name = :myParameter1 && lastname= :myParameter2]]></db:parameterized-query><db:in-param name=\"myParameter1\" defaultValue=\"jeje\"/><db:in-param name=\"myParameter2\" defaultValue=\"#[payload.parameter]\"/></db:template-query>";
 
         Map<String, String> callbackData = new HashMap<String, String>();
         callbackData.put("mysql-config", configRef);
