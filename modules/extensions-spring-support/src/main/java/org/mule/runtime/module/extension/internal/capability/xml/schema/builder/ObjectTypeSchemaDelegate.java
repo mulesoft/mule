@@ -8,16 +8,11 @@ package org.mule.runtime.module.extension.internal.capability.xml.schema.builder
 
 import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.ZERO;
-<<<<<<< HEAD
 import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.mule.metadata.utils.MetadataTypeUtils.getDefaultValue;
 import static org.mule.runtime.extension.api.introspection.declaration.type.TypeUtils.getExpressionSupport;
-=======
-import static java.util.stream.Collectors.toList;
-import static org.apache.commons.lang3.StringUtils.EMPTY;
->>>>>>> MULE-10029: Update SchemaBuilder to use DslSyntaxResolver
 import static org.mule.runtime.extension.api.util.NameUtils.getTopLevelTypeName;
 import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.extension.api.util.NameUtils.sanitizeName;
@@ -27,11 +22,6 @@ import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MUL
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
-<<<<<<< HEAD
-=======
-import org.mule.metadata.utils.MetadataTypeUtils;
-import org.mule.runtime.extension.api.introspection.declaration.type.TypeUtils;
->>>>>>> MULE-10029: Update SchemaBuilder to use DslSyntaxResolver
 import org.mule.runtime.extension.api.introspection.parameter.ImmutableParameterModel;
 import org.mule.runtime.extension.xml.dsl.api.DslElementSyntax;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ComplexContent;
@@ -44,10 +34,6 @@ import org.mule.runtime.module.extension.internal.capability.xml.schema.model.To
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.TopLevelElement;
 
 import java.util.Collection;
-<<<<<<< HEAD
-=======
-import java.util.Collections;
->>>>>>> MULE-10029: Update SchemaBuilder to use DslSyntaxResolver
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
