@@ -26,7 +26,7 @@ import static org.mule.runtime.extension.api.introspection.parameter.ExpressionS
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.REQUIRED;
 import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
-import static org.mule.runtime.extension.xml.dsl.api.XmlModelUtils.getStyleModelProperty;
+import static org.mule.runtime.extension.xml.dsl.api.XmlModelUtils.getHintsModelProperty;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMemberName;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.ArrayType;
@@ -421,7 +421,7 @@ public abstract class ExtensionDefinitionParser
         if (parameterDsl.supportsChildDeclaration() && collectionItemDsl.isPresent())
         {
             String itemIdentifier = collectionItemDsl.get().getElementName();
-            String itemNamespace = collectionItemDsl.get().getElementNamespace();
+            String itemNamespace = collectionItemDsl.get().getNamespace();
 
             arrayType.getType().accept(new BasicTypeMetadataVisitor()
             {
@@ -443,16 +443,20 @@ public abstract class ExtensionDefinitionParser
                 @Override
                 public void visitObject(ObjectType objectType)
                 {
-                    try
+                    if (collectionItemDsl.get().supportsTopLevelDeclaration())
                     {
-                        new ObjectTypeParameterParser(baseDefinitionBuilder.copy(), objectType, getContextClassLoader(),
-                                                      dslSyntaxResolver, parsingContext).parse()
-                                .forEach(definition -> addDefinition(definition));
+                        try
+                        {
+                            new ObjectTypeParameterParser(baseDefinitionBuilder.copy(), objectType, getContextClassLoader(),
+                                                          dslSyntaxResolver, parsingContext).parse()
+                                    .forEach(definition -> addDefinition(definition));
+                        }
+                        catch (ConfigurationException e)
+                        {
+                            throw new MuleRuntimeException(createStaticMessage("Could not create parser for collection complex type"), e);
+                        }
                     }
-                    catch (ConfigurationException e)
-                    {
-                        throw new MuleRuntimeException(createStaticMessage("Could not create parser for collection complex type"), e);
-                    }
+
                 }
             });
         }
@@ -641,7 +645,7 @@ public abstract class ExtensionDefinitionParser
     {
         parseObject(key, name, type, defaultValue, expressionSupport, required, acceptsReferences, elementDsl);
 
-        final String elementNamespace = elementDsl.getElementNamespace();
+        final String elementNamespace = elementDsl.getNamespace();
         final String elementName = elementDsl.getElementName();
 
         if (elementDsl.supportsChildDeclaration() && !elementDsl.isWrapped() && !parsingContext.isRegistered(elementName, elementNamespace))
@@ -857,7 +861,7 @@ public abstract class ExtensionDefinitionParser
 
     private boolean acceptsReferences(ParameterModel parameterModel)
     {
-        return getStyleModelProperty(parameterModel)
+        return getHintsModelProperty(parameterModel)
                 .map(XmlHintsModelProperty::allowsReferences)
                 .orElse(true);
     }

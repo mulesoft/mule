@@ -152,7 +152,8 @@ public class ExtensionBuildingDefinitionProvider implements ComponentBuildingDef
         final DslSyntaxResolver dslSyntaxResolver = new DslSyntaxResolver(extensionModel);
 
         final ClassLoader extensionClassLoader = getClassLoader(extensionModel);
-        withContextClassLoader(extensionClassLoader, () -> {
+        withContextClassLoader(extensionClassLoader, () ->
+        {
             new IdempotentExtensionWalker()
             {
                 @Override
@@ -201,7 +202,8 @@ public class ExtensionBuildingDefinitionProvider implements ComponentBuildingDef
         type.accept(new MetadataTypeVisitor()
         {
             @Override
-            public void visitUnion(UnionType unionType) {
+            public void visitUnion(UnionType unionType)
+            {
                 unionType.getTypes().forEach(type -> type.accept(this));
             }
 
@@ -242,7 +244,7 @@ public class ExtensionBuildingDefinitionProvider implements ComponentBuildingDef
                                            DslSyntaxResolver dslSyntaxResolver, ExtensionParsingContext parsingContext)
     {
         DslElementSyntax elementDsl = dslSyntaxResolver.resolve(parameterType);
-        if (parsingContext.isRegistered(elementDsl.getElementName(), elementDsl.getElementNamespace()))
+        if (parsingContext.isRegistered(elementDsl.getElementName(), elementDsl.getNamespace()))
         {
             return;
         }
@@ -261,7 +263,6 @@ public class ExtensionBuildingDefinitionProvider implements ComponentBuildingDef
             @Override
             public void visitArrayType(ArrayType arrayType)
             {
-
                 registerTopLevelParameter(arrayType.getType(), definitionBuilder.copy(), extensionClassLoader, dslSyntaxResolver, parsingContext);
             }
 
@@ -274,7 +275,8 @@ public class ExtensionBuildingDefinitionProvider implements ComponentBuildingDef
             }
 
             @Override
-            public void visitUnion(UnionType unionType) {
+            public void visitUnion(UnionType unionType)
+            {
                 unionType.getTypes().forEach(type -> type.accept(this));
             }
 

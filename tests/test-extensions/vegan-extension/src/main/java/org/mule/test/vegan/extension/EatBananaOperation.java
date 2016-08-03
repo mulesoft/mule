@@ -19,8 +19,8 @@ public class EatBananaOperation
         return banana;
     }
 
-    public Banana eatPealed(@XmlHints(allowInlineDefinition = false, allowReferences = false) Banana banana)
+    public Banana eatPealed(@XmlHints(allowInlineDefinition = false, allowReferences = false) Banana attributeOnlyBanana)
     {
-        return eatBanana(banana);
+        return eatBanana(attributeOnlyBanana);
     }
 }

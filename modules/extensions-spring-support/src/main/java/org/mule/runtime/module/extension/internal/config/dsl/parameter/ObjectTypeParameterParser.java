@@ -52,7 +52,7 @@ public class ObjectTypeParameterParser extends ExtensionDefinitionParser
         this.classLoader = classLoader;
         this.typeDsl = dslSyntaxResolver.resolve(type);
         this.name = typeDsl.getElementName();
-        this.namespace = typeDsl.getElementNamespace();
+        this.namespace = typeDsl.getNamespace();
     }
 
     public ObjectTypeParameterParser(Builder definition, String name, String namespace, ObjectType type, ClassLoader classLoader,
@@ -97,7 +97,7 @@ public class ObjectTypeParameterParser extends ExtensionDefinitionParser
                 @Override
                 public void visitObject(ObjectType objectType)
                 {
-                    if (!parsingContext.isRegistered(childDsl.getElementName(), childDsl.getElementNamespace()))
+                    if (!parsingContext.isRegistered(name, namespace))
                     {
                         parsingContext.registerObjectType(name, namespace, type);
                         parseObjectParameter(fieldName, fieldName, objectType, defaultValue, expressionSupport, false, acceptsReferences, childDsl);
