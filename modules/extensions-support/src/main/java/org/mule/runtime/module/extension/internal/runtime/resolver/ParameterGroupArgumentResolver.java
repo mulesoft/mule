@@ -8,8 +8,9 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.extension.api.introspection.declaration.type.TypeUtils.getAlias;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.checkInstantiable;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAlias;
+
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.ParameterGroup;
@@ -23,6 +24,7 @@ import com.google.common.collect.ImmutableList;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Optional;
+
 
 /**
  * Resolves arguments annotated with {@link ParameterGroup} in a {@link ReflectiveMethodOperationExecutor}.
@@ -96,14 +98,14 @@ public final class ParameterGroupArgumentResolver<T> implements ArgumentResolver
      * @param model enrichable model to check for the presence of {@link ParameterGroupModelProperty}
      * @return {@link List} with resolvers for the nester {@link org.mule.runtime.module.extension.internal.introspection.ParameterGroup}
      */
-    private List<ParameterGroupArgumentResolver<? extends Object>> getNestedParameterGroupResolvers(EnrichableModel model)
+    private List<ParameterGroupArgumentResolver<?>> getNestedParameterGroupResolvers(EnrichableModel model)
     {
         Optional<ParameterGroupModelProperty> parameterGroupModelProperty = model.getModelProperty(ParameterGroupModelProperty.class);
 
         if (parameterGroupModelProperty.isPresent())
         {
             return parameterGroupModelProperty.get().getGroups().stream()
-                    .map(group -> new ParameterGroupArgumentResolver<>(group))
+                    .map(ParameterGroupArgumentResolver::new)
                     .collect(toList());
         }
 

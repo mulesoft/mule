@@ -7,19 +7,24 @@
 package org.mule.test.metadata.extension;
 
 import static org.apache.commons.lang.builder.EqualsBuilder.reflectionEquals;
+
+import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyPart;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 
 public class LocationKey
 {
     @MetadataKeyPart(order = 1)
+    @Parameter
     private String continent;
 
     @MetadataKeyPart(order = 2)
+    @Parameter
     private String country;
 
     @DisplayName("State | City")
     @MetadataKeyPart(order = 3)
+    @Parameter
     private String city;
 
 

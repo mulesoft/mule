@@ -488,7 +488,7 @@ public class MetadataMediator
     {
         List<MetadataResult<?>> failedResults = Stream.of(results).filter(result -> !result.isSuccess()).collect(toList());
         String messages = failedResults.stream().map(f -> f.getFailure().get().getMessage()).collect(joining(" and "));
-        String stackTrace = failedResults.size() == 1 ? results[0].getFailure().get().getReason() : "";
+        String stackTrace = failedResults.size() == 1 ? failedResults.get(0).getFailure().get().getReason() : "";
         FailureCode failureCode = failedResults.size() == 1 ? results[0].getFailure().get().getFailureCode() : FailureCode.MULTIPLE;
         return failure(descriptor, messages, failureCode, stackTrace);
     }

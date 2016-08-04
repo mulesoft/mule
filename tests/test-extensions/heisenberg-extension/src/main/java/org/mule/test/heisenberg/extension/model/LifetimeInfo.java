@@ -6,8 +6,11 @@
  */
 package org.mule.test.heisenberg.extension.model;
 
+import static org.mule.test.heisenberg.extension.HeisenbergExtension.PERSONAL_INFORMATION_GROUP_NAME;
+
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
+import org.mule.runtime.extension.api.annotation.param.display.Placement;
 
 import java.time.LocalDateTime;
 import java.util.Calendar;
@@ -17,11 +20,14 @@ public class LifetimeInfo
 {
 
     @Optional
+    @Placement(group = PERSONAL_INFORMATION_GROUP_NAME, order = 3)
     private LocalDateTime dateOfConception;
 
+    @Placement(group = PERSONAL_INFORMATION_GROUP_NAME, order = 4)
     private Date dateOfBirth;
 
     @DisplayName("Date of decease")
+    @Placement(group = PERSONAL_INFORMATION_GROUP_NAME, order = 5)
     private Calendar dateOfDeath;
 
     public Date getDateOfBirth()

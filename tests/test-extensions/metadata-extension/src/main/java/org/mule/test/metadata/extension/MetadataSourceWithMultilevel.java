@@ -10,7 +10,7 @@ import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolve
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.ARGENTINA;
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.BUENOS_AIRES;
 
-import org.mule.runtime.extension.api.annotation.Parameter;
+import org.mule.runtime.extension.api.annotation.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
 import org.mule.runtime.extension.api.runtime.source.Source;
@@ -27,7 +27,7 @@ public class MetadataSourceWithMultilevel extends Source<Map<String, Object>, St
     private static final String ERROR_MESSAGE = "LocationKey field was not injected properly";
 
     @MetadataKeyId
-    @Parameter
+    @ParameterGroup
     public LocationKey key;
 
     @Override

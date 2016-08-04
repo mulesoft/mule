@@ -10,7 +10,6 @@ import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
@@ -36,6 +35,7 @@ import static org.mule.test.heisenberg.extension.HeisenbergExtension.EXTENSION_D
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
 import static org.mule.test.vegan.extension.VeganExtension.APPLE;
 import static org.mule.test.vegan.extension.VeganExtension.BANANA;
+
 import org.mule.metadata.api.model.AnyType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.NullType;
@@ -67,18 +67,14 @@ import org.mule.runtime.extension.api.introspection.declaration.fluent.SourceDec
 import org.mule.runtime.extension.api.introspection.declaration.type.annotation.TypeAliasAnnotation;
 import org.mule.runtime.extension.api.introspection.exception.ExceptionEnricherFactory;
 import org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport;
-import org.mule.runtime.extension.api.introspection.property.MetadataContentModelProperty;
-import org.mule.runtime.extension.api.introspection.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.extension.api.runtime.operation.OperationResult;
 import org.mule.runtime.module.extension.internal.exception.IllegalConfigurationModelDefinitionException;
 import org.mule.runtime.module.extension.internal.exception.IllegalOperationModelDefinitionException;
-import org.mule.runtime.module.extension.internal.model.property.ConnectivityModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingTypeModelProperty;
 import org.mule.tck.message.IntegerAttributes;
 import org.mule.tck.message.StringAttributes;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Fruit;
-import org.mule.test.heisenberg.extension.HeisenbergConnection;
 import org.mule.test.heisenberg.extension.HeisenbergConnectionProvider;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.heisenberg.extension.HeisenbergOperations;
@@ -93,7 +89,6 @@ import org.mule.test.heisenberg.extension.model.Weapon;
 import org.mule.test.heisenberg.extension.model.types.WeaponType;
 import org.mule.test.metadata.extension.MetadataExtension;
 import org.mule.test.metadata.extension.model.attribute.AbstractOutputAttributes;
-import org.mule.test.metadata.extension.model.shapes.Shape;
 import org.mule.test.petstore.extension.PetStoreConnector;
 import org.mule.test.vegan.extension.PaulMcCartneySource;
 import org.mule.test.vegan.extension.VeganAttributes;
@@ -170,100 +165,6 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         assertTestModuleConnectionProviders(extensionDeclaration);
         assertTestModuleMessageSource(extensionDeclaration);
         assertModelProperties(extensionDeclaration);
-    }
-
-    @Test
-    public void parseMetadataAnnotationsOnParameter()
-    {
-        setDescriber(describerFor(MetadataExtension.class));
-        ExtensionDeclarer declarer = getDescriber().describe(new DefaultDescribingContext(MetadataExtension.class.getClassLoader()));
-        ExtensionDeclaration declaration = declarer.getDeclaration();
-
-        List<ParameterDeclaration> parameters = getOperation(declaration, "contentMetadataWithKeyId").getParameters();
-
-        assertParameterIsMetadataKeyId(findParameter(parameters, "type"));
-        assertParameterIsMetadataContent(findParameter(parameters, "content"));
-    }
-
-    @Test
-    public void declareStaticAndDynamicTypesInOperation()
-    {
-        setDescriber(describerFor(MetadataExtension.class));
-        ExtensionDeclarer declarer = getDescriber().describe(new DefaultDescribingContext(MetadataExtension.class.getClassLoader()));
-        ExtensionDeclaration declaration = declarer.getDeclaration();
-        List<ParameterDeclaration> params;
-
-        OperationDeclaration dynamicContent = getOperation(declaration, "contentMetadataWithKeyId");
-        assertOutputType(dynamicContent.getOutput(), toMetadataType(Object.class), true);
-        assertOutputType(dynamicContent.getOutputAttributes(), toMetadataType(void.class), false);
-        params = dynamicContent.getParameters();
-        assertParameterType(findParameter(params, "type"), toMetadataType(String.class), false);
-        assertParameterType(findParameter(params, "content"), toMetadataType(Object.class), true);
-
-        OperationDeclaration dynamicOutput = getOperation(declaration, "outputMetadataWithKeyId");
-        assertOutputType(dynamicOutput.getOutput(), toMetadataType(Object.class), true);
-        assertOutputType(dynamicOutput.getOutputAttributes(), toMetadataType(void.class), false);
-        params = dynamicOutput.getParameters();
-        assertParameterType(findParameter(params, "type"), toMetadataType(String.class), false);
-        assertParameterType(findParameter(params, "content"), toMetadataType(Object.class), false);
-
-        OperationDeclaration dynaimcContentAndOutput = getOperation(declaration, "contentAndOutputMetadataWithKeyId");
-        assertOutputType(dynaimcContentAndOutput.getOutput(), toMetadataType(Object.class), true);
-        assertOutputType(dynaimcContentAndOutput.getOutputAttributes(), toMetadataType(void.class), false);
-        params = dynaimcContentAndOutput.getParameters();
-        assertParameterType(findParameter(params, "type"), toMetadataType(String.class), false);
-        assertParameterType(findParameter(params, "content"), toMetadataType(Object.class), true);
-
-        OperationDeclaration dynamicOutputAndAttributes = getOperation(declaration, "outputAttributesWithDynamicMetadata");
-        assertOutputType(dynamicOutputAndAttributes.getOutput(), toMetadataType(Object.class), true);
-        assertOutputType(dynamicOutputAndAttributes.getOutputAttributes(), toMetadataType(AbstractOutputAttributes.class), true);
-        params = dynamicOutputAndAttributes.getParameters();
-        assertParameterType(findParameter(params, "type"), toMetadataType(String.class), false);
-
-        OperationDeclaration staticOutputOnly = getOperation(declaration, "typeWithDeclaredSubtypesMetadata");
-        assertOutputType(staticOutputOnly.getOutput(), toMetadataType(boolean.class), false);
-        assertOutputType(staticOutputOnly.getOutputAttributes(), toMetadataType(void.class), false);
-
-        OperationDeclaration staticOutputAndAttributes = getOperation(declaration, "outputAttributesWithDeclaredSubtypesMetadata");
-        assertOutputType(staticOutputAndAttributes.getOutput(), toMetadataType(Shape.class), false);
-        assertOutputType(staticOutputAndAttributes.getOutputAttributes(), toMetadataType(AbstractOutputAttributes.class), false);
-    }
-
-    @Test
-    public void declareStaticAndDynamicTypesInSource()
-    {
-        setDescriber(describerFor(MetadataExtension.class));
-        ExtensionDeclarer declarer = getDescriber().describe(new DefaultDescribingContext(MetadataExtension.class.getClassLoader()));
-        ExtensionDeclaration declaration = declarer.getDeclaration();
-
-        SourceDeclaration sourceDynamicAttributes = declaration.getMessageSources().stream().filter(s -> s.getName().equals("MetadataSource")).findFirst()
-                .orElseThrow(() -> new RuntimeException("Missing source declaration MetadataSource"));
-
-        assertOutputType(sourceDynamicAttributes.getOutput(), TYPE_BUILDER.dictionaryType().id(Map.class.getName())
-                .ofKey(TYPE_BUILDER.stringType().id(String.class.getName()))
-                .ofValue(TYPE_BUILDER.objectType().id("java.lang.Object")
-                                 .with(new ClassInformationAnnotation(Object.class, null))
-                                 .with(new TypeAliasAnnotation(Object.class.getSimpleName())))
-                .build(), true);
-        assertOutputType(sourceDynamicAttributes.getOutputAttributes(), toMetadataType(StringAttributes.class), true);
-        assertParameterType(findParameter(sourceDynamicAttributes.getParameters(), "type"), toMetadataType(String.class), false);
-
-        SourceDeclaration sourceStaticAttributes = declaration.getMessageSources().stream().filter(s -> s.getName().equals("MetadataSourceWithMultilevel")).findFirst()
-                .orElseThrow(() -> new RuntimeException("Missing source declaration MetadataSource"));
-
-        assertOutputType(sourceStaticAttributes.getOutput(), TYPE_BUILDER.dictionaryType().id(Map.class.getName())
-                .ofKey(TYPE_BUILDER.stringType().id(String.class.getName()))
-                .ofValue(TYPE_BUILDER.objectType().id("java.lang.Object")
-                                 .with(new ClassInformationAnnotation(Object.class, null))
-                                 .with(new TypeAliasAnnotation(Object.class.getSimpleName())))
-                .build(), true);
-        assertOutputType(sourceStaticAttributes.getOutputAttributes(), toMetadataType(StringAttributes.class), false);
-
-        List<ParameterDeclaration> locationKey = sourceStaticAttributes.getParameters();
-        assertParameterType(findParameter(locationKey, "continent"), toMetadataType(String.class), false);
-        assertParameterType(findParameter(locationKey, "country"), toMetadataType(String.class), false);
-        assertParameterType(findParameter(locationKey, "city"), toMetadataType(String.class), false);
-
     }
 
     @Test
@@ -607,8 +508,6 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
 
         operation = getOperation(extensionDeclaration, CALL_SAUL);
         assertThat(operation.getParameters(), is(empty()));
-        ConnectivityModelProperty connectionType = operation.getModelProperty(ConnectivityModelProperty.class).get();
-        assertThat(connectionType.getConnectionType(), equalTo(toMetadataType(HeisenbergConnection.class)));
 
         operation = getOperation(extensionDeclaration, CURE_CANCER);
         assertThat(operation.getParameters(), is(empty()));
@@ -684,34 +583,16 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
 
         assertThat(param.getName(), equalTo(name));
         assertThat(param.getDescription(), equalTo(description));
-        assertThat(param.getType(), equalTo(metadataType));
+        assertThat(param.getType(), is(metadataType));
         assertThat(param.isRequired(), is(required));
         assertThat(param.getExpressionSupport(), is(expressionSupport));
         assertThat(param.getDefaultValue(), equalTo(defaultValue));
-    }
-
-    private void assertParameterType(ParameterDeclaration param, MetadataType type, boolean isDynamic)
-    {
-        assertThat(param.getType(), equalTo(type));
-        assertThat(param.hasDynamicType(), is(isDynamic));
     }
 
     private void assertOutputType(OutputDeclaration output, MetadataType type, boolean isDynamic)
     {
         assertThat(output.getType(), equalTo(type));
         assertThat(output.hasDynamicType(), is(isDynamic));
-    }
-
-    private void assertParameterIsMetadataKeyId(ParameterDeclaration param)
-    {
-        java.util.Optional<MetadataKeyPartModelProperty> metadata = param.getModelProperty(MetadataKeyPartModelProperty.class);
-        assertThat(metadata.isPresent(), is(true));
-    }
-
-    private void assertParameterIsMetadataContent(ParameterDeclaration param)
-    {
-        MetadataContentModelProperty metadata = param.getModelProperty(MetadataContentModelProperty.class).get();
-        assertThat(metadata, is(not(nullValue())));
     }
 
     private MetadataType listOfString()
