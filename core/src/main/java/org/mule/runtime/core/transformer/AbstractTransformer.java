@@ -279,7 +279,6 @@ public abstract class AbstractTransformer extends AbstractAnnotatedObject implem
         if (MultiPartPayload.class.isAssignableFrom(sourceType.getType()))
         {
             Message msg = MessageFactory.createStaticMessage("\"%s\" cannot be transformed to %s.", MultiPartPayload.class.getSimpleName(), getReturnDataType().getType().getName());
-            /// FIXME
             throw new TransformerException(msg, this);
         }
 

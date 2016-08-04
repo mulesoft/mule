@@ -6,13 +6,13 @@
  */
 package org.mule.runtime.core.message;
 
+import static java.util.Collections.emptyMap;
 import static java.util.Objects.requireNonNull;
 
 import org.mule.runtime.api.message.MultiPartPayload;
 
 import com.google.common.collect.ImmutableMap;
 
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Map;
 
@@ -46,8 +46,7 @@ public class PartAttributes extends BaseAttributes
             long size,
             Map<String, LinkedList<String>> headers)
     {
-        requireNonNull(name);
-        this.name = name;
+        this.name = requireNonNull(name);
         this.fileName = fileName;
         this.size = size;
         this.headers = ImmutableMap.copyOf(headers);
@@ -60,7 +59,7 @@ public class PartAttributes extends BaseAttributes
      */
     public PartAttributes(String name)
     {
-        this(name, null, -1, Collections.emptyMap());
+        this(name, null, -1, emptyMap());
     }
 
     /**
