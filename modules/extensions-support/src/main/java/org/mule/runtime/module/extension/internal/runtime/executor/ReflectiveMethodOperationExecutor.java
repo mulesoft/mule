@@ -18,6 +18,7 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
+import org.mule.runtime.extension.api.introspection.operation.OperationModel;
 import org.mule.runtime.extension.api.runtime.operation.OperationContext;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
 
@@ -62,11 +63,11 @@ public final class ReflectiveMethodOperationExecutor implements OperationExecuto
 
     private MuleContext muleContext;
 
-    ReflectiveMethodOperationExecutor(Method operationMethod, Object executorDelegate)
+    ReflectiveMethodOperationExecutor(OperationModel operationModel, Method operationMethod, Object executorDelegate)
     {
         this.operationMethod = operationMethod;
         this.executorDelegate = executorDelegate;
-        argumentResolverDelegate = isEmpty(operationMethod.getParameterTypes()) ? NO_ARGS_DELEGATE : new MethodArgumentResolverDelegate(operationMethod);
+        argumentResolverDelegate = isEmpty(operationMethod.getParameterTypes()) ? NO_ARGS_DELEGATE : new MethodArgumentResolverDelegate(operationModel, operationMethod);
         extensionClassLoader = operationMethod.getDeclaringClass().getClassLoader();
     }
 

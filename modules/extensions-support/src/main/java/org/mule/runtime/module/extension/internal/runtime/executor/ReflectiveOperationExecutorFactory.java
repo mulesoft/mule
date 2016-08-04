@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime.executor;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.extension.api.introspection.operation.OperationModel;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutorFactory;
 
@@ -38,7 +39,7 @@ public final class ReflectiveOperationExecutorFactory<T> implements OperationExe
     }
 
     @Override
-    public OperationExecutor createExecutor()
+    public OperationExecutor createExecutor(OperationModel operationModel)
     {
         Object delegate;
         try
@@ -50,6 +51,6 @@ public final class ReflectiveOperationExecutorFactory<T> implements OperationExe
             throw new MuleRuntimeException(createStaticMessage("Could not create instance of operation class " + implementationClass.getName()), e);
         }
 
-        return new ReflectiveMethodOperationExecutor(operationMethod, delegate);
+        return new ReflectiveMethodOperationExecutor(operationModel, operationMethod, delegate);
     }
 }
