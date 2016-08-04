@@ -46,7 +46,7 @@ public final class ParameterGroupArgumentResolver<T> implements ArgumentResolver
     {
         checkInstantiable(group.getType());
         this.group = group;
-        childResolvers = getResolversForModel(group);
+        childResolvers = getNestedParameterGroupResolvers(group);
     }
 
     /**
@@ -70,9 +70,10 @@ public final class ParameterGroupArgumentResolver<T> implements ArgumentResolver
             T parameterGroup = (T) group.getType().newInstance();
             for (Field parameterField : group.getParameters())
             {
-                if (operationContext.hasParameter(getAlias(parameterField)))
+                String fieldAlias = getAlias(parameterField);
+                if (operationContext.hasParameter(fieldAlias))
                 {
-                    parameterField.set(parameterGroup, operationContext.getParameter(getAlias(parameterField)));
+                    parameterField.set(parameterGroup, operationContext.getParameter(fieldAlias));
                 }
             }
 
@@ -90,20 +91,19 @@ public final class ParameterGroupArgumentResolver<T> implements ArgumentResolver
     }
 
     /**
-     * Recursively creates resolvers for the nested {@link org.mule.runtime.module.extension.internal.introspection.ParameterGroup}
+     * Recursively creates {@link ParameterGroupArgumentResolver} for the nested {@link org.mule.runtime.module.extension.internal.introspection.ParameterGroup}
      *
      * @param model enrichable model to check for the presence of {@link ParameterGroupModelProperty}
-     * @return map with the {@link org.mule.runtime.module.extension.internal.introspection.ParameterGroup#getContainer()}
-     * as key and the resolver associated to that container as value
+     * @return {@link List} with resolvers for the nester {@link org.mule.runtime.module.extension.internal.introspection.ParameterGroup}
      */
-    private List<ParameterGroupArgumentResolver<? extends Object>> getResolversForModel(EnrichableModel model)
+    private List<ParameterGroupArgumentResolver<? extends Object>> getNestedParameterGroupResolvers(EnrichableModel model)
     {
         Optional<ParameterGroupModelProperty> parameterGroupModelProperty = model.getModelProperty(ParameterGroupModelProperty.class);
 
         if (parameterGroupModelProperty.isPresent())
         {
             return parameterGroupModelProperty.get().getGroups().stream()
-                    .map(group -> new ParameterGroupArgumentResolver(group))
+                    .map(group -> new ParameterGroupArgumentResolver<>(group))
                     .collect(Collectors.toList());
         }
 

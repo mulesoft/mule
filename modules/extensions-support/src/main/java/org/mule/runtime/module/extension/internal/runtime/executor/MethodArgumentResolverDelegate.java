@@ -83,7 +83,7 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
         argumentResolvers = new ArgumentResolver[parameterTypes.length];
         Annotation[][] parameterAnnotations = method.getParameterAnnotations();
         Parameter[] parameters = method.getParameters();
-        parameterGroupResolvers = getResolversForParameterGroup(model);
+        parameterGroupResolvers = getParameterGroupResolvers(model);
         final List<String> paramNames = MuleExtensionAnnotationParser.getParamNames(method);
 
         for (int i = 0; i < parameterTypes.length; i++)
@@ -192,11 +192,11 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
     }
 
     /**
-     *
-     * @param model
-     * @return mapping between the {@link Method}'s arguments (which are and their respective resolvers
+     * Uses the {@link ParameterGroupModelProperty} obtain the resolvers.
+     * @param model operation model
+     * @return mapping between the {@link Method}'s arguments which are parameters groups and their respective resolvers
      */
-    private Map<Parameter, ParameterGroupArgumentResolver<? extends Object>> getResolversForParameterGroup(OperationModel model)
+    private Map<Parameter, ParameterGroupArgumentResolver<? extends Object>> getParameterGroupResolvers(OperationModel model)
     {
         Optional<ParameterGroupModelProperty> parameterGroupModelProperty = model.getModelProperty(ParameterGroupModelProperty.class);
         Map<Parameter, ParameterGroupArgumentResolver<? extends Object>> resolverMap = new HashedMap();
