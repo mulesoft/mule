@@ -6,7 +6,6 @@
  */
 package org.mule.test.config.dsl;
 
-import static org.mule.test.config.dsl.ParserXmlNamespaceInfoProvider.PARSERS_TEST_NAMESACE;
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromChildConfiguration;
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromChildMapConfiguration;
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromMultipleDefinitions;
@@ -14,13 +13,14 @@ import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder
 import static org.mule.runtime.config.spring.dsl.api.KeyAttributeDefinitionPair.newBuilder;
 import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromMapEntryType;
 import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromType;
+import static org.mule.test.config.dsl.ParserXmlNamespaceInfoProvider.PARSERS_TEST_NAMESACE;
 import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition;
 import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinitionProvider;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.test.config.spring.parsers.beans.ParameterAndChildElement;
 import org.mule.test.config.spring.parsers.beans.PojoWithSameTypeChildren;
 import org.mule.test.config.spring.parsers.beans.SimpleCollectionObject;
 import org.mule.test.config.spring.parsers.beans.SimplePojo;
-import org.mule.runtime.core.api.MuleContext;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -217,6 +217,19 @@ public class ParserComponentBuildingDefinitionProvider implements ComponentBuild
                                 .withIdentifier("my-pojo")
                                 .withTypeDefinition(fromType(SimplePojo.class))
                                 .withSetterParameterDefinition("someParameter", fromSimpleParameter("someParameter").build())
+                                .build());
+
+        definitions.add(baseBuilder
+                                .copy()
+                                .withIdentifier("text-pojo")
+                                .withTypeDefinition(fromType(SimplePojo.class))
+                                .withSetterParameterDefinition("someParameter", fromChildConfiguration(String.class).withIdentifier("text").build())
+                                .build());
+
+        definitions.add(baseBuilder
+                                .copy()
+                                .withIdentifier("text")
+                                .withTypeDefinition(fromType(String.class))
                                 .build());
 
         definitions.add(baseBuilder
