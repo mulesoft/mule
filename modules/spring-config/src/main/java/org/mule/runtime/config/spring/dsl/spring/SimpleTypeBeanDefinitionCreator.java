@@ -6,12 +6,13 @@
  */
 package org.mule.runtime.config.spring.dsl.spring;
 
-import static org.mule.runtime.config.spring.dsl.spring.DslSimpleType.SIMPLE_TYPE_VALUE_PARAMETER_NAME;
 import static org.mule.runtime.config.spring.dsl.spring.DslSimpleType.isSimpleType;
+import static org.mule.runtime.core.util.Preconditions.checkState;
 import org.mule.runtime.config.spring.dsl.api.TypeConverter;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.config.spring.dsl.processor.ObjectTypeVisitor;
 
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -38,9 +39,11 @@ public class SimpleTypeBeanDefinitionCreator extends BeanDefinitionCreator
         {
             ComponentModel componentModel = createBeanDefinitionRequest.getComponentModel();
             componentModel.setType(type);
-            final String value = componentModel.getParameters().get(SIMPLE_TYPE_VALUE_PARAMETER_NAME);
+            Map<String, String> parameters = componentModel.getParameters();
+            checkState(parameters.size() < 2, "Component model has more than one parameter when it's supposed to have at most one parameter");
+            checkState(!(componentModel.getTextContent() != null && !componentModel.getParameters().isEmpty()), "Component model has both a parameter and an inner content");
+            final String value = componentModel.getTextContent() != null ? componentModel.getTextContent() : parameters.values().iterator().next();
             Optional<TypeConverter> typeConverterOptional = createBeanDefinitionRequest.getComponentBuildingDefinition().getTypeConverter();
-
             componentModel.setBeanDefinition(getConvertibleBeanDefinition(type, value, typeConverterOptional));
             return true;
         }

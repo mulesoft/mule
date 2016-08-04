@@ -8,6 +8,7 @@ package org.mule.test.config.spring.parsers;
 
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
@@ -175,6 +176,14 @@ public class XmlDslProcessingTestCase extends FunctionalTestCase
         PojoWithSameTypeChildren pojoWithSameTypeChildren = muleContext.getRegistry().get("sameChildTypesObject");
         assertPabloChildParameters(pojoWithSameTypeChildren.getElementTypeA().getSimpleParameters());
         assertMarianoChildParameters(pojoWithSameTypeChildren.getAnotherElementTypeA().getSimpleParameters());
+    }
+
+    @Test
+    public void textPojo()
+    {
+        SimplePojo pojo = muleContext.getRegistry().get("textPojo");
+        assertThat(pojo, is(notNullValue()));
+        assertThat(pojo.getSomeParameter(), is("select * from PLANET"));
     }
 
     private void assertSimpleTypeCollectionValues(Collection<String> simpleTypeCollectionValues)
