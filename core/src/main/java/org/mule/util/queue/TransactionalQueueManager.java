@@ -30,7 +30,7 @@ import java.util.Map;
 public class TransactionalQueueManager extends AbstractQueueManager
 {
 
-    public static final String MAX_TRANSACTION_LOG_FILE_SIZE = MuleProperties.PROPERTY_PREFIX + "queue.tx.max.file.size";
+    public static final String MAX_TRANSACTION_LOG_FILE_SIZE = MuleProperties.SYSTEM_PROPERTY_PREFIX + "queue.tx.max.file.size";
     private LocalTxQueueTransactionJournal localTxTransactionJournal;
     private LocalTxQueueTransactionRecoverer localTxQueueTransactionRecoverer;
     private XaTxQueueTransactionJournal xaTransactionJournal;
