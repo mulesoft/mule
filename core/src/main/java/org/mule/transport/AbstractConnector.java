@@ -1693,7 +1693,7 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
                         // throw the first one in order not to break the reconnection
                         // strategy logic,
                         // every exception has been logged above already
-                        // api needs refactoring to support the multi-cause exception
+                        // API needs refactoring to support the multi-cause exception
                         // here
                         throw errors.get(0);
                     }
@@ -1702,7 +1702,7 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
         }
         catch (Exception e)
         {
-            // If an exception occurs while connection the receivers, disconnect the connector to
+            // If an exception occurs while connecting the receivers, disconnect the connector to
             // keep a consistent state.
             doDisconnect();
             throw e;
