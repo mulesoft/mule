@@ -7,7 +7,6 @@
 package org.mule.compatibility.core.transformer.simple;
 
 import static java.util.stream.Collectors.toList;
-import static org.mule.runtime.core.message.MultiPartPayload.BODY_PART_NAME;
 import static org.mule.runtime.core.util.IOUtils.toDataHandler;
 
 import org.mule.runtime.api.metadata.DataType;
@@ -46,9 +45,9 @@ public class MultiPartToAttachmentsTransformer extends AbstractMessageTransforme
             final Builder builder = MuleMessage.builder(message);
 
             final MultiPartPayload multiPartPayload = (MultiPartPayload) message.getPayload();
-            if (multiPartPayload.getPartsNames().contains(BODY_PART_NAME))
+            if (multiPartPayload.hasBodyPart())
             {
-                builder.payload(multiPartPayload.getPart(BODY_PART_NAME).getPayload());
+                builder.payload(multiPartPayload.getBodyPart().getPayload());
             }
             else
             {

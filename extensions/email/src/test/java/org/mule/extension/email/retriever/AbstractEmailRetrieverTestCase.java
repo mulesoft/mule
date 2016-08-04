@@ -33,7 +33,6 @@ import static org.mule.extension.email.util.EmailTestUtils.JUANI_EMAIL;
 import static org.mule.extension.email.util.EmailTestUtils.assertAttachmentContent;
 import static org.mule.extension.email.util.EmailTestUtils.getMultipartTestMessage;
 import static org.mule.extension.email.util.EmailTestUtils.testSession;
-import static org.mule.runtime.core.message.MultiPartPayload.BODY_PART_NAME;
 
 import org.mule.extension.email.EmailConnectorTestCase;
 import org.mule.runtime.api.message.MuleMessage;
@@ -134,7 +133,8 @@ public abstract class AbstractEmailRetrieverTestCase extends EmailConnectorTestC
         List<MuleMessage> emailAttachments = ((MultiPartPayload) messages.get(0).getPayload()).getParts();
 
         assertThat(emailAttachments, hasSize(3));
-        assertThat(((MultiPartPayload) messages.get(0).getPayload()).getPartsNames(), containsInAnyOrder(BODY_PART_NAME, EMAIL_JSON_ATTACHMENT_NAME, EMAIL_TEXT_PLAIN_ATTACHMENT_NAME));
+        assertThat(((MultiPartPayload) messages.get(0).getPayload()).hasBodyPart(), is(true));
+        assertThat(((MultiPartPayload) messages.get(0).getPayload()).getPartsNames(), containsInAnyOrder(EMAIL_JSON_ATTACHMENT_NAME, EMAIL_TEXT_PLAIN_ATTACHMENT_NAME));
         assertAttachmentContent(emailAttachments, EMAIL_JSON_ATTACHMENT_NAME, EMAIL_JSON_ATTACHMENT_CONTENT);
         assertAttachmentContent(emailAttachments, EMAIL_TEXT_PLAIN_ATTACHMENT_NAME, EMAIL_TEXT_PLAIN_ATTACHMENT_CONTENT);
     }

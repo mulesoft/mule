@@ -9,6 +9,8 @@ package org.mule.runtime.core.message;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.junit.Assert.assertThat;
@@ -213,5 +215,33 @@ public class MultiPartPayloadTestCase extends AbstractMuleContextTestCase
         expected.expectMessage("\"MultiPartPayload\" cannot be transformed to [B.");
 
         getPayloadAsBytes(message);
+    }
+
+    @Test
+    public void nestedMultiPartPayloadsFlattens() throws Exception
+    {
+        final MuleMessage attachmentPart1 = MuleMessage.builder()
+                                                       .payload("this is the attachment1")
+                                                       .mediaType(MediaType.TEXT)
+                                                       .attributes(new AttachmentAttributes("attachment1"))
+                                                       .build();
+        final MuleMessage attachmentPart2 = MuleMessage.builder()
+                                                       .payload("this is the attachment2")
+                                                       .mediaType(MediaType.TEXT)
+                                                       .attributes(new AttachmentAttributes("attachment2"))
+                                                       .build();
+
+        MuleMessage messageInner = MuleMessage.builder().payload(new MultiPartPayload(
+                MuleMessage.builder().payload(TEST_PAYLOAD).build(),
+                attachmentPart1)).build();
+
+        MuleMessage message = MuleMessage.builder().payload(new MultiPartPayload(
+                attachmentPart2,
+                messageInner)).build();
+
+        assertThat(((MultiPartPayload) message.getPayload()).getParts(), hasSize(3));
+        assertThat(((MultiPartPayload) message.getPayload()).getPart("attachment1"), not(nullValue()));
+        assertThat(((MultiPartPayload) message.getPayload()).getPart("attachment2"), not(nullValue()));
+        assertThat(((MultiPartPayload) message.getPayload()).getBodyPart(), not(nullValue()));
     }
 }
