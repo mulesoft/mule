@@ -6,8 +6,10 @@
  */
 package org.mule.runtime.core.transformer;
 
+import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 
+import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
@@ -274,6 +276,12 @@ public abstract class AbstractTransformer extends AbstractAnnotatedObject implem
         }
 
         DataType sourceType = DataType.fromObject(payload);
+        if (MultiPartPayload.class.isAssignableFrom(sourceType.getType()))
+        {
+            Message msg = createStaticMessage("\"%s\" cannot be transformed to %s.", MultiPartPayload.class.getSimpleName(), getReturnDataType().getType().getName());
+            throw new TransformerException(msg, this);
+        }
+
         if (!isSourceDataTypeSupported(sourceType))
         {
             Message msg = CoreMessages.transformOnObjectUnsupportedTypeOfEndpoint(getName(),

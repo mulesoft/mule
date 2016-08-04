@@ -8,13 +8,17 @@ package org.mule.extension.email.internal.commands;
 
 import static javax.mail.Folder.READ_ONLY;
 import static org.mule.extension.email.api.EmailAttributesBuilder.fromMessage;
+import static org.mule.extension.email.api.EmailContentProcessor.process;
+import static org.mule.runtime.core.message.DefaultMultiPartPayload.BODY_ATTRIBUTES;
 
 import org.mule.extension.email.api.EmailAttributes;
 import org.mule.extension.email.api.EmailContentProcessor;
 import org.mule.extension.email.api.exception.EmailRetrieverException;
 import org.mule.extension.email.internal.retriever.RetrieverConnection;
 import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.core.message.DefaultMultiPartPayload;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Predicate;
@@ -57,15 +61,25 @@ public final class ListCommand
             List<MuleMessage> list = new LinkedList<>();
             for (Message m : folder.getMessages())
             {
-                String body = "";
-                EmailAttributes attributes = fromMessage(m, false);
+                Object body = "";
+                EmailAttributes attributes = fromMessage(m);
                 if (matcher.test(attributes))
                 {
                     if (readContent)
                     {
                         body = EmailContentProcessor.process(m).getBody();
-                        attributes = fromMessage(m);
+
+                        final List<MuleMessage> attachmentParts = process(m).getAttachments();
+                        if(!attachmentParts.isEmpty())
+                        {
+                            final List<MuleMessage> parts = new ArrayList<>();
+                            parts.add(MuleMessage.builder().payload(body).attributes(BODY_ATTRIBUTES).build());
+                            parts.addAll(attachmentParts);
+
+                            body = new DefaultMultiPartPayload(parts);
+                        }
                     }
+                    attributes = fromMessage(m);
                     list.add(MuleMessage.builder().payload(body).attributes(attributes).build());
                 }
             }

@@ -6,9 +6,13 @@
  */
 package org.mule.runtime.core.util;
 
+import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MuleMessage.Builder;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.message.PartAttributes;
 import org.mule.runtime.core.message.ds.ByteArrayDataSource;
 import org.mule.runtime.core.message.ds.InputStreamDataSource;
 import org.mule.runtime.core.message.ds.StringDataSource;
@@ -269,13 +273,13 @@ public class IOUtils extends org.apache.commons.io.IOUtils
     /**
      * Transforms an Object into a DataHandler of its corresponding type.
      *
-     * @param name        the name of the attachment being handled
-     * @param object      the attachment to be handled
+     * @param name the name of the attachment being handled
+     * @param object the attachment to be handled
      * @param contentType the Content-Type of the attachment that is being handled
      * @return a {@link DataHandler} of the corresponding attachment
-     * @throws Exception if the transformation fails.
+     * @throws IOException if the transformation fails.
      */
-    public static DataHandler toDataHandler(String name, Object object, MediaType contentType) throws Exception
+    public static DataHandler toDataHandler(String name, Object object, MediaType contentType) throws IOException
     {
         DataHandler dh;
         if (object instanceof File)
@@ -324,5 +328,52 @@ public class IOUtils extends org.apache.commons.io.IOUtils
             dh = new DataHandler(object, contentType.toString());
         }
         return dh;
+    }
+
+    /**
+     * Transforms an Object into a {@link MuleMessage} to be used in a {@link MultiPartPayload}.
+     *
+     * @param name the name of the attachment being handled
+     * @param object the attachment to be handled
+     * @param contentType the Content-Type of the attachment that is being handled
+     * @return a {@link MuleMessage} of the corresponding attachment
+     * @throws IOException if the transformation fails.
+     */
+    public static MuleMessage toMuleMessagePart(String name, Object object, MediaType contentType) throws IOException
+    {
+        final Builder builder;
+
+        if (object instanceof File)
+        {
+            builder = MuleMessage.builder().payload(new FileInputStream((File) object));
+        }
+        else if (object instanceof URL)
+        {
+            builder = MuleMessage.builder().payload(((URL) object).openStream());
+        }
+        else if (object instanceof String)
+        {
+            builder = MuleMessage.builder().payload(object);
+            if (contentType == null || MediaType.ANY.matches(contentType))
+            {
+                builder.mediaType(MediaType.TEXT);
+            }
+        }
+        else
+        {
+            builder = MuleMessage.builder().payload(object);
+        }
+
+        if (contentType != null && !MediaType.ANY.matches(contentType))
+        {
+            builder.mediaType(contentType);
+        }
+        else
+        {
+            final DataHandler dataHandler = toDataHandler(name, object, contentType);
+            builder.mediaType(MediaType.parse(dataHandler.getContentType()));
+        }
+
+        return builder.attributes(new PartAttributes(name)).build();
     }
 }

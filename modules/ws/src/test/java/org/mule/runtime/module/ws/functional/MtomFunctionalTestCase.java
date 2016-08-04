@@ -7,10 +7,11 @@
 package org.mule.runtime.module.ws.functional;
 
 import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
+import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.util.IOUtils;
@@ -25,6 +26,8 @@ import javax.activation.FileDataSource;
 
 import org.junit.Ignore;
 import org.junit.Test;
+
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 
 @Ignore("See MULE-9203")
 public class MtomFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase
@@ -88,16 +91,18 @@ public class MtomFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase
 
     private void assertAttachmentInResponse(MuleMessage message, String fileName) throws Exception
     {
-        assertEquals(1, message.getInboundAttachmentNames().size());
+        final MultiPartPayload multiPartPayload = (MultiPartPayload) message.getPayload();
+        assertThat(multiPartPayload.getParts(), hasSize(1));
 
         String attachmentId = extractAttachmentId(getPayloadAsString(message));
-        DataHandler attachment = message.getInboundAttachment(attachmentId);
 
-        assertNotNull(attachment);
+        final org.mule.runtime.api.message.MuleMessage part = multiPartPayload.getPart(attachmentId);
+
+        assertNotNull(part.getPayload());
 
         InputStream expected = IOUtils.getResourceAsStream(fileName, getClass());
 
-        assertTrue(IOUtils.contentEquals(expected, attachment.getInputStream()));
+        assertTrue(IOUtils.contentEquals(expected, part.getPayload()));
     }
 
 

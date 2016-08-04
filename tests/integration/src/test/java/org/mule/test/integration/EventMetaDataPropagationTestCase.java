@@ -6,29 +6,31 @@
  */
 package org.mule.test.integration;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.mule.runtime.core.message.DefaultMultiPartPayload.BODY_ATTRIBUTES;
 
-import org.mule.test.AbstractIntegrationTestCase;
+import org.mule.runtime.api.message.MultiPartPayload;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.lifecycle.Callable;
 import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.message.DefaultMultiPartPayload;
+import org.mule.runtime.core.message.PartAttributes;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 import org.mule.tck.testmodels.fruit.Apple;
+import org.mule.test.AbstractIntegrationTestCase;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.activation.DataHandler;
-import javax.activation.DataSource;
 
 import org.junit.Test;
 
@@ -63,34 +65,9 @@ public class EventMetaDataPropagationTestCase extends AbstractIntegrationTestCas
                 props.put("booleanParam", Boolean.TRUE);
 
                 return MuleMessage.builder()
-                                  .payload(context.getMessageAsString())
+                                  .payload(new DefaultMultiPartPayload(MuleMessage.builder().payload(context.getMessageAsString()).attributes(BODY_ATTRIBUTES).build(),
+                                          MuleMessage.builder().nullPayload().mediaType(MediaType.TEXT).attributes(new PartAttributes("test1")).build()))
                                   .outboundProperties(props)
-                                  .addOutboundAttachment("test1", new DataHandler(new DataSource()
-                                  {
-                                      @Override
-                                      public InputStream getInputStream() throws IOException
-                                      {
-                                          return null;
-                                      }
-
-                                      @Override
-                                      public OutputStream getOutputStream() throws IOException
-                                      {
-                                          return null;
-                                      }
-
-                                      @Override
-                                      public String getContentType()
-                                      {
-                                          return "text/plain";
-                                      }
-
-                                      @Override
-                                      public String getName()
-                                      {
-                                          return "test1";
-                                      }
-                                  }))
                                   .build();
             }
             else
@@ -103,7 +80,8 @@ public class EventMetaDataPropagationTestCase extends AbstractIntegrationTestCas
                 assertEquals(12345, msg.<Integer> getInboundProperty("integerParam", 0).intValue());
                 assertEquals(123456789, msg.<Long> getInboundProperty("longParam", 0L).longValue());
                 assertEquals(Boolean.TRUE, msg.getInboundProperty("booleanParam", Boolean.FALSE));
-                assertNotNull(msg.getInboundAttachment("test1"));
+                assertThat(msg.getPayload(), instanceOf(DefaultMultiPartPayload.class));
+                assertThat(((MultiPartPayload) msg.getPayload()).getPart("test1"), not(nullValue()));
             }
             return null;
         }

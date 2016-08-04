@@ -6,12 +6,12 @@
  */
 package org.mule.extension.http;
 
-import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
+
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.message.MuleMessage;
@@ -184,7 +184,6 @@ public class BasicHttpTestCase extends MuleArtifactFunctionalTestCase
             assertThat(requestAttributes.getQueryString(), is("query=param"));
             assertThat(requestAttributes.getQueryParams(), hasEntry("query", "param"));
             assertThat(requestAttributes.getHeaders(), hasEntry("y-custom", "value-custom"));
-            assertThat(requestAttributes.getParts().entrySet(), is(empty()));
             return event;
         }
     }

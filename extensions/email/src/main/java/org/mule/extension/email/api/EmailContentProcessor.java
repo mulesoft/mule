@@ -6,23 +6,29 @@
  */
 package org.mule.extension.email.api;
 
+import static java.util.Collections.singletonList;
 import static javax.mail.Part.ATTACHMENT;
 import static org.mule.extension.email.internal.util.EmailConnectorUtils.TEXT;
-import static org.mule.runtime.core.util.IOUtils.toByteArray;
 
 import org.mule.extension.email.api.exception.EmailException;
+import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.core.message.PartAttributes;
 import org.mule.runtime.core.util.IOUtils;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.LinkedHashMap;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
 
-import javax.activation.DataHandler;
+import javax.mail.Header;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
@@ -33,7 +39,7 @@ public class EmailContentProcessor
 
     private static final String ERROR_PROCESSING_MESSAGE = "Error while processing message content.";
 
-    private final Map<String, DataHandler> attachments = new LinkedHashMap<>();
+    private final List<MuleMessage> attachmentParts = new LinkedList<>();
     private final StringJoiner body = new StringJoiner("\n");
 
     /**
@@ -72,9 +78,9 @@ public class EmailContentProcessor
     /**
      * @return an {@link ImmutableMap} with the attachments of an email message.
      */
-    public Map<String, DataHandler> getAttachments()
+    public List<MuleMessage> getAttachments()
     {
-        return ImmutableMap.copyOf(attachments);
+        return ImmutableList.copyOf(attachmentParts);
     }
 
     /**
@@ -117,10 +123,19 @@ public class EmailContentProcessor
 
             if (isAttachment(part))
             {
-                String contentType = part.getDataHandler().getContentType();
-                ByteArrayInputStream inputStream = new ByteArrayInputStream(toByteArray(part.getInputStream()));
-                DataHandler attachment = new DataHandler(inputStream, contentType);
-                attachments.put(part.getFileName(), attachment);
+                Map<String, LinkedList<String>> headers = new HashMap<>();
+                final Enumeration allHeaders = part.getAllHeaders();
+                while (allHeaders.hasMoreElements())
+                {
+                    Header h = (Header) allHeaders.nextElement();
+                    headers.put(h.getName(), new LinkedList<>(singletonList(h.getValue())));
+                }
+
+                attachmentParts.add(MuleMessage.builder()
+                                               .payload(part.getInputStream())
+                                               .mediaType(MediaType.parse(part.getContentType()))
+                                               .attributes(new PartAttributes(part.getFileName(), part.getFileName(), part.getSize(), headers))
+                                               .build());
             }
             else
             {

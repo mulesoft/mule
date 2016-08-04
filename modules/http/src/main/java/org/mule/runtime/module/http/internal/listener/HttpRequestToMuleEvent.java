@@ -14,8 +14,9 @@ import static org.mule.runtime.module.http.api.HttpHeaders.Names.HOST;
 import static org.mule.runtime.module.http.internal.HttpParser.decodeUrlEncodedBody;
 import static org.mule.runtime.module.http.internal.domain.HttpProtocol.HTTP_0_9;
 import static org.mule.runtime.module.http.internal.domain.HttpProtocol.HTTP_1_0;
-import static org.mule.runtime.module.http.internal.multipart.HttpPartDataSource.createDataHandlerFrom;
+import static org.mule.runtime.module.http.internal.multipart.HttpPartDataSource.multiPartPayloadForAttachments;
 import static org.mule.runtime.module.http.internal.util.HttpToMuleMessage.getMediaType;
+
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
@@ -34,6 +35,7 @@ import org.mule.runtime.module.http.internal.domain.MultipartHttpEntity;
 import org.mule.runtime.module.http.internal.domain.request.HttpRequest;
 import org.mule.runtime.module.http.internal.domain.request.HttpRequestContext;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -41,8 +43,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.activation.DataHandler;
 
 public class HttpRequestToMuleEvent
 {
@@ -79,7 +79,6 @@ public class HttpRequestToMuleEvent
                                            .setClientCertificate(requestContext.getClientConnection().getClientCertificate())
                                            .addPropertiesTo(inboundProperties);
 
-        final Map<String, DataHandler> inboundAttachments = new HashMap<>();
         Object payload = null;
 
         final MediaType mediaType = getMediaType(request.getHeaderValueIgnoreCase(CONTENT_TYPE), getDefaultEncoding(muleContext));
@@ -90,7 +89,14 @@ public class HttpRequestToMuleEvent
             {
                 if (entity instanceof MultipartHttpEntity)
                 {
-                    inboundAttachments.putAll(createDataHandlerFrom(((MultipartHttpEntity) entity).getParts()));
+                    try
+                    {
+                        payload = multiPartPayloadForAttachments((MultipartHttpEntity) entity);
+                    }
+                    catch (IOException e)
+                    {
+                        throw new HttpRequestParsingException(e.getMessage(), e);
+                    }
                 }
                 else
                 {
@@ -133,7 +139,6 @@ public class HttpRequestToMuleEvent
                                                .mediaType(mediaType)
                                                .inboundProperties(inboundProperties)
                                                .outboundProperties(outboundProperties)
-                                               .inboundAttachments(inboundAttachments)
                                                .build();
         return new DefaultMuleEvent(
                 message,

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.http.internal.request;
 
+import static org.mule.runtime.core.util.IOUtils.toDataHandler;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_PREFIX;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONNECTION;
@@ -18,12 +19,15 @@ import static org.mule.runtime.module.http.api.HttpHeaders.Values.APPLICATION_X_
 import static org.mule.runtime.module.http.api.HttpHeaders.Values.CHUNKED;
 import static org.mule.runtime.module.http.internal.request.DefaultHttpRequester.DEFAULT_EMPTY_BODY_METHODS;
 import static org.mule.runtime.module.http.internal.request.DefaultHttpRequester.DEFAULT_PAYLOAD_EXPRESSION;
+
+import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.message.PartAttributes;
 import org.mule.runtime.core.util.AttributeEvaluator;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.module.http.api.requester.HttpSendBodyMode;
@@ -196,7 +200,7 @@ public class MuleEventToHttpRequest
     {
         Object payload = muleEvent.getMessage().getPayload();
 
-        if (!muleEvent.getMessage().getOutboundAttachmentNames().isEmpty())
+        if (!muleEvent.getMessage().getOutboundAttachmentNames().isEmpty() || payload instanceof MultiPartPayload)
         {
             try
             {
@@ -260,6 +264,15 @@ public class MuleEventToHttpRequest
         for (String outboundAttachmentName : msg.getOutboundAttachmentNames())
         {
             attachments.put(outboundAttachmentName, msg.getOutboundAttachment(outboundAttachmentName));
+        }
+
+        if (msg.getPayload() instanceof MultiPartPayload)
+        {
+            for (org.mule.runtime.api.message.MuleMessage part : ((MultiPartPayload) msg.getPayload()).getParts())
+            {
+                final String partName = ((PartAttributes) part.getAttributes()).getName();
+                attachments.put(partName, toDataHandler(partName, part.getPayload(), part.getDataType().getMediaType()));
+            }
         }
 
         return new MultipartHttpEntity(HttpPartDataSource.createFrom(attachments));

@@ -10,27 +10,16 @@ import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.module.http.internal.ParameterMap;
 import org.mule.runtime.module.http.internal.domain.response.HttpResponse;
 
-import java.util.Map;
-
-import javax.activation.DataHandler;
-
 /**
  * Creates {@link HttpResponseAttributes} based on an {@HttpResponse} and it's parts.
  */
 public class HttpResponseAttributesBuilder
 {
     HttpResponse response;
-    Map<String, DataHandler> parts;
 
     public HttpResponseAttributesBuilder setResponse(HttpResponse response)
     {
         this.response = response;
-        return this;
-    }
-
-    public HttpResponseAttributesBuilder setParts(Map<String, DataHandler> parts)
-    {
-        this.parts = parts;
         return this;
     }
 
@@ -45,6 +34,6 @@ public class HttpResponseAttributesBuilder
         int statusCode = response.getStatusCode();
         String reasonPhrase = response.getReasonPhrase();
 
-        return new HttpResponseAttributes(statusCode, reasonPhrase, parts, headers);
+        return new HttpResponseAttributes(statusCode, reasonPhrase, headers);
     }
 }

@@ -12,11 +12,12 @@ import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.CREATED;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
+
 import org.mule.runtime.core.util.ArrayUtils;
 import org.mule.runtime.module.http.api.HttpHeaders;
-import org.mule.test.module.http.functional.AbstractHttpTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
+import org.mule.test.module.http.functional.AbstractHttpTestCase;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -25,6 +26,8 @@ import java.text.SimpleDateFormat;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.client.fluent.Response;
+import org.hamcrest.Description;
+import org.hamcrest.TypeSafeMatcher;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -198,17 +201,33 @@ public class HttpListenerResponseBuilderTestCase extends AbstractHttpTestCase
         final Response response = Request.Get(url).connectTimeout(DEFAULT_TIMEOUT).execute();
         final HttpResponse httpResponse = response.returnResponse();
         assertThat(httpResponse.getFirstHeader(HttpHeaders.Names.USER_AGENT).getValue(), is("Mule 3.6.0"));
-        assertThat(isDateValid(httpResponse.getFirstHeader(HttpHeaders.Names.DATE).getValue()), is(true));
-    }
+        assertThat(httpResponse.getFirstHeader(HttpHeaders.Names.DATE).getValue(), new TypeSafeMatcher<String>()
+        {
 
-    public boolean isDateValid(String dateToValidate){
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
-        try {
-            sdf.parse(dateToValidate);
-        } catch (ParseException e) {
-            e.printStackTrace();
-            return false;
-        }
-        return true;
+            private ParseException parseException;
+
+            @Override
+            public void describeTo(Description description)
+            {
+                description.appendText(parseException.getMessage());
+            }
+
+            @Override
+            protected boolean matchesSafely(String dateToValidate)
+            {
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+                try
+                {
+                    sdf.parse(dateToValidate);
+                }
+                catch (ParseException e)
+                {
+                    this.parseException = e;
+                    e.printStackTrace();
+                    return false;
+                }
+                return true;
+            }
+        });
     }
 }

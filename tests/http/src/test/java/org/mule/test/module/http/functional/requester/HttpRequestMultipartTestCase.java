@@ -11,7 +11,9 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
+
 import org.mule.extension.http.api.HttpResponseAttributes;
+import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.core.api.MuleEvent;
 
 import java.io.IOException;
@@ -74,6 +76,6 @@ public class HttpRequestMultipartTestCase extends AbstractHttpRequestTestCase
         MuleEvent response = flowRunner("requestFlow").withFlowVariable("requestPath", path).run();
         Serializable attributes = response.getMessage().getAttributes();
         assertThat(attributes, instanceOf(HttpResponseAttributes.class));
-        assertThat(((HttpResponseAttributes) attributes).getParts().entrySet(), hasSize(1));
+        assertThat(((MultiPartPayload) response.getMessage().getPayload()).getParts(), hasSize(1));
     }
 }

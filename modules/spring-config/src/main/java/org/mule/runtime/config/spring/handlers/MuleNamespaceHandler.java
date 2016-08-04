@@ -175,7 +175,6 @@ import org.mule.runtime.core.transformer.compression.GZipCompressTransformer;
 import org.mule.runtime.core.transformer.compression.GZipUncompressTransformer;
 import org.mule.runtime.core.transformer.encryption.DecryptionTransformer;
 import org.mule.runtime.core.transformer.encryption.EncryptionTransformer;
-import org.mule.runtime.core.transformer.simple.AddAttachmentTransformer;
 import org.mule.runtime.core.transformer.simple.AddFlowVariableTransformer;
 import org.mule.runtime.core.transformer.simple.AddPropertyTransformer;
 import org.mule.runtime.core.transformer.simple.AutoTransformer;
@@ -184,14 +183,12 @@ import org.mule.runtime.core.transformer.simple.ByteArrayToHexString;
 import org.mule.runtime.core.transformer.simple.ByteArrayToObject;
 import org.mule.runtime.core.transformer.simple.ByteArrayToSerializable;
 import org.mule.runtime.core.transformer.simple.CombineCollectionsTransformer;
-import org.mule.runtime.core.transformer.simple.CopyAttachmentsTransformer;
 import org.mule.runtime.core.transformer.simple.CopyPropertiesTransformer;
 import org.mule.runtime.core.transformer.simple.HexStringToByteArray;
 import org.mule.runtime.core.transformer.simple.MapToBean;
 import org.mule.runtime.core.transformer.simple.ObjectToByteArray;
 import org.mule.runtime.core.transformer.simple.ObjectToString;
 import org.mule.runtime.core.transformer.simple.ParseTemplateTransformer;
-import org.mule.runtime.core.transformer.simple.RemoveAttachmentTransformer;
 import org.mule.runtime.core.transformer.simple.RemoveFlowVariableTransformer;
 import org.mule.runtime.core.transformer.simple.RemovePropertyTransformer;
 import org.mule.runtime.core.transformer.simple.SerializableToByteArray;
@@ -200,6 +197,7 @@ import org.mule.runtime.core.transformer.simple.StringAppendTransformer;
 import org.mule.runtime.core.util.store.InMemoryObjectStore;
 import org.mule.runtime.core.util.store.ManagedObjectStore;
 import org.mule.runtime.core.util.store.TextFileObjectStore;
+
 import org.springframework.beans.factory.xml.BeanDefinitionParser;
 
 /**
@@ -278,9 +276,6 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("copy-properties", new MessageProcessorDefinitionParser(CopyPropertiesTransformer.class));
         registerMuleBeanDefinitionParser("set-variable", new MessageProcessorWithDataTypeDefinitionParser(AddFlowVariableTransformer.class)).addAlias(VARIABLE_NAME_ATTRIBUTE, IDENTIFIER_PROPERTY);
         registerMuleBeanDefinitionParser("remove-variable", new MessageProcessorDefinitionParser(RemoveFlowVariableTransformer.class)).addAlias(VARIABLE_NAME_ATTRIBUTE, IDENTIFIER_PROPERTY);
-        registerBeanDefinitionParser("set-attachment", new MessageProcessorDefinitionParser(AddAttachmentTransformer.class));
-        registerBeanDefinitionParser("remove-attachment", new MessageProcessorDefinitionParser(RemoveAttachmentTransformer.class));
-        registerBeanDefinitionParser("copy-attachments", new MessageProcessorDefinitionParser(CopyAttachmentsTransformer.class));
 
         registerMuleBeanDefinitionParser("expression-transformer", new ExpressionTransformerDefinitionParser(
                 ExpressionTransformer.class));

@@ -9,8 +9,9 @@ package org.mule.extension.email.retriever;
 
 import static java.lang.String.format;
 import static java.util.Collections.singletonList;
+import static org.hamcrest.CoreMatchers.hasItems;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.Matchers.arrayWithSize;
-import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.not;
@@ -32,18 +33,18 @@ import static org.mule.extension.email.util.EmailTestUtils.JUANI_EMAIL;
 import static org.mule.extension.email.util.EmailTestUtils.assertAttachmentContent;
 import static org.mule.extension.email.util.EmailTestUtils.getMultipartTestMessage;
 import static org.mule.extension.email.util.EmailTestUtils.testSession;
+
 import org.mule.extension.email.EmailConnectorTestCase;
-import org.mule.extension.email.api.EmailAttributes;
 import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.MultiPartPayload;
+import org.mule.runtime.core.message.DefaultMultiPartPayload;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
-import java.util.Map;
 
-import javax.activation.DataHandler;
 import javax.mail.Flags.Flag;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
@@ -129,11 +130,12 @@ public abstract class AbstractEmailRetrieverTestCase extends EmailConnectorTestC
         List<MuleMessage> messages = runFlowAndGetMessages(RETRIEVE_WITH_ATTACHMENTS);
 
         assertThat(messages, hasSize(1));
-        EmailAttributes attributes = (EmailAttributes) messages.get(0).getAttributes();
-        Map<String, DataHandler> emailAttachments = attributes.getAttachments();
+        assertThat(messages.get(0).getPayload(), instanceOf(MultiPartPayload.class));
+        List<MuleMessage> emailAttachments = ((MultiPartPayload) messages.get(0).getPayload()).getParts();
 
-        assertThat(emailAttachments.entrySet(), hasSize(2));
-        assertThat(emailAttachments.keySet(), containsInAnyOrder(EMAIL_JSON_ATTACHMENT_NAME, EMAIL_TEXT_PLAIN_ATTACHMENT_NAME));
+        assertThat(emailAttachments, hasSize(3));
+        assertThat(((DefaultMultiPartPayload) messages.get(0).getPayload()).hasBodyPart(), is(true));
+        assertThat(((MultiPartPayload) messages.get(0).getPayload()).getPartNames(), hasItems(EMAIL_JSON_ATTACHMENT_NAME, EMAIL_TEXT_PLAIN_ATTACHMENT_NAME));
         assertAttachmentContent(emailAttachments, EMAIL_JSON_ATTACHMENT_NAME, EMAIL_JSON_ATTACHMENT_CONTENT);
         assertAttachmentContent(emailAttachments, EMAIL_TEXT_PLAIN_ATTACHMENT_NAME, EMAIL_TEXT_PLAIN_ATTACHMENT_CONTENT);
     }

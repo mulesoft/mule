@@ -8,17 +8,19 @@ package org.mule.extension.email.internal.util;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
+
 import org.mule.extension.email.api.EmailAttachment;
 import org.mule.extension.email.api.EmailAttributes;
 import org.mule.extension.email.api.exception.EmailException;
 import org.mule.runtime.api.message.MuleMessage;
-import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.message.MultiPartPayload;
+import org.mule.runtime.core.message.DefaultMultiPartPayload;
+import org.mule.runtime.core.message.PartAttributes;
 
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
-import javax.activation.DataHandler;
 import javax.mail.Address;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
@@ -133,16 +135,20 @@ public final class EmailConnectorUtils
     }
 
     /**
-     * Transforms a {@link Map} of attachments into a {@link List} of {@link EmailAttachment}s.
+     * Transforms the attachments in a {@link MultiPartPayload} into a {@link List} of {@link EmailAttachment}s.
      *
-     * @param attachments a {@link Map} of {@link String} {@link DataHandler} that carries the attachments.
-     * @return a {@link List} of {@link EmailAttachment}.
+     * @param payload a {@link MultiPartPayload} that carries the attachments.
+     * @return a {@link List} of {@link EmailAttachment}, or an empty {@link List} if payload is not a
+     *         {@link MultiPartPayload}.
      */
-    public static List<EmailAttachment> mapToEmailAttachments(Map<String, DataHandler> attachments)
+    public static List<EmailAttachment> mapToEmailAttachments(Object payload)
     {
-        return attachments.entrySet().stream()
-                          .map(e -> new EmailAttachment(e.getKey(), e.getValue(),
-                                  DataType.builder().mediaType(e.getValue().getContentType()).build().getMediaType()))
-                          .collect(toList());
+        return payload instanceof DefaultMultiPartPayload
+                ? ((DefaultMultiPartPayload) payload).getNonBodyParts()
+                                                     .stream()
+                                                     .map(p -> new EmailAttachment(((PartAttributes) p.getAttributes()).getName(), p.getPayload(),
+                                                             p.getDataType().getMediaType()))
+                                                     .collect(toList())
+                : Collections.emptyList();
     }
 }

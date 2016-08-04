@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.http.internal.listener;
 
+import static org.mule.runtime.core.util.IOUtils.toDataHandler;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.getReasonPhraseForStatusCode;
 import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_PREFIX;
 import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_STATUS_PROPERTY;
@@ -18,6 +19,8 @@ import static org.mule.runtime.module.http.api.HttpHeaders.Names.TRANSFER_ENCODI
 import static org.mule.runtime.module.http.api.HttpHeaders.Values.CHUNKED;
 import static org.mule.runtime.module.http.api.requester.HttpStreamingType.ALWAYS;
 import static org.mule.runtime.module.http.api.requester.HttpStreamingType.AUTO;
+
+import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MessagingException;
@@ -26,6 +29,7 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.message.PartAttributes;
 import org.mule.runtime.core.util.AttributeEvaluator;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.NumberUtils;
@@ -131,7 +135,7 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
 
         HttpEntity httpEntity;
 
-        if (!event.getMessage().getOutboundAttachmentNames().isEmpty())
+        if (!event.getMessage().getOutboundAttachmentNames().isEmpty() || event.getMessage().getPayload() instanceof MultiPartPayload)
         {
             if (configuredContentType == null)
             {
@@ -361,10 +365,19 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
         {
             parts.put(outboundAttachmentName, event.getMessage().getOutboundAttachment(outboundAttachmentName));
         }
-        final MultipartHttpEntity multipartEntity;
+
         try
         {
-            multipartEntity = new MultipartHttpEntity(HttpPartDataSource.createFrom(parts));
+            if (event.getMessage().getPayload() instanceof MultiPartPayload)
+            {
+                for (org.mule.runtime.api.message.MuleMessage part : ((MultiPartPayload) event.getMessage().getPayload()).getParts())
+                {
+                    final String partName = ((PartAttributes) part.getAttributes()).getName();
+                    parts.put(partName, toDataHandler(partName, part.getPayload(), part.getDataType().getMediaType()));
+                }
+            }
+
+            final MultipartHttpEntity multipartEntity = new MultipartHttpEntity(HttpPartDataSource.createFrom(parts));
             return new ByteArrayHttpEntity(HttpMultipartEncoder.createMultipartContent(multipartEntity, contentType));
         }
         catch (Exception e)

@@ -16,17 +16,19 @@ import static org.mule.extension.email.util.EmailTestUtils.EMAIL_JSON_ATTACHMENT
 import static org.mule.extension.email.util.EmailTestUtils.EMAIL_TEXT_PLAIN_ATTACHMENT_CONTENT;
 import static org.mule.extension.email.util.EmailTestUtils.EMAIL_TEXT_PLAIN_ATTACHMENT_NAME;
 import static org.mule.extension.email.util.EmailTestUtils.assertAttachmentContent;
-import static org.mule.extension.email.util.EmailTestUtils.getSinglePartTestMessage;
 import static org.mule.extension.email.util.EmailTestUtils.getMultipartTestMessage;
+import static org.mule.extension.email.util.EmailTestUtils.getSinglePartTestMessage;
 
-import java.util.Map;
+import org.mule.runtime.api.message.MuleMessage;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
-import javax.activation.DataHandler;
+import java.util.List;
+
 import javax.mail.Message;
 
 import org.junit.Test;
 
-public class EmailContentProcessorTestCase
+public class EmailContentProcessorTestCase extends AbstractMuleTestCase
 {
     @Test
     public void emailTextBodyFromMultipart() throws Exception
@@ -48,8 +50,8 @@ public class EmailContentProcessorTestCase
     public void emailAttachmentsFromMultipart() throws Exception
     {
         Message message = getMultipartTestMessage();
-        Map<String, DataHandler> attachments = process(message).getAttachments();
-        assertThat(attachments.entrySet(), hasSize(2));
+        List<MuleMessage> attachments = process(message).getAttachments();
+        assertThat(attachments, hasSize(2));
         assertAttachmentContent(attachments, EMAIL_TEXT_PLAIN_ATTACHMENT_NAME, EMAIL_TEXT_PLAIN_ATTACHMENT_CONTENT);
         assertAttachmentContent(attachments, EMAIL_JSON_ATTACHMENT_NAME, EMAIL_JSON_ATTACHMENT_CONTENT);
     }

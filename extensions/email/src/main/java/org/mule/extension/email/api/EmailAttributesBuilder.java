@@ -14,7 +14,6 @@ import static javax.mail.Flags.Flag.SEEN;
 import static javax.mail.Message.RecipientType.BCC;
 import static javax.mail.Message.RecipientType.CC;
 import static javax.mail.Message.RecipientType.TO;
-import static org.mule.extension.email.api.EmailContentProcessor.process;
 
 import org.mule.extension.email.api.exception.EmailException;
 
@@ -27,7 +26,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.activation.DataHandler;
 import javax.mail.Address;
 import javax.mail.Flags;
 import javax.mail.Message;
@@ -49,7 +47,6 @@ public final class EmailAttributesBuilder
     private List<String> bcc = new ArrayList<>();
     private List<String> cc = new ArrayList<>();
     private Map<String, String> headers = new HashMap<>();
-    private Map<String, DataHandler> attachments = new HashMap<>();
     private LocalDateTime sentDate;
     private LocalDateTime receivedDate;
     private List<String> replyTo = new ArrayList<>();
@@ -68,13 +65,12 @@ public final class EmailAttributesBuilder
 
     /**
      * builds the new {@link EmailAttributes} instance from a given
-     * {@link Message} extracting all its attributes.
+     * {@link Message} extracting all its attributes including the attachments.
      *
-     * @param msg             the {@link Message} to extract attributes from.
-     * @param withAttachments if true, the message content will be opened to getPropertiesInstance the attachments.
+     * @param msg the {@link Message} to extract attributes from.
      * @return a new {@link EmailAttributes} instance.
      */
-    public static EmailAttributes fromMessage(Message msg, boolean withAttachments)
+    public static EmailAttributes fromMessage(Message msg)
     {
         try
         {
@@ -96,25 +92,12 @@ public final class EmailAttributesBuilder
                     .answered(flags.contains(ANSWERED))
                     .deleted(flags.contains(DELETED));
 
-            return withAttachments ? builder.withAttachments(process(msg).getAttachments()).build()
-                                   : builder.build();
+            return builder.build();
         }
         catch (MessagingException mse)
         {
             throw new EmailException(mse.getMessage(), mse);
         }
-    }
-
-    /**
-     * builds the new {@link EmailAttributes} instance from a given
-     * {@link Message} extracting all its attributes including the attachments.
-     *
-     * @param msg the {@link Message} to extract attributes from.
-     * @return a new {@link EmailAttributes} instance.
-     */
-    public static EmailAttributes fromMessage(Message msg)
-    {
-        return fromMessage(msg, true);
     }
 
     /**
@@ -206,18 +189,6 @@ public final class EmailAttributesBuilder
     public EmailAttributesBuilder setHeaders(Map<String, String> headers)
     {
         this.headers = headers;
-        return this;
-    }
-
-    /**
-     * set the attachments of the email.
-     *
-     * @param attachments the attachments to be set.
-     * @return this {@link EmailAttributesBuilder}
-     */
-    public EmailAttributesBuilder withAttachments(Map<String, DataHandler> attachments)
-    {
-        this.attachments = attachments;
         return this;
     }
 
@@ -332,7 +303,6 @@ public final class EmailAttributesBuilder
                                    cc,
                                    replyTo,
                                    headers,
-                                   attachments,
                                    receivedDate,
                                    sentDate,
                                    new EmailFlags(answered, deleted, draft, recent, seen));

@@ -6,14 +6,8 @@
  */
 package org.mule.extension.http.api;
 
-import static com.google.common.collect.ImmutableMap.copyOf;
-
 import org.mule.runtime.core.message.BaseAttributes;
 import org.mule.runtime.module.http.internal.ParameterMap;
-
-import java.util.Map;
-
-import javax.activation.DataHandler;
 
 /**
  * Base representation of HTTP message attributes.
@@ -26,23 +20,14 @@ public abstract class HttpAttributes extends BaseAttributes
      * Map of HTTP headers in the message. Former properties.
      */
     protected final ParameterMap headers;
-    /**
-     * Map of HTTP parts in the message (from multipart content). Former attachments.
-     */
-    protected final Map<String, DataHandler> parts;
 
-    public HttpAttributes(ParameterMap headers, Map<String, DataHandler> parts)
+    public HttpAttributes(ParameterMap headers)
     {
         this.headers = headers.toImmutableParameterMap();
-        this.parts = copyOf(parts);
     }
 
     public ParameterMap getHeaders()
     {
         return headers;
-    }
-    public Map<String, DataHandler> getParts()
-    {
-        return parts;
     }
 }
