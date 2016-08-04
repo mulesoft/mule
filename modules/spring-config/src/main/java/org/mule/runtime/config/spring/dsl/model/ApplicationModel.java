@@ -202,6 +202,7 @@ public class ApplicationModel
      * @param componentBuildingDefinitionRegistry an optional {@link ComponentBuildingDefinitionRegistry} used to correlate items in this model to their definitions
      * @throws Exception when the application configuration has semantic errors.
      */
+    //TODO: MULE-9638 remove this optional
     public ApplicationModel(ArtifactConfig artifactConfig, ArtifactConfiguration artifactConfiguration, Optional<ComponentBuildingDefinitionRegistry> componentBuildingDefinitionRegistry) throws Exception
     {
         configurePropertyPlaceholderResolver(artifactConfig);
