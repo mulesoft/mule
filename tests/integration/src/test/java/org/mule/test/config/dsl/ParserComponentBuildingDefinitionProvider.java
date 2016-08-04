@@ -48,6 +48,7 @@ public class ParserComponentBuildingDefinitionProvider implements ComponentBuild
         ComponentBuildingDefinition.Builder baseParameterCollectionParserBuilder = baseBuilder
                 .copy()
                 .withTypeDefinition(fromType(SimpleCollectionObject.class))
+                .asNamed()
                 .withSetterParameterDefinition("simpleTypeList", fromChildConfiguration(List.class).withWrapperIdentifier("simple-type-child-list").build())
                 .withSetterParameterDefinition("simpleTypeListWithConverter", fromChildConfiguration(List.class).withWrapperIdentifier("simple-type-child-list-with-converter").build())
                 .withSetterParameterDefinition("simpleTypeSet", fromChildConfiguration(Set.class).withWrapperIdentifier("simple-type-child-set").build())

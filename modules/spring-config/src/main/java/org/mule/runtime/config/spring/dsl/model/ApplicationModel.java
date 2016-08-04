@@ -13,15 +13,17 @@ import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.config.spring.dsl.processor.xml.CoreXmlNamespaceInfoProvider.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.from;
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.to;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
+import static org.mule.runtime.extension.api.util.NameUtils.pluralize;
+import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition;
 import org.mule.runtime.config.spring.dsl.api.config.ArtifactConfiguration;
 import org.mule.runtime.config.spring.dsl.api.config.ComponentConfiguration;
 import org.mule.runtime.config.spring.dsl.processor.ArtifactConfig;
-import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
-import static org.mule.runtime.extension.api.util.NameUtils.pluralize;
 import org.mule.runtime.config.spring.dsl.processor.ConfigFile;
 import org.mule.runtime.config.spring.dsl.processor.ConfigLine;
 import org.mule.runtime.config.spring.dsl.processor.SimpleConfigAttribute;
@@ -181,16 +183,31 @@ public class ApplicationModel
      * <p/>
      * A set of validations are applied that may make creation fail.
      *
-     * @param artifactConfig the mule artifact configuration content.
-     * @param artifactConfiguration
+     * @param artifactConfig        the mule artifact configuration content.
+     * @param artifactConfiguration an {@link ArtifactConfiguration}
      * @throws Exception when the application configuration has semantic errors.
      */
     public ApplicationModel(ArtifactConfig artifactConfig, ArtifactConfiguration artifactConfiguration) throws Exception
     {
+        this(artifactConfig, artifactConfiguration, empty());
+    }
+
+    /**
+     * Creates an {code ApplicationModel} from a {@link ArtifactConfig}.
+     * <p/>
+     * A set of validations are applied that may make creation fail.
+     *
+     * @param artifactConfig                      the mule artifact configuration content.
+     * @param artifactConfiguration               an {@link ArtifactConfiguration}
+     * @param componentBuildingDefinitionRegistry an optional {@link ComponentBuildingDefinitionRegistry} used to correlate items in this model to their definitions
+     * @throws Exception when the application configuration has semantic errors.
+     */
+    public ApplicationModel(ArtifactConfig artifactConfig, ArtifactConfiguration artifactConfiguration, Optional<ComponentBuildingDefinitionRegistry> componentBuildingDefinitionRegistry) throws Exception
+    {
         configurePropertyPlaceholderResolver(artifactConfig);
         convertConfigFileToComponentModel(artifactConfig);
         convertArtifactConfigurationToComponentModel(artifactConfiguration);
-        validateModel();
+        validateModel(componentBuildingDefinitionRegistry);
     }
 
     private void convertArtifactConfigurationToComponentModel(ArtifactConfiguration artifactConfiguration)
@@ -231,17 +248,19 @@ public class ApplicationModel
     {
         //TODO MULE-9825: a new mechanism for property placeholders need to be defined
         final List<String> locations = new ArrayList<>();
-        artifactConfig.getConfigFiles().stream().forEach(configFile -> {
-            configFile.getConfigLines().get(0).getChildren().stream().forEach( configLine -> {
-                if (configLine.getIdentifier().equals(PROPERTY_PLACEHOLDER_ELEMENT))
-                {
-                    String locationValue = configLine.getConfigAttributes().get("location").getValue();
-                    locationValue = propertyPlaceholderHelper.replacePlaceholders(locationValue, getProperties());
-                    locationValue = locationValue.replace("classpath:/", "");
-                    locations.add(locationValue);
-                }
-            });
-        });
+        artifactConfig.getConfigFiles().stream().forEach(configFile ->
+                                                         {
+                                                             configFile.getConfigLines().get(0).getChildren().stream().forEach(configLine ->
+                                                                                                                               {
+                                                                                                                                   if (configLine.getIdentifier().equals(PROPERTY_PLACEHOLDER_ELEMENT))
+                                                                                                                                   {
+                                                                                                                                       String locationValue = configLine.getConfigAttributes().get("location").getValue();
+                                                                                                                                       locationValue = propertyPlaceholderHelper.replacePlaceholders(locationValue, getProperties());
+                                                                                                                                       locationValue = locationValue.replace("classpath:/", "");
+                                                                                                                                       locations.add(locationValue);
+                                                                                                                                   }
+                                                                                                                               });
+                                                         });
         applicationProperties = new Properties();
         applicationProperties.putAll(getenv());
         applicationProperties.putAll(getProperties());
@@ -293,17 +312,18 @@ public class ApplicationModel
     {
         List<ConfigFile> configFiles = artifactConfig.getConfigFiles();
         configFiles.stream()
-                .forEach(configFile -> {
-                    List<ComponentModel> componentModels = extractComponentDefinitionModel(asList(configFile.getConfigLines().get(0)), configFile.getFilename());
-                    if (isMuleConfigFile(configFile))
-                    {
-                        muleComponentModels.addAll(componentModels);
-                    }
-                    else
-                    {
-                        springComponentModels.addAll(componentModels);
-                    }
-                });
+                .forEach(configFile ->
+                         {
+                             List<ComponentModel> componentModels = extractComponentDefinitionModel(asList(configFile.getConfigLines().get(0)), configFile.getFilename());
+                             if (isMuleConfigFile(configFile))
+                             {
+                                 muleComponentModels.addAll(componentModels);
+                             }
+                             else
+                             {
+                                 springComponentModels.addAll(componentModels);
+                             }
+                         });
 
     }
 
@@ -326,7 +346,7 @@ public class ApplicationModel
         return !springComponentModels.isEmpty();
     }
 
-    private void validateModel() throws ConfigurationException
+    private void validateModel(Optional<ComponentBuildingDefinitionRegistry> componentBuildingDefinitionRegistry) throws ConfigurationException
     {
         if (muleComponentModels.isEmpty() || !isMuleConfigurationFile())
         {
@@ -339,26 +359,31 @@ public class ApplicationModel
         validateChoiceExceptionStrategyStructure();
         validateNoDefaultExceptionStrategyAsGlobal();
         validateParameterAndChildForSameAttributeAreNotDefinedTogether();
+        if (componentBuildingDefinitionRegistry.isPresent())
+        {
+            validateNamedTopLevelElementsHaveName(componentBuildingDefinitionRegistry.get());
+        }
     }
 
     private void validateParameterAndChildForSameAttributeAreNotDefinedTogether()
     {
-        executeOnEveryMuleComponentTree(componentModel -> {
-            for (String parameterName : componentModel.getParameters().keySet())
-            {
-                if (!componentModel.isParameterValueProvidedBySchema(parameterName))
-                {
-                    String mapChildName = hyphenize(pluralize(parameterName));
-                    String listOrPojoChildName = hyphenize(parameterName);
-                    Optional<ComponentModel> childOptional = findRelatedChildForParameter(componentModel.getInnerComponents(), mapChildName, listOrPojoChildName);
-                    if (childOptional.isPresent() && !childOptional.get().getIdentifier().equals(SPRING_PROPERTY_IDENTIFIER))
-                    {
-                        throw new MuleRuntimeException(createStaticMessage(format("Component %s has a child element %s which is used for the same purpose of the configuration parameter %s. " +
-                                                                                  "Only one must be used.", componentModel.getIdentifier(), childOptional.get().getIdentifier(), parameterName)));
-                    }
-                }
-            }
-        });
+        executeOnEveryMuleComponentTree(componentModel ->
+                                        {
+                                            for (String parameterName : componentModel.getParameters().keySet())
+                                            {
+                                                if (!componentModel.isParameterValueProvidedBySchema(parameterName))
+                                                {
+                                                    String mapChildName = hyphenize(pluralize(parameterName));
+                                                    String listOrPojoChildName = hyphenize(parameterName);
+                                                    Optional<ComponentModel> childOptional = findRelatedChildForParameter(componentModel.getInnerComponents(), mapChildName, listOrPojoChildName);
+                                                    if (childOptional.isPresent() && !childOptional.get().getIdentifier().equals(SPRING_PROPERTY_IDENTIFIER))
+                                                    {
+                                                        throw new MuleRuntimeException(createStaticMessage(format("Component %s has a child element %s which is used for the same purpose of the configuration parameter %s. " +
+                                                                                                                  "Only one must be used.", componentModel.getIdentifier(), childOptional.get().getIdentifier(), parameterName)));
+                                                    }
+                                                }
+                                            }
+                                        });
     }
 
     private Optional<ComponentModel> findRelatedChildForParameter(List<ComponentModel> chilrenComponents, String... possibleNames)
@@ -376,34 +401,36 @@ public class ApplicationModel
 
     private void validateNoDefaultExceptionStrategyAsGlobal()
     {
-        executeOnEveryMuleComponentTree(componentModel -> {
-            if (componentModel.isRoot() && DEFAULT_ES_ELEMENT_IDENTIFIER.equals(componentModel.getIdentifier()))
-            {
-                if (componentModel.getNameAttribute() != null)
-                {
-                    throw new MuleRuntimeException(createStaticMessage(format("Component %s is not supported as global", DEFAULT_ES_ELEMENT_IDENTIFIER.getName())));
-                }
-            }
-        });
+        executeOnEveryMuleComponentTree(componentModel ->
+                                        {
+                                            if (componentModel.isRoot() && DEFAULT_ES_ELEMENT_IDENTIFIER.equals(componentModel.getIdentifier()))
+                                            {
+                                                if (componentModel.getNameAttribute() != null)
+                                                {
+                                                    throw new MuleRuntimeException(createStaticMessage(format("Component %s is not supported as global", DEFAULT_ES_ELEMENT_IDENTIFIER.getName())));
+                                                }
+                                            }
+                                        });
     }
 
     private void validateNameIsNotRepeated()
     {
         Map<String, ComponentModel> existingObjectsWithName = new HashMap<>();
-        executeOnEveryMuleComponentTree(componentModel -> {
-            String nameAttributeValue = componentModel.getNameAttribute();
-            if (nameAttributeValue != null && !ignoredNameValidationComponentList.contains(componentModel.getIdentifier()))
-            {
-                if (existingObjectsWithName.containsKey(nameAttributeValue))
-                {
-                    throw new MuleRuntimeException(createStaticMessage("Two configuration elements have been defined with the same global name. Global name [%s] must be unique. Clashing components are %s and %s",
-                                                                       nameAttributeValue,
-                                                                       existingObjectsWithName.get(nameAttributeValue).getIdentifier(),
-                                                                       componentModel.getIdentifier()));
-                }
-                existingObjectsWithName.put(nameAttributeValue, componentModel);
-            }
-        });
+        executeOnEveryMuleComponentTree(componentModel ->
+                                        {
+                                            String nameAttributeValue = componentModel.getNameAttribute();
+                                            if (nameAttributeValue != null && !ignoredNameValidationComponentList.contains(componentModel.getIdentifier()))
+                                            {
+                                                if (existingObjectsWithName.containsKey(nameAttributeValue))
+                                                {
+                                                    throw new MuleRuntimeException(createStaticMessage("Two configuration elements have been defined with the same global name. Global name [%s] must be unique. Clashing components are %s and %s",
+                                                                                                       nameAttributeValue,
+                                                                                                       existingObjectsWithName.get(nameAttributeValue).getIdentifier(),
+                                                                                                       componentModel.getIdentifier()));
+                                                }
+                                                existingObjectsWithName.put(nameAttributeValue, componentModel);
+                                            }
+                                        });
     }
 
     private boolean isMuleConfigurationFile()
@@ -413,20 +440,22 @@ public class ApplicationModel
 
     private void validateChoiceExceptionStrategyStructure()
     {
-        executeOnEveryMuleComponentTree(component -> {
-            if (component.getIdentifier().equals(CHOICE_EXCEPTION_STRATEGY_IDENTIFIER))
-            {
-                validateExceptionStrategiesHaveWhenAttribute(component);
-                validateNoMoreThanOneRollbackExceptionStrategyWithRedelivery(component);
-            }
-        });
+        executeOnEveryMuleComponentTree(component ->
+                                        {
+                                            if (component.getIdentifier().equals(CHOICE_EXCEPTION_STRATEGY_IDENTIFIER))
+                                            {
+                                                validateExceptionStrategiesHaveWhenAttribute(component);
+                                                validateNoMoreThanOneRollbackExceptionStrategyWithRedelivery(component);
+                                            }
+                                        });
     }
 
     private void validateNoMoreThanOneRollbackExceptionStrategyWithRedelivery(ComponentModel component)
     {
-        if (component.getInnerComponents().stream().filter(exceptionStrategyComponent -> {
-            return exceptionStrategyComponent.getParameters().get(MAX_REDELIVERY_ATTEMPTS_ROLLBACK_ES_ATTRIBUTE) != null;
-        }).count() > 1)
+        if (component.getInnerComponents().stream().filter(exceptionStrategyComponent ->
+                                                           {
+                                                               return exceptionStrategyComponent.getParameters().get(MAX_REDELIVERY_ATTEMPTS_ROLLBACK_ES_ATTRIBUTE) != null;
+                                                           }).count() > 1)
         {
             throw new MuleRuntimeException(createStaticMessage("Only one rollback-exception-strategy within a choice-exception-strategy can handle message redelivery. Remove one of the maxRedeliveryAttempts attributes"));
         }
@@ -446,18 +475,19 @@ public class ApplicationModel
 
     private void validateExceptionStrategyWhenAttributeIsOnlyPresentInsideChoice()
     {
-        executeOnEveryMuleComponentTree(component -> {
-            if (component.getIdentifier().getName().endsWith(EXCEPTION_STRATEGY_REFERENCE_ELEMENT))
-            {
-                Node componentNode = from(component).getNode();
-                if (component.getParameters().get(WHEN_CHOICE_ES_ATTRIBUTE) != null
-                    && !componentNode.getParentNode().getLocalName().equals(CHOICE_EXCEPTION_STRATEGY)
-                    && !componentNode.getParentNode().getLocalName().equals(MULE_ROOT_ELEMENT))
-                {
-                    throw new MuleRuntimeException(createStaticMessage("Only exception strategies within a choice-exception-strategy can have when attribute specified"));
-                }
-            }
-        });
+        executeOnEveryMuleComponentTree(component ->
+                                        {
+                                            if (component.getIdentifier().getName().endsWith(EXCEPTION_STRATEGY_REFERENCE_ELEMENT))
+                                            {
+                                                Node componentNode = from(component).getNode();
+                                                if (component.getParameters().get(WHEN_CHOICE_ES_ATTRIBUTE) != null
+                                                    && !componentNode.getParentNode().getLocalName().equals(CHOICE_EXCEPTION_STRATEGY)
+                                                    && !componentNode.getParentNode().getLocalName().equals(MULE_ROOT_ELEMENT))
+                                                {
+                                                    throw new MuleRuntimeException(createStaticMessage("Only exception strategies within a choice-exception-strategy can have when attribute specified"));
+                                                }
+                                            }
+                                        });
     }
 
     private void validateNameIsOnlyOnTopLevelElements() throws ConfigurationException
@@ -465,17 +495,47 @@ public class ApplicationModel
         try
         {
             List<ComponentModel> topLevelComponents = muleComponentModels.get(0).getInnerComponents();
-            topLevelComponents.stream().filter(this::isMuleComponent).forEach(topLevelComponent -> {
-                topLevelComponent.getInnerComponents().stream().filter(this::isMuleComponent).forEach((topLevelComponentChild -> {
-                    executeOnComponentTree(topLevelComponentChild, (component) -> {
-                        if (component.getNameAttribute() != null && !ignoredNameValidationComponentList.contains(component.getIdentifier()))
-                        {
-                            throw new MuleRuntimeException(createStaticMessage("Only top level elements can have a name attribute. Component %s has attribute name with value %s", component.getIdentifier(), component.getNameAttribute()));
-                        }
-                    }, true);
-                }));
+            topLevelComponents.stream().filter(this::isMuleComponent).forEach(topLevelComponent ->
+                                                                              {
+                                                                                  topLevelComponent.getInnerComponents().stream().filter(this::isMuleComponent).forEach((topLevelComponentChild ->
+                                                                                  {
+                                                                                      executeOnComponentTree(topLevelComponentChild, (component) ->
+                                                                                      {
+                                                                                          if (component.getNameAttribute() != null && !ignoredNameValidationComponentList.contains(component.getIdentifier()))
+                                                                                          {
+                                                                                              throw new MuleRuntimeException(createStaticMessage("Only top level elements can have a name attribute. Component %s has attribute name with value %s", component.getIdentifier(), component.getNameAttribute()));
+                                                                                          }
+                                                                                      }, true);
+                                                                                  }));
 
-            });
+                                                                              });
+        }
+        catch (Exception e)
+        {
+            throw new ConfigurationException(e);
+        }
+    }
+
+    private void validateNamedTopLevelElementsHaveName(ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry) throws ConfigurationException
+    {
+        try
+        {
+            List<ComponentModel> topLevelComponents = muleComponentModels.get(0).getInnerComponents();
+            topLevelComponents.stream().filter(this::isMuleComponent)
+                    .forEach(topLevelComponent ->
+                             {
+                                 final ComponentIdentifier identifier = topLevelComponent.getIdentifier();
+                                 componentBuildingDefinitionRegistry.getBuildingDefinition(identifier)
+                                         .filter(ComponentBuildingDefinition::isNamed)
+                                         .ifPresent(buildingDefinition ->
+                                                    {
+                                                        if (isBlank(topLevelComponent.getNameAttribute()))
+                                                        {
+                                                            throw new MuleRuntimeException(createStaticMessage(format("Global element %s:%s does not provide a name attribute.", identifier.getNamespace(), identifier.getName())));
+                                                        }
+                                                    });
+                             }
+                    );
         }
         catch (Exception e)
         {
@@ -511,9 +571,10 @@ public class ApplicationModel
             //TODO MULE-9648: for now do no process beans inside spring
             return;
         }
-        component.getInnerComponents().forEach((innerComponent) -> {
-            executeOnComponentTree(innerComponent, task, avoidSpringElements);
-        });
+        component.getInnerComponents().forEach((innerComponent) ->
+                                               {
+                                                   executeOnComponentTree(innerComponent, task, avoidSpringElements);
+                                               });
         task.accept(component);
     }
 
@@ -535,17 +596,18 @@ public class ApplicationModel
                 builder.addParameter(simpleConfigAttribute.getName(), resolveValueIfIsPlaceHolder(simpleConfigAttribute.getValue()), simpleConfigAttribute.isValueFromSchema());
             }
             List<ComponentModel> componentModels = extractComponentDefinitionModel(configLine.getChildren(), configFileName);
-            componentModels.stream().forEach(componentDefinitionModel -> {
-                if (SPRING_PROPERTY_IDENTIFIER.equals(componentDefinitionModel.getIdentifier()))
-                {
-                    String value = componentDefinitionModel.getParameters().get(VALUE_ATTRIBUTE);
-                    if (value != null)
-                    {
-                        builder.addParameter(componentDefinitionModel.getNameAttribute(), resolveValueIfIsPlaceHolder(value), false);
-                    }
-                }
-                builder.addChildComponentModel(componentDefinitionModel);
-            });
+            componentModels.stream().forEach(componentDefinitionModel ->
+                                             {
+                                                 if (SPRING_PROPERTY_IDENTIFIER.equals(componentDefinitionModel.getIdentifier()))
+                                                 {
+                                                     String value = componentDefinitionModel.getParameters().get(VALUE_ATTRIBUTE);
+                                                     if (value != null)
+                                                     {
+                                                         builder.addParameter(componentDefinitionModel.getNameAttribute(), resolveValueIfIsPlaceHolder(value), false);
+                                                     }
+                                                 }
+                                                 builder.addChildComponentModel(componentDefinitionModel);
+                                             });
             ConfigLine parent = configLine.getParent();
             if (parent != null && isConfigurationTopComponent(parent))
             {
@@ -590,6 +652,7 @@ public class ApplicationModel
 
     /**
      * TODO MULE-9688: When the model it's made immutable we will also provide the parent component for navigation and this will not be needed anymore.
+     *
      * @return the root component model
      */
     public ComponentModel getRootComponentModel()

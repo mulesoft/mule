@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.spring.dsl.spring;
 
+import static org.mule.runtime.api.meta.AnnotatedObject.PROPERTY_NAME;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.ANNOTATIONS_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.DEFAULT_ES_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.FILTER_ELEMENT_SUFFIX;
@@ -16,15 +17,13 @@ import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.SPRING_P
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.from;
 import static org.mule.runtime.config.spring.dsl.spring.PropertyComponentUtils.getPropertyValueFromPropertyComponent;
 import static org.mule.runtime.config.spring.parsers.AbstractMuleBeanDefinitionParser.processMetadataAnnotationsHelper;
-import static org.mule.runtime.api.meta.AnnotatedObject.PROPERTY_NAME;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
-
+import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition;
 import org.mule.runtime.config.spring.dsl.model.ComponentIdentifier;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.config.spring.dsl.processor.ObjectTypeVisitor;
 import org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler;
-import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.security.SecurityFilter;
 import org.mule.runtime.core.processor.SecurityFilterMessageProcessor;
@@ -116,28 +115,28 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator
 
     private void processAnnotationParameters(ComponentModel componentModel, Map<QName, Object> annotations)
     {
-        componentModel.getParameters().entrySet().stream().filter(entry -> {
-            return entry.getKey().contains(":");
-        }).forEach(annotationKey -> {
-            Node attribute = from(componentModel).getNode().getAttributes().getNamedItem(annotationKey.getKey());
-            if (attribute != null)
-            {
-                annotations.put(new QName(attribute.getNamespaceURI(), attribute.getLocalName()), annotationKey.getValue());
-            }
-        });
+        componentModel.getParameters().entrySet().stream()
+                .filter(entry -> entry.getKey().contains(":"))
+                .forEach(annotationKey ->
+                         {
+                             Node attribute = from(componentModel).getNode().getAttributes().getNamedItem(annotationKey.getKey());
+                             if (attribute != null)
+                             {
+                                 annotations.put(new QName(attribute.getNamespaceURI(), attribute.getLocalName()), annotationKey.getValue());
+                             }
+                         });
     }
 
     private void processNestedAnnotations(ComponentModel componentModel, Map<QName, Object> previousAnnotations)
     {
-        componentModel.getInnerComponents().stream().filter(cdm -> {
-            return cdm.getIdentifier().equals(ANNOTATIONS_ELEMENT_IDENTIFIER);
-        }).findFirst()
-                .ifPresent(annotationsCdm -> {
-                    annotationsCdm.getInnerComponents().forEach(annotationCdm -> {
-                                                                    previousAnnotations.put(new QName(from(annotationCdm).getNamespaceUri(), annotationCdm.getIdentifier().getName()), annotationCdm.getTextContent());
-                                                                }
-                    );
-                });
+        componentModel.getInnerComponents().stream()
+                .filter(cdm -> cdm.getIdentifier().equals(ANNOTATIONS_ELEMENT_IDENTIFIER))
+                .findFirst()
+                .ifPresent(annotationsCdm ->
+                    annotationsCdm.getInnerComponents().forEach(
+                            annotationCdm -> previousAnnotations.put(new QName(from(annotationCdm).getNamespaceUri(), annotationCdm.getIdentifier().getName()), annotationCdm.getTextContent())
+                    )
+                );
     }
 
     private void processAnnotations(ComponentModel componentModel, BeanDefinitionBuilder beanDefinitionBuilder)
