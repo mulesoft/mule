@@ -7,29 +7,41 @@
 package org.mule.transport;
 
 
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mule.config.i18n.MessageFactory.createStaticMessage;
+
 import org.mule.api.MessagingException;
 import org.mule.api.MuleException;
+import org.mule.api.MuleRuntimeException;
+import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.service.Service;
 import org.mule.api.source.CompositeMessageSource;
 import org.mule.api.transport.MessageDispatcher;
+import org.mule.api.transport.MessageReceiver;
 import org.mule.api.transport.MessageRequester;
+import org.mule.retry.RetryPolicyExhaustedException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.mule.TestConnector;
+
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkException;
 
-import junit.framework.Assert;
 import org.junit.Test;
+
+import junit.framework.Assert;
 
 /**
  * Tests that lifecycle methods on a connector are not processed more than once. (@see MULE-3062)
@@ -612,15 +624,75 @@ public class ConnectorLifecycleTestCase extends AbstractMuleContextTestCase
         assertNull(connector.getScheduler());
     }
 
+    @Test
+    public void errorWhenConnectingReceivers() throws Exception
+    {
+        final AtomicBoolean actuallyConnected = new AtomicBoolean(false);
+
+        connector = new TestConnector(muleContext)
+        {
+
+            @Override
+            protected void doConnect()
+            {
+                super.doConnect();
+                actuallyConnected.set(true);
+            }
+
+            @Override
+            protected void doDisconnect()
+            {
+                super.doDisconnect();
+                actuallyConnected.set(false);
+            }
+
+            @Override
+            public MessageReceiver createReceiver(FlowConstruct flowConstuct, InboundEndpoint endpoint) throws Exception
+            {
+                MessageReceiver receiver = new AbstractMessageReceiver(this, flowConstuct, endpoint)
+                {
+                    @Override
+                    protected void doConnect() throws Exception
+                    {
+                        throw new MuleRuntimeException(createStaticMessage("Simulate receiver connection exception."));
+                    }
+                };
+                return receiver;
+            }
+        };
+
+        InboundEndpoint in = getTestInboundEndpoint("out", "test://out", null, null, null, connector);
+
+        connector.registerListener(in, getSensingNullMessageProcessor(), getTestService());
+
+        assertThat(connector.isConnected(), is(false));
+        assertThat(actuallyConnected.get(), is(false));
+        try
+        {
+            connector.connect();
+            fail("Expected MuleRuntimeException: 'Simulate receiver connection exception.'");
+        }
+        catch (RetryPolicyExhaustedException e)
+        {
+            // expected
+            assertThat(e.getCause(), instanceOf(MuleRuntimeException.class));
+            assertThat(e.getCause().getMessage(), is("Simulate receiver connection exception."));
+        }
+        assertThat(connector.isConnected(), is(false));
+        assertThat(actuallyConnected.get(), is(false));
+    }
+
     protected Work createSomeWork()
     {
         return new Work()
         {
+            @Override
             public void run()
             {
                 System.out.println("I'm doing some work");
             }
 
+            @Override
             public void release()
             {
                 // nothing to do
