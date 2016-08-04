@@ -6,14 +6,16 @@
  */
 package org.mule.compatibility.core.transformer.simple;
 
+import static org.mule.runtime.core.message.DefaultMultiPartPayload.BODY_ATTRIBUTES;
+
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleMessage.Builder;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.message.AttachmentAttributes;
-import org.mule.runtime.core.message.MultiPartPayload;
+import org.mule.runtime.core.message.DefaultMultiPartPayload;
+import org.mule.runtime.core.message.PartAttributes;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 
 import java.nio.charset.Charset;
@@ -23,7 +25,7 @@ import java.util.List;
 import javax.activation.DataHandler;
 
 /**
- * Transforms the message, putting all inbound attachments of the source message as parts in a {@link MultiPartPayload}
+ * Transforms the message, putting all inbound attachments of the source message as parts in a {@link DefaultMultiPartPayload}
  * of the returning message.
  *
  * @since 4.0
@@ -49,7 +51,7 @@ public class AttachmentsToMultiPartTransformer extends AbstractMessageTransforme
 
             if (message.getPayload() != null)
             {
-                parts.add(MuleMessage.builder().payload(message.getPayload()).build());
+                parts.add(MuleMessage.builder().payload(message.getPayload()).attributes(BODY_ATTRIBUTES).build());
             }
 
             for (String attachmentName : message.getInboundAttachmentNames())
@@ -59,11 +61,11 @@ public class AttachmentsToMultiPartTransformer extends AbstractMessageTransforme
                 parts.add(MuleMessage.builder()
                                      .payload(attachment.getInputStream())
                                      .mediaType(MediaType.parse(attachment.getContentType()))
-                                     .attributes(new AttachmentAttributes(attachmentName))
+                                     .attributes(new PartAttributes(attachmentName))
                                      .build());
             }
 
-            event.setMessage(builder.payload(new MultiPartPayload(parts)).build());
+            event.setMessage(builder.payload(new DefaultMultiPartPayload(parts)).build());
         }
         catch (Exception e)
         {

@@ -14,9 +14,11 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.core.message.DefaultMultiPartPayload.BODY_ATTRIBUTES;
 import static org.mule.runtime.core.util.IOUtils.getResourceAsUrl;
 import static org.mule.runtime.core.util.IOUtils.toMuleMessagePart;
 
+import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.RequestContext;
@@ -36,7 +38,7 @@ import org.junit.rules.ExpectedException;
 
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 
-public class MultiPartPayloadTestCase extends AbstractMuleContextTestCase
+public class DefaultMultiPartPayloadTestCase extends AbstractMuleContextTestCase
 {
 
     @Rule
@@ -48,11 +50,11 @@ public class MultiPartPayloadTestCase extends AbstractMuleContextTestCase
         final MuleMessage attachmentPart = MuleMessage.builder()
                                                       .payload("this is the attachment")
                                                       .mediaType(MediaType.TEXT)
-                                                      .attributes(new AttachmentAttributes("attachment"))
+                                                      .attributes(new PartAttributes("attachment"))
                                                       .build();
 
-        MuleMessage message = MuleMessage.builder().payload(new MultiPartPayload(
-                MuleMessage.builder().payload(TEST_PAYLOAD).build(),
+        MuleMessage message = MuleMessage.builder().payload(new DefaultMultiPartPayload(
+                MuleMessage.builder().payload(TEST_PAYLOAD).attributes(BODY_ATTRIBUTES).build(),
                 attachmentPart
         )).build();
 
@@ -65,8 +67,8 @@ public class MultiPartPayloadTestCase extends AbstractMuleContextTestCase
     {
         final MuleMessage attachmentPart = toMuleMessagePart("spi-props", getResourceAsUrl("test-spi.properties", getClass()), MediaType.TEXT);
 
-        MuleMessage message = MuleMessage.builder().payload(new MultiPartPayload(
-                MuleMessage.builder().payload(TEST_PAYLOAD).build(),
+        MuleMessage message = MuleMessage.builder().payload(new DefaultMultiPartPayload(
+                MuleMessage.builder().payload(TEST_PAYLOAD).attributes(BODY_ATTRIBUTES).build(),
                 attachmentPart)).build();
 
         assertThat(((MultiPartPayload) message.getPayload()).getParts(), hasSize(2));
@@ -82,8 +84,8 @@ public class MultiPartPayloadTestCase extends AbstractMuleContextTestCase
         final MuleMessage attachmentPart1 = toMuleMessagePart("spi-props", getResourceAsUrl("test-spi.properties", getClass()), MediaType.TEXT);
         final MuleMessage attachmentPart2 = toMuleMessagePart("dummy", getResourceAsUrl("dummy.xml", getClass()), null);
 
-        MuleMessage message = MuleMessage.builder().payload(new MultiPartPayload(
-                MuleMessage.builder().payload(TEST_PAYLOAD).build(),
+        MuleMessage message = MuleMessage.builder().payload(new DefaultMultiPartPayload(
+                MuleMessage.builder().payload(TEST_PAYLOAD).attributes(BODY_ATTRIBUTES).build(),
                 attachmentPart1, attachmentPart2)).build();
 
         assertThat(((MultiPartPayload) message.getPayload()).getParts(), hasSize(3));
@@ -96,17 +98,17 @@ public class MultiPartPayloadTestCase extends AbstractMuleContextTestCase
         final MuleMessage attachmentPart = MuleMessage.builder()
                                                       .payload("this is the attachment")
                                                       .mediaType(MediaType.TEXT)
-                                                      .attributes(new AttachmentAttributes("attachment"))
+                                                      .attributes(new PartAttributes("attachment"))
                                                       .build();
 
-        final MuleMessage bodyPart = MuleMessage.builder().payload(TEST_PAYLOAD).build();
+        final MuleMessage bodyPart = MuleMessage.builder().payload(TEST_PAYLOAD).attributes(BODY_ATTRIBUTES).build();
 
-        MuleMessage message = MuleMessage.builder().payload(new MultiPartPayload(
+        MuleMessage message = MuleMessage.builder().payload(new DefaultMultiPartPayload(
                 bodyPart,
                 attachmentPart)).build();
 
-        assertThat(((MultiPartPayload) message.getPayload()).hasBodyPart(), is(true));
-        assertThat(((MultiPartPayload) message.getPayload()).getBodyPart(), sameInstance(bodyPart));
+        assertThat(((DefaultMultiPartPayload) message.getPayload()).hasBodyPart(), is(true));
+        assertThat(((DefaultMultiPartPayload) message.getPayload()).getBodyPart(), sameInstance(bodyPart));
     }
 
     @Test
@@ -115,19 +117,19 @@ public class MultiPartPayloadTestCase extends AbstractMuleContextTestCase
         final MuleMessage attachmentPart1 = MuleMessage.builder()
                                                        .payload("this is the attachment1")
                                                        .mediaType(MediaType.TEXT)
-                                                       .attributes(new AttachmentAttributes("attachment1"))
+                                                       .attributes(new PartAttributes("attachment1"))
                                                        .build();
         final MuleMessage attachmentPart2 = MuleMessage.builder()
                                                        .payload("this is the attachment2")
                                                        .mediaType(MediaType.TEXT)
-                                                       .attributes(new AttachmentAttributes("attachment2"))
+                                                       .attributes(new PartAttributes("attachment2"))
                                                        .build();
 
-        MuleMessage message = MuleMessage.builder().payload(new MultiPartPayload(
+        MuleMessage message = MuleMessage.builder().payload(new DefaultMultiPartPayload(
                 attachmentPart1,
                 attachmentPart2)).build();
 
-        assertThat(((MultiPartPayload) message.getPayload()).hasBodyPart(), is(false));
+        assertThat(((DefaultMultiPartPayload) message.getPayload()).hasBodyPart(), is(false));
     }
 
     @Test
@@ -136,11 +138,11 @@ public class MultiPartPayloadTestCase extends AbstractMuleContextTestCase
         final MuleMessage attachmentPart = MuleMessage.builder()
                                                       .payload("this is the attachment")
                                                       .mediaType(MediaType.TEXT)
-                                                      .attributes(new AttachmentAttributes("attachment"))
+                                                      .attributes(new PartAttributes("attachment"))
                                                       .build();
 
-        MuleMessage message = MuleMessage.builder().payload(new MultiPartPayload(
-                MuleMessage.builder().payload(TEST_PAYLOAD).build(),
+        MuleMessage message = MuleMessage.builder().payload(new DefaultMultiPartPayload(
+                MuleMessage.builder().payload(TEST_PAYLOAD).attributes(BODY_ATTRIBUTES).build(),
                 attachmentPart)).build();
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -162,8 +164,8 @@ public class MultiPartPayloadTestCase extends AbstractMuleContextTestCase
         final MuleMessage attachmentPart = toMuleMessagePart("spi-props", getResourceAsUrl("test-spi.properties", getClass()), MediaType.TEXT);
         assertThat(attachmentPart.getPayload(), instanceOf(InputStream.class));
 
-        MuleMessage message = MuleMessage.builder().payload(new MultiPartPayload(
-                MuleMessage.builder().payload(TEST_PAYLOAD).build(),
+        MuleMessage message = MuleMessage.builder().payload(new DefaultMultiPartPayload(
+                MuleMessage.builder().payload(TEST_PAYLOAD).attributes(BODY_ATTRIBUTES).build(),
                 attachmentPart)).build();
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -185,11 +187,11 @@ public class MultiPartPayloadTestCase extends AbstractMuleContextTestCase
         final MuleMessage attachmentPart = MuleMessage.builder()
                                                       .payload("this is the attachment")
                                                       .mediaType(MediaType.TEXT)
-                                                      .attributes(new AttachmentAttributes("attachment"))
+                                                      .attributes(new PartAttributes("attachment"))
                                                       .build();
 
-        MuleMessage message = MuleMessage.builder().payload(new MultiPartPayload(
-                MuleMessage.builder().payload(TEST_PAYLOAD).build(),
+        MuleMessage message = MuleMessage.builder().payload(new DefaultMultiPartPayload(
+                MuleMessage.builder().payload(TEST_PAYLOAD).attributes(BODY_ATTRIBUTES).build(),
                 attachmentPart)).build();
 
         expected.expect(TransformerException.class);
@@ -204,11 +206,11 @@ public class MultiPartPayloadTestCase extends AbstractMuleContextTestCase
         final MuleMessage attachmentPart = MuleMessage.builder()
                                                       .payload("this is the attachment")
                                                       .mediaType(MediaType.TEXT)
-                                                      .attributes(new AttachmentAttributes("attachment"))
+                                                      .attributes(new PartAttributes("attachment"))
                                                       .build();
 
-        MuleMessage message = MuleMessage.builder().payload(new MultiPartPayload(
-                MuleMessage.builder().payload(TEST_PAYLOAD).build(),
+        MuleMessage message = MuleMessage.builder().payload(new DefaultMultiPartPayload(
+                MuleMessage.builder().payload(TEST_PAYLOAD).attributes(BODY_ATTRIBUTES).build(),
                 attachmentPart)).build();
 
         expected.expect(TransformerException.class);
@@ -223,25 +225,42 @@ public class MultiPartPayloadTestCase extends AbstractMuleContextTestCase
         final MuleMessage attachmentPart1 = MuleMessage.builder()
                                                        .payload("this is the attachment1")
                                                        .mediaType(MediaType.TEXT)
-                                                       .attributes(new AttachmentAttributes("attachment1"))
+                                                       .attributes(new PartAttributes("attachment1"))
                                                        .build();
         final MuleMessage attachmentPart2 = MuleMessage.builder()
                                                        .payload("this is the attachment2")
                                                        .mediaType(MediaType.TEXT)
-                                                       .attributes(new AttachmentAttributes("attachment2"))
+                                                       .attributes(new PartAttributes("attachment2"))
                                                        .build();
 
-        MuleMessage messageInner = MuleMessage.builder().payload(new MultiPartPayload(
-                MuleMessage.builder().payload(TEST_PAYLOAD).build(),
-                attachmentPart1)).build();
+        MuleMessage messageInner = MuleMessage.builder().payload(new DefaultMultiPartPayload(
+                MuleMessage.builder().payload(TEST_PAYLOAD).attributes(BODY_ATTRIBUTES).build(),
+                attachmentPart1)).attributes(BODY_ATTRIBUTES).build();
 
-        MuleMessage message = MuleMessage.builder().payload(new MultiPartPayload(
+        MuleMessage message = MuleMessage.builder().payload(new DefaultMultiPartPayload(
                 attachmentPart2,
                 messageInner)).build();
 
         assertThat(((MultiPartPayload) message.getPayload()).getParts(), hasSize(3));
         assertThat(((MultiPartPayload) message.getPayload()).getPart("attachment1"), not(nullValue()));
         assertThat(((MultiPartPayload) message.getPayload()).getPart("attachment2"), not(nullValue()));
-        assertThat(((MultiPartPayload) message.getPayload()).getBodyPart(), not(nullValue()));
+        assertThat(((DefaultMultiPartPayload) message.getPayload()).getBodyPart(), not(nullValue()));
     }
+
+    @Test
+    public void partWithInvalidAttributes() throws Exception
+    {
+        final MuleMessage attachmentPart = MuleMessage.builder()
+                                                      .payload("this is the attachment")
+                                                      .mediaType(MediaType.TEXT)
+                                                      .attributes(new PartAttributes("attachment"))
+                                                      .build();
+
+        expected.expect(IllegalArgumentException.class);
+
+        new DefaultMultiPartPayload(
+                MuleMessage.builder().payload(TEST_PAYLOAD).build(),
+                attachmentPart);
+    }
+
 }

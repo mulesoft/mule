@@ -9,13 +9,13 @@ package org.mule.runtime.core.transformer.simple;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 
+import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.message.AttachmentAttributes;
-import org.mule.runtime.core.message.MultiPartPayload;
+import org.mule.runtime.core.message.PartAttributes;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 import org.mule.runtime.core.util.AttributeEvaluator;
 import org.mule.runtime.core.util.WildcardAttributeEvaluator;
@@ -62,7 +62,7 @@ public class RemovePartTransformer extends AbstractMessageTransformer
                 event.setMessage(MuleMessage.builder(message)
                                             .payload(((MultiPartPayload) payload).getParts()
                                                                                  .stream()
-                                                                                 .filter(p -> !wildcardAttributeEvaluator.matches(((AttachmentAttributes) p.getAttributes()).getName()))
+                                                                                 .filter(p -> !wildcardAttributeEvaluator.matches(((PartAttributes) p.getAttributes()).getName()))
                                                                                  .collect(toList()))
                                             .build());
             }
@@ -74,7 +74,7 @@ public class RemovePartTransformer extends AbstractMessageTransformer
                     event.setMessage(MuleMessage.builder(message)
                                                 .payload(((MultiPartPayload) payload).getParts()
                                                                                      .stream()
-                                                                                     .filter(p -> !((AttachmentAttributes) p.getAttributes()).getName().equals(keyValue.toString()))
+                                                                                     .filter(p -> !((PartAttributes) p.getAttributes()).getName().equals(keyValue.toString()))
                                                                                      .collect(toList()))
                                                 .build());
                 }

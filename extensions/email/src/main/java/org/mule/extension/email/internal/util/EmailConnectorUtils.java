@@ -13,8 +13,9 @@ import org.mule.extension.email.api.EmailAttachment;
 import org.mule.extension.email.api.EmailAttributes;
 import org.mule.extension.email.api.exception.EmailException;
 import org.mule.runtime.api.message.MuleMessage;
-import org.mule.runtime.core.message.AttachmentAttributes;
-import org.mule.runtime.core.message.MultiPartPayload;
+import org.mule.runtime.api.message.MultiPartPayload;
+import org.mule.runtime.core.message.DefaultMultiPartPayload;
+import org.mule.runtime.core.message.PartAttributes;
 
 import java.util.Collections;
 import java.util.List;
@@ -142,13 +143,12 @@ public final class EmailConnectorUtils
      */
     public static List<EmailAttachment> mapToEmailAttachments(Object payload)
     {
-        return payload instanceof MultiPartPayload
-                ? ((MultiPartPayload) payload).getParts()
-                                              .stream()
-                                              .filter(p -> p.getAttributes() instanceof AttachmentAttributes)
-                                              .map(p -> new EmailAttachment(((AttachmentAttributes) p.getAttributes()).getName(), p.getPayload(),
-                                                      p.getDataType().getMediaType()))
-                                              .collect(toList())
+        return payload instanceof DefaultMultiPartPayload
+                ? ((DefaultMultiPartPayload) payload).getNonBodyParts()
+                                                     .stream()
+                                                     .map(p -> new EmailAttachment(((PartAttributes) p.getAttributes()).getName(), p.getPayload(),
+                                                             p.getDataType().getMediaType()))
+                                                     .collect(toList())
                 : Collections.emptyList();
     }
 }

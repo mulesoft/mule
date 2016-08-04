@@ -14,14 +14,16 @@ import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.core.message.DefaultMultiPartPayload.BODY_ATTRIBUTES;
 
+import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.TransformerMessagingException;
-import org.mule.runtime.core.message.AttachmentAttributes;
-import org.mule.runtime.core.message.MultiPartPayload;
+import org.mule.runtime.core.message.DefaultMultiPartPayload;
+import org.mule.runtime.core.message.PartAttributes;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import javax.activation.DataHandler;
@@ -72,11 +74,11 @@ public class AttachmentsMultiPartTransformersTestCase extends AbstractMuleContex
         final MuleMessage attachmentPart = MuleMessage.builder()
                                                       .payload("this is the attachment")
                                                       .mediaType(MediaType.TEXT)
-                                                      .attributes(new AttachmentAttributes("attachment"))
+                                                      .attributes(new PartAttributes("attachment"))
                                                       .build();
 
-        MuleMessage message = MuleMessage.builder().payload(new MultiPartPayload(
-                MuleMessage.builder().payload(TEST_PAYLOAD).build(),
+        MuleMessage message = MuleMessage.builder().payload(new DefaultMultiPartPayload(
+                MuleMessage.builder().payload(TEST_PAYLOAD).attributes(BODY_ATTRIBUTES).build(),
                 attachmentPart)).build();
 
         final MuleMessage response = (MuleMessage) mp2a.transform(message, new DefaultMuleEvent(message, getTestFlow()));
@@ -92,15 +94,15 @@ public class AttachmentsMultiPartTransformersTestCase extends AbstractMuleContex
         final MuleMessage attachment1Part = MuleMessage.builder()
                                                        .payload("this is the attachment1")
                                                        .mediaType(MediaType.TEXT)
-                                                       .attributes(new AttachmentAttributes("attachment1"))
+                                                       .attributes(new PartAttributes("attachment1"))
                                                        .build();
         final MuleMessage attachment2Part = MuleMessage.builder()
                                                        .payload("this is the attachment2")
                                                        .mediaType(MediaType.TEXT)
-                                                       .attributes(new AttachmentAttributes("attachment2"))
+                                                       .attributes(new PartAttributes("attachment2"))
                                                        .build();
 
-        MuleMessage message = MuleMessage.builder().payload(new MultiPartPayload(
+        MuleMessage message = MuleMessage.builder().payload(new DefaultMultiPartPayload(
                 attachment1Part,
                 attachment2Part)).build();
 
@@ -123,12 +125,12 @@ public class AttachmentsMultiPartTransformersTestCase extends AbstractMuleContex
 
         assertThat(response.getPayload(), instanceOf(MultiPartPayload.class));
         assertThat(((MultiPartPayload) response.getPayload()).getParts(), hasSize(2));
-        assertThat(((MultiPartPayload) response.getPayload()).hasBodyPart(), is(true));
+        assertThat(((DefaultMultiPartPayload) response.getPayload()).hasBodyPart(), is(true));
         assertThat(((MultiPartPayload) response.getPayload()).getPartsNames(), hasItem("attachment"));
     }
 
     @Test
-    public void attachmentsWithoutPAyload() throws TransformerMessagingException, Exception
+    public void attachmentsWithoutPayload() throws TransformerMessagingException, Exception
     {
         final DataHandler attDH = mock(DataHandler.class);
         when(attDH.getContentType()).thenReturn(MediaType.TEXT.toRfcString());
@@ -138,7 +140,7 @@ public class AttachmentsMultiPartTransformersTestCase extends AbstractMuleContex
 
         assertThat(response.getPayload(), instanceOf(MultiPartPayload.class));
         assertThat(((MultiPartPayload) response.getPayload()).getParts(), hasSize(1));
-        assertThat(((MultiPartPayload) response.getPayload()).hasBodyPart(), is(false));
+        assertThat(((DefaultMultiPartPayload) response.getPayload()).hasBodyPart(), is(false));
         assertThat(((MultiPartPayload) response.getPayload()).getPartsNames(), hasItem("attachment"));
     }
 

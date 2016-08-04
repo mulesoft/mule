@@ -6,23 +6,22 @@
  */
 package org.mule.compatibility.core.transformer.simple;
 
-import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.core.util.IOUtils.toDataHandler;
 
+import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleMessage.Builder;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.message.AttachmentAttributes;
-import org.mule.runtime.core.message.MultiPartPayload;
+import org.mule.runtime.core.message.DefaultMultiPartPayload;
+import org.mule.runtime.core.message.PartAttributes;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 
 import java.nio.charset.Charset;
-import java.util.List;
 
 /**
- * Transforms the message, putting all attachment parts of the {@link MultiPartPayload} form the source as outbound
+ * Transforms the message, putting all attachment parts of the {@link DefaultMultiPartPayload} form the source as outbound
  * attachments in the returning message. of the returning message.
  *
  * @since 4.0
@@ -44,7 +43,7 @@ public class MultiPartToAttachmentsTransformer extends AbstractMessageTransforme
         {
             final Builder builder = MuleMessage.builder(message);
 
-            final MultiPartPayload multiPartPayload = (MultiPartPayload) message.getPayload();
+            final DefaultMultiPartPayload multiPartPayload = (DefaultMultiPartPayload) message.getPayload();
             if (multiPartPayload.hasBodyPart())
             {
                 builder.payload(multiPartPayload.getBodyPart().getPayload());
@@ -54,13 +53,9 @@ public class MultiPartToAttachmentsTransformer extends AbstractMessageTransforme
                 builder.nullPayload();
             }
 
-            final List<org.mule.runtime.api.message.MuleMessage> attachmentParts = multiPartPayload.getParts()
-                                                                                                   .stream()
-                                                                                                   .filter(p -> p.getAttributes() instanceof AttachmentAttributes)
-                                                                                                   .collect(toList());
-            for (org.mule.runtime.api.message.MuleMessage muleMessage : attachmentParts)
+            for (org.mule.runtime.api.message.MuleMessage muleMessage : multiPartPayload.getNonBodyParts())
             {
-                final AttachmentAttributes attributes = (AttachmentAttributes) muleMessage.getAttributes();
+                final PartAttributes attributes = (PartAttributes) muleMessage.getAttributes();
                 builder.addOutboundAttachment(attributes.getName(),
                         toDataHandler(attributes.getName(), muleMessage.getPayload(), muleMessage.getDataType().getMediaType()));
             }

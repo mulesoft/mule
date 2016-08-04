@@ -10,6 +10,7 @@ import static java.util.Arrays.asList;
 import static org.mule.runtime.core.util.IOUtils.toDataHandler;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 
+import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
@@ -25,8 +26,7 @@ import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.ExceptionHelper;
 import org.mule.runtime.core.config.i18n.MessageFactory;
-import org.mule.runtime.core.message.AttachmentAttributes;
-import org.mule.runtime.core.message.MultiPartPayload;
+import org.mule.runtime.core.message.PartAttributes;
 import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
 import org.mule.runtime.module.cxf.i18n.CxfMessages;
 import org.mule.runtime.module.cxf.security.WebServiceSecurityException;
@@ -108,7 +108,7 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
             {
                 for (org.mule.runtime.api.message.MuleMessage part : ((MultiPartPayload) event.getMessage().getPayload()).getParts())
                 {
-                    attachments.add(toDataHandler(((AttachmentAttributes) part.getAttributes()).getName(), part.getPayload(), part.getDataType().getMediaType()));
+                    attachments.add(toDataHandler(((PartAttributes) part.getAttributes()).getName(), part.getPayload(), part.getDataType().getMediaType()));
                 }
             }
         }

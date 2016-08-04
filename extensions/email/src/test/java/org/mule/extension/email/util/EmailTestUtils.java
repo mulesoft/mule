@@ -14,7 +14,8 @@ import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.metadata.MediaType.TEXT;
 
 import org.mule.runtime.api.message.MuleMessage;
-import org.mule.runtime.core.message.MultiPartPayload;
+import org.mule.runtime.api.message.MultiPartPayload;
+import org.mule.runtime.core.message.DefaultMultiPartPayload;
 import org.mule.runtime.core.util.IOUtils;
 
 import java.io.IOException;
@@ -94,7 +95,7 @@ public class EmailTestUtils
 
     public static void assertAttachmentContent(List<MuleMessage> attachments, String attachmentKey, Object expectedResult) throws IOException
     {
-        final MultiPartPayload multiPartPayload = new MultiPartPayload(attachments);
+        final MultiPartPayload multiPartPayload = new DefaultMultiPartPayload(attachments);
 
         MuleMessage attachment = multiPartPayload.getPart(attachmentKey);
         String attachmentAsString = IOUtils.toString((InputStream) attachment.getPayload());

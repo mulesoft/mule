@@ -13,8 +13,8 @@ import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
+import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.message.MultiPartPayload;
 
 import java.io.IOException;
 import java.io.Serializable;

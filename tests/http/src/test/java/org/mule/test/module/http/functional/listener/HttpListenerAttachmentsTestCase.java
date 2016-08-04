@@ -26,13 +26,13 @@ import static org.mule.runtime.module.http.api.HttpHeaders.Names.TRANSFER_ENCODI
 import static org.mule.runtime.module.http.api.HttpHeaders.Values.CHUNKED;
 import static org.mule.runtime.module.http.api.HttpHeaders.Values.MULTIPART_FORM_DATA;
 
+import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.processor.MessageProcessor;
-import org.mule.runtime.core.message.AttachmentAttributes;
-import org.mule.runtime.core.message.MultiPartPayload;
+import org.mule.runtime.core.message.PartAttributes;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.http.api.HttpHeaders;
 import org.mule.runtime.module.http.internal.HttpParser;
@@ -149,9 +149,9 @@ public class HttpListenerAttachmentsTestCase extends AbstractHttpTestCase
         assertThat(((MultiPartPayload) response.getPayload()).getParts(), hasSize(2));
 
         org.mule.runtime.api.message.MuleMessage attachment1 = ((MultiPartPayload) response.getPayload()).getPart(FILE_BODY_FIELD_NAME);
-        assertThat(attachment1.getAttributes(), instanceOf(AttachmentAttributes.class));
-        assertThat(((AttachmentAttributes) attachment1.getAttributes()).getName(), is(FILE_BODY_FIELD_NAME));
-        assertThat(((AttachmentAttributes) attachment1.getAttributes()).getFileName(), is(FILE_BODY_FIELD_FILENAME));
+        assertThat(attachment1.getAttributes(), instanceOf(PartAttributes.class));
+        assertThat(((PartAttributes) attachment1.getAttributes()).getName(), is(FILE_BODY_FIELD_NAME));
+        assertThat(((PartAttributes) attachment1.getAttributes()).getFileName(), is(FILE_BODY_FIELD_FILENAME));
         assertThat(attachment1.getDataType().getMediaType(), is(MediaType.BINARY));
         assertThat(IOUtils.toString((InputStream) attachment1.getPayload()), is(FILE_BODY_FIELD_VALUE));
 
@@ -327,10 +327,10 @@ public class HttpListenerAttachmentsTestCase extends AbstractHttpTestCase
             ((MultiPartPayload) event.getMessage().getPayload()).getParts().forEach(m ->
             {
                 String filename = null;
-                final AttachmentAttributes attributes = (AttachmentAttributes) m.getAttributes();
+                final PartAttributes attributes = (PartAttributes) m.getAttributes();
                 if (!attributes.getName().equals(attributes.getFileName()))
                 {
-                    filename = ((AttachmentAttributes) m.getAttributes()).getFileName();
+                    filename = ((PartAttributes) m.getAttributes()).getFileName();
                 }
                 parts.add(new org.mule.extension.http.api.HttpPart(attributes.getName(),
                         m.getPayload(),

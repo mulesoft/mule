@@ -11,7 +11,7 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.message.Correlation;
 import org.mule.runtime.core.message.DefaultMuleMessageBuilderFactory;
-import org.mule.runtime.core.message.MultiPartPayload;
+import org.mule.runtime.core.message.DefaultMultiPartPayload;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -219,7 +219,7 @@ public interface MuleMessage extends org.mule.runtime.api.message.MuleMessage, M
         Builder removeOutboundProperty(String key);
 
         /**
-         * @deprecated use {@link MultiPartPayload} instead.
+         * @deprecated use {@link DefaultMultiPartPayload} instead.
          * @param key
          * @param value
          * @return
@@ -228,7 +228,7 @@ public interface MuleMessage extends org.mule.runtime.api.message.MuleMessage, M
         Builder addInboundAttachment(String key, DataHandler value);
 
         /**
-         * @deprecated use {@link MultiPartPayload} instead.
+         * @deprecated use {@link DefaultMultiPartPayload} instead.
          * @param key
          * @param value
          * @return
@@ -237,7 +237,7 @@ public interface MuleMessage extends org.mule.runtime.api.message.MuleMessage, M
         Builder addOutboundAttachment(String key, DataHandler value);
 
         /**
-         * @deprecated use {@link MultiPartPayload} instead.
+         * @deprecated use {@link DefaultMultiPartPayload} instead.
          * @param key
          * @return
          */
@@ -245,7 +245,7 @@ public interface MuleMessage extends org.mule.runtime.api.message.MuleMessage, M
         Builder removeInboundAttachment(String key);
 
         /**
-         * @deprecated use {@link MultiPartPayload} instead.
+         * @deprecated use {@link DefaultMultiPartPayload} instead.
          * @param key
          * @return
          */
@@ -265,7 +265,7 @@ public interface MuleMessage extends org.mule.runtime.api.message.MuleMessage, M
         Builder outboundProperties(Map<String, Serializable> outboundProperties);
 
         /**
-         * @deprecated use {@link MultiPartPayload} instead.
+         * @deprecated use {@link DefaultMultiPartPayload} instead.
          * @param inboundAttachments
          * @return
          */
@@ -273,7 +273,7 @@ public interface MuleMessage extends org.mule.runtime.api.message.MuleMessage, M
         Builder inboundAttachments(Map<String, DataHandler> inboundAttachments);
 
         /**
-         * @deprecated use {@link MultiPartPayload} instead.
+         * @deprecated use {@link DefaultMultiPartPayload} instead.
          * @param outbundAttachments
          * @return
          */

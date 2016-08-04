@@ -12,18 +12,20 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.mule.runtime.core.message.DefaultMultiPartPayload.BODY_ATTRIBUTES;
 
-import org.mule.test.AbstractIntegrationTestCase;
+import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.lifecycle.Callable;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.message.AttachmentAttributes;
-import org.mule.runtime.core.message.MultiPartPayload;
+import org.mule.runtime.core.message.DefaultMultiPartPayload;
+import org.mule.runtime.core.message.PartAttributes;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 import org.mule.tck.testmodels.fruit.Apple;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import java.io.Serializable;
 import java.nio.charset.Charset;
@@ -63,8 +65,8 @@ public class EventMetaDataPropagationTestCase extends AbstractIntegrationTestCas
                 props.put("booleanParam", Boolean.TRUE);
 
                 return MuleMessage.builder()
-                                  .payload(new MultiPartPayload(MuleMessage.builder().payload(context.getMessageAsString()).build(),
-                                          MuleMessage.builder().nullPayload().mediaType(MediaType.TEXT).attributes(new AttachmentAttributes("test1")).build()))
+                                  .payload(new DefaultMultiPartPayload(MuleMessage.builder().payload(context.getMessageAsString()).attributes(BODY_ATTRIBUTES).build(),
+                                          MuleMessage.builder().nullPayload().mediaType(MediaType.TEXT).attributes(new PartAttributes("test1")).build()))
                                   .outboundProperties(props)
                                   .build();
             }
@@ -78,7 +80,7 @@ public class EventMetaDataPropagationTestCase extends AbstractIntegrationTestCas
                 assertEquals(12345, msg.<Integer> getInboundProperty("integerParam", 0).intValue());
                 assertEquals(123456789, msg.<Long> getInboundProperty("longParam", 0L).longValue());
                 assertEquals(Boolean.TRUE, msg.getInboundProperty("booleanParam", Boolean.FALSE));
-                assertThat(msg.getPayload(), instanceOf(MultiPartPayload.class));
+                assertThat(msg.getPayload(), instanceOf(DefaultMultiPartPayload.class));
                 assertThat(((MultiPartPayload) msg.getPayload()).getPart("test1"), not(nullValue()));
             }
             return null;

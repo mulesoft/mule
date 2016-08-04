@@ -13,7 +13,7 @@ import static org.mule.extension.email.internal.util.EmailConnectorUtils.TEXT;
 import org.mule.extension.email.api.exception.EmailException;
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.message.AttachmentAttributes;
+import org.mule.runtime.core.message.PartAttributes;
 import org.mule.runtime.core.util.IOUtils;
 
 import com.google.common.collect.ImmutableList;
@@ -134,7 +134,7 @@ public class EmailContentProcessor
                 attachmentParts.add(MuleMessage.builder()
                                                .payload(part.getInputStream())
                                                .mediaType(MediaType.parse(part.getContentType()))
-                                               .attributes(new AttachmentAttributes(part.getFileName(), part.getFileName(), part.getSize(), headers))
+                                               .attributes(new PartAttributes(part.getFileName(), part.getFileName(), part.getSize(), headers))
                                                .build());
             }
             else

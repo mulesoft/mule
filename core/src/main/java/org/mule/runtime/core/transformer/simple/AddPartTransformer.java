@@ -14,8 +14,8 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.message.AttachmentAttributes;
-import org.mule.runtime.core.message.MultiPartPayload;
+import org.mule.runtime.core.message.PartAttributes;
+import org.mule.runtime.core.message.DefaultMultiPartPayload;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 import org.mule.runtime.core.util.AttributeEvaluator;
 
@@ -72,11 +72,11 @@ public class AddPartTransformer extends AbstractMessageTransformer
                     MediaType contentType = DataType.builder().mediaType(contentTypeEvaluator.resolveStringValue(event)).build().getMediaType();
                     final MuleMessage message = event.getMessage();
                     event.setMessage(MuleMessage.builder(message)
-                                                .payload(new MultiPartPayload(
+                                                .payload(new DefaultMultiPartPayload(
                                                         MuleMessage.builder()
                                                                    .payload(message.getPayload())
                                                                    .mediaType(message.getDataType().getMediaType())
-                                                                   .attributes(new AttachmentAttributes(key))
+                                                                   .attributes(new PartAttributes(key))
                                                                    .build(),
                                                         toMuleMessagePart(key, value, contentType)))
                                                 .build());

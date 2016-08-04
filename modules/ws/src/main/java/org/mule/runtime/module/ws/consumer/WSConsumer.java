@@ -9,9 +9,11 @@ package org.mule.runtime.module.ws.consumer;
 
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
+import static org.mule.runtime.core.message.DefaultMultiPartPayload.BODY_ATTRIBUTES;
 import static org.mule.runtime.core.util.IOUtils.toDataHandler;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 
+import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
@@ -29,8 +31,8 @@ import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.config.i18n.MessageFactory;
-import org.mule.runtime.core.message.AttachmentAttributes;
-import org.mule.runtime.core.message.MultiPartPayload;
+import org.mule.runtime.core.message.DefaultMultiPartPayload;
+import org.mule.runtime.core.message.PartAttributes;
 import org.mule.runtime.core.processor.AbstractRequestResponseMessageProcessor;
 import org.mule.runtime.core.processor.NonBlockingMessageProcessor;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
@@ -460,7 +462,7 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
             {
                 for (org.mule.runtime.api.message.MuleMessage part : ((MultiPartPayload) event.getMessage().getPayload()).getParts())
                 {
-                    final String partName = ((AttachmentAttributes) part.getAttributes()).getName();
+                    final String partName = ((PartAttributes) part.getAttributes()).getName();
                     attachments.add(new AttachmentImpl(partName, toDataHandler(partName, part.getPayload(), part.getDataType().getMediaType())));
                 }
                 builder.nullPayload();
@@ -495,6 +497,7 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
                 parts.add(MuleMessage.builder()
                                      .payload(message.getPayload())
                                      .mediaType(message.getDataType().getMediaType())
+                                     .attributes(BODY_ATTRIBUTES)
                                      .build());
 
                 for (Attachment attachment : attachments)
@@ -511,7 +514,7 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
                         parts.add(MuleMessage.builder()
                                              .payload(attachment.getDataHandler().getInputStream())
                                              .mediaType(MediaType.parse(attachment.getDataHandler().getContentType()))
-                                             .attributes(new AttachmentAttributes(attachment.getId()))
+                                             .attributes(new PartAttributes(attachment.getId()))
                                              .build());
                     }
                     catch (Exception e)
@@ -521,7 +524,7 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
                     }
                 }
 
-                builder.payload(new MultiPartPayload(parts));
+                builder.payload(new DefaultMultiPartPayload(parts));
             }
             event.setMessage(builder.build());
         }

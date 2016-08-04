@@ -8,6 +8,8 @@ package org.mule.runtime.core.message;
 
 import static java.util.Objects.requireNonNull;
 
+import org.mule.runtime.api.message.MultiPartPayload;
+
 import com.google.common.collect.ImmutableMap;
 
 import java.util.Collections;
@@ -15,11 +17,11 @@ import java.util.LinkedList;
 import java.util.Map;
 
 /**
- * Representation of metadata associated to an attachment.
+ * Representation of metadata associated to a part in a {@link MultiPartPayload}.
  *
  * @since 4.0
  */
-public class AttachmentAttributes extends BaseAttributes
+public class PartAttributes extends BaseAttributes
 {
     private static final long serialVersionUID = -4718443205714605260L;
 
@@ -39,7 +41,7 @@ public class AttachmentAttributes extends BaseAttributes
      * @param size The size in bytes of the attachment, or -1 if unknown or undetermined.
      * @param headers The headers relative to the attachment part.
      */
-    public AttachmentAttributes(String name,
+    public PartAttributes(String name,
             String fileName,
             long size,
             Map<String, LinkedList<String>> headers)
@@ -56,7 +58,7 @@ public class AttachmentAttributes extends BaseAttributes
      * 
      * @param name The name of the part.
      */
-    public AttachmentAttributes(String name)
+    public PartAttributes(String name)
     {
         this(name, null, -1, Collections.emptyMap());
     }

@@ -9,13 +9,14 @@ package org.mule.extension.email.internal.commands;
 import static javax.mail.Folder.READ_ONLY;
 import static org.mule.extension.email.api.EmailAttributesBuilder.fromMessage;
 import static org.mule.extension.email.api.EmailContentProcessor.process;
+import static org.mule.runtime.core.message.DefaultMultiPartPayload.BODY_ATTRIBUTES;
 
 import org.mule.extension.email.api.EmailAttributes;
 import org.mule.extension.email.api.EmailContentProcessor;
 import org.mule.extension.email.api.exception.EmailRetrieverException;
 import org.mule.extension.email.internal.retriever.RetrieverConnection;
 import org.mule.runtime.api.message.MuleMessage;
-import org.mule.runtime.core.message.MultiPartPayload;
+import org.mule.runtime.core.message.DefaultMultiPartPayload;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -72,10 +73,10 @@ public final class ListCommand
                         if(!attachmentParts.isEmpty())
                         {
                             final List<MuleMessage> parts = new ArrayList<>();
-                            parts.add(MuleMessage.builder().payload(body).build());
+                            parts.add(MuleMessage.builder().payload(body).attributes(BODY_ATTRIBUTES).build());
                             parts.addAll(attachmentParts);
 
-                            body = new MultiPartPayload(parts);
+                            body = new DefaultMultiPartPayload(parts);
                         }
                     }
                     attributes = fromMessage(m);

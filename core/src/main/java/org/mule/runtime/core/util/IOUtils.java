@@ -6,13 +6,13 @@
  */
 package org.mule.runtime.core.util;
 
+import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleMessage.Builder;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.message.AttachmentAttributes;
-import org.mule.runtime.core.message.MultiPartPayload;
+import org.mule.runtime.core.message.PartAttributes;
 import org.mule.runtime.core.message.ds.ByteArrayDataSource;
 import org.mule.runtime.core.message.ds.InputStreamDataSource;
 import org.mule.runtime.core.message.ds.StringDataSource;
@@ -374,6 +374,6 @@ public class IOUtils extends org.apache.commons.io.IOUtils
             builder.mediaType(MediaType.parse(dataHandler.getContentType()));
         }
 
-        return builder.attributes(new AttachmentAttributes(name)).build();
+        return builder.attributes(new PartAttributes(name)).build();
     }
 }

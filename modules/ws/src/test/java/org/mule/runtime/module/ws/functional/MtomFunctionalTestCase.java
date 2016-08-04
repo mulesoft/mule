@@ -11,9 +11,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
+import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.message.MultiPartPayload;
 import org.mule.runtime.core.util.IOUtils;
 
 import java.io.File;

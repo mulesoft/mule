@@ -8,6 +8,7 @@ package org.mule.runtime.core.transformer;
 
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 
+import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
@@ -21,7 +22,6 @@ import org.mule.runtime.core.api.transformer.TransformerMessagingException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.config.i18n.Message;
 import org.mule.runtime.core.config.i18n.MessageFactory;
-import org.mule.runtime.core.message.MultiPartPayload;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.StringMessageUtils;
 
