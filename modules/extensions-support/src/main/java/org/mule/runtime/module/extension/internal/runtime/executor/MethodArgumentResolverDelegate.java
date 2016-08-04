@@ -28,15 +28,13 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.EventArgument
 import org.mule.runtime.module.extension.internal.runtime.resolver.MessageArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterGroupArgumentResolver;
 
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
-import org.apache.commons.collections.map.HashedMap;
 
 
 /**
@@ -199,7 +197,7 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
     private Map<Parameter, ParameterGroupArgumentResolver<? extends Object>> getParameterGroupResolvers(OperationModel model)
     {
         Optional<ParameterGroupModelProperty> parameterGroupModelProperty = model.getModelProperty(ParameterGroupModelProperty.class);
-        Map<Parameter, ParameterGroupArgumentResolver<? extends Object>> resolverMap = new HashedMap();
+        Map<Parameter, ParameterGroupArgumentResolver<? extends Object>> resolverMap = new HashMap();
 
         if (parameterGroupModelProperty.isPresent())
         {

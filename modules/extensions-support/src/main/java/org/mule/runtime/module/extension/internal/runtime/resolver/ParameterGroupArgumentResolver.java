@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
+import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.checkInstantiable;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAlias;
@@ -22,7 +23,6 @@ import com.google.common.collect.ImmutableList;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * Resolves arguments annotated with {@link ParameterGroup} in a {@link ReflectiveMethodOperationExecutor}.
@@ -104,7 +104,7 @@ public final class ParameterGroupArgumentResolver<T> implements ArgumentResolver
         {
             return parameterGroupModelProperty.get().getGroups().stream()
                     .map(group -> new ParameterGroupArgumentResolver<>(group))
-                    .collect(Collectors.toList());
+                    .collect(toList());
         }
 
         return ImmutableList.of();

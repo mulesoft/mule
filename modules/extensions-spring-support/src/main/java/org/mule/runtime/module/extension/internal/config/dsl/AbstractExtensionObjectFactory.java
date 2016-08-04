@@ -170,7 +170,7 @@ public abstract class AbstractExtensionObjectFactory<T> implements ObjectFactory
 
             if (parametersFromGroup.size() > 1)
             {
-                throw new ConfigurationException(createStaticMessage(format("In %s '%s', the following parameters [%s] cannot be set at the same time due to their exclusive relation",
+                throw new ConfigurationException(createStaticMessage(format("In %s '%s', the following parameters cannot be set at the same time due to their exclusive relation [%s]",
                                                                             getComponentModelTypeName(model), getModelName(model), Joiner.on(", ").join(parametersFromGroup))));
             }
 
