@@ -7,6 +7,7 @@
 package org.mule.transport;
 
 import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
+
 import org.mule.MessageExchangePattern;
 import org.mule.VoidMuleEvent;
 import org.mule.api.DefaultMuleException;
@@ -1655,39 +1656,49 @@ public abstract class AbstractConnector implements Connector, WorkListener
     {
         doConnect();
 
-        if (receivers != null)
+        try
         {
-            for (MessageReceiver receiver : receivers.values())
+            if (receivers != null)
             {
-                final List<MuleException> errors = new ArrayList<MuleException>();
-                try
+                for (MessageReceiver receiver : receivers.values())
                 {
-                    if (logger.isDebugEnabled())
+                    final List<MuleException> errors = new ArrayList<>();
+                    try
                     {
-                        logger.debug("Connecting receiver on endpoint: " + receiver.getEndpoint().getEndpointURI());
+                        if (logger.isDebugEnabled())
+                        {
+                            logger.debug("Connecting receiver on endpoint: " + receiver.getEndpoint().getEndpointURI());
+                        }
+                        receiver.connect();
+                        if (isStarted())
+                        {
+                            receiver.start();
+                        }
                     }
-                    receiver.connect();
-                    if (isStarted())
+                    catch (MuleException e)
                     {
-                        receiver.start();
+                        logger.error(e);
+                        errors.add(e);
                     }
-                }
-                catch (MuleException e)
-                {
-                    logger.error(e);
-                    errors.add(e);
-                }
 
-                if (!errors.isEmpty())
-                {
-                    // throw the first one in order not to break the reconnection
-                    // strategy logic,
-                    // every exception has been logged above already
-                    // api needs refactoring to support the multi-cause exception
-                    // here
-                    throw errors.get(0);
+                    if (!errors.isEmpty())
+                    {
+                        // throw the first one in order not to break the reconnection
+                        // strategy logic,
+                        // every exception has been logged above already
+                        // API needs refactoring to support the multi-cause exception
+                        // here
+                        throw errors.get(0);
+                    }
                 }
             }
+        }
+        catch (Exception e)
+        {
+            // If an exception occurs while connecting the receivers, disconnect the connector to
+            // keep a consistent state.
+            doDisconnect();
+            throw e;
         }
 
         setConnected(true);
