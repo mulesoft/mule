@@ -197,7 +197,7 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
     private Map<Parameter, ParameterGroupArgumentResolver<? extends Object>> getParameterGroupResolvers(OperationModel model)
     {
         Optional<ParameterGroupModelProperty> parameterGroupModelProperty = model.getModelProperty(ParameterGroupModelProperty.class);
-        Map<Parameter, ParameterGroupArgumentResolver<? extends Object>> resolverMap = new HashMap();
+        Map<Parameter, ParameterGroupArgumentResolver<? extends Object>> resolverMap = new HashMap<>();
 
         if (parameterGroupModelProperty.isPresent())
         {
