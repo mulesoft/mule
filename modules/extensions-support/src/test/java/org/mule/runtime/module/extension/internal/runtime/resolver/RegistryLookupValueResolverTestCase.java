@@ -13,6 +13,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.HELLO_WORLD;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -28,6 +29,7 @@ public class RegistryLookupValueResolverTestCase extends AbstractMuleTestCase
 {
 
     private static final String KEY = "key";
+    private static final String FAKE_KEY = "not there";
 
     @Mock(answer = RETURNS_DEEP_STUBS)
     private MuleEvent event;
@@ -38,6 +40,7 @@ public class RegistryLookupValueResolverTestCase extends AbstractMuleTestCase
     public void before() throws Exception
     {
         when(event.getMuleContext().getRegistry().get(KEY)).thenReturn(HELLO_WORLD);
+        when(event.getMuleContext().getRegistry().get(FAKE_KEY)).thenReturn(null);
         resolver = new RegistryLookupValueResolver(KEY);
     }
 
@@ -65,5 +68,11 @@ public class RegistryLookupValueResolverTestCase extends AbstractMuleTestCase
     public void blankKey()
     {
         new RegistryLookupValueResolver("");
+    }
+
+    @Test(expected = ConfigurationException.class)
+    public void nonExistingKey() throws Exception
+    {
+        new RegistryLookupValueResolver<>(FAKE_KEY).resolve(event);
     }
 }
