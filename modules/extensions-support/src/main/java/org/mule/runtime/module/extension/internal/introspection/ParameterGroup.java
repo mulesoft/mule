@@ -50,7 +50,7 @@ public class ParameterGroup<T> implements EnrichableModel
     private final Class<?> type;
 
     /**
-     * The class in which the generated value of {@link #type} is to be assigned. For {@link ParameterGroup} used
+     * The member in which the generated value of {@link #type} is to be assigned. For {@link ParameterGroup} used
      * as fields of a class, this container should be parameterized as a {@link Field}. And if it is used as
      * an argument of an operation it should the corresponding {@link Method}'s {@link java.lang.reflect.Parameter}.
      */
@@ -144,17 +144,17 @@ public class ParameterGroup<T> implements EnrichableModel
     /**
      * Whether the class is annotated with {@link ExclusiveOptionals} or not
      */
-    public boolean hasExclusiveParameters()
+    public boolean hasExclusiveOptionals()
     {
         return getAnnotation(type, ExclusiveOptionals.class) != null;
     }
 
     /**
-     * Whether the class is annotated with {@link ExclusiveOptionals} and {@link ExclusiveOptionals#oneRequired()} is set
+     * Whether the class is annotated with {@link ExclusiveOptionals} and {@link ExclusiveOptionals#isOneRequired()} ()} is set
      */
-    public boolean oneRequired()
+    public boolean isOneRequired()
     {
         ExclusiveOptionals annotation = getAnnotation(type, ExclusiveOptionals.class);
-        return annotation != null ? annotation.oneRequired() : false;
+        return annotation != null ? annotation.isOneRequired() : false;
     }
 }

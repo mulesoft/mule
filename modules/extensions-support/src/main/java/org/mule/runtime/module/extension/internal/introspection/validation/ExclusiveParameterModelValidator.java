@@ -86,7 +86,7 @@ public final class ExclusiveParameterModelValidator implements ModelValidator
     private void validateExclusiveParameterGroups(EnrichableModel model) throws IllegalModelDefinitionException
     {
 
-        model.getModelProperty(ParameterGroupModelProperty.class).filter(mp -> mp.hasExclusion()).ifPresent(property -> {
+        model.getModelProperty(ParameterGroupModelProperty.class).filter(mp -> mp.hasExclusiveOptionals()).ifPresent(property -> {
             for (ParameterGroup<?> pg : property.getGroups())
             {
                 Optional<ParameterGroupModelProperty> nestedParameterGroup = pg.getModelProperty(ParameterGroupModelProperty.class);

@@ -17,19 +17,19 @@ import org.mule.runtime.extension.api.runtime.operation.OperationContext;
 import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.executor.ReflectiveMethodOperationExecutor;
 
-import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableList;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.Map;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
  * Resolves arguments annotated with {@link ParameterGroup} in a {@link ReflectiveMethodOperationExecutor}.
  * <p/>
- * An implementation of {@link ArgumentResolver} which creates instances of a given  and maps
- * the fields annotated with {@link Parameter} to parameter values of a {@link OperationContext}.
+ * An implementation of {@link ArgumentResolver} which creates instances of a given
+ * {@link org.mule.runtime.module.extension.internal.introspection.ParameterGroup#getType()} and maps the fields
+ * annotated with {@link Parameter} to parameter values of a {@link OperationContext}.
  * <p/>
  * It also looks for fields annotated with {@link ParameterGroup} and recursively populates them too.
  *
@@ -40,7 +40,7 @@ public final class ParameterGroupArgumentResolver<T> implements ArgumentResolver
 {
 
     private final org.mule.runtime.module.extension.internal.introspection.ParameterGroup<?> group;
-    private final Map<? extends Object, ParameterGroupArgumentResolver<? extends Object>> childResolvers;
+    private final List<ParameterGroupArgumentResolver<? extends Object>> childResolvers;
 
     public ParameterGroupArgumentResolver(org.mule.runtime.module.extension.internal.introspection.ParameterGroup<?> group)
     {
@@ -59,7 +59,6 @@ public final class ParameterGroupArgumentResolver<T> implements ArgumentResolver
         return group.getContainer();
     }
 
-
     /**
      * {@inheritDoc}
      */
@@ -77,7 +76,7 @@ public final class ParameterGroupArgumentResolver<T> implements ArgumentResolver
                 }
             }
 
-            for (ParameterGroupArgumentResolver<?> childResolver : childResolvers.values())
+            for (ParameterGroupArgumentResolver<?> childResolver : childResolvers)
             {
                 childResolver.resolve(operationContext);
             }
@@ -94,9 +93,10 @@ public final class ParameterGroupArgumentResolver<T> implements ArgumentResolver
      * Recursively creates resolvers for the nested {@link org.mule.runtime.module.extension.internal.introspection.ParameterGroup}
      *
      * @param model enrichable model to check for the presence of {@link ParameterGroupModelProperty}
-     * @return map with the {@link Method} parameter as key and the associated resolver as value
+     * @return map with the {@link org.mule.runtime.module.extension.internal.introspection.ParameterGroup#getContainer()}
+     * as key and the resolver associated to that container as value
      */
-    public static Map<? extends Object, ParameterGroupArgumentResolver<? extends Object>> getResolversForModel(EnrichableModel model)
+    private List<ParameterGroupArgumentResolver<? extends Object>> getResolversForModel(EnrichableModel model)
     {
         Optional<ParameterGroupModelProperty> parameterGroupModelProperty = model.getModelProperty(ParameterGroupModelProperty.class);
 
@@ -104,9 +104,9 @@ public final class ParameterGroupArgumentResolver<T> implements ArgumentResolver
         {
             return parameterGroupModelProperty.get().getGroups().stream()
                     .map(group -> new ParameterGroupArgumentResolver(group))
-                    .collect(Collectors.toMap(argumentResolver -> argumentResolver.getContainer(), argumentResolver -> argumentResolver));
+                    .collect(Collectors.toList());
         }
 
-        return ImmutableMap.of();
+        return ImmutableList.of();
     }
 }

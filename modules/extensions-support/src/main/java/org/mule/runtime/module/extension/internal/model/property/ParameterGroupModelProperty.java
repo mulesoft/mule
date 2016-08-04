@@ -64,8 +64,8 @@ public final class ParameterGroupModelProperty implements ModelProperty
         return false;
     }
 
-    public boolean hasExclusion()
+    public boolean hasExclusiveOptionals()
     {
-        return groups.stream().anyMatch(g -> g.hasExclusiveParameters());
+        return groups.stream().anyMatch(g -> g.hasExclusiveOptionals());
     }
 }

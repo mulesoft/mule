@@ -152,7 +152,7 @@ public abstract class AbstractExtensionObjectFactory<T> implements ObjectFactory
 
     private void checkParameterGroupExclusivenessForModel(EnrichableModel model, Set<String> resolverKeys) throws ConfigurationException
     {
-        Optional<ParameterGroupModelProperty> parameterGroupModelProperty = model.getModelProperty(ParameterGroupModelProperty.class).filter(mp -> mp.hasExclusion());
+        Optional<ParameterGroupModelProperty> parameterGroupModelProperty = model.getModelProperty(ParameterGroupModelProperty.class).filter(mp -> mp.hasExclusiveOptionals());
         if (parameterGroupModelProperty.isPresent())
         {
             checkParameterGroupExclusiveness(model, parameterGroupModelProperty.get(), resolverKeys);
@@ -170,10 +170,11 @@ public abstract class AbstractExtensionObjectFactory<T> implements ObjectFactory
 
             if (parametersFromGroup.size() > 1)
             {
-                throw new ConfigurationException(createStaticMessage(format("In %s '%s', parameter group '%s' has been set with the following parameters [%s] but only one should be set at any time due to its exclusive relation", getComponentModelTypeName(model), getModelName(model), group.getType().getName(), Joiner.on(", ").join(parametersFromGroup))));
+                throw new ConfigurationException(createStaticMessage(format("In %s '%s', the following parameters [%s] cannot be set at the same time due to their exclusive relation",
+                                                                            getComponentModelTypeName(model), getModelName(model), Joiner.on(", ").join(parametersFromGroup))));
             }
 
-            if (group.oneRequired() && parametersFromGroup.isEmpty())
+            if (group.isOneRequired() && parametersFromGroup.isEmpty())
             {
                 throw new ConfigurationException((createStaticMessage(format("Parameter group '%s' requires that one of its optional parameters should be set but all of them are missing", group.getType().getName()))));
             }

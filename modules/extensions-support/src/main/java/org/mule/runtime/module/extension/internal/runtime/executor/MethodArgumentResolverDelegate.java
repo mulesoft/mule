@@ -8,7 +8,6 @@ package org.mule.runtime.module.extension.internal.runtime.executor;
 
 import static org.apache.commons.lang.ArrayUtils.isEmpty;
 import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.toMap;
-import static org.mule.runtime.module.extension.internal.runtime.resolver.ParameterGroupArgumentResolver.getResolversForModel;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isParameterContainer;
 import org.mule.metadata.java.api.JavaTypeLoader;
 import org.mule.runtime.api.message.MuleMessage;
@@ -18,7 +17,9 @@ import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.introspection.operation.OperationModel;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 import org.mule.runtime.extension.api.runtime.operation.OperationContext;
+import org.mule.runtime.module.extension.internal.introspection.ParameterGroup;
 import org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser;
+import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ByParameterNameArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConfigurationArgumentResolver;
@@ -27,12 +28,14 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.EventArgument
 import org.mule.runtime.module.extension.internal.runtime.resolver.MessageArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterGroupArgumentResolver;
 
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+
+import org.apache.commons.collections.map.HashedMap;
 
 
 /**
@@ -79,7 +82,7 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
         argumentResolvers = new ArgumentResolver[parameterTypes.length];
         Annotation[][] parameterAnnotations = method.getParameterAnnotations();
         Parameter[] parameters = method.getParameters();
-        parameterGroupResolvers = (Map<Parameter, ParameterGroupArgumentResolver<? extends Object>>) getResolversForModel(model);
+        parameterGroupResolvers = getResolversForParameterGroup(model);
         final List<String> paramNames = MuleExtensionAnnotationParser.getParamNames(method);
 
         for (int i = 0; i < parameterTypes.length; i++)
@@ -189,5 +192,26 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
             return '\u0000';
         }
         return null;
+    }
+
+    /**
+     *
+     * @param model
+     * @return mapping between the {@link Method}'s arguments (which are and their respective resolvers
+     */
+    private Map<Parameter, ParameterGroupArgumentResolver<? extends Object>> getResolversForParameterGroup(OperationModel model)
+    {
+        Optional<ParameterGroupModelProperty> parameterGroupModelProperty = model.getModelProperty(ParameterGroupModelProperty.class);
+        Map<Parameter, ParameterGroupArgumentResolver<? extends Object>> resolverMap = new HashedMap();
+
+        if (parameterGroupModelProperty.isPresent())
+        {
+            for (ParameterGroup<Parameter> group : parameterGroupModelProperty.get().getGroups())
+            {
+                resolverMap.put(group.getContainer(), new ParameterGroupArgumentResolver<>(group));
+            }
+        }
+
+        return resolverMap;
     }
 }

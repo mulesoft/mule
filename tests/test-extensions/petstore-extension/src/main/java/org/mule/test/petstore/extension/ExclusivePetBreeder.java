@@ -10,7 +10,7 @@ import org.mule.runtime.extension.api.annotation.ExclusiveOptionals;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 
-@ExclusiveOptionals(oneRequired = true)
+@ExclusiveOptionals(isOneRequired = true)
 public class ExclusivePetBreeder
 {
     @Optional
