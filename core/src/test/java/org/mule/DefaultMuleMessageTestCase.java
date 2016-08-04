@@ -6,13 +6,18 @@
  */
 package org.mule;
 
+import static java.nio.charset.StandardCharsets.UTF_16;
+import static java.nio.charset.StandardCharsets.UTF_16BE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mule.api.config.MuleProperties.CONTENT_TYPE_PROPERTY;
+import static org.mule.api.config.MuleProperties.MULE_ENCODING_PROPERTY;
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.PropertyScope;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -26,7 +31,10 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.activation.DataHandler;
@@ -459,5 +467,76 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase
         message.setProperty(FOO_PROPERTY, NullPayload.getInstance(), PropertyScope.OUTBOUND);
 
         assertThat(message.getProperty(FOO_PROPERTY, PropertyScope.OUTBOUND), is(nullValue()));
+    }
+
+    @Test
+    public void updatesEncodingPropertyWithStringCollection() throws Exception
+    {
+        MuleMessage message = createMuleMessage();
+        List<String> encodings = new ArrayList<>();
+        encodings.add(UTF_16.name());
+        encodings.add(UTF_16BE.name());
+        message.setProperty(MULE_ENCODING_PROPERTY, encodings);
+
+        assertThat(message.getEncoding(), equalTo(UTF_16.name()));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void failsToUpdateEncodingPropertyWithEmptyCollection() throws Exception
+    {
+        MuleMessage message = createMuleMessage();
+        List<String> encodings = new ArrayList<>();
+        message.setProperty(MULE_ENCODING_PROPERTY, encodings);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void failsToUpdateEncodingPropertyWithObjectCollection() throws Exception
+    {
+        MuleMessage message = createMuleMessage();
+        List<Object> encodings = Collections.singletonList(new Object());
+        message.setProperty(MULE_ENCODING_PROPERTY, encodings);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void failsToUpdateEncodingPropertyWithObjectValue() throws Exception
+    {
+        MuleMessage message = createMuleMessage();
+        message.setProperty(MULE_ENCODING_PROPERTY, new Object());
+    }
+
+    @Test
+    public void updatesContentTypePropertyWithStringCollection() throws Exception
+    {
+        MuleMessage message = createMuleMessage();
+        List<String> contentTypes = new ArrayList<>();
+        contentTypes.add("application/json; charset=UTF-8");
+        contentTypes.add("application/xml; charset=UTF-16");
+        message.setProperty(CONTENT_TYPE_PROPERTY, contentTypes);
+
+        assertThat(message.getDataType().getMimeType(), equalTo("application/json"));
+        assertThat(message.getDataType().getEncoding(), equalTo("UTF-8"));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void failsToUpdateContentTypePropertyWithEmptyCollection() throws Exception
+    {
+        MuleMessage message = createMuleMessage();
+        List<String> contentTypes = new ArrayList<>();
+        message.setProperty(CONTENT_TYPE_PROPERTY, contentTypes);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void failsToUpdateContentTypePropertyWithObjectCollection() throws Exception
+    {
+        MuleMessage message = createMuleMessage();
+        List<Object> contentTypes = Collections.singletonList(new Object());
+        message.setProperty(CONTENT_TYPE_PROPERTY, contentTypes);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void failsToUpdateContentTypePropertyWithObjectValue() throws Exception
+    {
+        MuleMessage message = createMuleMessage();
+        message.setProperty(CONTENT_TYPE_PROPERTY, new Object());
     }
 }
