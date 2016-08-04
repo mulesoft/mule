@@ -6,9 +6,12 @@
  */
 package org.mule;
 
-import static org.mule.util.SystemUtils.LINE_SEPARATOR;
+import static java.lang.String.format;
+import static org.mule.api.config.MuleProperties.CONTENT_TYPE_PROPERTY;
+import static org.mule.api.config.MuleProperties.MULE_ENCODING_PROPERTY;
 import static org.mule.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
-
+import static org.mule.transformer.types.SimpleDataType.CHARSET_PARAM;
+import static org.mule.util.SystemUtils.LINE_SEPARATOR;
 import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -53,6 +56,7 @@ import java.io.Serializable;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -527,17 +531,18 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     private void updateDataTypeWithProperty(String key, Object value)
     {
         // updates dataType when encoding is updated using a property instead of using #setEncoding
-        if (MuleProperties.MULE_ENCODING_PROPERTY.equals(key))
+        if (MULE_ENCODING_PROPERTY.equals(key))
         {
-            dataType.setEncoding((String) value);
+            dataType.setEncoding(getStringPropertyValue(MULE_ENCODING_PROPERTY, value));
         }
-        else if (MuleProperties.CONTENT_TYPE_PROPERTY.equalsIgnoreCase(key))
+        else if (CONTENT_TYPE_PROPERTY.equalsIgnoreCase(key))
         {
             try
             {
-                MimeType mimeType = new MimeType((String) value);
+                final String contentType = getStringPropertyValue(CONTENT_TYPE_PROPERTY, value);
+                MimeType mimeType = new MimeType(contentType);
                 dataType.setMimeType(mimeType.getPrimaryType() + "/" + mimeType.getSubType());
-                String encoding = mimeType.getParameter("charset");
+                String encoding = mimeType.getParameter(CHARSET_PARAM);
                 if (!StringUtils.isEmpty(encoding))
                 {
                     dataType.setEncoding(encoding);
@@ -552,12 +557,61 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
                 else
                 {
                     String encoding = Charset.defaultCharset().name();
-                    logger.warn(String.format("%s when parsing Content-Type '%s': %s", e.getClass().getName(), value, e.getMessage()));
-                    logger.warn(String.format("Using defualt encoding: %s", encoding));
+                    logger.warn(format("%s when parsing Content-Type '%s': %s", e.getClass().getName(), value, e.getMessage()));
+                    logger.warn(format("Using defualt encoding: %s", encoding));
                     dataType.setEncoding(encoding);
                 }
             }
         }
+    }
+
+    /*
+       There are properties, like encoding and content-type, that are used to update the message datatype.
+       Those properties are supposed to be Strings, and in general, they are.
+       But, there are cases, like HTTP requests, where content-type can be present more than once, so the
+       request will contain a list containing all the content-type values.
+       This method manages this situation by checking the type of the property value and attempts to get a
+       unique String value from it. In case of having multiple String values, the first one will be used.
+       If the value is not a String or collection of Strings, an error will be thrown.
+     */
+    private String getStringPropertyValue(String propertyName, Object value)
+    {
+        String propertyValue;
+
+        if (value instanceof String)
+        {
+           propertyValue = (String) value;
+        }
+        else if (value instanceof Collection)
+        {
+            if (((Collection) value).isEmpty())
+            {
+                throw new IllegalArgumentException(format("Unsupported value for '%s' property. Expected 'java.lang.String' but was an empty collection", propertyName));
+            }
+            final Object collectionItem = ((Collection) value).iterator().next();
+            if (collectionItem instanceof String)
+            {
+                propertyValue = (String) collectionItem;
+            }
+            else if (collectionItem == null)
+            {
+                propertyValue = null;
+            }
+            else
+            {
+                throw new IllegalArgumentException(format("Unsupported type for '%s' property. Expected 'java.lang.String' but was '%s'", propertyName, value.getClass().getName()));
+            }
+        }
+        else if (value == null)
+        {
+           propertyValue = null;
+        }
+        else
+        {
+            throw new IllegalArgumentException(format("Unsupported type for '%s' property. Expected 'java.lang.String' but was '%s'", propertyName, value.getClass().getName()));
+        }
+
+        return propertyValue;
     }
 
     /**
@@ -1285,7 +1339,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
                 return encoding;
             }
         }
-        encoding = getOutboundProperty(MuleProperties.MULE_ENCODING_PROPERTY);
+        encoding = getOutboundProperty(MULE_ENCODING_PROPERTY);
         if (encoding != null)
         {
             return encoding;
@@ -1813,7 +1867,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
                     }
                     catch(TransformerException ex)
                     {
-                        String message = String.format(
+                        String message = format(
                                 "Unable to serialize the attachment %s, which is of type %s with contents of type %s",
                                 name, handler.getClass(), theContent.getClass());
                         logger.error(message);
