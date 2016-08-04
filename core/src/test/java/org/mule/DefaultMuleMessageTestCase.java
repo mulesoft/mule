@@ -7,6 +7,7 @@
 package org.mule;
 
 import static java.nio.charset.StandardCharsets.UTF_16;
+import static java.nio.charset.StandardCharsets.UTF_16BE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
@@ -474,7 +475,7 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase
         MuleMessage message = createMuleMessage();
         List<String> encodings = new ArrayList<>();
         encodings.add(UTF_16.name());
-        encodings.add(UTF_16.name());
+        encodings.add(UTF_16BE.name());
         message.setProperty(MULE_ENCODING_PROPERTY, encodings);
 
         assertThat(message.getEncoding(), equalTo(UTF_16.name()));
@@ -509,7 +510,7 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase
         MuleMessage message = createMuleMessage();
         List<String> contentTypes = new ArrayList<>();
         contentTypes.add("application/json; charset=UTF-8");
-        contentTypes.add("application/json; charset=UTF-8");
+        contentTypes.add("application/xml; charset=UTF-16");
         message.setProperty(CONTENT_TYPE_PROPERTY, contentTypes);
 
         assertThat(message.getDataType().getMimeType(), equalTo("application/json"));
