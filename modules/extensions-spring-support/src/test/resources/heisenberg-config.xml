@@ -23,7 +23,6 @@
                        initialHealth="CANCER"
                        finalHealth="DEAD"
                        candidateDoors="candidateDoors"
-                       firstEndevour="Gray Matter Technologies"
                        labAddress="#['Pollos Hermanos']"
                        weaponTypeFunction="#[weaponType]"
                        literalExpressionWithoutDefault="#[money]">
@@ -73,6 +72,13 @@
                 </heisenberg:ricin>
             </heisenberg:weapon-value-map>
         </heisenberg:weapon-value-maps>
+        <heisenberg:first-endevour><![CDATA[
+        endeavour
+                        verb [ I + to infinitive ] uk us endeavor UK ​ /enˈdev.ər/ US ​ /enˈdev.ɚ/
+                        ​
+                        C1 to try to do something:
+                        Engineers are endeavouring to locate Gray Matter Technologies.
+        ]]></heisenberg:first-endevour>
         <heisenberg:health-progressions>
             <heisenberg:health-progression value="HEALTHY"/>
             <heisenberg:health-progression value="CANCER"/>

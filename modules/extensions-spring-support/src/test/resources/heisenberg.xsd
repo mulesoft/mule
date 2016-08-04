@@ -215,6 +215,7 @@
                                 </xs:sequence>
                             </xs:complexType>
                         </xs:element>
+                        <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="first-endevour"></xs:element>
                         <xs:element minOccurs="0" maxOccurs="1" name="health-progressions">
                             <xs:complexType>
                                 <xs:sequence>

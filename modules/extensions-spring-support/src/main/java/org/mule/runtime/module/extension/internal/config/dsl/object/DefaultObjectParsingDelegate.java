@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.config.dsl.object;
 
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromChildConfiguration;
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.config.spring.dsl.api.AttributeDefinition;
 import org.mule.runtime.extension.xml.dsl.api.DslElementSyntax;
@@ -26,7 +27,7 @@ public class DefaultObjectParsingDelegate implements ObjectParsingDelegate
      * @return {@code true}
      */
     @Override
-    public boolean accepts(ObjectType objectType)
+    public boolean accepts(MetadataType objectType)
     {
         return true;
     }
@@ -40,7 +41,7 @@ public class DefaultObjectParsingDelegate implements ObjectParsingDelegate
      * @return a {@link AttributeDefinition.Builder}
      */
     @Override
-    public AttributeDefinition.Builder parse(String name, ObjectType objectType, DslElementSyntax elementDsl)
+    public AttributeDefinition.Builder parse(String name, MetadataType objectType, DslElementSyntax elementDsl)
     {
         AttributeDefinition.Builder builder = fromChildConfiguration(ValueResolver.class);
         if (elementDsl.isWrapped())

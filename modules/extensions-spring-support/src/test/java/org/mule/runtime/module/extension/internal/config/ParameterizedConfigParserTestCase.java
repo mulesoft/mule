@@ -13,6 +13,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -228,7 +229,7 @@ public class ParameterizedConfigParserTestCase extends AbstractConfigParserTestC
         assertTrue(heisenberg.isCancer());
         assertThat(heisenberg.getInitialHealth(), is(INITIAL_HEALTH));
         assertThat(heisenberg.getEndingHealth(), is(FINAL_HEALTH));
-        assertThat(heisenberg.getFirstEndevour(), is(FIRST_ENDEVOUR));
+        assertThat(heisenberg.getFirstEndevour(), containsString(FIRST_ENDEVOUR));
         assertThat(heisenberg.getLabAddress(), is(LAB_ADDRESS));
 
         Calendar dayOfBirth = Calendar.getInstance();

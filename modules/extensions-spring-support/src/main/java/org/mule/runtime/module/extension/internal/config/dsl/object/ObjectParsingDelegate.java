@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.config.dsl.object;
 
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.config.spring.dsl.api.AttributeDefinition;
 
@@ -16,6 +17,6 @@ import org.mule.runtime.config.spring.dsl.api.AttributeDefinition;
  *
  * @since 4.0
  */
-public interface ObjectParsingDelegate extends ParsingDelegate<ObjectType, AttributeDefinition.Builder>
+public interface ObjectParsingDelegate extends ParsingDelegate<MetadataType, AttributeDefinition.Builder>
 {
 }
