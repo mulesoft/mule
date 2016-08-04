@@ -17,7 +17,6 @@ import org.mule.runtime.config.spring.dsl.model.ComponentIdentifier;
 import org.mule.runtime.config.spring.dsl.processor.TypeDefinitionVisitor;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +45,7 @@ public class ComponentBuildingDefinition
     //TODO MULE-9638 Use generics. Generics cannot be used right now because this method colides with the ones defined in FactoryBeans.
     private Class<?> objectFactoryType;
     private boolean prototype;
+    private boolean named = false;
     private ComponentIdentifier componentIdentifier;
     private Optional<TypeConverter> typeConverter = empty();
     private Optional<TypeConverter> keyTypeConverter = empty();
@@ -134,6 +134,14 @@ public class ComponentBuildingDefinition
     }
 
     /**
+     * @return whether the defined component has a name attribute
+     */
+    public boolean isNamed()
+    {
+        return named;
+    }
+
+    /**
      * Builder for {@code ComponentBuildingDefinition}
      * <p/>
      * TODO MULE-9693 Improve builder so the copy is not required to reuse the namespace value.
@@ -149,7 +157,7 @@ public class ComponentBuildingDefinition
          * Adds a new constructor parameter to be used during the object instantiation.
          *
          * @param attributeDefinition the constructor argument definition.
-         * @return the builder
+         * @return {@code this} builder
          */
         public Builder withConstructorParameterDefinition(AttributeDefinition attributeDefinition)
         {
@@ -162,7 +170,7 @@ public class ComponentBuildingDefinition
          *
          * @param fieldName           the name of the field in which the value must be injected
          * @param attributeDefinition the setter parameter definition
-         * @return the builder
+         * @return {@code this} builder
          */
         public Builder withSetterParameterDefinition(String fieldName, AttributeDefinition attributeDefinition)
         {
@@ -175,7 +183,7 @@ public class ComponentBuildingDefinition
          * For instance, a config element <http:listener> has as identifier listener
          *
          * @param identifier configuration element identifier
-         * @return the builder
+         * @return {@code this} builder
          */
         public Builder withIdentifier(String identifier)
         {
@@ -188,7 +196,7 @@ public class ComponentBuildingDefinition
          * For instance, a config element <http:listener> has as namespace http
          *
          * @param namespace configuration element namespace
-         * @return the builder
+         * @return {@code this} builder
          */
         public Builder withNamespace(String namespace)
         {
@@ -203,7 +211,7 @@ public class ComponentBuildingDefinition
          * which means that the object type is declared within the configuration using a config attribute.
          *
          * @param typeDefinition the type definition to discover the objecvt type
-         * @return the builder
+         * @return {@code this} builder
          */
         public Builder withTypeDefinition(TypeDefinition typeDefinition)
         {
@@ -218,7 +226,7 @@ public class ComponentBuildingDefinition
          * any of java primitive types, its wrapper or string.
          *
          * @param typeConverter converter from the configuration value to a custom type.
-         * @return the builder
+         * @return {@code this} builder
          * @return
          */
         public Builder withTypeConverter(TypeConverter typeConverter)
@@ -234,7 +242,7 @@ public class ComponentBuildingDefinition
          * any of java primitive types, its wrapper or string.
          *
          * @param typeConverter converter from the configuration value to a custom type.
-         * @return the builder
+         * @return {@code this} builder
          * @return
          */
         public Builder withKeyTypeConverter(TypeConverter typeConverter)
@@ -244,9 +252,9 @@ public class ComponentBuildingDefinition
         }
 
         /**
-         * Used to declare that object to be created is an scope.
+         * Used to declare that the object to be created is an scope.
          *
-         * @return the builder
+         * @return {@code this} builder
          */
         public Builder asScope()
         {
@@ -255,11 +263,21 @@ public class ComponentBuildingDefinition
         }
 
         /**
+         * Used to declare that the object to be created has a name attribute
+         * @return {@code this} builder
+         */
+        public Builder asNamed()
+        {
+            definition.named = true;
+            return this;
+        }
+
+        /**
          * Defines a factory class to be used for creating the object. This method can be used
          * when the object to be build required complex logic.
          *
          * @param objectFactoryType {@code Class} for the factory to use to create the object
-         * @return the builder
+         * @return {@code this} builder
          */
         public Builder withObjectFactoryType(Class<?> objectFactoryType)
         {
@@ -273,7 +291,7 @@ public class ComponentBuildingDefinition
          * an there are certain configuration parameters that we don't want to included them.
          *
          * @param parameterName the configuration parameter name.
-         * @return the builder.
+         * @return {@code this} builder.
          */
         public Builder withIgnoredConfigurationParameter(String parameterName)
         {
@@ -297,6 +315,12 @@ public class ComponentBuildingDefinition
             builder.definition.scope = this.definition.scope;
             builder.definition.typeDefinition = this.definition.typeDefinition;
             builder.definition.objectFactoryType = this.definition.objectFactoryType;
+
+            if (definition.isNamed())
+            {
+                builder.asNamed();
+            }
+
             return builder;
         }
 

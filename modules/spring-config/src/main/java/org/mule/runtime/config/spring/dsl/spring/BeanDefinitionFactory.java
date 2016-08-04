@@ -268,17 +268,13 @@ public class BeanDefinitionFactory
             @Override
             public void onComplexChildCollection(Class<?> type, Optional<String> wrapperIdentifierOptional)
             {
-                wrapperIdentifierOptional.ifPresent(wrapperIdentifier -> {
-                    wrapperIdentifierAndTypeMap.put(wrapperIdentifier, COLLECTION);
-                });
+                wrapperIdentifierOptional.ifPresent(wrapperIdentifier -> wrapperIdentifierAndTypeMap.put(wrapperIdentifier, COLLECTION));
             }
 
             @Override
             public void onComplexChild(Class<?> type, Optional<String> wrapperIdentifierOptional, Optional<String> childIdentifier)
             {
-                wrapperIdentifierOptional.ifPresent(wrapperIdentifier -> {
-                    wrapperIdentifierAndTypeMap.put(wrapperIdentifier, SINGLE);
-                });
+                wrapperIdentifierOptional.ifPresent(wrapperIdentifier -> wrapperIdentifierAndTypeMap.put(wrapperIdentifier, SINGLE));
             }
 
             @Override
@@ -296,10 +292,9 @@ public class BeanDefinitionFactory
                 }
             }
         };
-        Consumer<AttributeDefinition> collectWrappersConsumer = attributeDefinition -> {
-            attributeDefinition.accept(wrapperIdentifiersCollector);
-        };
-        buildingDefinition.getSetterParameterDefinitions().stream().map( setterAttributeDefinition -> setterAttributeDefinition.getAttributeDefinition()).forEach(collectWrappersConsumer);
+
+        Consumer<AttributeDefinition> collectWrappersConsumer = attributeDefinition -> attributeDefinition.accept(wrapperIdentifiersCollector);
+        buildingDefinition.getSetterParameterDefinitions().stream().map(setterAttributeDefinition -> setterAttributeDefinition.getAttributeDefinition()).forEach(collectWrappersConsumer);
         buildingDefinition.getConstructorAttributeDefinition().stream().forEach(collectWrappersConsumer);
         return wrapperIdentifierAndTypeMap;
     }

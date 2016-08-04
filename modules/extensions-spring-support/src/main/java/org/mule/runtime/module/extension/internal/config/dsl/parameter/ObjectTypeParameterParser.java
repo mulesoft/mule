@@ -71,6 +71,7 @@ public class ObjectTypeParameterParser extends ExtensionDefinitionParser
     {
         definitionBuilder.withIdentifier(name)
                 .withNamespace(namespace)
+                .asNamed()
                 .withTypeDefinition(fromType(ValueResolver.class))
                 .withObjectFactoryType(TopLevelParameterObjectFactory.class)
                 .withConstructorParameterDefinition(fromFixedValue(type).build())

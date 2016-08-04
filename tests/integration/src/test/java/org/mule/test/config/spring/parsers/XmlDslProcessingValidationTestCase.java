@@ -27,4 +27,11 @@ public class XmlDslProcessingValidationTestCase extends AbstractMuleTestCase
         new ApplicationContextBuilder().setApplicationResources(new String[]{"org/mule/config/spring/parsers/dsl-validation-duplicate-pojo-or-list-parameter-config.xml"}).build();
     }
 
+    @Test
+    public void namelessTopLevelElement() throws Exception
+    {
+        expectedException.expectMessage("Global element parsers-test:parameter-collection-parser does not provide a name attribute.");
+        new ApplicationContextBuilder().setApplicationResources(new String[]{"org/mule/config/spring/parsers/dsl-validation-nameless-top-level-element-config.xml"}).build();
+    }
+
 }
