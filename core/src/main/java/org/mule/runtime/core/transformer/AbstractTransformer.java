@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.transformer;
 
+import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 
 import org.mule.runtime.api.message.MultiPartPayload;
@@ -21,7 +22,6 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.transformer.TransformerMessagingException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.config.i18n.Message;
-import org.mule.runtime.core.config.i18n.MessageFactory;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.StringMessageUtils;
 
@@ -278,7 +278,7 @@ public abstract class AbstractTransformer extends AbstractAnnotatedObject implem
         DataType sourceType = DataType.fromObject(payload);
         if (MultiPartPayload.class.isAssignableFrom(sourceType.getType()))
         {
-            Message msg = MessageFactory.createStaticMessage("\"%s\" cannot be transformed to %s.", MultiPartPayload.class.getSimpleName(), getReturnDataType().getType().getName());
+            Message msg = createStaticMessage("\"%s\" cannot be transformed to %s.", MultiPartPayload.class.getSimpleName(), getReturnDataType().getType().getName());
             throw new TransformerException(msg, this);
         }
 
