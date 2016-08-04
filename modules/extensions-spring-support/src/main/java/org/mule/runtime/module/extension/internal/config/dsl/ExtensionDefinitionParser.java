@@ -712,10 +712,10 @@ public abstract class ExtensionDefinitionParser
 
     private void addParameter(String key, AttributeDefinition.Builder definitionBuilder)
     {
-        if (parameters.containsKey(key))
-            throw new RuntimeException("DUPLCIATED KEY");
-
-        parameters.put(key, definitionBuilder);
+        if (parameters.put(key, definitionBuilder) != null)
+        {
+            throw new IllegalArgumentException("An AttributeDefinition builder was already defined for parameter " + key);
+        }
     }
 
     private void parseNestedProcessor(ParameterModel parameterModel)
