@@ -126,7 +126,7 @@ public class AttachmentsMultiPartTransformersTestCase extends AbstractMuleContex
         assertThat(response.getPayload(), instanceOf(MultiPartPayload.class));
         assertThat(((MultiPartPayload) response.getPayload()).getParts(), hasSize(2));
         assertThat(((DefaultMultiPartPayload) response.getPayload()).hasBodyPart(), is(true));
-        assertThat(((MultiPartPayload) response.getPayload()).getPartsNames(), hasItem("attachment"));
+        assertThat(((MultiPartPayload) response.getPayload()).getPartNames(), hasItem("attachment"));
     }
 
     @Test
@@ -141,7 +141,7 @@ public class AttachmentsMultiPartTransformersTestCase extends AbstractMuleContex
         assertThat(response.getPayload(), instanceOf(MultiPartPayload.class));
         assertThat(((MultiPartPayload) response.getPayload()).getParts(), hasSize(1));
         assertThat(((DefaultMultiPartPayload) response.getPayload()).hasBodyPart(), is(false));
-        assertThat(((MultiPartPayload) response.getPayload()).getPartsNames(), hasItem("attachment"));
+        assertThat(((MultiPartPayload) response.getPayload()).getPartNames(), hasItem("attachment"));
     }
 
 }

@@ -58,7 +58,7 @@ public class DefaultMultiPartPayloadTestCase extends AbstractMuleContextTestCase
                 attachmentPart
         )).build();
 
-        assertThat(((MultiPartPayload) message.getPayload()).getPartsNames(), hasItem("attachment"));
+        assertThat(((MultiPartPayload) message.getPayload()).getPartNames(), hasItem("attachment"));
         assertThat(((MultiPartPayload) message.getPayload()).getPart("attachment"), sameInstance(attachmentPart));
     }
 
@@ -72,7 +72,7 @@ public class DefaultMultiPartPayloadTestCase extends AbstractMuleContextTestCase
                 attachmentPart)).build();
 
         assertThat(((MultiPartPayload) message.getPayload()).getParts(), hasSize(2));
-        assertThat(((MultiPartPayload) message.getPayload()).getPartsNames(), hasItem("spi-props"));
+        assertThat(((MultiPartPayload) message.getPayload()).getPartNames(), hasItem("spi-props"));
         assertThat(((MultiPartPayload) message.getPayload()).getPart("spi-props"), sameInstance(attachmentPart));
 
         assertThat(((MultiPartPayload) message.getPayload()).getPart("spi-props").getDataType().getMediaType(), is(MediaType.TEXT));
@@ -153,7 +153,7 @@ public class DefaultMultiPartPayloadTestCase extends AbstractMuleContextTestCase
         ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(baos.toByteArray()));
         message = (MuleMessage) ois.readObject();
 
-        assertThat(((MultiPartPayload) message.getPayload()).getPartsNames(), hasItem("attachment"));
+        assertThat(((MultiPartPayload) message.getPayload()).getPartNames(), hasItem("attachment"));
         assertThat(((MultiPartPayload) message.getPayload()).getPart("attachment").getPayload(), is("this is the attachment"));
         assertThat(((MultiPartPayload) message.getPayload()).getPart("attachment"), equalTo(attachmentPart));
     }
@@ -176,7 +176,7 @@ public class DefaultMultiPartPayloadTestCase extends AbstractMuleContextTestCase
         ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(baos.toByteArray()));
         message = (MuleMessage) ois.readObject();
 
-        assertThat(((MultiPartPayload) message.getPayload()).getPartsNames(), hasItem("spi-props"));
+        assertThat(((MultiPartPayload) message.getPayload()).getPartNames(), hasItem("spi-props"));
         assertThat(((MultiPartPayload) message.getPayload()).getPart("spi-props").getPayload(), instanceOf(byte[].class));
         assertThat(((MultiPartPayload) message.getPayload()).getPart("spi-props"), equalTo(attachmentPart));
     }

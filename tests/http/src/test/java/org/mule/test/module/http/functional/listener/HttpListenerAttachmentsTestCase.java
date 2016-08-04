@@ -209,8 +209,8 @@ public class HttpListenerAttachmentsTestCase extends AbstractHttpTestCase
                 assertThat(receivedMessage.getPayload(), instanceOf(MultiPartPayload.class));
                 MultiPartPayload receivedParts = ((MultiPartPayload) receivedMessage.getPayload());
                 assertThat(receivedParts.getParts().size(), is(2));
-                assertThat(receivedParts.getPartsNames(), hasItem(TEXT_BODY_FIELD_NAME));
-                assertThat(receivedParts.getPartsNames(), hasItem(FILE_BODY_FIELD_NAME));
+                assertThat(receivedParts.getPartNames(), hasItem(TEXT_BODY_FIELD_NAME));
+                assertThat(receivedParts.getPartNames(), hasItem(FILE_BODY_FIELD_NAME));
 
                 final String contentType = response.getFirstHeader(HttpHeaders.Names.CONTENT_TYPE).getValue();
                 assertThat(contentType, containsString(expectedResponseContentType));

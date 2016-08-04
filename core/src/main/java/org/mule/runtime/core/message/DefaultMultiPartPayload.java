@@ -94,7 +94,7 @@ public class DefaultMultiPartPayload implements Serializable, MultiPartPayload
      * @see org.mule.runtime.core.message.MultiPartPayload#getPartsNames()
      */
     @Override
-    public List<String> getPartsNames()
+    public List<String> getPartNames()
     {
         return parts.stream().map(m -> getPartAttributes(m).getName()).collect(toList());
     }
@@ -155,6 +155,6 @@ public class DefaultMultiPartPayload implements Serializable, MultiPartPayload
     @Override
     public String toString()
     {
-        return this.getClass().getSimpleName() + "{" + getPartsNames() + "}";
+        return this.getClass().getSimpleName() + "{" + getPartNames() + "}";
     }
 }

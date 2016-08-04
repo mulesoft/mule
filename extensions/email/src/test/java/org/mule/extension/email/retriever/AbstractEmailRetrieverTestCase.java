@@ -135,7 +135,7 @@ public abstract class AbstractEmailRetrieverTestCase extends EmailConnectorTestC
 
         assertThat(emailAttachments, hasSize(3));
         assertThat(((DefaultMultiPartPayload) messages.get(0).getPayload()).hasBodyPart(), is(true));
-        assertThat(((MultiPartPayload) messages.get(0).getPayload()).getPartsNames(), hasItems(EMAIL_JSON_ATTACHMENT_NAME, EMAIL_TEXT_PLAIN_ATTACHMENT_NAME));
+        assertThat(((MultiPartPayload) messages.get(0).getPayload()).getPartNames(), hasItems(EMAIL_JSON_ATTACHMENT_NAME, EMAIL_TEXT_PLAIN_ATTACHMENT_NAME));
         assertAttachmentContent(emailAttachments, EMAIL_JSON_ATTACHMENT_NAME, EMAIL_JSON_ATTACHMENT_CONTENT);
         assertAttachmentContent(emailAttachments, EMAIL_TEXT_PLAIN_ATTACHMENT_NAME, EMAIL_TEXT_PLAIN_ATTACHMENT_CONTENT);
     }

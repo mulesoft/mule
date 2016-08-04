@@ -54,7 +54,7 @@ public class HttpRequestInboundAttachmentsTestCase extends AbstractHttpRequestTe
 
     private void assertAttachment(MultiPartPayload payload, String attachmentName, String attachmentContents, MediaType contentType) throws IOException
     {
-        assertTrue(payload.getPartsNames().contains(attachmentName));
+        assertTrue(payload.getPartNames().contains(attachmentName));
 
         org.mule.runtime.api.message.MuleMessage attachment = payload.getPart(attachmentName);
         assertThat(attachment.getDataType().getMediaType(), equalTo(contentType));
