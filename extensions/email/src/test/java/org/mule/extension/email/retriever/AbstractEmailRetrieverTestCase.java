@@ -9,9 +9,9 @@ package org.mule.extension.email.retriever;
 
 import static java.lang.String.format;
 import static java.util.Collections.singletonList;
+import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.Matchers.arrayWithSize;
-import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.not;
@@ -134,7 +134,7 @@ public abstract class AbstractEmailRetrieverTestCase extends EmailConnectorTestC
 
         assertThat(emailAttachments, hasSize(3));
         assertThat(((MultiPartPayload) messages.get(0).getPayload()).hasBodyPart(), is(true));
-        assertThat(((MultiPartPayload) messages.get(0).getPayload()).getPartsNames(), containsInAnyOrder(EMAIL_JSON_ATTACHMENT_NAME, EMAIL_TEXT_PLAIN_ATTACHMENT_NAME));
+        assertThat(((MultiPartPayload) messages.get(0).getPayload()).getPartsNames(), hasItems(EMAIL_JSON_ATTACHMENT_NAME, EMAIL_TEXT_PLAIN_ATTACHMENT_NAME));
         assertAttachmentContent(emailAttachments, EMAIL_JSON_ATTACHMENT_NAME, EMAIL_JSON_ATTACHMENT_CONTENT);
         assertAttachmentContent(emailAttachments, EMAIL_TEXT_PLAIN_ATTACHMENT_NAME, EMAIL_TEXT_PLAIN_ATTACHMENT_CONTENT);
     }
