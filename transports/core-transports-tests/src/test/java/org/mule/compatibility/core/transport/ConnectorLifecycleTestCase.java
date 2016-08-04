@@ -7,27 +7,34 @@
 package org.mule.compatibility.core.transport;
 
 
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.api.transport.MessageDispatcher;
+import org.mule.compatibility.core.api.transport.MessageReceiver;
 import org.mule.compatibility.core.api.transport.MessageRequester;
-import org.mule.compatibility.core.transport.AbstractMessageDispatcher;
-import org.mule.compatibility.core.transport.AbstractMessageReceiver;
-import org.mule.compatibility.core.transport.AbstractMessageRequester;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.LifecycleException;
 import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 import org.mule.tck.testmodels.mule.TestConnector;
+
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkException;
@@ -616,6 +623,64 @@ public class ConnectorLifecycleTestCase extends AbstractMuleContextEndpointTestC
 
         connector.dispose();
         assertNull(connector.getScheduler());
+    }
+
+    @Test
+    public void errorWhenConnectingReceivers() throws Exception
+    {
+        final AtomicBoolean actuallyConnected = new AtomicBoolean(false);
+
+        connector = new TestConnector(muleContext)
+        {
+
+            @Override
+            protected void doConnect()
+            {
+                super.doConnect();
+                actuallyConnected.set(true);
+            }
+
+            @Override
+            protected void doDisconnect()
+            {
+                super.doDisconnect();
+                actuallyConnected.set(false);
+            }
+
+            @Override
+            public MessageReceiver createReceiver(FlowConstruct flowConstuct, InboundEndpoint endpoint) throws Exception
+            {
+                MessageReceiver receiver = new AbstractMessageReceiver(this, flowConstuct, endpoint)
+                {
+                    @Override
+                    protected void doConnect() throws Exception
+                    {
+                        throw new MuleRuntimeException(createStaticMessage("Simulate receiver connection exception."));
+                    }
+                };
+                return receiver;
+            }
+        };
+
+        InboundEndpoint in = getTestInboundEndpoint("out", "test://out", null, null, null, connector);
+
+        connector.registerListener(in, getSensingNullMessageProcessor(), getTestFlow());
+
+        assertThat(connector.isConnected(), is(false));
+        assertThat(actuallyConnected.get(), is(false));
+        try
+        {
+            connector.connect();
+            fail("Expected MuleRuntimeException: 'Simulate receiver connection exception.'");
+        }
+        catch (RetryPolicyExhaustedException e)
+        {
+            // expected
+            assertThat(e.getCause(), instanceOf(MuleRuntimeException.class));
+            assertThat(e.getCause().getMessage(), is("Simulate receiver connection exception."));
+        }
+        assertThat(connector.isConnected(), is(false));
+        assertThat(actuallyConnected.get(), is(false));
     }
 
     protected Work createSomeWork()

@@ -34,7 +34,6 @@ import org.mule.runtime.config.spring.dsl.processor.ConfigLine;
 import org.mule.runtime.config.spring.dsl.processor.xml.XmlApplicationParser;
 import org.mule.runtime.config.spring.dsl.spring.BeanDefinitionFactory;
 import org.mule.runtime.config.spring.editors.MulePropertyEditorRegistrar;
-import org.mule.runtime.config.spring.parsers.generic.AutoIdUtils;
 import org.mule.runtime.config.spring.processors.ContextExclusiveInjectorProcessor;
 import org.mule.runtime.config.spring.processors.DiscardedOptionalBeanPostProcessor;
 import org.mule.runtime.config.spring.processors.LifecycleStatePostProcessor;
@@ -182,7 +181,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
                 applicationConfigBuilder.addConfigFile(new ConfigFile(getFilename(springResource), asList(mainConfigLine)));
             }
             applicationConfigBuilder.setApplicationName(muleContext.getConfiguration().getId());
-            applicationModel = new ApplicationModel(applicationConfigBuilder.build(), artifactConfiguration);
+            applicationModel = new ApplicationModel(applicationConfigBuilder.build(), artifactConfiguration, Optional.of(componentBuildingDefinitionRegistry));
         }
         catch (Exception e)
         {

@@ -61,6 +61,19 @@
         </xsd:complexType>
     </xsd:element>
 
+    <xsd:element name="text-pojo" type="textPojoType" />
+
+    <xsd:complexType name="textPojoType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractExtensionType">
+                <xsd:sequence>
+                    <xsd:element name="text" type="xsd:string" minOccurs="1" maxOccurs="1" />
+                </xsd:sequence>
+                <xsd:attribute name="name" type="xsd:NMTOKEN"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
     <xsd:complexType name="simpleParameterCollectionParser">
         <xsd:complexContent>
             <xsd:extension base="mule:abstractExtensionType">

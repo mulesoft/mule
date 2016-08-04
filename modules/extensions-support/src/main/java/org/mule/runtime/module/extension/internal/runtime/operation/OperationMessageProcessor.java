@@ -140,7 +140,7 @@ public class OperationMessageProcessor extends ExtensionComponent implements Mes
     protected void doInitialise() throws InitialisationException
     {
         returnDelegate = createReturnDelegate();
-        operationExecutor = operationModel.getExecutor().createExecutor();
+        operationExecutor = operationModel.getExecutor().createExecutor(operationModel);
         executionMediator = createExecutionMediator();
         initialiseIfNeeded(operationExecutor, true, muleContext);
     }

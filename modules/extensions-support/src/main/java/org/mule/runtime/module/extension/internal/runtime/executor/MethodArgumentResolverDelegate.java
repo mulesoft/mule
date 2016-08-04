@@ -28,6 +28,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.EventArgument
 import org.mule.runtime.module.extension.internal.runtime.resolver.MessageArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterGroupArgumentResolver;
 
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -57,16 +58,16 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
     private final JavaTypeLoader typeLoader = new JavaTypeLoader(this.getClass().getClassLoader());
     private ArgumentResolver<? extends Object>[] argumentResolvers;
     private Map<java.lang.reflect.Parameter, ParameterGroupArgumentResolver<? extends Object>> parameterGroupResolvers;
-    private boolean initialized = false;
 
     /**
      * Creates a new instance for the given {@code method}
      *
      * @param method the {@link Method} to be called
      */
-    public MethodArgumentResolverDelegate(Method method)
+    public MethodArgumentResolverDelegate(OperationModel operationModel, Method method)
     {
         this.method = method;
+        initArgumentResolvers(operationModel);
     }
 
     private void initArgumentResolvers(OperationModel model)
@@ -124,10 +125,6 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
     @Override
     public Object[] resolve(OperationContext operationContext, Class<?>[] parameterTypes)
     {
-        if (!initialized)
-        {
-            initArgumentResolvers(operationContext.getOperationModel());
-        }
 
         Object[] parameterValues = new Object[argumentResolvers.length];
         int i = 0;

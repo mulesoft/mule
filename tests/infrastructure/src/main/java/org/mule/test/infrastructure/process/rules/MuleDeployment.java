@@ -254,7 +254,7 @@ public class MuleDeployment extends MuleInstallation
             @Override
             public String describeFailure()
             {
-                return "Application " + appName + " is not deployed after " + (deploymentTimeout / 60) + "seconds.";
+                return "Application " + appName + " is not deployed after " + (deploymentTimeout / 1000) + " seconds.";
             }
         });
     }
@@ -272,7 +272,7 @@ public class MuleDeployment extends MuleInstallation
             @Override
             public String describeFailure()
             {
-                return "Domain " + domainName + " is not deployed after " + (deploymentTimeout / 60) + "seconds.";
+                return "Domain " + domainName + " is not deployed after " + (deploymentTimeout / 1000) + " seconds.";
             }
         });
     }

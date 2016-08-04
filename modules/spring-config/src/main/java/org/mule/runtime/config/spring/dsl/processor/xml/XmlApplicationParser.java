@@ -106,9 +106,7 @@ public class XmlApplicationParser
 
     public Optional<ConfigLine> parse(Element configElement)
     {
-        return configLineFromElement(configElement, () -> {
-            return null;
-        });
+        return configLineFromElement(configElement, () -> null);
     }
 
     private Optional<ConfigLine> configLineFromElement(Node node, ConfigLineProvider parentProvider)
@@ -152,11 +150,7 @@ public class XmlApplicationParser
                 }
                 else
                 {
-                    configLineFromElement(child, () -> {
-                        return builder.build();
-                    }).ifPresent(configLine -> {
-                        builder.addChild(configLine);
-                    });
+                    configLineFromElement(child, builder::build).ifPresent(builder::addChild);
                 }
             }
         }
