@@ -17,7 +17,9 @@ import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.introspection.operation.OperationModel;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 import org.mule.runtime.extension.api.runtime.operation.OperationContext;
+import org.mule.runtime.module.extension.internal.introspection.ParameterGroup;
 import org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser;
+import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ByParameterNameArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConfigurationArgumentResolver;
@@ -28,8 +30,11 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterGrou
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 
 /**
@@ -38,7 +43,7 @@ import java.util.Map;
  *
  * @since 3.7.0
  */
-final class MethodArgumentResolverDelegate implements ArgumentResolverDelegate
+public final class MethodArgumentResolverDelegate implements ArgumentResolverDelegate
 {
 
     private static final ArgumentResolver<Object> CONFIGURATION_ARGUMENT_RESOLVER = new ConfigurationArgumentResolver();
@@ -50,21 +55,23 @@ final class MethodArgumentResolverDelegate implements ArgumentResolverDelegate
     private final Method method;
     private final JavaTypeLoader typeLoader = new JavaTypeLoader(this.getClass().getClassLoader());
     private ArgumentResolver<? extends Object>[] argumentResolvers;
+    private Map<java.lang.reflect.Parameter, ParameterGroupArgumentResolver<? extends Object>> parameterGroupResolvers;
 
     /**
      * Creates a new instance for the given {@code method}
      *
      * @param method the {@link Method} to be called
      */
-    public MethodArgumentResolverDelegate(Method method)
+    public MethodArgumentResolverDelegate(OperationModel operationModel, Method method)
     {
         this.method = method;
-        initArgumentResolvers();
+        initArgumentResolvers(operationModel);
     }
 
-    private void initArgumentResolvers()
+    private void initArgumentResolvers(OperationModel model)
     {
         final Class<?>[] parameterTypes = method.getParameterTypes();
+
         if (isEmpty(parameterTypes))
         {
             argumentResolvers = new ArgumentResolver[] {};
@@ -73,6 +80,8 @@ final class MethodArgumentResolverDelegate implements ArgumentResolverDelegate
 
         argumentResolvers = new ArgumentResolver[parameterTypes.length];
         Annotation[][] parameterAnnotations = method.getParameterAnnotations();
+        Parameter[] parameters = method.getParameters();
+        parameterGroupResolvers = getParameterGroupResolvers(model);
         final List<String> paramNames = MuleExtensionAnnotationParser.getParamNames(method);
 
         for (int i = 0; i < parameterTypes.length; i++)
@@ -100,7 +109,7 @@ final class MethodArgumentResolverDelegate implements ArgumentResolverDelegate
             }
             else if (isParameterContainer(annotations.keySet(), typeLoader.load(parameterType)))
             {
-                argumentResolver = new ParameterGroupArgumentResolver(parameterType);
+                argumentResolver = parameterGroupResolvers.get(parameters[i]);
             }
             else
             {
@@ -114,6 +123,7 @@ final class MethodArgumentResolverDelegate implements ArgumentResolverDelegate
     @Override
     public Object[] resolve(OperationContext operationContext, Class<?>[] parameterTypes)
     {
+
         Object[] parameterValues = new Object[argumentResolvers.length];
         int i = 0;
         for (ArgumentResolver<?> argumentResolver : argumentResolvers)
@@ -177,5 +187,26 @@ final class MethodArgumentResolverDelegate implements ArgumentResolverDelegate
             return '\u0000';
         }
         return null;
+    }
+
+    /**
+     * Uses the {@link ParameterGroupModelProperty} obtain the resolvers.
+     * @param model operation model
+     * @return mapping between the {@link Method}'s arguments which are parameters groups and their respective resolvers
+     */
+    private Map<Parameter, ParameterGroupArgumentResolver<? extends Object>> getParameterGroupResolvers(OperationModel model)
+    {
+        Optional<ParameterGroupModelProperty> parameterGroupModelProperty = model.getModelProperty(ParameterGroupModelProperty.class);
+        Map<Parameter, ParameterGroupArgumentResolver<? extends Object>> resolverMap = new HashMap<>();
+
+        if (parameterGroupModelProperty.isPresent())
+        {
+            for (ParameterGroup<Parameter> group : parameterGroupModelProperty.get().getGroups())
+            {
+                resolverMap.put(group.getContainer(), new ParameterGroupArgumentResolver<>(group));
+            }
+        }
+
+        return resolverMap;
     }
 }

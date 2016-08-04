@@ -11,6 +11,8 @@ import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.Parameter;
+import org.mule.runtime.extension.api.annotation.ParameterGroup;
+import org.mule.runtime.extension.api.annotation.Sources;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 import org.mule.runtime.extension.api.annotation.connector.Providers;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -20,6 +22,7 @@ import java.util.List;
 @Extension(name = "petstore", description = "PetStore Test connector")
 @Operations(PetStoreOperations.class)
 @Providers({SimplePetStoreConnectionProvider.class, PooledPetStoreConnectionProvider.class, TransactionalPetStoreConnectionProvider.class})
+@Sources({PetStoreSource.class})
 @Xml(namespaceLocation = "http://www.mulesoft.org/schema/mule/petstore", namespace = "petstore")
 public class PetStoreConnector
 {
@@ -39,6 +42,9 @@ public class PetStoreConnector
     @Optional
     private PetCage cage;
 
+    @ParameterGroup
+    private ExclusiveCashier cashier;
+
     public List<String> getPets()
     {
         return pets;
@@ -57,5 +63,10 @@ public class PetStoreConnector
     public PetCage getCage()
     {
         return cage;
+    }
+
+    public ExclusiveCashier getCashier()
+    {
+        return cashier;
     }
 }

@@ -20,6 +20,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueRe
 
 import com.google.common.collect.ImmutableList;
 
+import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Optional;
 
@@ -61,7 +62,7 @@ public final class GroupValueSetter implements ValueSetter
         return ImmutableList.of();
     }
 
-    private final ParameterGroup group;
+    private final ParameterGroup<Field> group;
     private final List<ValueSetter> childSetters;
 
     /**
@@ -83,7 +84,10 @@ public final class GroupValueSetter implements ValueSetter
         group.getParameters().forEach(field -> groupBuilder.addPropertyResolver(field, new StaticValueResolver<>(result.get(field.getName()))));
 
         Object groupValue = groupBuilder.build(VoidMuleEvent.getInstance());
-        setField(group.getField(), target, groupValue);
+
+        Field field = group.getContainer();
+        field.setAccessible(true);
+        setField(field, target, groupValue);
 
         for (ValueSetter childSetter : childSetters)
         {

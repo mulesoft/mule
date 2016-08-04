@@ -326,7 +326,7 @@ public class FlatExtensionDeclarationTestCase extends BaseExtensionDeclarationTe
     {
         for (OperationModel operation : extensionModel.getOperationModels())
         {
-            assertThat(((RuntimeOperationModel) operation).getExecutor().createExecutor(), is(instanceOf(Interceptable.class)));
+            assertThat(((RuntimeOperationModel) operation).getExecutor().createExecutor(operation), is(instanceOf(Interceptable.class)));
         }
     }
 

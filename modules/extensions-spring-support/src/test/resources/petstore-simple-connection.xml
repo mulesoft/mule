@@ -5,7 +5,7 @@
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/petstore http://www.mulesoft.org/schema/mule/petstore/current/mule-petstore.xsd">
 
-    <petstore:config name="petstore">
+    <petstore:config name="petstore" cashierName="jim">
         <petstore:pooled-connection username="john" password="doe" />
         <petstore:pets>
             <petstore:pet value="Lassie" />
@@ -14,7 +14,7 @@
         </petstore:pets>
     </petstore:config>
 
-    <petstore:config name="petstoreInvalidConnectionWithConnectionValidation">
+    <petstore:config name="petstoreInvalidConnectionWithConnectionValidation" cashierName="jim">
         <petstore:pooled-connection username="john" password="invalid-password" />
         <petstore:pets>
             <petstore:pet value="Lassie" />
@@ -23,7 +23,7 @@
         </petstore:pets>
     </petstore:config>
 
-    <petstore:config name="petstoreInvalidConnectionWithDisabledValidation">
+    <petstore:config name="petstoreInvalidConnectionWithDisabledValidation" cashierName="jim">
         <petstore:pooled-connection disableValidation="true" username="john" password="invalid-password" />
         <petstore:pets>
             <petstore:pet value="Lassie" />

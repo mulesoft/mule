@@ -13,6 +13,7 @@ import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.extension.api.introspection.parameter.ParameterModel.RESERVED_NAMES;
 import static org.mule.runtime.extension.api.util.NameUtils.getTopLevelTypeName;
 import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getComponentModelTypeName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isInstantiable;
 import static org.mule.runtime.module.extension.internal.util.MetadataTypeUtils.getAliasName;
 import org.mule.metadata.api.model.ArrayType;
@@ -30,7 +31,6 @@ import org.mule.runtime.extension.api.introspection.operation.OperationModel;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterizedModel;
 import org.mule.runtime.extension.api.introspection.property.SubTypesModelProperty;
-import org.mule.runtime.extension.api.introspection.source.SourceModel;
 import org.mule.runtime.extension.api.util.SubTypesMappingContainer;
 import org.mule.runtime.module.extension.internal.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
@@ -55,11 +55,6 @@ import java.util.Set;
  */
 public final class ParameterModelValidator implements ModelValidator
 {
-
-    private static final String CONFIGURATION = "configuration";
-    private static final String OPERATION = "operation";
-    private static final String CONNECTION_PROVIDER = "connection provider";
-    private static final String SOURCE = "source";
 
     private SubTypesMappingContainer subTypesMapping;
 
@@ -178,29 +173,5 @@ public final class ParameterModelValidator implements ModelValidator
                                                       p.getType(), ownerModelType, ownerName, extensionName));
                                    }
                         ));
-    }
-
-    private String getComponentModelTypeName(Object component)
-    {
-        if (component instanceof OperationModel)
-        {
-            return OPERATION;
-        }
-        else if (component instanceof ConfigurationModel)
-        {
-            return CONFIGURATION;
-        }
-        else if (component instanceof ConnectionProviderModel)
-        {
-            return CONNECTION_PROVIDER;
-        }
-        else if (component instanceof SourceModel)
-        {
-            return SOURCE;
-        }
-
-        throw new IllegalArgumentException(format("Component '%s' is not an instance of any known model type [%s, %s, %s, %s]",
-                                                  component.toString(),
-                                                  CONFIGURATION, CONNECTION_PROVIDER, OPERATION, SOURCE));
     }
 }

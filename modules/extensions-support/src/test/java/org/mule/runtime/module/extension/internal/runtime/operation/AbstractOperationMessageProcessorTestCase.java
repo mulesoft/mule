@@ -170,7 +170,7 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
         when(operationModel.getExecutor()).thenReturn(operationExecutorFactory);
         when(operationModel.getModelProperty(MetadataKeyIdModelProperty.class)).thenReturn(Optional.of(new MetadataKeyIdModelProperty(ExtensionsTypeLoaderFactory.getDefault().createTypeLoader().load(String.class))));
         when(operationModel.getModelProperty(ConnectivityModelProperty.class)).thenReturn(empty());
-        when(operationExecutorFactory.createExecutor()).thenReturn(operationExecutor);
+        when(operationExecutorFactory.createExecutor(operationModel)).thenReturn(operationExecutor);
 
         when(operationModel.getName()).thenReturn(OPERATION_NAME);
         when(operationModel.getExceptionEnricherFactory()).thenReturn(Optional.of(exceptionEnricherFactory));
@@ -200,7 +200,7 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
         when(operationModel.getOutput()).thenReturn(outputMock);
         when(operationModel.getOutputAttributes()).thenReturn(outputMock);
 
-        when(operationExecutorFactory.createExecutor()).thenReturn(operationExecutor);
+        when(operationExecutorFactory.createExecutor(operationModel)).thenReturn(operationExecutor);
 
         when(resolverSet.resolve(event)).thenReturn(parameters);
 

@@ -5,7 +5,7 @@
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/petstore http://www.mulesoft.org/schema/mule/petstore/current/mule-petstore.xsd">
 
-    <petstore:config name="petstore-valid">
+    <petstore:config name="petstore-valid" cashierName="jim">
         <petstore:valid-connection username="john" password="doe">
             <reconnect count="2" frequency="5"/>
             <pooling-profile/>
@@ -17,7 +17,7 @@
         </petstore:pets>
     </petstore:config>
 
-    <petstore:config name="petstore-invalid">
+    <petstore:config name="petstore-invalid" cashierName="jim">
         <petstore:invalid-connection username="john" password="doe">
             <reconnect count="2" frequency="5"/>
             <pooling-profile/>

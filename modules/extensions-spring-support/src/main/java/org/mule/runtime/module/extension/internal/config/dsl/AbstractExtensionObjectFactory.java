@@ -7,21 +7,34 @@
 package org.mule.runtime.module.extension.internal.config.dsl;
 
 import static com.google.common.collect.ImmutableList.copyOf;
+import static java.lang.String.format;
+import static java.util.stream.Collectors.toSet;
+import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinitionParser.CHILD_ELEMENT_KEY_PREFIX;
 import static org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinitionParser.CHILD_ELEMENT_KEY_SUFFIX;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getComponentModelTypeName;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getModelName;
 import org.mule.runtime.config.spring.dsl.api.ObjectFactory;
+import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
+import org.mule.runtime.extension.api.introspection.EnrichableModel;
+import org.mule.runtime.module.extension.internal.introspection.ParameterGroup;
+import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.CollectionValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.MapValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
+import com.google.common.base.Joiner;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * Base class for {@link ObjectFactory} implementation which create
@@ -56,12 +69,13 @@ public abstract class AbstractExtensionObjectFactory<T> implements ObjectFactory
      * using {@link #toValueResolver(Object)} to process the values.
      *
      * @return a {@link ResolverSet}
+     * @throws {@link ConfigurationException} if the exclusiveness condition between parameters is not honored
      */
-    protected ResolverSet getParametersAsResolverSet()
+    protected ResolverSet getParametersAsResolverSet(EnrichableModel model) throws ConfigurationException
     {
         ResolverSet resolverSet = new ResolverSet();
         getParameters().forEach((key, value) -> resolverSet.add(key, toValueResolver(value)));
-
+        checkParameterGroupExclusivenessForModel(model, getParameters().keySet());
         return resolverSet;
     }
 
@@ -134,5 +148,36 @@ public abstract class AbstractExtensionObjectFactory<T> implements ObjectFactory
     private String unwrapChildKey(String key)
     {
         return key.replaceAll(CHILD_ELEMENT_KEY_PREFIX, "").replaceAll(CHILD_ELEMENT_KEY_SUFFIX, "");
+    }
+
+    private void checkParameterGroupExclusivenessForModel(EnrichableModel model, Set<String> resolverKeys) throws ConfigurationException
+    {
+        Optional<ParameterGroupModelProperty> parameterGroupModelProperty = model.getModelProperty(ParameterGroupModelProperty.class).filter(mp -> mp.hasExclusiveOptionals());
+        if (parameterGroupModelProperty.isPresent())
+        {
+            checkParameterGroupExclusiveness(model, parameterGroupModelProperty.get(), resolverKeys);
+        }
+    }
+
+    private void checkParameterGroupExclusiveness(EnrichableModel model, ParameterGroupModelProperty parameterGroupModelProperty, Set<String> resolverKeys) throws ConfigurationException
+    {
+        for (ParameterGroup<?> group : parameterGroupModelProperty.getGroups())
+        {
+            Set<String> parametersFromGroup = group.getOptionalParameters().stream()
+                    .map(p -> p.getName())
+                    .filter(name -> resolverKeys.contains(name))
+                    .collect(toSet());
+
+            if (parametersFromGroup.size() > 1)
+            {
+                throw new ConfigurationException(createStaticMessage(format("In %s '%s', the following parameters cannot be set at the same: [%s]",
+                                                                            getComponentModelTypeName(model), getModelName(model), Joiner.on(", ").join(parametersFromGroup))));
+            }
+
+            if (group.isOneRequired() && parametersFromGroup.isEmpty())
+            {
+                throw new ConfigurationException((createStaticMessage(format("Parameter group '%s' requires that one of its optional parameters should be set but all of them are missing", group.getType().getName()))));
+            }
+        }
     }
 }

@@ -179,7 +179,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase
 
 
         when(extension1OperationModel.getExecutor()).thenReturn(executorFactory);
-        when(executorFactory.createExecutor()).thenReturn(executor);
+        when(executorFactory.createExecutor(extension1OperationModel)).thenReturn(executor);
 
         classLoader = getClass().getClassLoader();
         registerExtensions(extensionModel1, extensionModel2, extensionModel3WithRepeatedName);

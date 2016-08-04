@@ -11,6 +11,7 @@ import static java.util.Optional.ofNullable;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.config.spring.dsl.api.ObjectFactory;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.time.TimeSupplier;
 import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
@@ -36,7 +37,6 @@ import javax.inject.Inject;
  */
 class ConfigurationProviderObjectFactory extends AbstractExtensionObjectFactory<ConfigurationProvider<Object>> implements ObjectFactory<ConfigurationProvider<Object>>
 {
-
     private final String name;
     private final RuntimeConfigurationModel configurationModel;
     private final ConfigurationProviderFactory configurationProviderFactory = new DefaultConfigurationProviderFactory();
@@ -70,9 +70,9 @@ class ConfigurationProviderObjectFactory extends AbstractExtensionObjectFactory<
         return instance;
     }
 
-    private ConfigurationProvider<Object> createInnerInstance()
+    private ConfigurationProvider<Object> createInnerInstance() throws ConfigurationException
     {
-        ResolverSet resolverSet = getParametersAsResolverSet();
+        ResolverSet resolverSet = getParametersAsResolverSet(configurationModel);
         final ValueResolver<ConnectionProvider> connectionProviderResolver = getConnectionProviderResolver();
 
         ConfigurationProvider<Object> configurationProvider;
