@@ -48,7 +48,7 @@ import javax.xml.namespace.QName;
 final class ObjectTypeSchemaDelegate
 {
 
-    private final Map<MetadataType, ComplexTypeHolder> registeredComplexTypesHolders = new LinkedHashMap<>();
+    private final Map<String, ComplexTypeHolder> registeredComplexTypesHolders = new LinkedHashMap<>();
     private final ObjectFactory objectFactory = new ObjectFactory();
     private final SchemaBuilder builder;
 
@@ -175,7 +175,7 @@ final class ObjectTypeSchemaDelegate
      */
     private String registerPojoType(MetadataType metadataType, MetadataType baseType, String description)
     {
-        ComplexTypeHolder alreadyRegisteredType = registeredComplexTypesHolders.get(metadataType);
+        ComplexTypeHolder alreadyRegisteredType = registeredComplexTypesHolders.get(getId(metadataType));
         if (alreadyRegisteredType != null)
         {
             return alreadyRegisteredType.getComplexType().getName();
@@ -190,9 +190,10 @@ final class ObjectTypeSchemaDelegate
 
     private ComplexType registerPojoAsTypeWithBase(ObjectType metadataType, ObjectType baseType, String description)
     {
-        if (registeredComplexTypesHolders.get(metadataType) != null)
+        String typeId = getId(metadataType);
+        if (registeredComplexTypesHolders.get(typeId) != null)
         {
-            return registeredComplexTypesHolders.get(metadataType).getComplexType();
+            return registeredComplexTypesHolders.get(typeId).getComplexType();
         }
 
         QName base;
@@ -217,7 +218,7 @@ final class ObjectTypeSchemaDelegate
     private ComplexType declarePojoAsType(ObjectType metadataType, QName base, String description, Collection<ObjectFieldType> fields)
     {
         final TopLevelComplexType complexType = new TopLevelComplexType();
-        registeredComplexTypesHolders.put(metadataType, new ComplexTypeHolder(complexType, metadataType));
+        registeredComplexTypesHolders.put(getId(metadataType), new ComplexTypeHolder(complexType, metadataType));
 
         complexType.setName(sanitizeName(getId(metadataType)));
         complexType.setAnnotation(builder.createDocAnnotation(description));
