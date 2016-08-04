@@ -25,7 +25,7 @@ import org.apache.commons.beanutils.MethodUtils;
 public class SimpleDataType<T> implements DataType<T>, Cloneable
 {
 
-    private static final String CHARSET_PARAM = "charset";
+    public static final String CHARSET_PARAM = "charset";
 
     protected final Class<?> type;
     protected String mimeType = ANY_MIME_TYPE;
