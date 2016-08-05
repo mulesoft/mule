@@ -14,8 +14,8 @@
     <description>Mule repository module. Provides access to external dependencies required by the runtime.</description>
 
     <properties>
-        <aetherVersion>1.0.0.v20140518</aetherVersion>
-        <aetherProviderVersion>3.1.0</aetherProviderVersion>
+        <aetherVersion>1.1.0</aetherVersion>
+        <aetherProviderVersion>3.3.9</aetherProviderVersion>
     </properties>
 
     <dependencies>
