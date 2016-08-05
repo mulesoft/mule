@@ -248,7 +248,6 @@
                     <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="org.mule.test.heisenberg.extension.model.HealthStatusEnumType" use="optional" default="CANCER" name="initialHealth"></xs:attribute>
                     <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="org.mule.test.heisenberg.extension.model.HealthStatusEnumType" use="required" name="finalHealth"></xs:attribute>
                     <xs:attribute type="mule:expressionString" use="optional" name="labAddress"></xs:attribute>
-                    <xs:attribute type="xs:string" use="optional" name="firstEndevour"></xs:attribute>
                     <xs:attribute type="xs:string" use="optional" default="#[payload]" name="literalExpressionWithDefault"></xs:attribute>
                     <xs:attribute type="xs:string" use="optional" name="literalExpressionWithoutDefault"></xs:attribute>
                     <xs:attribute type="mule:expressionList" use="optional" name="healthProgressions"></xs:attribute>

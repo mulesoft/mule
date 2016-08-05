@@ -641,10 +641,13 @@ public final class SchemaBuilder
             @Override
             public void visitString(StringType stringType)
             {
-                defaultVisit(stringType);
                 if (paramDsl.supportsChildDeclaration())
                 {
-                    generateTextElement(paramDsl, description, all);
+                    generateTextElement(paramDsl, description, isRequired(forceOptional, required), all);
+                }
+                else
+                {
+                    defaultVisit(stringType);
                 }
             }
 
@@ -822,9 +825,9 @@ public final class SchemaBuilder
         return element;
     }
 
-    private void generateTextElement(DslElementSyntax paramDsl, String description, Group all)
+    private void generateTextElement(DslElementSyntax paramDsl, String description, boolean isRequired, Group all)
     {
-        TopLevelElement textElement = createTopLevelElement(paramDsl.getElementName(), ZERO, "1");
+        TopLevelElement textElement = createTopLevelElement(paramDsl.getElementName(), isRequired ? ONE : ZERO, "1");
         textElement.setAnnotation(createDocAnnotation(description));
         textElement.setType(STRING);
 
