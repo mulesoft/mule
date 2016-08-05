@@ -84,6 +84,7 @@ import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Do
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ExplicitGroup;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ExtensionType;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.FormChoice;
+import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Group;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.GroupRef;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Import;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.LocalComplexType;
@@ -638,6 +639,19 @@ public final class SchemaBuilder
             }
 
             @Override
+            public void visitString(StringType stringType)
+            {
+                if (paramDsl.supportsChildDeclaration())
+                {
+                    generateTextElement(paramDsl, description, isRequired(forceOptional, required), all);
+                }
+                else
+                {
+                    defaultVisit(stringType);
+                }
+            }
+
+            @Override
             protected void defaultVisit(MetadataType metadataType)
             {
                 extensionType.getAttributeOrAttributeGroup().add(createAttribute(name, description, metadataType, defaultValue,
@@ -809,6 +823,15 @@ public final class SchemaBuilder
         element.setComplexType(type);
 
         return element;
+    }
+
+    private void generateTextElement(DslElementSyntax paramDsl, String description, boolean isRequired, Group all)
+    {
+        TopLevelElement textElement = createTopLevelElement(paramDsl.getElementName(), isRequired ? ONE : ZERO, "1");
+        textElement.setAnnotation(createDocAnnotation(description));
+        textElement.setType(STRING);
+
+        all.getParticle().add(objectFactory.createElement(textElement));
     }
 
 }

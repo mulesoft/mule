@@ -23,7 +23,6 @@
                        initialHealth="CANCER"
                        finalHealth="DEAD"
                        candidateDoors="candidateDoors"
-                       firstEndevour="Gray Matter Technologies"
                        labAddress="#['Pollos Hermanos']"
                        weaponTypeFunction="#[weaponType]"
                        literalExpressionWithoutDefault="#[money]">
@@ -73,6 +72,13 @@
                 </heisenberg:ricin>
             </heisenberg:weapon-value-map>
         </heisenberg:weapon-value-maps>
+        <heisenberg:first-endevour><![CDATA[
+        endeavour
+                        verb [ I + to infinitive ] uk us endeavor UK ​ /enˈdev.ər/ US ​ /enˈdev.ɚ/
+                        ​
+                        C1 to try to do something:
+                        Engineers are endeavouring to locate Gray Matter Technologies.
+        ]]></heisenberg:first-endevour>
         <heisenberg:health-progressions>
             <heisenberg:health-progression value="HEALTHY"/>
             <heisenberg:health-progression value="CANCER"/>
@@ -92,7 +98,6 @@
                        initialHealth="${initialHealth}"
                        finalHealth="${finalHealth}"
                        candidateDoors="${candidateDoors}"
-                       firstEndevour="Gray Matter Technologies"
                        labAddress="#['Pollos Hermanos']"
                        deathsBySeasons="${deathsBySeasons}"
                        labeledRicin="${labeledRicin}"
@@ -113,6 +118,7 @@
             <heisenberg:monthly-income value="12000"/>
             <heisenberg:monthly-income value="500"/>
         </heisenberg:monthly-incomes>
+        <heisenberg:first-endevour><![CDATA[Gray Matter Technologies]]></heisenberg:first-endevour>
     </heisenberg:config>
 
     <heisenberg:config name="heisenbergByRef"
@@ -128,12 +134,12 @@
                        ricinPacks="ricinPacks"
                        nextDoor="door"
                        candidateDoors="candidateDoors"
-                       firstEndevour="Gray Matter Technologies"
                        labAddress="#['Pollos Hermanos']"
                        monthlyIncomes="monthlyIncomes"
                        deathsBySeasons="deathsBySeasons"
                        labeledRicin="labeledRicins"
                        literalExpressionWithoutDefault="#[money]">
+        <heisenberg:first-endevour><![CDATA[Gray Matter Technologies]]></heisenberg:first-endevour>
     </heisenberg:config>
 
     <heisenberg:config name="expressionHeisenberg"
@@ -148,7 +154,6 @@
                        money="#[money]"
                        recipe="#[app.registry.recipes]"
                        candidateDoors="#[app.registry.candidateDoors]"
-                       firstEndevour="Gray Matter Technologies"
                        labAddress="#['Pollos Hermanos']"
                        weaponTypeFunction="#[weaponType]"
                        monthlyIncomes="#[[12000L, 500L]]"
@@ -167,6 +172,7 @@
         <heisenberg:next-door address="#[pollosHermanos]" victim="#[gustavoFring]">
             <heisenberg:previous victim="#[krazy8]" address="#[jesses]"/>
         </heisenberg:next-door>
+        <heisenberg:first-endevour><![CDATA[Gray Matter Technologies]]></heisenberg:first-endevour>
     </heisenberg:config>
 
     <heisenberg:config name="expressionHeisenbergByRef"
@@ -184,13 +190,13 @@
                        enemies="#[app.registry.enemies]"
                        ricinPacks="#[app.registry.ricinPacks]"
                        nextDoor="#[org.mule.runtime.module.extension.internal.config.ParameterizedConfigParserTestCase.getDoor()]"
-                       firstEndevour="Gray Matter Technologies"
                        labAddress="#['Pollos Hermanos']"
                        monthlyIncomes="#[app.registry.monthlyIncomes]"
                        deathsBySeasons="#[app.registry.deathsBySeasons]"
                        labeledRicin="#[app.registry.labeledRicins]"
                        weapon="#[weapon]"
                        literalExpressionWithoutDefault="#[money]">
+        <heisenberg:first-endevour><![CDATA[Gray Matter Technologies]]></heisenberg:first-endevour>
     </heisenberg:config>
 
 

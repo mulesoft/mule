@@ -34,6 +34,7 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
+import org.mule.runtime.extension.api.annotation.param.display.Text;
 import org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher;
 import org.mule.test.heisenberg.extension.exception.HeisenbergException;
 import org.mule.test.heisenberg.extension.model.ExtendedPersonalInfo;
@@ -173,6 +174,7 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware
     @Parameter
     @Expression(NOT_SUPPORTED)
     @Optional
+    @Text
     private String firstEndevour;
 
     @Parameter

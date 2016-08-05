@@ -35,6 +35,7 @@ import org.mule.metadata.api.model.DateType;
 import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
+import org.mule.metadata.api.model.StringType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.runtime.api.config.PoolingProfile;
@@ -214,12 +215,28 @@ public abstract class ExtensionDefinitionParser
                                    }
 
                                    @Override
+                                   public void visitString(StringType stringType)
+                                   {
+                                       defaultVisit(stringType);
+                                       if (paramDsl.supportsChildDeclaration())
+                                       {
+                                           addParameter(getChildKey(getKey(parameter)),
+                                                        fromChildConfiguration(String.class)
+                                                                .withWrapperIdentifier(paramDsl.getElementName()));
+
+                                           addDefinition(baseDefinitionBuilder.copy()
+                                                                 .withIdentifier(paramDsl.getElementName())
+                                                                 .withTypeDefinition(fromType(String.class))
+                                                                 .build());
+                                       }
+                                   }
+
+                                   @Override
                                    public void visitObject(ObjectType objectType)
                                    {
                                        if (isExpressionFunction(objectType))
                                        {
                                            defaultVisit(objectType);
-                                           return;
                                        }
                                        else if (isNestedProcessor(objectType))
                                        {
@@ -695,7 +712,10 @@ public abstract class ExtensionDefinitionParser
 
     private void addParameter(String key, AttributeDefinition.Builder definitionBuilder)
     {
-        parameters.put(key, definitionBuilder);
+        if (parameters.put(key, definitionBuilder) != null)
+        {
+            throw new IllegalArgumentException("An AttributeDefinition builder was already defined for parameter " + key);
+        }
     }
 
     private void parseNestedProcessor(ParameterModel parameterModel)
