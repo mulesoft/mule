@@ -23,6 +23,10 @@ import org.mule.transport.NullPayload;
 import org.mule.util.StringUtils;
 
 import com.google.common.base.Charsets;
+import com.ning.http.client.AsyncHttpClient;
+import com.ning.http.client.AsyncHttpClientConfig;
+import com.ning.http.client.ListenableFuture;
+import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProvider;
 
 import java.io.IOException;
 import java.net.URLDecoder;
@@ -64,6 +68,7 @@ public class HttpListenerUrlEncodedTestCase extends FunctionalTestCase
     @Test
     public void urlEncodedParamsGenerateAMapPayload() throws Exception
     {
+
         final Response response = Request.Post(getListenerUrl())
                 .bodyForm(new BasicNameValuePair(PARAM_1_NAME, PARAM_1_VALUE),
                           new BasicNameValuePair(PARAM_2_NAME, PARAM_2_VALUE)).execute();
@@ -126,6 +131,27 @@ public class HttpListenerUrlEncodedTestCase extends FunctionalTestCase
                 .execute();
 
         assertNullPayloadAndEmptyResponse(response);
+    }
+
+    @Test
+    public void serverClosesConnectionAfterSendingData() throws Exception
+    {
+        // Apache Fluent doesn't fail while other clients such as curl, postman and this one do
+        AsyncHttpClientConfig asyncHttpClientConfig = getAsyncHttpClientConfig();
+        AsyncHttpClient asyncHttpClient = new AsyncHttpClient(new GrizzlyAsyncHttpProvider(asyncHttpClientConfig), asyncHttpClientConfig);
+        ListenableFuture<com.ning.http.client.Response> responseFuture = asyncHttpClient.
+                preparePost(getListenerUrl()).setBody("a=1&b=2").
+                addHeader("Content-Type", "application/x-www-form-urlencoded").execute();
+        com.ning.http.client.Response response = responseFuture.get();
+
+        assertThat(response.getStatusCode(), is(200));
+    }
+
+    private AsyncHttpClientConfig getAsyncHttpClientConfig()
+    {
+        AsyncHttpClientConfig.Builder builder = new AsyncHttpClientConfig.Builder();
+        builder.setAllowPoolingConnections(true);
+        return builder.build();
     }
 
     private void assertNullPayloadAndEmptyResponse(Response response) throws Exception
