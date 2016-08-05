@@ -12,9 +12,9 @@ import static java.lang.System.getProperty;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_LOG_VERBOSE_CLASSLOADING;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.EXTENSION_MANIFEST_FILE_NAME;
-import org.mule.functional.classloading.isolation.classification.ArtifactUrlClassification;
-import org.mule.functional.classloading.isolation.classification.ClassLoaderTestRunner;
-import org.mule.functional.classloading.isolation.classification.PluginUrlClassification;
+import org.mule.functional.classloading.isolation.api.ArtifactUrlClassification;
+import org.mule.functional.classloading.isolation.api.ArtifactClassLoaderHolder;
+import org.mule.functional.classloading.isolation.api.PluginUrlClassification;
 import org.mule.runtime.container.internal.ClasspathModuleDiscoverer;
 import org.mule.runtime.container.internal.ContainerClassLoaderFilterFactory;
 import org.mule.runtime.container.internal.MuleModule;
@@ -55,7 +55,7 @@ import org.slf4j.LoggerFactory;
  *
  * @since 4.0
  */
-public class MuleClassLoaderRunnerFactory
+public class IsolatedClassLoaderFactory
 {
 
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -63,13 +63,13 @@ public class MuleClassLoaderRunnerFactory
     private DefaultExtensionManager extensionManager = new DefaultExtensionManager();
 
     /**
-     * Creates a {@link ClassLoaderTestRunner} containing the container, plugins and application {@link ArtifactClassLoader}s
+     * Creates a {@link ArtifactClassLoaderHolder} containing the container, plugins and application {@link ArtifactClassLoader}s
      *
      * @param extraBootPackages {@link Set} of {@link String}s of extra boot packages to be appended to the container {@link ClassLoader}
      * @param artifactUrlClassification the {@link ArtifactUrlClassification} that defines the different {@link URL}s for each {@link ClassLoader}
-     * @return a {@link ClassLoaderTestRunner} that would be used to run the test
+     * @return a {@link ArtifactClassLoaderHolder} that would be used to run the test
      */
-    public ClassLoaderTestRunner createClassLoaderTestRunner(Set<String> extraBootPackages, ArtifactUrlClassification artifactUrlClassification)
+    public ArtifactClassLoaderHolder createArtifactClassLoader(Set<String> extraBootPackages, ArtifactUrlClassification artifactUrlClassification)
     {
         final TestContainerClassLoaderFactory testContainerClassLoaderFactory = new TestContainerClassLoaderFactory(extraBootPackages, artifactUrlClassification.getContainerUrls().toArray(new URL[0]));
 
@@ -86,7 +86,7 @@ public class MuleClassLoaderRunnerFactory
 
         ArtifactClassLoader appClassLoader = createApplicationArtifactClassLoader(classLoader, childClassLoaderLookupPolicy, artifactUrlClassification);
 
-        return new ClassLoaderTestRunner(containerClassLoader, pluginsArtifactClassLoaders, appClassLoader);
+        return new ArtifactClassLoaderHolder(containerClassLoader, pluginsArtifactClassLoaders, appClassLoader);
     }
 
     /**
@@ -101,11 +101,11 @@ public class MuleClassLoaderRunnerFactory
      * @param artifactUrlClassification the classifications to get plugins {@link URL}s
      * @return an {@link ArtifactClassLoader} for the container
      */
-    private ArtifactClassLoader createContainerArtifactClassLoader(TestContainerClassLoaderFactory testContainerClassLoaderFactory, ArtifactUrlClassification artifactUrlClassification)
+    protected ArtifactClassLoader createContainerArtifactClassLoader(TestContainerClassLoaderFactory testContainerClassLoaderFactory, ArtifactUrlClassification artifactUrlClassification)
     {
         logClassLoaderUrls("CONTAINER", artifactUrlClassification.getContainerUrls());
         MuleArtifactClassLoader launcherArtifact = new MuleArtifactClassLoader("launcher", new URL[0],
-                                                                               MuleClassLoaderRunnerFactory.class.getClassLoader(), new MuleClassLoaderLookupPolicy(Collections.emptyMap(), Collections.<String>emptySet()));
+                                                                               IsolatedClassLoaderFactory.class.getClassLoader(), new MuleClassLoaderLookupPolicy(Collections.emptyMap(), Collections.<String>emptySet()));
         ClassLoaderFilter filteredClassLoaderLauncher = new ContainerClassLoaderFilterFactory().create(testContainerClassLoaderFactory.getBootPackages(), Collections.<MuleModule>emptyList());
 
         return testContainerClassLoaderFactory.createContainerClassLoader(new FilteringArtifactClassLoader(launcherArtifact, filteredClassLoaderLauncher));
@@ -127,7 +127,7 @@ public class MuleClassLoaderRunnerFactory
      * @param pluginsArtifactClassLoaders a list where it would append each {@link ArtifactClassLoader} created for a plugin in order to allow access them later
      * @return a {@link CompositeClassLoader} that represents the plugin class loaders.
      */
-    private ClassLoader createPluginClassLoaders(ClassLoader parent, ClassLoaderLookupPolicy childClassLoaderLookupPolicy, ArtifactUrlClassification artifactUrlClassification, List<ArtifactClassLoader> pluginsArtifactClassLoaders)
+    protected ClassLoader createPluginClassLoaders(ClassLoader parent, ClassLoaderLookupPolicy childClassLoaderLookupPolicy, ArtifactUrlClassification artifactUrlClassification, List<ArtifactClassLoader> pluginsArtifactClassLoaders)
     {
         final List<ClassLoader> pluginClassLoaders = new ArrayList<>();
         // Adds a MuleArtifactClassLoader without a filter due to CompositeClassLoader doesn't delegate to the parent to resolve resources, in this case for extensions it is not able to load the mule-extension.xsd when loading
@@ -168,26 +168,6 @@ public class MuleClassLoaderRunnerFactory
     }
 
     /**
-     * Validates that only one module should be discovered. A plugin cannot have inside another plugin that holds a {@code mule-module.properties} for the time being.
-     *
-     * @param pluginName the plugin name
-     * @param discoveredModules {@link MuleModule} discovered
-     * @return the first Module from the list due to there should be only one module.
-     */
-    private MuleModule validatePluginModule(String pluginName, List<MuleModule> discoveredModules)
-    {
-        if (discoveredModules.size() == 0)
-        {
-            throw new IllegalStateException(pluginName + " doesn't have in its classpath a mule-module.properties to define what packages and resources should expose");
-        }
-        if (discoveredModules.size() > 1)
-        {
-            throw new IllegalStateException(pluginName + " has more than one mule-module.properties, composing plugins is not allowed");
-        }
-        return discoveredModules.get(0);
-    }
-
-    /**
      * Creates an {@link ArtifactClassLoader} for the application.
      *
      * @param parent the parent class loader to be assigned to the new one created here
@@ -195,7 +175,7 @@ public class MuleClassLoaderRunnerFactory
      * @param artifactUrlClassification the url classifications to get plugins urls
      * @return the {@link ArtifactClassLoader} to be used for running the test
      */
-    private ArtifactClassLoader createApplicationArtifactClassLoader(ClassLoader parent, ClassLoaderLookupPolicy childClassLoaderLookupPolicy, ArtifactUrlClassification artifactUrlClassification)
+    protected ArtifactClassLoader createApplicationArtifactClassLoader(ClassLoader parent, ClassLoaderLookupPolicy childClassLoaderLookupPolicy, ArtifactUrlClassification artifactUrlClassification)
     {
         logClassLoaderUrls("APP", artifactUrlClassification.getApplicationUrls());
         return new MuleArtifactClassLoader("app", artifactUrlClassification.getApplicationUrls().toArray(new URL[0]), parent, childClassLoaderLookupPolicy);
@@ -207,7 +187,7 @@ public class MuleClassLoaderRunnerFactory
      * @param classLoaderName the name of the {@link ClassLoader} to be logged
      * @param urls {@link List} of {@link URL}s that are going to be used for the {@link ClassLoader}
      */
-    private void logClassLoaderUrls(final String classLoaderName, final List<URL> urls)
+    protected void logClassLoaderUrls(final String classLoaderName, final List<URL> urls)
     {
         StringBuilder builder = new StringBuilder(classLoaderName).append(" classloader urls: [");
         urls.stream().forEach(e -> builder.append("\n").append(" ").append(e.getFile()));
@@ -239,6 +219,26 @@ public class MuleClassLoaderRunnerFactory
     private Boolean isVerboseClassLoading()
     {
         return valueOf(getProperty(MULE_LOG_VERBOSE_CLASSLOADING));
+    }
+
+    /**
+     * Validates that only one module should be discovered. A plugin cannot have inside another plugin that holds a {@code mule-module.properties} for the time being.
+     *
+     * @param pluginName the plugin name
+     * @param discoveredModules {@link MuleModule} discovered
+     * @return the first Module from the list due to there should be only one module.
+     */
+    private MuleModule validatePluginModule(String pluginName, List<MuleModule> discoveredModules)
+    {
+        if (discoveredModules.size() == 0)
+        {
+            throw new IllegalStateException(pluginName + " doesn't have in its classpath a mule-module.properties to define what packages and resources should expose");
+        }
+        if (discoveredModules.size() > 1)
+        {
+            throw new IllegalStateException(pluginName + " has more than one mule-module.properties, composing plugins is not allowed");
+        }
+        return discoveredModules.get(0);
     }
 
 }

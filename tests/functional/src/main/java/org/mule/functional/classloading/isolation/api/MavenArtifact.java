@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.functional.classloading.isolation.maven;
+package org.mule.functional.classloading.isolation.api;
 
 import static org.apache.commons.lang.StringUtils.isEmpty;
 

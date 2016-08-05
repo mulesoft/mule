@@ -5,10 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.functional.classloading.isolation.maven.dependencies;
-
-import org.mule.functional.classloading.isolation.maven.DependenciesGraph;
-import org.mule.functional.classloading.isolation.maven.MavenArtifact;
+package org.mule.functional.classloading.isolation.api;
 
 import java.util.function.Predicate;
 

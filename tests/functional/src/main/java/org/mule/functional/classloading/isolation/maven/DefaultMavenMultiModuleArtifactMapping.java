@@ -11,6 +11,8 @@ import static java.lang.Thread.currentThread;
 import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.mule.runtime.core.util.PropertiesUtils.loadProperties;
 
+import org.mule.functional.classloading.isolation.api.MavenMultiModuleArtifactMapping;
+
 import java.io.IOException;
 import java.util.Properties;
 
@@ -19,17 +21,17 @@ import java.util.Properties;
  *
  * @since 4.0
  */
-public class MuleMavenMultiModuleArtifactMapping implements MavenMultiModuleArtifactMapping
+public class DefaultMavenMultiModuleArtifactMapping implements MavenMultiModuleArtifactMapping
 {
     public static final String MAVEN_MODULE_MAPPING_PROPERTIES = "maven-module-mapping.properties";
     private Properties mappings;
 
     /**
-     * Creates a {@link MuleMavenMultiModuleArtifactMapping} and loads the mappings from {@link MuleMavenMultiModuleArtifactMapping#MAVEN_MODULE_MAPPING_PROPERTIES}
+     * Creates a {@link DefaultMavenMultiModuleArtifactMapping} and loads the mappings from {@link DefaultMavenMultiModuleArtifactMapping#MAVEN_MODULE_MAPPING_PROPERTIES}
      *
      * @throws RuntimeException if an error ocurred while reading the resource file
      */
-    public MuleMavenMultiModuleArtifactMapping()
+    public DefaultMavenMultiModuleArtifactMapping()
     {
         try
         {

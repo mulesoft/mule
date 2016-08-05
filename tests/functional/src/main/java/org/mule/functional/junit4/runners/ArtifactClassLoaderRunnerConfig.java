@@ -77,7 +77,7 @@ public @interface ArtifactClassLoaderRunnerConfig
      * {@link Class}es defined here will be also visible for all the tests in the module due to the {@link ClassLoader} is created one per module when
      * running tests.
      *
-     * @return array of {@link String} with fully qualified {@link Class} name for those classes that has to be exposed for the test. By default
+     * @return array of {@link Class} for those classes that has to be exposed for the test. By default
      * is empty.
      */
     Class[] exportClasses() default {};
