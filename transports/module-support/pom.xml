@@ -10,6 +10,10 @@
     <name>Transport support for mule modules</name>
     <description>Extended transport functionality for core mule modules.</description>
     
+    <properties>
+        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.mule.transports</groupId>

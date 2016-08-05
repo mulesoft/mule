@@ -17,6 +17,10 @@
     <name>Mule FTP connector</name>
     <description>A Mule extension that provides functionality to manage files in an FTP/SFTP server</description>
 
+    <properties>
+        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.mule.modules</groupId>

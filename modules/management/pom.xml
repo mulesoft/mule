@@ -11,6 +11,10 @@
     <name>Management Extensions</name>
     <description>Management Extensions for Mule</description>
 
+    <properties>
+        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.mule</groupId>

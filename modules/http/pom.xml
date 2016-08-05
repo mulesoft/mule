@@ -12,6 +12,10 @@
     <name>Mule HTTP Connector</name>
     <description>Provides components for exposing and consuming HTTP services</description>
 
+    <properties>
+        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.mule</groupId>

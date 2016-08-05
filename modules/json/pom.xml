@@ -11,6 +11,10 @@
     <name>JSON Module</name>
     <description>Implementation of JSON transformers for Mule</description>
 
+    <properties>
+        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
+    </properties>
+
     <build>
         <pluginManagement>
             <plugins>

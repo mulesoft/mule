@@ -11,6 +11,10 @@
     <name>TLS support module</name>
     <description>A Mule module for connectivity using TLS/SSL authentication.</description>
 
+    <properties>
+        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.mule.transports</groupId>

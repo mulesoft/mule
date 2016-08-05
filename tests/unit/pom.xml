@@ -11,6 +11,10 @@
     <name>Mule Unit Test Framework (TCK)</name>
     <description>Mule Unit Test framework (TCK)</description>
 
+    <properties>
+        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.mule</groupId>

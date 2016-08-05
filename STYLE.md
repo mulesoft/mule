@@ -4,7 +4,7 @@ As a best practice for team development, Mule uses coding conventions to ensure 
 
 ## Coding Conventions
 
-In general, Mule follows [Checkstyle](http://checkstyle.sourceforge.net/) conventions. Refer to this sample [checkstyle.xml](http://www.mulesoft.org/docs/checkstyle.xml) config file for further detail.
+Mule follows code formatting conventions configured in the `formatter.xml` file in the project root. This is a configuration that can be imported in eclipse, and an automatic check is done on compile to ensure that the configuration is being followed.
 
 
 ### JavaDoc Comments

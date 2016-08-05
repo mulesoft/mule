@@ -17,6 +17,10 @@
     <name>Mule Validation Extension</name>
     <description>A Mule extension that provides functionality for performing validations</description>
 
+    <properties>
+        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>commons-validator</groupId>

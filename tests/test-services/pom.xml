@@ -12,6 +12,10 @@
     <packaging>jar</packaging>
     <description>Container services used for testing purposes</description>
 
+    <properties>
+        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.mule</groupId>

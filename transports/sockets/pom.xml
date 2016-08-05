@@ -11,6 +11,10 @@
     <name>Sockets configuration module</name>
     <description>A Mule module for configuring sockets.</description>
 
+    <properties>
+        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.mule.modules</groupId>

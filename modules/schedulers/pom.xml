@@ -11,6 +11,10 @@
 
     <artifactId>mule-module-schedulers</artifactId>
 
+    <properties>
+        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
+    </properties>
+
      <dependencies>
          <dependency>
              <groupId>org.quartz-scheduler</groupId>

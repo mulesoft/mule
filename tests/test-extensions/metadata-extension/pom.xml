@@ -17,4 +17,7 @@
     <name>Mule Metadata Test Extension</name>
     <description>A Mule extension for testing</description>
 
+    <properties>
+        <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
+    </properties>
 </project>

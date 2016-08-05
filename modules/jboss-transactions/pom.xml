@@ -11,6 +11,10 @@
     <name>JBoss Transactions Integration</name>
     <description>Provides access to the JBoss Transaction Service for User and Xa transactions.</description>
 
+    <properties>
+        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.mule</groupId>

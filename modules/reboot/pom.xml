@@ -11,6 +11,10 @@
     <packaging>jar</packaging>
     <name>Mule 3 Container</name>
 
+    <properties>
+        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
+    </properties>
+
     <build>
         <plugins>
             <plugin>

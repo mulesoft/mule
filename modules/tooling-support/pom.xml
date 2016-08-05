@@ -13,6 +13,10 @@
     <name>Tooling</name>
     <description>This modules provides a set of services for tooling applications.</description>
 
+    <properties>
+        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.mule.modules</groupId>

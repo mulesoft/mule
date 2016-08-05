@@ -11,6 +11,10 @@
     <packaging>jar</packaging>
     <name>Mule HTTP Module Integration Tests</name>
 
+    <properties>
+        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
+    </properties>
+
     <build>
         <plugins>
             <plugin>
