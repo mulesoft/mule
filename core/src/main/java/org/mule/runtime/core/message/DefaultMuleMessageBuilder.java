@@ -489,6 +489,8 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
             buf.append(LINE_SEPARATOR);
             buf.append("  payload=").append(getDataType().getType().getName());
             buf.append(LINE_SEPARATOR);
+            buf.append("  mediaType=").append(getDataType().getMediaType());
+            buf.append(LINE_SEPARATOR);
             buf.append("  correlation=").append(getCorrelation().toString());
             buf.append(LINE_SEPARATOR);
             buf.append("  exceptionPayload=").append(ObjectUtils.defaultIfNull(exceptionPayload, NOT_SET));
