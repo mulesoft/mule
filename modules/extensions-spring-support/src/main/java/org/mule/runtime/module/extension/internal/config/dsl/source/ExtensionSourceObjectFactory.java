@@ -106,7 +106,7 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
             }
             catch (Exception e)
             {
-                throw new MuleRuntimeException(createStaticMessage(format("Could not create generator for source '%s'", sourceModel.getName())));
+                throw new MuleRuntimeException(createStaticMessage(format("Could not create generator for source '%s'", sourceModel.getName())), e);
             }
         };
     }
@@ -114,6 +114,11 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
     private RetryPolicyTemplate getRetryPolicyTemplate() throws ConfigurationException
     {
         return retryPolicyTemplate != null ? retryPolicyTemplate : connectionManager.getDefaultRetryPolicyTemplate();
+    }
+
+    public void setRetryPolicyTemplate(RetryPolicyTemplate retryPolicyTemplate)
+    {
+        this.retryPolicyTemplate = retryPolicyTemplate;
     }
 
     private ConfigurationException dynamicParameterException(ResolverSet resolverSet, SourceModel model)
@@ -131,10 +136,5 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
     public void setConfigurationProviderName(String configurationProviderName)
     {
         this.configurationProviderName = configurationProviderName;
-    }
-
-    public void setRetryPolicyTemplate(RetryPolicyTemplate retryPolicyTemplate)
-    {
-        this.retryPolicyTemplate = retryPolicyTemplate;
     }
 }
