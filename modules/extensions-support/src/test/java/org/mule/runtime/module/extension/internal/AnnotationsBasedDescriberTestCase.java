@@ -64,6 +64,7 @@ import org.mule.runtime.extension.api.introspection.declaration.fluent.Operation
 import org.mule.runtime.extension.api.introspection.declaration.fluent.OutputDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ParameterDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.SourceDeclaration;
+import org.mule.runtime.extension.api.introspection.declaration.type.annotation.TypeAliasAnnotation;
 import org.mule.runtime.extension.api.introspection.exception.ExceptionEnricherFactory;
 import org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport;
 import org.mule.runtime.extension.api.introspection.property.MetadataContentModelProperty;
@@ -240,7 +241,9 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
 
         assertOutputType(sourceDynamicAttributes.getOutput(), TYPE_BUILDER.dictionaryType().id(Map.class.getName())
                 .ofKey(TYPE_BUILDER.stringType().id(String.class.getName()))
-                .ofValue(TYPE_BUILDER.objectType().id("java.lang.Object").with(new ClassInformationAnnotation(Object.class, null)))
+                .ofValue(TYPE_BUILDER.objectType().id("java.lang.Object")
+                                 .with(new ClassInformationAnnotation(Object.class, null))
+                                 .with(new TypeAliasAnnotation(Object.class.getSimpleName())))
                 .build(), true);
         assertOutputType(sourceDynamicAttributes.getOutputAttributes(), toMetadataType(StringAttributes.class), true);
         assertParameterType(findParameter(sourceDynamicAttributes.getParameters(), "type"), toMetadataType(String.class), false);
@@ -250,7 +253,9 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
 
         assertOutputType(sourceStaticAttributes.getOutput(), TYPE_BUILDER.dictionaryType().id(Map.class.getName())
                 .ofKey(TYPE_BUILDER.stringType().id(String.class.getName()))
-                .ofValue(TYPE_BUILDER.objectType().id("java.lang.Object").with(new ClassInformationAnnotation(Object.class, null)))
+                .ofValue(TYPE_BUILDER.objectType().id("java.lang.Object")
+                                 .with(new ClassInformationAnnotation(Object.class, null))
+                                 .with(new TypeAliasAnnotation(Object.class.getSimpleName())))
                 .build(), true);
         assertOutputType(sourceStaticAttributes.getOutputAttributes(), toMetadataType(StringAttributes.class), false);
 
@@ -458,6 +463,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         assertParameter(parameters, "weaponTypeFunction", "", TYPE_BUILDER.objectType()
                                 .id(Function.class.getName())
                                 .with(new ClassInformationAnnotation(Function.class, asList(MuleEvent.class, WeaponType.class)))
+                                .with(new TypeAliasAnnotation(Function.class.getSimpleName()))
                                 .build(),
                         false, SUPPORTED, null);
         assertParameter(parameters, "wildCardWeapons", "", arrayOf(List.class, objectTypeBuilder(Weapon.class)), false, SUPPORTED, null);
