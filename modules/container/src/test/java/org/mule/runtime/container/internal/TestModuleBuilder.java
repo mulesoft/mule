@@ -24,7 +24,7 @@ public class TestModuleBuilder
 
     private final String name;
     private Set<String> packages = new HashSet<>();
-    private Set<String> paths = new HashSet<>();
+    private Set<String> resources = new HashSet<>();
 
     /**
      * Creates a new builder
@@ -54,16 +54,16 @@ public class TestModuleBuilder
     }
 
     /**
-     * Adds new resource paths to be exported
+     * Adds new resource resources to be exported
      *
-     * @param paths paths to export
+     * @param resources resources to export
      * @return {@code this}
      */
-    public TestModuleBuilder exportingPaths(String... paths)
+    public TestModuleBuilder exportingResources(String... resources)
     {
-        for (String path : paths)
+        for (String path : resources)
         {
-            this.paths.add(path);
+            this.resources.add(path);
         }
 
         return this;
@@ -76,6 +76,6 @@ public class TestModuleBuilder
      */
     public MuleModule build()
     {
-        return new MuleModule(name, packages, paths);
+        return new MuleModule(name, packages, resources);
     }
 }

@@ -18,6 +18,7 @@ import static org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStra
 import static org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy.PARENT_ONLY;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -28,7 +29,7 @@ import java.util.Set;
 
 import org.junit.Test;
 
-public class ContainerClassLoaderFactoryTestCase
+public class ContainerClassLoaderFactoryTestCase extends AbstractMuleTestCase
 {
 
     @Test
@@ -100,7 +101,7 @@ public class ContainerClassLoaderFactoryTestCase
         final ContainerClassLoaderFactory factory = new ContainerClassLoaderFactory();
         final ModuleDiscoverer moduleDiscoverer = mock(ModuleDiscoverer.class);
         final List<MuleModule> modules = new ArrayList<>();
-        modules.add(new TestModuleBuilder("module1").exportingPaths("META-INF/services/org/mule/runtime/core/config").build());
+        modules.add(new TestModuleBuilder("module1").exportingResources(BOOTSTRAP_PROPERTIES).build());
         when(moduleDiscoverer.discover()).thenReturn(modules);
         factory.setModuleDiscoverer(moduleDiscoverer);
         return factory;

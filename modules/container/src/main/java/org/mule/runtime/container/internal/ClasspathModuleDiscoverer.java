@@ -10,7 +10,7 @@ package org.mule.runtime.container.internal;
 import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.mule.runtime.core.util.PropertiesUtils.discoverProperties;
 import static org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter.EXPORTED_CLASS_PACKAGES_PROPERTY;
-import static org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter.EXPORTED_RESOURCE_PACKAGES_PROPERTY;
+import static org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter.EXPORTED_RESOURCE_PROPERTY;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -85,7 +85,7 @@ public class ClasspathModuleDiscoverer implements ModuleDiscoverer
             }
         }
 
-        final String exportedResourcesProperty = (String) moduleProperties.get(EXPORTED_RESOURCE_PACKAGES_PROPERTY);
+        final String exportedResourcesProperty = (String) moduleProperties.get(EXPORTED_RESOURCE_PROPERTY);
         if (!isEmpty(exportedResourcesProperty))
         {
             for (String path : exportedResourcesProperty.split(","))

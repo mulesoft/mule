@@ -11,12 +11,12 @@ import static java.util.Collections.unmodifiableSet;
 import static org.apache.commons.lang3.builder.ToStringBuilder.reflectionToString;
 import static org.apache.commons.lang3.builder.ToStringStyle.MULTI_LINE_STYLE;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
-
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
 
 import java.util.Collections;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Filters classes and resources using a {@link ArtifactDescriptor} describing
@@ -33,28 +33,45 @@ public class ArtifactClassLoaderFilter implements ClassLoaderFilter
     public static final ArtifactClassLoaderFilter NULL_CLASSLOADER_FILTER = new ArtifactClassLoaderFilter(Collections.EMPTY_SET, Collections.EMPTY_SET);
 
     public static final String EXPORTED_CLASS_PACKAGES_PROPERTY = "artifact.export.classPackages";
-    public static final String EXPORTED_RESOURCE_PACKAGES_PROPERTY = "artifact.export.resourcePackages";
+    public static final String EXPORTED_RESOURCE_PROPERTY = "artifact.export.resources";
 
     private static final char PACKAGE_SEPARATOR = '.';
     private static final String EMPTY_PACKAGE = "";
     private static final char RESOURCE_SEPARATOR = '/';
 
     private final Set<String> exportedClassPackages;
-    private final Set<String> exportedResourcePackages;
+    private final Set<String> exportedResources;
 
     /**
      * Creates a new classLoader filter
      *
      * @param exportedClassPackages    class package names to export. Can be empty
-     * @param exportedResourcePackages resource package names to export. Can be empty
+     * @param exportedResources resource file names to export. Can be empty
      */
-    public ArtifactClassLoaderFilter(Set<String> exportedClassPackages, Set<String> exportedResourcePackages)
+    public ArtifactClassLoaderFilter(Set<String> exportedClassPackages, Set<String> exportedResources)
     {
         checkArgument(exportedClassPackages != null, "Exported class packages cannot be null");
-        checkArgument(exportedResourcePackages != null, "Exported resource packages cannot be null");
+        checkArgument(exportedResources != null, "Exported resource cannot be null");
 
-        this.exportedClassPackages = unmodifiableSet(exportedClassPackages);
-        this.exportedResourcePackages = unmodifiableSet(exportedResourcePackages);
+        this.exportedClassPackages = unmodifiableSet(sanitizeClassPackageS(exportedClassPackages));
+        this.exportedResources = unmodifiableSet(sanitizeExportedResources(exportedResources));
+    }
+
+    private Set<String> sanitizeExportedResources(Set<String> exportedResources)
+    {
+        return exportedResources.stream().map(this::sanitizeResourceName).collect(Collectors.toSet());
+    }
+
+    private Set<String> sanitizeClassPackageS(Set<String> exportedClassPackages)
+    {
+        return exportedClassPackages.stream().map(this::sanitizePackageName).collect(Collectors.toSet());
+    }
+
+    private String sanitizePackageName(String exportedClassPackage)
+    {
+        exportedClassPackage = exportedClassPackage.trim();
+        exportedClassPackage = exportedClassPackage.endsWith(".") ? exportedClassPackage.substring(0, exportedClassPackage.length() - 1) : exportedClassPackage;
+        return exportedClassPackage;
     }
 
     @Override
@@ -70,9 +87,9 @@ public class ArtifactClassLoaderFilter implements ClassLoaderFilter
     public boolean exportsResource(String name)
     {
         checkArgument(name != null, "Resource name cannot be null");
-        final String resourcePackage = getResourceFolder(name);
+        final String sanitizeResourceName = sanitizeResourceName(name);
 
-        return exportedResourcePackages.contains(resourcePackage);
+        return exportedResources.contains(sanitizeResourceName);
     }
 
     /**
@@ -83,15 +100,18 @@ public class ArtifactClassLoaderFilter implements ClassLoaderFilter
         return exportedClassPackages;
     }
 
-    private String getResourceFolder(String resourceName)
+    private String sanitizeResourceName(String resourceName)
     {
-        String pkgName = "";
+        String sanitizedResource = "";
         if (resourceName.length() > 0)
         {
-            pkgName = (resourceName.charAt(0) == RESOURCE_SEPARATOR) ? resourceName.substring(1) : resourceName;
-            pkgName = (pkgName.lastIndexOf(RESOURCE_SEPARATOR) < 0) ? EMPTY_PACKAGE : pkgName.substring(0, pkgName.lastIndexOf(RESOURCE_SEPARATOR));
+            sanitizedResource = (resourceName.charAt(0) == RESOURCE_SEPARATOR) ? resourceName.substring(1) : resourceName;
+            if (sanitizedResource.length() > 0)
+            {
+                sanitizedResource = sanitizedResource.charAt(sanitizedResource.length() - 1) == RESOURCE_SEPARATOR ? sanitizedResource.substring(0, sanitizedResource.length() - 1) : sanitizedResource;
+            }
         }
-        return pkgName;
+        return sanitizedResource;
     }
 
     private String getPackageName(String className)
