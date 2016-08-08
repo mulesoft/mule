@@ -15,4 +15,13 @@
         <vm:outbound-endpoint path="out"/>
         <set-property propertyName="Content-Type" value="application/x-www-form-urlencoded"/>
     </flow>
+
+    <flow name="testFlow2">
+        <http:listener config-ref="listenerConfig"  path="map">
+            <http:response-builder>
+                <http:header headerName="Content-Type" value="application/x-www-form-urlencoded"/>
+            </http:response-builder>
+        </http:listener>
+        <expression-transformer expression="#[message.inboundProperties.'http.query.params']"/>
+    </flow>
 </mule>

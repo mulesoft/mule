@@ -6,6 +6,8 @@
  */
 package org.mule.module.http.functional.listener;
 
+import static org.apache.http.HttpVersion.HTTP_1_0;
+import static org.apache.http.HttpVersion.HTTP_1_1;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -147,6 +149,24 @@ public class HttpListenerUrlEncodedTestCase extends FunctionalTestCase
         assertThat(response.getStatusCode(), is(200));
     }
 
+    @Test
+    public void emptyParameterMapHttp10() throws Exception
+    {
+        final Response response = Request.Post(getListenerUrl("map"))
+                .version(HTTP_1_0).execute();
+
+        assertThat(response.returnResponse().getStatusLine().getStatusCode(), is(200));
+    }
+
+    @Test
+    public void emptyParameterMapHttp11() throws Exception
+    {
+        final Response response = Request.Post(getListenerUrl("map"))
+                .version(HTTP_1_1).execute();
+
+        assertThat(response.returnResponse().getStatusLine().getStatusCode(), is(200));
+    }
+
     private void assertNullPayloadAndEmptyResponse(Response response) throws Exception
     {
         final MuleMessage receivedMessage = muleContext.getClient().request(VM_OUTPUT_ENDPOINT, 1000);
@@ -165,9 +185,14 @@ public class HttpListenerUrlEncodedTestCase extends FunctionalTestCase
         assertThat(payloadAsMap, ParamMapMatcher.isEqual(HttpParser.decodeUrlEncodedBody(responseContent, Charsets.UTF_8.name()).toListValuesMap()));
     }
 
+    private String getListenerUrl(String path)
+    {
+        return String.format("http://localhost:%s/%s", listenPort.getNumber(), path);
+    }
+
     private String getListenerUrl()
     {
-        return String.format("http://localhost:%s/%s", listenPort.getNumber(), path.getValue());
+        return getListenerUrl(path.getValue());
     }
 
 }

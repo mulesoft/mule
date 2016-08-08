@@ -174,8 +174,13 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
                 }
                 else
                 {
-                    ByteArrayHttpEntity byteArrayHttpEntity = (ByteArrayHttpEntity) httpEntity;
-                    setupContentLengthEncoding(httpResponseHeaderBuilder, byteArrayHttpEntity.getContent().length);
+                    if (httpEntity instanceof EmptyHttpEntity)
+                    {
+                        setupContentLengthEncoding(httpResponseHeaderBuilder, 0);
+                    } else {
+                        ByteArrayHttpEntity byteArrayHttpEntity = (ByteArrayHttpEntity) httpEntity;
+                        setupContentLengthEncoding(httpResponseHeaderBuilder, byteArrayHttpEntity.getContent().length);
+                    }
                 }
             }
             else if (payload instanceof InputStream)
