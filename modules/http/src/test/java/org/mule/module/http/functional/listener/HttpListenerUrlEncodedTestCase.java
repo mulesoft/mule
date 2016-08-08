@@ -9,10 +9,10 @@ package org.mule.module.http.functional.listener;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.module.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
 import org.mule.api.MuleMessage;
-import org.mule.module.http.api.HttpHeaders;
 import org.mule.module.http.internal.HttpParser;
 import org.mule.module.http.internal.ParameterMap;
 import org.mule.module.http.matcher.ParamMapMatcher;
@@ -141,7 +141,7 @@ public class HttpListenerUrlEncodedTestCase extends FunctionalTestCase
         AsyncHttpClient asyncHttpClient = new AsyncHttpClient(new GrizzlyAsyncHttpProvider(asyncHttpClientConfig), asyncHttpClientConfig);
         ListenableFuture<com.ning.http.client.Response> responseFuture = asyncHttpClient.
                 preparePost(getListenerUrl()).setBody("a=1&b=2").
-                addHeader(HttpHeaders.Names.CONTENT_TYPE, HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED).execute();
+                addHeader(CONTENT_TYPE, APPLICATION_X_WWW_FORM_URLENCODED).execute();
         com.ning.http.client.Response response = responseFuture.get();
 
         assertThat(response.getStatusCode(), is(200));
@@ -153,14 +153,14 @@ public class HttpListenerUrlEncodedTestCase extends FunctionalTestCase
         assertThat(receivedMessage.getPayload(), IsInstanceOf.instanceOf(NullPayload.class));
 
         final HttpResponse httpResponse = response.returnResponse();
-        assertThat(httpResponse.getFirstHeader(HttpHeaders.Names.CONTENT_LENGTH).getValue(), Is.is("0"));
+        assertThat(httpResponse.getFirstHeader(CONTENT_LENGTH).getValue(), Is.is("0"));
         assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is(StringUtils.EMPTY));
     }
 
     private void compareParameterMaps(Response response, ParameterMap payloadAsMap) throws IOException
     {
         final HttpResponse httpResponse = response.returnResponse();
-        assertThat(httpResponse.getFirstHeader(HttpHeaders.Names.CONTENT_TYPE).getValue(), Is.is(HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED));
+        assertThat(httpResponse.getFirstHeader(CONTENT_TYPE).getValue(), Is.is(APPLICATION_X_WWW_FORM_URLENCODED));
         final String responseContent = IOUtils.toString(httpResponse.getEntity().getContent());
         assertThat(payloadAsMap, ParamMapMatcher.isEqual(HttpParser.decodeUrlEncodedBody(responseContent, Charsets.UTF_8.name()).toListValuesMap()));
     }
