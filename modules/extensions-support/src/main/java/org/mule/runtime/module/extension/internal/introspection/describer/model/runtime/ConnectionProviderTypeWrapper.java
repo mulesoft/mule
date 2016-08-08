@@ -8,20 +8,21 @@ package org.mule.runtime.module.extension.internal.introspection.describer.model
 
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.ConnectionProviderElement;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.ParameterizableTypeElement;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 
 import java.lang.reflect.Type;
 import java.util.List;
 
 /**
- * {@link TypeBasedComponentWrapper} specification for classes that are considered as Connection Providers
+ * {@link TypeWrapper} specification for classes that are considered as Connection Providers
  *
  * @since 4.0
  */
-public class ConnectionProviderTypeWrapper<T> extends TypeBasedComponentWrapper implements ConnectionProviderElement
+class ConnectionProviderTypeWrapper<T> extends TypeWrapper implements ConnectionProviderElement, ParameterizableTypeElement
 {
 
-    public ConnectionProviderTypeWrapper(Class<T> aClass)
+    ConnectionProviderTypeWrapper(Class<T> aClass)
     {
         super(aClass);
     }

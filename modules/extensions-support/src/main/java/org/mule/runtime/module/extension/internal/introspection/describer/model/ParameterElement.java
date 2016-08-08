@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.internal.introspection.describer.model
 import java.lang.reflect.Parameter;
 
 /**
- * A contract for an element to be considered as a Parameter
+ * A contract for an element from which a parameter can be derived
  *
  * @since 4.0
  */

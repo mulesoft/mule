@@ -12,6 +12,7 @@ import static java.util.stream.Collectors.toList;
 import org.mule.runtime.extension.api.annotation.Configurations;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.ConfigurationElement;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.ExtensionElement;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.ParameterizableTypeElement;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,7 +23,7 @@ import java.util.stream.Stream;
  *
  * @since 4.0
  */
-public class ExtensionTypeWrapper<T> extends ConfigurationWrapper implements ExtensionElement
+public class ExtensionTypeWrapper<T> extends DeclaringPointWrapper implements ExtensionElement, ParameterizableTypeElement
 {
 
     public ExtensionTypeWrapper(Class<T> aClass)
@@ -31,7 +32,7 @@ public class ExtensionTypeWrapper<T> extends ConfigurationWrapper implements Ext
     }
 
     /**
-     * @return A list {@link TypeBasedComponentWrapper} of declared configurations
+     * @return A list {@link ConfigurationElement} of declared configurations
      */
     public List<ConfigurationElement> getConfigurations()
     {

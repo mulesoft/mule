@@ -12,11 +12,11 @@ import java.lang.reflect.Type;
 import java.util.List;
 
 /**
- * A contract for an element to be considered as a Message Source
+ * A contract for an element from which a message source can be derived
  *
  * @since 4.0
  */
-public interface SourceElement extends TypeBasedComponent
+public interface SourceElement extends ParameterizableTypeElement
 {
 
     /**

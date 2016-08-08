@@ -9,11 +9,11 @@ package org.mule.runtime.module.extension.internal.introspection.describer.model
 import java.util.List;
 
 /**
- * A contract for an element to be considered as a Extension
+ * A contract for an element from which an Extension can be derived
  *
  * @since 4.0
  */
-public interface ExtensionElement extends TypeBasedComponent, ConfigurationElement
+public interface ExtensionElement extends ParameterizableTypeElement, DeclaringPointElement
 {
 
     /**

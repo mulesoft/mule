@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.introspection.describer.model;
 
 /**
- * A contract for a element to be considered as Operation Container
+ * A contract for a element from which operation container can be derived
  *
  * @since 4.0
  */

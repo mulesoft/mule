@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.introspection.describer.model.runtime;
 
+import static java.lang.String.format;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.FieldElement;
@@ -100,6 +102,6 @@ public class FieldWrapper implements FieldElement
     @Override
     public String getOwnerDescription()
     {
-        return "Class " + field.getDeclaringClass().getSimpleName();
+        return format("Class: '%s'", field.getDeclaringClass().getSimpleName());
     }
 }

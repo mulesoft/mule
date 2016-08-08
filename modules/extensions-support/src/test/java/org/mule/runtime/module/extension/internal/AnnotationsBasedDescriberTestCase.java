@@ -72,7 +72,6 @@ import org.mule.runtime.module.extension.internal.exception.IllegalConfiguration
 import org.mule.runtime.module.extension.internal.exception.IllegalOperationModelDefinitionException;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingTypeModelProperty;
 import org.mule.tck.message.IntegerAttributes;
-import org.mule.tck.message.StringAttributes;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Fruit;
 import org.mule.test.heisenberg.extension.HeisenbergConnectionProvider;
@@ -87,8 +86,6 @@ import org.mule.test.heisenberg.extension.model.KnockeableDoor;
 import org.mule.test.heisenberg.extension.model.Ricin;
 import org.mule.test.heisenberg.extension.model.Weapon;
 import org.mule.test.heisenberg.extension.model.types.WeaponType;
-import org.mule.test.metadata.extension.MetadataExtension;
-import org.mule.test.metadata.extension.model.attribute.AbstractOutputAttributes;
 import org.mule.test.petstore.extension.PetStoreConnector;
 import org.mule.test.vegan.extension.PaulMcCartneySource;
 import org.mule.test.vegan.extension.VeganAttributes;
@@ -115,7 +112,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedDescriberTestCase
 {
 
-    public static final String GET_GRAMS_IN_STORAGE = "getGramsInStorage";
+    private static final String GET_GRAMS_IN_STORAGE = "getGramsInStorage";
     private static final String EXTENDED_CONFIG_NAME = "extendedConfig";
     private static final String EXTENDED_CONFIG_DESCRIPTION = "extendedDescription";
     private static final String SOURCE_NAME = "ListenPayments";

@@ -23,7 +23,7 @@ import java.lang.reflect.Field;
 import java.util.Set;
 
 /**
- * A contract for any kind of component to be considered as an extension parameter
+ * A contract for any kind of component from which an extension's parameter can be derived
  *
  * @since 4.0
  */

@@ -24,10 +24,7 @@ import org.mule.runtime.extension.api.introspection.declaration.fluent.Extension
 import org.mule.runtime.extension.api.introspection.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.OutputDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ParameterDeclaration;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.ParameterizedInterceptableDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.SourceDeclaration;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.WithOperationsDeclaration;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.WithSourcesDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.spi.ModelEnricher;
 import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.introspection.metadata.MetadataResolverFactory;
@@ -52,7 +49,7 @@ import java.util.Optional;
  *
  * @since 4.0
  */
-public class DynamicMetadataModelEnricher implements ModelEnricher
+public class DynamicMetadataModelEnricher extends AbstractAnnotatedModelEnricher
 {
 
     private Class<?> extensionType;
@@ -61,32 +58,27 @@ public class DynamicMetadataModelEnricher implements ModelEnricher
     @Override
     public void enrich(DescribingContext describingContext)
     {
-        final Optional<ImplementingTypeModelProperty> modelProperty = describingContext
-                .getExtensionDeclarer()
-                .getDeclaration()
-                .getModelProperty(ImplementingTypeModelProperty.class);
-
-        if (modelProperty.isPresent())
+        extensionType = extractExtensionType(describingContext.getExtensionDeclarer().getDeclaration());
+        if (extensionType != null)
         {
-            extensionType = modelProperty.get().getType();
             typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(Thread.currentThread().getContextClassLoader());
 
             new IdempotentDeclarationWalker()
             {
                 @Override
-                public void onSource(WithSourcesDeclaration owner, SourceDeclaration declaration)
+                public void onSource(SourceDeclaration declaration)
                 {
                     enrichSourceMetadata(declaration);
                 }
 
                 @Override
-                public void onOperation(WithOperationsDeclaration owner, OperationDeclaration declaration)
+                public void onOperation(OperationDeclaration declaration)
                 {
                     enrichOperationMetadata(declaration);
                 }
 
                 @Override
-                public void onParameter(ParameterizedInterceptableDeclaration owner, ParameterDeclaration declaration)
+                public void onParameter(ParameterDeclaration declaration)
                 {
                     enrichParameter(declaration);
                 }

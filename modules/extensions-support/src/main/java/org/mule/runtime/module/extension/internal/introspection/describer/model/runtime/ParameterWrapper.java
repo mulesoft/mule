@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.introspection.describer.model.runtime;
 
+import static java.lang.String.format;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.ParameterElement;
@@ -95,6 +97,6 @@ public final class ParameterWrapper implements ParameterElement
     @Override
     public String getOwnerDescription()
     {
-        return "Method " + owner.getName();
+        return format("Method: '%s'", owner.getName());
     }
 }

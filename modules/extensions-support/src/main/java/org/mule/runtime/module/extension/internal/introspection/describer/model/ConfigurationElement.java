@@ -7,11 +7,11 @@
 package org.mule.runtime.module.extension.internal.introspection.describer.model;
 
 /**
- * A contract for an element to be considered as an extension configuration
+ * A contract for an element from which an extension configuration can be derived
  *
  * @since 4.0
  */
-public interface ConfigurationElement extends TypeBasedComponent, WithMessageSources, WithOperationContainers, WithConnectionProviders
+public interface ConfigurationElement extends ParameterizableTypeElement, DeclaringPointElement
 {
 
 }

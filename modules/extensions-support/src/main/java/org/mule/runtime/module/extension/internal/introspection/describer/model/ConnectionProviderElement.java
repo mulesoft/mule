@@ -7,11 +7,11 @@
 package org.mule.runtime.module.extension.internal.introspection.describer.model;
 
 /**
- * A contract for an element to be considered as a Connection Provider
+ * A contract for an element from which an extension connection provider can be derived
  *
  * @since 4.0
  */
-public interface ConnectionProviderElement extends TypeBasedComponent, WithParameters, WithGenerics
+public interface ConnectionProviderElement extends ParameterizableTypeElement, WithParameters, WithGenerics
 {
 
 }

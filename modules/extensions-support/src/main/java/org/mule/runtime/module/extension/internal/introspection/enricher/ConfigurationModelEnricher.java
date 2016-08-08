@@ -14,14 +14,12 @@ import org.mule.runtime.extension.api.introspection.declaration.fluent.BaseDecla
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.SourceDeclaration;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.WithOperationsDeclaration;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.WithSourcesDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.spi.ModelEnricher;
 import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.ExtensionParameter;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.WithParameters;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.runtime.MethodWrapper;
-import org.mule.runtime.module.extension.internal.introspection.describer.model.runtime.TypeBasedComponentWrapper;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.runtime.ParameterizableTypeWrapper;
 import org.mule.runtime.module.extension.internal.model.property.ConfigTypeModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ConnectivityModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingMethodModelProperty;
@@ -29,7 +27,6 @@ import org.mule.runtime.module.extension.internal.model.property.ImplementingTyp
 import org.mule.runtime.module.extension.internal.util.IdempotentDeclarationWalker;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * {@link ModelEnricher} implementation that walks through a {@link ExtensionDeclaration} and looks for annotated
@@ -38,7 +35,7 @@ import java.util.Optional;
  *
  * @since 4.0
  */
-public class ConfigurationModelEnricher implements ModelEnricher
+public class ConfigurationModelEnricher extends AbstractAnnotatedModelEnricher
 {
 
     private ClassTypeLoader typeLoader;
@@ -46,28 +43,24 @@ public class ConfigurationModelEnricher implements ModelEnricher
     @Override
     public void enrich(DescribingContext describingContext)
     {
-        final Optional<ImplementingTypeModelProperty> optionalImplementingProperty = describingContext
-                .getExtensionDeclarer()
-                .getDeclaration()
-                .getModelProperty(ImplementingTypeModelProperty.class);
-
-        if (optionalImplementingProperty.isPresent())
+        final Class<?> extensionType = extractExtensionType(describingContext.getExtensionDeclarer().getDeclaration());
+        if (extensionType != null)
         {
-            typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(optionalImplementingProperty.get().getType().getClassLoader());
+            typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(Thread.currentThread().getContextClassLoader());
             new IdempotentDeclarationWalker()
             {
                 @Override
-                public void onOperation(WithOperationsDeclaration owner, OperationDeclaration declaration)
+                public void onOperation(OperationDeclaration declaration)
                 {
                     declaration.getModelProperty(ImplementingMethodModelProperty.class)
                             .ifPresent(implementingProperty -> contribute(declaration, new MethodWrapper(implementingProperty.getMethod())));
                 }
 
                 @Override
-                public void onSource(WithSourcesDeclaration owner, SourceDeclaration declaration)
+                public void onSource(SourceDeclaration declaration)
                 {
                     declaration.getModelProperty(ImplementingTypeModelProperty.class)
-                            .ifPresent(implementingProperty -> contribute(declaration, new TypeBasedComponentWrapper(implementingProperty.getType())));
+                            .ifPresent(implementingProperty -> contribute(declaration, new ParameterizableTypeWrapper(implementingProperty.getType())));
                 }
             }.walk(describingContext.getExtensionDeclarer().getDeclaration());
         }

@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.introspection.describer.model;
 
 /**
- * A generic contract for any kind of component that can contain a name
+ * A generic contract for any kind of component from which, a name can be derived
  *
  * @since 4.0
  */

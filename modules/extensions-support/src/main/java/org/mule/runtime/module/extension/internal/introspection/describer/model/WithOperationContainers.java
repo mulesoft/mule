@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.internal.introspection.describer.model
 import java.util.List;
 
 /**
- * A generic contract for any kind of component that could contain a type that can define operations containers
+ * A generic contract for any kind of component from which, a list of operation containers can be derived
  *
  * @since 4.0
  */

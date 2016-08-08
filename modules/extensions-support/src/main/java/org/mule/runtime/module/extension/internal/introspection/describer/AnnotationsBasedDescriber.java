@@ -41,6 +41,7 @@ import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
+import org.mule.runtime.extension.api.introspection.Named;
 import org.mule.runtime.extension.api.introspection.connection.ConnectionManagementType;
 import org.mule.runtime.extension.api.introspection.declaration.DescribingContext;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ConfigurationDeclarer;
@@ -66,6 +67,7 @@ import org.mule.runtime.module.extension.internal.exception.IllegalOperationMode
 import org.mule.runtime.module.extension.internal.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.ConfigurationElement;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.ConnectionProviderElement;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.DeclaringPointElement;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.ExtensionElement;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.ExtensionParameter;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.ExtensionTypeFactory;
@@ -194,7 +196,7 @@ public final class AnnotationsBasedDescriber implements Describer
         }
     }
 
-    private void declareConfiguration(ExtensionDeclarer declaration, ConfigurationElement extensionType, ConfigurationElement configurationType)
+    private void declareConfiguration(ExtensionDeclarer declaration, ExtensionElement extensionType, DeclaringPointElement configurationType)
     {
         checkConfigurationIsNotAnOperation(configurationType.getDeclaredClass());
         ConfigurationDeclarer configurationDeclarer;
@@ -502,9 +504,10 @@ public final class AnnotationsBasedDescriber implements Describer
             final long count = parameters.stream().filter(param -> param.isAnnotatedWith(annotation)).count();
             if (count > 1)
             {
-                throw new IllegalModelDefinitionException(format("The defined parameter from [%s], uses the annotation @%s more than once",
+                throw new IllegalModelDefinitionException(format("The defined parameters %s from %s, uses the annotation @%s more than once",
+                                                                 parameters.stream().map(Named::getName).collect(toList()),
                                                                  parameters.get(0).getOwnerDescription(),
-                                                                 annotation.getName()));
+                                                                 annotation.getSimpleName()));
             }
         }
     }

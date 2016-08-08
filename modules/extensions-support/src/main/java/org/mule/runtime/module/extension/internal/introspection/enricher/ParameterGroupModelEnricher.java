@@ -17,7 +17,6 @@ import org.mule.runtime.extension.api.introspection.declaration.fluent.Connectio
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.SourceDeclaration;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.WithSourcesDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.spi.ModelEnricher;
 import org.mule.runtime.module.extension.internal.introspection.ParameterGroup;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.ExtensionParameter;
@@ -26,7 +25,7 @@ import org.mule.runtime.module.extension.internal.introspection.describer.model.
 import org.mule.runtime.module.extension.internal.introspection.describer.model.Type;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.runtime.FieldWrapper;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.runtime.MethodWrapper;
-import org.mule.runtime.module.extension.internal.introspection.describer.model.runtime.TypeBasedComponentWrapper;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.runtime.ParameterizableTypeWrapper;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingMethodModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
@@ -53,7 +52,7 @@ public class ParameterGroupModelEnricher implements ModelEnricher
         new IdempotentDeclarationWalker()
         {
             @Override
-            public void onSource(WithSourcesDeclaration owner, SourceDeclaration declaration)
+            public void onSource(SourceDeclaration declaration)
             {
                 enrich(declaration);
             }
@@ -92,7 +91,7 @@ public class ParameterGroupModelEnricher implements ModelEnricher
                         implementingType ->
                         {
                             final Class<?> type = implementingType.getType();
-                            final List<FieldElement> parameterGroups = new TypeBasedComponentWrapper(type).getAnnotatedFields(org.mule.runtime.extension.api.annotation.ParameterGroup.class);
+                            final List<FieldElement> parameterGroups = new ParameterizableTypeWrapper(type).getAnnotatedFields(org.mule.runtime.extension.api.annotation.ParameterGroup.class);
                             if (!parameterGroups.isEmpty())
                             {
                                 baseDeclaration.addModelProperty(new ParameterGroupModelProperty(parameterGroups

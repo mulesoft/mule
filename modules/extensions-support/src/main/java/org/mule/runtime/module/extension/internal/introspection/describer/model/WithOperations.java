@@ -11,7 +11,7 @@ import org.mule.runtime.module.extension.internal.introspection.describer.model.
 import java.util.List;
 
 /**
- * A generic contract for any kind of component that could contain operations
+ * A generic contract for any kind of component from which, a list of operations can be derived
  *
  * @since 4.0
  */

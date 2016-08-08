@@ -8,17 +8,18 @@ package org.mule.runtime.module.extension.internal.introspection.describer.model
 
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.SourceElement;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.ParameterizableTypeElement;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 
 import java.lang.reflect.Type;
 import java.util.List;
 
 /**
- * {@link TypeBasedComponentWrapper} specification for {@link Source} types.
+ * {@link TypeWrapper} specification for {@link Source} types.
  *
  * @since 4.0
  */
-final class SourceTypeWrapper<T extends Source> extends TypeBasedComponentWrapper implements SourceElement
+final class SourceTypeWrapper<T extends Source> extends TypeWrapper implements SourceElement, ParameterizableTypeElement
 {
 
     private final Class<T> aClass;

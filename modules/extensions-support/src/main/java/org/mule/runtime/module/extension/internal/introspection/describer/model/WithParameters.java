@@ -10,7 +10,7 @@ import java.lang.annotation.Annotation;
 import java.util.List;
 
 /**
- * A generic contract for any kind of component that could contain parameters
+ * A generic contract for any kind of component from which, a list of parameters can be derived
  *
  * @since 4.0
  */

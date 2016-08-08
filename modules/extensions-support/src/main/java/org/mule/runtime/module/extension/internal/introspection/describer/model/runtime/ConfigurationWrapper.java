@@ -6,87 +6,27 @@
  */
 package org.mule.runtime.module.extension.internal.introspection.describer.model.runtime;
 
-import static java.util.Arrays.stream;
-import static java.util.Collections.emptyList;
-import static java.util.stream.Collectors.toList;
-
-import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.ParameterGroup;
-import org.mule.runtime.extension.api.annotation.Sources;
-import org.mule.runtime.extension.api.annotation.connector.Providers;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.ConfigurationElement;
-import org.mule.runtime.module.extension.internal.introspection.describer.model.ConnectionProviderElement;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.ExtensionParameter;
-import org.mule.runtime.module.extension.internal.introspection.describer.model.OperationContainerElement;
-import org.mule.runtime.module.extension.internal.introspection.describer.model.SourceElement;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.ParameterizableTypeElement;
 
 import com.google.common.collect.ImmutableList;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
- * {@link TypeBasedComponentWrapper} specification for classes that are considered as Configurations
+ * {@link TypeWrapper} specification for classes that are considered as Configurations
  *
  * @since 4.0
  */
-public class ConfigurationWrapper extends TypeBasedComponentWrapper implements ConfigurationElement
+class ConfigurationWrapper extends DeclaringPointWrapper implements ConfigurationElement, ParameterizableTypeElement
 {
 
-    public ConfigurationWrapper(Class aClass)
+    ConfigurationWrapper(Class aClass)
     {
         super(aClass);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public List<SourceElement> getSources()
-    {
-        final Optional<Sources> optionalSources = this.getAnnotation(Sources.class);
-        if (optionalSources.isPresent())
-        {
-            return stream(optionalSources.get().value())
-                    .map(SourceTypeWrapper::new)
-                    .collect(toList());
-        }
-        return emptyList();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public List<OperationContainerElement> getOperationContainers()
-    {
-
-        final Optional<Operations> optionalOperations = this.getAnnotation(Operations.class);
-        if (optionalOperations.isPresent())
-        {
-            return stream(optionalOperations.get().value())
-                    .map(OperationContainerWrapper::new)
-                    .collect(toList());
-        }
-        return emptyList();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public List<ConnectionProviderElement> getConnectionProviders()
-    {
-
-        final Optional<Providers> optionalProviders = this.getAnnotation(Providers.class);
-        if (optionalProviders.isPresent())
-        {
-            return stream(optionalProviders.get().value())
-                    .map(ConnectionProviderTypeWrapper::new)
-                    .collect(toList());
-        }
-        return emptyList();
     }
 
     /**
