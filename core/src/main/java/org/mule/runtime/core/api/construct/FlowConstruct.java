@@ -6,12 +6,11 @@
  */
 package org.mule.runtime.core.api.construct;
 
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.meta.NamedObject;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.lifecycle.LifecycleStateEnabled;
 import org.mule.runtime.core.api.processor.MessageProcessor;
-import org.mule.runtime.core.api.routing.MessageInfoMapping;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.management.stats.FlowConstructStatistics;
 
@@ -33,12 +32,6 @@ public interface FlowConstruct extends NamedObject, LifecycleStateEnabled
      * @return The statistics holder used by this flow construct to keep track of its activity.
      */
     FlowConstructStatistics getStatistics();
-
-    /**
-     * @return This implementation of {@link MessageInfoMapping} used to control how Important message
-     *         information is pulled from the current message.
-     */
-    MessageInfoMapping getMessageInfoMapping();
 
     /**
      * @return This muleContext that this flow construct belongs to and runs in the context of.

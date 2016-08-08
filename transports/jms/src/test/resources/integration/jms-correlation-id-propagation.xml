@@ -17,8 +17,8 @@
     </flow>
 
     <flow name="withCustomCorrelationId">
+        <transports:set-correlation-id correlationId="#['custom-cid']"/>
         <transports:outbound-endpoint ref="in" />
-        <expression-message-info-mapping messageIdExpression="#[message.id]" correlationIdExpression="#['custom-cid']"/>
     </flow>
 
     <flow name="withNoCorrelationId">

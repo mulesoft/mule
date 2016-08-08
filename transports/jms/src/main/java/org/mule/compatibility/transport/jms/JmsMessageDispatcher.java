@@ -427,14 +427,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
      */
     private String resolveMuleCorrelationId(MuleEvent event) throws JMSException
     {
-        if (event.getFlowConstruct() != null && event.getFlowConstruct().getMessageInfoMapping() != null)
-        {
-            return event.getFlowConstruct().getMessageInfoMapping().getCorrelationId(event);
-        }
-        else
-        {
-            return defaultMessageInfoMapping.getCorrelationId(event);
-        }
+        return event.getMessage().getCorrelation().getId().orElse(event.getMessage().getUniqueId());
     }
 
     protected MuleMessage createMessageWithJmsMessagePayload(Message jmsMessage) throws Exception

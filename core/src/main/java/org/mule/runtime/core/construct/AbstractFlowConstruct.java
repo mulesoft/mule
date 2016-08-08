@@ -10,6 +10,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+
 import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
@@ -22,15 +23,12 @@ import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
-import org.mule.runtime.core.api.lifecycle.LifecycleCallback;
 import org.mule.runtime.core.api.lifecycle.LifecycleState;
 import org.mule.runtime.core.api.processor.MessageProcessor;
-import org.mule.runtime.core.api.routing.MessageInfoMapping;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.lifecycle.EmptyLifecycleCallback;
 import org.mule.runtime.core.management.stats.FlowConstructStatistics;
-import org.mule.runtime.core.routing.MuleMessageInfoMapping;
 import org.mule.runtime.core.util.ClassUtils;
 
 import java.beans.ExceptionListener;
@@ -65,7 +63,6 @@ public abstract class AbstractFlowConstruct extends AbstractAnnotatedObject impl
     protected final FlowConstructLifecycleManager lifecycleManager;
     protected final MuleContext muleContext;
     protected FlowConstructStatistics statistics;
-    protected MessageInfoMapping messageInfoMapping = new MuleMessageInfoMapping();
 
     /**
      * The initial states that the flow can be started in
@@ -86,6 +83,7 @@ public abstract class AbstractFlowConstruct extends AbstractAnnotatedObject impl
         this.lifecycleManager = new FlowConstructLifecycleManager(this, muleContext);
     }
 
+    @Override
     public final void initialise() throws InitialisationException
     {
         try
@@ -94,15 +92,12 @@ public abstract class AbstractFlowConstruct extends AbstractAnnotatedObject impl
             {
                 this.exceptionListener = muleContext.getDefaultExceptionStrategy();
             }
-            lifecycleManager.fireInitialisePhase(new LifecycleCallback<FlowConstruct>()
+            lifecycleManager.fireInitialisePhase((phaseName, object) ->
             {
-                public void onTransition(String phaseName, FlowConstruct object) throws MuleException
-                {
-                    injectFlowConstructMuleContext(exceptionListener);
-                    initialiseIfInitialisable(exceptionListener);
-                    validateConstruct();
-                    doInitialise();
-                }
+                injectFlowConstructMuleContext(exceptionListener);
+                initialiseIfInitialisable(exceptionListener);
+                validateConstruct();
+                doInitialise();
             });
 
         }
@@ -116,6 +111,7 @@ public abstract class AbstractFlowConstruct extends AbstractAnnotatedObject impl
         }
     }
 
+    @Override
     public final void start() throws MuleException
     {
         // Check if Initial State is Stopped
@@ -128,28 +124,24 @@ public abstract class AbstractFlowConstruct extends AbstractAnnotatedObject impl
             return;
         }
 
-        lifecycleManager.fireStartPhase(new LifecycleCallback<FlowConstruct>()
+        lifecycleManager.fireStartPhase((phaseName, object) ->
         {
-            public void onTransition(String phaseName, FlowConstruct object) throws MuleException
-            {
-                startIfStartable(exceptionListener);
-                doStart();
-            }
+            startIfStartable(exceptionListener);
+            doStart();
         });
     }
 
+    @Override
     public final void stop() throws MuleException
     {
-        lifecycleManager.fireStopPhase(new LifecycleCallback<FlowConstruct>()
+        lifecycleManager.fireStopPhase((phaseName, object) ->
         {
-            public void onTransition(String phaseName, FlowConstruct object) throws MuleException
-            {
-                doStop();
-                stopIfStoppable(exceptionListener);
-            }
+            doStop();
+            stopIfStoppable(exceptionListener);
         });
     }
 
+    @Override
     public final void dispose()
     {
         try
@@ -159,13 +151,10 @@ public abstract class AbstractFlowConstruct extends AbstractAnnotatedObject impl
                 stop();
             }
 
-            lifecycleManager.fireDisposePhase(new LifecycleCallback<FlowConstruct>()
+            lifecycleManager.fireDisposePhase((phaseName, object) ->
             {
-                public void onTransition(String phaseName, FlowConstruct object) throws MuleException
-                {
-                    doDispose();
-                    disposeIfDisposable(exceptionListener);
-                }
+                doDispose();
+                disposeIfDisposable(exceptionListener);
             });
         }
         catch (MuleException e)
@@ -189,11 +178,13 @@ public abstract class AbstractFlowConstruct extends AbstractAnnotatedObject impl
         return lifecycleManager.getState().isStopping();
     }
 
+    @Override
     public String getName()
     {
         return name;
     }
 
+    @Override
     public MessagingExceptionHandler getExceptionListener()
     {
         return exceptionListener;
@@ -214,29 +205,22 @@ public abstract class AbstractFlowConstruct extends AbstractAnnotatedObject impl
         this.initialState = initialState;
     }
 
+    @Override
     public LifecycleState getLifecycleState()
     {
         return lifecycleManager.getState();
     }
 
+    @Override
     public MuleContext getMuleContext()
     {
         return muleContext;
     }
 
+    @Override
     public FlowConstructStatistics getStatistics()
     {
         return statistics;
-    }
-
-    public MessageInfoMapping getMessageInfoMapping()
-    {
-        return messageInfoMapping;
-    }
-
-    public void setMessageInfoMapping(MessageInfoMapping messageInfoMapping)
-    {
-        this.messageInfoMapping = messageInfoMapping;
     }
 
     protected void doInitialise() throws MuleException

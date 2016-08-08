@@ -17,6 +17,7 @@ import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromConfigur
 import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromType;
 import static org.mule.runtime.config.spring.dsl.processor.xml.CoreXmlNamespaceInfoProvider.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.core.retry.policies.SimpleRetryPolicyTemplate.RETRY_COUNT_FOREVER;
+
 import org.mule.runtime.config.spring.MuleConfigurationConfigurator;
 import org.mule.runtime.config.spring.NotificationConfig;
 import org.mule.runtime.config.spring.ServerNotificationManagerConfigurator;
@@ -44,7 +45,6 @@ import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
-import org.mule.runtime.core.api.routing.MessageInfoMapping;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.schedule.SchedulerFactory;
 import org.mule.runtime.core.api.source.MessageSource;
@@ -288,7 +288,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
                                                  .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(MessageProcessor.class).build())
                                                  .withSetterParameterDefinition(EXCEPTION_LISTENER_ATTRIBUTE, fromChildConfiguration(MessagingExceptionHandler.class).build())
                                                  .withSetterParameterDefinition("processingStrategy", fromSimpleReferenceParameter("processingStrategy").build())
-                                                 .withSetterParameterDefinition("messageInfoMapping", fromChildConfiguration(MessageInfoMapping.class).build())
                                                  .build());
         componentBuildingDefinitions.add(baseDefinition.copy()
                                                  .withIdentifier(SCATTER_GATHER)

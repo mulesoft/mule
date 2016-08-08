@@ -16,6 +16,7 @@ import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.REQUIRED;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.SUPPORTED;
 import static org.springframework.util.ReflectionUtils.setField;
+
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -23,7 +24,6 @@ import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.lifecycle.LifecycleState;
-import org.mule.runtime.core.api.routing.MessageInfoMapping;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
@@ -301,12 +301,6 @@ public class MuleExtensionUtils
 
             @Override
             public FlowConstructStatistics getStatistics()
-            {
-                return null;
-            }
-
-            @Override
-            public MessageInfoMapping getMessageInfoMapping()
             {
                 return null;
             }
