@@ -15,7 +15,7 @@ import java.util.List;
  *
  * @since 4.0
  */
-interface WithGenerics
+public interface WithGenerics
 {
 
     /**

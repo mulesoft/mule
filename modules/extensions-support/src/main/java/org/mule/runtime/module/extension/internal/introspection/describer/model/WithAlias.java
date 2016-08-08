@@ -13,7 +13,7 @@ import org.mule.runtime.extension.api.annotation.Alias;
  *
  * @since 4.0
  */
-interface WithAlias extends Annotated, WithName
+interface WithAlias extends WithAnnotations, WithName
 {
 
     String EMPTY = "";

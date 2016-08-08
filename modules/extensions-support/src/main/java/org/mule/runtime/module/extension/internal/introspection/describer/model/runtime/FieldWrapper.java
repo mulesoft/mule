@@ -4,10 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.introspection.describer.model;
+package org.mule.runtime.module.extension.internal.introspection.describer.model.runtime;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.FieldElement;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.InfrastructureTypeMapping;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -20,7 +22,7 @@ import org.springframework.core.ResolvableType;
  *
  * @since 4.0
  */
-public class FieldWrapper implements ExtensionParameter
+public class FieldWrapper implements FieldElement
 {
 
     private final Field field;
@@ -71,7 +73,7 @@ public class FieldWrapper implements ExtensionParameter
     @Override
     public TypeWrapper getType()
     {
-        return new TypeWrapper<>(field.getType());
+        return new TypeWrapper(field.getType());
     }
 
     /**
@@ -89,23 +91,14 @@ public class FieldWrapper implements ExtensionParameter
     @Override
     public String getAlias()
     {
-        return InfrastructureTypeMapping.getMap().getOrDefault(field.getType(), ExtensionParameter.super.getAlias());
+        return InfrastructureTypeMapping.getMap().getOrDefault(field.getType(), FieldElement.super.getAlias());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public boolean isFieldBased()
-    {
-        return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getOwner()
+    public String getOwnerDescription()
     {
         return "Class " + field.getDeclaringClass().getSimpleName();
     }

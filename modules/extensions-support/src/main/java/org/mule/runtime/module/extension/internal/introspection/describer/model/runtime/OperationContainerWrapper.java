@@ -4,10 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.introspection.describer.model;
+package org.mule.runtime.module.extension.internal.introspection.describer.model.runtime;
 
 import static java.util.stream.Collectors.toList;
 
+import org.mule.runtime.module.extension.internal.introspection.describer.model.MethodElement;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.OperationContainerElement;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 
 import java.util.Collection;
@@ -17,15 +19,14 @@ import java.util.stream.Stream;
 /**
  * {@link TypeWrapper} specification for classes that contains Operations inside of it
  *
- * @param <T> type that the {@link OperationContainerType} represents
  * @since 4.0
  */
-public final class OperationContainerType<T> extends TypeWrapper<T> implements WithOperations
+final class OperationContainerWrapper extends TypeWrapper implements OperationContainerElement
 {
 
-    private final Class<T> aClass;
+    private final Class aClass;
 
-    public OperationContainerType(Class<T> aClass)
+    OperationContainerWrapper(Class aClass)
     {
         super(aClass);
         this.aClass = aClass;
@@ -35,7 +36,7 @@ public final class OperationContainerType<T> extends TypeWrapper<T> implements W
      * @return The list of {@link MethodWrapper} that the this type holds
      */
     @Override
-    public List<MethodWrapper> getOperations()
+    public List<MethodElement> getOperations()
     {
         return Stream
                 .of(aClass)

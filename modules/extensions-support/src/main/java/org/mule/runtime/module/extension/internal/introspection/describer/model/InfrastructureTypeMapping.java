@@ -19,6 +19,8 @@ import java.util.Map;
 /**
  * Mapping for types considered of "Infrastructure", of the {@link Class} of the infrastructure type and the
  * {@link String} name of it.
+ *
+ * @since 4.0
  */
 public class InfrastructureTypeMapping
 {

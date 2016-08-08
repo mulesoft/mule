@@ -24,7 +24,7 @@ import org.mule.runtime.extension.api.introspection.property.LayoutModelProperty
 import org.mule.runtime.extension.api.introspection.property.LayoutModelPropertyBuilder;
 import org.mule.runtime.extension.api.introspection.property.MetadataContentModelProperty;
 import org.mule.runtime.extension.api.introspection.property.MetadataKeyPartModelProperty;
-import org.mule.runtime.module.extension.internal.introspection.describer.model.Annotated;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.WithAnnotations;
 import org.mule.runtime.module.extension.internal.model.property.DeclaringMemberModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.exception.DefaultExceptionEnricherFactory;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
@@ -125,7 +125,7 @@ public final class MuleExtensionAnnotationParser
         }
     }
 
-    private static void parseLayoutAnnotations(Annotated annotatedElement, LayoutModelPropertyBuilder builder)
+    private static void parseLayoutAnnotations(WithAnnotations annotatedElement, LayoutModelPropertyBuilder builder)
     {
         java.util.Optional<Password> passwordAnnotation = annotatedElement.getAnnotation(Password.class);
         if (passwordAnnotation.isPresent())
@@ -149,7 +149,7 @@ public final class MuleExtensionAnnotationParser
                     tabName(placementAnnotation.tab());
         }
     }
-    private static void parsePlacementAnnotation(Annotated annotatedElement, LayoutModelPropertyBuilder builder)
+    private static void parsePlacementAnnotation(WithAnnotations annotatedElement, LayoutModelPropertyBuilder builder)
     {
         java.util.Optional<Placement> placementAnnotation = annotatedElement.getAnnotation(Placement.class);
         if (placementAnnotation.isPresent())
@@ -166,12 +166,12 @@ public final class MuleExtensionAnnotationParser
         return parseLayoutAnnotations(annotatedElement, name, LayoutModelPropertyBuilder.create());
     }
 
-    static LayoutModelProperty parseLayoutAnnotations(Annotated annotatedElement, String name)
+    static LayoutModelProperty parseLayoutAnnotations(WithAnnotations annotatedElement, String name)
     {
         return parseLayoutAnnotations(annotatedElement, name, LayoutModelPropertyBuilder.create());
     }
 
-    static LayoutModelProperty parseLayoutAnnotations(Annotated annotatedElement, String name, LayoutModelPropertyBuilder builder)
+    static LayoutModelProperty parseLayoutAnnotations(WithAnnotations annotatedElement, String name, LayoutModelPropertyBuilder builder)
     {
         if (isDisplayAnnotationPresent(annotatedElement))
         {
@@ -199,7 +199,7 @@ public final class MuleExtensionAnnotationParser
         return displayAnnotations.stream().anyMatch(annotation -> annotatedElement.getAnnotation(annotation) != null);
     }
 
-    private static boolean isDisplayAnnotationPresent(Annotated annotatedElement)
+    private static boolean isDisplayAnnotationPresent(WithAnnotations annotatedElement)
     {
         List<Class> displayAnnotations = Arrays.asList(Password.class, Text.class, Placement.class);
         return displayAnnotations.stream().anyMatch(annotation -> annotatedElement.getAnnotation(annotation) != null);
@@ -231,7 +231,7 @@ public final class MuleExtensionAnnotationParser
         }
     }
 
-    static java.util.Optional<ExceptionEnricherFactory> getExceptionEnricherFactory(Annotated element)
+    static java.util.Optional<ExceptionEnricherFactory> getExceptionEnricherFactory(WithAnnotations element)
     {
         final java.util.Optional<OnException> onExceptionAnnotation = element.getAnnotation(OnException.class);
         if (onExceptionAnnotation.isPresent())

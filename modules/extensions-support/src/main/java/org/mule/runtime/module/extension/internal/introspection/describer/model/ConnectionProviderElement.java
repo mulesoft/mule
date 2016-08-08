@@ -6,20 +6,12 @@
  */
 package org.mule.runtime.module.extension.internal.introspection.describer.model;
 
-import org.mule.runtime.module.extension.internal.introspection.describer.model.runtime.MethodWrapper;
-
-import java.util.List;
-
 /**
- * A generic contract for any kind of component that could contain operations
+ * A contract for an element to be considered as a Connection Provider
  *
  * @since 4.0
  */
-interface WithOperations
+public interface ConnectionProviderElement extends TypeBasedComponent, WithParameters, WithGenerics
 {
 
-    /**
-     * @return a list of {@link MethodWrapper}
-     */
-    List<MethodElement> getOperations();
 }

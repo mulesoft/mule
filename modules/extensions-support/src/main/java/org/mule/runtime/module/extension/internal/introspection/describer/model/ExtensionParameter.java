@@ -20,7 +20,6 @@ import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 import com.google.common.collect.ImmutableSet;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Parameter;
 import java.util.Set;
 
 /**
@@ -28,7 +27,7 @@ import java.util.Set;
  *
  * @since 4.0
  */
-public interface ExtensionParameter extends OfType, Annotated, Named, WithAlias, WithOwner
+public interface ExtensionParameter extends WithType, WithAnnotations, Named, WithAlias, WithOwner
 {
 
     Set<Class<?>> IMPLICIT_ARGUMENT_TYPES = ImmutableSet.<Class<?>>builder()
@@ -62,9 +61,9 @@ public interface ExtensionParameter extends OfType, Annotated, Named, WithAlias,
     default java.util.Optional<String> defaultValue()
     {
         java.util.Optional<String> optionalDefaultValue = java.util.Optional.empty();
-        if (!isRequired())
+        final java.util.Optional<Optional> annotation = getAnnotation(Optional.class);
+        if (annotation.isPresent())
         {
-            final java.util.Optional<Optional> annotation = getAnnotation(Optional.class);
             final Optional optionalAnnotation = annotation.get();
             final String defaultValue = optionalAnnotation.defaultValue();
             if (!defaultValue.equals(Optional.NULL))
@@ -78,16 +77,5 @@ public interface ExtensionParameter extends OfType, Annotated, Named, WithAlias,
     /**
      * @return A {@code boolean} indicating whether the parameter is based as a {@link Field}
      */
-    default boolean isFieldBased()
-    {
-        return false;
-    }
-
-    /**
-     * @return A {@code boolean} indicating whether the parameter is based as a {@link Parameter}
-     */
-    default boolean isParameterBased()
-    {
-        return false;
-    }
+    boolean isFieldBased();
 }

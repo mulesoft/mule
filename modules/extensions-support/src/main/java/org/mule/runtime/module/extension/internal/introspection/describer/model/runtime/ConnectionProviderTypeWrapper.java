@@ -4,23 +4,24 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.introspection.describer.model;
+package org.mule.runtime.module.extension.internal.introspection.describer.model.runtime;
 
 import org.mule.runtime.api.connection.ConnectionProvider;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.ConnectionProviderElement;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 
 import java.lang.reflect.Type;
 import java.util.List;
 
 /**
- * {@link TypeBasedComponent} specification for classes that are considered as Connection Providers
+ * {@link TypeBasedComponentWrapper} specification for classes that are considered as Connection Providers
  *
  * @since 4.0
  */
-public class ConnectionProviderType<T> extends TypeBasedComponent<T> implements WithParameters, WithGenerics
+public class ConnectionProviderTypeWrapper<T> extends TypeBasedComponentWrapper implements ConnectionProviderElement
 {
 
-    public ConnectionProviderType(Class<T> aClass)
+    public ConnectionProviderTypeWrapper(Class<T> aClass)
     {
         super(aClass);
     }

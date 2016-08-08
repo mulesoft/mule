@@ -16,11 +16,11 @@ import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.OperationDeclaration;
+import org.mule.runtime.extension.api.introspection.declaration.fluent.SourceDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.module.extension.internal.DefaultDescribingContext;
 import org.mule.runtime.module.extension.internal.introspection.describer.AnnotationsBasedDescriber;
 import org.mule.runtime.module.extension.internal.introspection.version.StaticVersionResolver;
-import org.mule.runtime.module.extension.internal.model.property.ConfigTypeModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ConnectivityModelProperty;
 import org.mule.test.heisenberg.extension.HeisenbergConnection;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
@@ -28,11 +28,11 @@ import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ConnectionAndUseConfigModelEnricherTestCase
+public class ConnectivityModelEnricherTestCase
 {
 
     private static final String CALL_SAUL = "callSaul";
-    private static final String GET_ENEMY = "getEnemy";
+    public static final String LISTEN_PAYMENTS = "ListenPayments";
     private ExtensionDeclaration declaration = null;
     private ClassTypeLoader typeLoader;
 
@@ -41,13 +41,13 @@ public class ConnectionAndUseConfigModelEnricherTestCase
     {
         final AnnotationsBasedDescriber basedDescriber = new AnnotationsBasedDescriber(HeisenbergExtension.class, new StaticVersionResolver(getProductVersion()));
         ExtensionDeclarer declarer = basedDescriber.describe(new DefaultDescribingContext(getClass().getClassLoader()));
-        new ConnectionAndUseConfigModelEnricher().enrich(new DefaultDescribingContext(declarer, this.getClass().getClassLoader()));
+        new ConnectivityModelEnricher().enrich(new DefaultDescribingContext(declarer, this.getClass().getClassLoader()));
         declaration = declarer.getDeclaration();
         typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(HeisenbergExtension.class.getClassLoader());
     }
 
     @Test
-    public void verifyConnectionModelProperty()
+    public void verifyConnectivityModelPropertyOnOperation()
     {
         OperationDeclaration operationDeclaration = getDeclaration(declaration.getOperations(), CALL_SAUL);
         final ConnectivityModelProperty connectivityModelProperty = checkIsPresent(operationDeclaration, ConnectivityModelProperty.class);
@@ -56,11 +56,11 @@ public class ConnectionAndUseConfigModelEnricherTestCase
     }
 
     @Test
-    public void verifyConfigurationModelProperty()
+    public void verifyConnectivityModelPropertyOnSource()
     {
-        OperationDeclaration operationDeclaration = getDeclaration(declaration.getOperations(), GET_ENEMY);
-        final ConfigTypeModelProperty configTypeModelProperty = checkIsPresent(operationDeclaration, ConfigTypeModelProperty.class);
+        SourceDeclaration sourceDeclaration = getDeclaration(declaration.getMessageSources(), LISTEN_PAYMENTS);
+        final ConnectivityModelProperty connectivityModelProperty = checkIsPresent(sourceDeclaration, ConnectivityModelProperty.class);
 
-        assertThat(configTypeModelProperty.getConfigType(), is(typeLoader.load(HeisenbergExtension.class)));
+        assertThat(connectivityModelProperty.getConnectionType(), is(typeLoader.load(HeisenbergConnection.class)));
     }
 }

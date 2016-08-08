@@ -20,13 +20,17 @@ import java.util.Optional;
 class EnricherTestUtils
 {
 
+    private EnricherTestUtils()
+    {
+    }
 
-    public static  <T extends NamedDeclaration> T getDeclaration(List<T> operationList, String name)
+    public static <T extends NamedDeclaration> T getDeclaration(List<T> operationList, String name)
     {
         return operationList.stream().filter(operation -> operation.getName().equals(name)).collect(toList()).get(0);
     }
 
-    public static <T extends ModelProperty> T checkIsPresent(BaseDeclaration declaration, Class<T> modelProperty){
+    public static <T extends ModelProperty> T checkIsPresent(BaseDeclaration declaration, Class<T> modelProperty)
+    {
         final Optional<T> property = declaration.getModelProperty(modelProperty);
         assertThat(property.isPresent(), is(true));
         return property.get();

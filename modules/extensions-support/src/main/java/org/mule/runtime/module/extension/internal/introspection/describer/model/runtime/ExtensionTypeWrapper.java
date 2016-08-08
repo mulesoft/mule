@@ -4,38 +4,36 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.introspection.describer.model;
+package org.mule.runtime.module.extension.internal.introspection.describer.model.runtime;
 
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 
 import org.mule.runtime.extension.api.annotation.Configurations;
-import org.mule.runtime.extension.api.annotation.Parameter;
-import org.mule.runtime.extension.api.annotation.ParameterGroup;
-
-import com.google.common.collect.ImmutableList;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.ConfigurationElement;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.ExtensionElement;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
 /**
- * {@link TypeBasedComponent} specification for classes that are considered as Extensions
+ * {@link ConfigurationWrapper} specification for classes that are considered as Extensions
  *
  * @since 4.0
  */
-public class ExtensionType<T> extends TypeBasedComponent<T> implements WithParameters
+public class ExtensionTypeWrapper<T> extends ConfigurationWrapper implements ExtensionElement
 {
 
-    public ExtensionType(Class<T> aClass)
+    public ExtensionTypeWrapper(Class<T> aClass)
     {
         super(aClass);
     }
 
     /**
-     * @return A list {@link TypeBasedComponent} of declared configurations
+     * @return A list {@link TypeBasedComponentWrapper} of declared configurations
      */
-    public List<TypeBasedComponent<?>> getConfigurations()
+    public List<ConfigurationElement> getConfigurations()
     {
         final Optional<Configurations> optionalConfigurations = this.getAnnotation(Configurations.class);
         if (optionalConfigurations.isPresent())
@@ -43,20 +41,9 @@ public class ExtensionType<T> extends TypeBasedComponent<T> implements WithParam
             final Configurations configurations = optionalConfigurations.get();
             return Stream
                     .of(configurations.value())
-                    .map(TypeBasedComponent::new)
+                    .map(ConfigurationWrapper::new)
                     .collect(toList());
         }
         return emptyList();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public List<ExtensionParameter> getParameters()
-    {
-        return ImmutableList.<ExtensionParameter>builder()
-                .addAll(getAnnotatedFields(Parameter.class))
-                .addAll(getAnnotatedFields(ParameterGroup.class)).build();
     }
 }

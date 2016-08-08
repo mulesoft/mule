@@ -6,20 +6,18 @@
  */
 package org.mule.runtime.module.extension.internal.introspection.describer.model;
 
-import org.mule.runtime.module.extension.internal.introspection.describer.model.runtime.MethodWrapper;
-
 import java.util.List;
 
 /**
- * A generic contract for any kind of component that could contain operations
+ * A generic contract for any kind of component that could contain a type that can define operations containers
  *
  * @since 4.0
  */
-interface WithOperations
+public interface WithOperationContainers
 {
 
     /**
-     * @return a list of {@link MethodWrapper}
+     * @return The list of Operation containers
      */
-    List<MethodElement> getOperations();
+    List<OperationContainerElement> getOperationContainers();
 }

@@ -6,20 +6,21 @@
  */
 package org.mule.runtime.module.extension.internal.introspection.describer.model;
 
-import org.mule.runtime.module.extension.internal.introspection.describer.model.runtime.MethodWrapper;
+import org.mule.runtime.extension.api.introspection.Named;
 
-import java.util.List;
+import java.lang.reflect.Method;
 
 /**
- * A generic contract for any kind of component that could contain operations
+ * A contract for an element to be considered as a Method
  *
  * @since 4.0
  */
-interface WithOperations
+public interface MethodElement extends WithParameters, WithReturnType, Named, WithAnnotations, WithAlias
 {
 
     /**
-     * @return a list of {@link MethodWrapper}
+     * @return The represented method
      */
-    List<MethodElement> getOperations();
+    //TODO MULE-10137 - Adapt logic to AST
+    Method getMethod();
 }

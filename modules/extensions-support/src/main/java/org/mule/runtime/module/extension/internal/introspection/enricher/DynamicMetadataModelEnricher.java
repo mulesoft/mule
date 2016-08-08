@@ -20,6 +20,7 @@ import org.mule.runtime.extension.api.introspection.ComponentModel;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.declaration.DescribingContext;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.BaseDeclaration;
+import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.OutputDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ParameterDeclaration;
@@ -31,7 +32,7 @@ import org.mule.runtime.extension.api.introspection.declaration.spi.ModelEnriche
 import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.introspection.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.introspection.property.MetadataKeyIdModelProperty;
-import org.mule.runtime.module.extension.internal.introspection.describer.model.ParameterWrapper;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.runtime.ParameterWrapper;
 import org.mule.runtime.module.extension.internal.metadata.MetadataScopeAdapter;
 import org.mule.runtime.module.extension.internal.model.property.DeclaringMemberModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingMethodModelProperty;
@@ -44,6 +45,13 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.Optional;
 
+/**
+ * {@link ModelEnricher} implementation that walks through a {@link ExtensionDeclaration} and looks for components
+ * (Operations and Message sources) annotated with {@link MetadataScope}. If a custom metadata scope is used, the
+ * component will be considered of dynamic type.
+ *
+ * @since 4.0
+ */
 public class DynamicMetadataModelEnricher implements ModelEnricher
 {
 
@@ -61,7 +69,7 @@ public class DynamicMetadataModelEnricher implements ModelEnricher
         if (modelProperty.isPresent())
         {
             extensionType = modelProperty.get().getType();
-            typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(extensionType.getClassLoader());
+            typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(Thread.currentThread().getContextClassLoader());
 
             new IdempotentDeclarationWalker()
             {

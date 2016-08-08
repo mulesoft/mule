@@ -8,19 +8,20 @@ package org.mule.runtime.module.extension.internal.introspection.describer.model
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.runtime.TypeWrapper;
 
 /**
  * A generic contract for any kind of component that could be of certain type
  *
  * @since 4.0
  */
-interface OfType
+interface WithType
 {
 
     /**
      * @return The {@link TypeWrapper} of the represented component
      */
-    TypeWrapper<?> getType();
+    Type getType();
 
     /**
      * @param typeLoader {@link ClassTypeLoader} that will load the {@link Class} and represent it as a

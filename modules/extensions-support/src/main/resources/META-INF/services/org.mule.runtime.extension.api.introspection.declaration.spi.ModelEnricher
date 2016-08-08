@@ -1,5 +1,6 @@
 org.mule.runtime.module.extension.internal.introspection.enricher.DataTypeModelEnricher
-org.mule.runtime.module.extension.internal.introspection.enricher.ConnectionAndUseConfigModelEnricher
+org.mule.runtime.module.extension.internal.introspection.enricher.ConfigurationModelEnricher
+org.mule.runtime.module.extension.internal.introspection.enricher.ConnectivityModelEnricher
 org.mule.runtime.module.extension.internal.introspection.enricher.ConnectionModelEnricher
 org.mule.runtime.module.extension.internal.introspection.enricher.StudioModelEnricher
 org.mule.runtime.module.extension.internal.introspection.enricher.ConfigNameModelEnricher

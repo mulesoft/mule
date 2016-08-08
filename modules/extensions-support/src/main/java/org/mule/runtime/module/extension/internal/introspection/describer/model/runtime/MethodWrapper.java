@@ -4,10 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.introspection.describer.model;
+package org.mule.runtime.module.extension.internal.introspection.describer.model.runtime;
 
 import org.mule.runtime.extension.api.annotation.ParameterGroup;
-import org.mule.runtime.extension.api.introspection.Named;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.ExtensionParameter;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.MethodElement;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -23,7 +24,7 @@ import org.springframework.core.ResolvableType;
  *
  * @since 4.0
  */
-public final class MethodWrapper implements WithParameters, WithReturnType, Named, Annotated, WithAlias
+public final class MethodWrapper implements MethodElement
 {
 
     private final Method method;
@@ -36,6 +37,7 @@ public final class MethodWrapper implements WithParameters, WithReturnType, Name
     /**
      * @return The wrapped method
      */
+    @Override
     public Method getMethod()
     {
         return method;

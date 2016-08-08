@@ -6,20 +6,21 @@
  */
 package org.mule.runtime.module.extension.internal.introspection.describer.model;
 
-import org.mule.runtime.module.extension.internal.introspection.describer.model.runtime.MethodWrapper;
+import org.mule.runtime.extension.api.runtime.source.Source;
 
+import java.lang.reflect.Type;
 import java.util.List;
 
 /**
- * A generic contract for any kind of component that could contain operations
+ * A contract for an element to be considered as a Message Source
  *
  * @since 4.0
  */
-interface WithOperations
+public interface SourceElement extends TypeBasedComponent
 {
 
     /**
-     * @return a list of {@link MethodWrapper}
+     * @return The list of generics of the super class {@link Source}
      */
-    List<MethodElement> getOperations();
+    List<Type> getSuperClassGenerics();
 }

@@ -15,13 +15,19 @@ import org.mule.runtime.extension.api.introspection.declaration.fluent.BaseDecla
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ConfigurationDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ConnectionProviderDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclaration;
+import org.mule.runtime.extension.api.introspection.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.SourceDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.WithSourcesDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.spi.ModelEnricher;
 import org.mule.runtime.module.extension.internal.introspection.ParameterGroup;
-import org.mule.runtime.module.extension.internal.introspection.describer.model.FieldWrapper;
-import org.mule.runtime.module.extension.internal.introspection.describer.model.TypeBasedComponent;
-import org.mule.runtime.module.extension.internal.introspection.describer.model.TypeWrapper;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.ExtensionParameter;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.FieldElement;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.ParameterElement;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.Type;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.runtime.FieldWrapper;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.runtime.MethodWrapper;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.runtime.TypeBasedComponentWrapper;
+import org.mule.runtime.module.extension.internal.model.property.ImplementingMethodModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.util.IdempotentDeclarationWalker;
@@ -63,6 +69,12 @@ public class ParameterGroupModelEnricher implements ModelEnricher
             {
                 enrich(declaration);
             }
+
+            @Override
+            protected void onOperation(OperationDeclaration declaration)
+            {
+                enrich(declaration);
+            }
         }.walk(describingContext.getExtensionDeclarer().getDeclaration());
     }
 
@@ -76,45 +88,82 @@ public class ParameterGroupModelEnricher implements ModelEnricher
     {
         baseDeclaration
                 .getModelProperty(ImplementingTypeModelProperty.class)
-                .ifPresent(implementing ->
-                           {
-                               final Class<?> type = implementing.getType();
-                               final List<FieldWrapper> annotatedFields = new TypeBasedComponent<>(type).getAnnotatedFields(org.mule.runtime.extension.api.annotation.ParameterGroup.class);
-                               baseDeclaration.addModelProperty(new ParameterGroupModelProperty(annotatedFields
-                                                                                                        .stream()
-                                                                                                        .map(this::toParameterGroup)
-                                                                                                        .collect(toList())));
-                           });
+                .ifPresent(
+                        implementingType ->
+                        {
+                            final Class<?> type = implementingType.getType();
+                            final List<FieldElement> parameterGroups = new TypeBasedComponentWrapper(type).getAnnotatedFields(org.mule.runtime.extension.api.annotation.ParameterGroup.class);
+                            if (!parameterGroups.isEmpty())
+                            {
+                                baseDeclaration.addModelProperty(new ParameterGroupModelProperty(parameterGroups
+                                                                                                         .stream()
+                                                                                                         .map(this::toParameterGroup)
+                                                                                                         .collect(toList())));
+                            }
+                        });
     }
 
     /**
-     * Given a {@link FieldWrapper} representing a {@link Field} based parameter, introspect it and returns the
+     * For each {@link org.mule.runtime.extension.api.annotation.ParameterGroup} annotated parameter the
+     * {@link ParameterGroupModelProperty} will be added
+     *
+     * @param operationDeclaration declaration of an Operation
+     */
+    private void enrich(OperationDeclaration operationDeclaration)
+    {
+        operationDeclaration.getModelProperty(ImplementingMethodModelProperty.class)
+                .ifPresent(
+                        method ->
+                        {
+                            final MethodWrapper methodWrapper = new MethodWrapper(method.getMethod());
+                            final List<ExtensionParameter> parameterGroups = methodWrapper.getParameterGroups();
+                            if (!parameterGroups.isEmpty())
+                            {
+                                operationDeclaration.addModelProperty(new ParameterGroupModelProperty(parameterGroups.stream()
+                                                                                                              .map(param -> (ParameterElement) param)
+                                                                                                              .map(this::toParameterGroup)
+                                                                                                              .collect(toList())));
+                            }
+                        });
+    }
+
+    /**
+     * Given a {@link ParameterElement} representing a {@link java.lang.reflect.Parameter} based parameter, introspect it and returns the
      * {@link ParameterGroup} of this field.
      *
-     * @param fieldWrapper Wrapper of the field based parameter
+     * @param parameterElement Wrapper of the parameter based parameter
      * @return A {@link ParameterGroup} representing the structure of the given parameter
      */
-    private ParameterGroup toParameterGroup(FieldWrapper fieldWrapper)
+    private ParameterGroup toParameterGroup(ParameterElement parameterElement)
     {
-        final TypeWrapper<?> paramGroupType = fieldWrapper.getType();
-        final ParameterGroup parameterGroup = new ParameterGroup(paramGroupType.getDeclaredClass(), fieldWrapper.getField());
-        getParameterGroupFields(paramGroupType).forEach(field -> parameterGroup.addParameter(field.getField()));
-
-        final List<FieldWrapper> parameterGroups = paramGroupType.getAnnotatedFields(org.mule.runtime.extension.api.annotation.ParameterGroup.class);
-        if (!parameterGroups.isEmpty())
-        {
-            parameterGroup.addModelProperty(new ParameterGroupModelProperty(parameterGroups
-                                                                                    .stream()
-                                                                                    .map(this::toParameterGroup)
-                                                                                    .collect(toList())));
-        }
+        final Type paramGroupType = parameterElement.getType();
+        final ParameterGroup parameterGroup = new ParameterGroup<>(paramGroupType.getDeclaredClass(), parameterElement.getParameter());
+        populateParameterGroup(parameterGroup, paramGroupType);
 
         return parameterGroup;
     }
 
     /**
-     * Given a {@link TypeWrapper} representing the type of a parameter group, returns all the fields that are
-     * considered as parameters:
+     * Given a {@link FieldElement} representing a {@link Field} based parameter, introspect it and returns the
+     * {@link ParameterGroup} of this field.
+     *
+     * @param fieldElement Wrapper of the field based parameter
+     * @return A {@link ParameterGroup} representing the structure of the given parameter
+     */
+    private ParameterGroup toParameterGroup(FieldElement fieldElement)
+    {
+        final Type paramGroupType = fieldElement.getType();
+        final ParameterGroup parameterGroup = new ParameterGroup<>(paramGroupType.getDeclaredClass(), fieldElement.getField());
+        populateParameterGroup(parameterGroup, paramGroupType);
+
+        return parameterGroup;
+    }
+
+    /**
+     * Given a empty {@link ParameterGroup} and a {@link Type} representing the type of the Parameter Group,
+     * populates it with all the parameters that contains.
+     * <p>
+     * The parameters are:
      * <p>
      * <ul>
      * <li>The ones that are annotated with {@link Parameter}</li>
@@ -124,12 +173,12 @@ public class ParameterGroupModelEnricher implements ModelEnricher
      * The above conditions are exclusive, so if a field is annotated with {@link Parameter} no field that just have
      * getters and setters will be considered.
      *
+     * @param parameterGroup {@link ParameterGroup} to populate
      * @param paramGroupType type of the parameter group
-     * @return a {@link List} of {@link FieldWrapper} of the parameters in the parameter group
      */
-    private List<FieldWrapper> getParameterGroupFields(TypeWrapper<?> paramGroupType)
+    private void populateParameterGroup(ParameterGroup parameterGroup, Type paramGroupType)
     {
-        List<FieldWrapper> annotatedFields = paramGroupType.getAnnotatedFields(Parameter.class);
+        List<FieldElement> annotatedFields = paramGroupType.getAnnotatedFields(Parameter.class);
         if (annotatedFields.isEmpty())
         {
             annotatedFields = getFieldsWithGetterAndSetters(paramGroupType.getDeclaredClass())
@@ -137,6 +186,16 @@ public class ParameterGroupModelEnricher implements ModelEnricher
                     .map(FieldWrapper::new)
                     .collect(toList());
         }
-        return annotatedFields;
+
+        annotatedFields.forEach(field -> parameterGroup.addParameter(field.getField()));
+
+        final List<FieldElement> parameterGroups = paramGroupType.getAnnotatedFields(org.mule.runtime.extension.api.annotation.ParameterGroup.class);
+        if (!parameterGroups.isEmpty())
+        {
+            parameterGroup.addModelProperty(new ParameterGroupModelProperty(parameterGroups
+                                                                                    .stream()
+                                                                                    .map(this::toParameterGroup)
+                                                                                    .collect(toList())));
+        }
     }
 }

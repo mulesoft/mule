@@ -4,29 +4,29 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.introspection.describer.model;
+package org.mule.runtime.module.extension.internal.introspection.describer.model.runtime;
 
 import static java.util.stream.Collectors.toList;
 
+import org.mule.runtime.module.extension.internal.introspection.describer.model.FieldElement;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.Type;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Optional;
 
 /**
  * Wrapper for {@link Class} that provide utility methods to facilitate the introspection of a {@link Class}
  *
- * @param <T> Class that the {@link TypeWrapper} represents
  * @since 4.0
  */
-public class TypeWrapper<T> implements Annotated, WithName, WithAlias
+public class TypeWrapper implements Type
 {
 
-    private final Class<T> aClass;
+    private final Class<?> aClass;
 
-    TypeWrapper(Class<T> aClass)
+    TypeWrapper(Class<?> aClass)
     {
         this.aClass = aClass;
     }
@@ -52,15 +52,17 @@ public class TypeWrapper<T> implements Annotated, WithName, WithAlias
     /**
      * {@inheritDoc}
      */
+    @Override
     public <A extends Annotation> Optional<A> getAnnotation(Class<A> annotationClass)
     {
         return Optional.ofNullable(aClass.getAnnotation(annotationClass));
     }
 
     /**
-     * @return A list of {@link FieldWrapper} that represent the list of {@link Field} that the class {@link T} declares
+     * {@inheritDoc}
      */
-    public List<FieldWrapper> getFields()
+    @Override
+    public List<FieldElement> getFields()
     {
         return IntrospectionUtils.getFields(aClass)
                 .stream()
@@ -69,11 +71,10 @@ public class TypeWrapper<T> implements Annotated, WithName, WithAlias
     }
 
     /**
-     * @param annotation class that the fields of this type should be annoted with
-     * @return A list of {@link FieldWrapper} that represent the list of {@link Field} that the class {@link T} declares
-     * and are annotated with the given annotation
+     * {@inheritDoc}
      */
-    public List<FieldWrapper> getAnnotatedFields(Class<? extends Annotation> annotation)
+    @Override
+    public List<FieldElement> getAnnotatedFields(Class<? extends Annotation> annotation)
     {
         return getFields()
                 .stream()
@@ -82,9 +83,10 @@ public class TypeWrapper<T> implements Annotated, WithName, WithAlias
     }
 
     /**
-     * @return the class that {@link TypeWrapper} represents
+     * {@inheritDoc}
      */
-    public Class<T> getDeclaredClass()
+    @Override
+    public Class<?> getDeclaredClass()
     {
         return aClass;
     }

@@ -8,7 +8,6 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
-import static org.mule.runtime.extension.api.introspection.declaration.type.TypeUtils.getAlias;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.checkInstantiable;
 
 import org.mule.runtime.core.api.MuleRuntimeException;
@@ -72,10 +71,10 @@ public final class ParameterGroupArgumentResolver<T> implements ArgumentResolver
             T parameterGroup = (T) group.getType().newInstance();
             for (Field parameterField : group.getParameters())
             {
-                String fieldAlias = getAlias(parameterField);
-                if (operationContext.hasParameter(fieldAlias))
+                final String parameterName = parameterField.getName();
+                if (operationContext.hasParameter(parameterName))
                 {
-                    parameterField.set(parameterGroup, operationContext.getParameter(fieldAlias));
+                    parameterField.set(parameterGroup, operationContext.getParameter(parameterName));
                 }
             }
 

@@ -6,20 +6,28 @@
  */
 package org.mule.runtime.module.extension.internal.introspection.describer.model;
 
-import org.mule.runtime.module.extension.internal.introspection.describer.model.runtime.MethodWrapper;
-
-import java.util.List;
+import java.lang.reflect.Field;
 
 /**
- * A generic contract for any kind of component that could contain operations
+ * A contract for an element to be considered as a Field
  *
  * @since 4.0
  */
-interface WithOperations
+public interface FieldElement extends ExtensionParameter
 {
 
     /**
-     * @return a list of {@link MethodWrapper}
+     * @return The represented {@link Field}
      */
-    List<MethodElement> getOperations();
+    //TODO MULE-10137 - Adapt logic to AST
+    Field getField();
+
+    /**
+     * {@inheritDoc}
+     */
+    default boolean isFieldBased()
+    {
+        return true;
+    }
+
 }

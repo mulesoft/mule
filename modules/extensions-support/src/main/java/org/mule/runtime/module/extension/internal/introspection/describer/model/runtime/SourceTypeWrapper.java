@@ -4,25 +4,26 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.introspection.describer.model;
+package org.mule.runtime.module.extension.internal.introspection.describer.model.runtime;
 
 import org.mule.runtime.extension.api.runtime.source.Source;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.SourceElement;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 
 import java.lang.reflect.Type;
 import java.util.List;
 
 /**
- * {@link TypeBasedComponent} specification for {@link Source} types.
+ * {@link TypeBasedComponentWrapper} specification for {@link Source} types.
  *
  * @since 4.0
  */
-public final class SourceType<T extends Source> extends TypeBasedComponent<T> implements WithGenerics
+final class SourceTypeWrapper<T extends Source> extends TypeBasedComponentWrapper implements SourceElement
 {
 
     private final Class<T> aClass;
 
-    public SourceType(Class<T> aClass)
+    SourceTypeWrapper(Class<T> aClass)
     {
         super(aClass);
         this.aClass = aClass;
@@ -32,17 +33,17 @@ public final class SourceType<T extends Source> extends TypeBasedComponent<T> im
      * {@inheritDoc}
      */
     @Override
-    public List<Type> getSuperClassGenerics()
+    public Class<? extends Source> getDeclaredClass()
     {
-        return IntrospectionUtils.getSuperClassGenerics(aClass, Source.class);
+        return aClass;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public List<Class<?>> getInterfaceGenerics(Class clazz)
+    public List<Type> getSuperClassGenerics()
     {
-        return IntrospectionUtils.getInterfaceGenerics(getDeclaredClass(), clazz);
+        return IntrospectionUtils.getSuperClassGenerics(aClass, Source.class);
     }
 }

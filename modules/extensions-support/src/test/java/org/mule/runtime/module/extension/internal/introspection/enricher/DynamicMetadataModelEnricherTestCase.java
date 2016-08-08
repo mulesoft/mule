@@ -23,6 +23,7 @@ import org.mule.runtime.extension.api.introspection.declaration.fluent.Operation
 import org.mule.runtime.extension.api.introspection.declaration.fluent.OutputDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ParameterDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.SourceDeclaration;
+import org.mule.runtime.extension.api.introspection.declaration.type.annotation.TypeAliasAnnotation;
 import org.mule.runtime.extension.api.introspection.property.MetadataContentModelProperty;
 import org.mule.runtime.extension.api.introspection.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.module.extension.internal.DefaultDescribingContext;
@@ -115,7 +116,9 @@ public class DynamicMetadataModelEnricherTestCase
 
         assertOutputType(sourceDynamicAttributes.getOutput(), TYPE_BUILDER.dictionaryType().id(Map.class.getName())
                 .ofKey(TYPE_BUILDER.stringType().id(String.class.getName()))
-                .ofValue(TYPE_BUILDER.objectType().id("java.lang.Object").with(new ClassInformationAnnotation(Object.class, null)))
+                .ofValue(TYPE_BUILDER.objectType().id("java.lang.Object")
+                                 .with(new ClassInformationAnnotation(Object.class, null))
+                                 .with(new TypeAliasAnnotation(Object.class.getSimpleName())))
                 .build(), true);
         assertOutputType(sourceDynamicAttributes.getOutputAttributes(), toMetadataType(StringAttributes.class), true);
         assertParameterType(getDeclaration(sourceDynamicAttributes.getParameters(), "type"), toMetadataType(String.class), false);
@@ -124,7 +127,9 @@ public class DynamicMetadataModelEnricherTestCase
 
         assertOutputType(sourceStaticAttributes.getOutput(), TYPE_BUILDER.dictionaryType().id(Map.class.getName())
                 .ofKey(TYPE_BUILDER.stringType().id(String.class.getName()))
-                .ofValue(TYPE_BUILDER.objectType().id("java.lang.Object").with(new ClassInformationAnnotation(Object.class, null)))
+                .ofValue(TYPE_BUILDER.objectType().id("java.lang.Object")
+                                 .with(new ClassInformationAnnotation(Object.class, null))
+                                 .with(new TypeAliasAnnotation(Object.class.getSimpleName())))
                 .build(), true);
         assertOutputType(sourceStaticAttributes.getOutputAttributes(), toMetadataType(StringAttributes.class), false);
 

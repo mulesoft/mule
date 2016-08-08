@@ -16,5 +16,5 @@ package org.mule.runtime.module.extension.internal.introspection.describer.model
 interface WithOwner
 {
 
-    String getOwner();
+    String getOwnerDescription();
 }

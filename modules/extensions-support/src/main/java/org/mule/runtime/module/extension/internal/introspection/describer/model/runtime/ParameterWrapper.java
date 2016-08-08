@@ -4,10 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.introspection.describer.model;
+package org.mule.runtime.module.extension.internal.introspection.describer.model.runtime;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.ParameterElement;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -21,7 +22,7 @@ import org.springframework.core.ResolvableType;
  *
  * @since 4.0
  */
-public final class ParameterWrapper implements ExtensionParameter
+public final class ParameterWrapper implements ParameterElement
 {
 
     private final Parameter parameter;
@@ -47,9 +48,9 @@ public final class ParameterWrapper implements ExtensionParameter
      * {@inheritDoc}
      */
     @Override
-    public TypeWrapper<?> getType()
+    public TypeWrapper getType()
     {
-        return new TypeWrapper<>(parameter.getType());
+        return new TypeWrapper(parameter.getType());
     }
 
     /**
@@ -92,16 +93,7 @@ public final class ParameterWrapper implements ExtensionParameter
      * {@inheritDoc}
      */
     @Override
-    public boolean isParameterBased()
-    {
-        return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getOwner()
+    public String getOwnerDescription()
     {
         return "Method " + owner.getName();
     }

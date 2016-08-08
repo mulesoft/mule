@@ -19,9 +19,9 @@ import org.mule.runtime.extension.api.introspection.declaration.fluent.WithSourc
 import org.mule.runtime.extension.api.introspection.declaration.spi.ModelEnricher;
 import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.ExtensionParameter;
-import org.mule.runtime.module.extension.internal.introspection.describer.model.MethodWrapper;
-import org.mule.runtime.module.extension.internal.introspection.describer.model.TypeBasedComponent;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.WithParameters;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.runtime.MethodWrapper;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.runtime.TypeBasedComponentWrapper;
 import org.mule.runtime.module.extension.internal.model.property.ConfigTypeModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ConnectivityModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingMethodModelProperty;
@@ -38,7 +38,7 @@ import java.util.Optional;
  *
  * @since 4.0
  */
-public class ConnectionAndUseConfigModelEnricher implements ModelEnricher
+public class ConnectivityModelEnricher implements ModelEnricher
 {
 
     private ClassTypeLoader typeLoader;
@@ -53,7 +53,7 @@ public class ConnectionAndUseConfigModelEnricher implements ModelEnricher
 
         if (optionalImplementingProperty.isPresent())
         {
-            typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(optionalImplementingProperty.get().getType().getClassLoader());
+            typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(Thread.currentThread().getContextClassLoader());
             new IdempotentDeclarationWalker()
             {
                 @Override
@@ -67,7 +67,7 @@ public class ConnectionAndUseConfigModelEnricher implements ModelEnricher
                 public void onSource(WithSourcesDeclaration owner, SourceDeclaration declaration)
                 {
                     declaration.getModelProperty(ImplementingTypeModelProperty.class)
-                            .ifPresent(implementingProperty -> contribute(declaration, new TypeBasedComponent<>(implementingProperty.getType())));
+                            .ifPresent(implementingProperty -> contribute(declaration, new TypeBasedComponentWrapper(implementingProperty.getType())));
                 }
             }.walk(describingContext.getExtensionDeclarer().getDeclaration());
         }
@@ -79,12 +79,6 @@ public class ConnectionAndUseConfigModelEnricher implements ModelEnricher
         if (!connectionParameters.isEmpty())
         {
             declaration.addModelProperty(new ConnectivityModelProperty(connectionParameters.get(0).getMetadataType(typeLoader)));
-        }
-
-        final List<ExtensionParameter> configParameters = methodWrapper.getParametersAnnotatedWith(UseConfig.class);
-        if (!configParameters.isEmpty())
-        {
-            declaration.addModelProperty(new ConfigTypeModelProperty(configParameters.get(0).getMetadataType(typeLoader)));
         }
     }
 }

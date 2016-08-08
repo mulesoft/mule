@@ -7,7 +7,6 @@
 package org.mule.runtime.module.extension.internal.introspection.describer;
 
 import static java.lang.String.format;
-import static java.util.Arrays.stream;
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang.StringUtils.EMPTY;
@@ -37,8 +36,6 @@ import org.mule.runtime.extension.api.annotation.ExtensionOf;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.RestrictedTo;
-import org.mule.runtime.extension.api.annotation.Sources;
-import org.mule.runtime.extension.api.annotation.connector.Providers;
 import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.param.Connection;
@@ -67,18 +64,23 @@ import org.mule.runtime.module.extension.internal.exception.IllegalConfiguration
 import org.mule.runtime.module.extension.internal.exception.IllegalConnectionProviderModelDefinitionException;
 import org.mule.runtime.module.extension.internal.exception.IllegalOperationModelDefinitionException;
 import org.mule.runtime.module.extension.internal.exception.IllegalParameterModelDefinitionException;
-import org.mule.runtime.module.extension.internal.introspection.describer.model.Annotated;
-import org.mule.runtime.module.extension.internal.introspection.describer.model.ConnectionProviderType;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.ConfigurationElement;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.ConnectionProviderElement;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.ExtensionElement;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.ExtensionParameter;
-import org.mule.runtime.module.extension.internal.introspection.describer.model.ExtensionType;
-import org.mule.runtime.module.extension.internal.introspection.describer.model.FieldWrapper;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.ExtensionTypeFactory;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.FieldElement;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.InfrastructureTypeMapping;
-import org.mule.runtime.module.extension.internal.introspection.describer.model.MethodWrapper;
-import org.mule.runtime.module.extension.internal.introspection.describer.model.OperationContainerType;
-import org.mule.runtime.module.extension.internal.introspection.describer.model.ParameterWrapper;
-import org.mule.runtime.module.extension.internal.introspection.describer.model.SourceType;
-import org.mule.runtime.module.extension.internal.introspection.describer.model.TypeBasedComponent;
-import org.mule.runtime.module.extension.internal.introspection.describer.model.TypeWrapper;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.MethodElement;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.OperationContainerElement;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.ParameterElement;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.SourceElement;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.Type;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.WithAnnotations;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.WithConnectionProviders;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.WithMessageSources;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.WithOperationContainers;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.runtime.FieldWrapper;
 import org.mule.runtime.module.extension.internal.introspection.version.VersionResolver;
 import org.mule.runtime.module.extension.internal.model.property.DeclaringMemberModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ExtendingOperationModelProperty;
@@ -97,13 +99,11 @@ import com.google.common.collect.Multimap;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 /**
  * Implementation of {@link Describer} which generates a {@link ExtensionDeclarer} by
@@ -137,7 +137,7 @@ public final class AnnotationsBasedDescriber implements Describer
     private final Map<Class<?>, SourceDeclarer> sourceDeclarers = new HashMap<>();
     private final Map<Class<?>, ConnectionProviderDeclarer> connectionProviderDeclarers = new HashMap<>();
 
-    private List<ParameterDeclarerContributor> fielParameterContributor;
+    private List<ParameterDeclarerContributor> fielParameterContributor = ImmutableList.of(new InfrastructureFieldContributor());
 
     public AnnotationsBasedDescriber(Class<?> extensionType, VersionResolver versionResolver)
     {
@@ -145,20 +145,6 @@ public final class AnnotationsBasedDescriber implements Describer
         this.extensionType = extensionType;
         this.versionResolver = versionResolver;
         typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(extensionType.getClassLoader());
-
-        intialiseFieldBasedParameterContributor();
-    }
-
-    private void intialiseFieldBasedParameterContributor()
-    {
-        fielParameterContributor = ImmutableList.of((parameter, declarer) ->
-                                                    {
-                                                        if (InfrastructureTypeMapping.getMap().containsKey(parameter.getType().getDeclaredClass()))
-                                                        {
-                                                            declarer.withModelProperty(new InfrastructureParameterModelProperty());
-                                                            declarer.withExpressionSupport(ExpressionSupport.NOT_SUPPORTED);
-                                                        }
-                                                    });
     }
 
     /**
@@ -167,7 +153,7 @@ public final class AnnotationsBasedDescriber implements Describer
     @Override
     public final ExtensionDeclarer describe(DescribingContext context)
     {
-        final ExtensionType<?> extensionTypeWrapper = new ExtensionType<>(extensionType);
+        final ExtensionElement extensionElement = ExtensionTypeFactory.getExtensionType(this.extensionType);
         Extension extension = getExtension(this.extensionType);
         ExtensionDeclarer declaration = context.getExtensionDeclarer()
                 .named(extension.name())
@@ -176,13 +162,13 @@ public final class AnnotationsBasedDescriber implements Describer
                 .withCategory(extension.category())
                 .withMinMuleVersion(new MuleVersion(extension.minMuleVersion()))
                 .describedAs(extension.description())
-                .withExceptionEnricherFactory(getExceptionEnricherFactory(extensionTypeWrapper))
+                .withExceptionEnricherFactory(getExceptionEnricherFactory(extensionElement))
                 .withModelProperty(new ImplementingTypeModelProperty(this.extensionType));
 
-        declareConfigurations(declaration, extensionTypeWrapper);
-        declareOperations(declaration, extensionTypeWrapper);
-        declareConnectionProviders(declaration, extensionTypeWrapper);
-        declareMessageSources(declaration, extensionTypeWrapper);
+        declareConfigurations(declaration, extensionElement);
+        declareOperations(declaration, extensionElement);
+        declareConnectionProviders(declaration, extensionElement);
+        declareMessageSources(declaration, extensionElement);
 
         return declaration;
     }
@@ -192,23 +178,23 @@ public final class AnnotationsBasedDescriber implements Describer
         return versionResolver.resolveVersion(extension);
     }
 
-    private void declareConfigurations(ExtensionDeclarer declaration, ExtensionType<?> extensionType)
+    private void declareConfigurations(ExtensionDeclarer declaration, ExtensionElement extensionElement)
     {
-        List<TypeBasedComponent<?>> configurationClasses = extensionType.getConfigurations();
-        if (configurationClasses.isEmpty())
+        List<ConfigurationElement> configurations = extensionElement.getConfigurations();
+        if (configurations.isEmpty())
         {
-            declareConfiguration(declaration, extensionType, extensionType);
+            declareConfiguration(declaration, extensionElement, extensionElement);
         }
         else
         {
-            for (TypeBasedComponent<?> configurationClass : configurationClasses)
+            for (ConfigurationElement configuration : configurations)
             {
-                declareConfiguration(declaration, extensionType, configurationClass);
+                declareConfiguration(declaration, extensionElement, configuration);
             }
         }
     }
 
-    private void declareConfiguration(ExtensionDeclarer declaration, TypeBasedComponent<?> extensionType, TypeBasedComponent<?> configurationType)
+    private void declareConfiguration(ExtensionDeclarer declaration, ConfigurationElement extensionType, ConfigurationElement configurationType)
     {
         checkConfigurationIsNotAnOperation(configurationType.getDeclaredClass());
         ConfigurationDeclarer configurationDeclarer;
@@ -238,15 +224,13 @@ public final class AnnotationsBasedDescriber implements Describer
         }
     }
 
-    private void declareMessageSources(HasSourceDeclarer declarer, TypeBasedComponent<?> typeComponent)
+    private void declareMessageSources(HasSourceDeclarer declarer, WithMessageSources typeComponent)
     {
-        Optional<Sources> sources = typeComponent.getAnnotation(Sources.class);
-        sources.ifPresent(sourcesAnnotation -> stream(sourcesAnnotation.value())
-                .map(SourceType::new)
-                .forEach(sourceType -> declareMessageSource(declarer, sourceType)));
+        //TODO: MULE-9220: Add a Syntax validator which checks that a Source class doesn't try to declare operations, configs, etc
+        typeComponent.getSources().forEach(source -> declareMessageSource(declarer, source));
     }
 
-    private void declareMessageSource(HasSourceDeclarer declarer, SourceType<?> sourceType)
+    private void declareMessageSource(HasSourceDeclarer declarer, SourceElement sourceType)
     {
         SourceDeclarer source = sourceDeclarers.get(sourceType.getDeclaredClass());
         if (source != null)
@@ -256,7 +240,7 @@ public final class AnnotationsBasedDescriber implements Describer
         }
 
         source = declarer.withMessageSource(sourceType.getAlias());
-        List<Type> sourceGenerics = sourceType.getSuperClassGenerics();
+        List<java.lang.reflect.Type> sourceGenerics = sourceType.getSuperClassGenerics();
 
         if (sourceGenerics.size() != 2)
         {
@@ -277,12 +261,9 @@ public final class AnnotationsBasedDescriber implements Describer
         sourceDeclarers.put(sourceType.getDeclaredClass(), source);
     }
 
-    private void declareOperations(HasOperationDeclarer declarer, TypeBasedComponent<?> typeComponent)
+    private void declareOperations(HasOperationDeclarer declarer, WithOperationContainers operationContainers)
     {
-        Optional<Operations> operations = typeComponent.getAnnotation(Operations.class);
-        operations.ifPresent(sourcesAnnotation -> stream(sourcesAnnotation.value())
-                .map(OperationContainerType::new)
-                .forEach(operationContainerType -> declareOperation(declarer, operationContainerType)));
+        operationContainers.getOperationContainers().forEach(operationContainer -> declareOperation(declarer, operationContainer));
     }
 
     private Class<?>[] getOperationClasses(Class<?> extensionType)
@@ -291,7 +272,7 @@ public final class AnnotationsBasedDescriber implements Describer
         return operations == null ? ArrayUtils.EMPTY_CLASS_ARRAY : operations.value();
     }
 
-    private void declareOperation(HasOperationDeclarer declarer, OperationContainerType<?> operationsContainer)
+    private void declareOperation(HasOperationDeclarer declarer, OperationContainerElement operationsContainer)
     {
         final Class<?> declaredClass = operationsContainer.getDeclaredClass();
         if (operationDeclarers.containsKey(declaredClass))
@@ -302,7 +283,7 @@ public final class AnnotationsBasedDescriber implements Describer
 
         checkOperationIsNotAnExtension(declaredClass);
 
-        for (MethodWrapper operationMethod : operationsContainer.getOperations())
+        for (MethodElement operationMethod : operationsContainer.getOperations())
         {
 
             final OperationDeclarer operation = declarer.withOperation(operationMethod.getAlias())
@@ -319,15 +300,12 @@ public final class AnnotationsBasedDescriber implements Describer
         }
     }
 
-    private void declareConnectionProviders(HasConnectionProviderDeclarer declarer, TypeWrapper<?> containerType)
+    private void declareConnectionProviders(HasConnectionProviderDeclarer declarer, WithConnectionProviders withConnectionProviders)
     {
-        Optional<Providers> optionalProvider = containerType.getAnnotation(Providers.class);
-        optionalProvider.ifPresent(providers -> Stream.of(providers.value())
-                .map(ConnectionProviderType::new)
-                .forEach(providerType -> declareConnectionProvider(declarer, providerType)));
+        withConnectionProviders.getConnectionProviders().forEach(provider -> declareConnectionProvider(declarer, provider));
     }
 
-    private void declareConnectionProvider(HasConnectionProviderDeclarer declarer, ConnectionProviderType<?> providerType)
+    private void declareConnectionProvider(HasConnectionProviderDeclarer declarer, ConnectionProviderElement providerType)
     {
         final Class<?> providerClass = providerType.getDeclaredClass();
         ConnectionProviderDeclarer providerDeclarer = connectionProviderDeclarers.get(providerClass);
@@ -390,7 +368,7 @@ public final class AnnotationsBasedDescriber implements Describer
     private List<ParameterDeclarer> declareParameters(ParameterizedDeclarer component, List<ExtensionParameter> parameters, List<ParameterDeclarerContributor> contributors, ExtensionParameter parameterGroupOwner)
     {
         List<ParameterDeclarer> declarerList = new ArrayList<>();
-        checkAnnotationsNotUsedMoreThanOnce(parameters, component, Connection.class, UseConfig.class, MetadataKeyId.class);
+        checkAnnotationsNotUsedMoreThanOnce(parameters, Connection.class, UseConfig.class, MetadataKeyId.class);
         for (ExtensionParameter extensionParameter : parameters)
         {
             if (extensionParameter.shouldBeAdvertised())
@@ -413,7 +391,7 @@ public final class AnnotationsBasedDescriber implements Describer
 
             if (extensionParameter.isAnnotatedWith(org.mule.runtime.extension.api.annotation.ParameterGroup.class))
             {
-                final TypeWrapper<?> type = extensionParameter.getType();
+                final Type type = extensionParameter.getType();
                 final List<ExtensionParameter> annotatedParameters = ImmutableList.<ExtensionParameter>builder()
                         .addAll(type.getAnnotatedFields(Parameter.class))
                         .addAll(type.getAnnotatedFields(org.mule.runtime.extension.api.annotation.ParameterGroup.class))
@@ -517,24 +495,23 @@ public final class AnnotationsBasedDescriber implements Describer
         }
     }
 
-    private void checkAnnotationsNotUsedMoreThanOnce(List<ExtensionParameter> parameters, ParameterizedDeclarer component, Class<? extends Annotation>... annotations)
+    private void checkAnnotationsNotUsedMoreThanOnce(List<ExtensionParameter> parameters, Class<? extends Annotation>... annotations)
     {
-        stream(annotations).forEach(
-                annotation ->
-                {
-                    final long count = parameters.stream().filter(param -> param.isAnnotatedWith(annotation)).count();
-                    if (count > 1)
-                    {
-                        throw new IllegalModelDefinitionException(format("The defined parameter from [%s], uses the annotation @%s more than once",
-                                                                         parameters.get(0).getOwner(),
-                                                                         annotation.getName()));
-                    }
-                });
+        for (Class<? extends Annotation> annotation : annotations)
+        {
+            final long count = parameters.stream().filter(param -> param.isAnnotatedWith(annotation)).count();
+            if (count > 1)
+            {
+                throw new IllegalModelDefinitionException(format("The defined parameter from [%s], uses the annotation @%s more than once",
+                                                                 parameters.get(0).getOwnerDescription(),
+                                                                 annotation.getName()));
+            }
+        }
     }
 
-    private void addTypeRestrictions(Annotated annotated, ParameterDeclarer parameter)
+    private void addTypeRestrictions(WithAnnotations withAnnotations, ParameterDeclarer parameter)
     {
-        Optional<RestrictedTo> typeRestriction = annotated.getAnnotation(RestrictedTo.class);
+        Optional<RestrictedTo> typeRestriction = withAnnotations.getAnnotation(RestrictedTo.class);
         if (typeRestriction.isPresent())
         {
             parameter.withModelProperty(new TypeRestrictionModelProperty<>(typeRestriction.get().value()));
@@ -543,18 +520,12 @@ public final class AnnotationsBasedDescriber implements Describer
 
     private void addImplementingTypeModelProperty(ExtensionParameter extensionParameter, ParameterDeclarer parameter)
     {
-        if (extensionParameter.isFieldBased())
-        {
-            parameter.withModelProperty(new DeclaringMemberModelProperty(((FieldWrapper) extensionParameter).getField()));
-        }
-
-        if (extensionParameter.isParameterBased())
-        {
-            parameter.withModelProperty(new ImplementingParameterModelProperty(((ParameterWrapper) extensionParameter).getParameter()));
-        }
+        parameter.withModelProperty(extensionParameter.isFieldBased()
+                                    ? new DeclaringMemberModelProperty(((FieldElement) extensionParameter).getField())
+                                    : new ImplementingParameterModelProperty(((ParameterElement) extensionParameter).getParameter()));
     }
 
-    private void addInterceptingCallbackModelProperty(MethodWrapper operationMethod, OperationDeclarer operation)
+    private void addInterceptingCallbackModelProperty(MethodElement operationMethod, OperationDeclarer operation)
     {
         if (InterceptingCallback.class.isAssignableFrom(operationMethod.getReturnType()))
         {
@@ -566,5 +537,19 @@ public final class AnnotationsBasedDescriber implements Describer
     {
 
         void contribute(ExtensionParameter parameter, ParameterDeclarer declarer);
+    }
+
+    private static class InfrastructureFieldContributor implements ParameterDeclarerContributor
+    {
+
+        @Override
+        public void contribute(ExtensionParameter parameter, ParameterDeclarer declarer)
+        {
+            if (InfrastructureTypeMapping.getMap().containsKey(parameter.getType().getDeclaredClass()))
+            {
+                declarer.withModelProperty(new InfrastructureParameterModelProperty());
+                declarer.withExpressionSupport(ExpressionSupport.NOT_SUPPORTED);
+            }
+        }
     }
 }
