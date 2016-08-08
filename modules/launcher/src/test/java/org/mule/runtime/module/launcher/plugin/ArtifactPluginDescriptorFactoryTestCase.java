@@ -14,7 +14,7 @@ import static org.hamcrest.core.Is.is;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter.EXPORTED_CLASS_PACKAGES_PROPERTY;
-import static org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter.EXPORTED_RESOURCE_PACKAGES_PROPERTY;
+import static org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter.EXPORTED_RESOURCE_PROPERTY;
 import static org.mule.runtime.module.launcher.plugin.ArtifactPluginDescriptorFactory.PLUGIN_PROPERTIES;
 import static org.mule.runtime.module.launcher.plugin.ArtifactPluginDescriptorFactory.PROPERTY_LOADER_OVERRIDE;
 import static org.mule.runtime.core.util.FileUtils.stringToFile;
@@ -84,11 +84,11 @@ public class ArtifactPluginDescriptorFactoryTestCase extends AbstractMuleTestCas
     {
         final File pluginFolder = createPluginFolder();
 
-        final String exportedResourcePackages = "META-INF, META-INF/xml";
-        new PluginPropertiesBuilder(pluginFolder).exportingResourcesFrom(exportedResourcePackages).build();
+        final String exportedResources = "META-INF, META-INF/xml";
+        new PluginPropertiesBuilder(pluginFolder).exportingResourcesFrom(exportedResources).build();
 
         final ArtifactClassLoaderFilter classLoaderFilter = mock(ArtifactClassLoaderFilter.class);
-        when(classLoaderFilterFactory.create(null, exportedResourcePackages)).thenReturn(classLoaderFilter);
+        when(classLoaderFilterFactory.create(null, exportedResources)).thenReturn(classLoaderFilter);
 
         final ArtifactPluginDescriptor pluginDescriptor = descriptorFactory.create(pluginFolder);
 
@@ -191,7 +191,7 @@ public class ArtifactPluginDescriptorFactoryTestCase extends AbstractMuleTestCas
         private final File pluginFolder;
         private String overrides;
         private String exportedClassPackages;
-        private String exportedResourcePackages;
+        private String exportedResources;
 
         public PluginPropertiesBuilder(File pluginFolder)
         {
@@ -214,7 +214,7 @@ public class ArtifactPluginDescriptorFactoryTestCase extends AbstractMuleTestCas
 
         public PluginPropertiesBuilder exportingResourcesFrom(String packages)
         {
-            this.exportedResourcePackages = packages;
+            this.exportedResources = packages;
 
             return this;
         }
@@ -229,7 +229,7 @@ public class ArtifactPluginDescriptorFactoryTestCase extends AbstractMuleTestCas
 
             addDescriptorProperty(pluginProperties, PROPERTY_LOADER_OVERRIDE, this.overrides);
             addDescriptorProperty(pluginProperties, EXPORTED_CLASS_PACKAGES_PROPERTY, this.exportedClassPackages);
-            addDescriptorProperty(pluginProperties, EXPORTED_RESOURCE_PACKAGES_PROPERTY, this.exportedResourcePackages);
+            addDescriptorProperty(pluginProperties, EXPORTED_RESOURCE_PROPERTY, this.exportedResources);
 
             return pluginProperties;
         }

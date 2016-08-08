@@ -33,7 +33,7 @@ public class ArtifactClassLoaderFilter implements ClassLoaderFilter
     public static final ArtifactClassLoaderFilter NULL_CLASSLOADER_FILTER = new ArtifactClassLoaderFilter(Collections.EMPTY_SET, Collections.EMPTY_SET);
 
     public static final String EXPORTED_CLASS_PACKAGES_PROPERTY = "artifact.export.classPackages";
-    public static final String EXPORTED_RESOURCE_PACKAGES_PROPERTY = "artifact.export.resourcePackages";
+    public static final String EXPORTED_RESOURCE_PROPERTY = "artifact.export.resources";
 
     private static final char PACKAGE_SEPARATOR = '.';
     private static final String EMPTY_PACKAGE = "";

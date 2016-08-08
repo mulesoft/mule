@@ -10,7 +10,7 @@ package org.mule.runtime.module.launcher.plugin;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.util.PropertiesUtils.loadProperties;
 import static org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter.EXPORTED_CLASS_PACKAGES_PROPERTY;
-import static org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter.EXPORTED_RESOURCE_PACKAGES_PROPERTY;
+import static org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter.EXPORTED_RESOURCE_PROPERTY;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilterFactory;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorCreateException;
@@ -66,7 +66,7 @@ public class ArtifactPluginDescriptorFactory implements ArtifactDescriptorFactor
             }
 
             String exportedClasses = props.getProperty(EXPORTED_CLASS_PACKAGES_PROPERTY);
-            String exportedResources = props.getProperty(EXPORTED_RESOURCE_PACKAGES_PROPERTY);
+            String exportedResources = props.getProperty(EXPORTED_RESOURCE_PROPERTY);
 
             final ArtifactClassLoaderFilter classLoaderFilter = classLoaderFilterFactory.create(exportedClasses, exportedResources);
             descriptor.setClassLoaderFilter(classLoaderFilter);

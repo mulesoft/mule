@@ -21,18 +21,18 @@ public class DefaultArtifactClassLoaderFilterFactory implements ArtifactClassLoa
     private static final String PACKAGE_SEPARATOR = "/";
 
     @Override
-    public ArtifactClassLoaderFilter create(String exportedClassPackages, String exportedResourcePackages)
+    public ArtifactClassLoaderFilter create(String exportedClassPackages, String exportedResources)
     {
-        Set<String> exportedClasses = getPackages(exportedClassPackages);
-        Set<String> exportedResources = getPackages(exportedResourcePackages);
+        Set<String> exportedArtifactPackages = getPackages(exportedClassPackages);
+        Set<String> exportedArtifactResources = getPackages(exportedResources);
 
-        if (exportedClasses.isEmpty() && exportedResources.isEmpty())
+        if (exportedArtifactPackages.isEmpty() && exportedArtifactResources.isEmpty())
         {
             return ArtifactClassLoaderFilter.NULL_CLASSLOADER_FILTER;
         }
         else
         {
-            return new ArtifactClassLoaderFilter(exportedClasses, exportedResources);
+            return new ArtifactClassLoaderFilter(exportedArtifactPackages, exportedArtifactResources);
         }
     }
 
