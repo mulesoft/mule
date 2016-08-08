@@ -3,10 +3,12 @@
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xsi:schemaLocation="
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
-               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+               http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
     <http:listener-config name="listenerConfig" host="localhost" port="${port}"/>
 
@@ -23,5 +25,10 @@
             </http:response-builder>
         </http:listener>
         <expression-transformer expression="#[message.inboundProperties.'http.query.params']"/>
+
+        <!-- The default handler ignores the error and returns 200, so we can't detect if it was handled correctly -->
+        <catch-exception-strategy>
+            <test:component throwException="true"/>
+        </catch-exception-strategy>
     </flow>
 </mule>
