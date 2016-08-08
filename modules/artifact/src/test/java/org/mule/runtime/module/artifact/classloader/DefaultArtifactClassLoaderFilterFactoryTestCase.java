@@ -33,14 +33,15 @@ public class DefaultArtifactClassLoaderFilterFactoryTestCase extends AbstractMul
     @Test
     public void createsFilter() throws Exception
     {
-        final ClassLoaderFilter filter = factory.create("java.lang, java.lang.annotation", "/META-INF, META-INF/xml/");
+        final ClassLoaderFilter filter = factory.create("java.lang, java.lang.annotation", "META-INF/MANIFEST.MF, META-INF/xml/schema.xsd");
 
         assertThat(filter.exportsClass(Object.class.getName()), is(true));
         assertThat(filter.exportsClass(Annotation.class.getName()), is(true));
         assertThat(filter.exportsClass(AnnotatedElement.class.getName()), is(false));
 
         assertThat(filter.exportsResource("META-INF/MANIFEST.MF"), is(true));
+        assertThat(filter.exportsResource("META-INF/readme.txt"), is(false));
         assertThat(filter.exportsResource("META-INF/xml/schema.xsd"), is(true));
-        assertThat(filter.exportsResource("META-INF/doc/readme.txt"), is(false));
+        assertThat(filter.exportsResource("META-INF/xml/readme.txt"), is(false));
     }
 }

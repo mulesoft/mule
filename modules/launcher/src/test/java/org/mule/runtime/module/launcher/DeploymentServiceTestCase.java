@@ -136,7 +136,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     private final ArtifactPluginFileBuilder echoPluginWithLib1 = new ArtifactPluginFileBuilder("echoPlugin1").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo").usingLibrary("lib/bar-1.0.jar").containingClass("org/foo/Plugin1Echo.clazz");
     private final ArtifactPluginFileBuilder echoPluginWithoutLib1 = new ArtifactPluginFileBuilder("echoPlugin1").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo").containingClass("org/foo/Plugin1Echo.clazz");
     private final ArtifactPluginFileBuilder echoPluginWithLib2 = new ArtifactPluginFileBuilder("echoPlugin2").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo.echo").usingLibrary("lib/bar-2.0.jar").containingClass("org/foo/echo/Plugin2Echo.clazz");
-    private final ArtifactPluginFileBuilder pluginWithResource = new ArtifactPluginFileBuilder("resourcePlugin").configuredWith(EXPORTED_RESOURCE_PACKAGES_PROPERTY, "/").containingResource("pluginResourceSource.properties", "pluginResource.properties");
+    private final ArtifactPluginFileBuilder pluginWithResource = new ArtifactPluginFileBuilder("resourcePlugin").configuredWith(EXPORTED_RESOURCE_PACKAGES_PROPERTY, "/pluginResource.properties").containingResource("pluginResourceSource.properties", "pluginResource.properties");
 
     // Application file builders
     private final ApplicationFileBuilder emptyAppFileBuilder = new ApplicationFileBuilder("empty-app").definedBy("empty-config.xml");
@@ -1414,7 +1414,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
 
         ArtifactPluginFileBuilder extensionPlugin = new ArtifactPluginFileBuilder("extensionPlugin")
                 .usingLibrary("lib/mule-module-hello-4.0-SNAPSHOT.jar")
-                .configuredWith(EXPORTED_RESOURCE_PACKAGES_PROPERTY, "/, META-INF");
+                .configuredWith(EXPORTED_RESOURCE_PACKAGES_PROPERTY, "/, META-INF/mule-hello.xsd, META-INF/spring.handlers, META-INF/spring.schemas");
         ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder("appWithExtensionPlugin").definedBy("app-with-extension-plugin-config.xml").containingPlugin(extensionPlugin);
         addPackedAppFromBuilder(applicationFileBuilder);
 

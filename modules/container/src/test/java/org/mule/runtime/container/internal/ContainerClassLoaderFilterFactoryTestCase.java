@@ -30,8 +30,8 @@ public class ContainerClassLoaderFilterFactoryTestCase extends AbstractMuleTestC
     public void acceptsExportedModulePackages() throws Exception
     {
         final List<MuleModule> muleModules = new ArrayList<>();
-        muleModules.add(new TestModuleBuilder("module1").exportingPackages("org.foo1", "org.foo1.bar").exportingPaths("META-INF", "META-INF/docs1").build());
-        muleModules.add(new TestModuleBuilder("module2").exportingPackages("org.foo2").exportingPaths("META-INF", "META-INF/docs2").build());
+        muleModules.add(new TestModuleBuilder("module1").exportingPackages("org.foo1", "org.foo1.bar.").exportingResources("META-INF/foo.txt", "META-INF/docs1/foo.txt").build());
+        muleModules.add(new TestModuleBuilder("module2").exportingPackages("org.foo2").exportingResources("META-INF/", "/META-INF/docs2").build());
 
         final ClassLoaderFilter classLoaderFilter = factory.create(Collections.emptySet(), muleModules);
 
@@ -43,9 +43,9 @@ public class ContainerClassLoaderFilterFactoryTestCase extends AbstractMuleTestC
         assertThat(classLoaderFilter.exportsResource("META-INF/foo.txt"), is(true));
         assertThat(classLoaderFilter.exportsResource("META-INF/docs1/foo.txt"), is(true));
         assertThat(classLoaderFilter.exportsResource("META-INF/docs2/foo.txt"), is(true));
+        assertThat(classLoaderFilter.exportsResource("/META-INF/docs2/foo.txt"), is(true));
         assertThat(classLoaderFilter.exportsResource("/foo.txt"), is(false));
     }
-
 
     @Test
     public void acceptsExportedSystemPackages() throws Exception

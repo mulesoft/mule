@@ -28,6 +28,9 @@ import java.util.Set;
 public class ContainerClassLoaderFilterFactory
 {
 
+    private static final String EMPTY_PACKAGE = "";
+    private static final char RESOURCE_SEPARATOR = '/';
+
     public ClassLoaderFilter create(Set<String> bootPackages, List<MuleModule> muleModules)
     {
         final Set<String> resources = getExportedResourcePaths(muleModules);
@@ -95,10 +98,26 @@ public class ContainerClassLoaderFilterFactory
 
             if (!exported)
             {
-                exported = isExportedBooPackage(name, RESOURCE_PACKAGE_SPLIT_REGEX);
+                final String resourceFolder = getResourceFolder(name);
+                exported = moduleClassLoaderFilter.exportsResource(resourceFolder);
+                if (!exported)
+                {
+                    exported = isExportedBooPackage(name, RESOURCE_PACKAGE_SPLIT_REGEX);
+                }
             }
 
             return exported;
+        }
+
+        private String getResourceFolder(String resourceName)
+        {
+            String resourceFolder = "";
+            if (resourceName.length() > 0)
+            {
+                resourceFolder = (resourceName.charAt(0) == RESOURCE_SEPARATOR) ? resourceName.substring(1) : resourceName;
+                resourceFolder = (resourceFolder.lastIndexOf(RESOURCE_SEPARATOR) < 0) ? EMPTY_PACKAGE : resourceFolder.substring(0, resourceFolder.lastIndexOf(RESOURCE_SEPARATOR));
+            }
+            return resourceFolder;
         }
 
         private boolean isExportedBooPackage(String name, String splitRegex)

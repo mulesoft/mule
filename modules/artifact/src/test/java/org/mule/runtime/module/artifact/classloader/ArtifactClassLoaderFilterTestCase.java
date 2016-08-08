@@ -7,13 +7,13 @@
 
 package org.mule.runtime.module.artifact.classloader;
 
+import static java.util.Collections.singleton;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.lang.annotation.Annotation;
-import java.util.Collections;
 
 import org.junit.Test;
 
@@ -21,7 +21,7 @@ import org.junit.Test;
 public class ArtifactClassLoaderFilterTestCase extends AbstractMuleTestCase
 {
 
-    private ArtifactClassLoaderFilter filter = new ArtifactClassLoaderFilter(Collections.singleton("java.lang"), Collections.singleton("META-INF"));
+    private ArtifactClassLoaderFilter filter = new ArtifactClassLoaderFilter(singleton("java.lang"), singleton("META-INF/schema.xsd"));
 
     @Test
     public void filtersClassWhenPackageNotExported() throws Exception
@@ -42,21 +42,15 @@ public class ArtifactClassLoaderFilterTestCase extends AbstractMuleTestCase
     }
 
     @Test
-    public void acceptsResourceWhenPackageExported() throws Exception
+    public void acceptsExportedResource() throws Exception
     {
         assertThat(filter.exportsResource("/META-INF/schema.xsd"), equalTo(true));
     }
 
     @Test
-    public void filtersResourceWhenPackageNotExported() throws Exception
+    public void filtersNotExportedResource() throws Exception
     {
-        assertThat(filter.exportsResource("/DOC/readme.txt"), equalTo(false));
-    }
-
-    @Test
-    public void filtersResourceWhenPackageNotExportedAndParentPackageIsExported() throws Exception
-    {
-        assertThat(filter.exportsResource("/META-INF/XML/sample.xml"), equalTo(false));
+        assertThat(filter.exportsResource("/META-INF/readme.txt"), equalTo(false));
     }
 
     @Test(expected = IllegalArgumentException.class)
