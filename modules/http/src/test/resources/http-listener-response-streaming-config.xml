@@ -247,20 +247,29 @@
     </flow>
 
     <flow name="mapFlow">
-        <http:listener config-ref="listenerConfig" path="/map"/>
-        <set-property propertyName="Content-Type" value="application/x-www-form-urlencoded"/>
+        <http:listener config-ref="listenerConfig" path="/map">
+            <http:response-builder>
+                <http:header headerName="Content-Type" value="application/x-www-form-urlencoded"/>
+            </http:response-builder>
+        </http:listener>
         <set-payload value="#[mapPayload]"/>
     </flow>
 
     <flow name="alwaysMapFlow">
-        <http:listener config-ref="listenerConfig" path="/alwaysMap" responseStreamingMode="ALWAYS"/>
-        <set-property propertyName="Content-Type" value="application/x-www-form-urlencoded"/>
+        <http:listener config-ref="listenerConfig" path="/alwaysMap" responseStreamingMode="ALWAYS">
+            <http:response-builder>
+                <http:header headerName="Content-Type" value="application/x-www-form-urlencoded"/>
+            </http:response-builder>
+        </http:listener>
         <set-payload value="#[mapPayload]"/>
     </flow>
 
     <flow name="neverMapFlow">
-        <http:listener config-ref="listenerConfig" path="/neverMap" responseStreamingMode="NEVER"/>
-        <set-property propertyName="Content-Type" value="application/x-www-form-urlencoded"/>
+        <http:listener config-ref="listenerConfig" path="/neverMap" responseStreamingMode="NEVER">
+            <http:response-builder>
+                <http:header headerName="Content-Type" value="application/x-www-form-urlencoded"/>
+            </http:response-builder>
+        </http:listener>
         <set-payload value="#[mapPayload]"/>
     </flow>
 </mule>

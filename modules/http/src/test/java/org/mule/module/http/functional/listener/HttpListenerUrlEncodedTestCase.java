@@ -137,21 +137,14 @@ public class HttpListenerUrlEncodedTestCase extends FunctionalTestCase
     public void serverClosesConnectionAfterSendingData() throws Exception
     {
         // Apache Fluent doesn't fail while other clients such as curl, postman and this one do
-        AsyncHttpClientConfig asyncHttpClientConfig = getAsyncHttpClientConfig();
+        AsyncHttpClientConfig asyncHttpClientConfig = new AsyncHttpClientConfig.Builder().build();
         AsyncHttpClient asyncHttpClient = new AsyncHttpClient(new GrizzlyAsyncHttpProvider(asyncHttpClientConfig), asyncHttpClientConfig);
         ListenableFuture<com.ning.http.client.Response> responseFuture = asyncHttpClient.
                 preparePost(getListenerUrl()).setBody("a=1&b=2").
-                addHeader("Content-Type", "application/x-www-form-urlencoded").execute();
+                addHeader(HttpHeaders.Names.CONTENT_TYPE, HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED).execute();
         com.ning.http.client.Response response = responseFuture.get();
 
         assertThat(response.getStatusCode(), is(200));
-    }
-
-    private AsyncHttpClientConfig getAsyncHttpClientConfig()
-    {
-        AsyncHttpClientConfig.Builder builder = new AsyncHttpClientConfig.Builder();
-        builder.setAllowPoolingConnections(true);
-        return builder.build();
     }
 
     private void assertNullPayloadAndEmptyResponse(Response response) throws Exception
