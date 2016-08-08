@@ -70,7 +70,7 @@ public class ArtifactClassLoaderFilter implements ClassLoaderFilter
     private String sanitizePackageName(String exportedClassPackage)
     {
         exportedClassPackage = exportedClassPackage.trim();
-        exportedClassPackage = exportedClassPackage.endsWith(".") ? exportedClassPackage.substring(0, exportedClassPackage.length()-1) : exportedClassPackage;
+        exportedClassPackage = exportedClassPackage.endsWith(".") ? exportedClassPackage.substring(0, exportedClassPackage.length() - 1) : exportedClassPackage;
         return exportedClassPackage;
     }
 
