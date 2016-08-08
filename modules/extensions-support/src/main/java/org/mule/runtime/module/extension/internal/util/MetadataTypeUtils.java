@@ -120,7 +120,7 @@ public final class MetadataTypeUtils
 
     public static boolean isInstantiable(MetadataType metadataType)
     {
-        return org.mule.metadata.utils.MetadataTypeUtils.getSingleAnnotation(metadataType, ClassInformationAnnotation.class)
+        return metadataType.getAnnotation(ClassInformationAnnotation.class)
                 .map(ClassInformationAnnotation::isInstantiable)
                 .orElse(metadataType.getMetadataFormat().equals(MetadataFormat.JAVA) &&
                         IntrospectionUtils.isInstantiable(getType(metadataType)));
@@ -133,7 +133,7 @@ public final class MetadataTypeUtils
 
     public static boolean isFinal(MetadataType metadataType)
     {
-        return org.mule.metadata.utils.MetadataTypeUtils.getSingleAnnotation(metadataType, ClassInformationAnnotation.class)
+        return metadataType.getAnnotation(ClassInformationAnnotation.class)
                 .map(ClassInformationAnnotation::isFinal)
                 .orElse(metadataType.getMetadataFormat().equals(MetadataFormat.JAVA) &&
                         Modifier.isFinal(getType(metadataType).getModifiers()));
@@ -147,11 +147,11 @@ public final class MetadataTypeUtils
 
     public static boolean isExtensible(MetadataType metadataType)
     {
-        return org.mule.metadata.utils.MetadataTypeUtils.getSingleAnnotation(metadataType, ExtensibleTypeAnnotation.class).isPresent();
+        return metadataType.getAnnotation(ExtensibleTypeAnnotation.class).isPresent();
     }
 
     public static boolean isEnum(MetadataType metadataType)
     {
-        return org.mule.metadata.utils.MetadataTypeUtils.getSingleAnnotation(metadataType, EnumAnnotation.class).isPresent();
+        return metadataType.getAnnotation(EnumAnnotation.class).isPresent();
     }
 }

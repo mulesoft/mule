@@ -59,7 +59,7 @@ public final class SubtypesModelValidator implements ModelValidator
     {
         List<String> finalBaseTypes = typesMapping.keySet().stream()
                 .filter(MetadataTypeUtils::isFinal)
-                .map(base -> base.getAnnotation(TypeIdAnnotation.class).stream().findFirst()
+                .map(base -> base.getAnnotation(TypeIdAnnotation.class)
                         .map(TypeIdAnnotation::getValue)
                         .orElse(getType(base).getName()))
                 .collect(toList());

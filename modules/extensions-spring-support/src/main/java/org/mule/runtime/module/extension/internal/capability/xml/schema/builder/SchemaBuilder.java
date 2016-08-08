@@ -11,7 +11,6 @@ import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.ZERO;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
-import static org.mule.metadata.utils.MetadataTypeUtils.getSingleAnnotation;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.SUPPORTED;
@@ -393,7 +392,7 @@ public final class SchemaBuilder
         restriction.setBase(STRING);
 
 
-        EnumAnnotation<String> enumAnnotation = getSingleAnnotation(enumType, EnumAnnotation.class)
+        EnumAnnotation<String> enumAnnotation = enumType.getAnnotation(EnumAnnotation.class)
                 .orElseThrow(() -> new IllegalArgumentException("Cannot obtain enum values for the given type"));
 
         for (String value : enumAnnotation.getValues())
@@ -434,7 +433,7 @@ public final class SchemaBuilder
             @Override
             public void visitString(StringType stringType)
             {
-                Optional<EnumAnnotation> enumAnnotation = getSingleAnnotation(stringType, EnumAnnotation.class);
+                Optional<EnumAnnotation> enumAnnotation = stringType.getAnnotation(EnumAnnotation.class);
 
                 if (enumAnnotation.isPresent())
                 {
