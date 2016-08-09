@@ -284,6 +284,6 @@ public class VoidMuleEvent implements MuleEvent
     @Override
     public void setSecurityContext(SecurityContext context)
     {
-
+        throw new UnsupportedOperationException();
     }
 }
