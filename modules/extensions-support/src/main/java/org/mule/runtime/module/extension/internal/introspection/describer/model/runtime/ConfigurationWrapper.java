@@ -21,7 +21,7 @@ import java.util.List;
  *
  * @since 4.0
  */
-class ConfigurationWrapper extends DeclaringPointWrapper implements ConfigurationElement, ParameterizableTypeElement
+class ConfigurationWrapper extends ComponentWrapper implements ConfigurationElement, ParameterizableTypeElement
 {
 
     ConfigurationWrapper(Class aClass)

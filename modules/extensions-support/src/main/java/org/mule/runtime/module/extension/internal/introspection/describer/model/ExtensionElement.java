@@ -13,7 +13,7 @@ import java.util.List;
  *
  * @since 4.0
  */
-public interface ExtensionElement extends ParameterizableTypeElement, DeclaringPointElement
+public interface ExtensionElement extends ParameterizableTypeElement, ComponentElement
 {
 
     /**

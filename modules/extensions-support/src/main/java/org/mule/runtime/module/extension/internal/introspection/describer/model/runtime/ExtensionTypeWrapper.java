@@ -23,7 +23,7 @@ import java.util.stream.Stream;
  *
  * @since 4.0
  */
-public class ExtensionTypeWrapper<T> extends DeclaringPointWrapper implements ExtensionElement, ParameterizableTypeElement
+public class ExtensionTypeWrapper<T> extends ComponentWrapper implements ExtensionElement, ParameterizableTypeElement
 {
 
     public ExtensionTypeWrapper(Class<T> aClass)

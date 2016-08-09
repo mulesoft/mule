@@ -11,7 +11,7 @@ package org.mule.runtime.module.extension.internal.introspection.describer.model
  *
  * @since 4.0
  */
-public interface ConfigurationElement extends ParameterizableTypeElement, DeclaringPointElement
+public interface ConfigurationElement extends ParameterizableTypeElement, ComponentElement
 {
 
 }

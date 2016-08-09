@@ -67,7 +67,7 @@ import org.mule.runtime.module.extension.internal.exception.IllegalOperationMode
 import org.mule.runtime.module.extension.internal.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.ConfigurationElement;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.ConnectionProviderElement;
-import org.mule.runtime.module.extension.internal.introspection.describer.model.DeclaringPointElement;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.ComponentElement;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.ExtensionElement;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.ExtensionParameter;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.ExtensionTypeFactory;
@@ -196,7 +196,7 @@ public final class AnnotationsBasedDescriber implements Describer
         }
     }
 
-    private void declareConfiguration(ExtensionDeclarer declaration, ExtensionElement extensionType, DeclaringPointElement configurationType)
+    private void declareConfiguration(ExtensionDeclarer declaration, ExtensionElement extensionType, ComponentElement configurationType)
     {
         checkConfigurationIsNotAnOperation(configurationType.getDeclaredClass());
         ConfigurationDeclarer configurationDeclarer;

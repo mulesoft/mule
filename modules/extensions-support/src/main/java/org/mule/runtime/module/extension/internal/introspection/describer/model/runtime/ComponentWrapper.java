@@ -14,7 +14,7 @@ import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.Sources;
 import org.mule.runtime.extension.api.annotation.connector.Providers;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.ConnectionProviderElement;
-import org.mule.runtime.module.extension.internal.introspection.describer.model.DeclaringPointElement;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.ComponentElement;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.OperationContainerElement;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.SourceElement;
 
@@ -22,14 +22,14 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Abstract implementation of {@link DeclaringPointWrapper}
+ * Abstract implementation of {@link ComponentWrapper}
  *
  * @since 4.0
  */
-abstract class DeclaringPointWrapper extends TypeWrapper implements DeclaringPointElement
+abstract class ComponentWrapper extends TypeWrapper implements ComponentElement
 {
 
-    DeclaringPointWrapper(Class<?> aClass)
+    ComponentWrapper(Class<?> aClass)
     {
         super(aClass);
     }
