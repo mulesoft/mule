@@ -7,14 +7,17 @@
 
 package org.mule.functional.classloading.isolation.classloader;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static java.lang.Boolean.valueOf;
 import static java.lang.System.getProperty;
+import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.MODULE_PROPERTIES;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_LOG_VERBOSE_CLASSLOADING;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.EXTENSION_MANIFEST_FILE_NAME;
-import org.mule.functional.api.classloading.isolation.ArtifactUrlClassification;
 import org.mule.functional.api.classloading.isolation.ArtifactClassLoaderHolder;
+import org.mule.functional.api.classloading.isolation.ArtifactUrlClassification;
 import org.mule.functional.api.classloading.isolation.PluginUrlClassification;
+import org.mule.functional.api.classloading.isolation.ServiceUrlClassification;
 import org.mule.runtime.container.internal.ClasspathModuleDiscoverer;
 import org.mule.runtime.container.internal.ContainerClassLoaderFilterFactory;
 import org.mule.runtime.container.internal.MuleModule;
@@ -83,8 +86,11 @@ public class IsolatedClassLoaderFactory {
 
     ClassLoaderLookupPolicy childClassLoaderLookupPolicy = testContainerClassLoaderFactory.getContainerClassLoaderLookupPolicy();
 
+    List<ArtifactClassLoader> serviceArtifactClassLoaders =
+        createServiceClassLoaders(classLoader, childClassLoaderLookupPolicy, artifactUrlClassification);
+
     List<ArtifactClassLoader> pluginsArtifactClassLoaders = new ArrayList<>();
-    if (!artifactUrlClassification.getPluginClassificationUrls().isEmpty()) {
+    if (!artifactUrlClassification.getPluginUrlClassifications().isEmpty()) {
       classLoader = createPluginClassLoaders(classLoader, childClassLoaderLookupPolicy, artifactUrlClassification,
                                              pluginsArtifactClassLoaders);
     }
@@ -92,7 +98,8 @@ public class IsolatedClassLoaderFactory {
     ArtifactClassLoader appClassLoader =
         createApplicationArtifactClassLoader(classLoader, childClassLoaderLookupPolicy, artifactUrlClassification);
 
-    return new ArtifactClassLoaderHolder(containerClassLoader, pluginsArtifactClassLoaders, appClassLoader);
+    return new ArtifactClassLoaderHolder(containerClassLoader, serviceArtifactClassLoaders, pluginsArtifactClassLoaders,
+                                         appClassLoader);
   }
 
   /**
@@ -125,20 +132,43 @@ public class IsolatedClassLoaderFactory {
   }
 
   /**
-   * For each plugin defined in the classification it will create an {@link ArtifactClassLoader} with the name defined in
-   * classification. For extension plugins it will also create the filter based on the extension manifest file. For a plain plugin
-   * it will collect the exported packages and resources for creating the filter from its mule-module.properties file. <pr/> It
-   * also creates a sharedLibs plugin without any library so far, in order to be a similar representation as mule's container has
-   * and also to allow the hierarchy process to look for classes from its parent (see {@link CompositeClassLoader} that doesn't
-   * delegate to its parent). <pr/> With the given list of created class loader plugins it will finally create a
-   * {@link CompositeClassLoader} and return it.
+   * For each service defined in the classification it creates an {@link ArtifactClassLoader} wit the name defined in
+   * classification.
+   *
+   * @param parent the parent class loader to be assigned to the new one created here
+   * @param childClassLoaderLookupPolicy look policy to be used
+   * @param artifactUrlClassification the url classifications to get plugins {@link URL}s
+   * @return a {@link CompositeClassLoader} that represents the service class loaders
+   */
+  protected List<ArtifactClassLoader> createServiceClassLoaders(ClassLoader parent,
+                                                                ClassLoaderLookupPolicy childClassLoaderLookupPolicy,
+                                                                ArtifactUrlClassification artifactUrlClassification) {
+    List<ArtifactClassLoader> servicesArtifactClassLoaders = newArrayList();
+    for (ServiceUrlClassification serviceUrlClassification : artifactUrlClassification.getServiceUrlClassifications()) {
+      MuleArtifactClassLoader artifactClassLoader = new MuleArtifactClassLoader(serviceUrlClassification.getName(),
+                                                                                serviceUrlClassification.getUrls().toArray(
+                                                                                                                           new URL[0]),
+                                                                                parent, childClassLoaderLookupPolicy);
+      servicesArtifactClassLoaders.add(artifactClassLoader);
+    }
+    return servicesArtifactClassLoaders;
+  }
+
+  /**
+   * For each plugin defined in the classification it creates an {@link ArtifactClassLoader} with the name defined in
+   * classification. For extension plugins it also creates the filter based on the extension manifest file. For a plain plugin it
+   * collects the exported packages and resources for creating the filter from its
+   * {@value ClasspathModuleDiscoverer#MODULE_PROPERTIES} file. <pr/> It also creates the sharedLibs class loader without any
+   * library so far, in order to be a similar representation as mule's container has and also to allow the hierarchy process to
+   * look for classes from its parent (see {@link CompositeClassLoader} that doesn't delegate to its parent). <pr/> With the given
+   * list of created class loader plugins it will finally create a {@link CompositeClassLoader} and return it.
    *
    * @param parent the parent class loader to be assigned to the new one created here
    * @param childClassLoaderLookupPolicy look policy to be used
    * @param artifactUrlClassification the url classifications to get plugins {@link URL}s
    * @param pluginsArtifactClassLoaders a list where it would append each {@link ArtifactClassLoader} created for a plugin in
    *        order to allow access them later
-   * @return a {@link CompositeClassLoader} that represents the plugin class loaders.
+   * @return a {@link CompositeClassLoader} that represents the plugin class loaders
    */
   protected ClassLoader createPluginClassLoaders(ClassLoader parent, ClassLoaderLookupPolicy childClassLoaderLookupPolicy,
                                                  ArtifactUrlClassification artifactUrlClassification,
@@ -149,7 +179,7 @@ public class IsolatedClassLoaderFactory {
     // the extension xsd that depends on that one.
     pluginClassLoaders.add(new MuleArtifactClassLoader("sharedLibs", new URL[0], parent, childClassLoaderLookupPolicy));
 
-    for (PluginUrlClassification pluginUrlClassification : artifactUrlClassification.getPluginClassificationUrls()) {
+    for (PluginUrlClassification pluginUrlClassification : artifactUrlClassification.getPluginUrlClassifications()) {
       logClassLoaderUrls("PLUGIN (" + pluginUrlClassification.getName() + ")", pluginUrlClassification.getUrls());
       MuleArtifactClassLoader pluginCL =
           new MuleArtifactClassLoader(pluginUrlClassification.getName(), pluginUrlClassification.getUrls().toArray(new URL[0]),
@@ -240,7 +270,7 @@ public class IsolatedClassLoaderFactory {
 
   /**
    * Validates that only one module should be discovered. A plugin cannot have inside another plugin that holds a
-   * {@code mule-module.properties} for the time being.
+   * {@value ClasspathModuleDiscoverer#MODULE_PROPERTIES} for the time being.
    *
    * @param pluginName the plugin name
    * @param discoveredModules {@link MuleModule} discovered
@@ -249,10 +279,11 @@ public class IsolatedClassLoaderFactory {
   private MuleModule validatePluginModule(String pluginName, List<MuleModule> discoveredModules) {
     if (discoveredModules.size() == 0) {
       throw new IllegalStateException(pluginName
-          + " doesn't have in its classpath a mule-module.properties to define what packages and resources should expose");
+          + " doesn't have in its classpath a " + MODULE_PROPERTIES + " to define what packages and resources should expose");
     }
     if (discoveredModules.size() > 1) {
-      throw new IllegalStateException(pluginName + " has more than one mule-module.properties, composing plugins is not allowed");
+      throw new IllegalStateException(pluginName + " has more than one " + MODULE_PROPERTIES
+          + ", composing plugins is not allowed");
     }
     return discoveredModules.get(0);
   }

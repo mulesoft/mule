@@ -19,26 +19,33 @@ import java.util.List;
 public final class ArtifactClassLoaderHolder {
 
   private ArtifactClassLoader containerClassLoader;
+  private List<ArtifactClassLoader> servicesArtifactClassLoaders;
   private List<ArtifactClassLoader> pluginsArtifactClassLoaders;
   private ArtifactClassLoader applicationClassLoader;
 
   public ArtifactClassLoaderHolder(ArtifactClassLoader containerClassLoader,
+                                   List<ArtifactClassLoader> servicesArtifactClassLoaders,
                                    List<ArtifactClassLoader> pluginsArtifactClassLoaders,
                                    ArtifactClassLoader applicationClassLoader) {
     this.containerClassLoader = containerClassLoader;
+    this.servicesArtifactClassLoaders = servicesArtifactClassLoaders;
     this.pluginsArtifactClassLoaders = pluginsArtifactClassLoaders;
     this.applicationClassLoader = applicationClassLoader;
   }
 
-  public ArtifactClassLoader getContainerClassLoader() {
+  public ArtifactClassLoader getContainerArtifactClassLoader() {
     return containerClassLoader;
   }
 
-  public List<ArtifactClassLoader> getPluginsClassLoaders() {
+  public List<ArtifactClassLoader> getServicesArtifactClassLoaders() {
+    return servicesArtifactClassLoaders;
+  }
+
+  public List<ArtifactClassLoader> getPluginsArtifactClassLoaders() {
     return pluginsArtifactClassLoaders;
   }
 
-  public ArtifactClassLoader getApplicationClassLoader() {
+  public ArtifactClassLoader getApplicationArtifactClassLoader() {
     return applicationClassLoader;
   }
 

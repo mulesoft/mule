@@ -36,6 +36,8 @@ public final class Configuration {
   /**
    * It sets the strategy to also include the root artifact in the result of the dependencies resolved. By default it is not
    * included due to the most common usage is to get dependencies instead of the whole set of root artifact plus dependencies.
+   * <p/>
+   * By default it is not included.
    *
    * @return this
    */
@@ -47,6 +49,8 @@ public final class Configuration {
   /**
    * A conditional way to define if the root artifact should be included or not in results. A {@link Predicate} can be passed that
    * will be evaluated with the root artifact during the resolution of the dependencies.
+   * <p/>
+   * By default it is not included.
    *
    * @param rootArtifactPredicate
    * @return this

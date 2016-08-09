@@ -7,6 +7,8 @@
 
 package org.mule.functional.api.classloading.isolation;
 
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptySet;
 import static org.mule.runtime.core.util.Preconditions.checkNotNull;
 import org.mule.functional.classloading.isolation.classification.DefaultClassPathClassifier;
 import org.mule.functional.classloading.isolation.classloader.IsolatedClassLoaderFactory;
@@ -50,10 +52,11 @@ public class ArtifactIsolatedClassLoaderBuilder {
 
   private File rootArtifactClassesFolder;
   private File rootArtifactTestClassesFolder;
-  private List<String> exclusions;
-  private List<String> extraBootPackages;
-  private List<String> extensionBasePackages;
-  private Set<Class> exportClasses;
+  private List<String> exclusions = emptyList();
+  private List<String> extraBootPackages = emptyList();
+  private List<String> extensionBasePackages = emptyList();
+  private Set<Class> exportClasses = emptySet();
+  private List<String> servicesExclusion = emptyList();
 
   /**
    * Sets the {@link ClassPathClassifier} implementation to be used by the builder.
@@ -166,6 +169,18 @@ public class ArtifactIsolatedClassLoaderBuilder {
   }
 
   /**
+   * Sets the {@link List} of {@link String}s to define the Maven artifactIds that should be ignore no matter if they are
+   * discovered as services.
+   *
+   * @param servicesExclusion
+   * @return this
+   */
+  public ArtifactIsolatedClassLoaderBuilder setServicesExclusion(final List<String> servicesExclusion) {
+    this.servicesExclusion = servicesExclusion;
+    return this;
+  }
+
+  /**
    * Builds the {@link ArtifactClassLoaderHolder} with the
    * {@link org.mule.runtime.module.artifact.classloader.ArtifactClassLoader}s for application, plugins and container.
    *
@@ -185,7 +200,7 @@ public class ArtifactIsolatedClassLoaderBuilder {
       context =
           new ClassPathClassifierContext(rootArtifactClassesFolder, rootArtifactTestClassesFolder, classPathUrlProvider.getURLs(),
                                          mavenDependenciesResolver.buildDependencies(), mavenMultiModuleArtifactMapping,
-                                         exclusions, extraBootPackages, extensionBasePackages, exportClasses);
+                                         exclusions, extraBootPackages, extensionBasePackages, exportClasses, servicesExclusion);
     } catch (IOException e) {
       throw new RuntimeException("Error while creating the classification context", e);
     }

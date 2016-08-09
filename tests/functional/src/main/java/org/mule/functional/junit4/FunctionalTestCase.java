@@ -86,6 +86,13 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
   }
 
   /**
+   * Allows to configure {@link SpringXmlConfigurationBuilder} as the test needs.
+   * 
+   * @param builder the {@link SpringXmlConfigurationBuilder} created from the configuration resources
+   */
+  protected void configureSpringXmlConfigurationBuilder(SpringXmlConfigurationBuilder builder) {}
+
+  /**
    * @return a single file that defines a mule application configuration
    */
   protected String getConfigFile() {

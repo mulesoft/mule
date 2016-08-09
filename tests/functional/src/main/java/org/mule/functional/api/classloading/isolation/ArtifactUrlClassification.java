@@ -19,7 +19,8 @@ import java.util.List;
 public class ArtifactUrlClassification {
 
   private final List<URL> containerUrls;
-  private final List<PluginUrlClassification> pluginClassificationsUrls;
+  private final List<ServiceUrlClassification> serviceUrlClassifications;
+  private final List<PluginUrlClassification> pluginUrlClassifications;
   private final List<URL> applicationUrls;
 
   /**
@@ -27,15 +28,18 @@ public class ArtifactUrlClassification {
    *
    * @param containerUrls list of {@link URL} that define the artifacts that would be loaded with the container
    *        {@link ClassLoader}
-   * @param pluginClassificationsUrls for each plugin discovered a list of {@link URL} that define the artifacts that would be
-   *        loaded by the plugin {@link ClassLoader}
+   * @param serviceUrlClassifications for each plugin discovered a list of {@link ServiceUrlClassification} that defines the
+   *        artifact that would be loaded by the service {@link ClassLoader}
+   * @param pluginUrlClassifications for each plugin discovered a list of {@link PluginUrlClassification} that defines the
+   *        artifact that would be loaded by the plugin {@link ClassLoader}
    * @param applicationUrls list of {@link URL} that define the artifacts that would be loaded with the application
    *        {@link ClassLoader}
    */
-  public ArtifactUrlClassification(List<URL> containerUrls, List<PluginUrlClassification> pluginClassificationsUrls,
-                                   List<URL> applicationUrls) {
+  public ArtifactUrlClassification(List<URL> containerUrls, List<ServiceUrlClassification> serviceUrlClassifications,
+                                   List<PluginUrlClassification> pluginUrlClassifications, List<URL> applicationUrls) {
     this.containerUrls = containerUrls;
-    this.pluginClassificationsUrls = pluginClassificationsUrls;
+    this.serviceUrlClassifications = serviceUrlClassifications;
+    this.pluginUrlClassifications = pluginUrlClassifications;
     this.applicationUrls = applicationUrls;
   }
 
@@ -43,8 +47,12 @@ public class ArtifactUrlClassification {
     return containerUrls;
   }
 
-  public List<PluginUrlClassification> getPluginClassificationUrls() {
-    return pluginClassificationsUrls;
+  public List<ServiceUrlClassification> getServiceUrlClassifications() {
+    return serviceUrlClassifications;
+  }
+
+  public List<PluginUrlClassification> getPluginUrlClassifications() {
+    return pluginUrlClassifications;
   }
 
   public List<URL> getApplicationUrls() {

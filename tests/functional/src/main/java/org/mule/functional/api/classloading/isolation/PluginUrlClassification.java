@@ -17,10 +17,8 @@ import java.util.List;
  *
  * @since 4.0
  */
-public class PluginUrlClassification {
+public class PluginUrlClassification extends ServiceUrlClassification {
 
-  private final List<URL> urls;
-  private final String name;
   private final List<Class> exportClasses;
 
   /**
@@ -31,17 +29,8 @@ public class PluginUrlClassification {
    * @param exportClasses list of {@link Class}es that would be used for exporting as extra classes to the plugin
    */
   public PluginUrlClassification(String name, List<URL> urls, List<Class> exportClasses) {
-    this.name = name;
-    this.urls = urls;
+    super(name, urls);
     this.exportClasses = exportClasses;
-  }
-
-  public List<URL> getUrls() {
-    return urls;
-  }
-
-  public String getName() {
-    return name;
   }
 
   public List<Class> getExportClasses() {

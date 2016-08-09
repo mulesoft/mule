@@ -17,16 +17,19 @@ import static org.apache.commons.io.FilenameUtils.getExtension;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.util.PropertiesUtils.loadProperties;
+import static org.springframework.core.io.support.ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX;
+import static org.springframework.util.ResourceUtils.extractJarFileURL;
 import org.mule.functional.api.classloading.isolation.ArtifactUrlClassification;
 import org.mule.functional.api.classloading.isolation.ClassPathClassifier;
 import org.mule.functional.api.classloading.isolation.ClassPathClassifierContext;
-import org.mule.functional.api.classloading.isolation.PluginUrlClassification;
-import org.mule.functional.classloading.isolation.classpath.MavenArtifactToClassPathUrlsResolver;
-import org.mule.functional.api.classloading.isolation.MavenMultiModuleArtifactMapping;
 import org.mule.functional.api.classloading.isolation.Configuration;
 import org.mule.functional.api.classloading.isolation.DependenciesFilter;
 import org.mule.functional.api.classloading.isolation.DependencyResolver;
+import org.mule.functional.api.classloading.isolation.MavenMultiModuleArtifactMapping;
+import org.mule.functional.api.classloading.isolation.PluginUrlClassification;
+import org.mule.functional.api.classloading.isolation.ServiceUrlClassification;
 import org.mule.functional.api.classloading.isolation.TransitiveDependenciesFilter;
+import org.mule.functional.classloading.isolation.classpath.MavenArtifactToClassPathUrlsResolver;
 import org.mule.functional.junit4.ExtensionsTestInfrastructureDiscoverer;
 import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -35,19 +38,21 @@ import org.mule.runtime.core.registry.DefaultRegistryBroker;
 import org.mule.runtime.core.registry.MuleRegistryHelper;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.introspection.declaration.spi.Describer;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManager;
 import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
-
-import com.google.common.collect.Lists;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Optional;
+import java.util.Properties;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -56,6 +61,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
 
 /**
@@ -64,10 +71,10 @@ import org.springframework.core.type.filter.AnnotationTypeFilter;
  * <p/>
  * Basically it creates a {@link ArtifactUrlClassification} hierarchy with:
  * <ul>
- * <li>Provided Scope (plus JDK stuff)</li>
+ * <li>{@code provided} scope (plus JDK stuff)</li>
  * <li>Composite ClassLoader(that includes a class loader for each extension (if discovered) and/or plugin if the current artifact
- * has target/classes folder, for any case its compile scope dependencies are also added (plus its target/classes)</li>
- * <li>Test Scope (plus target/test-classes and all the test scope dependencies including transitives)</li>
+ * has target/classes folder, for any case its {@code compile} scope dependencies are also added (plus its target/classes)</li>
+ * <li>Test Scope (plus target/test-classes and all the {@code test} scope dependencies including transitives)</li>
  * </ul>
  *
  * <p/>
@@ -80,8 +87,11 @@ public class DefaultClassPathClassifier implements ClassPathClassifier {
 
   public static final String GENERATED_TEST_SOURCES = "generated-test-sources";
   public static final String JAR = "jar";
+  public static final String FILE = "file";
   public static final String POM_PROPERTIES_FILE_NAME = "pom.properties";
   public static final String ARTIFACT_ID = "artifactId";
+  public static final String SERVICE_PROPERTIES_FILE_NAME = "service.properties";
+  public static final String SERVICE_PROVIDER_CLASS_NAME = "service.className";
 
   protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -99,10 +109,11 @@ public class DefaultClassPathClassifier implements ClassPathClassifier {
         new ExtendedClassPathClassifierContext(context, artifactToClassPathUrlResolver);
 
     List<URL> appUrls = buildAppUrls(extendedClassPathClassifierContext);
+    List<ServiceUrlClassification> serviceUrlClassifications = buildServicesUrlClassification(extendedClassPathClassifierContext);
     List<PluginUrlClassification> pluginUrlClassifications = buildPluginsUrlClassification(extendedClassPathClassifierContext);
     List<URL> containerUrls = buildContainerUrls(extendedClassPathClassifierContext, appUrls, pluginUrlClassifications);
 
-    return new ArtifactUrlClassification(containerUrls, pluginUrlClassifications, appUrls);
+    return new ArtifactUrlClassification(containerUrls, serviceUrlClassifications, pluginUrlClassifications, appUrls);
   }
 
   /**
@@ -144,12 +155,15 @@ public class DefaultClassPathClassifier implements ClassPathClassifier {
     ClassPathScanningCandidateComponentProvider scanner = new ClassPathScanningCandidateComponentProvider(true);
     scanner.addIncludeFilter(new AnnotationTypeFilter(Extension.class));
     // TODO(gfernandes): MULE-10081
-    String extensionsBasePackage = extendedContext.getClassificationContext().getExtensionBasePackages().stream()
-        .filter(v -> isNotBlank(v)).findFirst().get();
-    if (extensionsBasePackage != null && extensionsBasePackage.isEmpty()) {
-      throw new IllegalArgumentException("Base package for discovering extensions cannot be empty, it will take too much time to discover all the classes, please set a reasonable package for your extension annotate your tests with its base package");
+    Optional<String> extensionsBasePackage = extendedContext.getClassificationContext().getExtensionBasePackages().stream()
+        .filter(v -> isNotBlank(v)).findFirst();
+    if (!extensionsBasePackage.isPresent() || extensionsBasePackage.get().isEmpty()) {
+      throw new IllegalArgumentException("Base package for discovering extensions cannot be empty, it will take too much time to "
+          +
+          "discover all the classes, please set a reasonable package for your extension annotate " +
+          "your tests with its base package");
     }
-    Set<BeanDefinition> extensionsAnnotatedClasses = scanner.findCandidateComponents(extensionsBasePackage);
+    Set<BeanDefinition> extensionsAnnotatedClasses = scanner.findCandidateComponents(extensionsBasePackage.get());
 
     boolean isRootArtifactIdAnExtension = false;
     if (!extensionsAnnotatedClasses.isEmpty()) {
@@ -166,9 +180,12 @@ public class DefaultClassPathClassifier implements ClassPathClassifier {
                                              e);
         }
 
+        File extensionSourceCodeLocation = new File(extensionClass.getProtectionDomain().getCodeSource().getLocation().getPath());
+        logger.debug("Extension: '{}' loaded from path: '{}'", extensionClass.getName(), extensionSourceCodeLocation);
+
         String extensionMavenArtifactId =
-            getExtensionMavenArtifactId(extensionClass,
-                                        extendedContext.getClassificationContext().getMavenMultiModuleArtifactMapping());
+            getMavenArtifactId(extensionSourceCodeLocation,
+                               extendedContext.getClassificationContext().getMavenMultiModuleArtifactMapping());
         isRootArtifactIdAnExtension |= extendedContext.getRootArtifact().getArtifactId().equals(extensionMavenArtifactId);
 
         pluginClassifications.add(extensionClassPathClassification(extensionClass, extensionMavenArtifactId, extendedContext));
@@ -219,6 +236,77 @@ public class DefaultClassPathClassifier implements ClassPathClassifier {
   }
 
   /**
+   * Finds if there are {@value #SERVICE_PROPERTIES_FILE_NAME} in classpath in order to build a {@link ServiceUrlClassification}
+   * for each artifact that contains the {@value #SERVICE_PROPERTIES_FILE_NAME} file, {@cvalue #SERVICE_PROVIDER_CLASS_NAME} will
+   * be used as {@link ArtifactClassLoader#getArtifactName()}. Once an artifact is identified the dependencies are going to be
+   * collected from the graph using Maven {@code provided} scope.
+   *
+   * @param extendedContext {@link ExtendedClassPathClassifierContext} that holds the data needed for classifying the artifacts
+   * @return a {@link List} of {@link ServiceUrlClassification}s that would be the one used for the plugins class loaders.
+   */
+  protected List<ServiceUrlClassification> buildServicesUrlClassification(final ExtendedClassPathClassifierContext extendedContext) {
+    URLClassLoader classLoader = extendedContext.getClassificationContext().getClassPathClassLoader();
+    PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver(classLoader);
+    List<ServiceUrlClassification> serviceUrlClassifications = newArrayList();
+    Resource[] resources;
+    try {
+      resources = resolver.getResources(CLASSPATH_ALL_URL_PREFIX + "/META-INF/" + SERVICE_PROPERTIES_FILE_NAME);
+      logger.debug("Discovered " + resources.length + " services, processing them to build the URLs list for each one");
+      for (Resource resource : resources) {
+        File artifactFile;
+        String protocol = resource.getURL().getProtocol();
+        if (protocol.equals(JAR)) {
+          logger.debug("Service discovered from JAR file: " + resource.getFile());
+          artifactFile = new File(extractJarFileURL(resource.getURL()).getFile());
+        } else if (protocol.equals(FILE) && resource.getFile().getParentFile().getParentFile().isDirectory()) {
+          logger.debug("Service discovered from directory, most likely a multi-module project: " + resource.getFile());
+          artifactFile = resource.getFile().getParentFile().getParentFile();
+        } else {
+          throw new IllegalStateException("A " + SERVICE_PROPERTIES_FILE_NAME + " was found in a resource that is not a " + JAR +
+              " neither a folder (Maven multi-module), instead it is in a resource: '" +
+              resource.getFile() + "' that cannot be handled by the classification process");
+        }
+
+        Properties serviceProperties = loadProperties(resource.getInputStream());
+        String serviceProviderClassName = serviceProperties.getProperty(SERVICE_PROVIDER_CLASS_NAME);
+
+        String serviceMavenArtifactId =
+            getMavenArtifactId(artifactFile,
+                               extendedContext.getClassificationContext().getMavenMultiModuleArtifactMapping());
+        checkArgument(!extendedContext.getRootArtifact().getArtifactId().equals(serviceMavenArtifactId),
+                      "RootArtifact: '" + extendedContext.getRootArtifact() + "' cannot be a service. It is not supported");
+
+        if (!extendedContext.getClassificationContext().getServicesExclusion().contains(serviceMavenArtifactId)) {
+          logger.debug("Service: '" + serviceProviderClassName + "' from artifactId: '" + serviceMavenArtifactId
+              + "' found and being classified");
+
+          List<URL> serviceURLs = new DependencyResolver(new Configuration()
+              .setMavenDependencyGraph(extendedContext.getClassificationContext().getDependencyGraph())
+              .selectDependencies(new DependenciesFilter().match(dependency -> dependency.getArtifactId()
+                  .equals(serviceMavenArtifactId)))
+              .collectTransitiveDependencies(new TransitiveDependenciesFilter()
+                  .match(transitiveDependency -> transitiveDependency.isProvidedScope()
+                      && !extendedContext.getClassificationContext().getExclusions()
+                          .test(transitiveDependency))))
+                              .resolveDependencies()
+                              .stream().filter(d -> !d.isPomType())
+                              .map(dependency -> extendedContext.getArtifactToClassPathURLResolver()
+                                  .resolveURL(dependency, extendedContext.getClassificationContext().getClassPathURLs()))
+                              .collect(toList());
+
+          serviceUrlClassifications.add(new ServiceUrlClassification(serviceProviderClassName, serviceURLs));
+        } else {
+          logger.debug("Service: '" + serviceProviderClassName + "' from artifactId: '" + serviceMavenArtifactId
+              + "' found and ignored as it is excluded");
+        }
+      }
+    } catch (IOException e) {
+      throw new RuntimeException("Error while getting resources for services", e);
+    }
+    return serviceUrlClassifications;
+  }
+
+  /**
    * @return an {@link ExtensionManagerAdapter} that would be used to register the extensions, later it would be discarded.
    */
   private ExtensionManagerAdapter createExtensionManager() {
@@ -239,29 +327,27 @@ public class DefaultClassPathClassifier implements ClassPathClassifier {
   }
 
   /**
-   * Using the extensionClass and the location of the file source it will lookup for the maven artifact id using the
+   * For the given artifact {@link File} it will lookup for the maven artifact id using the
    * {@link MavenMultiModuleArtifactMapping}.
    *
-   * @param extensionClass the class of the extension
+   * @param artifactFile the artifact {@link File}
    * @param mavenMultiModuleMapping the maven multi module mapping
-   * @return the maven artifact id where the extension class belongs to
+   * @return the maven artifact id mapped to the given file
    */
-  private String getExtensionMavenArtifactId(final Class extensionClass,
-                                             final MavenMultiModuleArtifactMapping mavenMultiModuleMapping) {
-    File extensionSourceCodeLocation = new File(extensionClass.getProtectionDomain().getCodeSource().getLocation().getPath());
-    logger.debug("Extension: '{}' loaded from path: '{}'", extensionClass.getName(), extensionSourceCodeLocation);
-    String extensionMavenArtifactId;
+  private String getMavenArtifactId(final File artifactFile,
+                                    final MavenMultiModuleArtifactMapping mavenMultiModuleMapping) {
+    String mavenArtifactId;
 
     // If it is a file it means that it is an installed artifact
-    if (extensionSourceCodeLocation.isFile()) {
+    if (artifactFile.isFile()) {
       // It is a jar file, we just get it from the pom.properties file (jars must contain it in order to be classified)
-      extensionMavenArtifactId = readArtifactIdFromPomProperties(extensionSourceCodeLocation);
+      mavenArtifactId = readArtifactIdFromPomProperties(artifactFile);
     } else {
-      extensionMavenArtifactId = mavenMultiModuleMapping
-          .getArtifactId(extensionSourceCodeLocation.getParentFile().getParentFile().getAbsolutePath() + separator);
+      mavenArtifactId = mavenMultiModuleMapping
+          .getArtifactId(artifactFile.getParentFile().getParentFile().getAbsolutePath() + separator);
     }
 
-    return extensionMavenArtifactId;
+    return mavenArtifactId;
   }
 
   /**
@@ -381,13 +467,13 @@ public class DefaultClassPathClassifier implements ClassPathClassifier {
                                         extendedContext.getClassificationContext().getClassPathURLs()))
                         .collect(toSet());
 
-    List<Class> exportClassesForExtension = extendedContext
+    List<Class> exportClasses = extendedContext
         .getClassificationContext().getExportClasses().stream().filter(c -> c.getProtectionDomain().getCodeSource().getLocation()
             .getPath().startsWith(extendedContext.getClassificationContext().getRootArtifactClassesFolder().getPath()))
         .collect(toList());
 
-    return new PluginUrlClassification(extendedContext.getRootArtifact().getArtifactId(), Lists.newArrayList(urls),
-                                       exportClassesForExtension);
+    return new PluginUrlClassification(extendedContext.getRootArtifact().getArtifactId(), newArrayList(urls),
+                                       exportClasses);
   }
 
 }
