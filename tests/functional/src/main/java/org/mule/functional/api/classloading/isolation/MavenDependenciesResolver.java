@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.functional.classloading.isolation.maven;
+package org.mule.functional.api.classloading.isolation;
 
 /**
  * Resolves maven dependencies for the artifact being tested.

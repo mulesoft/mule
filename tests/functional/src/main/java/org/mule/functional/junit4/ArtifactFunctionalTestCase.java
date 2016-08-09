@@ -8,7 +8,8 @@
 package org.mule.functional.junit4;
 
 import static org.mule.functional.util.AnnotationUtils.getAnnotationAttributeFrom;
-import org.mule.functional.classloading.isolation.builder.IsolatedClassLoaderExtensionsManagerConfigurationBuilder;
+import org.mule.functional.api.classloading.isolation.IsolatedClassLoaderExtensionsManagerConfigurationBuilder;
+import org.mule.functional.api.classloading.isolation.ClassPathClassifier;
 import org.mule.functional.junit4.runners.ArtifactClassLoaderRunner;
 import org.mule.functional.junit4.runners.PluginClassLoadersAware;
 import org.mule.functional.junit4.runners.RunnerDelegateTo;
@@ -33,7 +34,7 @@ import org.junit.runner.RunWith;
  * about how to generate the dependency graph needed by this runner.
  * <p/>
  * The classification for {@link ClassLoader}s would be based on dependencies scope, provided will go to the container, compile to plugin and test to
- * the application. For more information about the classification process see {@link org.mule.functional.classloading.isolation.classification.ClassPathClassifier}.
+ * the application. For more information about the classification process see {@link ClassPathClassifier}.
  * <p/>
  * For plugins it will scan the plugin set of {@link java.net.URL}s to search for classes annotated with {@link org.mule.runtime.extension.api.annotation.Extension}, if
  * a class is annotated it will generate the metadata for the extension in runtime and it will also register it to the {@link org.mule.runtime.extension.api.ExtensionManager}.

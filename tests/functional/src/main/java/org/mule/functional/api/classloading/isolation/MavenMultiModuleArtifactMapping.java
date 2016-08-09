@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.functional.classloading.isolation.maven;
+package org.mule.functional.api.classloading.isolation;
 
 /**
  * Defines the multi-module folder name for an artifactId. It is useful when the convention of using the same artifactId

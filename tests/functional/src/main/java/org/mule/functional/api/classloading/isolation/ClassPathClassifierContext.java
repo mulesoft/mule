@@ -5,25 +5,17 @@
  * LICENSE.txt file.
  */
 
-package org.mule.functional.classloading.isolation.classification;
+package org.mule.functional.api.classloading.isolation;
 
-import static java.util.Collections.addAll;
-import static java.util.stream.Collectors.toSet;
-import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.functional.classloading.isolation.utils.RunnerModuleUtils.getExcludedProperties;
-import static org.mule.functional.util.AnnotationUtils.getAnnotationAttributeFromHierarchy;
 import static org.mule.runtime.core.util.Preconditions.checkNotNull;
-import org.mule.functional.classloading.isolation.maven.DependenciesGraph;
-import org.mule.functional.classloading.isolation.maven.MavenArtifact;
 import org.mule.functional.classloading.isolation.maven.MavenArtifactMatcherPredicate;
-import org.mule.functional.classloading.isolation.maven.MavenMultiModuleArtifactMapping;
-import org.mule.functional.junit4.runners.ArtifactClassLoaderRunnerConfig;
 
 import com.google.common.collect.Sets;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
@@ -40,15 +32,18 @@ import org.slf4j.LoggerFactory;
  */
 public class ClassPathClassifierContext
 {
+
     public static final int GROUP_ID_ARTIFACT_ID_TYPE_PATTERN_CHUNKS = 3;
     public static final String EXCLUDED_MODULES = "excluded.modules";
 
-    private final Class<?> testClass;
+    private final File rootArtifactClassesFolder;
+    private final File rootArtifactTestClassesFolder;
     private final List<URL> classPathURLs;
     private final DependenciesGraph dependenciesGraph;
     private final MavenMultiModuleArtifactMapping mavenMultiModuleArtifactMapping;
     private final Predicate<MavenArtifact> exclusions;
     private final Set<String> extraBootPackages;
+    private final List<String> extensionBasePackages;
     private final Set<Class> exportClasses;
 
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -56,37 +51,55 @@ public class ClassPathClassifierContext
     /**
      * Creates a context used for doing the classification of the class path.
      *
-     * @param testClass test {@link Class} being tested. Not null.
+     * @param rootArtifactClassesFolder {@link File} to the target/classes of the current artifact being classified. Not null.
+     * @param rootArtifactTestClassesFolder {@link File} to the target/test-classes of the current artifact being classified. Not null.
      * @param classPathURLs the whole set of {@link URL}s that were loaded by IDE/Maven Surefire plugin when running the test. Not null.
      * @param dependenciesGraph the maven dependencies graph for the artifact that the test belongs to. Not null.
      * @param mavenMultiModuleArtifactMapping a mapper to get multi-module folder for artifactIds. Not null.
+     * @param exclusionsList {@link List} of {@link String}'s to be used during classification for excluded packages.
+     * @param extraBootPackagesList {@link List} of {@link String}'s packages to be added as boot packages to the container.
+     * @param extensionBasePackages {@link List} of {@link String}'s base packages to be used for discovering extensions.
+     * @param exportClasses {@link Set} of {@link Class} to be exported in addition to the ones already exported by the plugin, for testing purposes only.
      * @throws IOException if an error happened while reading {@link org.mule.functional.classloading.isolation.utils.RunnerModuleUtils#EXCLUDED_PROPERTIES_FILE} file
      */
-    public ClassPathClassifierContext(final Class<?> testClass, final List<URL> classPathURLs, final DependenciesGraph dependenciesGraph, final MavenMultiModuleArtifactMapping mavenMultiModuleArtifactMapping) throws IOException
+    public ClassPathClassifierContext(final File rootArtifactClassesFolder, final File rootArtifactTestClassesFolder, final List<URL> classPathURLs, final DependenciesGraph dependenciesGraph, final MavenMultiModuleArtifactMapping mavenMultiModuleArtifactMapping,
+                                      final List<String> exclusionsList, final List<String> extraBootPackagesList, final List<String> extensionBasePackages, final Set<Class> exportClasses) throws IOException
     {
-        checkNotNull(testClass, "testClass cannot be null");
+        checkNotNull(rootArtifactClassesFolder, "rootArtifactClassesFolder cannot be null");
+        checkNotNull(rootArtifactTestClassesFolder, "rootArtifactTestClassesFolder cannot be null");
         checkNotNull(classPathURLs, "classPathURLs cannot be null");
         checkNotNull(dependenciesGraph, "dependenciesGraph cannot be null");
         checkNotNull(mavenMultiModuleArtifactMapping, "mavenMultiModuleArtifactMapping cannot be null");
 
-        this.testClass = testClass;
+        this.rootArtifactClassesFolder = rootArtifactClassesFolder;
+        this.rootArtifactTestClassesFolder = rootArtifactTestClassesFolder;
         this.classPathURLs = classPathURLs;
         this.dependenciesGraph = dependenciesGraph;
         this.mavenMultiModuleArtifactMapping = mavenMultiModuleArtifactMapping;
 
         Properties excludedProperties = getExcludedProperties();
-        this.exclusions = createExclusionsPredicate(testClass, excludedProperties);
-        this.extraBootPackages = getExtraBootPackages(testClass, excludedProperties);
+        this.exclusions = createExclusionsPredicate(exclusionsList, excludedProperties);
+        this.extraBootPackages = getExtraBootPackages(extraBootPackagesList, excludedProperties);
 
-        this.exportClasses = getExportClasses(testClass);
+        this.extensionBasePackages = extensionBasePackages;
+
+        this.exportClasses = exportClasses;
     }
 
     /**
-     * @return the {@link Class} for the test that is going to be executed
+     * @return a {@link File} to the classes of the current artifact being tested.
      */
-    public Class<?> getTestClass()
+    public File getRootArtifactClassesFolder()
     {
-        return testClass;
+        return rootArtifactClassesFolder;
+    }
+
+    /**
+     * @return a {@link File} to the test classes of the current artifact being tested.
+     */
+    public File getRootArtifactTestClassesFolder()
+    {
+        return rootArtifactTestClassesFolder;
     }
 
     /**
@@ -131,6 +144,14 @@ public class ClassPathClassifierContext
     }
 
     /**
+     * @return a {@link List} of base packages to be used for discovering extensions in classpath.
+     */
+    public List<String> getExtensionBasePackages()
+    {
+        return extensionBasePackages;
+    }
+
+    /**
      * @return {@link Set} of {@link Class}es that are going to be exported in addition to the ones already exported by extensions. For testing purposes only.
      */
     public Set<Class> getExportClasses()
@@ -143,26 +164,28 @@ public class ClassPathClassifierContext
      * be exposed by the container.
      * <p/>
      * It defined by the file {@link org.mule.functional.classloading.isolation.utils.RunnerModuleUtils#EXCLUDED_PROPERTIES_FILE} and can be changed by having this file in the module that is tested or
-     * appended to the default excluded groutId/artifactId/type by marking the test with the annotation {@link ArtifactClassLoaderRunnerConfig}.
+     * appended to the default excluded groutId/artifactId/type with the ones provided to this context.
      *
-     * @param klass the test {@link Class} being tested
+     * @param exclusionsList {@link List} of {@link String}'s, each entry is a coma separated list of patterns to parse and generate exclusions for.
      * @param excludedProperties {@link Properties} that has the list of excluded modules
      * @return a {@link Predicate} to be used in order to excluded maven artifacts from application/plugin class loaders.
      */
-    private Predicate<MavenArtifact> createExclusionsPredicate(final Class<?> klass, Properties excludedProperties)
+    private Predicate<MavenArtifact> createExclusionsPredicate(final List<String> exclusionsList, Properties excludedProperties)
     {
         Predicate<MavenArtifact> exclusionPredicate = null;
         String excludedModules = excludedProperties.getProperty(EXCLUDED_MODULES);
         if (excludedModules != null)
         {
-            exclusionPredicate = createPredicate(exclusionPredicate, excludedModules);
+            for (String exclusion : excludedModules.split(","))
+            {
+                exclusionPredicate = createPredicate(exclusionPredicate, exclusion);
+            }
         }
         else
         {
             logger.warn(EXCLUDED_MODULES + " found but there is no list of modules defined to be excluded, this could be the reason why the test may fail later due to JUnit classes are not found");
         }
-        List<String> exclusionsAnnotated = getAnnotationAttributeFromHierarchy(klass, ArtifactClassLoaderRunnerConfig.class, "exclusions");
-        for (String exclusionsToBeAppended : exclusionsAnnotated)
+        for (String exclusionsToBeAppended : exclusionsList)
         {
             if (exclusionsToBeAppended != null && exclusionsToBeAppended.length() > 0)
             {
@@ -178,28 +201,25 @@ public class ClassPathClassifierContext
      * Creates the predicate or adds a new one to the given one by splitting the exclusions patterns.
      *
      * @param exclusionPredicate the current exclusion predicate to compose with an OR operation (if not null).
-     * @param exclusions the coma separated list of patterns to parse and generate exclusions for.
+     * @param exclusion value to be parse and generate exclusions for.
      * @return a new {@link Predicate} with the exclusions.
      */
-    private Predicate<MavenArtifact> createPredicate(final Predicate<MavenArtifact> exclusionPredicate, final String exclusions)
+    private Predicate<MavenArtifact> createPredicate(final Predicate<MavenArtifact> exclusionPredicate, final String exclusion)
     {
         Predicate<MavenArtifact> predicate = exclusionPredicate;
-        for (String exclusion : exclusions.split(","))
+        String[] exclusionSplit = exclusion.split(":");
+        if (exclusionSplit.length != GROUP_ID_ARTIFACT_ID_TYPE_PATTERN_CHUNKS)
         {
-            String[] exclusionSplit = exclusion.split(":");
-            if (exclusionSplit.length != GROUP_ID_ARTIFACT_ID_TYPE_PATTERN_CHUNKS)
-            {
-                throw new IllegalArgumentException("Exclusion pattern should have the format groupId:artifactId:type");
-            }
-            Predicate<MavenArtifact> artifactExclusion = new MavenArtifactMatcherPredicate(exclusionSplit[0], exclusionSplit[1], exclusionSplit[2]);
-            if (predicate == null)
-            {
-                predicate = artifactExclusion;
-            }
-            else
-            {
-                predicate = predicate.or(artifactExclusion);
-            }
+            throw new IllegalArgumentException("Exclusion pattern should have the format groupId:artifactId:type");
+        }
+        Predicate<MavenArtifact> artifactExclusion = new MavenArtifactMatcherPredicate(exclusionSplit[0], exclusionSplit[1], exclusionSplit[2]);
+        if (predicate == null)
+        {
+            predicate = artifactExclusion;
+        }
+        else
+        {
+            predicate = predicate.or(artifactExclusion);
         }
         return predicate;
     }
@@ -208,16 +228,13 @@ public class ClassPathClassifierContext
      * Gets the {@link Set} of {@link String}s of packages to be added to the container {@link ClassLoader} in addition to the ones already
      * pre-defined by the mule container.
      *
-     * @param klass the test {@link Class} being tested
      * @param excludedProperties {@link Properties }that has the list of extra boot packages definitions
      * @return a {@link Set} of {@link String}s with the extra boot packages to be appended
      */
-    private Set<String> getExtraBootPackages(Class<?> klass, Properties excludedProperties)
+    private Set<String> getExtraBootPackages(final List<String> extraBootPackagesList, final Properties excludedProperties)
     {
         Set<String> packages = Sets.newHashSet();
-
-        List<String> extraBootPackagesList = getAnnotationAttributeFromHierarchy(klass, ArtifactClassLoaderRunnerConfig.class, "extraBootPackages");
-        extraBootPackagesList.stream().filter(e -> !isEmpty(e)).forEach(e -> addAll(packages, e.split(",")));
+        packages.addAll(extraBootPackagesList);
 
         String excludedExtraBootPackages = excludedProperties.getProperty("extraBoot.packages");
         if (excludedExtraBootPackages != null)
@@ -232,18 +249,6 @@ public class ClassPathClassifierContext
             logger.warn(EXCLUDED_MODULES + " found but there is no list of extra boot packages defined to be added to container, this could be the reason why the test may fail later due to JUnit classes are not found");
         }
         return packages;
-    }
-
-    /**
-     * Gets the {@link Set} of {@link Class}es to be exported by the plugin in addition to the ones that already exposes.
-     *
-     * @param klass the test {@link Class} being tested
-     * @return a {@link Set} of {@link Class}es with the classes to be exported
-     */
-    private Set<Class> getExportClasses(Class<?> klass)
-    {
-        List<Class[]> exportClassesList = getAnnotationAttributeFromHierarchy(klass, ArtifactClassLoaderRunnerConfig.class, "exportClasses");
-        return exportClassesList.stream().flatMap(Arrays::stream).collect(toSet());
     }
 
 }

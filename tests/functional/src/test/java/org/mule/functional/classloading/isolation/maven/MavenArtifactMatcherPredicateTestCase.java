@@ -10,6 +10,7 @@ package org.mule.functional.classloading.isolation.maven;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mule.functional.classloading.isolation.maven.MavenArtifactMatcherPredicate.ANY_WILDCARD;
+import org.mule.functional.api.classloading.isolation.MavenArtifact;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
