@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.functional.classloading.isolation.api;
+package org.mule.functional.api.classloading.isolation;
 
 import java.net.URL;
 import java.util.List;

@@ -8,8 +8,8 @@
 package org.mule.functional.junit4;
 
 import static org.mule.functional.util.AnnotationUtils.getAnnotationAttributeFrom;
-import org.mule.functional.classloading.isolation.api.IsolatedClassLoaderExtensionsManagerConfigurationBuilder;
-import org.mule.functional.classloading.isolation.api.ClassPathClassifier;
+import org.mule.functional.api.classloading.isolation.IsolatedClassLoaderExtensionsManagerConfigurationBuilder;
+import org.mule.functional.api.classloading.isolation.ClassPathClassifier;
 import org.mule.functional.junit4.runners.ArtifactClassLoaderRunner;
 import org.mule.functional.junit4.runners.PluginClassLoadersAware;
 import org.mule.functional.junit4.runners.RunnerDelegateTo;

@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.functional.classloading.isolation.api;
+package org.mule.functional.api.classloading.isolation;
 
 import static org.mule.functional.classloading.isolation.utils.RunnerModuleUtils.getExcludedProperties;
 import static org.mule.runtime.core.util.Preconditions.checkNotNull;

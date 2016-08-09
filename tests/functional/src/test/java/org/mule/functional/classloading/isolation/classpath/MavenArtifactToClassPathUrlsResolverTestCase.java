@@ -14,8 +14,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
-import org.mule.functional.classloading.isolation.api.MavenArtifact;
-import org.mule.functional.classloading.isolation.api.MavenMultiModuleArtifactMapping;
+import org.mule.functional.api.classloading.isolation.MavenArtifact;
+import org.mule.functional.api.classloading.isolation.MavenMultiModuleArtifactMapping;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

@@ -7,8 +7,8 @@
 
 package org.mule.functional.classloading.isolation.classpath;
 
-import org.mule.functional.classloading.isolation.api.MavenArtifact;
-import org.mule.functional.classloading.isolation.api.MavenMultiModuleArtifactMapping;
+import org.mule.functional.api.classloading.isolation.MavenArtifact;
+import org.mule.functional.api.classloading.isolation.MavenMultiModuleArtifactMapping;
 
 import java.io.File;
 import java.net.URL;

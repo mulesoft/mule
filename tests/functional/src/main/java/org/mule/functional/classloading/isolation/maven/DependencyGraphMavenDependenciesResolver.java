@@ -10,9 +10,9 @@ package org.mule.functional.classloading.isolation.maven;
 import static java.nio.file.Files.getFileAttributeView;
 import static java.nio.file.Files.readAllLines;
 import static java.nio.file.Paths.get;
-import org.mule.functional.classloading.isolation.api.DependenciesGraph;
-import org.mule.functional.classloading.isolation.api.MavenArtifact;
-import org.mule.functional.classloading.isolation.api.MavenDependenciesResolver;
+import org.mule.functional.api.classloading.isolation.DependenciesGraph;
+import org.mule.functional.api.classloading.isolation.MavenArtifact;
+import org.mule.functional.api.classloading.isolation.MavenDependenciesResolver;
 
 import java.io.File;
 import java.io.IOException;

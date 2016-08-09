@@ -11,7 +11,7 @@ import static java.lang.Thread.currentThread;
 import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.mule.runtime.core.util.PropertiesUtils.loadProperties;
 
-import org.mule.functional.classloading.isolation.api.MavenMultiModuleArtifactMapping;
+import org.mule.functional.api.classloading.isolation.MavenMultiModuleArtifactMapping;
 
 import java.io.IOException;
 import java.util.Properties;

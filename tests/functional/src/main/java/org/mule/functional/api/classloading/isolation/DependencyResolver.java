@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.functional.classloading.isolation.api;
+package org.mule.functional.api.classloading.isolation;
 
 import java.util.HashSet;
 import java.util.Set;

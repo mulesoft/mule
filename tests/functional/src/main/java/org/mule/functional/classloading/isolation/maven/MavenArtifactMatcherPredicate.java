@@ -9,7 +9,7 @@ package org.mule.functional.classloading.isolation.maven;
 
 import static org.apache.commons.lang.StringUtils.isEmpty;
 
-import org.mule.functional.classloading.isolation.api.MavenArtifact;
+import org.mule.functional.api.classloading.isolation.MavenArtifact;
 
 import java.util.function.Predicate;
 

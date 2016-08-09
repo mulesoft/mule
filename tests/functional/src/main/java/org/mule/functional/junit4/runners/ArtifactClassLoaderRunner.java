@@ -12,9 +12,9 @@ import static java.util.stream.Collectors.toSet;
 import static org.mule.functional.util.AnnotationUtils.getAnnotationAttributeFrom;
 import static org.mule.functional.util.AnnotationUtils.getAnnotationAttributeFromHierarchy;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
-import org.mule.functional.classloading.isolation.api.ArtifactIsolatedClassLoaderBuilder;
-import org.mule.functional.classloading.isolation.api.ArtifactClassLoaderHolder;
-import org.mule.functional.classloading.isolation.api.ClassPathClassifier;
+import org.mule.functional.api.classloading.isolation.ArtifactIsolatedClassLoaderBuilder;
+import org.mule.functional.api.classloading.isolation.ArtifactClassLoaderHolder;
+import org.mule.functional.api.classloading.isolation.ClassPathClassifier;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 
 import java.io.File;
