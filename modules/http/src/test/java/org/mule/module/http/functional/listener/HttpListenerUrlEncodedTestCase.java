@@ -6,13 +6,15 @@
  */
 package org.mule.module.http.functional.listener;
 
+import static org.apache.http.HttpVersion.HTTP_1_0;
+import static org.apache.http.HttpVersion.HTTP_1_1;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.module.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
 import org.mule.api.MuleMessage;
-import org.mule.module.http.api.HttpHeaders;
 import org.mule.module.http.internal.HttpParser;
 import org.mule.module.http.internal.ParameterMap;
 import org.mule.module.http.matcher.ParamMapMatcher;
@@ -23,6 +25,10 @@ import org.mule.transport.NullPayload;
 import org.mule.util.StringUtils;
 
 import com.google.common.base.Charsets;
+import com.ning.http.client.AsyncHttpClient;
+import com.ning.http.client.AsyncHttpClientConfig;
+import com.ning.http.client.ListenableFuture;
+import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProvider;
 
 import java.io.IOException;
 import java.net.URLDecoder;
@@ -64,6 +70,7 @@ public class HttpListenerUrlEncodedTestCase extends FunctionalTestCase
     @Test
     public void urlEncodedParamsGenerateAMapPayload() throws Exception
     {
+
         final Response response = Request.Post(getListenerUrl())
                 .bodyForm(new BasicNameValuePair(PARAM_1_NAME, PARAM_1_VALUE),
                           new BasicNameValuePair(PARAM_2_NAME, PARAM_2_VALUE)).execute();
@@ -128,27 +135,64 @@ public class HttpListenerUrlEncodedTestCase extends FunctionalTestCase
         assertNullPayloadAndEmptyResponse(response);
     }
 
+    @Test
+    public void serverClosesConnectionAfterSendingData() throws Exception
+    {
+        // Apache Fluent doesn't fail while other clients such as curl, postman and this one do
+        AsyncHttpClientConfig asyncHttpClientConfig = new AsyncHttpClientConfig.Builder().build();
+        AsyncHttpClient asyncHttpClient = new AsyncHttpClient(new GrizzlyAsyncHttpProvider(asyncHttpClientConfig), asyncHttpClientConfig);
+        ListenableFuture<com.ning.http.client.Response> responseFuture = asyncHttpClient.
+                preparePost(getListenerUrl()).setBody("a=1&b=2").
+                addHeader(CONTENT_TYPE, APPLICATION_X_WWW_FORM_URLENCODED).execute();
+        com.ning.http.client.Response response = responseFuture.get();
+
+        assertThat(response.getStatusCode(), is(200));
+    }
+
+    @Test
+    public void emptyParameterMapHttp10() throws Exception
+    {
+        final Response response = Request.Post(getListenerUrl("map"))
+                .version(HTTP_1_0).execute();
+
+        assertThat(response.returnResponse().getStatusLine().getStatusCode(), is(200));
+    }
+
+    @Test
+    public void emptyParameterMapHttp11() throws Exception
+    {
+        final Response response = Request.Post(getListenerUrl("map"))
+                .version(HTTP_1_1).execute();
+
+        assertThat(response.returnResponse().getStatusLine().getStatusCode(), is(200));
+    }
+
     private void assertNullPayloadAndEmptyResponse(Response response) throws Exception
     {
         final MuleMessage receivedMessage = muleContext.getClient().request(VM_OUTPUT_ENDPOINT, 1000);
         assertThat(receivedMessage.getPayload(), IsInstanceOf.instanceOf(NullPayload.class));
 
         final HttpResponse httpResponse = response.returnResponse();
-        assertThat(httpResponse.getFirstHeader(HttpHeaders.Names.CONTENT_LENGTH).getValue(), Is.is("0"));
+        assertThat(httpResponse.getFirstHeader(CONTENT_LENGTH).getValue(), Is.is("0"));
         assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is(StringUtils.EMPTY));
     }
 
     private void compareParameterMaps(Response response, ParameterMap payloadAsMap) throws IOException
     {
         final HttpResponse httpResponse = response.returnResponse();
-        assertThat(httpResponse.getFirstHeader(HttpHeaders.Names.CONTENT_TYPE).getValue(), Is.is(HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED));
+        assertThat(httpResponse.getFirstHeader(CONTENT_TYPE).getValue(), Is.is(APPLICATION_X_WWW_FORM_URLENCODED));
         final String responseContent = IOUtils.toString(httpResponse.getEntity().getContent());
         assertThat(payloadAsMap, ParamMapMatcher.isEqual(HttpParser.decodeUrlEncodedBody(responseContent, Charsets.UTF_8.name()).toListValuesMap()));
     }
 
+    private String getListenerUrl(String path)
+    {
+        return String.format("http://localhost:%s/%s", listenPort.getNumber(), path);
+    }
+
     private String getListenerUrl()
     {
-        return String.format("http://localhost:%s/%s", listenPort.getNumber(), path.getValue());
+        return getListenerUrl(path.getValue());
     }
 
 }
