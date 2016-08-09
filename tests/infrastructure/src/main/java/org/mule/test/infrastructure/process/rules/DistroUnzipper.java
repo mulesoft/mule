@@ -47,7 +47,7 @@ public class DistroUnzipper
             while (zipFileEntries.hasMoreElements())
             {
                 ZipEntry entry = zipFileEntries.nextElement();
-                File destFile = new File(entry.getName());
+                File destFile = new File(destDir, entry.getName());
                 if (entry.isDirectory())
                 {
                     destFile.mkdir();

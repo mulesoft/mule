@@ -15,6 +15,9 @@ import static org.apache.commons.lang.StringUtils.isEmpty;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import org.apache.commons.lang.StringUtils;
 import org.junit.rules.ExternalResource;
@@ -44,7 +47,8 @@ public class MuleInstallation extends ExternalResource
 {
 
     private static final String DISTRIBUTION_PROPERTY = "mule.distribution";
-    private static final File WORKING_DIRECTORY = new File(getProperty("user.dir"));
+    private static final String DISTRIBUTIONS_DIR = "servers";
+    private static final Path WORKING_DIRECTORY = Paths.get(getProperty("user.dir")).resolve(DISTRIBUTIONS_DIR);
     private static final String DELETE_ON_EXIT = getProperty("mule.test.deleteOnExit");
     private static final String zippedDistributionFromProperty = getProperty(DISTRIBUTION_PROPERTY);
     private static Logger logger = LoggerFactory.getLogger(MuleInstallation.class);
@@ -86,7 +90,7 @@ public class MuleInstallation extends ExternalResource
     protected void before() throws Throwable
     {
         logger.info("Unpacking Mule Distribution: " + distribution);
-        muleHome = new DistroUnzipper(distribution, WORKING_DIRECTORY).unzip().muleHome();
+        muleHome = new DistroUnzipper(distribution, WORKING_DIRECTORY.resolve(testname).toFile()).unzip().muleHome();
     }
 
     @Override
