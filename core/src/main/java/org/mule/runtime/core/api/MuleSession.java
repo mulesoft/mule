@@ -25,29 +25,9 @@ import java.util.Set;
  *
  * @see SessionHandler
  */
+@Deprecated
 public interface MuleSession extends Serializable
 {
-
-    /**
-     * Determines if this session is valid. A session becomes invalid if an exception occurs while processing
-     * 
-     * @return true if the session is valid, false otherwise
-     */
-    boolean isValid();
-
-    /**
-     * Determines if this session is valid. A session becomes invalid if an exception occurs while processing
-     * 
-     * @param value true if the session is valid, false otherwise
-     */
-    void setValid(boolean value);
-
-    /**
-     * Returns the unique id for this session
-     * 
-     * @return the unique id for this session
-     */
-    String getId();
 
     /**
      * The security context for this session. If not null outbound, inbound and/or method invocations will be

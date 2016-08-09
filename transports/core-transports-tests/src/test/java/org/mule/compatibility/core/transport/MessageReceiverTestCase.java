@@ -26,7 +26,7 @@ import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.MessageProcessor;
-import org.mule.runtime.core.session.NullSessionHandler;
+import org.mule.compatibility.core.session.NullSessionHandler;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -58,7 +58,6 @@ public class MessageReceiverTestCase extends AbstractMuleTestCase
     @Before
     public void setup() throws MuleException
     {
-        when(muleSession.getId()).thenReturn("1");
         MuleConfiguration muleConfiguration = mock(MuleConfiguration.class);
         when(muleContext.getConfiguration()).thenReturn(muleConfiguration);
         when(muleContext.getTransformationService()).thenReturn(transformationService);

@@ -13,6 +13,7 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
 import org.mule.runtime.core.api.security.Credentials;
+import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.management.stats.ProcessingTime;
@@ -277,4 +278,21 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent
      * @since 3.8.0
      */
     ProcessorsTrace getProcessorsTrace();
+
+    /**
+     * The security context for this session. If not null outbound, inbound and/or method invocations will be
+     * authenticated using this context
+     *
+     * @return the context for this session or null if the request is not secure.
+     */
+    SecurityContext getSecurityContext();
+
+    /**
+     * The security context for this session. If not null outbound, inbound and/or method invocations will be
+     * authenticated using this context
+     *
+     * @param context the context for this session or null if the request is not secure.
+     */
+    void setSecurityContext(SecurityContext context);
+
 }

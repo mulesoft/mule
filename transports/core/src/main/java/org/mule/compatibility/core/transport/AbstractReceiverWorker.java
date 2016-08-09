@@ -21,7 +21,7 @@ import org.mule.runtime.core.api.transaction.TransactionException;
 import org.mule.runtime.core.execution.TransactionalErrorHandlingExecutionTemplate;
 import org.mule.runtime.core.execution.TransactionalExecutionTemplate;
 import org.mule.runtime.core.message.SessionHandler;
-import org.mule.runtime.core.session.SerializeAndEncodeSessionHandler;
+import org.mule.compatibility.core.session.SerializeAndEncodeSessionHandler;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 
 import java.io.OutputStream;

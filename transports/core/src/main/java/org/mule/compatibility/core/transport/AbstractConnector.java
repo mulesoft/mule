@@ -76,7 +76,7 @@ import org.mule.runtime.core.processor.LaxAsyncInterceptingMessageProcessor;
 import org.mule.runtime.core.processor.chain.SimpleMessageProcessorChainBuilder;
 import org.mule.runtime.core.retry.async.AsynchronousRetryTemplate;
 import org.mule.runtime.core.routing.filters.WildcardFilter;
-import org.mule.runtime.core.session.SerializeAndEncodeSessionHandler;
+import org.mule.compatibility.core.session.SerializeAndEncodeSessionHandler;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.runtime.core.util.BeanUtils;
 import org.mule.runtime.core.util.ClassUtils;

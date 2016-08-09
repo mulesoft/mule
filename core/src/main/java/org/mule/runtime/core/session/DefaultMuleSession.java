@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
 /**
  * <code>DefaultMuleSession</code> manages the interaction and distribution of events for Mule Services.
  */
-
+@Deprecated
 public final class DefaultMuleSession implements MuleSession
 {
     /**
@@ -45,13 +45,6 @@ public final class DefaultMuleSession implements MuleSession
     private static Logger logger = LoggerFactory.getLogger(DefaultMuleSession.class);
 
     /**
-     * Determines if the service is valid
-     */
-    private boolean valid = true;
-
-    private String id;
-
-    /**
      * The security context associated with the session. Note that this context will only be serialized if the
      * SecurityContext object is Serializable.
      */
@@ -61,15 +54,12 @@ public final class DefaultMuleSession implements MuleSession
 
     public DefaultMuleSession()
     {
-        id = UUID.getUUID();
         properties = Collections.synchronizedMap(new CaseInsensitiveHashMap());
     }
 
     public DefaultMuleSession(MuleSession session)
     {
-        this.id = session.getId();
         this.securityContext = session.getSecurityContext();
-        this.valid = session.isValid();
 
         this.properties = Collections.synchronizedMap(new CaseInsensitiveHashMap());
         for (String key : session.getPropertyNamesAsSet())
@@ -81,24 +71,6 @@ public final class DefaultMuleSession implements MuleSession
     private TypedValue createTypedValue(MuleSession session, String key)
     {
         return new TypedValue(session.getProperty(key), session.getPropertyDataType(key));
-    }
-
-    @Override
-    public String getId()
-    {
-        return id;
-    }
-
-    @Override
-    public boolean isValid()
-    {
-        return valid;
-    }
-
-    @Override
-    public void setValid(boolean value)
-    {
-        valid = value;
     }
 
     /**
@@ -198,7 +170,7 @@ public final class DefaultMuleSession implements MuleSession
         return properties;
     }
 
-    void removeNonSerializableProperties()
+    public void removeNonSerializableProperties()
     {
         Iterator<Entry<String, TypedValue>> propertyIterator = properties.entrySet().iterator();
         while (propertyIterator.hasNext())
