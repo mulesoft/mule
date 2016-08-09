@@ -8,9 +8,11 @@ package org.mule.runtime.config.spring.dsl.spring;
 
 import static java.lang.String.format;
 import static java.util.Optional.of;
+import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.ANNOTATIONS_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.CONFIGURATION_IDENTIFIER;
-import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.DESCRIPTION_ELEMENT;
-import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_ROOT_ELEMENT;
+import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.DESCRIPTION_IDENTIFIER;
+import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.DOC_DESCRIPTION_IDENTIFIER;
+import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.NAME_ATTRIBUTE;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.QUEUE_STORE;
 import static org.mule.runtime.config.spring.dsl.processor.xml.CoreXmlNamespaceInfoProvider.CORE_NAMESPACE_NAME;
@@ -62,9 +64,14 @@ import org.w3c.dom.Element;
 public class BeanDefinitionFactory
 {
 
+    public static final String SPRING_PROTOTYPE_OBJECT = "prototype";
+    public static final String SPRING_SINGLETON_OBJECT = "singleton";
+
     private final ImmutableSet<ComponentIdentifier> ignoredMuleCoreComponentIdentifiers = ImmutableSet.<ComponentIdentifier>builder()
-            .add(new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(MULE_ROOT_ELEMENT).build())
-            .add(new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(DESCRIPTION_ELEMENT).build())
+            .add(MULE_IDENTIFIER)
+            .add(DESCRIPTION_IDENTIFIER)
+            .add(ANNOTATIONS_ELEMENT_IDENTIFIER)
+            .add(DOC_DESCRIPTION_IDENTIFIER)
             .build();
 
     /**

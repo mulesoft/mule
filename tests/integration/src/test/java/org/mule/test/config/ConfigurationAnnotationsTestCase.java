@@ -130,7 +130,7 @@ public class ConfigurationAnnotationsTestCase extends AbstractIntegrationTestCas
         assertThat(stb, not(nullValue()));
         assertThat(getDocName(stb), is("manzi-transformer"));
         assertThat(getSourceFile(stb), is("annotations-config.xml"));
-        assertThat(getSourceFileLine(stb), is(18));
+        assertThat(getSourceFileLine(stb), is(16));
         assertThat(getSourceElement(stb), is("<append-string-transformer message=\"Manzi\" name=\"ManziTransformer\" doc:name=\"manzi-transformer\"></append-string-transformer>"));
     }
 

@@ -9,6 +9,7 @@ package org.mule.runtime.config.spring;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.config.spring.MuleArtifactContext.INNER_BEAN_PREFIX;
+import static org.mule.runtime.config.spring.MuleArtifactContext.postProcessBeanDefinition;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.CONFIGURATION_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_DOMAIN_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_DOMAIN_ROOT_ELEMENT;
@@ -112,11 +113,6 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
         {
             String namespaceUri = element.getNamespaceURI();
             NamespaceHandler handler = getReaderContext().getNamespaceHandlerResolver().resolve(namespaceUri);
-            if (handler == null)
-            {
-                getReaderContext().error("Unable to locate NamespaceHandler for namespace [" + namespaceUri + "]", element);
-                return null;
-            }
 
             boolean noRecurse = false;
             boolean forceRecurse = false;
@@ -146,6 +142,7 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
                             }
                             BeanDefinitionFactory.checkElementNameUnique(registry, element);
                             registry.registerBeanDefinition(name, resolvedComponent.getBeanDefinition());
+                            postProcessBeanDefinition(resolvedComponent, registry, name);
                         }
                     }, (mpElement, beanDefinition) -> {
                         //We don't want the bean definition to be automatically injected in the parent bean in this cases since the parent is using the new parsing mechanism.

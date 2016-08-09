@@ -11,9 +11,9 @@ import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromReferenceObject;
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromSimpleParameter;
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromTextContent;
-import static org.mule.runtime.config.spring.dsl.model.CoreComponentBuildingDefinitionProvider.getTransformerBaseBuilderForClass;
 import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromConfigurationAttribute;
 import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromType;
+import static org.mule.runtime.config.spring.dsl.model.CoreComponentBuildingDefinitionProvider.getTransformerBaseBuilder;
 
 import org.mule.functional.client.QueueWriterMessageProcessor;
 import org.mule.functional.functional.AssertionMessageProcessor;
@@ -95,7 +95,7 @@ public class TestComponentBuildingDefinitionProvider implements ComponentBuildin
                                                  .withIdentifier("callback")
                                                  .withTypeDefinition(fromConfigurationAttribute("class")).build());
 
-        componentBuildingDefinitions.add(getTransformerBaseBuilderForClass(NoActionTransformer.class)
+        componentBuildingDefinitions.add(getTransformerBaseBuilder(NoActionTransformer.class)
                                                  .withNamespace(TEST_NAMESPACE)
                                                  .withIdentifier("no-action-transformer")
                                                  .build());

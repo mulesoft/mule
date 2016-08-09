@@ -14,6 +14,7 @@ import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromSimpleReferenceParameter;
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromUndefinedSimpleAttributes;
 import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromType;
+import static org.mule.runtime.config.spring.dsl.model.CoreComponentBuildingDefinitionProvider.getMuleMessageTransformerBaseBuilder;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 
 import org.mule.compatibility.config.spring.factories.InboundEndpointFactoryBean;
@@ -21,6 +22,9 @@ import org.mule.compatibility.config.spring.factories.OutboundEndpointFactoryBea
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
+import org.mule.compatibility.core.transformer.simple.AddAttachmentTransformer;
+import org.mule.compatibility.core.transformer.simple.CopyAttachmentsTransformer;
+import org.mule.compatibility.core.transformer.simple.RemoveAttachmentTransformer;
 import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition;
 import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.config.spring.dsl.api.TypeConverter;
@@ -88,6 +92,23 @@ public class TransportComponentBuildingDefinitionProvider implements ComponentBu
                                                  .withSetterParameterDefinition("outboundExchangePatterns", fromSimpleParameter("outboundExchangePatterns").build())
                                                  .withSetterParameterDefinition("defaultExchangePattern", fromSimpleParameter("defaultExchangePattern").build())
                                                  .build());
+        componentBuildingDefinitions.add(getMuleMessageTransformerBaseBuilder()
+                                                            .withIdentifier("set-attachment")
+                                                            .withTypeDefinition(fromType(AddAttachmentTransformer.class))
+                                                            .withSetterParameterDefinition("attachmentName", fromSimpleParameter("attachmentName").build())
+                                                            .withSetterParameterDefinition("value", fromSimpleParameter("value").build())
+                                                            .withSetterParameterDefinition("contentType", fromSimpleParameter("contentType").build())
+                                                            .build());
+        componentBuildingDefinitions.add(getMuleMessageTransformerBaseBuilder()
+                                                            .withIdentifier("remove-attachment")
+                                                            .withTypeDefinition(fromType(RemoveAttachmentTransformer.class))
+                                                            .withSetterParameterDefinition("attachmentName", fromSimpleParameter("attachmentName").build())
+                                                            .build());
+        componentBuildingDefinitions.add(getMuleMessageTransformerBaseBuilder()
+                                                            .withIdentifier("copy-attachments")
+                                                            .withTypeDefinition(fromType(CopyAttachmentsTransformer.class))
+                                                            .withSetterParameterDefinition("attachmentName", fromSimpleParameter("attachmentName").build())
+                                                            .build());
         return componentBuildingDefinitions;
     }
 

@@ -29,14 +29,6 @@ class BeanDefinitionBuilderHelper
     }
 
     /**
-     * @param reference adds a constructor parameter which is a reference to another bean
-     */
-    public void addConstructorReference(String reference)
-    {
-        this.beanDefinitionBuilder.addConstructorArgReference(reference);
-    }
-
-    /**
      * @param value adds a constructor value
      */
     public void addConstructorValue(Object value)

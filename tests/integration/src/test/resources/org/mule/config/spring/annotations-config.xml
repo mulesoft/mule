@@ -13,9 +13,5 @@
         </annotations>
     </string-to-byte-array-transformer>
 
-    <spring:beans>
-        <mule>
-            <append-string-transformer message="Manzi" name="ManziTransformer" doc:name="manzi-transformer"/>
-        </mule>
-    </spring:beans>
+    <append-string-transformer message="Manzi" name="ManziTransformer" doc:name="manzi-transformer"/>
 </mule>

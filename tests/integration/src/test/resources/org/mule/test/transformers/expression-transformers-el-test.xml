@@ -20,7 +20,7 @@
         <bean-property property-name="segments" expression="#[message.outboundProperties['SEGMENTS']]" optional="true"/>
         <bean-property property-name="radius" expression="#[message.outboundProperties['RADIUS']]"/>
     </bean-builder-transformer>
-    
+
     <expression-transformer name="testTransformer4" expression="#[[message.outboundProperties['foo'],message.outboundProperties['bar']]]"/>
 
 </mule>

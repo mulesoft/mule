@@ -31,6 +31,7 @@ import java.util.function.Predicate;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.support.ManagedMap;
 
@@ -125,7 +126,7 @@ class ComponentConfigurationBuilder
 
     private ConfigurableAttributeDefinitionVisitor constructorVisitor()
     {
-        return new ConfigurableAttributeDefinitionVisitor(beanDefinitionBuilderHelper::addConstructorValue, beanDefinitionBuilderHelper::addConstructorReference);
+        return new ConfigurableAttributeDefinitionVisitor(beanDefinitionBuilderHelper::addConstructorValue);
     }
 
     private ConfigurableAttributeDefinitionVisitor setterVisitor(String propertyName, AttributeDefinition attributeDefinition)
@@ -139,7 +140,7 @@ class ComponentConfigurationBuilder
                 return;
             }
             beanDefinitionBuilderHelper.forProperty(propertyName).addValue(value);
-        }, beanDefinitionBuilderHelper.forProperty(propertyName)::addReference);
+        });
     }
 
     private boolean isPropertySetWithUserConfigValue(String propertyName, Optional<Object> defaultValue, Object value)
@@ -155,17 +156,14 @@ class ComponentConfigurationBuilder
     private class ConfigurableAttributeDefinitionVisitor implements AttributeDefinitionVisitor
     {
 
-        private final Consumer<String> referenceConsumer;
         private final Consumer<Object> valueConsumer;
 
         /**
          * @param valueConsumer consumer for handling a bean definition
-         * @param referenceConsumer consumer for handling a bean reference
          */
-        ConfigurableAttributeDefinitionVisitor(Consumer<Object> valueConsumer, Consumer<String> referenceConsumer)
+        ConfigurableAttributeDefinitionVisitor(Consumer<Object> valueConsumer)
         {
             this.valueConsumer = valueConsumer;
-            this.referenceConsumer = referenceConsumer;
         }
 
         @Override
@@ -173,7 +171,7 @@ class ComponentConfigurationBuilder
         {
             ValueExtractorAttributeDefinitionVisitor valueExtractor = new ValueExtractorAttributeDefinitionVisitor();
             valueExtractor.onReferenceObject(objectType);
-            referenceConsumer.accept(valueExtractor.getStringValue());
+            valueConsumer.accept(valueExtractor.getValue());
         }
 
         @Override
@@ -182,12 +180,7 @@ class ComponentConfigurationBuilder
             ValueExtractorAttributeDefinitionVisitor valueExtractor = new ValueExtractorAttributeDefinitionVisitor();
             valueExtractor.onReferenceSimpleParameter(configAttributeName);
             Object value = valueExtractor.getValue();
-            if (value instanceof String)
-            {
-                referenceConsumer.accept((String) value);
-
-            }
-            else if (value != null)
+            if (value != null)
             {
                 valueConsumer.accept(value);
             }
@@ -304,14 +297,17 @@ class ComponentConfigurationBuilder
         @Override
         public void onReferenceObject(Class<?> objectType)
         {
-            objectReferencePopulator.populate(objectType, referenceId -> this.value = referenceId);
+            objectReferencePopulator.populate(objectType, referenceId -> this.value = new RuntimeBeanReference(referenceId));
         }
 
         @Override
         public void onReferenceSimpleParameter(final String configAttributeName)
         {
             String reference = simpleParameters.get(configAttributeName);
-            this.value = reference;
+            if (reference != null)
+            {
+                this.value = new RuntimeBeanReference(reference);
+            }
             simpleParameters.remove(configAttributeName);
             if (configAttributeName.equals(PROCESSING_STRATEGY_ATTRIBUTE) || configAttributeName.equals("defaultProcessingStrategy"))
             {

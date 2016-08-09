@@ -17,12 +17,14 @@ import org.mule.runtime.core.api.transformer.Transformer;
 
 import java.util.List;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
  * This really tests the handling of multiple references in
  * {@link org.mule.config.spring.parsers.assembly.DefaultBeanAssembler}
  */
+@Ignore("MULE-10226 - To be fixed once mule transports parsers are migrated to new parsing method")
 public class MultipleTransformerRefsTestCase  extends AbstractEndpointTestCase
 {
     @Override

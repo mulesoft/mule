@@ -10,6 +10,7 @@ import static java.util.Arrays.asList;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.ArrayUtils.addAll;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.CONFIGURATION_IDENTIFIER;
+import static org.mule.runtime.config.spring.dsl.spring.BeanDefinitionFactory.SPRING_SINGLETON_OBJECT;
 import static org.mule.runtime.config.spring.parsers.generic.AutoIdUtils.uniqueValue;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
@@ -43,6 +44,8 @@ import org.mule.runtime.config.spring.util.LaxInstantiationStrategyWrapper;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
+import org.mule.runtime.core.api.registry.TransformerResolver;
+import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.config.ConfigResource;
 import org.mule.runtime.core.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.registry.MuleRegistryHelper;
@@ -70,6 +73,7 @@ import org.springframework.beans.factory.support.BeanDefinitionReader;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.CglibSubclassingInstantiationStrategy;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.beans.factory.xml.DelegatingEntityResolver;
 import org.springframework.context.annotation.ConfigurationClassPostProcessor;
@@ -222,7 +226,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
         addBeanPostProcessors(beanFactory,
                               new MuleContextPostProcessor(muleContext),
                               new GlobalNamePostProcessor(),
-                              new PostRegistrationActionsPostProcessor((MuleRegistryHelper) muleContext.getRegistry()),
+                              new PostRegistrationActionsPostProcessor((MuleRegistryHelper) muleContext.getRegistry(), beanFactory),
                               new DiscardedOptionalBeanPostProcessor(optionalObjectsController, (DefaultListableBeanFactory) beanFactory),
                               new LifecycleStatePostProcessor(muleContext.getLifecycleManager().getState())
         );
@@ -304,6 +308,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
                                                                                       nameAttribute = uniqueValue(resolvedComponentModel.getBeanDefinition().getBeanClassName());
                                                                                   }
                                                                                   registry.registerBeanDefinition(nameAttribute, resolvedComponentModel.getBeanDefinition());
+                                                                                  postProcessBeanDefinition(componentModel, registry, nameAttribute);
                                                                               }
                                                                           }, null);
                     }
@@ -438,6 +443,22 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
         catch (IllegalStateException e)
         {
             return false;
+        }
+    }
+
+    /**
+     * Forces the registration of instances of {@link TransformerResolver}
+     * and {@link Converter} to be created, so that
+     * {@link PostRegistrationActionsPostProcessor} can work
+     * its magic and add them to the transformation graph
+     */
+    protected static void postProcessBeanDefinition(ComponentModel resolvedComponent, BeanDefinitionRegistry registry, String beanName)
+    {
+        if (Converter.class.isAssignableFrom(resolvedComponent.getType()))
+        {
+            GenericBeanDefinition converterBeanDefinitionCopy = new GenericBeanDefinition(resolvedComponent.getBeanDefinition());
+            converterBeanDefinitionCopy.setScope(SPRING_SINGLETON_OBJECT);
+            registry.registerBeanDefinition(beanName + "-" + "converter", converterBeanDefinitionCopy);
         }
     }
 

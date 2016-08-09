@@ -312,6 +312,7 @@ public class ComponentBuildingDefinition
             builder.definition.constructorAttributeDefinition = new ArrayList<>(this.definition.constructorAttributeDefinition);
             builder.identifier = this.identifier;
             builder.namespace = this.namespace;
+            builder.definition.prototype = this.definition.prototype;
             builder.definition.scope = this.definition.scope;
             builder.definition.typeDefinition = this.definition.typeDefinition;
             builder.definition.objectFactoryType = this.definition.objectFactoryType;

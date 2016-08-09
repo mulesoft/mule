@@ -67,7 +67,7 @@ public class ApplicationModel
     //TODO MULE-9692 move this logic elsewhere. This are here just for the language rules and those should be processed elsewhere.
     public static final String MULE_ROOT_ELEMENT = "mule";
     public static final String MULE_DOMAIN_ROOT_ELEMENT = "mule-domain";
-    public static final String DESCRIPTION_ELEMENT = "description";
+    public static final String ANNOTATIONS = "annotations";
     public static final String CHOICE_EXCEPTION_STRATEGY = "choice-exception-strategy";
     public static final String DEFAULT_EXCEPTION_STRATEGY = "default-exception-strategy";
     public static final String MAX_REDELIVERY_ATTEMPTS_ROLLBACK_ES_ATTRIBUTE = "maxRedeliveryAttempts";
@@ -89,9 +89,12 @@ public class ApplicationModel
     public static final String QUEUE_STORE = "queue-store";
     public static final String CONFIGURATION_ELEMENT = "configuration";
     public static final String DATA_WEAVE = "weave";
+    public static final String CUSTOM_TRANSFORMER = "custom-transformer";
+    public static final String DESCRIPTION_ELEMENT = "description";
 
     //TODO MULE-9638 Remove once all bean definitions parsers where migrated
     public static final String TEST_NAMESPACE = "test";
+    public static final String DOC_NAMESPACE = "doc";
     public static final String DB_NAMESPACE = "db";
     public static final String JAAS_NAMESPACE = "jaas";
     public static final String SPRING_SECURITY_NAMESPACE = "ss";
@@ -106,6 +109,7 @@ public class ApplicationModel
     public static final String BATCH_NAMESPACE = "batch";
     public static final String PARSER_TEST_NAMESPACE = "parsers-test";
     public static final String PROPERTY_PLACEHOLDER_ELEMENT = "property-placeholder";
+    public static final String GLOBAL_PROPERTY = "global-property";
 
     public static final ComponentIdentifier CHOICE_EXCEPTION_STRATEGY_IDENTIFIER = new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(CHOICE_EXCEPTION_STRATEGY).build();
     public static final ComponentIdentifier EXCEPTION_STRATEGY_REFERENCE_IDENTIFIER = new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(EXCEPTION_STRATEGY_REFERENCE_ELEMENT).build();
@@ -120,7 +124,11 @@ public class ApplicationModel
     public static final ComponentIdentifier TRANSFORMER_IDENTIFIER = new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(TRANSFORMER_REFERENCE_ELEMENT).build();
     public static final ComponentIdentifier QUEUE_STORE_IDENTIFIER = new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(QUEUE_STORE).build();
     public static final ComponentIdentifier CONFIGURATION_IDENTIFIER = new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(CONFIGURATION_ELEMENT).build();
+    public static final ComponentIdentifier CUSTOM_TRANSFORMER_IDENTIFIER = new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(CUSTOM_TRANSFORMER).build();
     public static final ComponentIdentifier SPRING_PROPERTY_PLACEHOLDER_IDENTIFIER = new ComponentIdentifier.Builder().withNamespace(SPRING_CONTEXT_NAMESPACE).withName(PROPERTY_PLACEHOLDER_ELEMENT).build();
+    public static final ComponentIdentifier DOC_DESCRIPTION_IDENTIFIER = new ComponentIdentifier.Builder().withNamespace(DOC_NAMESPACE).withName(DESCRIPTION_ELEMENT).build();
+    public static final ComponentIdentifier DESCRIPTION_IDENTIFIER = new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(DESCRIPTION_ELEMENT).build();
+    public static final ComponentIdentifier ANNOTATIONS_IDENTIFIER = new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(ANNOTATIONS).build();
 
     private static ImmutableSet<ComponentIdentifier> ignoredNameValidationComponentList = ImmutableSet.<ComponentIdentifier>builder()
             .add(new ComponentIdentifier.Builder().withNamespace(MULE_ROOT_ELEMENT).withName("flow-ref").build())
@@ -249,11 +257,16 @@ public class ApplicationModel
     {
         //TODO MULE-9825: a new mechanism for property placeholders need to be defined
         final List<String> locations = new ArrayList<>();
+        final Map<String, String> globalProperties = new HashMap<>();
         artifactConfig.getConfigFiles().stream().forEach(configFile ->
                                                          {
                                                              configFile.getConfigLines().get(0).getChildren().stream().forEach(configLine ->
                                                                                                                                {
-                                                                                                                                   if (configLine.getIdentifier().equals(PROPERTY_PLACEHOLDER_ELEMENT))
+                                                                                                                                   if (GLOBAL_PROPERTY.equals(configLine.getIdentifier()))
+                                                                                                                                   {
+                                                                                                                                       globalProperties.put(configLine.getConfigAttributes().get("name").getValue(), configLine.getConfigAttributes().get("value").getValue());
+                                                                                                                                   }
+                                                                                                                                   else if (PROPERTY_PLACEHOLDER_ELEMENT.equals(configLine.getIdentifier()))
                                                                                                                                    {
                                                                                                                                        String locationValue = configLine.getConfigAttributes().get("location").getValue();
                                                                                                                                        locationValue = propertyPlaceholderHelper.replacePlaceholders(locationValue, getProperties());
@@ -269,8 +282,8 @@ public class ApplicationModel
         if (artifactConfig.getApplicationProperties() != null)
         {
             applicationProperties.putAll(artifactConfig.getApplicationProperties());
-
         }
+        applicationProperties.putAll(globalProperties);
         for (String propertyFileLocation : locations)
         {
             Properties properties = new Properties();

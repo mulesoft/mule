@@ -32,8 +32,8 @@ public class TransformerTrackerLifecycleTestCase extends AbstractIntegrationTest
         muleContext.dispose();
 
         assertThat(ltt.getTracker(),
-                contains("setProperty",
-                        "setMuleContext", "setMuleContext",
+                contains("setMuleContext",
+                        "setProperty", "setMuleContext",
                         "initialise", "start",
                         "stop", "dispose"));
     }
