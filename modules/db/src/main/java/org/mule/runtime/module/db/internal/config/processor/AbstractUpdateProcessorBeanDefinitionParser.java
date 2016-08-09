@@ -16,29 +16,24 @@ import org.springframework.beans.factory.xml.BeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
-public abstract class AbstractUpdateProcessorBeanDefinitionParser implements BeanDefinitionParser
-{
+public abstract class AbstractUpdateProcessorBeanDefinitionParser implements BeanDefinitionParser {
 
-    public static final String BULK_MODE_ATTRIBUTE = "bulkMode";
+  public static final String BULK_MODE_ATTRIBUTE = "bulkMode";
 
-    @Override
-    public BeanDefinition parse(Element element, ParserContext parserContext)
-    {
-        BeanDefinitionParser beanDefinitionParser;
+  @Override
+  public BeanDefinition parse(Element element, ParserContext parserContext) {
+    BeanDefinitionParser beanDefinitionParser;
 
-        List<QueryType> validQueryTypes = getQueryType();
+    List<QueryType> validQueryTypes = getQueryType();
 
-        if (element.hasAttribute(BULK_MODE_ATTRIBUTE) && element.getAttribute(BULK_MODE_ATTRIBUTE).equals("true"))
-        {
-            beanDefinitionParser = new PreparedBulkUpdateProcessorBeanDefinitionParser(validQueryTypes);
-        }
-        else
-        {
-            beanDefinitionParser = new SingleUpdateProcessorDefinitionParser(validQueryTypes);
-        }
-
-        return beanDefinitionParser.parse(element, parserContext);
+    if (element.hasAttribute(BULK_MODE_ATTRIBUTE) && element.getAttribute(BULK_MODE_ATTRIBUTE).equals("true")) {
+      beanDefinitionParser = new PreparedBulkUpdateProcessorBeanDefinitionParser(validQueryTypes);
+    } else {
+      beanDefinitionParser = new SingleUpdateProcessorDefinitionParser(validQueryTypes);
     }
 
-    protected abstract List<QueryType> getQueryType();
+    return beanDefinitionParser.parse(element, parserContext);
+  }
+
+  protected abstract List<QueryType> getQueryType();
 }

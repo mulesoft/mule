@@ -27,55 +27,45 @@ import java.util.Set;
  *
  * @since 4.0
  */
-public interface ExtensionParameter extends WithType, WithAnnotations, Named, WithAlias, WithOwner
-{
+public interface ExtensionParameter extends WithType, WithAnnotations, Named, WithAlias, WithOwner {
 
-    Set<Class<?>> IMPLICIT_ARGUMENT_TYPES = ImmutableSet.<Class<?>>builder()
-            .add(MuleEvent.class)
-            .add(MuleMessage.class)
-            .add(org.mule.runtime.core.api.MuleMessage.class)
-            .build();
+  Set<Class<?>> IMPLICIT_ARGUMENT_TYPES = ImmutableSet.<Class<?>>builder().add(MuleEvent.class).add(MuleMessage.class)
+      .add(org.mule.runtime.core.api.MuleMessage.class).build();
 
-    /**
-     * @return A {@code boolean} indicating whether the parameter should be advertised and added as a {@link ParameterModel} in
-     * the {@link ExtensionModel}
-     */
-    default boolean shouldBeAdvertised()
-    {
-        return !(IMPLICIT_ARGUMENT_TYPES.contains(getType().getDeclaredClass()) ||
-                 (isAnnotatedWith(UseConfig.class) || isAnnotatedWith(Connection.class)) ||
-                 isAnnotatedWith(ParameterGroup.class));
+  /**
+   * @return A {@code boolean} indicating whether the parameter should be advertised and added as a {@link ParameterModel} in the
+   *         {@link ExtensionModel}
+   */
+  default boolean shouldBeAdvertised() {
+    return !(IMPLICIT_ARGUMENT_TYPES.contains(getType().getDeclaredClass())
+        || (isAnnotatedWith(UseConfig.class) || isAnnotatedWith(Connection.class)) || isAnnotatedWith(ParameterGroup.class));
+  }
+
+  /**
+   * @return A {@code boolean} indicating whether the parameter is a required or not
+   */
+  default boolean isRequired() {
+    return !(isAnnotatedWith(Optional.class));
+  }
+
+  /**
+   * @return The {@link java.util.Optional} default value of the operation
+   */
+  default java.util.Optional<String> defaultValue() {
+    java.util.Optional<String> optionalDefaultValue = java.util.Optional.empty();
+    final java.util.Optional<Optional> annotation = getAnnotation(Optional.class);
+    if (annotation.isPresent()) {
+      final Optional optionalAnnotation = annotation.get();
+      final String defaultValue = optionalAnnotation.defaultValue();
+      if (!defaultValue.equals(Optional.NULL)) {
+        optionalDefaultValue = java.util.Optional.of(defaultValue);
+      }
     }
+    return optionalDefaultValue;
+  }
 
-    /**
-     * @return A {@code boolean} indicating whether the parameter is a required or not
-     */
-    default boolean isRequired()
-    {
-        return !(isAnnotatedWith(Optional.class));
-    }
-
-    /**
-     * @return The {@link java.util.Optional} default value of the operation
-     */
-    default java.util.Optional<String> defaultValue()
-    {
-        java.util.Optional<String> optionalDefaultValue = java.util.Optional.empty();
-        final java.util.Optional<Optional> annotation = getAnnotation(Optional.class);
-        if (annotation.isPresent())
-        {
-            final Optional optionalAnnotation = annotation.get();
-            final String defaultValue = optionalAnnotation.defaultValue();
-            if (!defaultValue.equals(Optional.NULL))
-            {
-                optionalDefaultValue = java.util.Optional.of(defaultValue);
-            }
-        }
-        return optionalDefaultValue;
-    }
-
-    /**
-     * @return A {@code boolean} indicating whether the parameter is based as a {@link Field}
-     */
-    boolean isFieldBased();
+  /**
+   * @return A {@code boolean} indicating whether the parameter is based as a {@link Field}
+   */
+  boolean isFieldBased();
 }

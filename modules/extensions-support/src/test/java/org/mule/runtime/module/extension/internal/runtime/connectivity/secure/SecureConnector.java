@@ -18,16 +18,15 @@ import org.mule.runtime.extension.api.annotation.param.display.Text;
 @Operations(SecureOperations.class)
 @Providers(SecureConnectionProvider.class)
 @Xml(namespaceLocation = "http://www.mulesoft.org/schema/mule/secure", namespace = "secure")
-public class SecureConnector
-{
+public class SecureConnector {
 
-    @Parameter
-    @Text
-    private String plainStringField;
+  @Parameter
+  @Text
+  private String plainStringField;
 
-    @Parameter
-    @Password
-    private String password;
+  @Parameter
+  @Password
+  private String password;
 
 
 }

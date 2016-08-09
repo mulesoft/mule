@@ -29,36 +29,33 @@ import org.junit.Before;
 import org.junit.Test;
 
 @SmallTest
-public class ExtensionModelResourceFactoryTestCase extends AbstractGeneratedResourceFactoryTestCase
-{
+public class ExtensionModelResourceFactoryTestCase extends AbstractGeneratedResourceFactoryTestCase {
 
-    private ExtensionModelResourceFactory resourceFactory = new ExtensionModelResourceFactory();
-    private ExtensionModel extensionModel;
+  private ExtensionModelResourceFactory resourceFactory = new ExtensionModelResourceFactory();
+  private ExtensionModel extensionModel;
 
-    @Before
-    public void before()
-    {
-        Describer describer = new AnnotationsBasedDescriber(HeisenbergExtension.class, new StaticVersionResolver(getProductVersion()));
-        ExtensionFactory extensionFactory = new DefaultExtensionFactory(new SpiServiceRegistry(), getClass().getClassLoader());
-        final DescribingContext context = new DefaultDescribingContext(getClass().getClassLoader());
+  @Before
+  public void before() {
+    Describer describer =
+        new AnnotationsBasedDescriber(HeisenbergExtension.class, new StaticVersionResolver(getProductVersion()));
+    ExtensionFactory extensionFactory = new DefaultExtensionFactory(new SpiServiceRegistry(), getClass().getClassLoader());
+    final DescribingContext context = new DefaultDescribingContext(getClass().getClassLoader());
 
-        extensionModel = extensionFactory.createFrom(describer.describe(context), context);
-    }
+    extensionModel = extensionFactory.createFrom(describer.describe(context), context);
+  }
 
 
-    @Override
-    protected Class<? extends GeneratedResourceFactory>[] getResourceFactoryTypes()
-    {
-        return new Class[] {ExtensionModelResourceFactory.class};
-    }
+  @Override
+  protected Class<? extends GeneratedResourceFactory>[] getResourceFactoryTypes() {
+    return new Class[] {ExtensionModelResourceFactory.class};
+  }
 
-    @Test
-    public void generate() throws Exception
-    {
-        GeneratedResource resource = resourceFactory.generateResource(extensionModel).get();
-        assertThat(resource.getPath(), equalTo(EXTENSION_MODEL_JSON_FILE_NAME));
+  @Test
+  public void generate() throws Exception {
+    GeneratedResource resource = resourceFactory.generateResource(extensionModel).get();
+    assertThat(resource.getPath(), equalTo(EXTENSION_MODEL_JSON_FILE_NAME));
 
-        ExtensionModel deserialized = new ExtensionModelJsonSerializer().deserialize(new String(resource.getContent()));
-        assertThat(extensionModel.getName(), equalTo(deserialized.getName()));
-    }
+    ExtensionModel deserialized = new ExtensionModelJsonSerializer().deserialize(new String(resource.getContent()));
+    assertThat(extensionModel.getName(), equalTo(deserialized.getName()));
+  }
 }

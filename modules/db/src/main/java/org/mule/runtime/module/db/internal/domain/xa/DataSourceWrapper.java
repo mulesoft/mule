@@ -22,80 +22,67 @@ import javax.sql.XADataSource;
 /**
  * Using for unification XADataSource and DataSource
  */
-public class DataSourceWrapper implements DataSource, XaResourceFactoryHolder
-{
+public class DataSourceWrapper implements DataSource, XaResourceFactoryHolder {
 
-    private XADataSource xaDataSource;
+  private XADataSource xaDataSource;
 
-    public DataSourceWrapper(XADataSource xaDataSource)
-    {
-        this.xaDataSource = xaDataSource;
-    }
+  public DataSourceWrapper(XADataSource xaDataSource) {
+    this.xaDataSource = xaDataSource;
+  }
 
-    @Override
-    public int getLoginTimeout() throws SQLException
-    {
-        return xaDataSource.getLoginTimeout();
-    }
+  @Override
+  public int getLoginTimeout() throws SQLException {
+    return xaDataSource.getLoginTimeout();
+  }
 
-    @Override
-    public void setLoginTimeout(int seconds) throws SQLException
-    {
-        xaDataSource.setLoginTimeout(seconds);
-    }
+  @Override
+  public void setLoginTimeout(int seconds) throws SQLException {
+    xaDataSource.setLoginTimeout(seconds);
+  }
 
-    @Override
-    public PrintWriter getLogWriter() throws SQLException
-    {
-        return xaDataSource.getLogWriter();
-    }
+  @Override
+  public PrintWriter getLogWriter() throws SQLException {
+    return xaDataSource.getLogWriter();
+  }
 
-    @Override
-    public void setLogWriter(PrintWriter out) throws SQLException
-    {
-        xaDataSource.setLogWriter(out);
-    }
+  @Override
+  public void setLogWriter(PrintWriter out) throws SQLException {
+    xaDataSource.setLogWriter(out);
+  }
 
-    @Override
-    public Connection getConnection() throws SQLException
-    {
-        return new ConnectionWrapper(xaDataSource.getXAConnection());
-    }
+  @Override
+  public Connection getConnection() throws SQLException {
+    return new ConnectionWrapper(xaDataSource.getXAConnection());
+  }
 
-    @Override
-    public Connection getConnection(String username, String password) throws SQLException
-    {
-        return new ConnectionWrapper(xaDataSource.getXAConnection(username, password));
-    }
+  @Override
+  public Connection getConnection(String username, String password) throws SQLException {
+    return new ConnectionWrapper(xaDataSource.getXAConnection(username, password));
+  }
 
-    /**
-     * @return Returns the underlying XADataSource.
-     */
-    public XADataSource getXaDataSource()
-    {
-        return xaDataSource;
-    }
+  /**
+   * @return Returns the underlying XADataSource.
+   */
+  public XADataSource getXaDataSource() {
+    return xaDataSource;
+  }
 
-    @Override
-    public boolean isWrapperFor(Class<?> iface) throws SQLException
-    {
-        return false;
-    }
+  @Override
+  public boolean isWrapperFor(Class<?> iface) throws SQLException {
+    return false;
+  }
 
-    @Override
-    public <T> T unwrap(Class<T> iface) throws SQLException
-    {
-        return null;
-    }
+  @Override
+  public <T> T unwrap(Class<T> iface) throws SQLException {
+    return null;
+  }
 
-    public Logger getParentLogger() throws SQLFeatureNotSupportedException
-    {
-        return xaDataSource.getParentLogger();
-    }
+  public Logger getParentLogger() throws SQLFeatureNotSupportedException {
+    return xaDataSource.getParentLogger();
+  }
 
-    @Override
-    public Object getHoldObject()
-    {
-        return xaDataSource;
-    }
+  @Override
+  public Object getHoldObject() {
+    return xaDataSource;
+  }
 }

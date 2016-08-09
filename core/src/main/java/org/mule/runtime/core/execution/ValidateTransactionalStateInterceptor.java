@@ -13,30 +13,24 @@ import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.transaction.IllegalTransactionStateException;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 
-class ValidateTransactionalStateInterceptor<T> implements ExecutionInterceptor<T>
-{
-    private final ExecutionInterceptor<T> next;
-    private final TransactionConfig transactionConfig;
+class ValidateTransactionalStateInterceptor<T> implements ExecutionInterceptor<T> {
 
-    public ValidateTransactionalStateInterceptor(ExecutionInterceptor<T> next, TransactionConfig transactionConfig)
-    {
-        this.next = next;
-        this.transactionConfig = transactionConfig;
-    }
+  private final ExecutionInterceptor<T> next;
+  private final TransactionConfig transactionConfig;
 
-    @Override
-    public T execute(ExecutionCallback<T> callback, ExecutionContext executionContext) throws Exception
-    {
-        Transaction tx = TransactionCoordination.getInstance().getTransaction();
-        if (transactionConfig.getAction() == TransactionConfig.ACTION_NEVER && tx != null)
-        {
-            throw new IllegalTransactionStateException(
-                    CoreMessages.transactionAvailableButActionIs("Never"));
-        } else if (transactionConfig.getAction() == TransactionConfig.ACTION_ALWAYS_JOIN && tx == null)
-        {
-            throw new IllegalTransactionStateException(
-                    CoreMessages.transactionNotAvailableButActionIs("Always Join"));
-        }
-        return this.next.execute(callback, executionContext);
+  public ValidateTransactionalStateInterceptor(ExecutionInterceptor<T> next, TransactionConfig transactionConfig) {
+    this.next = next;
+    this.transactionConfig = transactionConfig;
+  }
+
+  @Override
+  public T execute(ExecutionCallback<T> callback, ExecutionContext executionContext) throws Exception {
+    Transaction tx = TransactionCoordination.getInstance().getTransaction();
+    if (transactionConfig.getAction() == TransactionConfig.ACTION_NEVER && tx != null) {
+      throw new IllegalTransactionStateException(CoreMessages.transactionAvailableButActionIs("Never"));
+    } else if (transactionConfig.getAction() == TransactionConfig.ACTION_ALWAYS_JOIN && tx == null) {
+      throw new IllegalTransactionStateException(CoreMessages.transactionNotAvailableButActionIs("Always Join"));
     }
+    return this.next.execute(callback, executionContext);
+  }
 }

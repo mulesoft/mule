@@ -16,9 +16,9 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.ManagedList;
 
 /**
- * {@code BeanDefinitionCreator} that handles components that contains a collection
- * of elements.
+ * {@code BeanDefinitionCreator} that handles components that contains a collection of elements.
  * <p>
+ * 
  * <pre>
  *  <parsers-test:simple-type-child-list>
  *      <parsers-test:simple-type-child value="value1"/>
@@ -28,30 +28,26 @@ import org.springframework.beans.factory.support.ManagedList;
  *
  * @since 4.0
  */
-public class CollectionBeanDefinitionCreator extends BeanDefinitionCreator
-{
+public class CollectionBeanDefinitionCreator extends BeanDefinitionCreator {
 
-    @Override
-    boolean handleRequest(CreateBeanDefinitionRequest createBeanDefinitionRequest)
-    {
-        ComponentModel componentModel = createBeanDefinitionRequest.getComponentModel();
-        ComponentBuildingDefinition componentBuildingDefinition = createBeanDefinitionRequest.getComponentBuildingDefinition();
-        ObjectTypeVisitor objectTypeVisitor = new ObjectTypeVisitor(componentModel);
-        componentBuildingDefinition.getTypeDefinition().visit(objectTypeVisitor);
-        if (Collection.class.isAssignableFrom(objectTypeVisitor.getType()))
-        {
-            componentModel.setType(objectTypeVisitor.getType());
-            ManagedList<Object> managedList = new ManagedList<>();
-            for (ComponentModel innerComponent : componentModel.getInnerComponents())
-            {
-                Object bean = innerComponent.getBeanDefinition() == null ? innerComponent.getBeanReference() : innerComponent.getBeanDefinition();
-                managedList.add(bean);
-            }
-            componentModel.setBeanDefinition(BeanDefinitionBuilder.genericBeanDefinition(objectTypeVisitor.getType())
-                                                     .addConstructorArgValue(managedList)
-                                                     .getBeanDefinition());
-            return true;
-        }
-        return false;
+  @Override
+  boolean handleRequest(CreateBeanDefinitionRequest createBeanDefinitionRequest) {
+    ComponentModel componentModel = createBeanDefinitionRequest.getComponentModel();
+    ComponentBuildingDefinition componentBuildingDefinition = createBeanDefinitionRequest.getComponentBuildingDefinition();
+    ObjectTypeVisitor objectTypeVisitor = new ObjectTypeVisitor(componentModel);
+    componentBuildingDefinition.getTypeDefinition().visit(objectTypeVisitor);
+    if (Collection.class.isAssignableFrom(objectTypeVisitor.getType())) {
+      componentModel.setType(objectTypeVisitor.getType());
+      ManagedList<Object> managedList = new ManagedList<>();
+      for (ComponentModel innerComponent : componentModel.getInnerComponents()) {
+        Object bean =
+            innerComponent.getBeanDefinition() == null ? innerComponent.getBeanReference() : innerComponent.getBeanDefinition();
+        managedList.add(bean);
+      }
+      componentModel.setBeanDefinition(BeanDefinitionBuilder.genericBeanDefinition(objectTypeVisitor.getType())
+          .addConstructorArgValue(managedList).getBeanDefinition());
+      return true;
     }
+    return false;
+  }
 }

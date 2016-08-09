@@ -11,18 +11,15 @@ import org.mule.runtime.module.db.internal.result.resultset.ResultSetHandler;
 import org.mule.tck.size.SmallTest;
 
 @SmallTest
-public class EagerStatementResultHandlerTestCase extends AbstractStatementResultHandlerTestCase
-{
+public class EagerStatementResultHandlerTestCase extends AbstractStatementResultHandlerTestCase {
 
-    @Override
-    protected StatementResultHandler createStatementResultHandler(ResultSetHandler resultSetHandler)
-    {
-        return new EagerStatementResultHandler(resultSetHandler);
-    }
+  @Override
+  protected StatementResultHandler createStatementResultHandler(ResultSetHandler resultSetHandler) {
+    return new EagerStatementResultHandler(resultSetHandler);
+  }
 
-    @Override
-    protected boolean mustCloseResources()
-    {
-        return true;
-    }
+  @Override
+  protected boolean mustCloseResources() {
+    return true;
+  }
 }

@@ -9,17 +9,14 @@ package org.mule.runtime.module.db.integration.delete;
 
 import org.mule.runtime.module.db.integration.model.AbstractTestDatabase;
 
-public class DeleteNamedParamBulkTestCase extends DeleteBulkTestCase
-{
+public class DeleteNamedParamBulkTestCase extends DeleteBulkTestCase {
 
-    public DeleteNamedParamBulkTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public DeleteNamedParamBulkTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return super.getFlowConfigurationResources();
-    }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return super.getFlowConfigurationResources();
+  }
 }

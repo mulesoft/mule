@@ -25,50 +25,44 @@ import javax.mail.internet.InternetAddress;
 
 import org.junit.Test;
 
-public class EmailConnectorUtilsTestCase
-{
+public class EmailConnectorUtilsTestCase {
 
-    private static final String JUANI_NAME = "Juan Desimoni";
+  private static final String JUANI_NAME = "Juan Desimoni";
 
-    @Test
-    public void stringAddressToInternetAddress()
-    {
-        Address address = toAddress(JUANI_EMAIL);
-        assertAddress(address, JUANI_EMAIL, null);
+  @Test
+  public void stringAddressToInternetAddress() {
+    Address address = toAddress(JUANI_EMAIL);
+    assertAddress(address, JUANI_EMAIL, null);
+  }
+
+  @Test
+  public void nameAddressToInternetAddress() {
+    String nameAddress = getNameAddressFormatInternetAddress(); // address in the "name<address>" format.
+    Address address = toAddress(nameAddress);
+    assertAddress(address, JUANI_EMAIL, JUANI_NAME);
+  }
+
+  @Test
+  public void listAddressesToInternetAddressArray() {
+    Address[] addresses =
+        toAddressArray(asList(JUANI_EMAIL, ESTEBAN_EMAIL, ALE_EMAIL, PABLON_EMAIL, getNameAddressFormatInternetAddress()));
+    assertThat(addresses.length, is(5));
+    for (Address address : addresses) {
+      assertThat(address, instanceOf(InternetAddress.class));
     }
+  }
 
-    @Test
-    public void nameAddressToInternetAddress()
-    {
-        String nameAddress = getNameAddressFormatInternetAddress();  // address in the "name<address>" format.
-        Address address = toAddress(nameAddress);
-        assertAddress(address, JUANI_EMAIL, JUANI_NAME);
-    }
+  private void assertAddress(Address address, String addressValue, String personal) {
+    assertThat(address, is(not(nullValue())));
+    assertThat(address, instanceOf(InternetAddress.class));
+    assertThat(address.getType(), is("rfc822"));
+    assertThat(((InternetAddress) address).getAddress(), is(addressValue));
+    assertThat(((InternetAddress) address).getPersonal(), is(personal));
+  }
 
-    @Test
-    public void listAddressesToInternetAddressArray()
-    {
-        Address[] addresses = toAddressArray(asList(JUANI_EMAIL, ESTEBAN_EMAIL, ALE_EMAIL, PABLON_EMAIL, getNameAddressFormatInternetAddress()));
-        assertThat(addresses.length, is(5));
-        for (Address address : addresses)
-        {
-            assertThat(address, instanceOf(InternetAddress.class));
-        }
-    }
-
-    private void assertAddress(Address address, String addressValue, String personal)
-    {
-        assertThat(address, is(not(nullValue())));
-        assertThat(address, instanceOf(InternetAddress.class));
-        assertThat(address.getType(), is("rfc822"));
-        assertThat(((InternetAddress) address).getAddress(), is(addressValue));
-        assertThat(((InternetAddress) address).getPersonal(), is(personal));
-    }
-
-    private String getNameAddressFormatInternetAddress()
-    {
-        return format("%s<%s>", JUANI_NAME, JUANI_EMAIL);
-    }
+  private String getNameAddressFormatInternetAddress() {
+    return format("%s<%s>", JUANI_NAME, JUANI_EMAIL);
+  }
 
 
 }

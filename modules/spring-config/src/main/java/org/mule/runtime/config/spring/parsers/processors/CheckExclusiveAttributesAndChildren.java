@@ -23,136 +23,109 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.TypeInfo;
 
 /**
- * Attributes and children elements cannot appear together. Child names are either
- * node names or types.
+ * Attributes and children elements cannot appear together. Child names are either node names or types.
  */
-public class CheckExclusiveAttributesAndChildren implements PreProcessor
-{
-    private final static Pattern TYPE_REGEXP = Pattern.compile("\\{(.*)\\}(.*)");
+public class CheckExclusiveAttributesAndChildren implements PreProcessor {
 
-    private final Set<String> attributeNames;
-    private final Set<String> childrenNames;
-    private final Set<ChildType> childrenTypes;
+  private final static Pattern TYPE_REGEXP = Pattern.compile("\\{(.*)\\}(.*)");
 
-    private static class ChildType
-    {
-        String ns;
-        String name;
+  private final Set<String> attributeNames;
+  private final Set<String> childrenNames;
+  private final Set<ChildType> childrenTypes;
 
-        public ChildType(String ns, String name)
-        {
-            this.ns = ns;
-            this.name = name;
-        }
+  private static class ChildType {
 
-        @Override
-        public String toString()
-        {
-            return "{" + ns + "}" + name;
-        }
+    String ns;
+    String name;
 
+    public ChildType(String ns, String name) {
+      this.ns = ns;
+      this.name = name;
     }
 
-    public CheckExclusiveAttributesAndChildren(String[] attributeNames, String[] childrenNamesOrTypes)
-    {
-        this.attributeNames = new HashSet<String>(Arrays.asList(attributeNames));
-        this.childrenNames = new HashSet<String>();
-        this.childrenTypes = new HashSet<ChildType>();
-        parseChildrenNamesOrTypes(childrenNamesOrTypes);
+    @Override
+    public String toString() {
+      return "{" + ns + "}" + name;
     }
 
-    private void parseChildrenNamesOrTypes(String[] childrenNamesOrTypes)
-    {
-        for (final String childrenNameOrType : childrenNamesOrTypes)
-        {
-            final Matcher matcher = TYPE_REGEXP.matcher(childrenNameOrType);
-            if (matcher.matches())
-            {
-                childrenTypes.add(new ChildType(matcher.group(1), matcher.group(2)));
-            }
-            else
-            {
-                childrenNames.add(childrenNameOrType);
-            }
-        }
+  }
+
+  public CheckExclusiveAttributesAndChildren(String[] attributeNames, String[] childrenNamesOrTypes) {
+    this.attributeNames = new HashSet<String>(Arrays.asList(attributeNames));
+    this.childrenNames = new HashSet<String>();
+    this.childrenTypes = new HashSet<ChildType>();
+    parseChildrenNamesOrTypes(childrenNamesOrTypes);
+  }
+
+  private void parseChildrenNamesOrTypes(String[] childrenNamesOrTypes) {
+    for (final String childrenNameOrType : childrenNamesOrTypes) {
+      final Matcher matcher = TYPE_REGEXP.matcher(childrenNameOrType);
+      if (matcher.matches()) {
+        childrenTypes.add(new ChildType(matcher.group(1), matcher.group(2)));
+      } else {
+        childrenNames.add(childrenNameOrType);
+      }
+    }
+  }
+
+  public void preProcess(PropertyConfiguration config, Element element) {
+    final NamedNodeMap attributes = element.getAttributes();
+    final int attributesCount = attributes.getLength();
+
+    for (int i = 0; i < attributesCount; i++) {
+      final String attributeName = SpringXMLUtils.attributeName((Attr) attributes.item(i));
+
+      if (attributeNames.contains(attributeName)) {
+        ensureNoForbiddenChildren(element, attributeName);
+      }
+    }
+  }
+
+  private void ensureNoForbiddenChildren(Element element, final String attributeName) {
+    final NodeList childNodes = element.getChildNodes();
+    final int childNodesCount = childNodes.getLength();
+    for (int j = 0; j < childNodesCount; j++) {
+      checkChildNode(element, attributeName, childNodes.item(j));
+    }
+  }
+
+  private void checkChildNode(Element element, final String attributeName, final Node child) {
+    if (child.getNodeType() == Node.ELEMENT_NODE) {
+      checkChildElement(element, attributeName, (Element) child);
+    }
+  }
+
+  private void checkChildElement(Element element, final String attributeName, final Element child) {
+    checkAttributeNameMatch(element, attributeName, child);
+
+    for (final ChildType childrenType : childrenTypes) {
+      final TypeInfo typeInfo = (TypeInfo) child;
+
+      if (((childrenType.ns.equals(typeInfo.getTypeNamespace()) && childrenType.name.equals(typeInfo.getTypeName())))
+          || typeInfo.isDerivedFrom(childrenType.ns, childrenType.name, TypeInfo.DERIVATION_EXTENSION)) {
+
+        throw new CheckExclusiveAttributesAndChildrenException("Element " + SpringXMLUtils.elementToString(element)
+            + " can't contain child of type " + childrenType + " because it defines attribute " + attributeName);
+      }
     }
 
-    public void preProcess(PropertyConfiguration config, Element element)
-    {
-        final NamedNodeMap attributes = element.getAttributes();
-        final int attributesCount = attributes.getLength();
+  }
 
-        for (int i = 0; i < attributesCount; i++)
-        {
-            final String attributeName = SpringXMLUtils.attributeName((Attr) attributes.item(i));
+  private void checkAttributeNameMatch(Element element, final String attributeName, final Element child) {
+    final String childElementName = child.getLocalName();
 
-            if (attributeNames.contains(attributeName))
-            {
-                ensureNoForbiddenChildren(element, attributeName);
-            }
-        }
+    if (childrenNames.contains(childElementName)) {
+      throw new CheckExclusiveAttributesAndChildrenException("Element " + SpringXMLUtils.elementToString(element)
+          + " can't contain child " + childElementName + " because it defines attribute " + attributeName);
     }
+  }
 
-    private void ensureNoForbiddenChildren(Element element, final String attributeName)
-    {
-        final NodeList childNodes = element.getChildNodes();
-        final int childNodesCount = childNodes.getLength();
-        for (int j = 0; j < childNodesCount; j++)
-        {
-            checkChildNode(element, attributeName, childNodes.item(j));
-        }
+  public static class CheckExclusiveAttributesAndChildrenException extends IllegalStateException {
+
+    private static final long serialVersionUID = 8661524219979354246L;
+
+    public CheckExclusiveAttributesAndChildrenException(String message) {
+      super(message);
     }
-
-    private void checkChildNode(Element element, final String attributeName, final Node child)
-    {
-        if (child.getNodeType() == Node.ELEMENT_NODE)
-        {
-            checkChildElement(element, attributeName, (Element) child);
-        }
-    }
-
-    private void checkChildElement(Element element, final String attributeName, final Element child)
-    {
-        checkAttributeNameMatch(element, attributeName, child);
-
-        for (final ChildType childrenType : childrenTypes)
-        {
-            final TypeInfo typeInfo = (TypeInfo) child;
-
-            if (((childrenType.ns.equals(typeInfo.getTypeNamespace()) && childrenType.name.equals(typeInfo.getTypeName())))
-                || typeInfo.isDerivedFrom(childrenType.ns, childrenType.name, TypeInfo.DERIVATION_EXTENSION))
-            {
-
-                throw new CheckExclusiveAttributesAndChildrenException(
-                    "Element " + SpringXMLUtils.elementToString(element) + " can't contain child of type "
-                                    + childrenType + " because it defines attribute " + attributeName);
-            }
-        }
-
-    }
-
-    private void checkAttributeNameMatch(Element element, final String attributeName, final Element child)
-    {
-        final String childElementName = child.getLocalName();
-
-        if (childrenNames.contains(childElementName))
-        {
-            throw new CheckExclusiveAttributesAndChildrenException("Element "
-                                                                   + SpringXMLUtils.elementToString(element)
-                                                                   + " can't contain child "
-                                                                   + childElementName
-                                                                   + " because it defines attribute "
-                                                                   + attributeName);
-        }
-    }
-
-    public static class CheckExclusiveAttributesAndChildrenException extends IllegalStateException
-    {
-        private static final long serialVersionUID = 8661524219979354246L;
-
-        public CheckExclusiveAttributesAndChildrenException(String message)
-        {
-            super(message);
-        }
-    }
+  }
 }

@@ -19,48 +19,42 @@ import java.io.InputStream;
 
 import org.junit.Test;
 
-public class HttpRequestExpectHeaderTestCase extends AbstractHttpExpectHeaderServerTestCase
-{
+public class HttpRequestExpectHeaderTestCase extends AbstractHttpExpectHeaderServerTestCase {
 
-    private static final String REQUEST_FLOW_NAME = "requestFlow";
+  private static final String REQUEST_FLOW_NAME = "requestFlow";
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "http-request-expect-header-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "http-request-expect-header-config.xml";
+  }
 
-    @Test
-    public void handlesContinueResponse() throws Exception
-    {
-        startExpectContinueServer();
+  @Test
+  public void handlesContinueResponse() throws Exception {
+    startExpectContinueServer();
 
-        flowRunner(REQUEST_FLOW_NAME).withPayload(TEST_MESSAGE).run();
-        assertThat(requestBody, equalTo(TEST_MESSAGE));
+    flowRunner(REQUEST_FLOW_NAME).withPayload(TEST_MESSAGE).run();
+    assertThat(requestBody, equalTo(TEST_MESSAGE));
 
-        stopServer();
-    }
+    stopServer();
+  }
 
-    @Test
-    public void handlesExpectationFailedResponse() throws Exception
-    {
-        startExpectFailedServer();
+  @Test
+  public void handlesExpectationFailedResponse() throws Exception {
+    startExpectFailedServer();
 
-        // Set a payload that will fail when consumed. As the server rejects the request after processing
-        // the header, the client should not send the body.
-        MuleEvent response = flowRunner(REQUEST_FLOW_NAME).withPayload(new InputStream()
-        {
-            @Override
-            public int read() throws IOException
-            {
-                throw new IOException("Payload should not be consumed");
-            }
-        }).run();
+    // Set a payload that will fail when consumed. As the server rejects the request after processing
+    // the header, the client should not send the body.
+    MuleEvent response = flowRunner(REQUEST_FLOW_NAME).withPayload(new InputStream() {
 
-        assertThat((HttpResponseAttributes) response.getMessage().getAttributes(),
-                   hasStatusCode(EXPECTATION_FAILED.getStatusCode()));
+      @Override
+      public int read() throws IOException {
+        throw new IOException("Payload should not be consumed");
+      }
+    }).run();
 
-        stopServer();
-    }
+    assertThat((HttpResponseAttributes) response.getMessage().getAttributes(), hasStatusCode(EXPECTATION_FAILED.getStatusCode()));
+
+    stopServer();
+  }
 
 }

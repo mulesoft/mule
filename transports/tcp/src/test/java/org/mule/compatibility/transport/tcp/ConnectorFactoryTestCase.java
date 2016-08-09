@@ -14,14 +14,13 @@ import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 
 import org.junit.Test;
 
-public class ConnectorFactoryTestCase extends AbstractMuleContextEndpointTestCase
-{
-    @Test
-    public void testCreate() throws Exception
-    {
-        ImmutableEndpoint endpoint = getEndpointFactory().getInboundEndpoint("tcp://7877");
-        assertNotNull(endpoint);
-        assertNotNull(endpoint.getConnector());
-        assertEquals("tcp://localhost:7877", endpoint.getEndpointURI().getAddress());
-    }
+public class ConnectorFactoryTestCase extends AbstractMuleContextEndpointTestCase {
+
+  @Test
+  public void testCreate() throws Exception {
+    ImmutableEndpoint endpoint = getEndpointFactory().getInboundEndpoint("tcp://7877");
+    assertNotNull(endpoint);
+    assertNotNull(endpoint.getConnector());
+    assertEquals("tcp://localhost:7877", endpoint.getEndpointURI().getAddress());
+  }
 }

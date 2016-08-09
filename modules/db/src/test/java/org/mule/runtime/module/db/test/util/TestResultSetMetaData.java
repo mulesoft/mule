@@ -16,128 +16,103 @@ import java.util.List;
  * <p/>
  * NOTE: partial implementation to cover current test scenarios
  */
-public class TestResultSetMetaData implements ResultSetMetaData
-{
+public class TestResultSetMetaData implements ResultSetMetaData {
 
-    private final List<ColumnMetadata> columns;
+  private final List<ColumnMetadata> columns;
 
-    public TestResultSetMetaData(List<ColumnMetadata> columns)
-    {
-        this.columns = columns;
-    }
+  public TestResultSetMetaData(List<ColumnMetadata> columns) {
+    this.columns = columns;
+  }
 
-    public int getColumnCount() throws SQLException
-    {
-        return columns.size();
-    }
+  public int getColumnCount() throws SQLException {
+    return columns.size();
+  }
 
-    public boolean isAutoIncrement(int i) throws SQLException
-    {
-        throw new UnsupportedOperationException();
-    }
+  public boolean isAutoIncrement(int i) throws SQLException {
+    throw new UnsupportedOperationException();
+  }
 
-    public boolean isCaseSensitive(int i) throws SQLException
-    {
-        throw new UnsupportedOperationException();
-    }
+  public boolean isCaseSensitive(int i) throws SQLException {
+    throw new UnsupportedOperationException();
+  }
 
-    public boolean isSearchable(int i) throws SQLException
-    {
-        throw new UnsupportedOperationException();
-    }
+  public boolean isSearchable(int i) throws SQLException {
+    throw new UnsupportedOperationException();
+  }
 
-    public boolean isCurrency(int i) throws SQLException
-    {
-        throw new UnsupportedOperationException();
-    }
+  public boolean isCurrency(int i) throws SQLException {
+    throw new UnsupportedOperationException();
+  }
 
-    public int isNullable(int i) throws SQLException
-    {
-        throw new UnsupportedOperationException();
-    }
+  public int isNullable(int i) throws SQLException {
+    throw new UnsupportedOperationException();
+  }
 
-    public boolean isSigned(int i) throws SQLException
-    {
-        throw new UnsupportedOperationException();
-    }
+  public boolean isSigned(int i) throws SQLException {
+    throw new UnsupportedOperationException();
+  }
 
-    public int getColumnDisplaySize(int i) throws SQLException
-    {
-        throw new UnsupportedOperationException();
-    }
+  public int getColumnDisplaySize(int i) throws SQLException {
+    throw new UnsupportedOperationException();
+  }
 
-    public String getColumnLabel(int i) throws SQLException
-    {
-        return columns.get(i-1).getLabel();
-    }
+  public String getColumnLabel(int i) throws SQLException {
+    return columns.get(i - 1).getLabel();
+  }
 
-    public String getColumnName(int i) throws SQLException
-    {
-        return columns.get(i-1).getName();
-    }
+  public String getColumnName(int i) throws SQLException {
+    return columns.get(i - 1).getName();
+  }
 
-    public String getSchemaName(int i) throws SQLException
-    {
-        throw new UnsupportedOperationException();
-    }
+  public String getSchemaName(int i) throws SQLException {
+    throw new UnsupportedOperationException();
+  }
 
-    public int getPrecision(int i) throws SQLException
-    {
-        throw new UnsupportedOperationException();
-    }
+  public int getPrecision(int i) throws SQLException {
+    throw new UnsupportedOperationException();
+  }
 
-    public int getScale(int i) throws SQLException
-    {
-        throw new UnsupportedOperationException();
-    }
+  public int getScale(int i) throws SQLException {
+    throw new UnsupportedOperationException();
+  }
 
-    public String getTableName(int i) throws SQLException
-    {
-        throw new UnsupportedOperationException();
-    }
+  public String getTableName(int i) throws SQLException {
+    throw new UnsupportedOperationException();
+  }
 
-    public String getCatalogName(int i) throws SQLException
-    {
-        throw new UnsupportedOperationException();
-    }
+  public String getCatalogName(int i) throws SQLException {
+    throw new UnsupportedOperationException();
+  }
 
-    public int getColumnType(int i) throws SQLException
-    {
-        throw new UnsupportedOperationException();
-    }
+  public int getColumnType(int i) throws SQLException {
+    throw new UnsupportedOperationException();
+  }
 
-    public String getColumnTypeName(int i) throws SQLException
-    {
-        throw new UnsupportedOperationException();
-    }
+  public String getColumnTypeName(int i) throws SQLException {
+    throw new UnsupportedOperationException();
+  }
 
-    public boolean isReadOnly(int i) throws SQLException
-    {
-        throw new UnsupportedOperationException();
-    }
+  public boolean isReadOnly(int i) throws SQLException {
+    throw new UnsupportedOperationException();
+  }
 
-    public boolean isWritable(int i) throws SQLException
-    {
-        throw new UnsupportedOperationException();
-    }
+  public boolean isWritable(int i) throws SQLException {
+    throw new UnsupportedOperationException();
+  }
 
-    public boolean isDefinitelyWritable(int i) throws SQLException
-    {
-        throw new UnsupportedOperationException();
-    }
+  public boolean isDefinitelyWritable(int i) throws SQLException {
+    throw new UnsupportedOperationException();
+  }
 
-    public String getColumnClassName(int i) throws SQLException
-    {
-        throw new UnsupportedOperationException();
-    }
+  public String getColumnClassName(int i) throws SQLException {
+    throw new UnsupportedOperationException();
+  }
 
-    public <T> T unwrap(Class<T> tClass) throws SQLException
-    {
-        throw new UnsupportedOperationException();
-    }
+  public <T> T unwrap(Class<T> tClass) throws SQLException {
+    throw new UnsupportedOperationException();
+  }
 
-    public boolean isWrapperFor(Class<?> aClass) throws SQLException
-    {
-        throw new UnsupportedOperationException();
-    }
+  public boolean isWrapperFor(Class<?> aClass) throws SQLException {
+    throw new UnsupportedOperationException();
+  }
 }

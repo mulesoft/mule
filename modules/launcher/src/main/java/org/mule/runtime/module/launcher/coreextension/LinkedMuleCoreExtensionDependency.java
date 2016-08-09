@@ -13,26 +13,22 @@ import java.lang.reflect.Method;
 /**
  * Maps a core extension dependency class to a method in a dependant class
  */
-public class LinkedMuleCoreExtensionDependency
-{
+public class LinkedMuleCoreExtensionDependency {
 
-    private final Class<? extends MuleCoreExtension> dependencyClass;
+  private final Class<? extends MuleCoreExtension> dependencyClass;
 
-    private final Method dependantMethod;
+  private final Method dependantMethod;
 
-    public LinkedMuleCoreExtensionDependency(Class<? extends MuleCoreExtension> dependencyClass, Method dependantMethod)
-    {
-        this.dependencyClass = dependencyClass;
-        this.dependantMethod = dependantMethod;
-    }
+  public LinkedMuleCoreExtensionDependency(Class<? extends MuleCoreExtension> dependencyClass, Method dependantMethod) {
+    this.dependencyClass = dependencyClass;
+    this.dependantMethod = dependantMethod;
+  }
 
-    public Method getDependantMethod()
-    {
-        return dependantMethod;
-    }
+  public Method getDependantMethod() {
+    return dependantMethod;
+  }
 
-    public Class<? extends MuleCoreExtension> getDependencyClass()
-    {
-        return dependencyClass;
-    }
+  public Class<? extends MuleCoreExtension> getDependencyClass() {
+    return dependencyClass;
+  }
 }

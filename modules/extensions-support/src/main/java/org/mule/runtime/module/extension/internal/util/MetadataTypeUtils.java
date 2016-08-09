@@ -30,128 +30,107 @@ import java.util.List;
  *
  * @since 4.0
  */
-public final class MetadataTypeUtils
-{
+public final class MetadataTypeUtils {
 
-    private MetadataTypeUtils()
-    {
+  private MetadataTypeUtils() {}
+
+  public static boolean isNullType(MetadataType type) {
+    return type instanceof NullType;
+  }
+
+  public static boolean isObjectType(MetadataType type) {
+    return type instanceof ObjectType;
+  }
+
+  public static boolean isVoid(MetadataType type) {
+    return isNullType(type);
+  }
+
+  /**
+   * @param metadataType the {@link MetadataType} to inspect to retrieve its type Alias
+   * @return the {@code Alias} name of the {@link MetadataType}
+   */
+  public static String getAliasName(MetadataType metadataType) {
+    return IntrospectionUtils.getAliasName(getType(metadataType));
+  }
+
+  /**
+   * @param metadataType the {@link MetadataType} to inspect to retrieve its type Alias
+   * @param defaultName default name to use if {@code metadataType} alias is not defined
+   * @return the {@code Alias} name of the {@link MetadataType} or the {@code defaultName} if alias was not specified
+   */
+  public static String getAliasName(MetadataType metadataType, String defaultName) {
+    Class<?> type = getType(metadataType);
+    return IntrospectionUtils.getAliasName(defaultName, type.getAnnotation(Alias.class));
+  }
+
+  /**
+   * Provides a unique way to generate an {@link UnionType} from the SubTypes Mapping declaration for a given {@link MetadataType
+   * baseType}.
+   * <p>
+   * If no subType mapping exists for the given {@link MetadataType baseType}, then the {@code baseType} is returned, without
+   * wrapping it in a new {@link UnionType}.
+   * <p>
+   * When there is a single subtype mapped, then instead of returning an {@link UnionType} of a single {@link MetadataType}, the
+   * subtype is returned.
+   * <p>
+   * In all cases, if the {@link MetadataType baseType} is a concrete implementation, it is also added as a part of the
+   * {@link UnionType}.
+   *
+   * @param baseType the base {@link MetadataType} for which subtypes could be mapped
+   * @param subtypesContainer the {@link SubTypesMappingContainer} used to look for mapped subtypes for the given {@code baseType}
+   * @return The {@code baseType} if no subtypes were present, its subtype if only one mapping is defined, or the {@link UnionType
+   *         union} of all the mapped subtypes for the given {@code baseType}
+   */
+  public static MetadataType subTypesUnion(MetadataType baseType, SubTypesMappingContainer subtypesContainer,
+                                           ClassLoader classLoader) {
+    List<MetadataType> subTypes = subtypesContainer.getSubTypes(baseType);
+    if (subTypes.isEmpty()) {
+      return baseType;
     }
 
-    public static boolean isNullType(MetadataType type)
-    {
-        return type instanceof NullType;
+    boolean baseIsInstantiable = isInstantiable(baseType);
+    if (subTypes.size() == 1 && !baseIsInstantiable) {
+      // avoid single type union
+      return subTypes.get(0);
     }
 
-    public static boolean isObjectType(MetadataType type)
-    {
-        return type instanceof ObjectType;
+    ImmutableList.Builder<MetadataType> union = ImmutableList.<MetadataType>builder().addAll(subTypes);
+    if (baseIsInstantiable) {
+      union.add(baseType);
     }
 
-    public static boolean isVoid(MetadataType type)
-    {
-        return isNullType(type);
-    }
+    UnionTypeBuilder<?> unionTypeBuilder = BaseTypeBuilder.create(baseType.getMetadataFormat()).unionType();
+    union.build().forEach(unionTypeBuilder::of);
+    return unionTypeBuilder.build();
+  }
 
-    /**
-     * @param metadataType the {@link MetadataType} to inspect to retrieve its type Alias
-     * @return the {@code Alias} name of the {@link MetadataType}
-     */
-    public static String getAliasName(MetadataType metadataType)
-    {
-        return IntrospectionUtils.getAliasName(getType(metadataType));
-    }
+  public static boolean isInstantiable(MetadataType metadataType) {
+    return metadataType.getAnnotation(ClassInformationAnnotation.class).map(ClassInformationAnnotation::isInstantiable)
+        .orElse(metadataType.getMetadataFormat().equals(MetadataFormat.JAVA)
+            && IntrospectionUtils.isInstantiable(getType(metadataType)));
+  }
 
-    /**
-     * @param metadataType the {@link MetadataType} to inspect to retrieve its type Alias
-     * @param defaultName  default name to use if {@code metadataType} alias is not defined
-     * @return the {@code Alias} name of the {@link MetadataType} or the {@code defaultName}
-     * if alias was not specified
-     */
-    public static String getAliasName(MetadataType metadataType, String defaultName)
-    {
-        Class<?> type = getType(metadataType);
-        return IntrospectionUtils.getAliasName(defaultName, type.getAnnotation(Alias.class));
-    }
+  public static boolean hasExposedFields(MetadataType metadataType) {
+    return metadataType instanceof ObjectType && !((ObjectType) metadataType).getFields().isEmpty();
+  }
 
-    /**
-     * Provides a unique way to generate an {@link UnionType} from the SubTypes Mapping declaration
-     * for a given {@link MetadataType baseType}.
-     * <p>
-     * If no subType mapping exists for the given {@link MetadataType baseType}, then the {@code baseType}
-     * is returned, without wrapping it in a new {@link UnionType}.
-     * <p>
-     * When there is a single subtype mapped, then instead of returning an {@link UnionType} of a single
-     * {@link MetadataType}, the subtype is returned.
-     * <p>
-     * In all cases, if the {@link MetadataType baseType} is a concrete implementation, it is also added
-     * as a part of the {@link UnionType}.
-     *
-     * @param baseType          the base {@link MetadataType} for which subtypes could be mapped
-     * @param subtypesContainer the {@link SubTypesMappingContainer} used to look for mapped subtypes for
-     *                          the given {@code baseType}
-     * @return The {@code baseType} if no subtypes were present, its subtype if only one mapping is defined,
-     * or the {@link UnionType union} of all the mapped subtypes for the given {@code baseType}
-     */
-    public static MetadataType subTypesUnion(MetadataType baseType, SubTypesMappingContainer subtypesContainer, ClassLoader classLoader)
-    {
-        List<MetadataType> subTypes = subtypesContainer.getSubTypes(baseType);
-        if (subTypes.isEmpty())
-        {
-            return baseType;
-        }
+  public static boolean isFinal(MetadataType metadataType) {
+    return metadataType.getAnnotation(ClassInformationAnnotation.class).map(ClassInformationAnnotation::isFinal)
+        .orElse(metadataType.getMetadataFormat().equals(MetadataFormat.JAVA)
+            && Modifier.isFinal(getType(metadataType).getModifiers()));
+  }
 
-        boolean baseIsInstantiable = isInstantiable(baseType);
-        if (subTypes.size() == 1 && !baseIsInstantiable)
-        {
-            // avoid single type union
-            return subTypes.get(0);
-        }
+  public static String getId(MetadataType metadataType) {
+    return org.mule.metadata.utils.MetadataTypeUtils.getTypeId(metadataType)
+        .orElse(metadataType.getMetadataFormat().equals(MetadataFormat.JAVA) ? getType(metadataType).getName() : "");
+  }
 
-        ImmutableList.Builder<MetadataType> union = ImmutableList.<MetadataType>builder().addAll(subTypes);
-        if (baseIsInstantiable)
-        {
-            union.add(baseType);
-        }
+  public static boolean isExtensible(MetadataType metadataType) {
+    return metadataType.getAnnotation(ExtensibleTypeAnnotation.class).isPresent();
+  }
 
-        UnionTypeBuilder<?> unionTypeBuilder = BaseTypeBuilder.create(baseType.getMetadataFormat()).unionType();
-        union.build().forEach(unionTypeBuilder::of);
-        return unionTypeBuilder.build();
-    }
-
-    public static boolean isInstantiable(MetadataType metadataType)
-    {
-        return metadataType.getAnnotation(ClassInformationAnnotation.class)
-                .map(ClassInformationAnnotation::isInstantiable)
-                .orElse(metadataType.getMetadataFormat().equals(MetadataFormat.JAVA) &&
-                        IntrospectionUtils.isInstantiable(getType(metadataType)));
-    }
-
-    public static boolean hasExposedFields(MetadataType metadataType)
-    {
-        return metadataType instanceof ObjectType && !((ObjectType) metadataType).getFields().isEmpty();
-    }
-
-    public static boolean isFinal(MetadataType metadataType)
-    {
-        return metadataType.getAnnotation(ClassInformationAnnotation.class)
-                .map(ClassInformationAnnotation::isFinal)
-                .orElse(metadataType.getMetadataFormat().equals(MetadataFormat.JAVA) &&
-                        Modifier.isFinal(getType(metadataType).getModifiers()));
-    }
-
-    public static String getId(MetadataType metadataType)
-    {
-        return org.mule.metadata.utils.MetadataTypeUtils.getTypeId(metadataType)
-                .orElse(metadataType.getMetadataFormat().equals(MetadataFormat.JAVA) ? getType(metadataType).getName() : "");
-    }
-
-    public static boolean isExtensible(MetadataType metadataType)
-    {
-        return metadataType.getAnnotation(ExtensibleTypeAnnotation.class).isPresent();
-    }
-
-    public static boolean isEnum(MetadataType metadataType)
-    {
-        return metadataType.getAnnotation(EnumAnnotation.class).isPresent();
-    }
+  public static boolean isEnum(MetadataType metadataType) {
+    return metadataType.getAnnotation(EnumAnnotation.class).isPresent();
+  }
 }

@@ -17,35 +17,32 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 @SmallTest
-public class EqualsFilterTestCase extends AbstractMuleTestCase
-{
+public class EqualsFilterTestCase extends AbstractMuleTestCase {
 
-    @Test
-    public void testEqualsFilterNoPattern()
-    {
-        EqualsFilter filter = new EqualsFilter();
-        assertNull(filter.getPattern());
-        assertFalse(filter.accept("foo"));
+  @Test
+  public void testEqualsFilterNoPattern() {
+    EqualsFilter filter = new EqualsFilter();
+    assertNull(filter.getPattern());
+    assertFalse(filter.accept("foo"));
 
-        filter.setPattern("foo");
-        assertTrue(filter.accept("foo"));
+    filter.setPattern("foo");
+    assertTrue(filter.accept("foo"));
 
-        filter.setPattern(null);
-        assertFalse(filter.accept("foo"));
-    }
+    filter.setPattern(null);
+    assertFalse(filter.accept("foo"));
+  }
 
-    @Test
-    public void testEqualsFilter()
-    {
-        Exception obj = new Exception("test");
-        EqualsFilter filter = new EqualsFilter(obj);
-        assertNotNull(filter.getPattern());
-        assertTrue(filter.accept(obj));
-        assertTrue(!filter.accept(new Exception("tes")));
+  @Test
+  public void testEqualsFilter() {
+    Exception obj = new Exception("test");
+    EqualsFilter filter = new EqualsFilter(obj);
+    assertNotNull(filter.getPattern());
+    assertTrue(filter.accept(obj));
+    assertTrue(!filter.accept(new Exception("tes")));
 
-        filter.setPattern("Hello");
-        assertTrue(filter.accept("Hello"));
-        assertTrue(!filter.accept("Helo"));
-    }
+    filter.setPattern("Hello");
+    assertTrue(filter.accept("Hello"));
+    assertTrue(!filter.accept("Helo"));
+  }
 
 }

@@ -11,45 +11,32 @@ import org.mule.runtime.config.spring.parsers.generic.ChildEmbeddedDefinitionPar
 import org.w3c.dom.Element;
 
 /**
- * A parser for "embedded" endpoints - ie inbound, outbound and response endpoints.
- * Because we have automatic String -> MuleEnpointURI conversion via property editors
- * this can be used in a variety of ways. It should work directly with a simple
- * String address attribute or, in combination with a child element (handled by
- * {@link ChildAddressDefinitionParser}, or embedded in
- * {@link AddressedEndpointDefinitionParser} for a more compact single-element
- * approach.
+ * A parser for "embedded" endpoints - ie inbound, outbound and response endpoints. Because we have automatic String ->
+ * MuleEnpointURI conversion via property editors this can be used in a variety of ways. It should work directly with a simple
+ * String address attribute or, in combination with a child element (handled by {@link ChildAddressDefinitionParser}, or embedded
+ * in {@link AddressedEndpointDefinitionParser} for a more compact single-element approach.
  * <p>
  * This class does support references to other endpoints.
  * </p>
  * TODO - check that references are global!
  */
-public class ChildEndpointDefinitionParser extends ChildEmbeddedDefinitionParser
-{
+public class ChildEndpointDefinitionParser extends ChildEmbeddedDefinitionParser {
 
-    public ChildEndpointDefinitionParser(Class<?> endpoint)
-    {
-        super(endpoint);
-        EndpointUtils.addProperties(this);
-        EndpointUtils.addPostProcess(this);
-    }
+  public ChildEndpointDefinitionParser(Class<?> endpoint) {
+    super(endpoint);
+    EndpointUtils.addProperties(this);
+    EndpointUtils.addPostProcess(this);
+  }
 
-    @Override
-    public String getPropertyName(Element e)
-    {
-        String parent = e.getParentNode().getLocalName().toLowerCase();
-        if (e.getLocalName() != null
-            && (e.getLocalName().toLowerCase().endsWith("inbound-endpoint")))
-        {
-            return "messageSource";
-        }
-        else if ("binding".equals(parent) || "java-interface-binding".equals(parent)
-                 || "publish-notifications".equals(parent))
-        {
-            return "endpoint";
-        }
-        else
-        {
-            return super.getPropertyName(e);
-        }
+  @Override
+  public String getPropertyName(Element e) {
+    String parent = e.getParentNode().getLocalName().toLowerCase();
+    if (e.getLocalName() != null && (e.getLocalName().toLowerCase().endsWith("inbound-endpoint"))) {
+      return "messageSource";
+    } else if ("binding".equals(parent) || "java-interface-binding".equals(parent) || "publish-notifications".equals(parent)) {
+      return "endpoint";
+    } else {
+      return super.getPropertyName(e);
     }
+  }
 }

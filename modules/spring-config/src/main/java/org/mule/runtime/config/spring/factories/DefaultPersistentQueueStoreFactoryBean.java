@@ -8,10 +8,9 @@ package org.mule.runtime.config.spring.factories;
 
 import org.mule.runtime.core.api.config.MuleProperties;
 
-public class DefaultPersistentQueueStoreFactoryBean extends ObjectStoreFromRegistryFactoryBean
-{
-    public DefaultPersistentQueueStoreFactoryBean()
-    {
-        super(MuleProperties.QUEUE_STORE_DEFAULT_PERSISTENT_NAME);
-    }
+public class DefaultPersistentQueueStoreFactoryBean extends ObjectStoreFromRegistryFactoryBean {
+
+  public DefaultPersistentQueueStoreFactoryBean() {
+    super(MuleProperties.QUEUE_STORE_DEFAULT_PERSISTENT_NAME);
+  }
 }

@@ -25,22 +25,23 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
 
-public class AbstractDomainTestCase extends AbstractMuleTestCase
-{
-    @ClassRule
-    public static TemporaryFolder temporaryFolder = new TemporaryFolder();
-    @Rule
-    public final SystemProperty muleHomeSystemProperty = new SystemProperty(MuleProperties.MULE_HOME_DIRECTORY_PROPERTY, temporaryFolder.getRoot().getCanonicalPath());
-    protected final File muleHomeFolder;
-    protected final ArtifactClassLoader containerClassLoader = new MuleArtifactClassLoader("mule", new URL[0], getClass().getClassLoader(), new MuleClassLoaderLookupPolicy(emptyMap(), emptySet()));
+public class AbstractDomainTestCase extends AbstractMuleTestCase {
 
-    public AbstractDomainTestCase() throws IOException
-    {
-        muleHomeFolder = temporaryFolder.getRoot();
-    }
+  @ClassRule
+  public static TemporaryFolder temporaryFolder = new TemporaryFolder();
+  @Rule
+  public final SystemProperty muleHomeSystemProperty =
+      new SystemProperty(MuleProperties.MULE_HOME_DIRECTORY_PROPERTY, temporaryFolder.getRoot().getCanonicalPath());
+  protected final File muleHomeFolder;
+  protected final ArtifactClassLoader containerClassLoader =
+      new MuleArtifactClassLoader("mule", new URL[0], getClass().getClassLoader(),
+                                  new MuleClassLoaderLookupPolicy(emptyMap(), emptySet()));
 
-    protected void createDomainDir(String domainFolder, String domain)
-    {
-        assertThat(new File(muleHomeFolder, domainFolder + File.separator + domain).mkdirs(), is(true));
-    }
+  public AbstractDomainTestCase() throws IOException {
+    muleHomeFolder = temporaryFolder.getRoot();
+  }
+
+  protected void createDomainDir(String domainFolder, String domain) {
+    assertThat(new File(muleHomeFolder, domainFolder + File.separator + domain).mkdirs(), is(true));
+  }
 }

@@ -16,59 +16,51 @@ import org.mule.runtime.module.oauth2.internal.authorizationcode.state.ResourceO
 import org.hamcrest.core.Is;
 import org.junit.Test;
 
-public class InvalidateOauthContextTestCase extends FunctionalTestCase
-{
+public class InvalidateOauthContextTestCase extends FunctionalTestCase {
 
-    public static final String ACCESS_TOKEN = "Access_token";
-    public static final String RESOURCE_OWNER_JOHN = "john";
-    public static final String RESOURCE_OWNER_TONY = "tony";
+  public static final String ACCESS_TOKEN = "Access_token";
+  public static final String RESOURCE_OWNER_JOHN = "john";
+  public static final String RESOURCE_OWNER_TONY = "tony";
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "tokenmanager/invalidate-oauth-context-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "tokenmanager/invalidate-oauth-context-config.xml";
+  }
 
-    @Test
-    public void invalidateTokenManagerGeneralOauthContext() throws Exception
-    {
-        TokenManagerConfig tokenManagerConfig = muleContext.getRegistry().get("tokenManagerConfig");
-        final ConfigOAuthContext configOAuthContext = tokenManagerConfig.getConfigOAuthContext();
-        loadResourceOwnerWithAccessToken(configOAuthContext, ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID);
-        flowRunner("invalidateOauthContext").withPayload(TEST_MESSAGE).run();
-        assertThatOAuthContextWasCleanForUser(configOAuthContext, ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID);
-    }
+  @Test
+  public void invalidateTokenManagerGeneralOauthContext() throws Exception {
+    TokenManagerConfig tokenManagerConfig = muleContext.getRegistry().get("tokenManagerConfig");
+    final ConfigOAuthContext configOAuthContext = tokenManagerConfig.getConfigOAuthContext();
+    loadResourceOwnerWithAccessToken(configOAuthContext, ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID);
+    flowRunner("invalidateOauthContext").withPayload(TEST_MESSAGE).run();
+    assertThatOAuthContextWasCleanForUser(configOAuthContext, ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID);
+  }
 
-    @Test
-    public void invalidateTokenManagerGeneralOauthContextForResourceOwnerId() throws Exception
-    {
-        TokenManagerConfig tokenManagerConfig = muleContext.getRegistry().get("tokenManagerConfig");
-        final ConfigOAuthContext configOAuthContext = tokenManagerConfig.getConfigOAuthContext();
-        loadResourceOwnerWithAccessToken(configOAuthContext, RESOURCE_OWNER_JOHN);
-        loadResourceOwnerWithAccessToken(configOAuthContext, RESOURCE_OWNER_TONY);
+  @Test
+  public void invalidateTokenManagerGeneralOauthContextForResourceOwnerId() throws Exception {
+    TokenManagerConfig tokenManagerConfig = muleContext.getRegistry().get("tokenManagerConfig");
+    final ConfigOAuthContext configOAuthContext = tokenManagerConfig.getConfigOAuthContext();
+    loadResourceOwnerWithAccessToken(configOAuthContext, RESOURCE_OWNER_JOHN);
+    loadResourceOwnerWithAccessToken(configOAuthContext, RESOURCE_OWNER_TONY);
 
-        flowRunner("invalidateOauthContextWithResourceOwnerId").withPayload(TEST_MESSAGE)
-                                                               .withFlowVariable("resourceOwnerId", RESOURCE_OWNER_TONY)
-                                                               .run();
-        assertThatOAuthContextWasCleanForUser(configOAuthContext, RESOURCE_OWNER_TONY);
-        assertThat(configOAuthContext.getContextForResourceOwner(RESOURCE_OWNER_JOHN).getAccessToken(), Is.is(ACCESS_TOKEN));
-    }
+    flowRunner("invalidateOauthContextWithResourceOwnerId").withPayload(TEST_MESSAGE)
+        .withFlowVariable("resourceOwnerId", RESOURCE_OWNER_TONY).run();
+    assertThatOAuthContextWasCleanForUser(configOAuthContext, RESOURCE_OWNER_TONY);
+    assertThat(configOAuthContext.getContextForResourceOwner(RESOURCE_OWNER_JOHN).getAccessToken(), Is.is(ACCESS_TOKEN));
+  }
 
-    @Test
-    public void invalidateTokenManagerForNonExistentResourceOwnerId() throws Exception
-    {
-        flowRunner("invalidateOauthContextWithResourceOwnerId").withPayload(TEST_MESSAGE).runExpectingException();
-    }
+  @Test
+  public void invalidateTokenManagerForNonExistentResourceOwnerId() throws Exception {
+    flowRunner("invalidateOauthContextWithResourceOwnerId").withPayload(TEST_MESSAGE).runExpectingException();
+  }
 
-    private void assertThatOAuthContextWasCleanForUser(ConfigOAuthContext configOAuthContext, String resourceOwnerId)
-    {
-        assertThat(configOAuthContext.getContextForResourceOwner(resourceOwnerId).getAccessToken(), nullValue());
-    }
+  private void assertThatOAuthContextWasCleanForUser(ConfigOAuthContext configOAuthContext, String resourceOwnerId) {
+    assertThat(configOAuthContext.getContextForResourceOwner(resourceOwnerId).getAccessToken(), nullValue());
+  }
 
-    private void loadResourceOwnerWithAccessToken(ConfigOAuthContext configOAuthContext, String resourceOwnerId)
-    {
-        final ResourceOwnerOAuthContext resourceOwnerContext = configOAuthContext.getContextForResourceOwner(resourceOwnerId);
-        resourceOwnerContext.setAccessToken(ACCESS_TOKEN);
-        configOAuthContext.updateResourceOwnerOAuthContext(resourceOwnerContext);
-    }
+  private void loadResourceOwnerWithAccessToken(ConfigOAuthContext configOAuthContext, String resourceOwnerId) {
+    final ResourceOwnerOAuthContext resourceOwnerContext = configOAuthContext.getContextForResourceOwner(resourceOwnerId);
+    resourceOwnerContext.setAccessToken(ACCESS_TOKEN);
+    configOAuthContext.updateResourceOwnerOAuthContext(resourceOwnerContext);
+  }
 }

@@ -13,38 +13,33 @@ import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.config.i18n.Message;
 
 
-public class FilterUnacceptedException extends MessagingException
-{
-    private static final long serialVersionUID = -1828111078295716525L;
-    
-    private transient Filter filter;
+public class FilterUnacceptedException extends MessagingException {
 
-    public FilterUnacceptedException(Message message, MuleEvent event, Filter filter, MessageProcessor failingMessageProcessor)
-    {
-        super(message, event, failingMessageProcessor);
-        this.filter = filter;
-        addInfo("Filter", String.format("%s (%s)", filter.toString(), LocationExecutionContextProvider.getDocName(filter)));
-    }
+  private static final long serialVersionUID = -1828111078295716525L;
 
-    public FilterUnacceptedException(Message message, MuleEvent event, Filter filter, Throwable cause)
-    {
-        super(message, event, cause);
-        this.filter = filter;
-        addInfo("Filter", String.format("%s (%s)", filter.toString(), LocationExecutionContextProvider.getDocName(filter)));
-    }
+  private transient Filter filter;
 
-    public FilterUnacceptedException(Message message, MuleEvent event, Throwable cause)
-    {
-        super(message, event, cause);
-    }
+  public FilterUnacceptedException(Message message, MuleEvent event, Filter filter, MessageProcessor failingMessageProcessor) {
+    super(message, event, failingMessageProcessor);
+    this.filter = filter;
+    addInfo("Filter", String.format("%s (%s)", filter.toString(), LocationExecutionContextProvider.getDocName(filter)));
+  }
 
-    public FilterUnacceptedException(Message message, MuleEvent event, MessageProcessor failingMessageProcessor)
-    {
-        super(message, event, failingMessageProcessor);
-    }
+  public FilterUnacceptedException(Message message, MuleEvent event, Filter filter, Throwable cause) {
+    super(message, event, cause);
+    this.filter = filter;
+    addInfo("Filter", String.format("%s (%s)", filter.toString(), LocationExecutionContextProvider.getDocName(filter)));
+  }
 
-    public Filter getFilter()
-    {
-        return filter;
-    }
+  public FilterUnacceptedException(Message message, MuleEvent event, Throwable cause) {
+    super(message, event, cause);
+  }
+
+  public FilterUnacceptedException(Message message, MuleEvent event, MessageProcessor failingMessageProcessor) {
+    super(message, event, failingMessageProcessor);
+  }
+
+  public Filter getFilter() {
+    return filter;
+  }
 }

@@ -20,46 +20,39 @@ import org.mule.runtime.core.api.processor.MessageProcessor;
 import java.util.LinkedList;
 import java.util.List;
 
-public class LifecycleSensingObjectFactory implements ObjectFactory<MessageProcessor>, Lifecycle
-{
+public class LifecycleSensingObjectFactory implements ObjectFactory<MessageProcessor>, Lifecycle {
 
-    private List<LifecycleAction> lifecycleActions = new LinkedList<>();
+  private List<LifecycleAction> lifecycleActions = new LinkedList<>();
 
-    @Override
-    public MessageProcessor getObject() throws Exception
-    {
-        lifecycleActions.add(GET_OBJECT);
-        LifecycleSensingMessageProcessor lifecycleSensingMessageProcessor = new LifecycleSensingMessageProcessor();
-        lifecycleSensingMessageProcessor.setObjectFactory(this);
-        return lifecycleSensingMessageProcessor;
-    }
+  @Override
+  public MessageProcessor getObject() throws Exception {
+    lifecycleActions.add(GET_OBJECT);
+    LifecycleSensingMessageProcessor lifecycleSensingMessageProcessor = new LifecycleSensingMessageProcessor();
+    lifecycleSensingMessageProcessor.setObjectFactory(this);
+    return lifecycleSensingMessageProcessor;
+  }
 
-    @Override
-    public void dispose()
-    {
-        lifecycleActions.add(DISPOSE);
-    }
+  @Override
+  public void dispose() {
+    lifecycleActions.add(DISPOSE);
+  }
 
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        lifecycleActions.add(INITIALISE);
-    }
+  @Override
+  public void initialise() throws InitialisationException {
+    lifecycleActions.add(INITIALISE);
+  }
 
-    @Override
-    public void start() throws MuleException
-    {
-        lifecycleActions.add(START);
-    }
+  @Override
+  public void start() throws MuleException {
+    lifecycleActions.add(START);
+  }
 
-    @Override
-    public void stop() throws MuleException
-    {
-        lifecycleActions.add(STOP);
-    }
+  @Override
+  public void stop() throws MuleException {
+    lifecycleActions.add(STOP);
+  }
 
-    public List<LifecycleAction> getLifecycleActions()
-    {
-        return lifecycleActions;
-    }
+  public List<LifecycleAction> getLifecycleActions() {
+    return lifecycleActions;
+  }
 }

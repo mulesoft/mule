@@ -12,19 +12,16 @@ import org.mule.runtime.core.api.MuleEvent;
 
 import org.junit.Test;
 
-public class WSConsumerWithXMLTransformerTestCase extends AbstractWSConsumerFunctionalTestCase
-{
+public class WSConsumerWithXMLTransformerTestCase extends AbstractWSConsumerFunctionalTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "ws-consumer-with-xml-transformer-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "ws-consumer-with-xml-transformer-config.xml";
+  }
 
-    @Test
-    public void consumerWorksWithXMLTransformer() throws Exception
-    {
-        MuleEvent response = flowRunner("client").withPayload(ECHO_REQUEST).run();
-        assertXMLEqual(EXPECTED_ECHO_RESPONSE, getPayloadAsString(response.getMessage()));
-    }
+  @Test
+  public void consumerWorksWithXMLTransformer() throws Exception {
+    MuleEvent response = flowRunner("client").withPayload(ECHO_REQUEST).run();
+    assertXMLEqual(EXPECTED_ECHO_RESPONSE, getPayloadAsString(response.getMessage()));
+  }
 }

@@ -12,19 +12,17 @@ import org.mule.test.config.spring.parsers.beans.ThirdPartyContainer;
 
 import org.junit.Test;
 
-public class ThirdPartyTestCase extends AbstractIntegrationTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/config/spring/parsers/third-party-test.xml";
-    }
+public class ThirdPartyTestCase extends AbstractIntegrationTestCase {
 
-    @Test
-    public void testContainer()
-    {
-        ThirdPartyContainer container = muleContext.getRegistry().lookupObject("container");
-        assertNotNull(container);
-        assertNotNull(container.getThing());
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/config/spring/parsers/third-party-test.xml";
+  }
+
+  @Test
+  public void testContainer() {
+    ThirdPartyContainer container = muleContext.getRegistry().lookupObject("container");
+    assertNotNull(container);
+    assertNotNull(container.getThing());
+  }
 }

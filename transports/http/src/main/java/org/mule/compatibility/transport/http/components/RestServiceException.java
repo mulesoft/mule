@@ -11,20 +11,18 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.config.i18n.Message;
 
-public class RestServiceException extends MessagingException
-{
-    /**
-     * Serial version
-     */
-    private static final long serialVersionUID = -1026055907767407434L;
+public class RestServiceException extends MessagingException {
 
-    public RestServiceException(Message message, MuleEvent event, MessageProcessor failingMessageProcessor)
-    {
-        super(message, event, failingMessageProcessor);
-    }
+  /**
+   * Serial version
+   */
+  private static final long serialVersionUID = -1026055907767407434L;
 
-    public RestServiceException(Message message, MuleEvent event, Throwable cause, MessageProcessor failingMessageProcessor)
-    {
-        super(message, event, cause, failingMessageProcessor);
-    }
+  public RestServiceException(Message message, MuleEvent event, MessageProcessor failingMessageProcessor) {
+    super(message, event, failingMessageProcessor);
+  }
+
+  public RestServiceException(Message message, MuleEvent event, Throwable cause, MessageProcessor failingMessageProcessor) {
+    super(message, event, cause, failingMessageProcessor);
+  }
 }

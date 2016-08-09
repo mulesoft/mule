@@ -9,24 +9,20 @@ package org.mule.test.heisenberg.extension.model;
 import org.mule.runtime.extension.api.annotation.Extensible;
 
 @Extensible
-public interface Weapon
-{
+public interface Weapon {
 
-    class WeaponAttributes
-    {
+  class WeaponAttributes {
 
-        public String getBrand()
-        {
-            return brand;
-        }
-
-        public void setBrand(String brand)
-        {
-            this.brand = brand;
-        }
-
-        public String brand;
+    public String getBrand() {
+      return brand;
     }
 
-    String kill();
+    public void setBrand(String brand) {
+      this.brand = brand;
+    }
+
+    public String brand;
+  }
+
+  String kill();
 }

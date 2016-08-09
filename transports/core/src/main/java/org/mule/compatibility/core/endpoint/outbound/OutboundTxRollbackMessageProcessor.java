@@ -14,43 +14,33 @@ import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 
 /**
- * MessageProcessor implementation that stops outbound flow is the current
- * transaction has been rolled back.
+ * MessageProcessor implementation that stops outbound flow is the current transaction has been rolled back.
  */
-public class OutboundTxRollbackMessageProcessor extends AbstractInterceptingMessageProcessor
-{
-    @Override
-    public MuleEvent process(MuleEvent event) throws MuleException
-    {
-        // No point continuing if the service has rolledback the transaction
-        if (isTransactionRollback())
-        {
-            return event;
-        }
-        else
-        {
-            return processNext(event);
-        }
-    }
+public class OutboundTxRollbackMessageProcessor extends AbstractInterceptingMessageProcessor {
 
-    /**
-     * Checks to see if the current transaction has been rolled back
-     */
-    protected boolean isTransactionRollback()
-    {
-        try
-        {
-            Transaction tx = TransactionCoordination.getInstance().getTransaction();
-            if (tx != null && tx.isRollbackOnly())
-            {
-                return true;
-            }
-        }
-        catch (TransactionException e)
-        {
-            // TODO MULE-863: What should we really do?
-            logger.warn(e.getMessage());
-        }
-        return false;
+  @Override
+  public MuleEvent process(MuleEvent event) throws MuleException {
+    // No point continuing if the service has rolledback the transaction
+    if (isTransactionRollback()) {
+      return event;
+    } else {
+      return processNext(event);
     }
+  }
+
+  /**
+   * Checks to see if the current transaction has been rolled back
+   */
+  protected boolean isTransactionRollback() {
+    try {
+      Transaction tx = TransactionCoordination.getInstance().getTransaction();
+      if (tx != null && tx.isRollbackOnly()) {
+        return true;
+      }
+    } catch (TransactionException e) {
+      // TODO MULE-863: What should we really do?
+      logger.warn(e.getMessage());
+    }
+    return false;
+  }
 }

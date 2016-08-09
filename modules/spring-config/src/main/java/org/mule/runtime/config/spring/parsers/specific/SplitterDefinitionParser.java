@@ -12,19 +12,16 @@ import org.mule.runtime.core.routing.AbstractSplitter;
 /**
  * Generic router definition parser for parsing all Router elements.
  */
-public class SplitterDefinitionParser extends ChildDefinitionParser
-{
+public class SplitterDefinitionParser extends ChildDefinitionParser {
 
-    public static final String SETTER = "messageProcessor";
+  public static final String SETTER = "messageProcessor";
 
-    public SplitterDefinitionParser(Class clazz)
-    {
-        super(SETTER, clazz);
-    }
+  public SplitterDefinitionParser(Class clazz) {
+    super(SETTER, clazz);
+  }
 
-    public SplitterDefinitionParser()
-    {
-        super(SETTER, null, AbstractSplitter.class, true);
-    }
+  public SplitterDefinitionParser() {
+    super(SETTER, null, AbstractSplitter.class, true);
+  }
 
 }

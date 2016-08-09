@@ -17,24 +17,23 @@ import org.mule.runtime.api.metadata.resolving.MetadataOutputResolver;
 import org.mule.runtime.module.extension.file.api.TreeNode;
 
 /**
- * Resolves the output {@link MetadataType} for an operation that returns an
- * {@link TreeNode}.
+ * Resolves the output {@link MetadataType} for an operation that returns an {@link TreeNode}.
  *
  * @since 1.0
  */
-public class FileTreeNodeMetadataResolver implements MetadataOutputResolver
-{
-    private FileAttributesMetadataResolver attributesResolver = new FileAttributesMetadataResolver();
+public class FileTreeNodeMetadataResolver implements MetadataOutputResolver {
 
-    @Override
-    public MetadataType getOutputMetadata(MetadataContext context, Object key) throws MetadataResolvingException, ConnectionException
-    {
-        MetadataType attributes = attributesResolver.getAttributesMetadata(context, key);
-        ObjectTypeBuilder<?> treeNode = create(JAVA).objectType();
-        treeNode.addField().key("attributes").value(attributes);
-        treeNode.addField().key("content").value().anyType();
-        treeNode.addField().key("childs").value().arrayType().of(treeNode);
+  private FileAttributesMetadataResolver attributesResolver = new FileAttributesMetadataResolver();
 
-        return treeNode.build();
-    }
+  @Override
+  public MetadataType getOutputMetadata(MetadataContext context, Object key)
+      throws MetadataResolvingException, ConnectionException {
+    MetadataType attributes = attributesResolver.getAttributesMetadata(context, key);
+    ObjectTypeBuilder<?> treeNode = create(JAVA).objectType();
+    treeNode.addField().key("attributes").value(attributes);
+    treeNode.addField().key("content").value().anyType();
+    treeNode.addField().key("childs").value().arrayType().of(treeNode);
+
+    return treeNode.build();
+  }
 }

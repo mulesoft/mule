@@ -7,28 +7,27 @@
 package org.mule.runtime.core.api.processor;
 
 /**
- * This interface defines a contract for a component able to name staged queues
- * through a {@link org.mule.runtime.core.api.processor.StageNameSource} implementation
+ * This interface defines a contract for a component able to name staged queues through a
+ * {@link org.mule.runtime.core.api.processor.StageNameSource} implementation
  *
  * @since 3.5.0
  */
-public interface StageNameSourceProvider
-{
+public interface StageNameSourceProvider {
 
-    /**
-     * Provides a {@link org.mule.runtime.core.api.processor.StageNameSource}
-     *
-     * @return a {@link org.mule.runtime.core.api.processor.StageNameSource}
-     */
-    public StageNameSource getAsyncStageNameSource();
+  /**
+   * Provides a {@link org.mule.runtime.core.api.processor.StageNameSource}
+   *
+   * @return a {@link org.mule.runtime.core.api.processor.StageNameSource}
+   */
+  public StageNameSource getAsyncStageNameSource();
 
-    /**
-     * Returns a {@link org.mule.runtime.core.api.processor.StageNameSource} that
-     * takes the given paramter into consideration when generating the name
-     *
-     * @param asyncName a name to be consider when building the final name
-     * @return a {@link org.mule.runtime.core.api.processor.StageNameSource}
-     */
-    public StageNameSource getAsyncStageNameSource(String asyncName);
+  /**
+   * Returns a {@link org.mule.runtime.core.api.processor.StageNameSource} that takes the given paramter into consideration when
+   * generating the name
+   *
+   * @param asyncName a name to be consider when building the final name
+   * @return a {@link org.mule.runtime.core.api.processor.StageNameSource}
+   */
+  public StageNameSource getAsyncStageNameSource(String asyncName);
 
 }

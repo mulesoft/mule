@@ -14,21 +14,18 @@ import org.mule.runtime.config.spring.parsers.generic.ParentDefinitionParser;
 
 import org.w3c.dom.Attr;
 
-public class ReferenceExceptionStrategyDefinitionParser extends ParentDefinitionParser
-{
-    public ReferenceExceptionStrategyDefinitionParser()
-    {
-        addAlias(AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF, "exceptionListener");
-        registerPreProcessor(createNoNameAttributePreProcessor());
-    }
+public class ReferenceExceptionStrategyDefinitionParser extends ParentDefinitionParser {
 
-    @Override
-    protected void processProperty(Attr attribute, BeanAssembler assembler)
-    {
-        if (!"http://www.mulesoft.org/schema/mule/documentation".equals(attribute.getNamespaceURI()))
-        {
-            assembler.extendBean(attribute);
-        }
+  public ReferenceExceptionStrategyDefinitionParser() {
+    addAlias(AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF, "exceptionListener");
+    registerPreProcessor(createNoNameAttributePreProcessor());
+  }
+
+  @Override
+  protected void processProperty(Attr attribute, BeanAssembler assembler) {
+    if (!"http://www.mulesoft.org/schema/mule/documentation".equals(attribute.getNamespaceURI())) {
+      assembler.extendBean(attribute);
     }
+  }
 
 }

@@ -8,7 +8,7 @@ package org.mule.test.petstore.extension;
 
 import org.mule.runtime.api.connection.CachedConnectionProvider;
 
-public class SimplePetStoreConnectionProvider extends PetStoreConnectionProvider<PetStoreClient> implements CachedConnectionProvider<PetStoreClient>
-{
+public class SimplePetStoreConnectionProvider extends PetStoreConnectionProvider<PetStoreClient>
+    implements CachedConnectionProvider<PetStoreClient> {
 
 }

@@ -13,39 +13,31 @@ import static org.junit.Assert.assertTrue;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.functional.junit4.FunctionalTestCase;
 
-public class AbstractConfigurationErrorTestCase extends FunctionalTestCase
-{
+public class AbstractConfigurationErrorTestCase extends FunctionalTestCase {
 
-    private Exception exception;
+  private Exception exception;
 
-    public AbstractConfigurationErrorTestCase()
-    {
-        setStartContext(false);
+  public AbstractConfigurationErrorTestCase() {
+    setStartContext(false);
+  }
+
+  @Override
+  protected MuleContext createMuleContext() throws Exception {
+    try {
+      return super.createMuleContext();
+    } catch (Exception e) {
+      logger.error("Configuration error detected", e);
+      exception = e;
+      return null;
     }
+  }
 
-    @Override
-    protected MuleContext createMuleContext() throws Exception
-    {
-        try
-        {
-            return super.createMuleContext();
-        }
-        catch (Exception e)
-        {
-            logger.error("Configuration error detected", e);
-            exception = e;
-            return null;
-        }
-    }
+  protected final void assertConfigurationError(String assertionMessage) {
+    assertTrue(assertionMessage, exception != null);
+  }
 
-    protected final void assertConfigurationError(String assertionMessage)
-    {
-        assertTrue(assertionMessage, exception != null);
-    }
-
-    protected final void assertConfigurationError(String assertionMessage, String expectedError)
-    {
-        assertConfigurationError(assertionMessage);
-        assertThat(exception.getMessage(), containsString(expectedError));
-    }
+  protected final void assertConfigurationError(String assertionMessage, String expectedError) {
+    assertConfigurationError(assertionMessage);
+    assertThat(exception.getMessage(), containsString(expectedError));
+  }
 }

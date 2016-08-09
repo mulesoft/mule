@@ -10,12 +10,10 @@ import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.transport.MessageRequester;
 import org.mule.runtime.core.api.MuleException;
 
-public final class UnsupportedMessageRequesterFactory extends AbstractMessageRequesterFactory
-{
+public final class UnsupportedMessageRequesterFactory extends AbstractMessageRequesterFactory {
 
-    public MessageRequester create(InboundEndpoint endpoint) throws MuleException
-    {
-        return new UnsupportedMessageRequester(endpoint);
-    }
+  public MessageRequester create(InboundEndpoint endpoint) throws MuleException {
+    return new UnsupportedMessageRequester(endpoint);
+  }
 
 }

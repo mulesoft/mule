@@ -27,34 +27,33 @@ import org.mule.test.metadata.extension.model.shapes.Square;
 import org.mule.test.metadata.extension.resolver.TestContentAndOutputResolverWithKeyResolver;
 
 @Extension(name = "Metadata")
-@Operations({MetadataOperations.class, MetadataFailureOperations.class, MetadataInheritedExtensionResolversOperations.class, MetadataInheritedOperationResolversOperations.class})
+@Operations({MetadataOperations.class, MetadataFailureOperations.class, MetadataInheritedExtensionResolversOperations.class,
+    MetadataInheritedOperationResolversOperations.class})
 @Providers(MetadataConnectionProvider.class)
 @Sources({MetadataSource.class, MetadataSourceWithMultilevel.class})
 @SubTypeMapping(baseType = Animal.class, subTypes = Bear.class)
 @SubTypeMapping(baseType = Shape.class, subTypes = {Circle.class, Rectangle.class})
-@SubTypeMapping(baseType = AbstractOutputAttributes.class, subTypes = {AnimalsOutputAttributes.class, ShapeOutputAttributes.class})
+@SubTypeMapping(baseType = AbstractOutputAttributes.class,
+    subTypes = {AnimalsOutputAttributes.class, ShapeOutputAttributes.class})
 @SubTypeMapping(baseType = Rectangle.class, subTypes = {Square.class})
 @Xml(namespaceLocation = "http://www.mulesoft.org/schema/mule/metadata", namespace = "metadata")
 @MetadataScope(keysResolver = TestContentAndOutputResolverWithKeyResolver.class,
-        contentResolver = TestContentAndOutputResolverWithKeyResolver.class,
-        outputResolver = TestContentAndOutputResolverWithKeyResolver.class)
-public class MetadataExtension
-{
+    contentResolver = TestContentAndOutputResolverWithKeyResolver.class,
+    outputResolver = TestContentAndOutputResolverWithKeyResolver.class)
+public class MetadataExtension {
 
-    @Parameter
-    @Optional(defaultValue = "noExpression")
-    private String data;
-    @Parameter
-    @Optional(defaultValue = "#['defaultString']")
-    private String dataWithDefault;
+  @Parameter
+  @Optional(defaultValue = "noExpression")
+  private String data;
+  @Parameter
+  @Optional(defaultValue = "#['defaultString']")
+  private String dataWithDefault;
 
-    public String getData()
-    {
-        return data;
-    }
+  public String getData() {
+    return data;
+  }
 
-    public String getDataWithDefault()
-    {
-        return dataWithDefault;
-    }
+  public String getDataWithDefault() {
+    return dataWithDefault;
+  }
 }

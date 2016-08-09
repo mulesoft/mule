@@ -15,32 +15,29 @@ import org.mule.runtime.core.config.i18n.Message;
  * @deprecated Transport infrastructure is deprecated.
  */
 @Deprecated
-public class EndpointException extends MuleException
-{
-    /**
-     * Serial version
-     */
-    private static final long serialVersionUID = 3219403251233216800L;
+public class EndpointException extends MuleException {
 
-    /**
-     * @param message the exception message
-     */
-    public EndpointException(Message message)
-    {
-        super(message);
-    }
+  /**
+   * Serial version
+   */
+  private static final long serialVersionUID = 3219403251233216800L;
 
-    /**
-     * @param message the exception message
-     * @param cause the exception that cause this exception to be thrown
-     */
-    public EndpointException(Message message, Throwable cause)
-    {
-        super(message, cause);
-    }
+  /**
+   * @param message the exception message
+   */
+  public EndpointException(Message message) {
+    super(message);
+  }
 
-    public EndpointException(Throwable cause)
-    {
-        super(cause);
-    }
+  /**
+   * @param message the exception message
+   * @param cause the exception that cause this exception to be thrown
+   */
+  public EndpointException(Message message, Throwable cause) {
+    super(message, cause);
+  }
+
+  public EndpointException(Throwable cause) {
+    super(cause);
+  }
 }

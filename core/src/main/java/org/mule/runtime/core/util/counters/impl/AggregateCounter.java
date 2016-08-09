@@ -9,54 +9,47 @@ package org.mule.runtime.core.util.counters.impl;
 import org.mule.runtime.core.util.counters.Counter;
 import org.mule.runtime.core.util.counters.CounterFactory.Type;
 
-public abstract class AggregateCounter extends AbstractCounter
-{
-    private final Counter base;
+public abstract class AggregateCounter extends AbstractCounter {
 
-    public AggregateCounter(String name, Type type, AbstractCounter base)
-    {
-        super(name, type);
-        this.base = base;
-        base.addAggregate(this);
-    }
+  private final Counter base;
 
-    @Override
-    public double increment()
-    {
-        throw new UnsupportedOperationException();
-    }
+  public AggregateCounter(String name, Type type, AbstractCounter base) {
+    super(name, type);
+    this.base = base;
+    base.addAggregate(this);
+  }
 
-    @Override
-    public double incrementBy(double value)
-    {
-        throw new UnsupportedOperationException();
-    }
+  @Override
+  public double increment() {
+    throw new UnsupportedOperationException();
+  }
 
-    @Override
-    public double decrement()
-    {
-        throw new UnsupportedOperationException();
-    }
+  @Override
+  public double incrementBy(double value) {
+    throw new UnsupportedOperationException();
+  }
 
-    @Override
-    public void setRawValue(double value)
-    {
-        throw new UnsupportedOperationException();
-    }
+  @Override
+  public double decrement() {
+    throw new UnsupportedOperationException();
+  }
 
-    public final synchronized void compute()
-    {
-        this.doCompute();
-        this.propagate();
-    }
+  @Override
+  public void setRawValue(double value) {
+    throw new UnsupportedOperationException();
+  }
 
-    public Counter getBase()
-    {
-        return this.base;
-    }
+  public final synchronized void compute() {
+    this.doCompute();
+    this.propagate();
+  }
 
-    @Override
-    public abstract double nextValue();
+  public Counter getBase() {
+    return this.base;
+  }
 
-    public abstract void doCompute();
+  @Override
+  public abstract double nextValue();
+
+  public abstract void doCompute();
 }

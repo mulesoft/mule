@@ -10,22 +10,20 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-public class LocalizedValidationMessageTestCase extends ValidationTestCase
-{
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
+public class LocalizedValidationMessageTestCase extends ValidationTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "validation-i18n.xml";
-    }
+  @Rule
+  public ExpectedException expectedException = ExpectedException.none();
 
-    @Test
-    public void localizedMessage() throws Exception
-    {
-        expectedException.expectMessage("Se esperaba que el valor fuera true pero fue false");
-        flowRunner("localizedMessage").run();
-    }
+  @Override
+  protected String getConfigFile() {
+    return "validation-i18n.xml";
+  }
+
+  @Test
+  public void localizedMessage() throws Exception {
+    expectedException.expectMessage("Se esperaba que el valor fuera true pero fue false");
+    flowRunner("localizedMessage").run();
+  }
 
 }

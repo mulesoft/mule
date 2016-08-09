@@ -19,30 +19,26 @@ import java.nio.file.Path;
  *
  * @since 4.0
  */
-public final class LocalCreateDirectoryCommand extends LocalFileCommand implements CreateDirectoryCommand
-{
+public final class LocalCreateDirectoryCommand extends LocalFileCommand implements CreateDirectoryCommand {
 
-    /**
-     * {@inheritDoc}
-     */
-    public LocalCreateDirectoryCommand(LocalFileSystem fileSystem)
-    {
-        super(fileSystem);
+  /**
+   * {@inheritDoc}
+   */
+  public LocalCreateDirectoryCommand(LocalFileSystem fileSystem) {
+    super(fileSystem);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void createDirectory(FileConnectorConfig config, String directoryPath) {
+    Path target = resolvePath(config, directoryPath);
+
+    if (Files.exists(target)) {
+      throw new IllegalArgumentException(format("Directory '%s' already exists", target));
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void createDirectory(FileConnectorConfig config, String directoryPath)
-    {
-        Path target = resolvePath(config, directoryPath);
-
-        if (Files.exists(target))
-        {
-            throw new IllegalArgumentException(format("Directory '%s' already exists", target));
-        }
-
-        mkdirs(config, target);
-    }
+    mkdirs(config, target);
+  }
 }

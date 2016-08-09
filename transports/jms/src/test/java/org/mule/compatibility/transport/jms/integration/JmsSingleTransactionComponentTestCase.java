@@ -10,27 +10,24 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 /**
- * There is a separate transaction for each service when single transaction(action:
- * BEGIN_OR_JOIN) and jms transport are used
+ * There is a separate transaction for each service when single transaction(action: BEGIN_OR_JOIN) and jms transport are used
  */
-public class JmsSingleTransactionComponentTestCase extends AbstractJmsFunctionalTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "integration/jms-single-tx-component.xml";
-    }
+public class JmsSingleTransactionComponentTestCase extends AbstractJmsFunctionalTestCase {
 
-    @Test
-    @Ignore("MULE-6926: flaky test")
-    public void testSingleTransactionComponent() throws Exception
-    {
-        send(scenarioCommit);
-        // Receive message but roll back transaction.
-        receive(scenarioRollback);
-        // Receive message again and commit transaction.
-        receive(scenarioCommit);
-        // Verify there is no more message to receive.
-        receive(scenarioNotReceive);
-    }
+  @Override
+  protected String getConfigFile() {
+    return "integration/jms-single-tx-component.xml";
+  }
+
+  @Test
+  @Ignore("MULE-6926: flaky test")
+  public void testSingleTransactionComponent() throws Exception {
+    send(scenarioCommit);
+    // Receive message but roll back transaction.
+    receive(scenarioRollback);
+    // Receive message again and commit transaction.
+    receive(scenarioCommit);
+    // Verify there is no more message to receive.
+    receive(scenarioNotReceive);
+  }
 }

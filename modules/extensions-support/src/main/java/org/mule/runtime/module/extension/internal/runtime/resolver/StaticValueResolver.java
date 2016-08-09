@@ -10,36 +10,31 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 
 /**
- * A {@link ValueResolver} which always returns the same
- * constant value.
+ * A {@link ValueResolver} which always returns the same constant value.
  *
  * @since 3.7.0
  */
-public class StaticValueResolver<T> implements ValueResolver<T>
-{
+public class StaticValueResolver<T> implements ValueResolver<T> {
 
-    private final T value;
+  private final T value;
 
-    public StaticValueResolver(T value)
-    {
-        this.value = value;
-    }
+  public StaticValueResolver(T value) {
+    this.value = value;
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public T resolve(MuleEvent event) throws MuleException
-    {
-        return value;
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public T resolve(MuleEvent event) throws MuleException {
+    return value;
+  }
 
-    /**
-     * @return {@code false}
-     */
-    @Override
-    public boolean isDynamic()
-    {
-        return false;
-    }
+  /**
+   * @return {@code false}
+   */
+  @Override
+  public boolean isDynamic() {
+    return false;
+  }
 }

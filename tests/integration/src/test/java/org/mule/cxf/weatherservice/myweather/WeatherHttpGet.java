@@ -19,21 +19,15 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 @SOAPBinding(parameterStyle = ParameterStyle.BARE)
 public interface WeatherHttpGet {
 
-    @WebResult(name = "WeatherReturn", targetNamespace = "http://ws.cdyne.com/WeatherWS/", partName = "Body")
-    @WebMethod(operationName = "GetCityWeatherByZIP")
-    public WeatherReturn getCityWeatherByZIP(
-        @WebParam(partName = "ZIP", name = "ZIP", targetNamespace = "")
-        String zip
-    );
+  @WebResult(name = "WeatherReturn", targetNamespace = "http://ws.cdyne.com/WeatherWS/", partName = "Body")
+  @WebMethod(operationName = "GetCityWeatherByZIP")
+  public WeatherReturn getCityWeatherByZIP(@WebParam(partName = "ZIP", name = "ZIP", targetNamespace = "") String zip);
 
-    @WebResult(name = "ArrayOfWeatherDescription", targetNamespace = "http://ws.cdyne.com/WeatherWS/", partName = "Body")
-    @WebMethod(operationName = "GetWeatherInformation")
-    public ArrayOfWeatherDescription getWeatherInformation();
+  @WebResult(name = "ArrayOfWeatherDescription", targetNamespace = "http://ws.cdyne.com/WeatherWS/", partName = "Body")
+  @WebMethod(operationName = "GetWeatherInformation")
+  public ArrayOfWeatherDescription getWeatherInformation();
 
-    @WebResult(name = "ForecastReturn", targetNamespace = "http://ws.cdyne.com/WeatherWS/", partName = "Body")
-    @WebMethod(operationName = "GetCityForecastByZIP")
-    public ForecastReturn getCityForecastByZIP(
-        @WebParam(partName = "ZIP", name = "ZIP", targetNamespace = "")
-        String zip
-    );
+  @WebResult(name = "ForecastReturn", targetNamespace = "http://ws.cdyne.com/WeatherWS/", partName = "Body")
+  @WebMethod(operationName = "GetCityForecastByZIP")
+  public ForecastReturn getCityForecastByZIP(@WebParam(partName = "ZIP", name = "ZIP", targetNamespace = "") String zip);
 }

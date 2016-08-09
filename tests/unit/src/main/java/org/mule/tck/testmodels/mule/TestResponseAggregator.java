@@ -10,20 +10,17 @@ import org.mule.runtime.core.routing.SimpleCollectionAggregator;
 
 
 /**
- * <code>TestResponseAggregator</code> is a mock response Agrregator object used for
- * testing configuration
+ * <code>TestResponseAggregator</code> is a mock response Agrregator object used for testing configuration
  */
-public class TestResponseAggregator extends SimpleCollectionAggregator
-{
-    private String testProperty;
+public class TestResponseAggregator extends SimpleCollectionAggregator {
 
-    public String getTestProperty()
-    {
-        return testProperty;
-    }
+  private String testProperty;
 
-    public void setTestProperty(String testProperty)
-    {
-        this.testProperty = testProperty;
-    }
+  public String getTestProperty() {
+    return testProperty;
+  }
+
+  public void setTestProperty(String testProperty) {
+    this.testProperty = testProperty;
+  }
 }

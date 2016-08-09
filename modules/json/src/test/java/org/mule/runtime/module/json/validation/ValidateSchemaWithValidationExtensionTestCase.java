@@ -16,25 +16,21 @@ import org.mule.runtime.core.api.MessagingException;
 
 import org.junit.Test;
 
-public class ValidateSchemaWithValidationExtensionTestCase extends ExtensionFunctionalTestCase
-{
+public class ValidateSchemaWithValidationExtensionTestCase extends ExtensionFunctionalTestCase {
 
-    @Override
-    protected Class<?>[] getAnnotatedExtensionClasses()
-    {
-        return new Class<?>[] {ValidationExtension.class};
-    }
+  @Override
+  protected Class<?>[] getAnnotatedExtensionClasses() {
+    return new Class<?>[] {ValidationExtension.class};
+  }
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "validate-schema-with-validation-module-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "validate-schema-with-validation-module-config.xml";
+  }
 
-    @Test
-    public void validateInGroup() throws Exception
-    {
-        MessagingException e = flowRunner("validate").runExpectingException();
-        assertThat(e, is(instanceOf(ValidationException.class)));
-    }
+  @Test
+  public void validateInGroup() throws Exception {
+    MessagingException e = flowRunner("validate").runExpectingException();
+    assertThat(e, is(instanceOf(ValidationException.class)));
+  }
 }

@@ -32,80 +32,73 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 
-public class ProxyWSDLRewriteSchemaLocationsTestCase extends FunctionalTestCase
-{
-    @Rule
-    public final DynamicPort httpPortProxy = new DynamicPort("portProxy");
+public class ProxyWSDLRewriteSchemaLocationsTestCase extends FunctionalTestCase {
 
-    @Rule
-    public final DynamicPort httpPortMockServer = new DynamicPort("portMockServer");
+  @Rule
+  public final DynamicPort httpPortProxy = new DynamicPort("portProxy");
 
-    private static final HttpRequestOptions HTTP_REQUEST_OPTIONS = newOptions().method(HttpConstants.Methods.POST.name()).build();
+  @Rule
+  public final DynamicPort httpPortMockServer = new DynamicPort("portMockServer");
 
-    private MuleContext mockServerContext;
+  private static final HttpRequestOptions HTTP_REQUEST_OPTIONS = newOptions().method(HttpConstants.Methods.POST.name()).build();
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "wsdlAndXsdMockServer/proxy-wsdl-rewrite-schema-locations-conf-httpn.xml";
+  private MuleContext mockServerContext;
+
+  @Override
+  protected String getConfigFile() {
+    return "wsdlAndXsdMockServer/proxy-wsdl-rewrite-schema-locations-conf-httpn.xml";
+  }
+
+  @Override
+  protected void doSetUpBeforeMuleContextCreation() throws Exception {
+    ApplicationContextBuilder applicationContextBuilder = new ApplicationContextBuilder();
+    applicationContextBuilder
+        .setApplicationResources(new String[] {"wsdlAndXsdMockServer/proxy-wsdl-rewrite-schema-locations-conf-server-httpn.xml"});
+    mockServerContext = applicationContextBuilder.build();
+    super.doSetUpBeforeMuleContextCreation();
+  }
+
+  @Override
+  protected void doTearDownAfterMuleContextDispose() throws Exception {
+    super.doTearDownAfterMuleContextDispose();
+    if (mockServerContext != null) {
+      mockServerContext.dispose();
     }
+  }
 
-    @Override
-    protected void doSetUpBeforeMuleContextCreation() throws Exception
-    {
-        ApplicationContextBuilder applicationContextBuilder = new ApplicationContextBuilder();
-        applicationContextBuilder.setApplicationResources(new String[]{"wsdlAndXsdMockServer/proxy-wsdl-rewrite-schema-locations-conf-server-httpn.xml"});
-        mockServerContext = applicationContextBuilder.build();
-        super.doSetUpBeforeMuleContextCreation();
+  @Test
+  public void testProxyWSDLRewriteAllSchemaLocations() throws Exception {
+    String proxyAddress = "http://localhost:" + httpPortProxy.getNumber() + "/localServicePath";
+    MuleMessage response =
+        muleContext.getClient().send(proxyAddress + "?wsdl", MuleMessage.builder().nullPayload().build(), HTTP_REQUEST_OPTIONS);
+
+    Set<String> expectedParametersValues = new HashSet<String>();
+    expectedParametersValues.addAll(Arrays.asList("xsd=xsd0"));
+
+    List<Element> schemaImports = getSchemaImports(getWsdl(response));
+    for (Element schemaImport : schemaImports) {
+      String schemaLocation = getLocation(schemaImport);
+      int parametersStart = schemaLocation.indexOf("?");
+      String locationPath = schemaLocation.substring(0, parametersStart);
+
+      assertEquals(proxyAddress, locationPath);
+
+      String queryString = schemaLocation.substring(parametersStart + 1);
+      expectedParametersValues.remove(queryString);
     }
+    assertTrue(expectedParametersValues.isEmpty());
+  }
 
-    @Override
-    protected void doTearDownAfterMuleContextDispose() throws Exception
-    {
-        super.doTearDownAfterMuleContextDispose();
-        if(mockServerContext !=null)
-        {
-            mockServerContext.dispose();
-        }
-    }
+  private Document getWsdl(MuleMessage response) throws Exception {
+    return XMLUnit.buildTestDocument(new InputSource(new StringReader(getPayloadAsString(response))));
+  }
 
-    @Test
-    public void testProxyWSDLRewriteAllSchemaLocations() throws Exception
-    {
-        String proxyAddress = "http://localhost:" + httpPortProxy.getNumber() + "/localServicePath";
-        MuleMessage response = muleContext.getClient().send(proxyAddress + "?wsdl", MuleMessage.builder().nullPayload().build(), HTTP_REQUEST_OPTIONS);
+  private List<Element> getSchemaImports(Document wsdl) {
+    return DOMUtils.findAllElementsByTagName(wsdl.getDocumentElement(), "xsd:import");
+  }
 
-        Set<String> expectedParametersValues = new HashSet<String>();
-        expectedParametersValues.addAll(Arrays.asList("xsd=xsd0"));
-
-        List<Element> schemaImports = getSchemaImports(getWsdl(response));
-        for(Element schemaImport : schemaImports)
-        {
-            String schemaLocation = getLocation(schemaImport);
-            int parametersStart = schemaLocation.indexOf("?");
-            String locationPath = schemaLocation.substring(0, parametersStart);
-
-            assertEquals(proxyAddress, locationPath);
-
-            String queryString = schemaLocation.substring(parametersStart+1);
-            expectedParametersValues.remove(queryString);
-        }
-        assertTrue(expectedParametersValues.isEmpty());
-    }
-
-    private Document getWsdl(MuleMessage response) throws Exception
-    {
-        return XMLUnit.buildTestDocument(new InputSource(new StringReader(getPayloadAsString(response))));
-    }
-
-    private List<Element> getSchemaImports(Document wsdl)
-    {
-        return DOMUtils.findAllElementsByTagName(wsdl.getDocumentElement(), "xsd:import");
-    }
-
-    private String getLocation(Element schemaImport)
-    {
-        return schemaImport.getAttributes().getNamedItem("schemaLocation").getNodeValue();
-    }
+  private String getLocation(Element schemaImport) {
+    return schemaImport.getAttributes().getNamedItem("schemaLocation").getNodeValue();
+  }
 
 }

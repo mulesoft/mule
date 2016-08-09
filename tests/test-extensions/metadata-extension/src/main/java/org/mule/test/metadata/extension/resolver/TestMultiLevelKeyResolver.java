@@ -25,75 +25,60 @@ import org.mule.test.metadata.extension.LocationKey;
 
 import java.util.Set;
 
-public class TestMultiLevelKeyResolver implements MetadataKeysResolver, MetadataContentResolver<LocationKey>
-{
-    public static final String ERROR_MESSAGE = "LocationKey type metadata key was not injected properly in the MetadataResolver";
+public class TestMultiLevelKeyResolver implements MetadataKeysResolver, MetadataContentResolver<LocationKey> {
 
-    // continents
-    public static final String AMERICA = "AMERICA";
-    public static final String EUROPE = "EUROPE";
+  public static final String ERROR_MESSAGE = "LocationKey type metadata key was not injected properly in the MetadataResolver";
 
-    // countries
-    public static final String FRANCE = "FRANCE";
-    public static final String ARGENTINA = "ARGENTINA";
-    public static final String USA = "USA";
-    public static final String USA_DISPLAY_NAME = "United States";
+  // continents
+  public static final String AMERICA = "AMERICA";
+  public static final String EUROPE = "EUROPE";
 
-    // cities
-    public static final String BUENOS_AIRES = "BA";
-    public static final String LA_PLATA = "LPLT";
-    public static final String PARIS = "PRS";
-    public static final String SAN_FRANCISCO = "SFO";
+  // countries
+  public static final String FRANCE = "FRANCE";
+  public static final String ARGENTINA = "ARGENTINA";
+  public static final String USA = "USA";
+  public static final String USA_DISPLAY_NAME = "United States";
+
+  // cities
+  public static final String BUENOS_AIRES = "BA";
+  public static final String LA_PLATA = "LPLT";
+  public static final String PARIS = "PRS";
+  public static final String SAN_FRANCISCO = "SFO";
 
 
-    @Override
-    public MetadataType getContentMetadata(MetadataContext context, LocationKey key) throws MetadataResolvingException, ConnectionException
-    {
-        checkLocationKey(key);
-        final ObjectTypeBuilder objectBuilder = BaseTypeBuilder.create(new MetadataFormat(key.toString(), key.toString(), APPLICATION_JAVA_MIME_TYPE)).objectType();
-        objectBuilder.addField().key("CONTINENT").value().stringType();
-        objectBuilder.addField().key("COUNTRY").value().stringType();
-        objectBuilder.addField().key("CITY").value().stringType();
-        return objectBuilder.build();
+  @Override
+  public MetadataType getContentMetadata(MetadataContext context, LocationKey key)
+      throws MetadataResolvingException, ConnectionException {
+    checkLocationKey(key);
+    final ObjectTypeBuilder objectBuilder =
+        BaseTypeBuilder.create(new MetadataFormat(key.toString(), key.toString(), APPLICATION_JAVA_MIME_TYPE)).objectType();
+    objectBuilder.addField().key("CONTINENT").value().stringType();
+    objectBuilder.addField().key("COUNTRY").value().stringType();
+    objectBuilder.addField().key("CITY").value().stringType();
+    return objectBuilder.build();
+  }
+
+  @Override
+  public Set<MetadataKey> getMetadataKeys(MetadataContext context) throws MetadataResolvingException, ConnectionException {
+    return newHashSet(buildAmericaKey(), buildEuropeKey());
+  }
+
+  public static MetadataKey buildEuropeKey() {
+    return newKey(EUROPE).withDisplayName(EUROPE).withChild(newKey(FRANCE).withChild(newKey(PARIS))).build();
+  }
+
+  public static MetadataKey buildAmericaKey() {
+    return newKey(AMERICA).withDisplayName(AMERICA)
+        .withChild(newKey(ARGENTINA).withChild(newKey(BUENOS_AIRES)).withChild(newKey(LA_PLATA)))
+        .withChild(newKey(USA).withDisplayName(USA_DISPLAY_NAME).withChild(newKey(SAN_FRANCISCO))).build();
+  }
+
+  private void checkLocationKey(LocationKey key) throws MetadataResolvingException {
+    boolean injectedProperly =
+        key != null && key.getContinent().equals(AMERICA) && key.getCountry().equals(USA) && key.getCity().equals(SAN_FRANCISCO);
+
+    if (!injectedProperly) {
+      throw new MetadataResolvingException(ERROR_MESSAGE, FailureCode.INVALID_METADATA_KEY);
     }
-
-    @Override
-    public Set<MetadataKey> getMetadataKeys(MetadataContext context) throws MetadataResolvingException, ConnectionException
-    {
-        return newHashSet(buildAmericaKey(), buildEuropeKey());
-    }
-
-    public static MetadataKey buildEuropeKey()
-    {
-        return newKey(EUROPE)
-                .withDisplayName(EUROPE)
-                .withChild(newKey(FRANCE).withChild(newKey(PARIS)))
-                .build();
-    }
-
-    public static MetadataKey buildAmericaKey()
-    {
-        return newKey(AMERICA)
-                .withDisplayName(AMERICA)
-                .withChild(newKey(ARGENTINA)
-                            .withChild(newKey(BUENOS_AIRES))
-                            .withChild(newKey(LA_PLATA)))
-                .withChild(newKey(USA)
-                            .withDisplayName(USA_DISPLAY_NAME)
-                            .withChild(newKey(SAN_FRANCISCO)))
-                .build();
-    }
-
-    private void checkLocationKey(LocationKey key) throws MetadataResolvingException
-    {
-        boolean injectedProperly = key != null
-                                   && key.getContinent().equals(AMERICA)
-                                   && key.getCountry().equals(USA)
-                                   && key.getCity().equals(SAN_FRANCISCO);
-
-        if (!injectedProperly)
-        {
-            throw new MetadataResolvingException(ERROR_MESSAGE, FailureCode.INVALID_METADATA_KEY);
-        }
-    }
+  }
 }

@@ -13,17 +13,14 @@ import org.mule.runtime.api.metadata.DataType;
 
 import java.io.Serializable;
 
-public class SessionVarExpressionDataTypeResolverTestCase extends AbstractVarExpressionDataTypeResolverTestCase
-{
+public class SessionVarExpressionDataTypeResolverTestCase extends AbstractVarExpressionDataTypeResolverTestCase {
 
-    public SessionVarExpressionDataTypeResolverTestCase()
-    {
-        super(new SessionVarExpressionDataTypeResolver(), SESSION_VARS);
-    }
+  public SessionVarExpressionDataTypeResolverTestCase() {
+    super(new SessionVarExpressionDataTypeResolver(), SESSION_VARS);
+  }
 
-    @Override
-    protected void setVariable(MuleEvent event, Object propertyValue, DataType dataType)
-    {
-        event.getSession().setProperty(PROPERTY_NAME, (Serializable) propertyValue, dataType);
-    }
+  @Override
+  protected void setVariable(MuleEvent event, Object propertyValue, DataType dataType) {
+    event.getSession().setProperty(PROPERTY_NAME, (Serializable) propertyValue, dataType);
+  }
 }

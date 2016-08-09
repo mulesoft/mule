@@ -17,30 +17,23 @@ import java.nio.charset.Charset;
 /**
  * Throws an exception if the message does not contain "success".
  */
-public class ValidateResponse extends AbstractTransformer
-{
-    @Override
-    protected Object doTransform(Object src, Charset encoding) throws TransformerException
-    {
-        String response = null;
-        if (src instanceof String)
-        {
-            response = (String) src;
-        }
-        else if (src instanceof InputStream)
-        {
-            response = IOUtils.toString((InputStream) src);
-        }
-        
-        if (response != null && response.contains("success"))
-        {
-            return response;
-        }
-        else
-        {
-            throw new TransformerException(MessageFactory.createStaticMessage("Invalid response from service: " + response));
-        }
+public class ValidateResponse extends AbstractTransformer {
+
+  @Override
+  protected Object doTransform(Object src, Charset encoding) throws TransformerException {
+    String response = null;
+    if (src instanceof String) {
+      response = (String) src;
+    } else if (src instanceof InputStream) {
+      response = IOUtils.toString((InputStream) src);
     }
+
+    if (response != null && response.contains("success")) {
+      return response;
+    } else {
+      throw new TransformerException(MessageFactory.createStaticMessage("Invalid response from service: " + response));
+    }
+  }
 }
 
 

@@ -16,52 +16,38 @@ import java.io.ByteArrayOutputStream;
 import java.nio.charset.Charset;
 
 /**
- * <code>ObjectToInputStream</code> converts Serializable objects to an InputStream
- * but treats <code>java.lang.String</code>, <code>byte[]</code> and
- * <code>org.mule.runtime.core.message.OutputHandler</code> differently by using their
- * byte[] content rather thqn Serializing them.
+ * <code>ObjectToInputStream</code> converts Serializable objects to an InputStream but treats <code>java.lang.String</code>,
+ * <code>byte[]</code> and <code>org.mule.runtime.core.message.OutputHandler</code> differently by using their byte[] content
+ * rather thqn Serializing them.
  */
-public class ObjectToInputStream extends SerializableToByteArray
-{
+public class ObjectToInputStream extends SerializableToByteArray {
 
-    public ObjectToInputStream()
-    {
-        this.registerSourceType(DataType.STRING);
-        this.registerSourceType(DataType.fromType(OutputHandler.class));
-        setReturnDataType(DataType.INPUT_STREAM);
+  public ObjectToInputStream() {
+    this.registerSourceType(DataType.STRING);
+    this.registerSourceType(DataType.fromType(OutputHandler.class));
+    setReturnDataType(DataType.INPUT_STREAM);
+  }
+
+  @Override
+  public Object doTransform(Object src, Charset encoding) throws TransformerException {
+    try {
+      if (src instanceof String) {
+        return new ByteArrayInputStream(((String) src).getBytes(encoding));
+      } else if (src instanceof byte[]) {
+        return new ByteArrayInputStream((byte[]) src);
+      } else if (src instanceof OutputHandler) {
+        OutputHandler oh = (OutputHandler) src;
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        oh.write(RequestContext.getEvent(), out);
+
+        return new ByteArrayInputStream(out.toByteArray());
+      } else {
+        return new ByteArrayInputStream((byte[]) super.doTransform(src, encoding));
+      }
+    } catch (Exception e) {
+      throw new TransformerException(this, e);
     }
-
-    @Override
-    public Object doTransform(Object src, Charset encoding) throws TransformerException
-    {
-        try
-        {
-            if (src instanceof String)
-            {
-                return new ByteArrayInputStream(((String) src).getBytes(encoding));
-            }
-            else if (src instanceof byte[])
-            {
-                return new ByteArrayInputStream((byte[]) src);
-            }
-            else if (src instanceof OutputHandler)
-            {
-                OutputHandler oh = (OutputHandler) src;
-
-                ByteArrayOutputStream out = new ByteArrayOutputStream();
-                oh.write(RequestContext.getEvent(), out);
-
-                return new ByteArrayInputStream(out.toByteArray());
-            }
-            else
-            {
-                return new ByteArrayInputStream((byte[]) super.doTransform(src, encoding));
-            }
-        }
-        catch (Exception e)
-        {
-            throw new TransformerException(this, e);
-        }
-    }
+  }
 
 }

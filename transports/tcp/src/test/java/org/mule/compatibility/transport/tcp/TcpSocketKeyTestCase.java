@@ -21,62 +21,57 @@ import org.mule.runtime.core.api.MuleException;
 
 import org.junit.Test;
 
-public class TcpSocketKeyTestCase 
-{
+public class TcpSocketKeyTestCase {
 
-    @Test
-    public void testHashAndEquals() throws MuleException
-    {
-        final TcpConnector tcpConnector = mock(TcpConnector.class);
+  @Test
+  public void testHashAndEquals() throws MuleException {
+    final TcpConnector tcpConnector = mock(TcpConnector.class);
 
-        final ImmutableEndpoint endpoint1in = createEndpoint(tcpConnector, "localhost", 8080);
-        final TcpSocketKey key1in = new TcpSocketKey(endpoint1in);
+    final ImmutableEndpoint endpoint1in = createEndpoint(tcpConnector, "localhost", 8080);
+    final TcpSocketKey key1in = new TcpSocketKey(endpoint1in);
 
-        final ImmutableEndpoint endpoint1out = createEndpoint(tcpConnector, "localhost", 8080);
-        final TcpSocketKey key1out = new TcpSocketKey(endpoint1out);
+    final ImmutableEndpoint endpoint1out = createEndpoint(tcpConnector, "localhost", 8080);
+    final TcpSocketKey key1out = new TcpSocketKey(endpoint1out);
 
-        final ImmutableEndpoint endpoint2in = createEndpoint(tcpConnector, "localhost", 9080);
-        final TcpSocketKey key2in = new TcpSocketKey(endpoint2in);
+    final ImmutableEndpoint endpoint2in = createEndpoint(tcpConnector, "localhost", 9080);
+    final TcpSocketKey key2in = new TcpSocketKey(endpoint2in);
 
-        assertEquals(key1in, key1in);
-        assertEquals(key1in, key1out);
-        assertNotSame(key1in, key2in);
-        assertEquals(key1in.hashCode(), key1in.hashCode());
-        assertEquals(key1in.hashCode(), key1out.hashCode());
-        assertFalse(key1in.hashCode() == key2in.hashCode());
-    }
+    assertEquals(key1in, key1in);
+    assertEquals(key1in, key1out);
+    assertNotSame(key1in, key2in);
+    assertEquals(key1in.hashCode(), key1in.hashCode());
+    assertEquals(key1in.hashCode(), key1out.hashCode());
+    assertFalse(key1in.hashCode() == key2in.hashCode());
+  }
 
-    @Test(expected=IllegalArgumentException.class)
-    public void testUnresolvedHost()
-    {
-        final TcpConnector tcpConnector = mock(TcpConnector.class);
-        when(tcpConnector.isFailOnUnresolvedHost()).thenReturn(Boolean.TRUE);
-        
-        final ImmutableEndpoint endpoint = createEndpoint(tcpConnector, "some.invented.host_abc", 8080);
-        @SuppressWarnings("unused")
-        final TcpSocketKey key = new TcpSocketKey(endpoint);
-    }
+  @Test(expected = IllegalArgumentException.class)
+  public void testUnresolvedHost() {
+    final TcpConnector tcpConnector = mock(TcpConnector.class);
+    when(tcpConnector.isFailOnUnresolvedHost()).thenReturn(Boolean.TRUE);
 
-    @Test
-    public void testResolvedHost()
-    {
-        final TcpConnector tcpConnector = mock(TcpConnector.class);
-        when(tcpConnector.isFailOnUnresolvedHost()).thenReturn(Boolean.TRUE);
-        
-        final ImmutableEndpoint endpoint = createEndpoint(tcpConnector, "localhost", 8080);
-        final TcpSocketKey key = new TcpSocketKey(endpoint);
-        assertNotNull(key);
-    }
+    final ImmutableEndpoint endpoint = createEndpoint(tcpConnector, "some.invented.host_abc", 8080);
+    @SuppressWarnings("unused")
+    final TcpSocketKey key = new TcpSocketKey(endpoint);
+  }
 
-    private ImmutableEndpoint createEndpoint(TcpConnector tcpConnector, String host, int port)
-    {
-        final EndpointURI endpointURI = mock(EndpointURI.class);
-        when(endpointURI.getHost()).thenReturn(host);
-        when(endpointURI.getPort()).thenReturn(port);
-        final ImmutableEndpoint endpoint = mock(ImmutableEndpoint.class);
-        when(endpoint.getConnector()).thenReturn(tcpConnector);
-        when(endpoint.getEndpointURI()).thenReturn(endpointURI);
-        return endpoint;
-    }
+  @Test
+  public void testResolvedHost() {
+    final TcpConnector tcpConnector = mock(TcpConnector.class);
+    when(tcpConnector.isFailOnUnresolvedHost()).thenReturn(Boolean.TRUE);
+
+    final ImmutableEndpoint endpoint = createEndpoint(tcpConnector, "localhost", 8080);
+    final TcpSocketKey key = new TcpSocketKey(endpoint);
+    assertNotNull(key);
+  }
+
+  private ImmutableEndpoint createEndpoint(TcpConnector tcpConnector, String host, int port) {
+    final EndpointURI endpointURI = mock(EndpointURI.class);
+    when(endpointURI.getHost()).thenReturn(host);
+    when(endpointURI.getPort()).thenReturn(port);
+    final ImmutableEndpoint endpoint = mock(ImmutableEndpoint.class);
+    when(endpoint.getConnector()).thenReturn(tcpConnector);
+    when(endpoint.getEndpointURI()).thenReturn(endpointURI);
+    return endpoint;
+  }
 
 }

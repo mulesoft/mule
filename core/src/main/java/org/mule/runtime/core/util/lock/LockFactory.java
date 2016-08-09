@@ -11,22 +11,21 @@ import java.util.concurrent.locks.Lock;
 /**
  * Factory for creating Lock instances.
  *
- * All mule components that require synchronization for access shared data must be synchronized using locks from
- * the LockFactory provided by MuleContext
+ * All mule components that require synchronization for access shared data must be synchronized using locks from the LockFactory
+ * provided by MuleContext
  *
  * Default LockFactory can be override by modules using registry-bootstrap.
  */
-public interface LockFactory
-{
+public interface LockFactory {
 
-    /**
-     * Provides a lock to create thread safe Mule components.
-     *
-     * Always returns the same lock for a certain lockId
-     *
-     * @param lockId Id of the lock
-     * @return a {@link Lock} instance associated to the lockId
-     */
-    Lock createLock(String lockId);
-    
+  /**
+   * Provides a lock to create thread safe Mule components.
+   *
+   * Always returns the same lock for a certain lockId
+   *
+   * @param lockId Id of the lock
+   * @return a {@link Lock} instance associated to the lockId
+   */
+  Lock createLock(String lockId);
+
 }

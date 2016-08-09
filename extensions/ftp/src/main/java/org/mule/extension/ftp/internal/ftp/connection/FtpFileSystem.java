@@ -13,36 +13,31 @@ import org.mule.runtime.module.extension.file.api.FileSystem;
 import java.io.InputStream;
 
 /**
- * Specialization of the {@link FileSystem} contract for
- * file systems mounted on FTP/SFTP servers
+ * Specialization of the {@link FileSystem} contract for file systems mounted on FTP/SFTP servers
  *
  * @since 4.0
  */
-public interface FtpFileSystem extends FileSystem
-{
+public interface FtpFileSystem extends FileSystem {
 
-    /**
-     * Severs the underlying connection to the remote server
-     */
-    void disconnect();
+  /**
+   * Severs the underlying connection to the remote server
+   */
+  void disconnect();
 
-    /**
-     * Returns an InputStream which obtains the content for the
-     * file of the given {@code filePayload}.
-     * <p>
-     * The invoked <b>MUST</b> make sure that the returned stream
-     * is closed in order for the underlying connection
-     * to be closed.
-     *
-     * @param filePayload a {@link FileAttributes} referencing to a FTP file
-     * @return an {@link InputStream}
-     */
-    InputStream retrieveFileContent(FileAttributes filePayload);
+  /**
+   * Returns an InputStream which obtains the content for the file of the given {@code filePayload}.
+   * <p>
+   * The invoked <b>MUST</b> make sure that the returned stream is closed in order for the underlying connection to be closed.
+   *
+   * @param filePayload a {@link FileAttributes} referencing to a FTP file
+   * @return an {@link InputStream}
+   */
+  InputStream retrieveFileContent(FileAttributes filePayload);
 
-    /**
-     * Validates the underlying connection to the remote server
-     *
-     * @return a {@link ConnectionValidationResult}
-     */
-    ConnectionValidationResult validateConnection();
+  /**
+   * Validates the underlying connection to the remote server
+   *
+   * @return a {@link ConnectionValidationResult}
+   */
+  ConnectionValidationResult validateConnection();
 }

@@ -16,17 +16,15 @@ import javax.lang.model.element.TypeElement;
  *
  * @since 4.0
  */
-public class ExtensionTypeFactory
-{
+public class ExtensionTypeFactory {
 
-    /**
-     * Creates a {@link ExtensionElement} from a given {@link Class} that will help to introspect an extension.
-     *
-     * @param extensionClass {@link Extension} annotated {@link Class}
-     * @return an {@link ExtensionElement} wrapping the extension {@link Class} structure
-     */
-    public static ExtensionElement getExtensionType(Class<?> extensionClass)
-    {
-        return new ExtensionTypeWrapper<>(extensionClass);
-    }
+  /**
+   * Creates a {@link ExtensionElement} from a given {@link Class} that will help to introspect an extension.
+   *
+   * @param extensionClass {@link Extension} annotated {@link Class}
+   * @return an {@link ExtensionElement} wrapping the extension {@link Class} structure
+   */
+  public static ExtensionElement getExtensionType(Class<?> extensionClass) {
+    return new ExtensionTypeWrapper<>(extensionClass);
+  }
 }

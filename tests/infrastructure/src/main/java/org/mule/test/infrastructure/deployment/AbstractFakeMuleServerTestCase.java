@@ -17,32 +17,27 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
 
-public class AbstractFakeMuleServerTestCase extends AbstractMuleTestCase
-{
+public class AbstractFakeMuleServerTestCase extends AbstractMuleTestCase {
 
-    @Rule
-    public TemporaryFolder muleHome = new TemporaryFolder();
+  @Rule
+  public TemporaryFolder muleHome = new TemporaryFolder();
 
-    protected FakeMuleServer muleServer;
+  protected FakeMuleServer muleServer;
 
-    protected List<MuleCoreExtension> getCoreExtensions()
-    {
-        return new LinkedList<>();
+  protected List<MuleCoreExtension> getCoreExtensions() {
+    return new LinkedList<>();
+  }
+
+  @Before
+  public void setUp() throws Exception {
+    muleServer = new FakeMuleServer(muleHome.getRoot().getAbsolutePath(), getCoreExtensions());
+  }
+
+  @After
+  public void tearDown() throws Exception {
+    if (muleServer != null) {
+      muleServer.stop();
+      muleServer = null;
     }
-
-    @Before
-    public void setUp() throws Exception
-    {
-        muleServer = new FakeMuleServer(muleHome.getRoot().getAbsolutePath(), getCoreExtensions());
-    }
-
-    @After
-    public void tearDown() throws Exception
-    {
-        if (muleServer != null)
-        {
-            muleServer.stop();
-            muleServer = null;
-        }
-    }
+  }
 }

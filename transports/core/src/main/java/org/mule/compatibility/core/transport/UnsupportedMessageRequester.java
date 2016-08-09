@@ -9,53 +9,44 @@ package org.mule.compatibility.core.transport;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.runtime.core.api.MuleMessage;
 
-public final class UnsupportedMessageRequester extends AbstractMessageRequester
-{
+public final class UnsupportedMessageRequester extends AbstractMessageRequester {
 
-    public UnsupportedMessageRequester(InboundEndpoint endpoint)
-    {
-        super(endpoint);
-    }
+  public UnsupportedMessageRequester(InboundEndpoint endpoint) {
+    super(endpoint);
+  }
 
-    @Override
-    protected MuleMessage doRequest(long timeout) throws Exception
-    {
-        throw new UnsupportedOperationException("Request not supported for this transport");
-    }
+  @Override
+  protected MuleMessage doRequest(long timeout) throws Exception {
+    throw new UnsupportedOperationException("Request not supported for this transport");
+  }
 
-    @Override
-    protected void doInitialise()
-    {
-        // empty
-    }
+  @Override
+  protected void doInitialise() {
+    // empty
+  }
 
-    @Override
-    protected void doDispose()
-    {
-        // empty
-    }
+  @Override
+  protected void doDispose() {
+    // empty
+  }
 
-    @Override
-    protected void doConnect() throws Exception
-    {
-        // empty
-    }
+  @Override
+  protected void doConnect() throws Exception {
+    // empty
+  }
 
-    @Override
-    protected void doDisconnect() throws Exception
-    {
-        // empty
-    }
+  @Override
+  protected void doDisconnect() throws Exception {
+    // empty
+  }
 
-    @Override
-    protected void doStart() 
-    {
-        // empty
-    }
+  @Override
+  protected void doStart() {
+    // empty
+  }
 
-    @Override
-    protected void doStop() 
-    {
-        // empty
-    }
+  @Override
+  protected void doStop() {
+    // empty
+  }
 }

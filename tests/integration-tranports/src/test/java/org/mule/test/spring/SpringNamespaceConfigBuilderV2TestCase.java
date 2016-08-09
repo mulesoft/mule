@@ -19,66 +19,56 @@ import org.mule.tck.testmodels.mule.TestCompressionTransformer;
 import org.junit.Test;
 
 /**
- * This is an extended version of the same test covered in
- * {@link SpringNamespaceConfigBuilderTestCase}.  Both are translations of an
- * earlier (1.X) test.
+ * This is an extended version of the same test covered in {@link SpringNamespaceConfigBuilderTestCase}. Both are translations of
+ * an earlier (1.X) test.
  * <p/>
- * I realise this seems rather messy, and I did consider merging the two, but they often test different
- * things, and we would have lost quite a few tests on merging.  So I am afraid we are left with two
- * rather rambling, parallel tests.  But these tests examing "corner cases" no other tests cover, so
- * are quite valuable...
+ * I realise this seems rather messy, and I did consider merging the two, but they often test different things, and we would have
+ * lost quite a few tests on merging. So I am afraid we are left with two rather rambling, parallel tests. But these tests examing
+ * "corner cases" no other tests cover, so are quite valuable...
  */
-public class SpringNamespaceConfigBuilderV2TestCase extends AbstractConfigBuilderTestCase
-{
+public class SpringNamespaceConfigBuilderV2TestCase extends AbstractConfigBuilderTestCase {
 
-    public SpringNamespaceConfigBuilderV2TestCase()
-    {
-        super(true);
-        setDisposeContextPerClass(true);
-    }
+  public SpringNamespaceConfigBuilderV2TestCase() {
+    super(true);
+    setDisposeContextPerClass(true);
+  }
 
-    @Override
-    public String[] getConfigFiles()
-    {
-        return new String[] {
-                "org/mule/test/spring/config2/test-xml-mule2-config.xml",
-                "org/mule/test/spring/config2/test-xml-mule2-config-split.xml",
-                "org/mule/test/spring/config2/test-xml-mule2-config-split-properties.xml"
-        };
-    }
+  @Override
+  public String[] getConfigFiles() {
+    return new String[] {"org/mule/test/spring/config2/test-xml-mule2-config.xml",
+        "org/mule/test/spring/config2/test-xml-mule2-config-split.xml",
+        "org/mule/test/spring/config2/test-xml-mule2-config-split-properties.xml"};
+  }
 
-    @Test
-    public void testPropertyTypesConfig() throws Exception
-    {
-        Flow c = (Flow) muleContext.getRegistry().lookupFlowConstruct("testPropertiesComponent");
-        assertNotNull(c);
-        Object obj = getComponent(c);
-        assertNotNull(obj);
-        assertTrue(obj instanceof Apple);
-        assertTrue(((Apple) obj).isBitten());
-        assertTrue(((Apple) obj).isWashed());
-    }
+  @Test
+  public void testPropertyTypesConfig() throws Exception {
+    Flow c = (Flow) muleContext.getRegistry().lookupFlowConstruct("testPropertiesComponent");
+    assertNotNull(c);
+    Object obj = getComponent(c);
+    assertNotNull(obj);
+    assertTrue(obj instanceof Apple);
+    assertTrue(((Apple) obj).isBitten());
+    assertTrue(((Apple) obj).isWashed());
+  }
 
-    @Override
-    public void testTransformerConfig()
-    {
-        // first of all test generic transformer configuration
-        super.testTransformerConfig();
+  @Override
+  public void testTransformerConfig() {
+    // first of all test generic transformer configuration
+    super.testTransformerConfig();
 
-        Transformer t = muleContext.getRegistry().lookupTransformer("TestCompressionTransformer");
-        assertNotNull(t);
-        assertTrue(t instanceof TestCompressionTransformer);
+    Transformer t = muleContext.getRegistry().lookupTransformer("TestCompressionTransformer");
+    assertNotNull(t);
+    assertTrue(t instanceof TestCompressionTransformer);
 
-        // This will only work with the MuleXml Builder other implementations
-        // will have to set this proerty manually or mimic Mules behaviour
-        assertEquals("this was set from the manager properties!",
-                     ((TestCompressionTransformer) t).getBeanProperty1());
-        assertEquals(12, ((TestCompressionTransformer) t).getBeanProperty2());
+    // This will only work with the MuleXml Builder other implementations
+    // will have to set this proerty manually or mimic Mules behaviour
+    assertEquals("this was set from the manager properties!", ((TestCompressionTransformer) t).getBeanProperty1());
+    assertEquals(12, ((TestCompressionTransformer) t).getBeanProperty2());
 
-        assertEquals(t.getReturnDataType().getType(), java.lang.String.class);
+    assertEquals(t.getReturnDataType().getType(), java.lang.String.class);
 
-        t = muleContext.getRegistry().lookupTransformer("TestTransformer");
-        assertNotNull(t);
-        assertEquals(t.getReturnDataType().getType(), byte[].class);
-    }
+    t = muleContext.getRegistry().lookupTransformer("TestTransformer");
+    assertNotNull(t);
+    assertEquals(t.getReturnDataType().getType(), byte[].class);
+  }
 }

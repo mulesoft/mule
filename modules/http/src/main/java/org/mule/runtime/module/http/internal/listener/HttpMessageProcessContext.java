@@ -12,55 +12,48 @@ import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.execution.MessageProcessContext;
 
-public class HttpMessageProcessContext implements MessageProcessContext
-{
+public class HttpMessageProcessContext implements MessageProcessContext {
 
-    private final DefaultHttpListener listener;
-    private final FlowConstruct flowConstruct;
-    private final WorkManager workManager;
-    private final ClassLoader executionClassLoader;
+  private final DefaultHttpListener listener;
+  private final FlowConstruct flowConstruct;
+  private final WorkManager workManager;
+  private final ClassLoader executionClassLoader;
 
-    HttpMessageProcessContext(final DefaultHttpListener listener, final FlowConstruct flowConstruct, final WorkManager workManager, final ClassLoader executionClassLoader)
-    {
-        this.listener = listener;
-        this.flowConstruct = flowConstruct;
-        this.workManager = workManager;
-        this.executionClassLoader = executionClassLoader;
-    }
+  HttpMessageProcessContext(final DefaultHttpListener listener, final FlowConstruct flowConstruct, final WorkManager workManager,
+                            final ClassLoader executionClassLoader) {
+    this.listener = listener;
+    this.flowConstruct = flowConstruct;
+    this.workManager = workManager;
+    this.executionClassLoader = executionClassLoader;
+  }
 
-    @Override
-    public boolean supportsAsynchronousProcessing()
-    {
-        return false;
-    }
+  @Override
+  public boolean supportsAsynchronousProcessing() {
+    return false;
+  }
 
-    @Override
-    public MessageSource getMessageSource()
-    {
-        return listener;
-    }
+  @Override
+  public MessageSource getMessageSource() {
+    return listener;
+  }
 
-    @Override
-    public FlowConstruct getFlowConstruct()
-    {
-        return flowConstruct;
-    }
+  @Override
+  public FlowConstruct getFlowConstruct() {
+    return flowConstruct;
+  }
 
-    @Override
-    public WorkManager getFlowExecutionWorkManager()
-    {
-        return workManager;
-    }
+  @Override
+  public WorkManager getFlowExecutionWorkManager() {
+    return workManager;
+  }
 
-    @Override
-    public TransactionConfig getTransactionConfig()
-    {
-        return null;
-    }
+  @Override
+  public TransactionConfig getTransactionConfig() {
+    return null;
+  }
 
-    @Override
-    public ClassLoader getExecutionClassLoader()
-    {
-        return executionClassLoader;
-    }
+  @Override
+  public ClassLoader getExecutionClassLoader() {
+    return executionClassLoader;
+  }
 }

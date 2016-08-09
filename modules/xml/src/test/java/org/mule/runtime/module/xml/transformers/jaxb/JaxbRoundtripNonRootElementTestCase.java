@@ -14,41 +14,33 @@ import org.mule.runtime.module.xml.util.XMLUtils;
 
 import org.w3c.dom.Document;
 
-public class JaxbRoundtripNonRootElementTestCase extends JaxbRoundtripTestCase
-{
+public class JaxbRoundtripNonRootElementTestCase extends JaxbRoundtripTestCase {
 
-    @Override
-    public Transformer getTransformer() throws Exception
-    {
-        JAXBUnmarshallerTransformer t = new JAXBUnmarshallerTransformer(ctx, DataType.STRING);
-        initialiseObject(t);
-        return t;
-    }
+  @Override
+  public Transformer getTransformer() throws Exception {
+    JAXBUnmarshallerTransformer t = new JAXBUnmarshallerTransformer(ctx, DataType.STRING);
+    initialiseObject(t);
+    return t;
+  }
 
-    @Override
-    public Transformer getRoundTripTransformer() throws Exception
-    {
-        // Since we're transforming to a non-JAXB type, we can't round-trip
-        return null;
-    }
+  @Override
+  public Transformer getRoundTripTransformer() throws Exception {
+    // Since we're transforming to a non-JAXB type, we can't round-trip
+    return null;
+  }
 
-    @Override
-    public Object getTestData()
-    {
-        try
-        {
-            Document doc = XMLUtils.toW3cDocument(super.getTestData());
-            return doc.getDocumentElement().getFirstChild();
-        }
-        catch (Exception e)
-        {
-            throw new RuntimeException(e);
-        }
+  @Override
+  public Object getTestData() {
+    try {
+      Document doc = XMLUtils.toW3cDocument(super.getTestData());
+      return doc.getDocumentElement().getFirstChild();
+    } catch (Exception e) {
+      throw new RuntimeException(e);
     }
+  }
 
-    @Override
-    public Object getResultData()
-    {
-        return ((Person)super.getResultData()).getName();
-    }
+  @Override
+  public Object getResultData() {
+    return ((Person) super.getResultData()).getName();
+  }
 }

@@ -12,33 +12,28 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
-public class HttpRequestCustomTlsConfigTestCase extends AbstractHttpRequestTestCase
-{
+public class HttpRequestCustomTlsConfigTestCase extends AbstractHttpRequestTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "http-request-custom-tls-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "http-request-custom-tls-config.xml";
+  }
 
-    @Override
-    protected boolean enableHttps()
-    {
-        return true;
-    }
+  @Override
+  protected boolean enableHttps() {
+    return true;
+  }
 
-    @Test
-    public void configureTlsFromGlobalContext() throws Exception
-    {
-        flowRunner("testFlowGlobalContext").withPayload(TEST_MESSAGE).run();
-        assertThat(body, equalTo(TEST_MESSAGE));
-    }
+  @Test
+  public void configureTlsFromGlobalContext() throws Exception {
+    flowRunner("testFlowGlobalContext").withPayload(TEST_MESSAGE).run();
+    assertThat(body, equalTo(TEST_MESSAGE));
+  }
 
-    @Test
-    public void configureTlsFromNestedContext() throws Exception
-    {
-        flowRunner("testFlowNestedContext").withPayload(TEST_MESSAGE).run();
-        assertThat(body, equalTo(TEST_MESSAGE));
-    }
+  @Test
+  public void configureTlsFromNestedContext() throws Exception {
+    flowRunner("testFlowNestedContext").withPayload(TEST_MESSAGE).run();
+    assertThat(body, equalTo(TEST_MESSAGE));
+  }
 
 }

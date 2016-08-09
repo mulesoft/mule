@@ -13,21 +13,19 @@ import java.lang.reflect.Parameter;
  *
  * @since 4.0
  */
-public interface ParameterElement extends ExtensionParameter
-{
+public interface ParameterElement extends ExtensionParameter {
 
-    /**
-     * @return The represented {@link Parameter}
-     */
-    //TODO MULE-10137 - Adapt logic to AST
-    Parameter getParameter();
+  /**
+   * @return The represented {@link Parameter}
+   */
+  // TODO MULE-10137 - Adapt logic to AST
+  Parameter getParameter();
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    default boolean isFieldBased()
-    {
-        return false;
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  default boolean isFieldBased() {
+    return false;
+  }
 }

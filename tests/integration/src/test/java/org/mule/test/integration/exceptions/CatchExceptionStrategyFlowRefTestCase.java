@@ -24,47 +24,43 @@ import org.hamcrest.core.Is;
 import org.hamcrest.core.IsNull;
 import org.junit.Test;
 
-public class CatchExceptionStrategyFlowRefTestCase extends AbstractIntegrationTestCase
-{
-    public static final int TIMEOUT = 5000;
+public class CatchExceptionStrategyFlowRefTestCase extends AbstractIntegrationTestCase {
+
+  public static final int TIMEOUT = 5000;
+
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/integration/exceptions/catch-exception-strategy-flow-ref.xml";
+  }
+
+  @Test
+  public void testFlowRefHandlingException() throws Exception {
+    MuleMessage response = flowRunner("exceptionHandlingBlock").withPayload(JSON_REQUEST).run().getMessage();
+    // compare the structure and values but not the attributes' order
+    ObjectMapper mapper = new ObjectMapper();
+    JsonNode actualJsonNode = mapper.readTree(getPayloadAsString(response));
+    JsonNode expectedJsonNode = mapper.readTree(JSON_RESPONSE);
+    assertThat(actualJsonNode, is(expectedJsonNode));
+  }
+
+  @Test
+  public void testFlowRefHandlingExceptionWithTransaction() throws Exception {
+    MuleMessage response = flowRunner("transactionNotResolvedAfterException").withPayload(JSON_REQUEST).run().getMessage();
+    // compare the structure and values but not the attributes' order
+    ObjectMapper mapper = new ObjectMapper();
+    JsonNode actualJsonNode = mapper.readTree(getPayloadAsString(response));
+    JsonNode expectedJsonNode = mapper.readTree(JSON_RESPONSE);
+    assertThat(actualJsonNode, is(expectedJsonNode));
+  }
+
+  public static class VerifyTransactionNotResolvedProcessor implements MessageProcessor {
 
     @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/integration/exceptions/catch-exception-strategy-flow-ref.xml";
+    public MuleEvent process(MuleEvent event) throws MuleException {
+      Transaction tx = TransactionCoordination.getInstance().getTransaction();
+      assertThat(tx, IsNull.<Object>notNullValue());
+      assertThat(tx.isRollbackOnly(), Is.is(false));
+      return event;
     }
-
-    @Test
-    public void testFlowRefHandlingException() throws Exception
-    {
-        MuleMessage response = flowRunner("exceptionHandlingBlock").withPayload(JSON_REQUEST).run().getMessage();
-        // compare the structure and values but not the attributes' order
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode actualJsonNode = mapper.readTree(getPayloadAsString(response));
-        JsonNode expectedJsonNode = mapper.readTree(JSON_RESPONSE);
-        assertThat(actualJsonNode, is(expectedJsonNode));
-    }
-
-    @Test
-    public void testFlowRefHandlingExceptionWithTransaction() throws Exception
-    {
-        MuleMessage response = flowRunner("transactionNotResolvedAfterException").withPayload(JSON_REQUEST).run().getMessage();
-        // compare the structure and values but not the attributes' order
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode actualJsonNode = mapper.readTree(getPayloadAsString(response));
-        JsonNode expectedJsonNode = mapper.readTree(JSON_RESPONSE);
-        assertThat(actualJsonNode, is(expectedJsonNode));
-    }
-
-    public static class VerifyTransactionNotResolvedProcessor implements MessageProcessor
-    {
-        @Override
-        public MuleEvent process(MuleEvent event) throws MuleException
-        {
-            Transaction tx = TransactionCoordination.getInstance().getTransaction();
-            assertThat(tx, IsNull.<Object>notNullValue());
-            assertThat(tx.isRollbackOnly(), Is.is(false));
-            return event;
-        }
-    }
+  }
 }

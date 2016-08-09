@@ -14,42 +14,43 @@ import org.mule.runtime.core.api.source.NonBlockingMessageSource;
 /**
  * Represents an listener for HTTP requests.
  */
-public interface HttpListener extends NonBlockingMessageSource, Lifecycle
-{
+public interface HttpListener extends NonBlockingMessageSource, Lifecycle {
 
-    /**
-     * @return the config for this listener.
-     */
-    public HttpListenerConfig getConfig();
+  /**
+   * @return the config for this listener.
+   */
+  public HttpListenerConfig getConfig();
 
-    /**
-     * Stops this listener. Any subsequent call made to the listener will return {@link org.mule.runtime.module.http.internal.listener.ServiceTemporarilyUnavailableListenerRequestHandler#SERVICE_TEMPORARILY_UNAVAILABLE_STATUS_CODE}.
-     *
-     * @throws MuleException if there's was a problem stopping the listener
-     */
-    public void stop() throws MuleException;
+  /**
+   * Stops this listener. Any subsequent call made to the listener will return
+   * {@link org.mule.runtime.module.http.internal.listener.ServiceTemporarilyUnavailableListenerRequestHandler#SERVICE_TEMPORARILY_UNAVAILABLE_STATUS_CODE}.
+   *
+   * @throws MuleException if there's was a problem stopping the listener
+   */
+  public void stop() throws MuleException;
 
-    /**
-     * Starts an stopped listener. The listener will start to accept requests again.
-     *
-     * @throws MuleException
-     */
-    public void start() throws MuleException;
+  /**
+   * Starts an stopped listener. The listener will start to accept requests again.
+   *
+   * @throws MuleException
+   */
+  public void start() throws MuleException;
 
-    /**
-     * Get rid of this listener. Subsequent call made to the listener will return {@link org.mule.runtime.module.http.internal.listener.NoListenerRequestHandler#RESOURCE_NOT_FOUND_STATUS_CODE} unless
-     * there's another listener which path matches the request criteria.
-     */
-    public void dispose();
+  /**
+   * Get rid of this listener. Subsequent call made to the listener will return
+   * {@link org.mule.runtime.module.http.internal.listener.NoListenerRequestHandler#RESOURCE_NOT_FOUND_STATUS_CODE} unless there's
+   * another listener which path matches the request criteria.
+   */
+  public void dispose();
 
-    /**
-     * @return the path in which this listener is listening for incoming requests
-     */
-    public String getPath();
+  /**
+   * @return the path in which this listener is listening for incoming requests
+   */
+  public String getPath();
 
-    /**
-     * @return the http methods that this listener can process.
-     */
-    public String[] getAllowedMethods();
+  /**
+   * @return the http methods that this listener can process.
+   */
+  public String[] getAllowedMethods();
 
 }

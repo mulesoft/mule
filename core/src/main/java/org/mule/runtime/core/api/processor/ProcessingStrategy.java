@@ -13,11 +13,8 @@ import java.util.List;
 /**
  * Determines how a list of message processors should processed.
  */
-public interface ProcessingStrategy
-{
+public interface ProcessingStrategy {
 
-    void configureProcessors(List<MessageProcessor> processors,
-                             org.mule.runtime.core.api.processor.StageNameSource nameSource,
-                             MessageProcessorChainBuilder chainBuilder,
-                             MuleContext muleContext);
+  void configureProcessors(List<MessageProcessor> processors, org.mule.runtime.core.api.processor.StageNameSource nameSource,
+                           MessageProcessorChainBuilder chainBuilder, MuleContext muleContext);
 }

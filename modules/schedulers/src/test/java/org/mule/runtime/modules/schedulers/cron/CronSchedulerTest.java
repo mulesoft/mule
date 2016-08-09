@@ -25,88 +25,77 @@ import java.util.TimeZone;
 import org.junit.Test;
 
 
-public class CronSchedulerTest  extends AbstractMuleContextTestCase
-{
+public class CronSchedulerTest extends AbstractMuleContextTestCase {
 
-    private Prober pollingProber = new PollingProber(1000, 0l);
+  private Prober pollingProber = new PollingProber(1000, 0l);
 
-    @Test
-    public void validateLifecycleHappyPath() throws MuleException
-    {
-        CronScheduler scheduler = createVoidScheduler();
+  @Test
+  public void validateLifecycleHappyPath() throws MuleException {
+    CronScheduler scheduler = createVoidScheduler();
 
-        scheduler.initialise();
-        scheduler.start();
-        scheduler.stop();
-        scheduler.dispose();
-    }
+    scheduler.initialise();
+    scheduler.start();
+    scheduler.stop();
+    scheduler.dispose();
+  }
 
-    @Test
-    public void stopAfterInitializeShouldNotFail() throws MuleException
-    {
-        CronScheduler scheduler = createVoidScheduler();
-        scheduler.initialise();
-        scheduler.stop();
-    }
+  @Test
+  public void stopAfterInitializeShouldNotFail() throws MuleException {
+    CronScheduler scheduler = createVoidScheduler();
+    scheduler.initialise();
+    scheduler.stop();
+  }
 
 
-    @Test
-    public void startAfterStopShouldNotFail() throws Exception
-    {
-        PollingWorker mockPollingWorker = mock(PollingWorker.class);
-        CronScheduler scheduler = createScheduler(mockPollingWorker);
+  @Test
+  public void startAfterStopShouldNotFail() throws Exception {
+    PollingWorker mockPollingWorker = mock(PollingWorker.class);
+    CronScheduler scheduler = createScheduler(mockPollingWorker);
 
-        scheduler.initialise();
-        scheduler.start();
-        scheduler.stop();
+    scheduler.initialise();
+    scheduler.start();
+    scheduler.stop();
 
-        reset(mockPollingWorker);
+    reset(mockPollingWorker);
 
-        verify(mockPollingWorker, never()).run();
+    verify(mockPollingWorker, never()).run();
 
-        scheduler.start();
-        scheduler.schedule();
+    scheduler.start();
+    scheduler.schedule();
 
-        pollingProber.check(new Probe()
-        {
-            @Override
-            public boolean isSatisfied()
-            {
-                try
-                {
-                    verify(mockPollingWorker, atLeastOnce()).run();
-                    return true;
-                }
-                catch (Exception e)
-                {
-                    throw new RuntimeException("unexpected exception from mock task");
-                }
-                catch (AssertionError e)
-                {
-                    return false;
-                }
-            }
+    pollingProber.check(new Probe() {
 
-            @Override
-            public String describeFailure()
-            {
-                return "The scheduler was never run";
-            }
-        });
-    }
+      @Override
+      public boolean isSatisfied() {
+        try {
+          verify(mockPollingWorker, atLeastOnce()).run();
+          return true;
+        } catch (Exception e) {
+          throw new RuntimeException("unexpected exception from mock task");
+        } catch (AssertionError e) {
+          return false;
+        }
+      }
 
-    private CronScheduler createVoidScheduler()
-    {
-        CronScheduler scheduler = new CronScheduler("name", new PollingWorker(mock(PollingTask.class), muleContext.getExceptionListener()), "0/1 * * * * ?", TimeZone.getDefault());
-        scheduler.setMuleContext(muleContext);
-        return scheduler;
-    }
+      @Override
+      public String describeFailure() {
+        return "The scheduler was never run";
+      }
+    });
+  }
 
-    private CronScheduler createScheduler(PollingWorker worker)
-    {
-        CronScheduler cronScheduler = new CronScheduler("name", worker, "0/1 * * * * ?", TimeZone.getDefault());
-        cronScheduler.setMuleContext(muleContext);
-        return cronScheduler;
-    }
+  private CronScheduler createVoidScheduler() {
+    CronScheduler scheduler =
+        new CronScheduler("name", new PollingWorker(mock(PollingTask.class), muleContext.getExceptionListener()), "0/1 * * * * ?",
+                          TimeZone.getDefault());
+    scheduler.setMuleContext(muleContext);
+    return scheduler;
+  }
+
+  private CronScheduler createScheduler(PollingWorker worker) {
+    CronScheduler cronScheduler = new CronScheduler("name", worker, "0/1 * * * * ?", TimeZone.getDefault());
+    cronScheduler.setMuleContext(muleContext);
+    return cronScheduler;
+  }
 
 }

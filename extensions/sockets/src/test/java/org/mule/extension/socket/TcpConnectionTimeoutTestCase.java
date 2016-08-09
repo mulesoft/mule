@@ -16,19 +16,17 @@ import java.net.SocketTimeoutException;
 
 import org.junit.Test;
 
-public class TcpConnectionTimeoutTestCase extends SocketExtensionTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "tcp-connection-timeout-config.xml";
-    }
+public class TcpConnectionTimeoutTestCase extends SocketExtensionTestCase {
 
-    @Test
-    public void socketConnectionTimeout() throws Exception
-    {
-        final Throwable throwable = catchThrowable(() -> flowRunner("tcp-connection-timeout").withPayload(TEST_STRING).run());
-        assertThat(throwable, is(instanceOf(MessagingException.class)));
-        assertThat(((MessagingException) throwable).getCauseException(), is(instanceOf(SocketTimeoutException.class)));
-    }
+  @Override
+  protected String getConfigFile() {
+    return "tcp-connection-timeout-config.xml";
+  }
+
+  @Test
+  public void socketConnectionTimeout() throws Exception {
+    final Throwable throwable = catchThrowable(() -> flowRunner("tcp-connection-timeout").withPayload(TEST_STRING).run());
+    assertThat(throwable, is(instanceOf(MessagingException.class)));
+    assertThat(((MessagingException) throwable).getCauseException(), is(instanceOf(SocketTimeoutException.class)));
+  }
 }

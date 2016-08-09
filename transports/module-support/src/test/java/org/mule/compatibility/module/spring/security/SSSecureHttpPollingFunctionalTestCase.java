@@ -8,16 +8,11 @@ package org.mule.compatibility.module.spring.security;
 
 import org.mule.runtime.module.spring.security.SecureHttpPollingFunctionalTestCase;
 
-public class SSSecureHttpPollingFunctionalTestCase extends SecureHttpPollingFunctionalTestCase
-{
+public class SSSecureHttpPollingFunctionalTestCase extends SecureHttpPollingFunctionalTestCase {
 
-    @Override
-    protected String[] getConfigFiles()
-    {
-        return new String[] {
-                             "spring-security/secure-http-polling-server-flow.xml",
-                "secure-http-polling-client-flow.xml"
-        };
-    }
+  @Override
+  protected String[] getConfigFiles() {
+    return new String[] {"spring-security/secure-http-polling-server-flow.xml", "secure-http-polling-client-flow.xml"};
+  }
 
 }

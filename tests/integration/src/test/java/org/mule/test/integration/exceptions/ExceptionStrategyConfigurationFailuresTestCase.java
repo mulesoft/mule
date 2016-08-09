@@ -36,122 +36,101 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
-public class ExceptionStrategyConfigurationFailuresTestCase extends AbstractMuleTestCase
-{
+public class ExceptionStrategyConfigurationFailuresTestCase extends AbstractMuleTestCase {
 
-    @Rule
-    public SystemProperty useXalan;
+  @Rule
+  public SystemProperty useXalan;
 
-    /**
-     * Verify that regardless of the XML library used, validation errors are handled correctly.
-     * @return
-     */
-    @Parameterized.Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][] {
-                {false},
-                {true}
-        });
+  /**
+   * Verify that regardless of the XML library used, validation errors are handled correctly.
+   * 
+   * @return
+   */
+  @Parameterized.Parameters
+  public static Collection<Object[]> parameters() {
+    return Arrays.asList(new Object[][] {{false}, {true}});
+  }
+
+  public ExceptionStrategyConfigurationFailuresTestCase(boolean isUseXalan) {
+    if (isUseXalan) {
+      useXalan = new ForceXalanTransformerFactory();
+    } else {
+      useXalan = null;
     }
+  }
 
-    public ExceptionStrategyConfigurationFailuresTestCase(boolean isUseXalan)
-    {
-        if (isUseXalan)
-        {
-            useXalan = new ForceXalanTransformerFactory();
+  @Test(expected = ConfigurationException.class)
+  public void testNamedFlowExceptionStrategyFails() throws Exception {
+    loadConfiguration("org/mule/test/integration/exceptions/named-flow-exception-strategy.xml");
+  }
+
+  // TODO MULE-10061 - Review once the MuleContext lifecycle is clearly definedWatermarkInvalidExpressionTestCase
+  @Test(expected = InitialisationException.class)
+  public void testReferenceExceptionStrategyAsGlobalExceptionStrategy() throws Exception {
+    loadConfiguration("org/mule/test/integration/exceptions/reference-global-exception-strategy.xml");
+  }
+
+  @Test(expected = ConfigurationException.class)
+  public void testChoiceExceptionStrategyCantHaveMiddleExceptionStrategyWithoutExpression() throws Exception {
+    loadConfiguration("org/mule/test/integration/exceptions/exception-strategy-in-choice-without-expression.xml");
+  }
+
+  @Test(expected = ConfigurationException.class)
+  public void testChoiceExceptionStrategyCantHaveDefaultExceptionStrategy() throws Exception {
+    loadConfiguration("org/mule/test/integration/exceptions/default-exception-strategy-in-choice.xml");
+  }
+
+  @Test(expected = ConfigurationException.class)
+  public void testDefaultEsFailsAsReferencedExceptionStrategy() throws Exception {
+    loadConfiguration("org/mule/test/integration/exceptions/default-es-as-referenced-exception-strategy.xml");
+  }
+
+  // TODO MULE-10061 - Review once the MuleContext lifecycle is clearly defined
+  @Test(expected = InitialisationException.class)
+  public void testDefaultExceptionStrategyReferencesNonExistentExceptionStrategy() throws Exception {
+    loadConfiguration("org/mule/test/integration/exceptions/default-exception-strategy-reference-non-existent-es.xml");
+  }
+
+  // TODO MULE-10061 - Review once the MuleContext lifecycle is clearly defined
+  @Test(expected = InitialisationException.class)
+  public void testDefaultExceptionStrategyReferencesExceptionStrategyWithExpression() throws Exception {
+    loadConfiguration("org/mule/test/integration/exceptions/default-exception-strategy-reference-has-expression.xml");
+  }
+
+  @Test(expected = ConfigurationException.class)
+  public void testChoiceExceptionStrategyWithMultipleHandleRedeliveryExceptionStrategies() throws Exception {
+    loadConfiguration("org/mule/test/integration/exceptions/choice-exception-strategy-multiple-rollback.xml");
+  }
+
+  @Test(expected = ConfigurationException.class)
+  public void testCatchExceptionStrategyWithWhenWithoutChoice() throws Exception {
+    loadConfiguration("org/mule/test/integration/exceptions/when-without-choice-in-catch-es.xml");
+  }
+
+  @Test(expected = ConfigurationException.class)
+  public void testRollbackExceptionStrategyWithWhenWithoutChoice() throws Exception {
+    loadConfiguration("org/mule/test/integration/exceptions/when-without-choice-in-rollback-es.xml");
+  }
+
+  private void loadConfiguration(String configuration) throws MuleException, InterruptedException {
+    MuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
+    List<ConfigurationBuilder> builders = new ArrayList<ConfigurationBuilder>();
+    builders.add(new SpringXmlConfigurationBuilder(configuration));
+    MuleContextBuilder contextBuilder = new DefaultMuleContextBuilder();
+    MuleContext muleContext = muleContextFactory.createMuleContext(builders, contextBuilder);
+    final AtomicReference<Latch> contextStartedLatch = new AtomicReference<Latch>();
+    contextStartedLatch.set(new Latch());
+    muleContext.registerListener(new MuleContextNotificationListener<MuleContextNotification>() {
+
+      @Override
+      public void onNotification(MuleContextNotification notification) {
+        if (notification.getAction() == MuleContextNotification.CONTEXT_STARTED) {
+          contextStartedLatch.get().countDown();
         }
-        else
-        {
-            useXalan = null;
-        }
-    }
-
-    @Test(expected = ConfigurationException.class)
-    public void testNamedFlowExceptionStrategyFails() throws Exception
-    {
-        loadConfiguration("org/mule/test/integration/exceptions/named-flow-exception-strategy.xml");
-    }
-
-    //TODO MULE-10061 - Review once the MuleContext lifecycle is clearly definedWatermarkInvalidExpressionTestCase
-    @Test(expected = InitialisationException.class)
-    public void testReferenceExceptionStrategyAsGlobalExceptionStrategy() throws Exception
-    {
-        loadConfiguration("org/mule/test/integration/exceptions/reference-global-exception-strategy.xml");
-    }
-
-    @Test(expected = ConfigurationException.class)
-    public void testChoiceExceptionStrategyCantHaveMiddleExceptionStrategyWithoutExpression() throws Exception
-    {
-        loadConfiguration("org/mule/test/integration/exceptions/exception-strategy-in-choice-without-expression.xml");
-    }
-
-    @Test(expected = ConfigurationException.class)
-    public void testChoiceExceptionStrategyCantHaveDefaultExceptionStrategy() throws Exception
-    {
-        loadConfiguration("org/mule/test/integration/exceptions/default-exception-strategy-in-choice.xml");
-    }
-
-    @Test(expected = ConfigurationException.class)
-    public void testDefaultEsFailsAsReferencedExceptionStrategy() throws Exception
-    {
-        loadConfiguration("org/mule/test/integration/exceptions/default-es-as-referenced-exception-strategy.xml");
-    }
-
-    //TODO MULE-10061 - Review once the MuleContext lifecycle is clearly defined
-    @Test(expected = InitialisationException.class)
-    public void testDefaultExceptionStrategyReferencesNonExistentExceptionStrategy() throws Exception
-    {
-        loadConfiguration("org/mule/test/integration/exceptions/default-exception-strategy-reference-non-existent-es.xml");
-    }
-
-    //TODO MULE-10061 - Review once the MuleContext lifecycle is clearly defined
-    @Test(expected = InitialisationException.class)
-    public void testDefaultExceptionStrategyReferencesExceptionStrategyWithExpression() throws Exception
-    {
-        loadConfiguration("org/mule/test/integration/exceptions/default-exception-strategy-reference-has-expression.xml");
-    }
-
-    @Test(expected = ConfigurationException.class)
-    public void testChoiceExceptionStrategyWithMultipleHandleRedeliveryExceptionStrategies() throws Exception
-    {
-        loadConfiguration("org/mule/test/integration/exceptions/choice-exception-strategy-multiple-rollback.xml");
-    }
-
-    @Test(expected = ConfigurationException.class)
-    public void testCatchExceptionStrategyWithWhenWithoutChoice() throws Exception
-    {
-        loadConfiguration("org/mule/test/integration/exceptions/when-without-choice-in-catch-es.xml");
-    }
-
-    @Test(expected = ConfigurationException.class)
-    public void testRollbackExceptionStrategyWithWhenWithoutChoice() throws Exception
-    {
-        loadConfiguration("org/mule/test/integration/exceptions/when-without-choice-in-rollback-es.xml");
-    }
-
-    private void loadConfiguration(String configuration) throws MuleException, InterruptedException
-    {
-        MuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
-        List<ConfigurationBuilder> builders = new ArrayList<ConfigurationBuilder>();
-        builders.add(new SpringXmlConfigurationBuilder(configuration));
-        MuleContextBuilder contextBuilder = new DefaultMuleContextBuilder();
-        MuleContext muleContext = muleContextFactory.createMuleContext(builders, contextBuilder);
-        final AtomicReference<Latch> contextStartedLatch = new AtomicReference<Latch>();
-        contextStartedLatch.set(new Latch());
-        muleContext.registerListener(new MuleContextNotificationListener<MuleContextNotification>()
-        {
-            @Override
-            public void onNotification(MuleContextNotification notification)
-            {
-                if (notification.getAction() == MuleContextNotification.CONTEXT_STARTED)
-                {
-                    contextStartedLatch.get().countDown();
-                }
-            }
-        });
-        muleContext.start();
-        contextStartedLatch.get().await(20, TimeUnit.SECONDS);
-    }
+      }
+    });
+    muleContext.start();
+    contextStartedLatch.get().await(20, TimeUnit.SECONDS);
+  }
 
 }

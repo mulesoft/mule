@@ -10,11 +10,10 @@ import org.mule.runtime.core.context.notification.MuleContextNotification;
 
 
 /**
- * <code>MuleContextNotificationListener</code> is an observer interface that objects
- * can implement and then register themselves with the Mule manager to be notified
- * when a Manager event occurs.
+ * <code>MuleContextNotificationListener</code> is an observer interface that objects can implement and then register themselves
+ * with the Mule manager to be notified when a Manager event occurs.
  */
-public interface MuleContextNotificationListener<T extends MuleContextNotification> extends ServerNotificationListener<MuleContextNotification>
-{
-    // no methods
+public interface MuleContextNotificationListener<T extends MuleContextNotification>
+    extends ServerNotificationListener<MuleContextNotification> {
+  // no methods
 }

@@ -34,38 +34,35 @@ import org.junit.Before;
 import org.junit.Test;
 
 @SmallTest
-public class ExtensionManifestGeneratorTestCase extends AbstractGeneratedResourceFactoryTestCase
-{
+public class ExtensionManifestGeneratorTestCase extends AbstractGeneratedResourceFactoryTestCase {
 
-    private ExtensionManifestGenerator generator = new ExtensionManifestGenerator();
+  private ExtensionManifestGenerator generator = new ExtensionManifestGenerator();
 
-    private ExtensionModel extensionModel;
+  private ExtensionModel extensionModel;
 
-    @Before
-    public void before()
-    {
-        Describer describer = new AnnotationsBasedDescriber(HeisenbergExtension.class, new StaticVersionResolver(getProductVersion()));
-        ExtensionFactory extensionFactory = new DefaultExtensionFactory(new SpiServiceRegistry(), getClass().getClassLoader());
-        final DescribingContext context = new DefaultDescribingContext(getClass().getClassLoader());
+  @Before
+  public void before() {
+    Describer describer =
+        new AnnotationsBasedDescriber(HeisenbergExtension.class, new StaticVersionResolver(getProductVersion()));
+    ExtensionFactory extensionFactory = new DefaultExtensionFactory(new SpiServiceRegistry(), getClass().getClassLoader());
+    final DescribingContext context = new DefaultDescribingContext(getClass().getClassLoader());
 
-        extensionModel = extensionFactory.createFrom(describer.describe(context), context);
-    }
+    extensionModel = extensionFactory.createFrom(describer.describe(context), context);
+  }
 
-    @Override
-    protected Class<? extends GeneratedResourceFactory>[] getResourceFactoryTypes()
-    {
-        return new Class[] {ExtensionManifestGenerator.class};
-    }
+  @Override
+  protected Class<? extends GeneratedResourceFactory>[] getResourceFactoryTypes() {
+    return new Class[] {ExtensionManifestGenerator.class};
+  }
 
-    @Test
-    public void generate() throws Exception
-    {
-        InputStream in = getClass().getResourceAsStream("/heisenberg-test-manifest.xml");
-        assertThat(in, is(notNullValue()));
-        String expectedSchema = IOUtils.toString(in);
-        Optional<GeneratedResource> resource = generator.generateResource(extensionModel);
-        assertThat(resource.isPresent(), is(true));
+  @Test
+  public void generate() throws Exception {
+    InputStream in = getClass().getResourceAsStream("/heisenberg-test-manifest.xml");
+    assertThat(in, is(notNullValue()));
+    String expectedSchema = IOUtils.toString(in);
+    Optional<GeneratedResource> resource = generator.generateResource(extensionModel);
+    assertThat(resource.isPresent(), is(true));
 
-        compareXML(expectedSchema, new String(resource.get().getContent()));
-    }
+    compareXML(expectedSchema, new String(resource.get().getContent()));
+  }
 }

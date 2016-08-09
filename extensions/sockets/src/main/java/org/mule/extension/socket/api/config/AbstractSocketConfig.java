@@ -22,36 +22,33 @@ import javax.inject.Inject;
 
 /**
  * Abstract config for {@link SocketsExtension}
+ * 
  * @since 4.0
  */
-public class AbstractSocketConfig implements Initialisable
-{
+public class AbstractSocketConfig implements Initialisable {
 
-    @Inject
-    private MuleContext muleContext;
+  @Inject
+  private MuleContext muleContext;
 
-    /**
-     * Default encoding used for serializing {@link String}. This encoding is used in
-     * {@link SocketOperations#send(RequesterConnection, RequesterConfig, Object, String, String, MuleMessage)} operation
-     * for serializing {@link String} types if no encoding parameter is specified.
-     *
-     * It is also used by the {@link SocketWorker} for encoding the replies send by the {@link SocketListener} source.
-     */
-    @Parameter
-    @Optional
-    private String defaultEncoding;
+  /**
+   * Default encoding used for serializing {@link String}. This encoding is used in
+   * {@link SocketOperations#send(RequesterConnection, RequesterConfig, Object, String, String, MuleMessage)} operation for
+   * serializing {@link String} types if no encoding parameter is specified.
+   *
+   * It is also used by the {@link SocketWorker} for encoding the replies send by the {@link SocketListener} source.
+   */
+  @Parameter
+  @Optional
+  private String defaultEncoding;
 
-    public String getDefaultEncoding()
-    {
-        return defaultEncoding;
+  public String getDefaultEncoding() {
+    return defaultEncoding;
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    if (defaultEncoding == null) {
+      defaultEncoding = muleContext.getConfiguration().getDefaultEncoding();
     }
-
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        if (defaultEncoding == null)
-        {
-            defaultEncoding = muleContext.getConfiguration().getDefaultEncoding();
-        }
-    }
+  }
 }

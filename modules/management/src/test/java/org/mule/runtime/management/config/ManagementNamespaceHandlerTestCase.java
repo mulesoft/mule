@@ -24,58 +24,55 @@ import java.util.Iterator;
 
 import org.junit.Test;
 
-public class ManagementNamespaceHandlerTestCase extends FunctionalTestCase
-{
-    private static final int CHAINSAW_PORT = 8080;
+public class ManagementNamespaceHandlerTestCase extends FunctionalTestCase {
 
-    public ManagementNamespaceHandlerTestCase()
-    {
-        super();
-        // do not start the muleContext, we're only doing registry lookups in this test case
-        setStartContext(false);
-    }
+  private static final int CHAINSAW_PORT = 8080;
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "management-namespace-config.xml";
-    }
+  public ManagementNamespaceHandlerTestCase() {
+    super();
+    // do not start the muleContext, we're only doing registry lookups in this test case
+    setStartContext(false);
+  }
 
-    @Test
-    public void testSimpleJmxAgentConfig() throws Exception
-    {
-        Agent agent = muleContext.getRegistry().lookupObject(JmxApplicationAgent.class);
-        assertNotNull(agent);
-        assertEquals(JmxApplicationAgent.class, agent.getClass());
-        JmxApplicationAgent jmxAgent = (JmxApplicationAgent) agent;
-        assertFalse(jmxAgent.isCreateServer());
-        assertTrue(jmxAgent.isLocateServer());
-        assertTrue(jmxAgent.isEnableStatistics());
-        assertEquals("some://test.url", jmxAgent.getConnectorServerUrl());
+  @Override
+  protected String getConfigFile() {
+    return "management-namespace-config.xml";
+  }
 
-        agent = muleContext.getRegistry().lookupAgent("jmx-log4j");
-        assertNotNull(agent);
-        assertEquals(Log4jAgent.class, agent.getClass());
+  @Test
+  public void testSimpleJmxAgentConfig() throws Exception {
+    Agent agent = muleContext.getRegistry().lookupObject(JmxApplicationAgent.class);
+    assertNotNull(agent);
+    assertEquals(JmxApplicationAgent.class, agent.getClass());
+    JmxApplicationAgent jmxAgent = (JmxApplicationAgent) agent;
+    assertFalse(jmxAgent.isCreateServer());
+    assertTrue(jmxAgent.isLocateServer());
+    assertTrue(jmxAgent.isEnableStatistics());
+    assertEquals("some://test.url", jmxAgent.getConnectorServerUrl());
 
-        agent = muleContext.getRegistry().lookupAgent("jmx-mx4j-adaptor");
-        assertNotNull(agent);
-        assertEquals(Mx4jAgent.class, agent.getClass());
-        Mx4jAgent mx4jAgent = (Mx4jAgent) agent;
-        assertEquals(mx4jAgent.getJmxAdaptorUrl(), "http://127.0.0.1:8000");
+    agent = muleContext.getRegistry().lookupAgent("jmx-log4j");
+    assertNotNull(agent);
+    assertEquals(Log4jAgent.class, agent.getClass());
 
-        agent = muleContext.getRegistry().lookupAgent("jmx-notifications");
-        assertNotNull(agent);
-        assertEquals(JmxServerNotificationAgent.class, agent.getClass());
+    agent = muleContext.getRegistry().lookupAgent("jmx-mx4j-adaptor");
+    assertNotNull(agent);
+    assertEquals(Mx4jAgent.class, agent.getClass());
+    Mx4jAgent mx4jAgent = (Mx4jAgent) agent;
+    assertEquals(mx4jAgent.getJmxAdaptorUrl(), "http://127.0.0.1:8000");
 
-        agent = muleContext.getRegistry().lookupAgent("test-custom-agent");
-        assertNotNull(agent);
-        assertEquals(TestAgent.class, agent.getClass());
-        assertEquals("woggle", ((TestAgent) agent).getFrobbit());
+    agent = muleContext.getRegistry().lookupAgent("jmx-notifications");
+    assertNotNull(agent);
+    assertEquals(JmxServerNotificationAgent.class, agent.getClass());
 
-        // needs profiler installed
-//        agent = muleContext.getRegistry().lookupAgent("yourkit-profiler");
-//        assertNotNull(agent);
-//        assertEquals(YourKitProfilerAgent.class, agent.getClass());
-    }
+    agent = muleContext.getRegistry().lookupAgent("test-custom-agent");
+    assertNotNull(agent);
+    assertEquals(TestAgent.class, agent.getClass());
+    assertEquals("woggle", ((TestAgent) agent).getFrobbit());
+
+    // needs profiler installed
+    // agent = muleContext.getRegistry().lookupAgent("yourkit-profiler");
+    // assertNotNull(agent);
+    // assertEquals(YourKitProfilerAgent.class, agent.getClass());
+  }
 
 }

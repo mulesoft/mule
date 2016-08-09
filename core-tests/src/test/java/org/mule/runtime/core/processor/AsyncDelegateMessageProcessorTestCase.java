@@ -34,182 +34,154 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 
-public class AsyncDelegateMessageProcessorTestCase extends AbstractMuleContextTestCase
-        implements ExceptionListener
-{
+public class AsyncDelegateMessageProcessorTestCase extends AbstractMuleContextTestCase implements ExceptionListener {
 
-    protected AsyncDelegateMessageProcessor messageProcessor;
-    protected TestListener target = new TestListener();
-    protected Exception exceptionThrown;
-    protected Latch latch = new Latch();
+  protected AsyncDelegateMessageProcessor messageProcessor;
+  protected TestListener target = new TestListener();
+  protected Exception exceptionThrown;
+  protected Latch latch = new Latch();
 
-    public AsyncDelegateMessageProcessorTestCase()
-    {
-        setStartContext(true);
+  public AsyncDelegateMessageProcessorTestCase() {
+    setStartContext(true);
+  }
+
+  @Override
+  protected void doSetUp() throws Exception {
+    super.doSetUp();
+    messageProcessor = createAsyncDelegatMessageProcessor(target);
+    messageProcessor.initialise();
+    messageProcessor.start();
+  }
+
+  @Test
+  public void testProcessOneWay() throws Exception {
+    MuleEvent event = getTestEvent(TEST_MESSAGE);
+
+    MuleEvent result = messageProcessor.process(event);
+
+    latch.await(10000, TimeUnit.MILLISECONDS);
+    assertNotNull(target.sensedEvent);
+    // Event is not the same because it gets copied in
+    // AbstractMuleEventWork#run()
+    assertNotSame(event, target.sensedEvent);
+    assertEquals(event.getMessageAsString(), target.sensedEvent.getMessageAsString());
+
+    assertSame(VoidMuleEvent.getInstance(), result);
+    assertNull(exceptionThrown);
+    assertNotSame(Thread.currentThread(), target.thread);
+
+    messageProcessor.stop();
+    messageProcessor.dispose();
+  }
+
+  @Test
+  public void testProcessRequestResponse() throws Exception {
+    MuleEvent event = getTestEvent(TEST_MESSAGE);
+
+    MuleEvent result = messageProcessor.process(event);
+
+    latch.await(10000, TimeUnit.MILLISECONDS);
+    assertNotNull(target.sensedEvent);
+    // Event is not the same because it gets copied in
+    // AbstractMuleEventWork#run()
+    assertNotSame(event, target.sensedEvent);
+    assertEquals(event.getMessageAsString(), target.sensedEvent.getMessageAsString());
+
+    assertSame(VoidMuleEvent.getInstance(), result);
+    assertNull(exceptionThrown);
+    assertNotSame(Thread.currentThread(), target.thread);
+
+    messageProcessor.stop();
+    messageProcessor.dispose();
+  }
+
+  @Test
+  public void testProcessOneWayWithTx() throws Exception {
+    MuleEvent event = getTestEvent(TEST_MESSAGE);
+    Transaction transaction = new TestTransaction(muleContext);
+    TransactionCoordination.getInstance().bindTransaction(transaction);
+
+    try {
+      messageProcessor.process(event);
+      fail("Exception expected");
+    } catch (Exception e) {
+      assertTrue(e instanceof MessagingException);
+      assertNull(target.sensedEvent);
+    } finally {
+      TransactionCoordination.getInstance().unbindTransaction(transaction);
     }
+  }
+
+  @Test
+  public void testProcessRequestResponseWithTx() throws Exception {
+    MuleEvent event = getTestEvent(TEST_MESSAGE);
+    Transaction transaction = new TestTransaction(muleContext);
+    TransactionCoordination.getInstance().bindTransaction(transaction);
+
+    try {
+      assertAsync(messageProcessor, event);
+      fail("Exception expected");
+    } catch (Exception e) {
+    } finally {
+      TransactionCoordination.getInstance().unbindTransaction(transaction);
+    }
+  }
+
+  protected void assertSync(MessageProcessor processor, MuleEvent event) throws MuleException {
+    MuleEvent result = processor.process(event);
+
+    assertSame(event, target.sensedEvent);
+    assertSame(event, result);
+  }
+
+  protected void assertAsync(MessageProcessor processor, MuleEvent event) throws MuleException, InterruptedException {
+    MuleEvent result = processor.process(event);
+
+    latch.await(10000, TimeUnit.MILLISECONDS);
+    assertNotNull(target.sensedEvent);
+    // Event is not the same because it gets copied in
+    // AbstractMuleEventWork#run()
+    assertNotSame(event, target.sensedEvent);
+    assertEquals(event.getMessageAsString(), target.sensedEvent.getMessageAsString());
+
+    assertNull(result);
+    assertNull(exceptionThrown);
+  }
+
+  protected AsyncDelegateMessageProcessor createAsyncDelegatMessageProcessor(MessageProcessor listener) throws Exception {
+    AsyncDelegateMessageProcessor mp =
+        new AsyncDelegateMessageProcessor(listener, new AsynchronousProcessingStrategy(), "thread");
+    mp.setMuleContext(muleContext);
+    mp.setFlowConstruct(new Flow("flow", muleContext));
+    mp.initialise();
+    return mp;
+  }
+
+  class TestListener implements MessageProcessor {
+
+    MuleEvent sensedEvent;
+    Thread thread;
 
     @Override
-    protected void doSetUp() throws Exception
-    {
-        super.doSetUp();
-        messageProcessor = createAsyncDelegatMessageProcessor(target);
-        messageProcessor.initialise();
-        messageProcessor.start();
+    public MuleEvent process(MuleEvent event) throws MuleException {
+      sensedEvent = event;
+      thread = Thread.currentThread();
+      latch.countDown();
+      return event;
     }
+  }
 
-    @Test
-    public void testProcessOneWay() throws Exception
-    {
-        MuleEvent event = getTestEvent(TEST_MESSAGE);
+  @Override
+  public void exceptionThrown(Exception e) {
+    exceptionThrown = e;
+  }
 
-        MuleEvent result = messageProcessor.process(event);
-
-        latch.await(10000, TimeUnit.MILLISECONDS);
-        assertNotNull(target.sensedEvent);
-        // Event is not the same because it gets copied in
-        // AbstractMuleEventWork#run()
-        assertNotSame(event, target.sensedEvent);
-        assertEquals(event.getMessageAsString(), target.sensedEvent.getMessageAsString());
-
-        assertSame(VoidMuleEvent.getInstance(), result);
-        assertNull(exceptionThrown);
-        assertNotSame(Thread.currentThread(), target.thread);
-
-        messageProcessor.stop();
-        messageProcessor.dispose();
-    }
-
-    @Test
-    public void testProcessRequestResponse() throws Exception
-    {
-        MuleEvent event = getTestEvent(TEST_MESSAGE);
-
-        MuleEvent result = messageProcessor.process(event);
-
-        latch.await(10000, TimeUnit.MILLISECONDS);
-        assertNotNull(target.sensedEvent);
-        // Event is not the same because it gets copied in
-        // AbstractMuleEventWork#run()
-        assertNotSame(event, target.sensedEvent);
-        assertEquals(event.getMessageAsString(), target.sensedEvent.getMessageAsString());
-
-        assertSame(VoidMuleEvent.getInstance(), result);
-        assertNull(exceptionThrown);
-        assertNotSame(Thread.currentThread(), target.thread);
-
-        messageProcessor.stop();
-        messageProcessor.dispose();
-    }
-
-    @Test
-    public void testProcessOneWayWithTx() throws Exception
-    {
-        MuleEvent event = getTestEvent(TEST_MESSAGE);
-        Transaction transaction = new TestTransaction(muleContext);
-        TransactionCoordination.getInstance().bindTransaction(transaction);
-
-        try
-        {
-            messageProcessor.process(event);
-            fail("Exception expected");
-        }
-        catch (Exception e)
-        {
-            assertTrue(e instanceof MessagingException);
-            assertNull(target.sensedEvent);
-        }
-        finally
-        {
-            TransactionCoordination.getInstance().unbindTransaction(transaction);
-        }
-    }
-
-    @Test
-    public void testProcessRequestResponseWithTx() throws Exception
-    {
-        MuleEvent event = getTestEvent(TEST_MESSAGE);
-        Transaction transaction = new TestTransaction(muleContext);
-        TransactionCoordination.getInstance().bindTransaction(transaction);
-
-        try
-        {
-            assertAsync(messageProcessor, event);
-            fail("Exception expected");
-        }
-        catch (Exception e)
-        {
-        }
-        finally
-        {
-            TransactionCoordination.getInstance().unbindTransaction(transaction);
-        }
-    }
-
-    protected void assertSync(MessageProcessor processor, MuleEvent event) throws MuleException
-    {
-        MuleEvent result = processor.process(event);
-
-        assertSame(event, target.sensedEvent);
-        assertSame(event, result);
-    }
-
-    protected void assertAsync(MessageProcessor processor, MuleEvent event)
-            throws MuleException, InterruptedException
-    {
-        MuleEvent result = processor.process(event);
-
-        latch.await(10000, TimeUnit.MILLISECONDS);
-        assertNotNull(target.sensedEvent);
-        // Event is not the same because it gets copied in
-        // AbstractMuleEventWork#run()
-        assertNotSame(event, target.sensedEvent);
-        assertEquals(event.getMessageAsString(), target.sensedEvent.getMessageAsString());
-
-        assertNull(result);
-        assertNull(exceptionThrown);
-    }
-
-    protected AsyncDelegateMessageProcessor createAsyncDelegatMessageProcessor(MessageProcessor listener)
-            throws Exception
-    {
-        AsyncDelegateMessageProcessor mp = new AsyncDelegateMessageProcessor(listener,
-                                                                             new AsynchronousProcessingStrategy(), "thread");
-        mp.setMuleContext(muleContext);
-        mp.setFlowConstruct(new Flow("flow", muleContext));
-        mp.initialise();
-        return mp;
-    }
-
-    class TestListener implements MessageProcessor
-    {
-
-        MuleEvent sensedEvent;
-        Thread thread;
-
-        @Override
-        public MuleEvent process(MuleEvent event) throws MuleException
-        {
-            sensedEvent = event;
-            thread = Thread.currentThread();
-            latch.countDown();
-            return event;
-        }
-    }
+  class TestWorkManagerSource implements WorkManagerSource {
 
     @Override
-    public void exceptionThrown(Exception e)
-    {
-        exceptionThrown = e;
+    public WorkManager getWorkManager() throws MuleException {
+      return muleContext.getWorkManager();
     }
-
-    class TestWorkManagerSource implements WorkManagerSource
-    {
-
-        @Override
-        public WorkManager getWorkManager() throws MuleException
-        {
-            return muleContext.getWorkManager();
-        }
-    }
+  }
 
 }

@@ -16,27 +16,24 @@ import org.mule.runtime.core.api.MuleException;
 
 import org.junit.Test;
 
-public class MuleClientStandaloneTestCase extends AbstractMuleClientTestCase
-{
+public class MuleClientStandaloneTestCase extends AbstractMuleClientTestCase {
 
-    @Override
-    protected MuleContext createMuleContext() throws Exception
-    {
-        return null;
-    }
+  @Override
+  protected MuleContext createMuleContext() throws Exception {
+    return null;
+  }
 
-    @Test
-    public void testCreateMuleClient() throws MuleException
-    {
-        MuleClient muleClient = new MuleClient();
-        assertNotSame(muleContext, muleClient.getMuleContext());
-        assertTrue(muleClient.getMuleContext().isInitialised());
-        assertTrue(muleClient.getMuleContext().isStarted());
-        muleClient.dispatch("test://test", "message", null);
-        muleClient.send("test://test", "message", null);
-        muleClient.dispose();
-        assertFalse(muleClient.getMuleContext().isInitialised());
-        assertFalse(muleClient.getMuleContext().isStarted());
-    }
+  @Test
+  public void testCreateMuleClient() throws MuleException {
+    MuleClient muleClient = new MuleClient();
+    assertNotSame(muleContext, muleClient.getMuleContext());
+    assertTrue(muleClient.getMuleContext().isInitialised());
+    assertTrue(muleClient.getMuleContext().isStarted());
+    muleClient.dispatch("test://test", "message", null);
+    muleClient.send("test://test", "message", null);
+    muleClient.dispose();
+    assertFalse(muleClient.getMuleContext().isInitialised());
+    assertFalse(muleClient.getMuleContext().isStarted());
+  }
 
 }

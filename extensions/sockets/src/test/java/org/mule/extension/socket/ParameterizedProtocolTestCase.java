@@ -21,37 +21,30 @@ import org.junit.runners.Parameterized;
  * Base clase for common tests across all the {@link TcpProtocol} implementations
  */
 @RunnerDelegateTo(Parameterized.class)
-public abstract class ParameterizedProtocolTestCase extends SocketExtensionTestCase
-{
+public abstract class ParameterizedProtocolTestCase extends SocketExtensionTestCase {
 
-    @Parameterized.Parameter(0)
-    public String testName;
+  @Parameterized.Parameter(0)
+  public String testName;
 
-    @Parameterized.Parameter(1)
-    public String protocolBeanName;
+  @Parameterized.Parameter(1)
+  public String protocolBeanName;
 
-    @Parameterized.Parameters(name = "{0}")
-    public static Collection<Object[]> data()
-    {
-        return Arrays.asList(new Object[][] {
-                {LengthProtocol.class.getSimpleName(), "length"},
-                {DirectProtocol.class.getSimpleName(), "direct"},
-                {SafeProtocol.class.getSimpleName(), "safe"},
-        });
-    }
+  @Parameterized.Parameters(name = "{0}")
+  public static Collection<Object[]> data() {
+    return Arrays.asList(new Object[][] {{LengthProtocol.class.getSimpleName(), "length"},
+        {DirectProtocol.class.getSimpleName(), "direct"}, {SafeProtocol.class.getSimpleName(), "safe"},});
+  }
 
-    @Override
-    protected void doSetUpBeforeMuleContextCreation() throws Exception
-    {
-        super.doSetUpBeforeMuleContextCreation();
-        System.setProperty("protocol", protocolBeanName);
-    }
+  @Override
+  protected void doSetUpBeforeMuleContextCreation() throws Exception {
+    super.doSetUpBeforeMuleContextCreation();
+    System.setProperty("protocol", protocolBeanName);
+  }
 
-    @Override
-    protected void doTearDown() throws Exception
-    {
-        System.clearProperty("protocol");
-        super.doTearDown();
-    }
+  @Override
+  protected void doTearDown() throws Exception {
+    System.clearProperty("protocol");
+    super.doTearDown();
+  }
 
 }

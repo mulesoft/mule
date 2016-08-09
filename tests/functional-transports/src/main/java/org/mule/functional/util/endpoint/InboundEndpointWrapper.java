@@ -30,213 +30,177 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Wraps an {@link InboundEndpoint} enabling subclasses to override only those
- * methods which add extra behaviour.
+ * Wraps an {@link InboundEndpoint} enabling subclasses to override only those methods which add extra behaviour.
  */
-public abstract class InboundEndpointWrapper implements InboundEndpoint
-{
+public abstract class InboundEndpointWrapper implements InboundEndpoint {
 
-    private InboundEndpoint delegate;
+  private InboundEndpoint delegate;
 
-    public InboundEndpointWrapper(InboundEndpoint delegate)
-    {
-        this.delegate = delegate;
-    }
+  public InboundEndpointWrapper(InboundEndpoint delegate) {
+    this.delegate = delegate;
+  }
 
-    @Override
-    public AbstractRedeliveryPolicy createDefaultRedeliveryPolicy(int maxRedelivery)
-    {
-        return delegate.createDefaultRedeliveryPolicy(maxRedelivery);
-    }
+  @Override
+  public AbstractRedeliveryPolicy createDefaultRedeliveryPolicy(int maxRedelivery) {
+    return delegate.createDefaultRedeliveryPolicy(maxRedelivery);
+  }
 
-    @Override
-    public void setFlowConstruct(FlowConstruct flowConstruct)
-    {
-        delegate.setFlowConstruct(flowConstruct);
-    }
+  @Override
+  public void setFlowConstruct(FlowConstruct flowConstruct) {
+    delegate.setFlowConstruct(flowConstruct);
+  }
 
-    @Override
-    public EndpointURI getEndpointURI()
-    {
-        return delegate.getEndpointURI();
-    }
+  @Override
+  public EndpointURI getEndpointURI() {
+    return delegate.getEndpointURI();
+  }
 
-    @Override
-    public String getAddress()
-    {
-        return delegate.getAddress();
-    }
+  @Override
+  public String getAddress() {
+    return delegate.getAddress();
+  }
 
-    @Override
-    public Charset getEncoding()
-    {
-        return delegate.getEncoding();
-    }
+  @Override
+  public Charset getEncoding() {
+    return delegate.getEncoding();
+  }
 
-    @Override
-    public Connector getConnector()
-    {
-        return delegate.getConnector();
-    }
+  @Override
+  public Connector getConnector() {
+    return delegate.getConnector();
+  }
 
-    @Override
-    public Map<String, Serializable> getProperties()
-    {
-        return delegate.getProperties();
-    }
+  @Override
+  public Map<String, Serializable> getProperties() {
+    return delegate.getProperties();
+  }
 
-    @Override
-    public Serializable getProperty(Object key)
-    {
-        return delegate.getProperty(key);
-    }
+  @Override
+  public Serializable getProperty(Object key) {
+    return delegate.getProperty(key);
+  }
 
-    @Override
-    public String getProtocol()
-    {
-        return delegate.getProtocol();
-    }
+  @Override
+  public String getProtocol() {
+    return delegate.getProtocol();
+  }
 
-    @Override
-    public boolean isReadOnly()
-    {
-        return delegate.isReadOnly();
-    }
+  @Override
+  public boolean isReadOnly() {
+    return delegate.isReadOnly();
+  }
 
-    @Override
-    public TransactionConfig getTransactionConfig()
-    {
-        return delegate.getTransactionConfig();
-    }
+  @Override
+  public TransactionConfig getTransactionConfig() {
+    return delegate.getTransactionConfig();
+  }
 
-    @Override
-    public Filter getFilter()
-    {
-        return delegate.getFilter();
-    }
+  @Override
+  public Filter getFilter() {
+    return delegate.getFilter();
+  }
 
-    @Override
-    public boolean isDeleteUnacceptedMessages()
-    {
-        return delegate.isDeleteUnacceptedMessages();
-    }
+  @Override
+  public boolean isDeleteUnacceptedMessages() {
+    return delegate.isDeleteUnacceptedMessages();
+  }
 
-    @Override
-    public EndpointSecurityFilter getSecurityFilter()
-    {
-        return delegate.getSecurityFilter();
-    }
+  @Override
+  public EndpointSecurityFilter getSecurityFilter() {
+    return delegate.getSecurityFilter();
+  }
 
-    @Override
-    public EndpointMessageProcessorChainFactory getMessageProcessorsFactory()
-    {
-        return delegate.getMessageProcessorsFactory();
-    }
+  @Override
+  public EndpointMessageProcessorChainFactory getMessageProcessorsFactory() {
+    return delegate.getMessageProcessorsFactory();
+  }
 
-    @Override
-    public List<MessageProcessor> getMessageProcessors()
-    {
-        return delegate.getMessageProcessors();
-    }
+  @Override
+  public List<MessageProcessor> getMessageProcessors() {
+    return delegate.getMessageProcessors();
+  }
 
-    @Override
-    public List<MessageProcessor> getResponseMessageProcessors()
-    {
-        return delegate.getResponseMessageProcessors();
-    }
+  @Override
+  public List<MessageProcessor> getResponseMessageProcessors() {
+    return delegate.getResponseMessageProcessors();
+  }
 
-    @Override
-    public MessageExchangePattern getExchangePattern()
-    {
-        return delegate.getExchangePattern();
-    }
+  @Override
+  public MessageExchangePattern getExchangePattern() {
+    return delegate.getExchangePattern();
+  }
 
-    @Override
-    public int getResponseTimeout()
-    {
-        return delegate.getResponseTimeout();
-    }
+  @Override
+  public int getResponseTimeout() {
+    return delegate.getResponseTimeout();
+  }
 
-    @Override
-    public String getInitialState()
-    {
-        return delegate.getInitialState();
-    }
+  @Override
+  public String getInitialState() {
+    return delegate.getInitialState();
+  }
 
-    @Override
-    public MuleContext getMuleContext()
-    {
-        return delegate.getMuleContext();
-    }
+  @Override
+  public MuleContext getMuleContext() {
+    return delegate.getMuleContext();
+  }
 
-    @Override
-    public RetryPolicyTemplate getRetryPolicyTemplate()
-    {
-        return delegate.getRetryPolicyTemplate();
-    }
+  @Override
+  public RetryPolicyTemplate getRetryPolicyTemplate() {
+    return delegate.getRetryPolicyTemplate();
+  }
 
-    @Override
-    public String getEndpointBuilderName()
-    {
-        return delegate.getEndpointBuilderName();
-    }
+  @Override
+  public String getEndpointBuilderName() {
+    return delegate.getEndpointBuilderName();
+  }
 
-    @Override
-    public boolean isProtocolSupported(String protocol)
-    {
-        return delegate.isProtocolSupported(protocol);
-    }
+  @Override
+  public boolean isProtocolSupported(String protocol) {
+    return delegate.isProtocolSupported(protocol);
+  }
 
-    @Override
-    public MediaType getMimeType()
-    {
-        return delegate.getMimeType();
-    }
+  @Override
+  public MediaType getMimeType() {
+    return delegate.getMimeType();
+  }
 
-    @Override
-    public AbstractRedeliveryPolicy getRedeliveryPolicy()
-    {
-        return delegate.getRedeliveryPolicy();
-    }
+  @Override
+  public AbstractRedeliveryPolicy getRedeliveryPolicy() {
+    return delegate.getRedeliveryPolicy();
+  }
 
-    @Override
-    public boolean isDisableTransportTransformer()
-    {
-        return delegate.isDisableTransportTransformer();
-    }
+  @Override
+  public boolean isDisableTransportTransformer() {
+    return delegate.isDisableTransportTransformer();
+  }
 
-    @Override
-    public MuleMessage request(long timeout) throws Exception
-    {
-        return delegate.request(timeout);
-    }
+  @Override
+  public MuleMessage request(long timeout) throws Exception {
+    return delegate.request(timeout);
+  }
 
-    @Override
-    public void setListener(MessageProcessor listener)
-    {
-        delegate.setListener(listener);
-    }
+  @Override
+  public void setListener(MessageProcessor listener) {
+    delegate.setListener(listener);
+  }
 
-    @Override
-    public String getName()
-    {
-        return delegate.getName();
-    }
+  @Override
+  public String getName() {
+    return delegate.getName();
+  }
 
-    @Override
-    public void start() throws MuleException
-    {
-        delegate.start();
-    }
+  @Override
+  public void start() throws MuleException {
+    delegate.start();
+  }
 
-    @Override
-    public void stop() throws MuleException
-    {
-        delegate.stop();
-    }
+  @Override
+  public void stop() throws MuleException {
+    delegate.stop();
+  }
 
-    public InboundEndpoint getDelegate()
-    {
-        return delegate;
-    }
+  public InboundEndpoint getDelegate() {
+    return delegate;
+  }
 }

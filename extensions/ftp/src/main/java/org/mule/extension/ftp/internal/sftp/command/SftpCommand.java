@@ -22,123 +22,97 @@ import java.util.Stack;
  *
  * @since 4.0
  */
-public abstract class SftpCommand extends FtpCommand<SftpFileSystem>
-{
+public abstract class SftpCommand extends FtpCommand<SftpFileSystem> {
 
-    protected SftpClient client;
+  protected SftpClient client;
 
-    /**
-     * Creates a new instance
-     *
-     * @param fileSystem a {@link SftpFileSystem} used as the connection object
-     * @param client     a {@link SftpClient}
-     */
-    public SftpCommand(SftpFileSystem fileSystem, SftpClient client)
-    {
-        super(fileSystem);
-        this.client = client;
+  /**
+   * Creates a new instance
+   *
+   * @param fileSystem a {@link SftpFileSystem} used as the connection object
+   * @param client a {@link SftpClient}
+   */
+  public SftpCommand(SftpFileSystem fileSystem, SftpClient client) {
+    super(fileSystem);
+    this.client = client;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected FtpFileAttributes getFile(FileConnectorConfig config, String filePath, boolean requireExistence) {
+    Path path = resolvePath(config, filePath);
+    SftpFileAttributes attributes;
+    try {
+      attributes = client.getAttributes(path);
+    } catch (Exception e) {
+      throw exception("Found exception trying to obtain path " + path, e);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected FtpFileAttributes getFile(FileConnectorConfig config, String filePath, boolean requireExistence)
-    {
-        Path path = resolvePath(config, filePath);
-        SftpFileAttributes attributes;
-        try
-        {
-            attributes = client.getAttributes(path);
-        }
-        catch (Exception e)
-        {
-            throw exception("Found exception trying to obtain path " + path, e);
-        }
+    if (attributes != null) {
+      return attributes;
+    } else {
+      if (requireExistence) {
+        throw pathNotFoundException(path);
+      } else {
+        return null;
+      }
+    }
+  }
 
-        if (attributes != null)
-        {
-            return attributes;
-        }
-        else
-        {
-            if (requireExistence)
-            {
-                throw pathNotFoundException(path);
-            }
-            else
-            {
-                return null;
-            }
-        }
+  /**
+   * Creates the directory pointed by {@code directoryPath} also creating any missing parent directories
+   *
+   * @param directoryPath the {@link Path} to the directory you want to create
+   */
+  @Override
+  protected void doMkDirs(FileConnectorConfig config, Path directoryPath) {
+    Stack<Path> fragments = new Stack<>();
+    for (int i = directoryPath.getNameCount(); i >= 0; i--) {
+      Path subPath = Paths.get("/").resolve(directoryPath.subpath(0, i));
+      if (exists(config, subPath)) {
+        break;
+      }
+      fragments.push(subPath);
     }
 
-    /**
-     * Creates the directory pointed by {@code directoryPath} also creating
-     * any missing parent directories
-     *
-     * @param directoryPath the {@link Path} to the directory you want to create
-     */
-    @Override
-    protected void doMkDirs(FileConnectorConfig config, Path directoryPath)
-    {
-        Stack<Path> fragments = new Stack<>();
-        for (int i = directoryPath.getNameCount(); i >= 0; i--)
-        {
-            Path subPath = Paths.get("/").resolve(directoryPath.subpath(0, i));
-            if (exists(config, subPath))
-            {
-                break;
-            }
-            fragments.push(subPath);
-        }
-
-        while (!fragments.isEmpty())
-        {
-            Path fragment = fragments.pop();
-            client.mkdir(fragment.toString());
-        }
+    while (!fragments.isEmpty()) {
+      Path fragment = fragments.pop();
+      client.mkdir(fragment.toString());
     }
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected boolean tryChangeWorkingDirectory(String path)
-    {
-        try
-        {
-            client.changeWorkingDirectory(path);
-            return true;
-        }
-        catch (Exception e)
-        {
-            return false;
-        }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected boolean tryChangeWorkingDirectory(String path) {
+    try {
+      client.changeWorkingDirectory(path);
+      return true;
+    } catch (Exception e) {
+      return false;
     }
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void doRename(String filePath, String newName) throws Exception
-    {
-        client.rename(filePath, newName);
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected void doRename(String filePath, String newName) throws Exception {
+    client.rename(filePath, newName);
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected String getCurrentWorkingDirectory()
-    {
-        try
-        {
-            return client.getWorkingDirectory();
-        }
-        catch (Exception e)
-        {
-            throw exception("Failed to determine current working directory");
-        }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected String getCurrentWorkingDirectory() {
+    try {
+      return client.getWorkingDirectory();
+    } catch (Exception e) {
+      throw exception("Failed to determine current working directory");
     }
+  }
 }

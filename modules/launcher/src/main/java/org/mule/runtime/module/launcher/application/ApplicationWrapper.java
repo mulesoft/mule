@@ -13,44 +13,36 @@ import org.mule.runtime.module.launcher.domain.Domain;
 import java.io.IOException;
 
 /**
- * Decorates the target deployer to properly switch out context classloader for deployment
- * one where applicable. E.g. init() phase may load custom classes for an application, which
- * must be executed with deployment (app) classloader in the context, and not Mule system
- * classloader.
+ * Decorates the target deployer to properly switch out context classloader for deployment one where applicable. E.g. init() phase
+ * may load custom classes for an application, which must be executed with deployment (app) classloader in the context, and not
+ * Mule system classloader.
  */
-public class ApplicationWrapper extends DeployableArtifactWrapper<Application, ApplicationDescriptor> implements Application
-{
+public class ApplicationWrapper extends DeployableArtifactWrapper<Application, ApplicationDescriptor> implements Application {
 
-    protected ApplicationWrapper(Application delegate) throws IOException
-    {
-        super(delegate);
-    }
+  protected ApplicationWrapper(Application delegate) throws IOException {
+    super(delegate);
+  }
 
-    public String getAppName()
-    {
-        return getArtifactName();
-    }
+  public String getAppName() {
+    return getArtifactName();
+  }
 
-    @Override
-    public Domain getDomain()
-    {
-        return getDelegate().getDomain();
-    }
+  @Override
+  public Domain getDomain() {
+    return getDelegate().getDomain();
+  }
 
-    @Override
-    public ApplicationStatus getStatus()
-    {
-        return getDelegate().getStatus();
-    }
+  @Override
+  public ApplicationStatus getStatus() {
+    return getDelegate().getStatus();
+  }
 
-    @Override
-    public String toString()
-    {
-        return String.format("%s(%s)", getClass().getName(), getDelegate());
-    }
+  @Override
+  public String toString() {
+    return String.format("%s(%s)", getClass().getName(), getDelegate());
+  }
 
-    public Application getDelegate()
-    {
-        return super.getDelegate();
-    }
+  public Application getDelegate() {
+    return super.getDelegate();
+  }
 }

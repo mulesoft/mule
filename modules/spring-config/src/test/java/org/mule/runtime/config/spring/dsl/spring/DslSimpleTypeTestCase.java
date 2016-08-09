@@ -17,35 +17,32 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.Test;
 
 @SmallTest
-public class DslSimpleTypeTestCase extends AbstractMuleTestCase
-{
+public class DslSimpleTypeTestCase extends AbstractMuleTestCase {
 
-    private enum TestEnum
-    {
-        TEST
-    }
+  private enum TestEnum {
+    TEST
+  }
 
-    @Test
-    public void simpleTypes()
-    {
-        assertThat(isSimpleType(byte.class), is(true));
-        assertThat(isSimpleType(Byte.class), is(true));
-        assertThat(isSimpleType(short.class), is(true));
-        assertThat(isSimpleType(Short.class), is(true));
-        assertThat(isSimpleType(int.class), is(true));
-        assertThat(isSimpleType(Integer.class), is(true));
-        assertThat(isSimpleType(long.class), is(true));
-        assertThat(isSimpleType(Long.class), is(true));
-        assertThat(isSimpleType(float.class), is(true));
-        assertThat(isSimpleType(Float.class), is(true));
-        assertThat(isSimpleType(double.class), is(true));
-        assertThat(isSimpleType(Double.class), is(true));
-        assertThat(isSimpleType(char.class), is(true));
-        assertThat(isSimpleType(Character.class), is(true));
-        assertThat(isSimpleType(String.class), is(true));
-        assertThat(isSimpleType(Object.class), is(false));
-        assertThat(isSimpleType(TestEnum.class), is(true));
-        assertThat(isSimpleType(AtomicInteger.class), is(false));
-    }
+  @Test
+  public void simpleTypes() {
+    assertThat(isSimpleType(byte.class), is(true));
+    assertThat(isSimpleType(Byte.class), is(true));
+    assertThat(isSimpleType(short.class), is(true));
+    assertThat(isSimpleType(Short.class), is(true));
+    assertThat(isSimpleType(int.class), is(true));
+    assertThat(isSimpleType(Integer.class), is(true));
+    assertThat(isSimpleType(long.class), is(true));
+    assertThat(isSimpleType(Long.class), is(true));
+    assertThat(isSimpleType(float.class), is(true));
+    assertThat(isSimpleType(Float.class), is(true));
+    assertThat(isSimpleType(double.class), is(true));
+    assertThat(isSimpleType(Double.class), is(true));
+    assertThat(isSimpleType(char.class), is(true));
+    assertThat(isSimpleType(Character.class), is(true));
+    assertThat(isSimpleType(String.class), is(true));
+    assertThat(isSimpleType(Object.class), is(false));
+    assertThat(isSimpleType(TestEnum.class), is(true));
+    assertThat(isSimpleType(AtomicInteger.class), is(false));
+  }
 
 }

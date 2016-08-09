@@ -9,38 +9,31 @@ package org.mule.runtime.config.spring;
 import org.mule.common.Capability;
 import org.mule.common.MuleArtifact;
 
-public class DefaultMuleArtifact implements MuleArtifact
-{
-    private Object object;
+public class DefaultMuleArtifact implements MuleArtifact {
 
-    public DefaultMuleArtifact(Object object)
-    {
-        this.object = object;
-    }
+  private Object object;
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public <T extends Capability> T getCapability(Class<T> clazz)
-    {
-        if (hasCapability(clazz))
-        {
-            return (T) object;
-        }
-        else
-        {
-            return null;
-        }
-    }
+  public DefaultMuleArtifact(Object object) {
+    this.object = object;
+  }
 
-    @Override
-    public <T extends Capability> boolean hasCapability(Class<T> clazz)
-    {
-        return clazz.isAssignableFrom(object.getClass());
+  @SuppressWarnings("unchecked")
+  @Override
+  public <T extends Capability> T getCapability(Class<T> clazz) {
+    if (hasCapability(clazz)) {
+      return (T) object;
+    } else {
+      return null;
     }
+  }
 
-    @Override
-    public String toString()
-    {
-        return object != null ? object.getClass().getName() : "null";
-    }
+  @Override
+  public <T extends Capability> boolean hasCapability(Class<T> clazz) {
+    return clazz.isAssignableFrom(object.getClass());
+  }
+
+  @Override
+  public String toString() {
+    return object != null ? object.getClass().getName() : "null";
+  }
 }

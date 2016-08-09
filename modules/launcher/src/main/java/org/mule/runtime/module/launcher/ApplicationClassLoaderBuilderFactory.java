@@ -15,35 +15,34 @@ import org.mule.runtime.module.launcher.plugin.ArtifactPluginRepository;
  *
  * @since 4.0
  */
-public class ApplicationClassLoaderBuilderFactory
-{
+public class ApplicationClassLoaderBuilderFactory {
 
-    private final MuleApplicationClassLoaderFactory applicationClassLoaderFactory;
-    private final ArtifactPluginRepository artifactPluginRepository;
-    private final ArtifactPluginFactory artifactPluginFactory;
+  private final MuleApplicationClassLoaderFactory applicationClassLoaderFactory;
+  private final ArtifactPluginRepository artifactPluginRepository;
+  private final ArtifactPluginFactory artifactPluginFactory;
 
-    /**
-     * Creates an {@code ApplicationClassLoaderBuilderFactory} to create {@code ApplicationClassLoaderBuilder} instances.
-     *
-     * @param applicationClassLoaderFactory factory for the class loader of the artifact resources and classes
-     * @param artifactPluginRepository repository for artifact plugins provided by the runtime
-     * @param artifactPluginFactory factory for creating plugin instances
-     */
-    public ApplicationClassLoaderBuilderFactory(MuleApplicationClassLoaderFactory applicationClassLoaderFactory, ArtifactPluginRepository artifactPluginRepository, ArtifactPluginFactory artifactPluginFactory)
-    {
-        this.applicationClassLoaderFactory = applicationClassLoaderFactory;
-        this.artifactPluginRepository = artifactPluginRepository;
-        this.artifactPluginFactory = artifactPluginFactory;
-    }
+  /**
+   * Creates an {@code ApplicationClassLoaderBuilderFactory} to create {@code ApplicationClassLoaderBuilder} instances.
+   *
+   * @param applicationClassLoaderFactory factory for the class loader of the artifact resources and classes
+   * @param artifactPluginRepository repository for artifact plugins provided by the runtime
+   * @param artifactPluginFactory factory for creating plugin instances
+   */
+  public ApplicationClassLoaderBuilderFactory(MuleApplicationClassLoaderFactory applicationClassLoaderFactory,
+                                              ArtifactPluginRepository artifactPluginRepository,
+                                              ArtifactPluginFactory artifactPluginFactory) {
+    this.applicationClassLoaderFactory = applicationClassLoaderFactory;
+    this.artifactPluginRepository = artifactPluginRepository;
+    this.artifactPluginFactory = artifactPluginFactory;
+  }
 
-    /**
-     * Creates a new {@code ApplicationClassLoaderBuilder} instance to create the application artifact class loader.
-     *
-     * @return a {@code ApplicationClassLoaderBuilder} instance.
-     */
-    public ApplicationClassLoaderBuilder createArtifactClassLoaderBuilder()
-    {
-        return new ApplicationClassLoaderBuilder(applicationClassLoaderFactory, artifactPluginRepository, artifactPluginFactory);
-    }
+  /**
+   * Creates a new {@code ApplicationClassLoaderBuilder} instance to create the application artifact class loader.
+   *
+   * @return a {@code ApplicationClassLoaderBuilder} instance.
+   */
+  public ApplicationClassLoaderBuilder createArtifactClassLoaderBuilder() {
+    return new ApplicationClassLoaderBuilder(applicationClassLoaderFactory, artifactPluginRepository, artifactPluginFactory);
+  }
 
 }

@@ -11,13 +11,14 @@ import org.mule.runtime.core.api.MuleException;
 /**
  * <code>Stoppable</code> is a lifecycle interfaqce that introduces a {@link #stop()} method to an object.
  *
- * This lifecycle interface should always be implemented with its opposite lifecycle interface {@link org.mule.runtime.core.api.lifecycle.Stoppable}.
+ * This lifecycle interface should always be implemented with its opposite lifecycle interface
+ * {@link org.mule.runtime.core.api.lifecycle.Stoppable}.
  *
  * @see org.mule.runtime.core.api.lifecycle.Startable
  */
-public interface Stoppable
-{
-    String PHASE_NAME = "stop";
-    
-    void stop() throws MuleException;
+public interface Stoppable {
+
+  String PHASE_NAME = "stop";
+
+  void stop() throws MuleException;
 }

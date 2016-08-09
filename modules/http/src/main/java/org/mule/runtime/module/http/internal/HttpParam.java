@@ -8,19 +8,17 @@ package org.mule.runtime.module.http.internal;
 
 import org.mule.runtime.core.api.MuleEvent;
 
-public abstract class HttpParam
-{
-    private HttpParamType type;
+public abstract class HttpParam {
 
-    public HttpParam(HttpParamType type)
-    {
-        this.type = type;
-    }
+  private HttpParamType type;
 
-    public HttpParamType getType()
-    {
-        return type;
-    }
+  public HttpParam(HttpParamType type) {
+    this.type = type;
+  }
 
-    public abstract void resolve(ParameterMap parameterMap, MuleEvent muleEvent);
+  public HttpParamType getType() {
+    return type;
+  }
+
+  public abstract void resolve(ParameterMap parameterMap, MuleEvent muleEvent);
 }

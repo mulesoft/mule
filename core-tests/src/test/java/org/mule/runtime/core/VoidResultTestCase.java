@@ -17,20 +17,18 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 
 @SmallTest
-public class VoidResultTestCase extends AbstractMuleTestCase
-{
+public class VoidResultTestCase extends AbstractMuleTestCase {
 
-    @Test
-    public void testUniqueDeserialization()
-    {
-        VoidResult result = VoidResult.getInstance();
+  @Test
+  public void testUniqueDeserialization() {
+    VoidResult result = VoidResult.getInstance();
 
-        byte[] serialized = SerializationUtils.serialize(result);
-        assertNotNull(serialized);
+    byte[] serialized = SerializationUtils.serialize(result);
+    assertNotNull(serialized);
 
-        Object deserialized = SerializationUtils.deserialize(serialized);
-        assertSame(deserialized, result);
-        assertEquals(deserialized, result);
-    }
+    Object deserialized = SerializationUtils.deserialize(serialized);
+    assertSame(deserialized, result);
+    assertEquals(deserialized, result);
+  }
 
 }

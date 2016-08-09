@@ -12,15 +12,13 @@ import org.mule.compatibility.core.transport.AbstractMessageDispatcherFactory;
 import org.mule.runtime.core.api.MuleException;
 
 /**
- * A Test message dispatcher factory that is used for testing configuration loading since "test://"
- * endpoints can be used instead of bringing in other dependencies into Mule core
+ * A Test message dispatcher factory that is used for testing configuration loading since "test://" endpoints can be used instead
+ * of bringing in other dependencies into Mule core
  */
-public class TestMessageDispatcherFactory extends AbstractMessageDispatcherFactory
-{
+public class TestMessageDispatcherFactory extends AbstractMessageDispatcherFactory {
 
-    @Override
-    public MessageDispatcher create(OutboundEndpoint endpoint) throws MuleException
-    {
-        return new TestMessageDispatcher(endpoint);
-    }
+  @Override
+  public MessageDispatcher create(OutboundEndpoint endpoint) throws MuleException {
+    return new TestMessageDispatcher(endpoint);
+  }
 }

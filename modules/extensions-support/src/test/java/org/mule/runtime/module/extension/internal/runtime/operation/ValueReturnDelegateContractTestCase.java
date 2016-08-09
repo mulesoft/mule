@@ -34,87 +34,83 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleTestCase
-{
-    @Mock(answer = RETURNS_DEEP_STUBS)
-    protected MuleContext muleContext;
+public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleTestCase {
 
-    @Mock
-    protected OperationContextAdapter operationContext;
+  @Mock(answer = RETURNS_DEEP_STUBS)
+  protected MuleContext muleContext;
 
-    @Mock
-    protected MuleEvent event;
+  @Mock
+  protected OperationContextAdapter operationContext;
 
-    @Mock
-    protected Attributes attributes;
+  @Mock
+  protected MuleEvent event;
 
-    protected ReturnDelegate delegate;
+  @Mock
+  protected Attributes attributes;
 
-    @Before
-    public void before()
-    {
-        delegate = createReturnDelegate();
-        when(operationContext.getEvent()).thenReturn(event);
-        when(event.getMessage()).thenReturn(org.mule.runtime.core.api.MuleMessage.builder().payload("").attributes(attributes).build());
-    }
+  protected ReturnDelegate delegate;
 
-    @Test
-    public void returnsSingleValue()
-    {
-        byte[] value = new byte[] {};
-        delegate.asReturnValue(value, operationContext);
+  @Before
+  public void before() {
+    delegate = createReturnDelegate();
+    when(operationContext.getEvent()).thenReturn(event);
+    when(event.getMessage())
+        .thenReturn(org.mule.runtime.core.api.MuleMessage.builder().payload("").attributes(attributes).build());
+  }
 
-        MuleMessage message = getOutputMessage();
+  @Test
+  public void returnsSingleValue() {
+    byte[] value = new byte[] {};
+    delegate.asReturnValue(value, operationContext);
 
-        assertThat(message.getPayload(), is(sameInstance(value)));
-        assertThat(message.getDataType().getType().equals(byte[].class), is(true));
-    }
+    MuleMessage message = getOutputMessage();
 
-    @Test
-    public void operationReturnsOperationResultButKeepsAttributes() throws Exception
-    {
-        Object payload = new Object();
-        MediaType mediaType = ANY.withCharset(getDefaultEncoding(muleContext));
+    assertThat(message.getPayload(), is(sameInstance(value)));
+    assertThat(message.getDataType().getType().equals(byte[].class), is(true));
+  }
 
-        delegate.asReturnValue(OperationResult.builder().output(payload).mediaType(mediaType).build(), operationContext);
+  @Test
+  public void operationReturnsOperationResultButKeepsAttributes() throws Exception {
+    Object payload = new Object();
+    MediaType mediaType = ANY.withCharset(getDefaultEncoding(muleContext));
 
-        MuleMessage message = getOutputMessage();
+    delegate.asReturnValue(OperationResult.builder().output(payload).mediaType(mediaType).build(), operationContext);
 
-        assertThat(message.getPayload(), is(sameInstance(payload)));
-        assertThat(message.getAttributes(), is(NULL_ATTRIBUTES));
-        assertThat(message.getDataType().getMediaType(), equalTo(mediaType));
-    }
+    MuleMessage message = getOutputMessage();
 
-    @Test
-    public void operationReturnsOperationResultThatOnlySpecifiesPayload() throws Exception
-    {
-        Object payload = "hello world!";
+    assertThat(message.getPayload(), is(sameInstance(payload)));
+    assertThat(message.getAttributes(), is(NULL_ATTRIBUTES));
+    assertThat(message.getDataType().getMediaType(), equalTo(mediaType));
+  }
 
-        delegate.asReturnValue(OperationResult.builder().output(payload).build(), operationContext);
+  @Test
+  public void operationReturnsOperationResultThatOnlySpecifiesPayload() throws Exception {
+    Object payload = "hello world!";
 
-        MuleMessage message = getOutputMessage();
+    delegate.asReturnValue(OperationResult.builder().output(payload).build(), operationContext);
 
-        assertThat(message.getPayload(), is(sameInstance(payload)));
-        assertThat(message.getAttributes(), is(NULL_ATTRIBUTES));
-        assertThat(message.getDataType().getType().equals(String.class), is(true));
-    }
+    MuleMessage message = getOutputMessage();
 
-    @Test
-    public void operationReturnsOperationResultThatOnlySpecifiesPayloadAndAttributes() throws Exception
-    {
-        Object payload = "hello world!";
-        Attributes newAttributes = mock(Attributes.class);
+    assertThat(message.getPayload(), is(sameInstance(payload)));
+    assertThat(message.getAttributes(), is(NULL_ATTRIBUTES));
+    assertThat(message.getDataType().getType().equals(String.class), is(true));
+  }
 
-        delegate.asReturnValue(OperationResult.builder().output(payload).attributes(newAttributes).build(), operationContext);
+  @Test
+  public void operationReturnsOperationResultThatOnlySpecifiesPayloadAndAttributes() throws Exception {
+    Object payload = "hello world!";
+    Attributes newAttributes = mock(Attributes.class);
 
-        MuleMessage message = getOutputMessage();
+    delegate.asReturnValue(OperationResult.builder().output(payload).attributes(newAttributes).build(), operationContext);
 
-        assertThat(message.getPayload(), is(sameInstance(payload)));
-        assertThat(message.getAttributes(), is(sameInstance(newAttributes)));
-        assertThat(message.getDataType().getType().equals(String.class), is(true));
-    }
+    MuleMessage message = getOutputMessage();
 
-    protected abstract ReturnDelegate createReturnDelegate();
+    assertThat(message.getPayload(), is(sameInstance(payload)));
+    assertThat(message.getAttributes(), is(sameInstance(newAttributes)));
+    assertThat(message.getDataType().getType().equals(String.class), is(true));
+  }
 
-    protected abstract MuleMessage getOutputMessage();
+  protected abstract ReturnDelegate createReturnDelegate();
+
+  protected abstract MuleMessage getOutputMessage();
 }

@@ -19,110 +19,90 @@ import org.slf4j.LoggerFactory;
  * @deprecated Transport infrastructure is deprecated.
  */
 @Deprecated
-public abstract class AbstractServiceDescriptor implements ServiceDescriptor
-{
+public abstract class AbstractServiceDescriptor implements ServiceDescriptor {
 
-    /**
-     * logger used by this class
-     */
-    protected final Logger logger = LoggerFactory.getLogger(getClass());
+  /**
+   * logger used by this class
+   */
+  protected final Logger logger = LoggerFactory.getLogger(getClass());
 
-    protected String service;
+  protected String service;
 
-    public AbstractServiceDescriptor(String service)
-    {
-        this.service = service;
+  public AbstractServiceDescriptor(String service) {
+    this.service = service;
+  }
+
+  @Override
+  public String getService() {
+    return service;
+  }
+
+  protected String removeProperty(String name, Properties properties) {
+    String temp = (String) properties.remove(name);
+    if (StringUtils.isEmpty(StringUtils.trim(temp))) {
+      return null;
+    } else {
+      return temp;
+    }
+  }
+
+  protected Class<?> removeClassProperty(String name, Properties properties) throws ClassNotFoundException {
+    String clazz = removeProperty(name, properties);
+    if (clazz == null) {
+      return null;
+    } else {
+      return ClassUtils.loadClass(clazz, getClass());
+    }
+  }
+
+
+
+  /**
+   * Unique key used to cache the service descriptors. This uses the service and the overrides, but since it is generated
+   * externally by the factory that instantiates the service descriptor we do not need to keep overrides or properties anywhere
+   * else.
+   */
+  public static class Key {
+
+    private final Map<?, ?> overrides;
+    private final String service;
+
+    public Key(String service, Map<?, ?> overrides) {
+      this.overrides = overrides;
+      this.service = service;
     }
 
     @Override
-    public String getService()
-    {
-        return service;
+    public boolean equals(Object o) {
+      if (this == o) {
+        return true;
+      }
+      if (!(o instanceof Key)) {
+        return false;
+      }
+
+      final Key key = (Key) o;
+
+      if (overrides != null ? !overrides.equals(key.overrides) : key.overrides != null) {
+        return false;
+      }
+      if (!service.equals(key.service)) {
+        return false;
+      }
+
+      return true;
     }
 
-    protected String removeProperty(String name, Properties properties)
-    {
-        String temp = (String)properties.remove(name);
-        if (StringUtils.isEmpty(StringUtils.trim(temp)))
-        {
-            return null;
-        }
-        else
-        {
-            return temp;
-        }
+    @Override
+    public int hashCode() {
+      return 29 * (overrides != null ? overrides.hashCode() : 0) + (service != null ? service.hashCode() : 0);
     }
 
-    protected Class<?> removeClassProperty(String name, Properties properties) throws ClassNotFoundException
-    {
-        String clazz = removeProperty(name, properties);
-        if (clazz == null)
-        {
-            return null;
-        }
-        else
-        {
-            return ClassUtils.loadClass(clazz, getClass());
-        }
+    public String getKey() {
+      return service + ":" + Integer.toString(hashCode());
     }
 
-
-
-    /**
-     * Unique key used to cache the service descriptors.  This uses the service and the
-     * overrides, but since it is generated externally by the factory that instantiates
-     * the service descriptor we do not need to keep overrides or properties anywhere else.
-     */
-    public static class Key
-    {
-        
-        private final Map<?, ?> overrides;
-        private final String service;
-
-        public Key(String service, Map<?, ?> overrides)
-        {
-            this.overrides = overrides;
-            this.service = service;
-        }
-
-        @Override
-        public boolean equals(Object o)
-        {
-            if (this == o)
-            {
-                return true;
-            }
-            if (!(o instanceof Key))
-            {
-                return false;
-            }
-
-            final Key key = (Key)o;
-
-            if (overrides != null ? !overrides.equals(key.overrides) : key.overrides != null)
-            {
-                return false;
-            }
-            if (!service.equals(key.service))
-            {
-                return false;
-            }
-
-            return true;
-        }
-
-        @Override
-        public int hashCode()
-        {
-            return 29 * (overrides != null ? overrides.hashCode() : 0) + (service != null ? service.hashCode(): 0);
-        }
-
-        public String getKey()
-        {
-            return service + ":" + Integer.toString(hashCode()); 
-        }
-
-    }
+  }
 
 }
 

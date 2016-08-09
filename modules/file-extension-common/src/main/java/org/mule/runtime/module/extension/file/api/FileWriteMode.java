@@ -11,23 +11,19 @@ package org.mule.runtime.module.extension.file.api;
  *
  * @since 4.0
  */
-public enum FileWriteMode
-{
-    /**
-     * Means that if the file to be written already exists, then it should
-     * be overwritten
-     */
-    OVERWRITE,
+public enum FileWriteMode {
+  /**
+   * Means that if the file to be written already exists, then it should be overwritten
+   */
+  OVERWRITE,
 
-    /**
-     * Means that if the file to be written already exists, then the content
-     * should be appended to that file
-     */
-    APPEND,
+  /**
+   * Means that if the file to be written already exists, then the content should be appended to that file
+   */
+  APPEND,
 
-    /**
-     * Means that a new file should be created and an error should be raised
-     * if the file already exists
-     */
-    CREATE_NEW
+  /**
+   * Means that a new file should be created and an error should be raised if the file already exists
+   */
+  CREATE_NEW
 }

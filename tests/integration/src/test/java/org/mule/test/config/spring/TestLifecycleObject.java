@@ -14,71 +14,60 @@ import org.mule.runtime.core.api.store.ObjectStoreManager;
 
 import javax.inject.Inject;
 
-public class TestLifecycleObject implements Lifecycle
-{
+public class TestLifecycleObject implements Lifecycle {
 
-    private int initialise = 0;
-    private int start = 0;
-    private int stop = 0;
-    private int dispose = 0;
+  private int initialise = 0;
+  private int start = 0;
+  private int stop = 0;
+  private int dispose = 0;
 
-    @Inject
-    private ObjectStoreManager objectStoreManager;
+  @Inject
+  private ObjectStoreManager objectStoreManager;
 
-    @Inject
-    private MuleContext muleContext;
+  @Inject
+  private MuleContext muleContext;
 
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        initialise++;
-    }
+  @Override
+  public void initialise() throws InitialisationException {
+    initialise++;
+  }
 
-    @Override
-    public void start() throws MuleException
-    {
-        start++;
-    }
+  @Override
+  public void start() throws MuleException {
+    start++;
+  }
 
-    @Override
-    public void stop() throws MuleException
-    {
-        stop++;
-    }
+  @Override
+  public void stop() throws MuleException {
+    stop++;
+  }
 
-    @Override
-    public void dispose()
-    {
-        dispose++;
-    }
+  @Override
+  public void dispose() {
+    dispose++;
+  }
 
-    public int getInitialise()
-    {
-        return initialise;
-    }
+  public int getInitialise() {
+    return initialise;
+  }
 
-    public int getStart()
-    {
-        return start;
-    }
+  public int getStart() {
+    return start;
+  }
 
-    public int getStop()
-    {
-        return stop;
-    }
+  public int getStop() {
+    return stop;
+  }
 
-    public int getDispose()
-    {
-        return dispose;
-    }
+  public int getDispose() {
+    return dispose;
+  }
 
-    public ObjectStoreManager getObjectStoreManager()
-    {
-        return objectStoreManager;
-    }
+  public ObjectStoreManager getObjectStoreManager() {
+    return objectStoreManager;
+  }
 
-    public MuleContext getMuleContext()
-    {
-        return muleContext;
-    }
+  public MuleContext getMuleContext() {
+    return muleContext;
+  }
 }

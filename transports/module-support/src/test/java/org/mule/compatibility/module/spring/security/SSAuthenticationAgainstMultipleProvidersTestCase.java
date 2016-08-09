@@ -8,13 +8,11 @@ package org.mule.compatibility.module.spring.security;
 
 import org.mule.runtime.module.spring.security.AuthenticationAgainstMultipleProvidersTestCase;
 
-public class SSAuthenticationAgainstMultipleProvidersTestCase extends AuthenticationAgainstMultipleProvidersTestCase
-{
+public class SSAuthenticationAgainstMultipleProvidersTestCase extends AuthenticationAgainstMultipleProvidersTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "spring-security/mule-multiple-providers-config-flow.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "spring-security/mule-multiple-providers-config-flow.xml";
+  }
 
 }

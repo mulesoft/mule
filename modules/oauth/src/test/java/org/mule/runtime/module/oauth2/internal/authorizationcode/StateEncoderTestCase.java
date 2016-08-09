@@ -16,71 +16,64 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Test;
 
-public class StateEncoderTestCase extends AbstractMuleTestCase
-{
+public class StateEncoderTestCase extends AbstractMuleTestCase {
 
-    public static final String ORIGINAL_STATE_VALUE = "original-state-value";
-    public static final String TEST_RESOURCE_OWNER_ID = "test-oauth-id";
-    public static final String TEST_ON_COMPLETE_URL = "http://host:12/path";
+  public static final String ORIGINAL_STATE_VALUE = "original-state-value";
+  public static final String TEST_RESOURCE_OWNER_ID = "test-oauth-id";
+  public static final String TEST_ON_COMPLETE_URL = "http://host:12/path";
 
-    @Test(expected = IllegalArgumentException.class)
-    public void encodeNullOAuthStateId()
-    {
-        new StateEncoder(ORIGINAL_STATE_VALUE).encodeResourceOwnerIdInState(null);
-    }
+  @Test(expected = IllegalArgumentException.class)
+  public void encodeNullOAuthStateId() {
+    new StateEncoder(ORIGINAL_STATE_VALUE).encodeResourceOwnerIdInState(null);
+  }
 
-    @Test
-    public void encodeAndDecodeWithState()
-    {
-        final StateEncoder stateEncoder = new StateEncoder(ORIGINAL_STATE_VALUE);
-        stateEncoder.encodeResourceOwnerIdInState(TEST_RESOURCE_OWNER_ID);
-        final String encodedState = stateEncoder.getEncodedState();
-        final StateDecoder stateDecoder = new StateDecoder(encodedState);
-        assertThat(stateDecoder.decodeResourceOwnerId(), is(TEST_RESOURCE_OWNER_ID));
-        assertThat(stateDecoder.decodeOriginalState(), is(ORIGINAL_STATE_VALUE));
-    }
+  @Test
+  public void encodeAndDecodeWithState() {
+    final StateEncoder stateEncoder = new StateEncoder(ORIGINAL_STATE_VALUE);
+    stateEncoder.encodeResourceOwnerIdInState(TEST_RESOURCE_OWNER_ID);
+    final String encodedState = stateEncoder.getEncodedState();
+    final StateDecoder stateDecoder = new StateDecoder(encodedState);
+    assertThat(stateDecoder.decodeResourceOwnerId(), is(TEST_RESOURCE_OWNER_ID));
+    assertThat(stateDecoder.decodeOriginalState(), is(ORIGINAL_STATE_VALUE));
+  }
 
-    @Test
-    public void encodeAndDecodeWithNullState()
-    {
-        final StateEncoder stateEncoder = new StateEncoder(null);
-        stateEncoder.encodeResourceOwnerIdInState(TEST_RESOURCE_OWNER_ID);
-        final String encodedState = stateEncoder.getEncodedState();
-        final StateDecoder stateDecoder = new StateDecoder(encodedState);
-        assertThat(stateDecoder.decodeResourceOwnerId(), is(TEST_RESOURCE_OWNER_ID));
-        assertThat(stateDecoder.decodeOriginalState(), nullValue());
-    }
+  @Test
+  public void encodeAndDecodeWithNullState() {
+    final StateEncoder stateEncoder = new StateEncoder(null);
+    stateEncoder.encodeResourceOwnerIdInState(TEST_RESOURCE_OWNER_ID);
+    final String encodedState = stateEncoder.getEncodedState();
+    final StateDecoder stateDecoder = new StateDecoder(encodedState);
+    assertThat(stateDecoder.decodeResourceOwnerId(), is(TEST_RESOURCE_OWNER_ID));
+    assertThat(stateDecoder.decodeOriginalState(), nullValue());
+  }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void doNotAllowNewParameterAfterOnCompleteRedirectTo()
-    {
-        final StateEncoder stateEncoder = new StateEncoder(null);
-        stateEncoder.encodeOnCompleteRedirectToInState(TEST_ON_COMPLETE_URL);
-        stateEncoder.encodeResourceOwnerIdInState(TEST_RESOURCE_OWNER_ID);
-    }
+  @Test(expected = IllegalArgumentException.class)
+  public void doNotAllowNewParameterAfterOnCompleteRedirectTo() {
+    final StateEncoder stateEncoder = new StateEncoder(null);
+    stateEncoder.encodeOnCompleteRedirectToInState(TEST_ON_COMPLETE_URL);
+    stateEncoder.encodeResourceOwnerIdInState(TEST_RESOURCE_OWNER_ID);
+  }
 
-    @Test
-    public void encodeAndDecodeOnCompleteRedirectToParameter()
-    {
-        final StateEncoder stateEncoder = new StateEncoder(null);
-        stateEncoder.encodeOnCompleteRedirectToInState(TEST_ON_COMPLETE_URL);
-        final String encodedState = stateEncoder.getEncodedState();
-        final StateDecoder stateDecoder = new StateDecoder(encodedState);
-        assertThat(stateDecoder.decodeOnCompleteRedirectTo(), is(TEST_ON_COMPLETE_URL));
-        assertThat(stateDecoder.decodeOriginalState(), nullValue());
-    }
+  @Test
+  public void encodeAndDecodeOnCompleteRedirectToParameter() {
+    final StateEncoder stateEncoder = new StateEncoder(null);
+    stateEncoder.encodeOnCompleteRedirectToInState(TEST_ON_COMPLETE_URL);
+    final String encodedState = stateEncoder.getEncodedState();
+    final StateDecoder stateDecoder = new StateDecoder(encodedState);
+    assertThat(stateDecoder.decodeOnCompleteRedirectTo(), is(TEST_ON_COMPLETE_URL));
+    assertThat(stateDecoder.decodeOriginalState(), nullValue());
+  }
 
-    @Test
-    public void encodeAndDecodeResourceOwnerAndOnCompleteRedirectToParameter()
-    {
-        final StateEncoder stateEncoder = new StateEncoder(ORIGINAL_STATE_VALUE);
-        stateEncoder.encodeResourceOwnerIdInState(TEST_RESOURCE_OWNER_ID);
-        stateEncoder.encodeOnCompleteRedirectToInState(TEST_ON_COMPLETE_URL);
-        String encodedState = stateEncoder.getEncodedState();
-        final StateDecoder stateDecoder = new StateDecoder(encodedState);
-        assertThat(stateDecoder.decodeOnCompleteRedirectTo(), is(TEST_ON_COMPLETE_URL));
-        assertThat(stateDecoder.decodeResourceOwnerId(), is(TEST_RESOURCE_OWNER_ID));
-        assertThat(stateDecoder.decodeOriginalState(), is(ORIGINAL_STATE_VALUE));
-    }
+  @Test
+  public void encodeAndDecodeResourceOwnerAndOnCompleteRedirectToParameter() {
+    final StateEncoder stateEncoder = new StateEncoder(ORIGINAL_STATE_VALUE);
+    stateEncoder.encodeResourceOwnerIdInState(TEST_RESOURCE_OWNER_ID);
+    stateEncoder.encodeOnCompleteRedirectToInState(TEST_ON_COMPLETE_URL);
+    String encodedState = stateEncoder.getEncodedState();
+    final StateDecoder stateDecoder = new StateDecoder(encodedState);
+    assertThat(stateDecoder.decodeOnCompleteRedirectTo(), is(TEST_ON_COMPLETE_URL));
+    assertThat(stateDecoder.decodeResourceOwnerId(), is(TEST_RESOURCE_OWNER_ID));
+    assertThat(stateDecoder.decodeOriginalState(), is(ORIGINAL_STATE_VALUE));
+  }
 
 }

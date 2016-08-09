@@ -14,11 +14,10 @@ import org.mule.runtime.core.api.MuleException;
 /**
  * <code>VMMessageDispatcherFactory</code> creates an in-memory event dispatcher
  */
-public class VMMessageDispatcherFactory extends AbstractMessageDispatcherFactory
-{
-    @Override
-    public MessageDispatcher create(OutboundEndpoint endpoint) throws MuleException
-    {
-        return new VMMessageDispatcher(endpoint);
-    }
+public class VMMessageDispatcherFactory extends AbstractMessageDispatcherFactory {
+
+  @Override
+  public MessageDispatcher create(OutboundEndpoint endpoint) throws MuleException {
+    return new VMMessageDispatcher(endpoint);
+  }
 }

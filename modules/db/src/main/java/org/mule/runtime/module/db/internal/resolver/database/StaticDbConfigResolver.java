@@ -13,19 +13,16 @@ import org.mule.runtime.module.db.internal.domain.database.DbConfig;
 /**
  * Resolves a {@link DbConfig} to a static value without using the current event
  */
-public class StaticDbConfigResolver extends AbstractDbConfigResolver
-{
+public class StaticDbConfigResolver extends AbstractDbConfigResolver {
 
-    private final DbConfig dbConfig;
+  private final DbConfig dbConfig;
 
-    public StaticDbConfigResolver(DbConfig dbConfig)
-    {
-        this.dbConfig = dbConfig;
-    }
+  public StaticDbConfigResolver(DbConfig dbConfig) {
+    this.dbConfig = dbConfig;
+  }
 
-    @Override
-    public DbConfig resolve(MuleEvent muleEvent)
-    {
-        return dbConfig;
-    }
+  @Override
+  public DbConfig resolve(MuleEvent muleEvent) {
+    return dbConfig;
+  }
 }

@@ -27,31 +27,22 @@ import org.mule.runtime.extension.api.annotation.param.display.Placement;
  */
 @Alias("pop3")
 @DisplayName("POP3 Connection")
-public class POP3Provider extends AbstractRetrieverProvider<RetrieverConnection>
-{
+public class POP3Provider extends AbstractRetrieverProvider<RetrieverConnection> {
 
-    /**
-     * The port number of the mail server. '110' by default.
-     */
-    @Parameter
-    @Optional(defaultValue = POP3_PORT)
-    @Placement(group = CONNECTION, order = 2)
-    private String port;
+  /**
+   * The port number of the mail server. '110' by default.
+   */
+  @Parameter
+  @Optional(defaultValue = POP3_PORT)
+  @Placement(group = CONNECTION, order = 2)
+  private String port;
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public RetrieverConnection connect() throws ConnectionException
-    {
-        return new RetrieverConnection(POP3,
-                                       settings.getUser(),
-                                       settings.getPassword(),
-                                       settings.getHost(),
-                                       port,
-                                       getConnectionTimeout(),
-                                       getReadTimeout(),
-                                       getWriteTimeout(),
-                                       getProperties());
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public RetrieverConnection connect() throws ConnectionException {
+    return new RetrieverConnection(POP3, settings.getUser(), settings.getPassword(), settings.getHost(), port,
+                                   getConnectionTimeout(), getReadTimeout(), getWriteTimeout(), getProperties());
+  }
 }

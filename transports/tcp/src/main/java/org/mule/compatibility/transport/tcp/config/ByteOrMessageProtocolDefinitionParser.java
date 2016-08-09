@@ -9,16 +9,12 @@ package org.mule.compatibility.transport.tcp.config;
 import org.mule.runtime.config.spring.parsers.delegate.BooleanAttributeSelectionDefinitionParser;
 import org.mule.runtime.config.spring.parsers.generic.ChildDefinitionParser;
 
-public class ByteOrMessageProtocolDefinitionParser extends BooleanAttributeSelectionDefinitionParser
-{
+public class ByteOrMessageProtocolDefinitionParser extends BooleanAttributeSelectionDefinitionParser {
 
-    public static final String PROTOCOL = "tcpProtocol";
+  public static final String PROTOCOL = "tcpProtocol";
 
-    public ByteOrMessageProtocolDefinitionParser(Class bytes, Class message)
-    {
-        super("payloadOnly", true,
-                new ChildDefinitionParser(PROTOCOL, bytes),
-                new ChildDefinitionParser(PROTOCOL, message));
-    }
+  public ByteOrMessageProtocolDefinitionParser(Class bytes, Class message) {
+    super("payloadOnly", true, new ChildDefinitionParser(PROTOCOL, bytes), new ChildDefinitionParser(PROTOCOL, message));
+  }
 
 }

@@ -13,32 +13,27 @@ import org.hamcrest.Factory;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 
-public class Deployment extends TypeSafeMatcher<MuleProcessController>
-{
+public class Deployment extends TypeSafeMatcher<MuleProcessController> {
 
-    private String applicationName;
+  private String applicationName;
 
-    public Deployment(String applicationName)
-    {
-        this.applicationName = applicationName;
-    }
+  public Deployment(String applicationName) {
+    this.applicationName = applicationName;
+  }
 
-    @Override
-    public boolean matchesSafely(MuleProcessController mule)
-    {
-        return mule.isDeployed(applicationName);
-    }
+  @Override
+  public boolean matchesSafely(MuleProcessController mule) {
+    return mule.isDeployed(applicationName);
+  }
 
-    @Override
-    public void describeTo(Description description)
-    {
-        description.appendText("a Mule Standalone server that has successfully deployed: " + applicationName);
-    }
+  @Override
+  public void describeTo(Description description) {
+    description.appendText("a Mule Standalone server that has successfully deployed: " + applicationName);
+  }
 
-    @Factory
-    public static <T> Matcher<MuleProcessController> hasDeployed(String applicationName)
-    {
-        return new Deployment(applicationName);
-    }
+  @Factory
+  public static <T> Matcher<MuleProcessController> hasDeployed(String applicationName) {
+    return new Deployment(applicationName);
+  }
 
 };

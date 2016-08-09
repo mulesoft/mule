@@ -16,45 +16,33 @@ import java.util.Map.Entry;
 /**
  * Replace any exception thrown with a MessagingException
  */
-public class ExceptionToMessagingExceptionExecutionInterceptor implements MessageProcessorExecutionInterceptor
-{
+public class ExceptionToMessagingExceptionExecutionInterceptor implements MessageProcessorExecutionInterceptor {
 
-    @Override
-    public MuleEvent execute(MessageProcessor messageProcessor, MuleEvent event) throws MessagingException
-    {
-        try
-        {
-            return messageProcessor.process(event);
-        }
-        catch (MessagingException messagingException)
-        {
-            if (messagingException.getFailingMessageProcessor() == null)
-            {
-                throw putContext(messagingException, messageProcessor, event);
-            }
-            else
-            {
-                throw putContext(messagingException, messagingException.getFailingMessageProcessor(), event);
-            }
-        }
-        catch (Throwable ex)
-        {
-            throw putContext(new MessagingException(event, ex, messageProcessor), messageProcessor, event);
-        }
+  @Override
+  public MuleEvent execute(MessageProcessor messageProcessor, MuleEvent event) throws MessagingException {
+    try {
+      return messageProcessor.process(event);
+    } catch (MessagingException messagingException) {
+      if (messagingException.getFailingMessageProcessor() == null) {
+        throw putContext(messagingException, messageProcessor, event);
+      } else {
+        throw putContext(messagingException, messagingException.getFailingMessageProcessor(), event);
+      }
+    } catch (Throwable ex) {
+      throw putContext(new MessagingException(event, ex, messageProcessor), messageProcessor, event);
     }
+  }
 
-    private MessagingException putContext(MessagingException messagingException, MessageProcessor failingMessageProcessor, MuleEvent event)
-    {
-        for (ExceptionContextProvider exceptionContextProvider : event.getMuleContext().getExceptionContextProviders())
-        {
-            for (Entry<String, Object> contextInfoEntry : exceptionContextProvider.getContextInfo(event, failingMessageProcessor).entrySet())
-            {
-                if (!messagingException.getInfo().containsKey(contextInfoEntry.getKey()))
-                {
-                    messagingException.getInfo().put(contextInfoEntry.getKey(), contextInfoEntry.getValue());
-                }
-            }
+  private MessagingException putContext(MessagingException messagingException, MessageProcessor failingMessageProcessor,
+                                        MuleEvent event) {
+    for (ExceptionContextProvider exceptionContextProvider : event.getMuleContext().getExceptionContextProviders()) {
+      for (Entry<String, Object> contextInfoEntry : exceptionContextProvider.getContextInfo(event, failingMessageProcessor)
+          .entrySet()) {
+        if (!messagingException.getInfo().containsKey(contextInfoEntry.getKey())) {
+          messagingException.getInfo().put(contextInfoEntry.getKey(), contextInfoEntry.getValue());
         }
-        return messagingException;
+      }
     }
+    return messagingException;
+  }
 }

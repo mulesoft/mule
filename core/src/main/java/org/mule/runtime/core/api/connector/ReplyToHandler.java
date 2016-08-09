@@ -12,21 +12,20 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 
 /**
- * <code>ReplyToHandler</code> is used to handle routing where a replyTo endpointUri is
- * set on the message
+ * <code>ReplyToHandler</code> is used to handle routing where a replyTo endpointUri is set on the message
  */
 
-public interface ReplyToHandler
-{
-    void processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException;
+public interface ReplyToHandler {
 
-    /**
-     * Processes replyTo in the case an exception occurred.  Not all implementations will implement this if for example
-     * they should only send a reply message in the sucess case.
-     *
-     * @param exception the exception thrown by processing
-     * @param replyTo name of the channel that exception message should be sent if relevant
-     */
-    void processExceptionReplyTo(MessagingException exception, Object replyTo);
+  void processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException;
+
+  /**
+   * Processes replyTo in the case an exception occurred. Not all implementations will implement this if for example they should
+   * only send a reply message in the sucess case.
+   *
+   * @param exception the exception thrown by processing
+   * @param replyTo name of the channel that exception message should be sent if relevant
+   */
+  void processExceptionReplyTo(MessagingException exception, Object replyTo);
 
 }

@@ -14,34 +14,29 @@ import org.mule.runtime.core.execution.MessageProcessTemplate;
 
 import org.mockito.Mockito;
 
-public class PhaseSupportTestHelper<T>
-{
+public class PhaseSupportTestHelper<T> {
 
-    private final Class<T> supportedTemplateClass;
-    private final T supportedTemplate;
-    private final MessageProcessTemplate notSupportedTemplate;
+  private final Class<T> supportedTemplateClass;
+  private final T supportedTemplate;
+  private final MessageProcessTemplate notSupportedTemplate;
 
-    public PhaseSupportTestHelper(Class<T> supportedTemplate)
-    {
-        this.supportedTemplateClass = supportedTemplate;
-        this.supportedTemplate = Mockito.mock(this.supportedTemplateClass);
-        this.notSupportedTemplate = Mockito.mock(MessageProcessTemplate.class);
-    }
+  public PhaseSupportTestHelper(Class<T> supportedTemplate) {
+    this.supportedTemplateClass = supportedTemplate;
+    this.supportedTemplate = Mockito.mock(this.supportedTemplateClass);
+    this.notSupportedTemplate = Mockito.mock(MessageProcessTemplate.class);
+  }
 
-    public void testSupportTemplates(MessageProcessPhase messageProcessPhase)
-    {
-        notSupportedTemplateTest(messageProcessPhase);
-        supportedTemplateTest(messageProcessPhase);
-    }
+  public void testSupportTemplates(MessageProcessPhase messageProcessPhase) {
+    notSupportedTemplateTest(messageProcessPhase);
+    supportedTemplateTest(messageProcessPhase);
+  }
 
-    public void notSupportedTemplateTest(MessageProcessPhase messageProcessPhase)
-    {
-        assertThat(messageProcessPhase.supportsTemplate(notSupportedTemplate), is(false));
-    }
+  public void notSupportedTemplateTest(MessageProcessPhase messageProcessPhase) {
+    assertThat(messageProcessPhase.supportsTemplate(notSupportedTemplate), is(false));
+  }
 
-    public void supportedTemplateTest(MessageProcessPhase messageProcessPhase)
-    {
-        assertThat(messageProcessPhase.supportsTemplate((MessageProcessTemplate) supportedTemplate), is(true));
-    }
+  public void supportedTemplateTest(MessageProcessPhase messageProcessPhase) {
+    assertThat(messageProcessPhase.supportsTemplate((MessageProcessTemplate) supportedTemplate), is(true));
+  }
 
 }

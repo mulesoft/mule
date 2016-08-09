@@ -27,94 +27,79 @@ import org.mule.tck.size.SmallTest;
 import org.junit.Test;
 
 @SmallTest
-public class ConfigurationModelValidatorTestCase extends AbstractMuleTestCase
-{
+public class ConfigurationModelValidatorTestCase extends AbstractMuleTestCase {
 
-    private ModelValidator validator = new ConfigurationModelValidator();
-    private ExtensionFactory extensionFactory = new DefaultExtensionFactory(new SpiServiceRegistry(), getClass().getClassLoader());
+  private ModelValidator validator = new ConfigurationModelValidator();
+  private ExtensionFactory extensionFactory = new DefaultExtensionFactory(new SpiServiceRegistry(), getClass().getClassLoader());
 
-    @Test
-    public void validConfigurationTypesForOperations() throws Exception
-    {
-        validate(ValidExtension.class);
-    }
+  @Test
+  public void validConfigurationTypesForOperations() throws Exception {
+    validate(ValidExtension.class);
+  }
 
-    @Test(expected = IllegalConfigurationModelDefinitionException.class)
-    public void invalidConfigurationTypesForOperations() throws Exception
-    {
-        validate(InvalidExtension.class);
-    }
+  @Test(expected = IllegalConfigurationModelDefinitionException.class)
+  public void invalidConfigurationTypesForOperations() throws Exception {
+    validate(InvalidExtension.class);
+  }
 
-    @Extension(name = "invalidExtension")
-    @Configurations({TestConfig.class})
-    @Operations(InvalidTestOperations.class)
-    public static class InvalidExtension
-    {
+  @Extension(name = "invalidExtension")
+  @Configurations({TestConfig.class})
+  @Operations(InvalidTestOperations.class)
+  public static class InvalidExtension {
 
-    }
+  }
 
-    @Extension(name = "validExtension")
-    @Configurations({TestConfig.class, TestConfig2.class})
-    @Operations(ValidTestOperations.class)
-    public static class ValidExtension
-    {
+  @Extension(name = "validExtension")
+  @Configurations({TestConfig.class, TestConfig2.class})
+  @Operations(ValidTestOperations.class)
+  public static class ValidExtension {
 
-    }
+  }
 
-    @Configuration(name = "config")
-    public static class TestConfig implements Config
-    {
+  @Configuration(name = "config")
+  public static class TestConfig implements Config {
 
-    }
+  }
 
-    @Configuration(name = "config2")
-    public static class TestConfig2 implements Config
-    {
+  @Configuration(name = "config2")
+  public static class TestConfig2 implements Config {
 
-    }
+  }
 
-    public static class ValidTestOperations
-    {
+  public static class ValidTestOperations {
 
-        public void foo(@UseConfig Config connection)
-        {
-
-        }
-
-        public void bar(@UseConfig Config connection)
-        {
-
-        }
-    }
-
-    public static class InvalidTestOperations
-    {
-
-        public void foo(@UseConfig Config connection)
-        {
-
-        }
-
-        public void bar(@UseConfig TestConfig2 connection)
-        {
-
-        }
-    }
-
-    interface Config
-    {
+    public void foo(@UseConfig Config connection) {
 
     }
 
-    private ExtensionModel modelFor(Class<?> connectorClass)
-    {
-        DescribingContext context = new DefaultDescribingContext(connectorClass.getClassLoader());
-        return extensionFactory.createFrom(new AnnotationsBasedDescriber(connectorClass, new StaticVersionResolver(getProductVersion()))
-                                                   .describe(context), context);
+    public void bar(@UseConfig Config connection) {
+
+    }
+  }
+
+  public static class InvalidTestOperations {
+
+    public void foo(@UseConfig Config connection) {
+
     }
 
-    private void validate(Class<?> connectorClass)
-    {
-        validator.validate(modelFor(connectorClass));
+    public void bar(@UseConfig TestConfig2 connection) {
+
     }
+  }
+
+  interface Config {
+
+  }
+
+  private ExtensionModel modelFor(Class<?> connectorClass) {
+    DescribingContext context = new DefaultDescribingContext(connectorClass.getClassLoader());
+    return extensionFactory
+        .createFrom(new AnnotationsBasedDescriber(connectorClass, new StaticVersionResolver(getProductVersion()))
+            .describe(context), context);
+  }
+
+  private void validate(Class<?> connectorClass) {
+    validator.validate(modelFor(connectorClass));
+  }
 }

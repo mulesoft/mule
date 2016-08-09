@@ -9,25 +9,25 @@ package org.mule.runtime.core.api.store;
 import java.io.Serializable;
 import java.util.List;
 
-public interface PartitionableObjectStore<T extends Serializable> extends ListableObjectStore<T>
-{
-    boolean contains(Serializable key, String partitionName) throws ObjectStoreException;
+public interface PartitionableObjectStore<T extends Serializable> extends ListableObjectStore<T> {
 
-    void store(Serializable key, T value, String partitionName) throws ObjectStoreException;
+  boolean contains(Serializable key, String partitionName) throws ObjectStoreException;
 
-    T retrieve(Serializable key, String partitionName) throws ObjectStoreException;
+  void store(Serializable key, T value, String partitionName) throws ObjectStoreException;
 
-    T remove(Serializable key, String partitionName) throws ObjectStoreException;
+  T retrieve(Serializable key, String partitionName) throws ObjectStoreException;
 
-    List<Serializable> allKeys(String partitionName) throws ObjectStoreException;
+  T remove(Serializable key, String partitionName) throws ObjectStoreException;
 
-    List<String> allPartitions() throws ObjectStoreException;
+  List<Serializable> allKeys(String partitionName) throws ObjectStoreException;
 
-    void open(String partitionName) throws ObjectStoreException;
+  List<String> allPartitions() throws ObjectStoreException;
 
-    void close(String partitionName) throws ObjectStoreException;
+  void open(String partitionName) throws ObjectStoreException;
 
-    void disposePartition(String partitionName) throws ObjectStoreException;
-    
-    public void clear(String partitionName) throws ObjectStoreException;
+  void close(String partitionName) throws ObjectStoreException;
+
+  void disposePartition(String partitionName) throws ObjectStoreException;
+
+  public void clear(String partitionName) throws ObjectStoreException;
 }

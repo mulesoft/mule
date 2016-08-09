@@ -26,111 +26,103 @@ import java.util.List;
 import org.junit.Test;
 import org.mockito.InOrder;
 
-public class MuleServiceManagerTestCase extends AbstractMuleTestCase
-{
+public class MuleServiceManagerTestCase extends AbstractMuleTestCase {
 
-    @Test
-    public void registerServices() throws Exception
-    {
-        final ServiceDiscoverer serviceDiscoverer = mock(ServiceDiscoverer.class);
-        final List<Service> services = new ArrayList<>();
-        Service service1 = mock(Service.class);
-        Service service2 = mock(Service.class);
-        services.add(service1);
-        services.add(service2);
-        when(serviceDiscoverer.discoverServices()).thenReturn(services);
+  @Test
+  public void registerServices() throws Exception {
+    final ServiceDiscoverer serviceDiscoverer = mock(ServiceDiscoverer.class);
+    final List<Service> services = new ArrayList<>();
+    Service service1 = mock(Service.class);
+    Service service2 = mock(Service.class);
+    services.add(service1);
+    services.add(service2);
+    when(serviceDiscoverer.discoverServices()).thenReturn(services);
 
-        final MuleServiceManager muleServiceManager = new MuleServiceManager(serviceDiscoverer);
-        muleServiceManager.start();
+    final MuleServiceManager muleServiceManager = new MuleServiceManager(serviceDiscoverer);
+    muleServiceManager.start();
 
-        assertThat(muleServiceManager.getServices().size(), equalTo(2));
-        assertThat(muleServiceManager.getServices().get(0), equalTo(service1));
-        assertThat(muleServiceManager.getServices().get(1), equalTo(service2));
-    }
+    assertThat(muleServiceManager.getServices().size(), equalTo(2));
+    assertThat(muleServiceManager.getServices().get(0), equalTo(service1));
+    assertThat(muleServiceManager.getServices().get(1), equalTo(service2));
+  }
 
-    @Test
-    public void startServices() throws Exception
-    {
-        final ServiceDiscoverer serviceDiscoverer = mock(ServiceDiscoverer.class);
-        final List<Service> services = new ArrayList<>();
-        StartableService service1 = mock(StartableService.class);
-        StartableService service2 = mock(StartableService.class);
-        services.add(service1);
-        services.add(service2);
-        when(serviceDiscoverer.discoverServices()).thenReturn(services);
+  @Test
+  public void startServices() throws Exception {
+    final ServiceDiscoverer serviceDiscoverer = mock(ServiceDiscoverer.class);
+    final List<Service> services = new ArrayList<>();
+    StartableService service1 = mock(StartableService.class);
+    StartableService service2 = mock(StartableService.class);
+    services.add(service1);
+    services.add(service2);
+    when(serviceDiscoverer.discoverServices()).thenReturn(services);
 
-        final MuleServiceManager muleServiceManager = new MuleServiceManager(serviceDiscoverer);
-        muleServiceManager.start();
+    final MuleServiceManager muleServiceManager = new MuleServiceManager(serviceDiscoverer);
+    muleServiceManager.start();
 
-        InOrder inOrder = inOrder(service1, service2);
-        inOrder.verify(service1).start();
-        inOrder.verify(service2).start();
-    }
+    InOrder inOrder = inOrder(service1, service2);
+    inOrder.verify(service1).start();
+    inOrder.verify(service2).start();
+  }
 
-    @Test
-    public void stopsServices() throws Exception
-    {
-        final ServiceDiscoverer serviceDiscoverer = mock(ServiceDiscoverer.class);
-        final List<Service> services = new ArrayList<>();
-        StoppableService service1 = mock(StoppableService.class);
-        StoppableService service2 = mock(StoppableService.class);
-        services.add(service1);
-        services.add(service2);
-        when(serviceDiscoverer.discoverServices()).thenReturn(services);
+  @Test
+  public void stopsServices() throws Exception {
+    final ServiceDiscoverer serviceDiscoverer = mock(ServiceDiscoverer.class);
+    final List<Service> services = new ArrayList<>();
+    StoppableService service1 = mock(StoppableService.class);
+    StoppableService service2 = mock(StoppableService.class);
+    services.add(service1);
+    services.add(service2);
+    when(serviceDiscoverer.discoverServices()).thenReturn(services);
 
-        final MuleServiceManager muleServiceManager = new MuleServiceManager(serviceDiscoverer);
-        muleServiceManager.start();
-        muleServiceManager.stop();
+    final MuleServiceManager muleServiceManager = new MuleServiceManager(serviceDiscoverer);
+    muleServiceManager.start();
+    muleServiceManager.stop();
 
-        InOrder inOrder = inOrder(service1, service2);
-        inOrder.verify(service2).stop();
-        inOrder.verify(service1).stop();
-    }
+    InOrder inOrder = inOrder(service1, service2);
+    inOrder.verify(service2).stop();
+    inOrder.verify(service1).stop();
+  }
 
-    @Test
-    public void ignoresServiceStopError() throws Exception
-    {
-        final ServiceDiscoverer serviceDiscoverer = mock(ServiceDiscoverer.class);
-        final List<Service> services = new ArrayList<>();
-        StoppableService service1 = mock(StoppableService.class);
-        doThrow(new RuntimeException()).when(service1).stop();
-        StoppableService service2 = mock(StoppableService.class);
-        doThrow(new RuntimeException()).when(service2).stop();
-        services.add(service1);
-        services.add(service2);
-        when(serviceDiscoverer.discoverServices()).thenReturn(services);
+  @Test
+  public void ignoresServiceStopError() throws Exception {
+    final ServiceDiscoverer serviceDiscoverer = mock(ServiceDiscoverer.class);
+    final List<Service> services = new ArrayList<>();
+    StoppableService service1 = mock(StoppableService.class);
+    doThrow(new RuntimeException()).when(service1).stop();
+    StoppableService service2 = mock(StoppableService.class);
+    doThrow(new RuntimeException()).when(service2).stop();
+    services.add(service1);
+    services.add(service2);
+    when(serviceDiscoverer.discoverServices()).thenReturn(services);
 
-        final MuleServiceManager muleServiceManager = new MuleServiceManager(serviceDiscoverer);
-        muleServiceManager.start();
-        muleServiceManager.stop();
+    final MuleServiceManager muleServiceManager = new MuleServiceManager(serviceDiscoverer);
+    muleServiceManager.start();
+    muleServiceManager.stop();
 
-        InOrder inOrder = inOrder(service1, service2);
-        inOrder.verify(service2).stop();
-        inOrder.verify(service1).stop();
-    }
+    InOrder inOrder = inOrder(service1, service2);
+    inOrder.verify(service2).stop();
+    inOrder.verify(service1).stop();
+  }
 
-    @Test
-    public void wrapsServices() throws Exception
-    {
-        final ServiceDiscoverer serviceDiscoverer = mock(ServiceDiscoverer.class);
-        final List<Service> services = new ArrayList<>();
-        StoppableService service1 = mock(StoppableService.class);
-        services.add(service1);
-        when(serviceDiscoverer.discoverServices()).thenReturn(services);
+  @Test
+  public void wrapsServices() throws Exception {
+    final ServiceDiscoverer serviceDiscoverer = mock(ServiceDiscoverer.class);
+    final List<Service> services = new ArrayList<>();
+    StoppableService service1 = mock(StoppableService.class);
+    services.add(service1);
+    when(serviceDiscoverer.discoverServices()).thenReturn(services);
 
-        final MuleServiceManager muleServiceManager = new MuleServiceManager(serviceDiscoverer);
-        muleServiceManager.start();
+    final MuleServiceManager muleServiceManager = new MuleServiceManager(serviceDiscoverer);
+    muleServiceManager.start();
 
-        assertThat(Proxy.isProxyClass(muleServiceManager.getServices().get(0).getClass()), is(true));
-    }
+    assertThat(Proxy.isProxyClass(muleServiceManager.getServices().get(0).getClass()), is(true));
+  }
 
-    public interface StartableService extends Service, Startable
-    {
+  public interface StartableService extends Service, Startable {
 
-    }
+  }
 
-    public interface StoppableService extends Service, Stoppable
-    {
+  public interface StoppableService extends Service, Stoppable {
 
-    }
+  }
 }

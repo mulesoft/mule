@@ -11,36 +11,31 @@ import org.mule.runtime.module.ws.consumer.SoapFaultException;
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;
 
-public class SoapFaultCodeMatcher extends TypeSafeMatcher<SoapFaultException>
-{
+public class SoapFaultCodeMatcher extends TypeSafeMatcher<SoapFaultException> {
 
-    private final String code;
+  private final String code;
 
-    public SoapFaultCodeMatcher(String code)
-    {
-        this.code = code;
-    }
+  public SoapFaultCodeMatcher(String code) {
+    this.code = code;
+  }
 
-    @Override
-    protected boolean matchesSafely(SoapFaultException item)
-    {
-        return code.equals(item.getFaultCode().getLocalPart());
-    }
+  @Override
+  protected boolean matchesSafely(SoapFaultException item) {
+    return code.equals(item.getFaultCode().getLocalPart());
+  }
 
-    @Override
-    public void describeTo(Description description)
-    {
-        description.appendText("a fault code " + code);
-    }
+  @Override
+  public void describeTo(Description description) {
+    description.appendText("a fault code " + code);
+  }
 
-    @Override
-    protected void describeMismatchSafely(SoapFaultException item, Description mismatchDescription)
-    {
-        mismatchDescription.appendText("is not a SoapFaultException with fault code ").appendValue(item.getFaultCode().getLocalPart());
-    }
+  @Override
+  protected void describeMismatchSafely(SoapFaultException item, Description mismatchDescription) {
+    mismatchDescription.appendText("is not a SoapFaultException with fault code ")
+        .appendValue(item.getFaultCode().getLocalPart());
+  }
 
-    public static SoapFaultCodeMatcher hasFaultCode(final String code)
-    {
-        return new SoapFaultCodeMatcher(code);
-    }
+  public static SoapFaultCodeMatcher hasFaultCode(final String code) {
+    return new SoapFaultCodeMatcher(code);
+  }
 }

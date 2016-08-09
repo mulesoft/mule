@@ -24,71 +24,57 @@ import java.io.Serializable;
  * Sets the outbound endpoint uri on as a property of the message using the following key:
  * {@link MuleProperties#MULE_ENDPOINT_PROPERTY}.
  */
-public class OutboundEndpointPropertyMessageProcessor implements MessageProcessor
-{
+public class OutboundEndpointPropertyMessageProcessor implements MessageProcessor {
 
-    private String[] ignoredPropertyOverrides = new String[] {MuleProperties.MULE_METHOD_PROPERTY, "Content-Type"};
+  private String[] ignoredPropertyOverrides = new String[] {MuleProperties.MULE_METHOD_PROPERTY, "Content-Type"};
 
-    private OutboundEndpoint endpoint;
+  private OutboundEndpoint endpoint;
 
-    public OutboundEndpointPropertyMessageProcessor(OutboundEndpoint endpoint)
-    {
-        this.endpoint = endpoint;
-    }
+  public OutboundEndpointPropertyMessageProcessor(OutboundEndpoint endpoint) {
+    this.endpoint = endpoint;
+  }
 
-    @Override
-    public MuleEvent process(MuleEvent event) throws MuleException
-    {
-        MuleMessage.Builder messageBuilder = MuleMessage.builder(event.getMessage())
-                .addOutboundProperty(MULE_ENDPOINT_PROPERTY, endpoint.getEndpointURI().toString());
+  @Override
+  public MuleEvent process(MuleEvent event) throws MuleException {
+    MuleMessage.Builder messageBuilder =
+        MuleMessage.builder(event.getMessage()).addOutboundProperty(MULE_ENDPOINT_PROPERTY, endpoint.getEndpointURI().toString());
 
-        if (endpoint.getProperties() != null)
-        {
-            for (String prop : endpoint.getProperties().keySet())
-            {
-                Serializable value = endpoint.getProperties().get(prop);
+    if (endpoint.getProperties() != null) {
+      for (String prop : endpoint.getProperties().keySet()) {
+        Serializable value = endpoint.getProperties().get(prop);
 
-                if ("Content-Type".equalsIgnoreCase(prop))
-                {
-                    messageBuilder.mediaType(MediaType.parse(value.toString()));
-                }
-                else
-                {
-                    // don't overwrite property on the message
-                    if (!ignoreProperty(event.getMessage(), prop))
-                    {
-                        // inbound endpoint properties are in the invocation scope
-                        messageBuilder.addOutboundProperty(prop, value);
-                    }
-                }
-            }
+        if ("Content-Type".equalsIgnoreCase(prop)) {
+          messageBuilder.mediaType(MediaType.parse(value.toString()));
+        } else {
+          // don't overwrite property on the message
+          if (!ignoreProperty(event.getMessage(), prop)) {
+            // inbound endpoint properties are in the invocation scope
+            messageBuilder.addOutboundProperty(prop, value);
+          }
         }
-        event.setMessage(messageBuilder.build());
-        event = OptimizedRequestContext.unsafeSetEvent(event);
-        return event;
+      }
+    }
+    event.setMessage(messageBuilder.build());
+    event = OptimizedRequestContext.unsafeSetEvent(event);
+    return event;
+  }
+
+  protected boolean ignoreProperty(MuleMessage message, String key) {
+    if (key == null) {
+      return true;
     }
 
-    protected boolean ignoreProperty(MuleMessage message, String key)
-    {
-        if (key == null)
-        {
-            return true;
-        }
-
-        for (String ignoredPropertyOverride : ignoredPropertyOverrides)
-        {
-            if (key.equals(ignoredPropertyOverride))
-            {
-                return false;
-            }
-        }
-
-        return null != message.getOutboundProperty(key);
+    for (String ignoredPropertyOverride : ignoredPropertyOverrides) {
+      if (key.equals(ignoredPropertyOverride)) {
+        return false;
+      }
     }
 
-    @Override
-    public String toString()
-    {
-        return ObjectUtils.toString(this);
-    }
+    return null != message.getOutboundProperty(key);
+  }
+
+  @Override
+  public String toString() {
+    return ObjectUtils.toString(this);
+  }
 }

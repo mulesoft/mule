@@ -9,15 +9,13 @@ package org.mule.test.integration.transport.jms.scripting;
 import org.junit.Ignore;
 
 /**
- * Tests that we are able to request jms messages from inside the script when
- * the endpoints are defined using XA transactions.
+ * Tests that we are able to request jms messages from inside the script when the endpoints are defined using XA transactions.
  */
 @Ignore("AMQ 5.x never returns a message within xa flow request, regression in amq")
-public class JmsRequestFromScriptWithXaTransactionTestCase extends AbstractJmsRequestFromScriptTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/integration/transport/jms/scripting/jms-request-from-script-with-xa-transaction-config.xml";
-    }
+public class JmsRequestFromScriptWithXaTransactionTestCase extends AbstractJmsRequestFromScriptTestCase {
+
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/integration/transport/jms/scripting/jms-request-from-script-with-xa-transaction-config.xml";
+  }
 }

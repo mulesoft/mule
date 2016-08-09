@@ -23,82 +23,67 @@ import org.slf4j.LoggerFactory;
  *
  * @since 4.0
  */
-public final class SftpDeleteCommand extends SftpCommand implements DeleteCommand
-{
+public final class SftpDeleteCommand extends SftpCommand implements DeleteCommand {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SftpDeleteCommand.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(SftpDeleteCommand.class);
 
-    /**
-     * {@inheritDoc}
-     */
-    public SftpDeleteCommand(SftpFileSystem fileSystem, SftpClient client)
-    {
-        super(fileSystem, client);
+  /**
+   * {@inheritDoc}
+   */
+  public SftpDeleteCommand(SftpFileSystem fileSystem, SftpClient client) {
+    super(fileSystem, client);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void delete(FileConnectorConfig config, String filePath) {
+    FileAttributes fileAttributes = getExistingFile(config, filePath);
+    final boolean isDirectory = fileAttributes.isDirectory();
+    final String path = fileAttributes.getPath();
+
+    if (isDirectory) {
+      deleteDirectory(path);
+    } else {
+      deleteFile(path);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void delete(FileConnectorConfig config, String filePath)
-    {
-        FileAttributes fileAttributes = getExistingFile(config, filePath);
-        final boolean isDirectory = fileAttributes.isDirectory();
-        final String path = fileAttributes.getPath();
+    logDelete(path);
+  }
 
-        if (isDirectory)
-        {
-            deleteDirectory(path);
-        }
-        else
-        {
-            deleteFile(path);
-        }
+  private void deleteFile(String path) {
+    fileSystem.verifyNotLocked(Paths.get(path));
+    LOGGER.debug("Preparing to delete file '{}'", path);
+    client.deleteFile(path);
+  }
 
-        logDelete(path);
+  private void deleteDirectory(String path) {
+    LOGGER.debug("Preparing to delete directory '{}'", path);
+    for (FileAttributes file : client.list(path)) {
+      final String filePath = file.getPath();
+      if (isVirtualDirectory(file.getName())) {
+        continue;
+      }
+
+      if (file.isDirectory()) {
+        deleteDirectory(filePath);
+      } else {
+        deleteFile(filePath);
+      }
     }
 
-    private void deleteFile(String path)
-    {
-        fileSystem.verifyNotLocked(Paths.get(path));
-        LOGGER.debug("Preparing to delete file '{}'", path);
-        client.deleteFile(path);
+    Path directoryPath = Paths.get(path);
+    Path directoryFragment = directoryPath.getName(directoryPath.getNameCount() - 1);
+    if (isVirtualDirectory(directoryFragment.getFileName().toString())) {
+      path = Paths.get("/").resolve(directoryPath.subpath(0, directoryPath.getNameCount() - 1)).toAbsolutePath().toString();
     }
+    client.deleteDirectory(path);
 
-    private void deleteDirectory(String path)
-    {
-        LOGGER.debug("Preparing to delete directory '{}'", path);
-        for (FileAttributes file : client.list(path))
-        {
-            final String filePath = file.getPath();
-            if (isVirtualDirectory(file.getName()))
-            {
-                continue;
-            }
+    logDelete(path);
+  }
 
-            if (file.isDirectory())
-            {
-                deleteDirectory(filePath);
-            }
-            else
-            {
-                deleteFile(filePath);
-            }
-        }
-
-        Path directoryPath = Paths.get(path);
-        Path directoryFragment = directoryPath.getName(directoryPath.getNameCount() - 1);
-        if (isVirtualDirectory(directoryFragment.getFileName().toString()))
-        {
-            path = Paths.get("/").resolve(directoryPath.subpath(0, directoryPath.getNameCount() - 1)).toAbsolutePath().toString();
-        }
-        client.deleteDirectory(path);
-
-        logDelete(path);
-    }
-
-    private void logDelete(String path)
-    {
-        LOGGER.debug("Successfully deleted '{}'", path);
-    }
+  private void logDelete(String path) {
+    LOGGER.debug("Successfully deleted '{}'", path);
+  }
 }

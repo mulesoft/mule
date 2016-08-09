@@ -12,24 +12,22 @@ import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.config.i18n.Message;
 
 /**
- * <code>FailedToQueueEventException</code> is thrown when an event cannot be put on
- * an internal service queue.
+ * <code>FailedToQueueEventException</code> is thrown when an event cannot be put on an internal service queue.
  */
 
-public class FailedToQueueEventException extends MessagingException
-{
-    /**
-     * Serial version
-     */
-    private static final long serialVersionUID = -8368283988424746098L;
+public class FailedToQueueEventException extends MessagingException {
 
-    public FailedToQueueEventException(Message message, MuleEvent event, MessageProcessor failingMessageProcessor)
-    {
-        super(message, event, failingMessageProcessor);
-    }
+  /**
+   * Serial version
+   */
+  private static final long serialVersionUID = -8368283988424746098L;
 
-    public FailedToQueueEventException(Message message, MuleEvent event, Throwable cause, MessageProcessor failingMessageProcessor)
-    {
-        super(message, event, cause, failingMessageProcessor);
-    }
+  public FailedToQueueEventException(Message message, MuleEvent event, MessageProcessor failingMessageProcessor) {
+    super(message, event, failingMessageProcessor);
+  }
+
+  public FailedToQueueEventException(Message message, MuleEvent event, Throwable cause,
+                                     MessageProcessor failingMessageProcessor) {
+    super(message, event, cause, failingMessageProcessor);
+  }
 }

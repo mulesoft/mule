@@ -26,58 +26,48 @@ import java.util.List;
 import org.apache.commons.lang.SerializationUtils;
 import org.junit.Test;
 
-public class CollectionAggregatorRouterSerializationTestCase extends AbstractIntegrationTestCase
-{
+public class CollectionAggregatorRouterSerializationTestCase extends AbstractIntegrationTestCase {
+
+  @Override
+  protected String getConfigFile() {
+    return "collection-aggregator-router-serialization.xml";
+  }
+
+  @Test
+  public void eventGroupDeserialization() throws Exception {
+    muleContext.getRegistry().registerObject(MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME,
+                                             new EventGroupSerializerObjectStore<Serializable>());
+    List<String> list = Arrays.asList("first", "second");
+    flowRunner("splitter").withPayload(list).asynchronously().run();
+
+    MuleClient client = muleContext.getClient();
+    MuleMessage request = client.request("test://out", RECEIVE_TIMEOUT);
+    assertNotNull(request);
+    assertThat(request.getPayload(), instanceOf(List.class));
+    assertThat(((List<MuleMessage>) request.getPayload()), hasSize(list.size()));
+  }
+
+  private class EventGroupSerializerObjectStore<T extends Serializable> extends SimpleMemoryObjectStore<Serializable> {
 
     @Override
-    protected String getConfigFile()
-    {
-        return "collection-aggregator-router-serialization.xml";
+    protected void doStore(Serializable key, Serializable value) throws ObjectStoreException {
+      if (value instanceof EventGroup) {
+        value = SerializationUtils.serialize(value);
+      }
+      super.doStore(key, value);
     }
 
-    @Test
-    public void eventGroupDeserialization() throws Exception
-    {
-        muleContext.getRegistry().registerObject(MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME,
-                                                 new EventGroupSerializerObjectStore<Serializable>());
-        List<String> list = Arrays.asList("first", "second");
-        flowRunner("splitter").withPayload(list).asynchronously().run();
-
-        MuleClient client = muleContext.getClient();
-        MuleMessage request = client.request("test://out", RECEIVE_TIMEOUT);
-        assertNotNull(request);
-        assertThat(request.getPayload(), instanceOf(List.class));
-        assertThat(((List<MuleMessage>) request.getPayload()), hasSize(list.size()));
-    }
-
-    private class EventGroupSerializerObjectStore<T extends Serializable> extends SimpleMemoryObjectStore<Serializable>
-    {
-        @Override
-        protected void doStore(Serializable key, Serializable value) throws ObjectStoreException
-        {
-            if (value instanceof EventGroup)
-            {
-                value = SerializationUtils.serialize(value);
-            }
-            super.doStore(key, value);
+    @Override
+    protected Serializable doRetrieve(Serializable key) {
+      Object value = super.doRetrieve(key);
+      if (value instanceof byte[]) {
+        try {
+          value = SerializationUtils.deserialize((byte[]) value);
+        } catch (SerializationException e) {
+          // return original value
         }
-
-        @Override
-        protected Serializable doRetrieve(Serializable key)
-        {
-            Object value = super.doRetrieve(key);
-            if (value instanceof byte[])
-            {
-                try
-                {
-                    value = SerializationUtils.deserialize((byte[]) value);
-                }
-                catch (SerializationException e)
-                {
-                    // return original value
-                }
-            }
-            return (Serializable) value;
-        }
+      }
+      return (Serializable) value;
     }
+  }
 }

@@ -20,44 +20,36 @@ import org.springframework.beans.factory.FactoryBean;
 /**
  * Abstract spring FactoryBean used to creating endpoints via spring.
  */
-public abstract class AbstractEndpointFactoryBean extends EndpointURIEndpointBuilder
-    implements FactoryBean, Initialisable
-{
+public abstract class AbstractEndpointFactoryBean extends EndpointURIEndpointBuilder implements FactoryBean, Initialisable {
 
-    protected final Logger logger = LoggerFactory.getLogger(getClass());
+  protected final Logger logger = LoggerFactory.getLogger(getClass());
 
-    public AbstractEndpointFactoryBean(EndpointURIEndpointBuilder global) throws EndpointException
-    {
-        super(global);
-    }
+  public AbstractEndpointFactoryBean(EndpointURIEndpointBuilder global) throws EndpointException {
+    super(global);
+  }
 
-    public AbstractEndpointFactoryBean()
-    {
-        super();
-    }
+  public AbstractEndpointFactoryBean() {
+    super();
+  }
 
-    @Override
-    public Object getObject() throws Exception
-    {
-        return doGetObject();
-    }
+  @Override
+  public Object getObject() throws Exception {
+    return doGetObject();
+  }
 
-    @Override
-    public boolean isSingleton()
-    {
-        return true;
-    }
+  @Override
+  public boolean isSingleton() {
+    return true;
+  }
 
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        // subclasses may override this method
-    }
-    
-    protected abstract Object doGetObject() throws Exception;
+  @Override
+  public void initialise() throws InitialisationException {
+    // subclasses may override this method
+  }
 
-    public EndpointFactory getEndpointFactory()
-    {
-        return (EndpointFactory) muleContext.getRegistry().lookupObject(MuleEndpointProperties.OBJECT_MULE_ENDPOINT_FACTORY);
-    }
+  protected abstract Object doGetObject() throws Exception;
+
+  public EndpointFactory getEndpointFactory() {
+    return (EndpointFactory) muleContext.getRegistry().lookupObject(MuleEndpointProperties.OBJECT_MULE_ENDPOINT_FACTORY);
+  }
 }

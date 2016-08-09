@@ -19,42 +19,35 @@ import java.util.Map;
 /**
  * Maps an application life cycle phase to an application status
  */
-public class ApplicationStatusMapper
-{
+public class ApplicationStatusMapper {
 
-    private static Map<String, ApplicationStatus> statusMapping;
+  private static Map<String, ApplicationStatus> statusMapping;
 
-    public static ApplicationStatus getApplicationStatus(String currentPhase)
-    {
-        final ApplicationStatus applicationStatus = getStatusMapping().get(currentPhase);
+  public static ApplicationStatus getApplicationStatus(String currentPhase) {
+    final ApplicationStatus applicationStatus = getStatusMapping().get(currentPhase);
 
-        if (applicationStatus == null)
-        {
-            throw new IllegalStateException("Unknown lifecycle phase: " + currentPhase);
-        }
-
-        return applicationStatus;
+    if (applicationStatus == null) {
+      throw new IllegalStateException("Unknown lifecycle phase: " + currentPhase);
     }
 
-    private static Map<String, ApplicationStatus> getStatusMapping()
-    {
-        if (statusMapping == null)
-        {
-            synchronized (ApplicationStatusMapper.class)
-            {
-                if (statusMapping == null)
-                {
-                    statusMapping = new HashMap<String, ApplicationStatus>();
+    return applicationStatus;
+  }
 
-                    statusMapping.put(NotInLifecyclePhase.PHASE_NAME, ApplicationStatus.CREATED);
-                    statusMapping.put(Disposable.PHASE_NAME, ApplicationStatus.DESTROYED);
-                    statusMapping.put(Stoppable.PHASE_NAME, ApplicationStatus.STOPPED);
-                    statusMapping.put(Startable.PHASE_NAME, ApplicationStatus.STARTED);
-                    statusMapping.put(Initialisable.PHASE_NAME, ApplicationStatus.INITIALISED);
-                }
-            }
+  private static Map<String, ApplicationStatus> getStatusMapping() {
+    if (statusMapping == null) {
+      synchronized (ApplicationStatusMapper.class) {
+        if (statusMapping == null) {
+          statusMapping = new HashMap<String, ApplicationStatus>();
+
+          statusMapping.put(NotInLifecyclePhase.PHASE_NAME, ApplicationStatus.CREATED);
+          statusMapping.put(Disposable.PHASE_NAME, ApplicationStatus.DESTROYED);
+          statusMapping.put(Stoppable.PHASE_NAME, ApplicationStatus.STOPPED);
+          statusMapping.put(Startable.PHASE_NAME, ApplicationStatus.STARTED);
+          statusMapping.put(Initialisable.PHASE_NAME, ApplicationStatus.INITIALISED);
         }
-
-        return statusMapping;
+      }
     }
+
+    return statusMapping;
+  }
 }

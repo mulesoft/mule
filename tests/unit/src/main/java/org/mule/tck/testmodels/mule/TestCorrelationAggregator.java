@@ -12,26 +12,22 @@ import org.mule.runtime.core.routing.AggregationException;
 import org.mule.runtime.core.routing.EventGroup;
 
 /**
- * <code>TestResponseAggregator</code> is a mock response Agrregator object used for
- * testing configuration
+ * <code>TestResponseAggregator</code> is a mock response Agrregator object used for testing configuration
  */
-public class TestCorrelationAggregator extends AbstractCorrelationAggregator
-{
-    private String testProperty;
+public class TestCorrelationAggregator extends AbstractCorrelationAggregator {
 
-    @Override
-    protected MuleEvent aggregateEvents(EventGroup events) throws AggregationException
-    {
-        return events.getMessageCollectionEvent();
-    }
+  private String testProperty;
 
-    public String getTestProperty()
-    {
-        return testProperty;
-    }
+  @Override
+  protected MuleEvent aggregateEvents(EventGroup events) throws AggregationException {
+    return events.getMessageCollectionEvent();
+  }
 
-    public void setTestProperty(String testProperty)
-    {
-        this.testProperty = testProperty;
-    }
+  public String getTestProperty() {
+    return testProperty;
+  }
+
+  public void setTestProperty(String testProperty) {
+    this.testProperty = testProperty;
+  }
 }

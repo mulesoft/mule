@@ -14,17 +14,15 @@ import java.util.Map;
 /**
  * Processes rows from a resultSet
  */
-public interface RowHandler
-{
+public interface RowHandler {
 
-    /**
-     * Process a row from a resultSet
-     *
-     * @param resultSet resultset containing the row to process. Non null
-     * @return a map where each key represents a column name and the value is the value
-     * for that column in the current row. Non null.
-     * @throws SQLException if a database access error occurs or this method is called
-     * on a closed result set
-     */
-    Map<String, Object> process(ResultSet resultSet) throws SQLException;
+  /**
+   * Process a row from a resultSet
+   *
+   * @param resultSet resultset containing the row to process. Non null
+   * @return a map where each key represents a column name and the value is the value for that column in the current row. Non
+   *         null.
+   * @throws SQLException if a database access error occurs or this method is called on a closed result set
+   */
+  Map<String, Object> process(ResultSet resultSet) throws SQLException;
 }

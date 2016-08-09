@@ -12,51 +12,43 @@ import org.mule.runtime.core.config.i18n.MessageFactory;
 
 import java.io.File;
 
-public class FileMessages extends MessageFactory
-{
-    private static final FileMessages factory = new FileMessages();
-    
-    private static final String BUNDLE_PATH = getBundlePath("file");
+public class FileMessages extends MessageFactory {
 
-    public static Message errorWhileListingFiles()
-    {
-        return factory.createMessage(BUNDLE_PATH, 1);
-    }
+  private static final FileMessages factory = new FileMessages();
 
-    public static Message exceptionWhileProcessing(String name, String string)
-    {
-        return factory.createMessage(BUNDLE_PATH, 2, name, string);
-    }
+  private static final String BUNDLE_PATH = getBundlePath("file");
 
-    public static Message failedToDeleteFile(File file)
-    {
-        return factory.createMessage(BUNDLE_PATH, 3, file.getAbsolutePath());
-    }
+  public static Message errorWhileListingFiles() {
+    return factory.createMessage(BUNDLE_PATH, 1);
+  }
 
-    public static Message failedToMoveFile(String from, String to)
-    {
-        return factory.createMessage(BUNDLE_PATH, 4, from, to);
-    }
+  public static Message exceptionWhileProcessing(String name, String string) {
+    return factory.createMessage(BUNDLE_PATH, 2, name, string);
+  }
 
-    public static Message moveToDirectoryNotWritable()
-    {
-        return factory.createMessage(BUNDLE_PATH, 5);
-    }
+  public static Message failedToDeleteFile(File file) {
+    return factory.createMessage(BUNDLE_PATH, 3, file.getAbsolutePath());
+  }
 
-    public static Message invalidFileFilter(EndpointURI endpointURI)
-    {
-        return factory.createMessage(BUNDLE_PATH, 6, endpointURI);
-    }
+  public static Message failedToMoveFile(String from, String to) {
+    return factory.createMessage(BUNDLE_PATH, 4, from, to);
+  }
 
-    public static Message fileDoesNotExist(String string)
-    {
-        return factory.createMessage(BUNDLE_PATH, 7, string);
-    }
+  public static Message moveToDirectoryNotWritable() {
+    return factory.createMessage(BUNDLE_PATH, 5);
+  }
 
-    public static Message invalidFilter(Object filter)
-    {
-        return factory.createMessage(BUNDLE_PATH, 8, filter.getClass().getName());
-    }
+  public static Message invalidFileFilter(EndpointURI endpointURI) {
+    return factory.createMessage(BUNDLE_PATH, 6, endpointURI);
+  }
+
+  public static Message fileDoesNotExist(String string) {
+    return factory.createMessage(BUNDLE_PATH, 7, string);
+  }
+
+  public static Message invalidFilter(Object filter) {
+    return factory.createMessage(BUNDLE_PATH, 8, filter.getClass().getName());
+  }
 
 }
 

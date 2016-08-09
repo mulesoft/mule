@@ -9,28 +9,25 @@ package org.mule.extension.validation.api;
 import org.mule.runtime.core.api.MuleEvent;
 
 /**
- * A specialization of {@link ValidationResult} which
- * takes a {@link MultipleValidationResult} as a result.
+ * A specialization of {@link ValidationResult} which takes a {@link MultipleValidationResult} as a result.
  *
  * @since 3.7.0
  */
-public final class MultipleValidationException extends ValidationException
-{
+public final class MultipleValidationException extends ValidationException {
 
-    private final MultipleValidationResult multipleValidationResult;
+  private final MultipleValidationResult multipleValidationResult;
 
-    public MultipleValidationException(MultipleValidationResult multipleValidationResult, MuleEvent event)
-    {
-        super(multipleValidationResult, event);
-        this.multipleValidationResult = multipleValidationResult;
-    }
+  public MultipleValidationException(MultipleValidationResult multipleValidationResult, MuleEvent event) {
+    super(multipleValidationResult, event);
+    this.multipleValidationResult = multipleValidationResult;
+  }
 
-    /**
-     * The {@link MultipleValidationResult} which this exception informs
-     * @return a {@link MultipleValidationResult}
-     */
-    public MultipleValidationResult getMultipleValidationResult()
-    {
-        return multipleValidationResult;
-    }
+  /**
+   * The {@link MultipleValidationResult} which this exception informs
+   * 
+   * @return a {@link MultipleValidationResult}
+   */
+  public MultipleValidationResult getMultipleValidationResult() {
+    return multipleValidationResult;
+  }
 }

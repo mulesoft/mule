@@ -17,36 +17,31 @@ import org.mule.tck.testmodels.mule.TestConnector;
 
 import org.junit.Test;
 
-public class CustomConfigTestCase extends FunctionalTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/integration/config/custom-config.xml";
-    }
+public class CustomConfigTestCase extends FunctionalTestCase {
 
-    @Test
-    public void testCustomEndpointConfig() throws Exception
-    {
-        ImmutableEndpoint ep = getEndpointFactory().getOutboundEndpoint(
-            "fooEndpoint");
-        assertNotNull("fooEndpoint should not be null", ep);
-        TestFilter tf = (TestFilter)ep.getFilter();
-        assertNotNull("the filter on the endpoint should not be null", tf);
-        assertEquals(tf.getFoo(), "goo");
-        assertEquals(tf.getBar(), 12);
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/integration/config/custom-config.xml";
+  }
 
-    @Test
-    public void testCustomConnectorConfig() throws Exception
-    {
-        TestConnector cnn = (TestConnector) muleContext.getRegistry().lookupObject("customConnector");
-        assertNotNull("customConnector should not be null", cnn);
-        assertEquals(cnn.getSomeProperty(), "foo");
-    }
+  @Test
+  public void testCustomEndpointConfig() throws Exception {
+    ImmutableEndpoint ep = getEndpointFactory().getOutboundEndpoint("fooEndpoint");
+    assertNotNull("fooEndpoint should not be null", ep);
+    TestFilter tf = (TestFilter) ep.getFilter();
+    assertNotNull("the filter on the endpoint should not be null", tf);
+    assertEquals(tf.getFoo(), "goo");
+    assertEquals(tf.getBar(), 12);
+  }
 
-    public EndpointFactory getEndpointFactory()
-    {
-        return (EndpointFactory) muleContext.getRegistry().lookupObject(MuleEndpointProperties.OBJECT_MULE_ENDPOINT_FACTORY);
-    }
+  @Test
+  public void testCustomConnectorConfig() throws Exception {
+    TestConnector cnn = (TestConnector) muleContext.getRegistry().lookupObject("customConnector");
+    assertNotNull("customConnector should not be null", cnn);
+    assertEquals(cnn.getSomeProperty(), "foo");
+  }
+
+  public EndpointFactory getEndpointFactory() {
+    return (EndpointFactory) muleContext.getRegistry().lookupObject(MuleEndpointProperties.OBJECT_MULE_ENDPOINT_FACTORY);
+  }
 }

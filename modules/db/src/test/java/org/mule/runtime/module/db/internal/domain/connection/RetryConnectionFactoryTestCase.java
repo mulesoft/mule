@@ -28,58 +28,54 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 @SmallTest
-public class RetryConnectionFactoryTestCase extends AbstractMuleTestCase
-{
+public class RetryConnectionFactoryTestCase extends AbstractMuleTestCase {
 
-    private final RetryPolicyTemplate retryPolicyTemplate = mock(RetryPolicyTemplate.class);
-    private final ConnectionFactory delegate = mock(ConnectionFactory.class);
-    private final RetryConnectionFactory connectionFactory = new RetryConnectionFactory(retryPolicyTemplate, delegate);
-    private final DataSource dataSource = mock(DataSource.class);
+  private final RetryPolicyTemplate retryPolicyTemplate = mock(RetryPolicyTemplate.class);
+  private final ConnectionFactory delegate = mock(ConnectionFactory.class);
+  private final RetryConnectionFactory connectionFactory = new RetryConnectionFactory(retryPolicyTemplate, delegate);
+  private final DataSource dataSource = mock(DataSource.class);
 
-    @Test
-    public void createsConnection() throws Exception
-    {
-        final ArgumentCaptor<RetryCallback> retryCallbackArgumentCaptor = ArgumentCaptor.forClass(RetryCallback.class);
+  @Test
+  public void createsConnection() throws Exception {
+    final ArgumentCaptor<RetryCallback> retryCallbackArgumentCaptor = ArgumentCaptor.forClass(RetryCallback.class);
 
-        when(retryPolicyTemplate.execute(retryCallbackArgumentCaptor.capture(), Matchers.<WorkManager>any())).then(new Answer<Object>()
-        {
-            public Object answer(InvocationOnMock invocationOnMock) throws Throwable
-            {
-                RetryCallback retryCallback = retryCallbackArgumentCaptor.getValue();
-                retryCallback.doWork(null);
-                return null;
-            }
+    when(retryPolicyTemplate.execute(retryCallbackArgumentCaptor.capture(), Matchers.<WorkManager>any()))
+        .then(new Answer<Object>() {
+
+          public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
+            RetryCallback retryCallback = retryCallbackArgumentCaptor.getValue();
+            retryCallback.doWork(null);
+            return null;
+          }
         });
 
-        Connection expectedConnection = mock(Connection.class);
-        when(delegate.create(dataSource)).thenReturn(expectedConnection);
+    Connection expectedConnection = mock(Connection.class);
+    when(delegate.create(dataSource)).thenReturn(expectedConnection);
 
-        Connection connection = connectionFactory.create(dataSource);
-        assertThat(connection, equalTo(expectedConnection));
-    }
+    Connection connection = connectionFactory.create(dataSource);
+    assertThat(connection, equalTo(expectedConnection));
+  }
 
-    @Test(expected = ConnectionCreationException.class)
-    public void failsOnConnectionError() throws Exception
-    {
-        final ArgumentCaptor<RetryCallback> retryCallbackArgumentCaptor = ArgumentCaptor.forClass(RetryCallback.class);
+  @Test(expected = ConnectionCreationException.class)
+  public void failsOnConnectionError() throws Exception {
+    final ArgumentCaptor<RetryCallback> retryCallbackArgumentCaptor = ArgumentCaptor.forClass(RetryCallback.class);
 
-        when(retryPolicyTemplate.execute(retryCallbackArgumentCaptor.capture(), Matchers.<WorkManager>any())).then(new Answer<Object>()
-        {
-            public Object answer(InvocationOnMock invocationOnMock) throws Throwable
-            {
-                throw new RuntimeException();
-            }
+    when(retryPolicyTemplate.execute(retryCallbackArgumentCaptor.capture(), Matchers.<WorkManager>any()))
+        .then(new Answer<Object>() {
+
+          public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
+            throw new RuntimeException();
+          }
         });
 
-        connectionFactory.create(dataSource);
-    }
+    connectionFactory.create(dataSource);
+  }
 
-    @Test(expected = ConnectionCreationException.class)
-    public void failsOnNullConnection() throws Exception
-    {
-        Connection expectedConnection = null;
-        when(dataSource.getConnection()).thenReturn(expectedConnection);
+  @Test(expected = ConnectionCreationException.class)
+  public void failsOnNullConnection() throws Exception {
+    Connection expectedConnection = null;
+    when(dataSource.getConnection()).thenReturn(expectedConnection);
 
-        connectionFactory.create(dataSource);
-    }
+    connectionFactory.create(dataSource);
+  }
 }

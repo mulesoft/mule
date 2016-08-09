@@ -9,14 +9,13 @@ package org.mule.compatibility.transport.jms.integration.transactions.local;
 import org.mule.compatibility.transport.jms.integration.AbstractJmsSingleTransactionSingleServiceTestCase;
 
 /**
- * Test all combinations of (inbound) BEGIN_OR_JOIN.  They should all pass.
+ * Test all combinations of (inbound) BEGIN_OR_JOIN. They should all pass.
  */
-public class JmsSingleTransactionSingleServiceBeginOrJoinConfigurationTestCase extends
-    AbstractJmsSingleTransactionSingleServiceTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "integration/transactions/local/jms-single-tx-single-service-begin-or-join.xml";
-    }
+public class JmsSingleTransactionSingleServiceBeginOrJoinConfigurationTestCase
+    extends AbstractJmsSingleTransactionSingleServiceTestCase {
+
+  @Override
+  protected String getConfigFile() {
+    return "integration/transactions/local/jms-single-tx-single-service-begin-or-join.xml";
+  }
 }

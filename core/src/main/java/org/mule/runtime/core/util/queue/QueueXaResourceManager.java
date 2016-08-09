@@ -13,32 +13,27 @@ import org.mule.runtime.core.util.xa.ResourceManagerException;
 
 import javax.transaction.xa.XAResource;
 
-public class QueueXaResourceManager extends AbstractXAResourceManager
-{
+public class QueueXaResourceManager extends AbstractXAResourceManager {
 
-    @Override
-    protected void doBegin(AbstractTransactionContext context)
-    {
-        // Nothing special to do
-    }
+  @Override
+  protected void doBegin(AbstractTransactionContext context) {
+    // Nothing special to do
+  }
 
-    @Override
-    protected int doPrepare(AbstractXaTransactionContext context) throws ResourceManagerException
-    {
-        context.doPrepare();
-        return XAResource.XA_OK;
-    }
+  @Override
+  protected int doPrepare(AbstractXaTransactionContext context) throws ResourceManagerException {
+    context.doPrepare();
+    return XAResource.XA_OK;
+  }
 
-    @Override
-    protected void doCommit(AbstractTransactionContext context) throws ResourceManagerException
-    {
-        context.doCommit();
-    }
+  @Override
+  protected void doCommit(AbstractTransactionContext context) throws ResourceManagerException {
+    context.doCommit();
+  }
 
-    @Override
-    protected void doRollback(AbstractTransactionContext context) throws ResourceManagerException
-    {
-        context.doRollback();
-    }
+  @Override
+  protected void doRollback(AbstractTransactionContext context) throws ResourceManagerException {
+    context.doRollback();
+  }
 
 }

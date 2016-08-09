@@ -32,169 +32,147 @@ import org.apache.commons.collections.Transformer;
  * 
  * This runner is <b>not</b> thread-safe.
  */
-public class FlowRunner extends FlowConstructRunner<FlowRunner>
-{
+public class FlowRunner extends FlowConstructRunner<FlowRunner> {
 
-    private String flowName;
+  private String flowName;
 
-    private ExecutionTemplate<MuleEvent> txExecutionTemplate = callback -> callback.process();
+  private ExecutionTemplate<MuleEvent> txExecutionTemplate = callback -> callback.process();
 
-    private ReplyToHandler replyToHandler;
+  private ReplyToHandler replyToHandler;
 
-    private Transformer responseEventTransformer = input -> input;
+  private Transformer responseEventTransformer = input -> input;
 
-    /**
-     * Initializes this flow runner.
-     * 
-     * @param muleContext the context of the mule application
-     * @param flowName the name of the flow to run events through
-     */
-    public FlowRunner(MuleContext muleContext, String flowName)
-    {
-        super(muleContext);
-        this.flowName = flowName;
+  /**
+   * Initializes this flow runner.
+   * 
+   * @param muleContext the context of the mule application
+   * @param flowName the name of the flow to run events through
+   */
+  public FlowRunner(MuleContext muleContext, String flowName) {
+    super(muleContext);
+    this.flowName = flowName;
+  }
+
+  /**
+   * Configures the flow to run inside a transaction.
+   * 
+   * @param action The action to do at the start of the transactional block. See {@link TransactionConfig} constants.
+   * @param factory See {@link MuleTransactionConfig#setFactory(TransactionFactory)}.
+   * @return this {@link FlowRunner}
+   */
+  public FlowRunner transactionally(TransactionConfigEnum action, TransactionFactory factory) {
+    MuleTransactionConfig transactionConfig = new MuleTransactionConfig(action.getAction());
+    transactionConfig.setFactory(factory);
+
+    txExecutionTemplate = createTransactionalExecutionTemplate(muleContext, transactionConfig);
+    eventBuilder.transactionally();
+
+    return this;
+  }
+
+  /**
+   * Configures this runner's flow to be run non-blocking.
+   * 
+   * @return this {@link FlowRunner}
+   */
+  public FlowRunner nonBlocking() {
+    replyToHandler = new SensingNullReplyToHandler();
+    eventBuilder.withReplyToHandler(replyToHandler);
+
+    responseEventTransformer = input -> {
+      MuleEvent responseEvent = (MuleEvent) input;
+      SensingNullReplyToHandler nullSensingReplyToHandler = (SensingNullReplyToHandler) replyToHandler;
+      try {
+        return getNonBlockingResponse(nullSensingReplyToHandler, responseEvent);
+      } catch (Exception e) {
+        throw new MuleRuntimeException(e);
+      }
+    };
+
+    return this;
+  }
+
+  protected MuleEvent getNonBlockingResponse(SensingNullReplyToHandler replyToHandler, MuleEvent result) throws Exception {
+    if (NonBlockingVoidMuleEvent.getInstance() == result) {
+      if (!replyToHandler.latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS)) {
+        throw new RuntimeException("No Non-Blocking Response");
+      }
+      if (replyToHandler.exception != null) {
+        throw replyToHandler.exception;
+      }
+      return replyToHandler.event;
+    } else {
+      return result;
+    }
+  }
+
+  /**
+   * Runs the specified flow with the provided event and configuration, and performs a {@link FlowAssert#verify(String))}
+   * afterwards.
+   * 
+   * If this is called multiple times, the <b>same</b> event will be sent. To force the creation of a new event, use
+   * {@link #reset()}.
+   * 
+   * @return the resulting <code>MuleEvent</code>
+   * @throws Exception
+   */
+  public MuleEvent run() throws Exception {
+    return runAndVerify(flowName);
+  }
+
+  /**
+   * Runs the specified flow with the provided event and configuration.
+   * 
+   * If this is called multiple times, the <b>same</b> event will be sent. To force the creation of a new event, use
+   * {@link #reset()}.
+   * 
+   * @return the resulting <code>MuleEvent</code>
+   * @throws Exception
+   */
+  public MuleEvent runNoVerify() throws Exception {
+    return runAndVerify(new String[] {});
+  }
+
+  /**
+   * Runs the specified flow with the provided event and configuration, and performs a {@link FlowAssert#verify(String))} for each
+   * {@code flowNamesToVerify} afterwards.
+   * 
+   * If this is called multiple times, the <b>same</b> event will be sent. To force the creation of a new event, use
+   * {@link #reset()}.
+   * 
+   * @param flowNamesToVerify the names of the flows to {@link FlowAssert#verify(String))} afterwards.
+   * @return the resulting <code>MuleEvent</code>
+   * @throws Exception
+   */
+  public MuleEvent runAndVerify(String... flowNamesToVerify) throws Exception {
+    Flow flow = (Flow) getFlowConstruct();
+    MuleEvent responseEvent = txExecutionTemplate.execute(() -> flow.process(getOrBuildEvent()));
+    for (String flowNameToVerify : flowNamesToVerify) {
+      FlowAssert.verify(flowNameToVerify);
     }
 
-    /**
-     * Configures the flow to run inside a transaction.
-     * 
-     * @param action The action to do at the start of the transactional block. See {@link TransactionConfig} constants.
-     * @param factory See {@link MuleTransactionConfig#setFactory(TransactionFactory)}.
-     * @return this {@link FlowRunner}
-     */
-    public FlowRunner transactionally(TransactionConfigEnum action, TransactionFactory factory)
-    {
-        MuleTransactionConfig transactionConfig = new MuleTransactionConfig(action.getAction());
-        transactionConfig.setFactory(factory);
+    return (MuleEvent) responseEventTransformer.transform(responseEvent);
+  }
 
-        txExecutionTemplate = createTransactionalExecutionTemplate(muleContext, transactionConfig);
-        eventBuilder.transactionally();
-
-        return this;
+  /**
+   * Runs the specified flow with the provided event and configuration expecting a failure. Will fail if there's no failure
+   * running the flow.
+   *
+   * @return the message exception return by the flow
+   * @throws Exception
+   */
+  public MessagingException runExpectingException() throws Exception {
+    try {
+      run();
+      fail("Flow executed successfully. Expecting exception");
+      return null;
+    } catch (MessagingException e) {
+      return e;
     }
+  }
 
-    /**
-     * Configures this runner's flow to be run non-blocking.
-     * 
-     * @return this {@link FlowRunner}
-     */
-    public FlowRunner nonBlocking()
-    {
-        replyToHandler = new SensingNullReplyToHandler();
-        eventBuilder.withReplyToHandler(replyToHandler);
-
-        responseEventTransformer = input -> {
-            MuleEvent responseEvent = (MuleEvent) input;
-            SensingNullReplyToHandler nullSensingReplyToHandler = (SensingNullReplyToHandler) replyToHandler;
-            try
-            {
-                return getNonBlockingResponse(nullSensingReplyToHandler, responseEvent);
-            }
-            catch (Exception e)
-            {
-                throw new MuleRuntimeException(e);
-            }
-        };
-
-        return this;
-    }
-
-    protected MuleEvent getNonBlockingResponse(SensingNullReplyToHandler replyToHandler, MuleEvent result) throws Exception
-    {
-        if (NonBlockingVoidMuleEvent.getInstance() == result)
-        {
-            if (!replyToHandler.latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS))
-            {
-                throw new RuntimeException("No Non-Blocking Response");
-            }
-            if (replyToHandler.exception != null)
-            {
-                throw replyToHandler.exception;
-            }
-            return replyToHandler.event;
-        }
-        else
-        {
-            return result;
-        }
-    }
-
-    /**
-     * Runs the specified flow with the provided event and configuration, and performs a
-     * {@link FlowAssert#verify(String))} afterwards.
-     * 
-     * If this is called multiple times, the <b>same</b> event will be sent. To force the creation of a new event, use
-     * {@link #reset()}.
-     * 
-     * @return the resulting <code>MuleEvent</code>
-     * @throws Exception
-     */
-    public MuleEvent run() throws Exception
-    {
-        return runAndVerify(flowName);
-    }
-
-    /**
-     * Runs the specified flow with the provided event and configuration.
-     * 
-     * If this is called multiple times, the <b>same</b> event will be sent. To force the creation of a new event, use
-     * {@link #reset()}.
-     * 
-     * @return the resulting <code>MuleEvent</code>
-     * @throws Exception
-     */
-    public MuleEvent runNoVerify() throws Exception
-    {
-        return runAndVerify(new String[] {});
-    }
-
-    /**
-     * Runs the specified flow with the provided event and configuration, and performs a
-     * {@link FlowAssert#verify(String))} for each {@code flowNamesToVerify} afterwards.
-     * 
-     * If this is called multiple times, the <b>same</b> event will be sent. To force the creation of a new event, use
-     * {@link #reset()}.
-     * 
-     * @param flowNamesToVerify the names of the flows to {@link FlowAssert#verify(String))} afterwards.
-     * @return the resulting <code>MuleEvent</code>
-     * @throws Exception
-     */
-    public MuleEvent runAndVerify(String... flowNamesToVerify) throws Exception
-    {
-        Flow flow = (Flow) getFlowConstruct();
-        MuleEvent responseEvent = txExecutionTemplate.execute(() -> flow.process(getOrBuildEvent()));
-        for (String flowNameToVerify : flowNamesToVerify)
-        {
-            FlowAssert.verify(flowNameToVerify);
-        }
-
-        return (MuleEvent) responseEventTransformer.transform(responseEvent);
-    }
-
-    /**
-     * Runs the specified flow with the provided event and configuration expecting a failure. Will fail if there's no
-     * failure running the flow.
-     *
-     * @return the message exception return by the flow
-     * @throws Exception
-     */
-    public MessagingException runExpectingException() throws Exception
-    {
-        try
-        {
-            run();
-            fail("Flow executed successfully. Expecting exception");
-            return null;
-        }
-        catch (MessagingException e)
-        {
-            return e;
-        }
-    }
-
-    @Override
-    public String getFlowConstructName()
-    {
-        return flowName;
-    }
+  @Override
+  public String getFlowConstructName() {
+    return flowName;
+  }
 }

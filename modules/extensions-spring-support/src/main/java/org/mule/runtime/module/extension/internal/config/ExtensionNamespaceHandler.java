@@ -9,19 +9,15 @@ package org.mule.runtime.module.extension.internal.config;
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
 /**
- * This class is just a workaround for MULE-9865. Should be deleted
- * as soon as that issue is resolved. Do not user since we will not
- * wait to Mule 5.0 to delete it
+ * This class is just a workaround for MULE-9865. Should be deleted as soon as that issue is resolved. Do not user since we will
+ * not wait to Mule 5.0 to delete it
  *
  * @since 3.7.0
  */
 @Deprecated
-public class ExtensionNamespaceHandler extends NamespaceHandlerSupport
-{
+public class ExtensionNamespaceHandler extends NamespaceHandlerSupport {
 
-    @Override
-    public void init()
-    {
-    }
+  @Override
+  public void init() {}
 
 }

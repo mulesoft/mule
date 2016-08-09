@@ -24,45 +24,41 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class UsernameTokenProxyWithoutMustUnderstandTestCase extends FunctionalTestCase
-{
+public class UsernameTokenProxyWithoutMustUnderstandTestCase extends FunctionalTestCase {
 
-    private static final HttpRequestOptions HTTP_REQUEST_OPTIONS = newOptions().method(POST.name()).disableStatusCodeValidation().build();
+  private static final HttpRequestOptions HTTP_REQUEST_OPTIONS =
+      newOptions().method(POST.name()).disableStatusCodeValidation().build();
 
-    @Rule
-    public final DynamicPort httpPortProxy = new DynamicPort("port1");
+  @Rule
+  public final DynamicPort httpPortProxy = new DynamicPort("port1");
 
-    private String request;
-    private String response;
+  private String request;
+  private String response;
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "cxf-proxy-service-without-mustunderstand-flow-httpn.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "cxf-proxy-service-without-mustunderstand-flow-httpn.xml";
+  }
 
-    @Before
-    public void doSetUp() throws Exception
-    {
-        request = IOUtils.getResourceAsString("in-message-with-mustunderstand.xml",getClass());
-        response = IOUtils.getResourceAsString("out-message-with-mustunderstand.xml",getClass());
-        ClientPasswordCallback.setPassword("secret");
-        super.doSetUp();
-        XMLUnit.setIgnoreWhitespace(true);
-    }
+  @Before
+  public void doSetUp() throws Exception {
+    request = IOUtils.getResourceAsString("in-message-with-mustunderstand.xml", getClass());
+    response = IOUtils.getResourceAsString("out-message-with-mustunderstand.xml", getClass());
+    ClientPasswordCallback.setPassword("secret");
+    super.doSetUp();
+    XMLUnit.setIgnoreWhitespace(true);
+  }
 
-    @Test
-    public void testProxyServiceWithoutMustUnderstand() throws Exception
-    {
-        MuleMessage replyMessage = sendRequest("http://localhost:" + httpPortProxy.getNumber() + "/proxy-envelope", request);
-        assertNotNull(replyMessage);
-        String payload = getPayloadAsString(replyMessage);
-        assertFalse(payload.contains("Fault"));
-        assertTrue(XMLUnit.compareXML(response, payload).identical());
-    }
+  @Test
+  public void testProxyServiceWithoutMustUnderstand() throws Exception {
+    MuleMessage replyMessage = sendRequest("http://localhost:" + httpPortProxy.getNumber() + "/proxy-envelope", request);
+    assertNotNull(replyMessage);
+    String payload = getPayloadAsString(replyMessage);
+    assertFalse(payload.contains("Fault"));
+    assertTrue(XMLUnit.compareXML(response, payload).identical());
+  }
 
-    protected MuleMessage sendRequest(String url,String payload) throws MuleException
-    {
-        return muleContext.getClient().send(url, getTestMuleMessage(payload), HTTP_REQUEST_OPTIONS);
-    }
+  protected MuleMessage sendRequest(String url, String payload) throws MuleException {
+    return muleContext.getClient().send(url, getTestMuleMessage(payload), HTTP_REQUEST_OPTIONS);
+  }
 }

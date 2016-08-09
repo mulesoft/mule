@@ -10,14 +10,11 @@ import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.model.EntryPointResolver;
 import org.mule.runtime.core.api.model.InvocationResult;
 
-public class CustomEntryPointResolver implements EntryPointResolver
-{
+public class CustomEntryPointResolver implements EntryPointResolver {
 
-    public InvocationResult invoke(Object component, MuleEventContext context) throws Exception
-    {
-        return new InvocationResult(this,
-                ((Target) component).custom(context.getMessage().getPayload()),
-                Target.class.getMethod("custom", new Class[]{Object.class}));
-    }
+  public InvocationResult invoke(Object component, MuleEventContext context) throws Exception {
+    return new InvocationResult(this, ((Target) component).custom(context.getMessage().getPayload()),
+                                Target.class.getMethod("custom", new Class[] {Object.class}));
+  }
 
 }

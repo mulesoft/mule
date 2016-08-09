@@ -46,165 +46,132 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Maps an HTTP response into a Mule event. A new message is set in the event with the contents of the response.
- * The body will be set as payload by default (except that the target attribute is set in the requester, in that case
- * the enricher expression provided will be used to set the response). Headers are mapped as inbound properties.
- * The status code is mapped as an inbound property {@code HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY}.
+ * Maps an HTTP response into a Mule event. A new message is set in the event with the contents of the response. The body will be
+ * set as payload by default (except that the target attribute is set in the requester, in that case the enricher expression
+ * provided will be used to set the response). Headers are mapped as inbound properties. The status code is mapped as an inbound
+ * property {@code HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY}.
  */
-public class HttpResponseToMuleEvent
-{
-    private static final Logger logger = LoggerFactory.getLogger(HttpResponseToMuleEvent.class);
+public class HttpResponseToMuleEvent {
 
-    private static final String MULTI_PART_PREFIX = "multipart/";
+  private static final Logger logger = LoggerFactory.getLogger(HttpResponseToMuleEvent.class);
 
-    private DefaultHttpRequester requester;
-    private MuleContext muleContext;
+  private static final String MULTI_PART_PREFIX = "multipart/";
 
-    private AttributeEvaluator parseResponse;
+  private DefaultHttpRequester requester;
+  private MuleContext muleContext;
 
-    public HttpResponseToMuleEvent(DefaultHttpRequester requester, MuleContext muleContext, AttributeEvaluator parseResponse)
-    {
-        this.requester = requester;
-        this.muleContext = muleContext;
-        this.parseResponse = parseResponse;
+  private AttributeEvaluator parseResponse;
+
+  public HttpResponseToMuleEvent(DefaultHttpRequester requester, MuleContext muleContext, AttributeEvaluator parseResponse) {
+    this.requester = requester;
+    this.muleContext = muleContext;
+    this.parseResponse = parseResponse;
+  }
+
+  public void convert(MuleEvent muleEvent, HttpResponse response, String uri) throws MessagingException {
+    String responseContentType = response.getHeaderValueIgnoreCase(CONTENT_TYPE);
+    DataType dataType = muleEvent.getMessage().getDataType();
+    if (StringUtils.isEmpty(responseContentType) && !MediaType.ANY.matches(dataType.getMediaType())) {
+      responseContentType = dataType.getMediaType().toRfcString();
     }
 
-    public void convert(MuleEvent muleEvent, HttpResponse response, String uri) throws MessagingException
-    {
-        String responseContentType = response.getHeaderValueIgnoreCase(CONTENT_TYPE);
-        DataType dataType = muleEvent.getMessage().getDataType();
-        if (StringUtils.isEmpty(responseContentType) && !MediaType.ANY.matches(dataType.getMediaType()))
-        {
-            responseContentType = dataType.getMediaType().toRfcString();
+    InputStream responseInputStream = ((InputStreamHttpEntity) response.getEntity()).getInputStream();
+    Charset encoding = getMediaType(responseContentType, getDefaultEncoding(muleContext)).getCharset().get();
+
+    Map<String, Serializable> inboundProperties = getInboundProperties(response);
+    Object payload = responseInputStream;
+
+    if (responseContentType != null && parseResponse.resolveBooleanValue(muleEvent)) {
+      if (responseContentType.startsWith(MULTI_PART_PREFIX)) {
+        try {
+          payload = multiPartPayloadForAttachments(responseContentType, responseInputStream);
+        } catch (IOException e) {
+          throw new MessagingException(muleEvent, e);
         }
-
-        InputStream responseInputStream = ((InputStreamHttpEntity) response.getEntity()).getInputStream();
-        Charset encoding = getMediaType(responseContentType, getDefaultEncoding(muleContext)).getCharset().get();
-
-        Map<String, Serializable> inboundProperties = getInboundProperties(response);
-        Object payload = responseInputStream;
-
-        if (responseContentType != null && parseResponse.resolveBooleanValue(muleEvent))
-        {
-            if (responseContentType.startsWith(MULTI_PART_PREFIX))
-            {
-                try
-                {
-                    payload = multiPartPayloadForAttachments(responseContentType, responseInputStream);
-                }
-                catch (IOException e)
-                {
-                    throw new MessagingException(muleEvent, e);
-                }
-            }
-            else if (responseContentType.startsWith(APPLICATION_X_WWW_FORM_URLENCODED.toRfcString()))
-            {
-                payload = HttpParser.decodeString(IOUtils.toString(responseInputStream), encoding);
-            }
-        }
-
-        String requestMessageId = muleEvent.getMessage().getUniqueId();
-        String requestMessageRootId = muleEvent.getMessage().getMessageRootId();
-
-        // Setting uniqueId and rootId in order to correlate messages from request to response generated.
-        final Builder builder = MuleMessage.builder()
-                                           .payload(muleEvent.getMessage().getPayload())
-                                           .id(requestMessageId)
-                                           .rootId(requestMessageRootId)
-                                           .inboundProperties(inboundProperties);
-        
-        if (StringUtils.isEmpty(responseContentType))
-        {
-            builder.mediaType(muleEvent.getMessage().getDataType().getMediaType());
-        }
-        else
-        {
-            builder.mediaType(MediaType.parse(responseContentType));
-        }
-        
-        MuleMessage message = builder.build();
-
-        muleEvent.setMessage(message);
-        setResponsePayload(payload, muleEvent);
-
-        if (requester.getConfig().isEnableCookies())
-        {
-            processCookies(response, uri);
-        }
+      } else if (responseContentType.startsWith(APPLICATION_X_WWW_FORM_URLENCODED.toRfcString())) {
+        payload = HttpParser.decodeString(IOUtils.toString(responseInputStream), encoding);
+      }
     }
 
-    private Map<String, Serializable> getInboundProperties(HttpResponse response)
-    {
-        Map<String, Serializable> properties = new HashMap<>();
+    String requestMessageId = muleEvent.getMessage().getUniqueId();
+    String requestMessageRootId = muleEvent.getMessage().getMessageRootId();
 
-        for (String headerName : response.getHeaderNames())
-        {
-            // Content-Type was already processed
-            if (!CONTENT_TYPE.equalsIgnoreCase(headerName))
-            {
-                properties.put(headerName, getHeaderValueToProperty(response, headerName));
-            }
-        }
+    // Setting uniqueId and rootId in order to correlate messages from request to response generated.
+    final Builder builder = MuleMessage.builder().payload(muleEvent.getMessage().getPayload()).id(requestMessageId)
+        .rootId(requestMessageRootId).inboundProperties(inboundProperties);
 
-        properties.put(HTTP_STATUS_PROPERTY, response.getStatusCode());
-        properties.put(HTTP_REASON_PROPERTY, response.getReasonPhrase());
-
-        return properties;
+    if (StringUtils.isEmpty(responseContentType)) {
+      builder.mediaType(muleEvent.getMessage().getDataType().getMediaType());
+    } else {
+      builder.mediaType(MediaType.parse(responseContentType));
     }
 
-    private Serializable getHeaderValueToProperty(HttpResponse response, String headerName)
-    {
-        Collection<String> headerValues = response.getHeaderValues(headerName);
-        if (headerValues.size() > 1)
-        {
-            return new ArrayList<>(headerValues);
-        }
-        return response.getHeaderValue(headerName);
+    MuleMessage message = builder.build();
+
+    muleEvent.setMessage(message);
+    setResponsePayload(payload, muleEvent);
+
+    if (requester.getConfig().isEnableCookies()) {
+      processCookies(response, uri);
+    }
+  }
+
+  private Map<String, Serializable> getInboundProperties(HttpResponse response) {
+    Map<String, Serializable> properties = new HashMap<>();
+
+    for (String headerName : response.getHeaderNames()) {
+      // Content-Type was already processed
+      if (!CONTENT_TYPE.equalsIgnoreCase(headerName)) {
+        properties.put(headerName, getHeaderValueToProperty(response, headerName));
+      }
     }
 
-    /**
-     * Stores the response payload (body of the HTTP response) in the Mule message according to the "target"
-     * property. If empty, it will be stored in the payload. If not, it will use the target expression to enrich
-     * the message with the body of the response.
-     */
-    private void setResponsePayload(Object payload, MuleEvent muleEvent)
-    {
-        if (StringUtils.isEmpty(requester.getTarget()) || DEFAULT_PAYLOAD_EXPRESSION.equals(requester.getTarget()) )
-        {
-            muleEvent.setMessage(MuleMessage.builder(muleEvent.getMessage())
-                                         .payload(payload).mediaType(muleEvent.getMessage().getDataType().getMediaType()).build());
-        }
-        else
-        {
-            muleContext.getExpressionManager().enrich(requester.getTarget(), muleEvent, payload);
-        }
+    properties.put(HTTP_STATUS_PROPERTY, response.getStatusCode());
+    properties.put(HTTP_REASON_PROPERTY, response.getReasonPhrase());
+
+    return properties;
+  }
+
+  private Serializable getHeaderValueToProperty(HttpResponse response, String headerName) {
+    Collection<String> headerValues = response.getHeaderValues(headerName);
+    if (headerValues.size() > 1) {
+      return new ArrayList<>(headerValues);
+    }
+    return response.getHeaderValue(headerName);
+  }
+
+  /**
+   * Stores the response payload (body of the HTTP response) in the Mule message according to the "target" property. If empty, it
+   * will be stored in the payload. If not, it will use the target expression to enrich the message with the body of the response.
+   */
+  private void setResponsePayload(Object payload, MuleEvent muleEvent) {
+    if (StringUtils.isEmpty(requester.getTarget()) || DEFAULT_PAYLOAD_EXPRESSION.equals(requester.getTarget())) {
+      muleEvent.setMessage(MuleMessage.builder(muleEvent.getMessage()).payload(payload)
+          .mediaType(muleEvent.getMessage().getDataType().getMediaType()).build());
+    } else {
+      muleContext.getExpressionManager().enrich(requester.getTarget(), muleEvent, payload);
+    }
+  }
+
+
+  private void processCookies(HttpResponse response, String uri) {
+    Collection<String> setCookieHeader = response.getHeaderValuesIgnoreCase(SET_COOKIE);
+    Collection<String> setCookie2Header = response.getHeaderValuesIgnoreCase(SET_COOKIE2);
+
+    Map<String, List<String>> cookieHeaders = new HashMap<>();
+
+    if (setCookieHeader != null) {
+      cookieHeaders.put(SET_COOKIE, new ArrayList<>(setCookieHeader));
     }
 
-
-    private void processCookies(HttpResponse response, String uri)
-    {
-        Collection<String> setCookieHeader = response.getHeaderValuesIgnoreCase(SET_COOKIE);
-        Collection<String> setCookie2Header = response.getHeaderValuesIgnoreCase(SET_COOKIE2);
-
-        Map<String, List<String>> cookieHeaders = new HashMap<>();
-
-        if (setCookieHeader != null)
-        {
-            cookieHeaders.put(SET_COOKIE, new ArrayList<>(setCookieHeader));
-        }
-
-        if (setCookie2Header != null)
-        {
-            cookieHeaders.put(SET_COOKIE2, new ArrayList<>(setCookie2Header));
-        }
-
-        try
-        {
-            requester.getConfig().getCookieManager().put(URI.create(uri), cookieHeaders);
-        }
-        catch (IOException e)
-        {
-            logger.warn("Error storing cookies for URI " + uri, e);
-        }
+    if (setCookie2Header != null) {
+      cookieHeaders.put(SET_COOKIE2, new ArrayList<>(setCookie2Header));
     }
+
+    try {
+      requester.getConfig().getCookieManager().put(URI.create(uri), cookieHeaders);
+    } catch (IOException e) {
+      logger.warn("Error storing cookies for URI " + uri, e);
+    }
+  }
 }

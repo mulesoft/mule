@@ -11,20 +11,17 @@ import javax.xml.xpath.XPathFactory;
 import net.sf.saxon.xpath.XPathFactoryImpl;
 
 /**
- * Implementation of {@link JaxpXPathEvaluator} which uses
- * the Saxon implementation.
+ * Implementation of {@link JaxpXPathEvaluator} which uses the Saxon implementation.
  *
  * @since 3.6.0
  */
-public class SaxonXpathEvaluator extends JaxpXPathEvaluator
-{
-    /**
-     * {@inheritDoc}
-     * Returns instances of {@link XPathFactoryImpl}
-     */
-    @Override
-    protected XPathFactory createXPathFactory()
-    {
-        return new XPathFactoryImpl();
-    }
+public class SaxonXpathEvaluator extends JaxpXPathEvaluator {
+
+  /**
+   * {@inheritDoc} Returns instances of {@link XPathFactoryImpl}
+   */
+  @Override
+  protected XPathFactory createXPathFactory() {
+    return new XPathFactoryImpl();
+  }
 }

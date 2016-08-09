@@ -16,38 +16,33 @@ import org.mule.runtime.core.work.MuleWorkManager;
 import java.util.List;
 
 /**
- * Allows Mule to use non-blocking execution model where possible and free up threads when performing IO
- * operations.
+ * Allows Mule to use non-blocking execution model where possible and free up threads when performing IO operations.
  *
  * @since 3.7
  */
-public class NonBlockingProcessingStrategy extends AbstractThreadingProfileProcessingStrategy
-{
+public class NonBlockingProcessingStrategy extends AbstractThreadingProfileProcessingStrategy {
 
-    private static final int DEFAULT_MAX_THREADS = 128;
+  private static final int DEFAULT_MAX_THREADS = 128;
 
-    public NonBlockingProcessingStrategy()
-    {
-        maxThreads = DEFAULT_MAX_THREADS;
+  public NonBlockingProcessingStrategy() {
+    maxThreads = DEFAULT_MAX_THREADS;
+  }
+
+  @Override
+  public void configureProcessors(List<MessageProcessor> processors,
+                                  org.mule.runtime.core.api.processor.StageNameSource nameSource,
+                                  MessageProcessorChainBuilder chainBuilder, MuleContext muleContext) {
+    for (MessageProcessor processor : processors) {
+      chainBuilder.chain((MessageProcessor) processor);
     }
+  }
 
-    @Override
-    public void configureProcessors(List<MessageProcessor> processors, org.mule.runtime.core.api.processor.StageNameSource
-            nameSource, MessageProcessorChainBuilder chainBuilder, MuleContext muleContext)
-    {
-        for (MessageProcessor processor : processors)
-        {
-            chainBuilder.chain((MessageProcessor) processor);
-        }
-    }
-
-    public WorkManager createWorkManager(FlowConstruct flowConstruct)
-    {
-        MuleContext muleContext = flowConstruct.getMuleContext();
-        MuleWorkManager workManager = (MuleWorkManager) createThreadingProfile(muleContext).createWorkManager
-                (getThreadPoolName(flowConstruct.getName(), muleContext), muleContext.getConfiguration()
-                        .getShutdownTimeout());
-        return workManager;
-    }
+  public WorkManager createWorkManager(FlowConstruct flowConstruct) {
+    MuleContext muleContext = flowConstruct.getMuleContext();
+    MuleWorkManager workManager = (MuleWorkManager) createThreadingProfile(muleContext)
+        .createWorkManager(getThreadPoolName(flowConstruct.getName(), muleContext),
+                           muleContext.getConfiguration().getShutdownTimeout());
+    return workManager;
+  }
 
 }

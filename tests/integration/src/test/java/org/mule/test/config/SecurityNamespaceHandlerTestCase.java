@@ -20,35 +20,31 @@ import java.util.Iterator;
 
 import org.junit.Test;
 
-public class SecurityNamespaceHandlerTestCase extends AbstractIntegrationTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "security-namespace-config.xml";
-    }
+public class SecurityNamespaceHandlerTestCase extends AbstractIntegrationTestCase {
 
-    @Test
-    public void testSecurity()
-    {
-        SecurityManager securityManager = muleContext.getSecurityManager();
-        assertNotNull(securityManager.getProvider("dummySecurityProvider"));
-        assertTrue(securityManager.getProvider("dummySecurityProvider") instanceof TestSingleUserSecurityProvider);
-        verifyEncryptionStrategy(securityManager, "dummyEncryptionStrategy", MockEncryptionStrategy.class);
-        verifyEncryptionStrategy(securityManager, "passwordEncryptionStrategy", PasswordBasedEncryptionStrategy.class);
-        verifyEncryptionStrategy(securityManager, "secretKeyEncryptionStrategy", SecretKeyEncryptionStrategy.class);
+  @Override
+  protected String getConfigFile() {
+    return "security-namespace-config.xml";
+  }
+
+  @Test
+  public void testSecurity() {
+    SecurityManager securityManager = muleContext.getSecurityManager();
+    assertNotNull(securityManager.getProvider("dummySecurityProvider"));
+    assertTrue(securityManager.getProvider("dummySecurityProvider") instanceof TestSingleUserSecurityProvider);
+    verifyEncryptionStrategy(securityManager, "dummyEncryptionStrategy", MockEncryptionStrategy.class);
+    verifyEncryptionStrategy(securityManager, "passwordEncryptionStrategy", PasswordBasedEncryptionStrategy.class);
+    verifyEncryptionStrategy(securityManager, "secretKeyEncryptionStrategy", SecretKeyEncryptionStrategy.class);
+  }
+
+  private void verifyEncryptionStrategy(SecurityManager securityManager, String name, Class clazz) {
+    Iterator strategies = securityManager.getEncryptionStrategies().iterator();
+    logger.debug("Listing strategies");
+    while (strategies.hasNext()) {
+      EncryptionStrategy strategy = (EncryptionStrategy) strategies.next();
+      logger.debug(strategy.getName() + " / " + strategy.toString() + " / " + strategy.getClass());
     }
-    
-    private void verifyEncryptionStrategy(SecurityManager securityManager, String name, Class clazz)
-    {
-        Iterator strategies = securityManager.getEncryptionStrategies().iterator();
-        logger.debug("Listing strategies");
-        while (strategies.hasNext())
-        {
-            EncryptionStrategy strategy = (EncryptionStrategy) strategies.next();
-            logger.debug(strategy.getName() + " / " + strategy.toString() + " / " + strategy.getClass());
-        }
-        assertNotNull(name, securityManager.getEncryptionStrategy(name));
-        assertTrue(securityManager.getEncryptionStrategy(name).getClass().equals(clazz));
-    }
+    assertNotNull(name, securityManager.getEncryptionStrategy(name));
+    assertTrue(securityManager.getEncryptionStrategy(name).getClass().equals(clazz));
+  }
 }

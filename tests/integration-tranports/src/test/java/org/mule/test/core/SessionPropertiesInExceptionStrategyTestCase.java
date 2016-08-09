@@ -18,26 +18,24 @@ import java.util.List;
 
 import org.junit.Test;
 
-public class SessionPropertiesInExceptionStrategyTestCase extends FunctionalTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/properties/session-properties-in-exception-strategy-config.xml";
-    }
+public class SessionPropertiesInExceptionStrategyTestCase extends FunctionalTestCase {
 
-    @Test
-    public void sessionPropertyIsNotLost() throws Exception
-    {
-        List<String> list = new ArrayList<String>();
-        list.add("one");
-        list.add("two");
-        list.add("three");
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/properties/session-properties-in-exception-strategy-config.xml";
+  }
 
-        MuleEvent event = flowRunner("test").withPayload(list).run();
+  @Test
+  public void sessionPropertyIsNotLost() throws Exception {
+    List<String> list = new ArrayList<String>();
+    list.add("one");
+    list.add("two");
+    list.add("three");
 
-        assertNull(event.getMessage().getExceptionPayload());
-        assertThat(event.getMessage().getPayload(), is(notNullValue()));
-        assertThat(event.getSession().getProperty("ErrorCount"), is(list.size()));
-    }
+    MuleEvent event = flowRunner("test").withPayload(list).run();
+
+    assertNull(event.getMessage().getExceptionPayload());
+    assertThat(event.getMessage().getPayload(), is(notNullValue()));
+    assertThat(event.getSession().getProperty("ErrorCount"), is(list.size()));
+  }
 }

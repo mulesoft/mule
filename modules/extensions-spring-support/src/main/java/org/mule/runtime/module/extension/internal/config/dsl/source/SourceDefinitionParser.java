@@ -24,42 +24,38 @@ import org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingCon
 import org.mule.runtime.module.extension.internal.runtime.source.ExtensionMessageSource;
 
 /**
- * An {@link ExtensionMessageSource} used to parse instances of {@link ExtensionMessageSource}
- * instances through a {@link SourceDefinitionParser}
+ * An {@link ExtensionMessageSource} used to parse instances of {@link ExtensionMessageSource} instances through a
+ * {@link SourceDefinitionParser}
  *
  * @since 4.0
  */
-public class SourceDefinitionParser extends ExtensionDefinitionParser
-{
+public class SourceDefinitionParser extends ExtensionDefinitionParser {
 
-    private final RuntimeExtensionModel extensionModel;
-    private final RuntimeSourceModel sourceModel;
-    private final MuleContext muleContext;
-    private final DslElementSyntax sourceDsl;
+  private final RuntimeExtensionModel extensionModel;
+  private final RuntimeSourceModel sourceModel;
+  private final MuleContext muleContext;
+  private final DslElementSyntax sourceDsl;
 
-    public SourceDefinitionParser(ComponentBuildingDefinition.Builder definition, RuntimeExtensionModel extensionModel,
-                                  RuntimeSourceModel sourceModel, DslSyntaxResolver dslSyntaxResolver, MuleContext muleContext,
-                                  ExtensionParsingContext parsingContext)
-    {
-        super(definition, dslSyntaxResolver, parsingContext);
-        this.extensionModel = extensionModel;
-        this.sourceModel = sourceModel;
-        this.muleContext = muleContext;
-        this.sourceDsl = dslSyntaxResolver.resolve(sourceModel);
-    }
+  public SourceDefinitionParser(ComponentBuildingDefinition.Builder definition, RuntimeExtensionModel extensionModel,
+                                RuntimeSourceModel sourceModel, DslSyntaxResolver dslSyntaxResolver, MuleContext muleContext,
+                                ExtensionParsingContext parsingContext) {
+    super(definition, dslSyntaxResolver, parsingContext);
+    this.extensionModel = extensionModel;
+    this.sourceModel = sourceModel;
+    this.muleContext = muleContext;
+    this.sourceDsl = dslSyntaxResolver.resolve(sourceModel);
+  }
 
-    @Override
-    protected void doParse(ComponentBuildingDefinition.Builder definitionBuilder) throws ConfigurationException
-    {
-        definitionBuilder.withIdentifier(sourceDsl.getElementName())
-                .withTypeDefinition(fromType(ExtensionMessageSource.class))
-                .withObjectFactoryType(ExtensionSourceObjectFactory.class)
-                .withConstructorParameterDefinition(fromFixedValue(extensionModel).build())
-                .withConstructorParameterDefinition(fromFixedValue(sourceModel).build())
-                .withConstructorParameterDefinition(fromFixedValue(muleContext).build())
-                .withSetterParameterDefinition("retryPolicyTemplate", fromChildConfiguration(RetryPolicyTemplate.class).build())
-                .withSetterParameterDefinition("configurationProviderName", fromSimpleParameter(CONFIG_ATTRIBUTE).build());
+  @Override
+  protected void doParse(ComponentBuildingDefinition.Builder definitionBuilder) throws ConfigurationException {
+    definitionBuilder.withIdentifier(sourceDsl.getElementName()).withTypeDefinition(fromType(ExtensionMessageSource.class))
+        .withObjectFactoryType(ExtensionSourceObjectFactory.class)
+        .withConstructorParameterDefinition(fromFixedValue(extensionModel).build())
+        .withConstructorParameterDefinition(fromFixedValue(sourceModel).build())
+        .withConstructorParameterDefinition(fromFixedValue(muleContext).build())
+        .withSetterParameterDefinition("retryPolicyTemplate", fromChildConfiguration(RetryPolicyTemplate.class).build())
+        .withSetterParameterDefinition("configurationProviderName", fromSimpleParameter(CONFIG_ATTRIBUTE).build());
 
-        parseParameters(sourceModel.getParameterModels());
-    }
+    parseParameters(sourceModel.getParameterModels());
+  }
 }

@@ -27,61 +27,52 @@ import org.enhydra.jdbc.standard.StandardDataSource;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class ReconnectStandardTestCase extends AbstractDbIntegrationTestCase
-{
+public class ReconnectStandardTestCase extends AbstractDbIntegrationTestCase {
 
-    public static final int EXPECTED_CONNECTION_ERRORS = 2;
+  public static final int EXPECTED_CONNECTION_ERRORS = 2;
 
-    private static int errorCount;
+  private static int errorCount;
 
-    public ReconnectStandardTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
+  public ReconnectStandardTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
+
+  @Parameterized.Parameters
+  public static List<Object[]> parameters() {
+    return TestDbConfig.getDerbyResource();
+  }
+
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/reconnect/derby-db-reconnect-standard-config.xml"};
+  }
+
+  @Test
+  public void reconnectsAfterConnectionFailure() throws Exception {
+    final MuleEvent responseEvent = flowRunner("testReconnection").withPayload(TEST_MESSAGE).run();
+
+    final MuleMessage response = responseEvent.getMessage();
+    assertMessageContains(response, getAllPlanetRecords());
+    assertThat(errorCount, equalTo(EXPECTED_CONNECTION_ERRORS));
+  }
+
+  public static class EnableDatabaseConnection implements RetryNotifier {
+
+    public synchronized void onFailure(RetryContext context, Throwable e) {
+
+      errorCount++;
+
+      if (errorCount == EXPECTED_CONNECTION_ERRORS) {
+        // Fixes datasource's URL to enable connection
+        DbConfigResolver dbConfigResolver = muleContext.getRegistry().get("badDbConfig");
+        DbConfig config = dbConfigResolver.resolve(null);
+        StandardDataSource dataSource = (StandardDataSource) config.getDataSource();
+        dataSource.setUrl("jdbc:derby:muleEmbeddedDB;create=true");
+      }
     }
 
-    @Parameterized.Parameters
-    public static List<Object[]> parameters()
-    {
-        return TestDbConfig.getDerbyResource();
+    public void onSuccess(RetryContext context) {
+
     }
-
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/reconnect/derby-db-reconnect-standard-config.xml"};
-    }
-
-    @Test
-    public void reconnectsAfterConnectionFailure() throws Exception
-    {
-        final MuleEvent responseEvent = flowRunner("testReconnection").withPayload(TEST_MESSAGE).run();
-
-        final MuleMessage response = responseEvent.getMessage();
-        assertMessageContains(response, getAllPlanetRecords());
-        assertThat(errorCount, equalTo(EXPECTED_CONNECTION_ERRORS));
-    }
-
-    public static class EnableDatabaseConnection implements RetryNotifier
-    {
-
-        public synchronized void onFailure(RetryContext context, Throwable e)
-        {
-
-            errorCount++;
-
-            if (errorCount == EXPECTED_CONNECTION_ERRORS)
-            {
-                // Fixes datasource's URL to enable connection
-                DbConfigResolver dbConfigResolver = muleContext.getRegistry().get("badDbConfig");
-                DbConfig config = dbConfigResolver.resolve(null);
-                StandardDataSource dataSource = (StandardDataSource) config.getDataSource();
-                dataSource.setUrl("jdbc:derby:muleEmbeddedDB;create=true");
-            }
-        }
-
-        public void onSuccess(RetryContext context)
-        {
-
-        }
-    }
+  }
 }

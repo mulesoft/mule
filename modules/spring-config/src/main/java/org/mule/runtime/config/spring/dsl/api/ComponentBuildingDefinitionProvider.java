@@ -19,19 +19,18 @@ import java.util.List;
  *
  * @since 4.0
  */
-public interface ComponentBuildingDefinitionProvider
-{
+public interface ComponentBuildingDefinitionProvider {
 
-    /**
-     * Initialization method called once the extensions is discovered.
-     *
-     * @param muleContext the {@link org.mule.runtime.core.api.MuleContext} of the application being created.
-     */
-    void init(MuleContext muleContext);
+  /**
+   * Initialization method called once the extensions is discovered.
+   *
+   * @param muleContext the {@link org.mule.runtime.core.api.MuleContext} of the application being created.
+   */
+  void init(MuleContext muleContext);
 
-    /**
-     * @return list of {@code ComponentBuildingDefinition} provided by the extension.
-     */
-    List<ComponentBuildingDefinition> getComponentBuildingDefinitions();
+  /**
+   * @return list of {@code ComponentBuildingDefinition} provided by the extension.
+   */
+  List<ComponentBuildingDefinition> getComponentBuildingDefinitions();
 
 }

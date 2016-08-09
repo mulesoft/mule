@@ -13,23 +13,20 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 import org.springframework.beans.factory.xml.ParserContext;
 
-public class ExtendTarget implements PostProcessor
-{
+public class ExtendTarget implements PostProcessor {
 
-    private String name;
-    private String value;
+  private String name;
+  private String value;
 
-    public ExtendTarget(String name, String value)
-    {
-        this.name = name;
-        this.value = value;
-    }
+  public ExtendTarget(String name, String value) {
+    this.name = name;
+    this.value = value;
+  }
 
-    public void postProcess(ParserContext unused, BeanAssembler assembler, Element element)
-    {
-        Attr attribute = element.getOwnerDocument().createAttribute(name);
-        attribute.setNodeValue(value);
-        assembler.extendTarget(attribute);
-    }
+  public void postProcess(ParserContext unused, BeanAssembler assembler, Element element) {
+    Attr attribute = element.getOwnerDocument().createAttribute(name);
+    attribute.setNodeValue(value);
+    assembler.extendTarget(attribute);
+  }
 
 }

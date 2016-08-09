@@ -31,124 +31,112 @@ import java.util.Map;
 
 import org.junit.Test;
 
-public class DefaultServiceExceptionStrategyTestCase extends AbstractIntegrationTestCase
-{
+public class DefaultServiceExceptionStrategyTestCase extends AbstractIntegrationTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/integration/exceptions/default-service-exception-strategy-config-flow.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/integration/exceptions/default-service-exception-strategy-config-flow.xml";
+  }
 
-    @Test
-    public void testDefaultExceptionStrategySingleEndpoint() throws Exception
-    {
-        FlowConstruct flowConstruct = muleContext.getRegistry().lookupFlowConstruct("testService1");
+  @Test
+  public void testDefaultExceptionStrategySingleEndpoint() throws Exception {
+    FlowConstruct flowConstruct = muleContext.getRegistry().lookupFlowConstruct("testService1");
 
-        assertNotNull(flowConstruct);
-        assertNotNull(flowConstruct.getExceptionListener());
-        assertTrue(flowConstruct.getExceptionListener() instanceof DefaultMessagingExceptionStrategy);
-        assertEquals(1,
-            ((DefaultMessagingExceptionStrategy) flowConstruct.getExceptionListener()).getMessageProcessors()
-                .size());
+    assertNotNull(flowConstruct);
+    assertNotNull(flowConstruct.getExceptionListener());
+    assertTrue(flowConstruct.getExceptionListener() instanceof DefaultMessagingExceptionStrategy);
+    assertEquals(1, ((DefaultMessagingExceptionStrategy) flowConstruct.getExceptionListener()).getMessageProcessors().size());
 
-        flowRunner("testService1").withPayload(getTestMuleMessage()).asynchronously().run();
+    flowRunner("testService1").withPayload(getTestMuleMessage()).asynchronously().run();
 
-        assertExceptionMessage(muleContext.getClient().request("test://out1", RECEIVE_TIMEOUT));
-        // request one more time to ensure that only one exception message was sent
-        // per exception
-        assertNull(muleContext.getClient().request("test://out2", RECEIVE_TIMEOUT));
-    }
+    assertExceptionMessage(muleContext.getClient().request("test://out1", RECEIVE_TIMEOUT));
+    // request one more time to ensure that only one exception message was sent
+    // per exception
+    assertNull(muleContext.getClient().request("test://out2", RECEIVE_TIMEOUT));
+  }
 
-    @Test
-    public void testDefaultExceptionStrategyMultipleEndpoints() throws Exception
-    {
-        FlowConstruct flowConstruct =  muleContext.getRegistry().lookupFlowConstruct("testService2");
+  @Test
+  public void testDefaultExceptionStrategyMultipleEndpoints() throws Exception {
+    FlowConstruct flowConstruct = muleContext.getRegistry().lookupFlowConstruct("testService2");
 
-        assertNotNull(flowConstruct);
-        assertNotNull(flowConstruct.getExceptionListener());
-        assertTrue(flowConstruct.getExceptionListener() instanceof DefaultMessagingExceptionStrategy);
-        DefaultMessagingExceptionStrategy exceptionListener = (DefaultMessagingExceptionStrategy) flowConstruct.getExceptionListener();
-        MessageProcessor mp = exceptionListener.getMessageProcessors().iterator().next();
-        assertTrue(mp.getClass().getName(), mp instanceof MulticastingRouter);
-        assertEquals(2, ((MulticastingRouter) mp).getRoutes().size());
+    assertNotNull(flowConstruct);
+    assertNotNull(flowConstruct.getExceptionListener());
+    assertTrue(flowConstruct.getExceptionListener() instanceof DefaultMessagingExceptionStrategy);
+    DefaultMessagingExceptionStrategy exceptionListener =
+        (DefaultMessagingExceptionStrategy) flowConstruct.getExceptionListener();
+    MessageProcessor mp = exceptionListener.getMessageProcessors().iterator().next();
+    assertTrue(mp.getClass().getName(), mp instanceof MulticastingRouter);
+    assertEquals(2, ((MulticastingRouter) mp).getRoutes().size());
 
-        MuleClient client = muleContext.getClient();
+    MuleClient client = muleContext.getClient();
 
-        flowRunner("testService2").withPayload(getTestMuleMessage()).asynchronously().run();
+    flowRunner("testService2").withPayload(getTestMuleMessage()).asynchronously().run();
 
-        MuleMessage out2 = client.request("test://out2", RECEIVE_TIMEOUT);
-        MuleMessage out3 = client.request("test://out3", RECEIVE_TIMEOUT);
-        assertExceptionMessage(out2);
-        assertExceptionMessage(out3);
-        assertNotSame(out2, out3);
-        assertThat(out3.getPayload(), equalTo(out2.getPayload()));
-    }
+    MuleMessage out2 = client.request("test://out2", RECEIVE_TIMEOUT);
+    MuleMessage out3 = client.request("test://out3", RECEIVE_TIMEOUT);
+    assertExceptionMessage(out2);
+    assertExceptionMessage(out3);
+    assertNotSame(out2, out3);
+    assertThat(out3.getPayload(), equalTo(out2.getPayload()));
+  }
 
-    @Test
-    public void testDefaultExceptionStrategyNonEndpoint() throws Exception
-    {
-        MuleClient mc = muleContext.getClient();
+  @Test
+  public void testDefaultExceptionStrategyNonEndpoint() throws Exception {
+    MuleClient mc = muleContext.getClient();
 
-        flowRunner("testService3").withPayload(getTestMuleMessage()).asynchronously().run();
+    flowRunner("testService3").withPayload(getTestMuleMessage()).asynchronously().run();
 
-        MuleMessage out4 = mc.request("test://out4", RECEIVE_TIMEOUT);
-        assertEquals("ERROR!", getPayloadAsString(out4));
-    }
+    MuleMessage out4 = mc.request("test://out4", RECEIVE_TIMEOUT);
+    assertEquals("ERROR!", getPayloadAsString(out4));
+  }
 
-    @Test
-    public void testSerializablePayload() throws Exception
-    {
-        Map<String, String> map = new HashMap<String, String>();
-        map.put("key1", "value1");
-        map.put("key2", "value2");
+  @Test
+  public void testSerializablePayload() throws Exception {
+    Map<String, String> map = new HashMap<String, String>();
+    map.put("key1", "value1");
+    map.put("key2", "value2");
 
-        MuleClient client = muleContext.getClient();
-        flowRunner("testService6").withPayload(getTestMuleMessage(map)).asynchronously().run();
+    MuleClient client = muleContext.getClient();
+    flowRunner("testService6").withPayload(getTestMuleMessage(map)).asynchronously().run();
 
-        MuleMessage message = client.request("test://out6", RECEIVE_TIMEOUT);
+    MuleMessage message = client.request("test://out6", RECEIVE_TIMEOUT);
 
-        assertTrue(message.getPayload() instanceof ExceptionMessage);
-        Object payload = ((ExceptionMessage) message.getPayload()).getPayload();
-        assertTrue("payload shoud be a Map, but is " + payload.getClass().getName(),
-            payload instanceof Map<?, ?>);
-        Map<?, ?> payloadMap = (Map<?, ?>) payload;
-        assertEquals("value1", payloadMap.get("key1"));
-        assertEquals("value2", payloadMap.get("key2"));
-    }
+    assertTrue(message.getPayload() instanceof ExceptionMessage);
+    Object payload = ((ExceptionMessage) message.getPayload()).getPayload();
+    assertTrue("payload shoud be a Map, but is " + payload.getClass().getName(), payload instanceof Map<?, ?>);
+    Map<?, ?> payloadMap = (Map<?, ?>) payload;
+    assertEquals("value1", payloadMap.get("key1"));
+    assertEquals("value2", payloadMap.get("key2"));
+  }
 
-    @Test
-    public void testStopsServiceOnException() throws Exception
-    {
-        final FlowConstruct flowConstruct = muleContext.getRegistry().lookupFlowConstruct("testService5");
+  @Test
+  public void testStopsServiceOnException() throws Exception {
+    final FlowConstruct flowConstruct = muleContext.getRegistry().lookupFlowConstruct("testService5");
 
-        MuleClient client = muleContext.getClient();
-        flowRunner("testService5").withPayload(getTestMuleMessage()).asynchronously().run();
+    MuleClient client = muleContext.getClient();
+    flowRunner("testService5").withPayload(getTestMuleMessage()).asynchronously().run();
 
-        assertExceptionMessage(client.request("test://out5", RECEIVE_TIMEOUT));
+    assertExceptionMessage(client.request("test://out5", RECEIVE_TIMEOUT));
 
-        Prober prober = new PollingProber(5000, 100);
-        prober.check(new Probe()
-        {
-            @Override
-            public boolean isSatisfied()
-            {
-                return !flowConstruct.getLifecycleState().isStarted();
-            }
+    Prober prober = new PollingProber(5000, 100);
+    prober.check(new Probe() {
 
-            @Override
-            public String describeFailure()
-            {
-                return "Service was not stopped after processing the exception";
-            }
-        });
-    }
+      @Override
+      public boolean isSatisfied() {
+        return !flowConstruct.getLifecycleState().isStarted();
+      }
 
-    private void assertExceptionMessage(MuleMessage out)
-    {
-        assertTrue(out.getPayload() instanceof ExceptionMessage);
-        ExceptionMessage exceptionMessage = (ExceptionMessage) out.getPayload();
-        assertEquals(FunctionalTestException.class, exceptionMessage.getException().getCause().getClass());
-        assertEquals("test", exceptionMessage.getPayload());
-    }
+      @Override
+      public String describeFailure() {
+        return "Service was not stopped after processing the exception";
+      }
+    });
+  }
+
+  private void assertExceptionMessage(MuleMessage out) {
+    assertTrue(out.getPayload() instanceof ExceptionMessage);
+    ExceptionMessage exceptionMessage = (ExceptionMessage) out.getPayload();
+    assertEquals(FunctionalTestException.class, exceptionMessage.getException().getCause().getClass());
+    assertEquals("test", exceptionMessage.getPayload());
+  }
 }

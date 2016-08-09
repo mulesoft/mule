@@ -33,123 +33,105 @@ import org.apache.commons.codec.binary.Base64;
 /**
  * Handler for calling the token url, parsing the response and storing the oauth context data.
  */
-public class ClientCredentialsTokenRequestHandler extends AbstractTokenRequestHandler
-{
+public class ClientCredentialsTokenRequestHandler extends AbstractTokenRequestHandler {
 
-    private String scopes;
-    private ApplicationCredentials applicationCredentials;
-    private TokenResponseConfiguration tokenResponseConfiguration = new TokenResponseConfiguration();
-    private TokenManagerConfig tokenManager;
-    private boolean encodeClientCredentialsInBody = false;
-    private MuleEventLogger muleEventLogger = new MuleEventLogger(logger);
+  private String scopes;
+  private ApplicationCredentials applicationCredentials;
+  private TokenResponseConfiguration tokenResponseConfiguration = new TokenResponseConfiguration();
+  private TokenManagerConfig tokenManager;
+  private boolean encodeClientCredentialsInBody = false;
+  private MuleEventLogger muleEventLogger = new MuleEventLogger(logger);
 
-    public void setApplicationCredentials(ApplicationCredentials applicationCredentials)
-    {
-        this.applicationCredentials = applicationCredentials;
+  public void setApplicationCredentials(ApplicationCredentials applicationCredentials) {
+    this.applicationCredentials = applicationCredentials;
+  }
+
+  public void setScopes(String scopes) {
+    this.scopes = scopes;
+  }
+
+  public void setTokenResponseConfiguration(TokenResponseConfiguration tokenResponseConfiguration) {
+    this.tokenResponseConfiguration = tokenResponseConfiguration;
+  }
+
+  @Override
+  public void setMuleContext(MuleContext muleContext) {
+    super.setMuleContext(muleContext);
+  }
+
+  private void setMapPayloadWithTokenRequestParameters(final MuleEvent event) throws MuleException {
+    final HashMap<String, String> formData = new HashMap<>();
+    formData.put(OAuthConstants.GRANT_TYPE_PARAMETER, OAuthConstants.GRANT_TYPE_CLIENT_CREDENTIALS);
+    String clientId = applicationCredentials.getClientId();
+    String clientSecret = applicationCredentials.getClientSecret();
+
+    MuleMessage.Builder builder = MuleMessage.builder(event.getMessage());
+    if (encodeClientCredentialsInBody) {
+      formData.put(OAuthConstants.CLIENT_ID_PARAMETER, clientId);
+      formData.put(OAuthConstants.CLIENT_SECRET_PARAMETER, clientSecret);
+    } else {
+      String encodedCredentials = Base64.encodeBase64String(String.format("%s:%s", clientId, clientSecret).getBytes());
+      builder.addOutboundProperty(HttpHeaders.Names.AUTHORIZATION, "Basic " + encodedCredentials);
     }
-
-    public void setScopes(String scopes)
-    {
-        this.scopes = scopes;
+    if (scopes != null) {
+      formData.put(OAuthConstants.SCOPE_PARAMETER, scopes);
     }
+    event.setMessage(builder.payload(formData).build());
+  }
 
-    public void setTokenResponseConfiguration(TokenResponseConfiguration tokenResponseConfiguration)
-    {
-        this.tokenResponseConfiguration = tokenResponseConfiguration;
+  public void refreshAccessToken() throws MuleException {
+    try {
+      final DefaultMuleEvent accessTokenEvent =
+          new DefaultMuleEvent(MuleMessage.builder().nullPayload().build(), MessageExchangePattern.REQUEST_RESPONSE,
+                               new Flow("test", getMuleContext()));
+      setMapPayloadWithTokenRequestParameters(accessTokenEvent);
+      final MuleEvent response;
+      response = invokeTokenUrl(accessTokenEvent);
+      final TokenResponseProcessor tokenResponseProcessor = TokenResponseProcessor
+          .createClientCredentialsProcessor(tokenResponseConfiguration, getMuleContext().getExpressionManager());
+      tokenResponseProcessor.process(response);
+
+      if (logger.isDebugEnabled()) {
+        logger.debug("Retrieved access token, refresh token and expires from token url are: %s, %s, %s",
+                     tokenResponseProcessor.getAccessToken(), tokenResponseProcessor.getRefreshToken(),
+                     tokenResponseProcessor.getExpiresIn());
+      }
+
+      if (!tokenResponseContentIsValid(tokenResponseProcessor)) {
+        throw new TokenNotFoundException(response, tokenResponseProcessor);
+      }
+
+      final ResourceOwnerOAuthContext defaultUserState =
+          tokenManager.getConfigOAuthContext().getContextForResourceOwner(ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID);
+      defaultUserState.setAccessToken(tokenResponseProcessor.getAccessToken());
+      defaultUserState.setExpiresIn(tokenResponseProcessor.getExpiresIn());
+      final Map<String, Object> customResponseParameters = tokenResponseProcessor.getCustomResponseParameters();
+      for (String paramName : customResponseParameters.keySet()) {
+        defaultUserState.getTokenResponseParameters().put(paramName, customResponseParameters.get(paramName));
+      }
+      tokenManager.getConfigOAuthContext().updateResourceOwnerOAuthContext(defaultUserState);
+    } catch (TokenNotFoundException e) {
+      logger.error(String
+          .format("Could not extract access token or refresh token from token URL. Access token is %s, Refresh token is %s",
+                  e.getTokenResponseProcessor().getAccessToken(), e.getTokenResponseProcessor().getRefreshToken()));
+      muleEventLogger.logContent(e.getTokenUrlResponse());
+      throw new DefaultMuleException(e);
+    } catch (TokenUrlResponseException e) {
+      logger.error((String.format("HTTP response from token URL %s returned a failure status code", getTokenUrl())));
+      muleEventLogger.logContent(e.getTokenUrlResponse());
+      throw new DefaultMuleException(e);
     }
+  }
 
-    @Override
-    public void setMuleContext(MuleContext muleContext)
-    {
-        super.setMuleContext(muleContext);
-    }
+  private boolean tokenResponseContentIsValid(TokenResponseProcessor tokenResponseProcessor) {
+    return tokenResponseProcessor.getAccessToken() != null;
+  }
 
-    private void setMapPayloadWithTokenRequestParameters(final MuleEvent event) throws MuleException
-    {
-        final HashMap<String, String> formData = new HashMap<>();
-        formData.put(OAuthConstants.GRANT_TYPE_PARAMETER, OAuthConstants.GRANT_TYPE_CLIENT_CREDENTIALS);
-        String clientId = applicationCredentials.getClientId();
-        String clientSecret = applicationCredentials.getClientSecret();
+  public void setTokenManager(TokenManagerConfig tokenManager) {
+    this.tokenManager = tokenManager;
+  }
 
-        MuleMessage.Builder builder = MuleMessage.builder(event.getMessage());
-        if (encodeClientCredentialsInBody)
-        {
-            formData.put(OAuthConstants.CLIENT_ID_PARAMETER, clientId);
-            formData.put(OAuthConstants.CLIENT_SECRET_PARAMETER, clientSecret);
-        }
-        else
-        {
-            String encodedCredentials = Base64.encodeBase64String(String.format("%s:%s", clientId, clientSecret).getBytes());
-            builder.addOutboundProperty(HttpHeaders.Names.AUTHORIZATION, "Basic " + encodedCredentials);
-        }
-        if (scopes != null)
-        {
-            formData.put(OAuthConstants.SCOPE_PARAMETER, scopes);
-        }
-        event.setMessage(builder.payload(formData).build());
-    }
-
-    public void refreshAccessToken() throws MuleException
-    {
-        try
-        {
-            final DefaultMuleEvent accessTokenEvent = new DefaultMuleEvent(MuleMessage.builder().nullPayload().build(), MessageExchangePattern.REQUEST_RESPONSE, new Flow("test", getMuleContext()));
-            setMapPayloadWithTokenRequestParameters(accessTokenEvent);
-            final MuleEvent response;
-            response = invokeTokenUrl(accessTokenEvent);
-            final TokenResponseProcessor tokenResponseProcessor = TokenResponseProcessor.createClientCredentialsProcessor(tokenResponseConfiguration, getMuleContext().getExpressionManager());
-            tokenResponseProcessor.process(response);
-
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Retrieved access token, refresh token and expires from token url are: %s, %s, %s",
-                             tokenResponseProcessor.getAccessToken(),
-                             tokenResponseProcessor.getRefreshToken(),
-                             tokenResponseProcessor.getExpiresIn());
-            }
-
-            if (!tokenResponseContentIsValid(tokenResponseProcessor))
-            {
-                throw new TokenNotFoundException(response, tokenResponseProcessor);
-            }
-
-            final ResourceOwnerOAuthContext defaultUserState = tokenManager.getConfigOAuthContext().getContextForResourceOwner(ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID);
-            defaultUserState.setAccessToken(tokenResponseProcessor.getAccessToken());
-            defaultUserState.setExpiresIn(tokenResponseProcessor.getExpiresIn());
-            final Map<String,Object> customResponseParameters = tokenResponseProcessor.getCustomResponseParameters();
-            for (String paramName : customResponseParameters.keySet())
-            {
-                defaultUserState.getTokenResponseParameters().put(paramName, customResponseParameters.get(paramName));
-            }
-            tokenManager.getConfigOAuthContext().updateResourceOwnerOAuthContext(defaultUserState);
-        }
-        catch (TokenNotFoundException e)
-        {
-            logger.error(String.format("Could not extract access token or refresh token from token URL. Access token is %s, Refresh token is %s",
-                                       e.getTokenResponseProcessor().getAccessToken(), e.getTokenResponseProcessor().getRefreshToken()));
-            muleEventLogger.logContent(e.getTokenUrlResponse());
-            throw new DefaultMuleException(e);
-        }
-        catch (TokenUrlResponseException e)
-        {
-            logger.error((String.format("HTTP response from token URL %s returned a failure status code", getTokenUrl())));
-            muleEventLogger.logContent(e.getTokenUrlResponse());
-            throw new DefaultMuleException(e);
-        }
-    }
-
-    private boolean tokenResponseContentIsValid(TokenResponseProcessor tokenResponseProcessor)
-    {
-        return tokenResponseProcessor.getAccessToken() != null;
-    }
-
-    public void setTokenManager(TokenManagerConfig tokenManager)
-    {
-        this.tokenManager = tokenManager;
-    }
-
-    public void setEncodeClientCredentialsInBody(boolean encodeClientCredentialsInBody)
-    {
-        this.encodeClientCredentialsInBody = encodeClientCredentialsInBody;
-    }
+  public void setEncodeClientCredentialsInBody(boolean encodeClientCredentialsInBody) {
+    this.encodeClientCredentialsInBody = encodeClientCredentialsInBody;
+  }
 }

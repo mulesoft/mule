@@ -79,480 +79,393 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Listens for near real-time events that happens on files contained inside a directory or
- * on the directory itself. The events are not acquired by polling the filesystem
- * but rather actually listening for operating system events.
+ * Listens for near real-time events that happens on files contained inside a directory or on the directory itself. The events are
+ * not acquired by polling the filesystem but rather actually listening for operating system events.
  * <p>
- * Whenever a file (or the directory) is created, updated or deleted, this
- * {@link Source} will fire a {@link MuleMessage} which payload reference
- * the affected file and the attributes will be a {@link ListenerFileAttributes}
- * instance.
+ * Whenever a file (or the directory) is created, updated or deleted, this {@link Source} will fire a {@link MuleMessage} which
+ * payload reference the affected file and the attributes will be a {@link ListenerFileAttributes} instance.
  * <p>
  * There're however some special cases to be considered:
  * <p>
  * <ul>
- * <li>If the file has been deleted, then it's not possible to obtain its content
- * so the message payload will be {@code null}</li>
- * <li>Also in the case of file deletion, all its attributes are also not available.
- * Thus, the message attributes will actually be an instance of {@link DeletedFileAttributes}
- * which throws {@link IllegalStateException} whenever a non available attribute
- * is requested
- * </li>
+ * <li>If the file has been deleted, then it's not possible to obtain its content so the message payload will be {@code null}</li>
+ * <li>Also in the case of file deletion, all its attributes are also not available. Thus, the message attributes will actually be
+ * an instance of {@link DeletedFileAttributes} which throws {@link IllegalStateException} whenever a non available attribute is
+ * requested</li>
  * <li>When the event references a directory, then the payload is also a {@code null}</li>
  * </ul>
  * <p>
  * <b>When to use it</b>
  * <p>
- * This source is useful in cases in which a flow should respond to changes done on the filesystem,
- * examples being trigger files, transaction files being added on a drop folder, settings files updated,
- * etc. All of the above cases could be done using a {@code <file:list>} operation inside a poll scope
- * (maybe also combined with a {@code <watermark>}.
+ * This source is useful in cases in which a flow should respond to changes done on the filesystem, examples being trigger files,
+ * transaction files being added on a drop folder, settings files updated, etc. All of the above cases could be done using a
+ * {@code <file:list>} operation inside a poll scope (maybe also combined with a {@code <watermark>}.
  * <p>
- * However, although polling is a powerful and reliable solution, it's not an efficient one.
- * Because this listener relies on operating system notifications, it's much more efficient
- * in terms of resources.
+ * However, although polling is a powerful and reliable solution, it's not an efficient one. Because this listener relies on
+ * operating system notifications, it's much more efficient in terms of resources.
  * <p>
  * <b>Reliability</b>
  * <p>
- * The trade-off between a poll reliability and this listener's performance is reliability.
- * Because operating system events don't generally include the concept of transaction or replay,
- * there's no way to guarantee that no event is going to be lost in case of failure or server crash.
- * Although you can always use mule to implement a reliable acquisition pattern, there's no fallback
- * is such acquisition fails. What this means is that this listener is no silver bullet and it should
- * not been seen as the recommended approach over a poll+list+watermark approach. Users should
- * analyse each use case and environment to determine which the best option is.
+ * The trade-off between a poll reliability and this listener's performance is reliability. Because operating system events don't
+ * generally include the concept of transaction or replay, there's no way to guarantee that no event is going to be lost in case
+ * of failure or server crash. Although you can always use mule to implement a reliable acquisition pattern, there's no fallback
+ * is such acquisition fails. What this means is that this listener is no silver bullet and it should not been seen as the
+ * recommended approach over a poll+list+watermark approach. Users should analyse each use case and environment to determine which
+ * the best option is.
  * <p>
  * <b>Operating system limitations</b>
  * <p>
- * This component's behaviour might be slightly different depending on the OS on which it is deployed.
- * The main differences are usually (but not exclusively) related to:
+ * This component's behaviour might be slightly different depending on the OS on which it is deployed. The main differences are
+ * usually (but not exclusively) related to:
  * <ul>
- * <li>Overflows: In highly concurrent scenarios a given file might be associated to hundreds of
- * events per second. Some OS might not be able to handle that gracefully and decide to drop
- * some of those events or even fail.
- * </li>
- * <li>Polling: Some operation systems (like older versions of OSX) don't actually support file system
- * notifications. In those cases, the JRE decides to compensate by using a high frequency poll, in which
- * case the listener becomes pretty much the same as using a poll element</li>
+ * <li>Overflows: In highly concurrent scenarios a given file might be associated to hundreds of events per second. Some OS might
+ * not be able to handle that gracefully and decide to drop some of those events or even fail.</li>
+ * <li>Polling: Some operation systems (like older versions of OSX) don't actually support file system notifications. In those
+ * cases, the JRE decides to compensate by using a high frequency poll, in which case the listener becomes pretty much the same as
+ * using a poll element</li>
  * </ul>
  *
  * @since 4.0
  */
 @Alias(DirectoryListener.DIRECTORY_LISTENER)
-public class DirectoryListener extends Source<InputStream, ListenerFileAttributes> implements FlowConstructAware
-{
+public class DirectoryListener extends Source<InputStream, ListenerFileAttributes> implements FlowConstructAware {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DirectoryListener.class);
-    static final String DIRECTORY_LISTENER = "directory-listener";
+  private static final Logger LOGGER = LoggerFactory.getLogger(DirectoryListener.class);
+  static final String DIRECTORY_LISTENER = "directory-listener";
 
-    @UseConfig
-    private FileConnector config;
+  @UseConfig
+  private FileConnector config;
 
-    /**
-     * The directory on which notifications are being listened to
-     */
-    @Parameter
-    @Optional
-    private String directory;
+  /**
+   * The directory on which notifications are being listened to
+   */
+  @Parameter
+  @Optional
+  private String directory;
 
-    /**
-     * Whether to react to creation notifications. Defaults to true
-     */
-    @Parameter
-    @Optional(defaultValue = "true")
-    private boolean notifyOnCreate = true;
+  /**
+   * Whether to react to creation notifications. Defaults to true
+   */
+  @Parameter
+  @Optional(defaultValue = "true")
+  private boolean notifyOnCreate = true;
 
-    /**
-     * Whether to react to update notifications. Defaults to true
-     */
-    @Parameter
-    @Optional(defaultValue = "true")
-    private boolean notifyOnUpdate = true;
+  /**
+   * Whether to react to update notifications. Defaults to true
+   */
+  @Parameter
+  @Optional(defaultValue = "true")
+  private boolean notifyOnUpdate = true;
 
-    /**
-     * Whether to react to deletion notifications. Defaults to true
-     */
-    @Parameter
-    @Optional(defaultValue = "false")
-    private boolean notifyOnDelete = false;
+  /**
+   * Whether to react to deletion notifications. Defaults to true
+   */
+  @Parameter
+  @Optional(defaultValue = "false")
+  private boolean notifyOnDelete = false;
 
-    /**
-     * Whether or not to also listen for notification which happen on
-     * sub directories which are also contained on the main one.
-     * <p>
-     * This option is set to {@code false} by default. Consider that when
-     * enabled, some operating systems might fire many notifications when
-     * an event happens on a subdirectory. One per each watched directory
-     * on the notification's path.
-     */
-    @Parameter
-    @Optional(defaultValue = "false")
-    @Summary("Whether or not to also listen for notification which happen on sub directories which are also contained " +
-             "on the main one.")
-    private boolean recursive = false;
+  /**
+   * Whether or not to also listen for notification which happen on sub directories which are also contained on the main one.
+   * <p>
+   * This option is set to {@code false} by default. Consider that when enabled, some operating systems might fire many
+   * notifications when an event happens on a subdirectory. One per each watched directory on the notification's path.
+   */
+  @Parameter
+  @Optional(defaultValue = "false")
+  @Summary("Whether or not to also listen for notification which happen on sub directories which are also contained "
+      + "on the main one.")
+  private boolean recursive = false;
 
-    /**
-     * A matcher used to filter events on files which do not meet
-     * the matcher's criteria
-     */
-    @Parameter
-    @Optional
-    @Alias("matchWith")
-    @Placement(group = MATCHER)
-    @DisplayName(MATCH_WITH)
-    private FilePredicateBuilder<FilePredicateBuilder, FileAttributes> predicateBuilder;
+  /**
+   * A matcher used to filter events on files which do not meet the matcher's criteria
+   */
+  @Parameter
+  @Optional
+  @Alias("matchWith")
+  @Placement(group = MATCHER)
+  @DisplayName(MATCH_WITH)
+  private FilePredicateBuilder<FilePredicateBuilder, FileAttributes> predicateBuilder;
 
-    @Inject
-    private MuleContext muleContext;
+  @Inject
+  private MuleContext muleContext;
 
-    @Connection
-    private FileSystem fileSystem;
+  @Connection
+  private FileSystem fileSystem;
 
-    private FlowConstruct flowConstruct;
-    private WatchService watcher;
-    private Predicate<FileAttributes> matcher;
-    private Set<FileEventType> enabledEventTypes = new HashSet<>();
-    private ExecutorService executorService;
-    private PrimaryNodeLifecycleNotificationListener clusterListener;
+  private FlowConstruct flowConstruct;
+  private WatchService watcher;
+  private Predicate<FileAttributes> matcher;
+  private Set<FileEventType> enabledEventTypes = new HashSet<>();
+  private ExecutorService executorService;
+  private PrimaryNodeLifecycleNotificationListener clusterListener;
 
-    private final Map<WatchKey, Path> keyPaths = new HashMap<>();
-    private final AtomicBoolean stopRequested = new AtomicBoolean(false);
-    private boolean started = false;
+  private final Map<WatchKey, Path> keyPaths = new HashMap<>();
+  private final AtomicBoolean stopRequested = new AtomicBoolean(false);
+  private boolean started = false;
 
-    @Override
-    public void start() throws Exception
-    {
-        if (!muleContext.isPrimaryPollingInstance())
-        {
-            LOGGER.debug("{} source on flow {} not started because this is a secondary cluster node", DIRECTORY_LISTENER, flowConstruct.getName());
-            initialiseClusterListener();
-            return;
-        }
-
-        calculateEnabledEventTypes();
-        createWatcherService();
-
-        matcher = predicateBuilder != null ? predicateBuilder.build() : new NullFilePayloadPredicate();
-        executorService = newSingleThreadExecutor(r -> new Thread(r, format("%s%s.file.listener", getPrefix(muleContext), flowConstruct.getName())));
-        started = true;
-        stopRequested.set(false);
-        executorService.execute(this::listen);
+  @Override
+  public void start() throws Exception {
+    if (!muleContext.isPrimaryPollingInstance()) {
+      LOGGER.debug("{} source on flow {} not started because this is a secondary cluster node", DIRECTORY_LISTENER,
+                   flowConstruct.getName());
+      initialiseClusterListener();
+      return;
     }
 
-    private synchronized void initialiseClusterListener()
-    {
-        if (clusterListener == null)
-        {
-            clusterListener = new PrimaryNodeLifecycleNotificationListener(() ->
-                                                                           {
-                                                                               try
-                                                                               {
-                                                                                   start();
-                                                                               }
-                                                                               catch (Exception e)
-                                                                               {
-                                                                                   throw new MuleRuntimeException(e);
-                                                                               }
-                                                                           }, muleContext);
+    calculateEnabledEventTypes();
+    createWatcherService();
 
-            clusterListener.register();
+    matcher = predicateBuilder != null ? predicateBuilder.build() : new NullFilePayloadPredicate();
+    executorService =
+        newSingleThreadExecutor(r -> new Thread(r,
+                                                format("%s%s.file.listener", getPrefix(muleContext), flowConstruct.getName())));
+    started = true;
+    stopRequested.set(false);
+    executorService.execute(this::listen);
+  }
+
+  private synchronized void initialiseClusterListener() {
+    if (clusterListener == null) {
+      clusterListener = new PrimaryNodeLifecycleNotificationListener(() -> {
+        try {
+          start();
+        } catch (Exception e) {
+          throw new MuleRuntimeException(e);
         }
+      }, muleContext);
+
+      clusterListener.register();
+    }
+  }
+
+  private void listen() {
+    try {
+      for (;;) {
+        if (isRequestedToStop()) {
+          return;
+        }
+
+        WatchKey key;
+        try {
+          key = watcher.take();
+        } catch (InterruptedException | ClosedWatchServiceException e) {
+          return;
+        }
+
+        try {
+          key.pollEvents().forEach(event -> processEvent(event, key));
+        } finally {
+          resetWatchKey(key);
+        }
+      }
+    } catch (Exception e) {
+      sourceContext.getExceptionCallback().onException(e);
+    }
+  }
+
+  private void processEvent(WatchEvent<?> watchEvent, WatchKey key) {
+    WatchEvent<Path> event = (WatchEvent<Path>) watchEvent;
+
+    Path watchPath = keyPaths.get(key);
+
+    if (watchPath == null) {
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug(format("Got an unregistered path for key %s. Event context was: ", key, event.context()));
+      }
+
+      return;
     }
 
-    private void listen()
-    {
-        try
-        {
-            for (; ; )
-            {
-                if (isRequestedToStop())
-                {
-                    return;
-                }
+    final Path path = watchPath.resolve(event.context()).toAbsolutePath();
+    final Kind<?> kind = event.kind();
 
-                WatchKey key;
-                try
-                {
-                    key = watcher.take();
-                }
-                catch (InterruptedException | ClosedWatchServiceException e)
-                {
-                    return;
-                }
-
-                try
-                {
-                    key.pollEvents().forEach(event -> processEvent(event, key));
-                }
-                finally
-                {
-                    resetWatchKey(key);
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            sourceContext.getExceptionCallback().onException(e);
-        }
+    if (kind == OVERFLOW) {
+      if (LOGGER.isWarnEnabled()) {
+        LOGGER.warn(format("Too many changes occurred concurrently on file '%s'. Events might have been lost or discarded"));
+      }
+      return;
     }
 
-    private void processEvent(WatchEvent<?> watchEvent, WatchKey key)
-    {
-        WatchEvent<Path> event = (WatchEvent<Path>) watchEvent;
-
-        Path watchPath = keyPaths.get(key);
-
-        if (watchPath == null)
-        {
-            if (LOGGER.isDebugEnabled())
-            {
-                LOGGER.debug(format("Got an unregistered path for key %s. Event context was: ", key, event.context()));
-            }
-
-            return;
-        }
-
-        final Path path = watchPath.resolve(event.context()).toAbsolutePath();
-        final Kind<?> kind = event.kind();
-
-        if (kind == OVERFLOW)
-        {
-            if (LOGGER.isWarnEnabled())
-            {
-                LOGGER.warn(format("Too many changes occurred concurrently on file '%s'. Events might have been lost or discarded"));
-            }
-            return;
-        }
-
-        ListenerFileAttributes attributes = new ListenerFileAttributes(path, FileEventType.of(kind));
-        if (!matcher.test(attributes))
-        {
-            if (LOGGER.isDebugEnabled())
-            {
-                LOGGER.debug(format("Detected a '%s' event on path '%s' but it will be skipped because it does not meet the matcher's criteria",
-                                    FileEventType.of(kind), path.toString()));
-            }
-            return;
-        }
-
-        if (isRequestedToStop())
-        {
-            return;
-        }
-
-        sourceContext.getMessageHandler().handle(createMessage(path, attributes));
-        createAdditionalWatchers(attributes);
+    ListenerFileAttributes attributes = new ListenerFileAttributes(path, FileEventType.of(kind));
+    if (!matcher.test(attributes)) {
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER
+            .debug(format("Detected a '%s' event on path '%s' but it will be skipped because it does not meet the matcher's criteria",
+                          FileEventType.of(kind), path.toString()));
+      }
+      return;
     }
 
-    private void createAdditionalWatchers(ListenerFileAttributes attributes)
-    {
-        if (recursive && attributes.getEventType().equals(FileEventType.CREATE.name()) && attributes.isDirectory())
-        {
-            try
-            {
-                registerPath(Paths.get(attributes.getPath()));
-            }
-            catch (Exception e)
-            {
-                if (LOGGER.isDebugEnabled())
-                {
-                    LOGGER.debug(format("Directory '%s' was created but failed to place a new listener on it", attributes.getPath()), e);
-                }
-            }
-        }
+    if (isRequestedToStop()) {
+      return;
     }
 
-    private boolean isRequestedToStop()
-    {
-        return stopRequested.get() || Thread.currentThread().isInterrupted();
+    sourceContext.getMessageHandler().handle(createMessage(path, attributes));
+    createAdditionalWatchers(attributes);
+  }
+
+  private void createAdditionalWatchers(ListenerFileAttributes attributes) {
+    if (recursive && attributes.getEventType().equals(FileEventType.CREATE.name()) && attributes.isDirectory()) {
+      try {
+        registerPath(Paths.get(attributes.getPath()));
+      } catch (Exception e) {
+        if (LOGGER.isDebugEnabled()) {
+          LOGGER.debug(format("Directory '%s' was created but failed to place a new listener on it", attributes.getPath()), e);
+        }
+      }
+    }
+  }
+
+  private boolean isRequestedToStop() {
+    return stopRequested.get() || Thread.currentThread().isInterrupted();
+  }
+
+  private MuleMessage createMessage(Path path, ListenerFileAttributes attributes) {
+    Object payload = null;
+    MediaType mediaType = MediaType.ANY;
+
+    if (attributes.getEventType().equals(DELETE.name())) {
+      attributes = new DeletedFileAttributes(path);
+    } else if (!attributes.isDirectory()) {
+      mediaType = fileSystem.getFileMessageMediaType(mediaType, attributes);
+      payload = new FileInputStream(path, new NullPathLock());
     }
 
-    private MuleMessage createMessage(Path path, ListenerFileAttributes attributes)
-    {
-        Object payload = null;
-        MediaType mediaType = MediaType.ANY;
+    return MuleMessage.builder().payload(payload).mediaType(mediaType).attributes(attributes).build();
+  }
 
-        if (attributes.getEventType().equals(DELETE.name()))
-        {
-            attributes = new DeletedFileAttributes(path);
-        }
-        else if (!attributes.isDirectory())
-        {
-            mediaType = fileSystem.getFileMessageMediaType(mediaType, attributes);
-            payload = new FileInputStream(path, new NullPathLock());
-        }
+  @Override
+  public void stop() {
+    stopRequested.set(true);
+    started = false;
 
-        return MuleMessage.builder().payload(payload).mediaType(mediaType).attributes(attributes).build();
+    closeWatcherService();
+    shutdownExecutor();
+  }
+
+  private void shutdownExecutor() {
+    if (executorService == null) {
+      return;
     }
 
-    @Override
-    public void stop()
-    {
-        stopRequested.set(true);
-        started = false;
+    executorService.shutdownNow();
+    try {
+      if (!executorService.awaitTermination(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS)) {
+        if (LOGGER.isWarnEnabled()) {
+          LOGGER.warn("Could not properly terminate pending events for directory listener on flow " + flowConstruct.getName());
+        }
+      }
+    } catch (InterruptedException e) {
+      if (LOGGER.isWarnEnabled()) {
+        LOGGER.warn("Got interrupted while trying to terminate pending events for directory listener on flow "
+            + flowConstruct.getName());
+      }
+    }
+  }
 
-        closeWatcherService();
-        shutdownExecutor();
+  private void closeWatcherService() {
+    if (watcher == null) {
+      return;
     }
 
-    private void shutdownExecutor()
-    {
-        if (executorService == null)
-        {
-            return;
-        }
-
-        executorService.shutdownNow();
-        try
-        {
-            if (!executorService.awaitTermination(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS))
-            {
-                if (LOGGER.isWarnEnabled())
-                {
-                    LOGGER.warn("Could not properly terminate pending events for directory listener on flow " + flowConstruct.getName());
-                }
-            }
-        }
-        catch (InterruptedException e)
-        {
-            if (LOGGER.isWarnEnabled())
-            {
-                LOGGER.warn("Got interrupted while trying to terminate pending events for directory listener on flow " + flowConstruct.getName());
-            }
-        }
+    try {
+      watcher.close();
+    } catch (IOException e) {
+      if (LOGGER.isWarnEnabled()) {
+        LOGGER.warn("Found exception trying to close watcher service for directory listener on flow " + flowConstruct.getName(),
+                    e);
+      }
     }
 
-    private void closeWatcherService()
-    {
-        if (watcher == null)
-        {
-            return;
-        }
+    keyPaths.clear();
+  }
 
-        try
-        {
-            watcher.close();
-        }
-        catch (IOException e)
-        {
-            if (LOGGER.isWarnEnabled())
-            {
-                LOGGER.warn("Found exception trying to close watcher service for directory listener on flow " + flowConstruct.getName(), e);
-            }
-        }
-
-        keyPaths.clear();
+  private void resetWatchKey(WatchKey key) {
+    if (key.reset()) {
+      return;
     }
 
-    private void resetWatchKey(WatchKey key)
-    {
-        if (key.reset())
-        {
-            return;
+    Path path = keyPaths.remove(key);
+    if (path != null) {
+      try {
+        registerPath(path);
+      } catch (IOException e) {
+        if (LOGGER.isWarnEnabled()) {
+          LOGGER.warn(format("Directory '%s' became unavailable and a new listener could not be established on it",
+                             path.toString()));
         }
+      }
+    }
+  }
 
-        Path path = keyPaths.remove(key);
-        if (path != null)
-        {
-            try
-            {
-                registerPath(path);
-            }
-            catch (IOException e)
-            {
-                if (LOGGER.isWarnEnabled())
-                {
-                    LOGGER.warn(format("Directory '%s' became unavailable and a new listener could not be established on it",
-                                       path.toString()));
-                }
-            }
+  private void createWatcherService() throws IOException {
+    try {
+      watcher = FileSystems.getDefault().newWatchService();
+    } catch (Exception e) {
+      throw new MuleRuntimeException(createStaticMessage("Could not create watcher service"), e);
+    }
+
+    final Path rootPath = resolveRootPath();
+    registerPath(rootPath);
+
+    if (recursive) {
+      walkFileTree(rootPath, new SimpleFileVisitor<Path>() {
+
+        @Override
+        public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+          if (!dir.equals(rootPath)) {
+            registerPath(dir);
+          }
+          return CONTINUE;
         }
+      });
     }
+  }
 
-    private void createWatcherService() throws IOException
-    {
-        try
-        {
-            watcher = FileSystems.getDefault().newWatchService();
-        }
-        catch (Exception e)
-        {
-            throw new MuleRuntimeException(createStaticMessage("Could not create watcher service"), e);
-        }
+  private void registerPath(Path path) throws IOException {
+    WatchKey key = path.register(watcher, getEnabledEventKinds(), HIGH);
+    keyPaths.put(key, path);
+  }
 
-        final Path rootPath = resolveRootPath();
-        registerPath(rootPath);
+  private Path resolveRootPath() {
+    return new DirectoryListenerCommand((LocalFileSystem) fileSystem).resolveRootPath(config, directory);
+  }
 
-        if (recursive)
-        {
-            walkFileTree(rootPath, new SimpleFileVisitor<Path>()
-            {
-                @Override
-                public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException
-                {
-                    if (!dir.equals(rootPath))
-                    {
-                        registerPath(dir);
-                    }
-                    return CONTINUE;
-                }
-            });
-        }
+  private void calculateEnabledEventTypes() throws ConfigurationException {
+    ImmutableSet.Builder<FileEventType> types = ImmutableSet.builder();
+    addEventType(types, notifyOnCreate, () -> CREATE);
+    addEventType(types, notifyOnUpdate, () -> UPDATE);
+    addEventType(types, notifyOnDelete, () -> DELETE);
+
+    enabledEventTypes = types.build();
+
+    if (enabledEventTypes.isEmpty()) {
+      throw new ConfigurationException(createStaticMessage(format("File listener in flow '%s' has disabled all notification types. At least one should be enabled",
+                                                                  flowConstruct.getName())));
     }
+  }
 
-    private void registerPath(Path path) throws IOException
-    {
-        WatchKey key = path.register(watcher, getEnabledEventKinds(), HIGH);
-        keyPaths.put(key, path);
+  private Kind<?>[] getEnabledEventKinds() {
+    Set<Kind> kindSet = enabledEventTypes.stream().map(FileEventType::asEventKind).collect(toSet());
+    Kind[] kinds = new Kind[kindSet.size()];
+    return kindSet.toArray(kinds);
+  }
+
+  private void addEventType(ImmutableSet.Builder<FileEventType> types, boolean condition, Supplier<FileEventType> supplier) {
+    if (condition) {
+      types.add(supplier.get());
     }
+  }
 
-    private Path resolveRootPath()
-    {
-        return new DirectoryListenerCommand((LocalFileSystem) fileSystem).resolveRootPath(config, directory);
-    }
+  @Override
+  public void setFlowConstruct(FlowConstruct flowConstruct) {
+    this.flowConstruct = flowConstruct;
+  }
 
-    private void calculateEnabledEventTypes() throws ConfigurationException
-    {
-        ImmutableSet.Builder<FileEventType> types = ImmutableSet.builder();
-        addEventType(types, notifyOnCreate, () -> CREATE);
-        addEventType(types, notifyOnUpdate, () -> UPDATE);
-        addEventType(types, notifyOnDelete, () -> DELETE);
-
-        enabledEventTypes = types.build();
-
-        if (enabledEventTypes.isEmpty())
-        {
-            throw new ConfigurationException(createStaticMessage(format(
-                    "File listener in flow '%s' has disabled all notification types. At least one should be enabled", flowConstruct.getName())));
-        }
-    }
-
-    private Kind<?>[] getEnabledEventKinds()
-    {
-        Set<Kind> kindSet = enabledEventTypes.stream().map(FileEventType::asEventKind).collect(toSet());
-        Kind[] kinds = new Kind[kindSet.size()];
-        return kindSet.toArray(kinds);
-    }
-
-    private void addEventType(ImmutableSet.Builder<FileEventType> types, boolean condition, Supplier<FileEventType> supplier)
-    {
-        if (condition)
-        {
-            types.add(supplier.get());
-        }
-    }
-
-    @Override
-    public void setFlowConstruct(FlowConstruct flowConstruct)
-    {
-        this.flowConstruct = flowConstruct;
-    }
-
-    /**
-     * @return whether {@code this} source is actually started
-     */
-    public boolean isStarted()
-    {
-        return started;
-    }
+  /**
+   * @return whether {@code this} source is actually started
+   */
+  public boolean isStarted() {
+    return started;
+  }
 }

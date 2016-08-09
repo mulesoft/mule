@@ -17,24 +17,21 @@ import org.mule.runtime.api.metadata.resolving.MetadataOutputResolver;
 
 import java.util.Set;
 
-public class TestContentAndOutputResolverWithKeyResolver implements MetadataKeysResolver, MetadataContentResolver<String>, MetadataOutputResolver<String>
-{
+public class TestContentAndOutputResolverWithKeyResolver
+    implements MetadataKeysResolver, MetadataContentResolver<String>, MetadataOutputResolver<String> {
 
-    @Override
-    public Set<MetadataKey> getMetadataKeys(MetadataContext context) throws MetadataResolvingException, ConnectionException
-    {
-        return TestMetadataResolverUtils.getKeys(context);
-    }
+  @Override
+  public Set<MetadataKey> getMetadataKeys(MetadataContext context) throws MetadataResolvingException, ConnectionException {
+    return TestMetadataResolverUtils.getKeys(context);
+  }
 
-    @Override
-    public MetadataType getContentMetadata(MetadataContext context, String key) throws MetadataResolvingException
-    {
-        return TestMetadataResolverUtils.getMetadata(key);
-    }
+  @Override
+  public MetadataType getContentMetadata(MetadataContext context, String key) throws MetadataResolvingException {
+    return TestMetadataResolverUtils.getMetadata(key);
+  }
 
-    @Override
-    public MetadataType getOutputMetadata(MetadataContext context, String key) throws MetadataResolvingException
-    {
-        return TestMetadataResolverUtils.getMetadata(key);
-    }
+  @Override
+  public MetadataType getOutputMetadata(MetadataContext context, String key) throws MetadataResolvingException {
+    return TestMetadataResolverUtils.getMetadata(key);
+  }
 }

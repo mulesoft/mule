@@ -29,72 +29,62 @@ import java.util.Map;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class ResponseAggregatorTestCase extends AbstractIntegrationTestCase
-{
+public class ResponseAggregatorTestCase extends AbstractIntegrationTestCase {
 
-    @Rule
-    public DynamicPort port = new DynamicPort("port1");
+  @Rule
+  public DynamicPort port = new DynamicPort("port1");
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/usecases/routing/response/response-router-flow.xml";
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/usecases/routing/response/response-router-flow.xml";
+  }
+
+  @Test
+  public void testSyncResponse() throws Exception {
+    MuleClient client = muleContext.getClient();
+    final HttpRequestOptions httpRequestOptions = newOptions().method(POST.name()).build();
+    MuleMessage message = client.send(format("http://localhost:%s", port.getNumber()),
+                                      MuleMessage.builder().payload("request").build(), httpRequestOptions);
+    assertNotNull(message);
+    assertThat(new String(getPayloadAsBytes(message)), is("Received: request"));
+  }
+
+  @Test
+  public void testResponseEventsCleanedUp() throws Exception {
+    RelaxedAsyncReplyMP mp = new RelaxedAsyncReplyMP();
+
+    try {
+      MuleEvent event = getTestEvent("message1");
+      final MuleMessage message =
+          MuleMessage.builder(event.getMessage()).correlationId(event.getMessage().getUniqueId()).correlationGroupSize(1).build();
+      event.setMessage(message);
+
+      SensingNullMessageProcessor listener = getSensingNullMessageProcessor();
+      mp.setListener(listener);
+      mp.setReplySource(listener.getMessageSource());
+
+      mp.process(event);
+
+      Map<String, MuleEvent> responseEvents = mp.getResponseEvents();
+      assertTrue("Response events should be cleaned up.", responseEvents.isEmpty());
+    } finally {
+      mp.stop();
+    }
+  }
+
+  /**
+   * This class opens up the access to responseEvents map for testing
+   */
+  private static final class RelaxedAsyncReplyMP extends AbstractAsyncRequestReplyRequester {
+
+    private RelaxedAsyncReplyMP() throws MuleException {
+      store = new SimpleMemoryObjectStore<>();
+      name = "asyncReply";
+      start();
     }
 
-    @Test
-    public void testSyncResponse() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        final HttpRequestOptions httpRequestOptions = newOptions().method(POST.name()).build();
-        MuleMessage message = client.send(format("http://localhost:%s", port.getNumber()), MuleMessage.builder().payload("request").build(), httpRequestOptions);
-        assertNotNull(message);
-        assertThat(new String(getPayloadAsBytes(message)), is("Received: request"));
+    public Map<String, MuleEvent> getResponseEvents() {
+      return responseEvents;
     }
-
-    @Test
-    public void testResponseEventsCleanedUp() throws Exception
-    {
-        RelaxedAsyncReplyMP mp = new RelaxedAsyncReplyMP();
-
-        try
-        {
-            MuleEvent event = getTestEvent("message1");
-            final MuleMessage message = MuleMessage.builder(event.getMessage())
-                                                   .correlationId(event.getMessage().getUniqueId())
-                                                   .correlationGroupSize(1)
-                                                   .build();
-            event.setMessage(message);
-
-            SensingNullMessageProcessor listener = getSensingNullMessageProcessor();
-            mp.setListener(listener);
-            mp.setReplySource(listener.getMessageSource());
-
-            mp.process(event);
-
-            Map<String, MuleEvent> responseEvents = mp.getResponseEvents();
-            assertTrue("Response events should be cleaned up.", responseEvents.isEmpty());
-        }
-        finally
-        {
-            mp.stop();
-        }
-    }
-
-    /**
-     * This class opens up the access to responseEvents map for testing
-     */
-    private static final class RelaxedAsyncReplyMP extends AbstractAsyncRequestReplyRequester
-    {
-        private RelaxedAsyncReplyMP() throws MuleException
-        {
-            store = new SimpleMemoryObjectStore<>();
-            name = "asyncReply";
-            start();
-        }
-
-        public Map<String, MuleEvent> getResponseEvents()
-        {
-            return responseEvents;
-        }
-    }
+  }
 }

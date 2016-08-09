@@ -13,20 +13,18 @@ import java.net.SocketTimeoutException;
 
 import org.junit.Test;
 
-public class TcpReadingTimeoutTestCase extends SocketExtensionTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "tcp-reading-timeout-config.xml";
-    }
+public class TcpReadingTimeoutTestCase extends SocketExtensionTestCase {
 
-    @Test
-    public void socketThrowsTimeout() throws Exception
-    {
-        expectedException.expect(MessagingException.class);
-        expectedException.expectCause(instanceOf(SocketTimeoutException.class));
+  @Override
+  protected String getConfigFile() {
+    return "tcp-reading-timeout-config.xml";
+  }
 
-        flowRunner("tcp-reading-timeout").withPayload(TEST_STRING).run();
-    }
+  @Test
+  public void socketThrowsTimeout() throws Exception {
+    expectedException.expect(MessagingException.class);
+    expectedException.expectCause(instanceOf(SocketTimeoutException.class));
+
+    flowRunner("tcp-reading-timeout").withPayload(TEST_STRING).run();
+  }
 }

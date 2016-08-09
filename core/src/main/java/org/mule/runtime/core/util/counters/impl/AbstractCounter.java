@@ -13,57 +13,51 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public abstract class AbstractCounter implements Counter
-{
-    private final Type type;
-    private final String name;
-    private final List<AggregateCounter> aggregates;
+public abstract class AbstractCounter implements Counter {
 
-    public AbstractCounter(String name, Type type)
-    {
-        super();
-        this.name = name;
-        this.type = type;
-        this.aggregates = Collections.synchronizedList(new ArrayList<AggregateCounter>());
+  private final Type type;
+  private final String name;
+  private final List<AggregateCounter> aggregates;
+
+  public AbstractCounter(String name, Type type) {
+    super();
+    this.name = name;
+    this.type = type;
+    this.aggregates = Collections.synchronizedList(new ArrayList<AggregateCounter>());
+  }
+
+  @Override
+  public Type getType() {
+    return this.type;
+  }
+
+  @Override
+  public String getName() {
+    return this.name;
+  }
+
+  @Override
+  public abstract double increment();
+
+  @Override
+  public abstract double incrementBy(double value);
+
+  @Override
+  public abstract double decrement();
+
+  @Override
+  public abstract void setRawValue(double value);
+
+  @Override
+  public abstract double nextValue();
+
+  protected void addAggregate(AggregateCounter counter) {
+    this.aggregates.add(counter);
+  }
+
+  protected void propagate() {
+    for (AggregateCounter counter : this.aggregates) {
+      counter.compute();
     }
-
-    @Override
-    public Type getType()
-    {
-        return this.type;
-    }
-
-    @Override
-    public String getName()
-    {
-        return this.name;
-    }
-
-    @Override
-    public abstract double increment();
-
-    @Override
-    public abstract double incrementBy(double value);
-
-    @Override
-    public abstract double decrement();
-
-    @Override
-    public abstract void setRawValue(double value);
-
-    @Override
-    public abstract double nextValue();
-
-    protected void addAggregate(AggregateCounter counter)
-    {
-        this.aggregates.add(counter);
-    }
-
-    protected void propagate()
-    {
-        for (AggregateCounter counter : this.aggregates)
-        {
-            counter.compute();
-        }
-    }
+  }
 }

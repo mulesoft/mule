@@ -33,42 +33,38 @@ import java.util.Set;
  *
  * @since 4.0
  */
-public class HttpMetadataResolver implements Initialisable, MetadataKeysResolver, MetadataOutputResolver<String>
-{
-    private static final ClassTypeLoader  TYPE_LOADER = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
-    private static final String ANY = "ANY";
+public class HttpMetadataResolver implements Initialisable, MetadataKeysResolver, MetadataOutputResolver<String> {
 
-    private Class[] classes = new Class[]{InputStream.class, ParameterMap.class};
-    private Map<String, MetadataType> types;
-    private Set<MetadataKey> keys;
+  private static final ClassTypeLoader TYPE_LOADER = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
+  private static final String ANY = "ANY";
 
-    @Override
-    public Set<MetadataKey> getMetadataKeys(MetadataContext context) throws MetadataResolvingException, ConnectionException
-    {
-        return keys;
-    }
+  private Class[] classes = new Class[] {InputStream.class, ParameterMap.class};
+  private Map<String, MetadataType> types;
+  private Set<MetadataKey> keys;
 
-    @Override
-    public MetadataType getOutputMetadata(MetadataContext context, String key) throws MetadataResolvingException, ConnectionException
-    {
-        return types.get(key);
-    }
+  @Override
+  public Set<MetadataKey> getMetadataKeys(MetadataContext context) throws MetadataResolvingException, ConnectionException {
+    return keys;
+  }
 
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        UnionTypeBuilder builder = new BaseTypeBuilder<>(JAVA).unionType();
-        //Create all MetadataTypes and store them by String key
-        Arrays.stream(classes).forEach(aClass -> {
-            MetadataType type = TYPE_LOADER.load(aClass);
-            types.put(aClass.getSimpleName(), type);
-            builder.of(type);
-        });
-        types.put(ANY, builder.build());
-        //Create MetadataKeys
-        types.keySet().stream().forEach(
-                aKey -> keys.add(newKey(aKey).build())
-        );
-    }
+  @Override
+  public MetadataType getOutputMetadata(MetadataContext context, String key)
+      throws MetadataResolvingException, ConnectionException {
+    return types.get(key);
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    UnionTypeBuilder builder = new BaseTypeBuilder<>(JAVA).unionType();
+    // Create all MetadataTypes and store them by String key
+    Arrays.stream(classes).forEach(aClass -> {
+      MetadataType type = TYPE_LOADER.load(aClass);
+      types.put(aClass.getSimpleName(), type);
+      builder.of(type);
+    });
+    types.put(ANY, builder.build());
+    // Create MetadataKeys
+    types.keySet().stream().forEach(aKey -> keys.add(newKey(aKey).build()));
+  }
 
 }

@@ -7,14 +7,12 @@
 package org.mule.test.integration.transport.jms.scripting;
 
 /**
- * Tests that we are able to request jms messages from inside the script when
- * the endpoints are defined using no transactions.
+ * Tests that we are able to request jms messages from inside the script when the endpoints are defined using no transactions.
  */
-public class JmsRequestFromScriptWithNoTransactionTestCase extends AbstractJmsRequestFromScriptTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/integration/transport/jms/scripting/jms-request-from-script-with-no-transaction-config.xml";
-    }
+public class JmsRequestFromScriptWithNoTransactionTestCase extends AbstractJmsRequestFromScriptTestCase {
+
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/integration/transport/jms/scripting/jms-request-from-script-with-no-transaction-config.xml";
+  }
 }

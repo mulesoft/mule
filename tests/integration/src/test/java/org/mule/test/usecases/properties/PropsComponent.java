@@ -17,48 +17,40 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class PropsComponent implements Callable
-{
-    private static final Logger logger = LoggerFactory.getLogger(PropsComponent.class);
+public class PropsComponent implements Callable {
 
-    protected static Apple testObjectProperty = new Apple();
+  private static final Logger logger = LoggerFactory.getLogger(PropsComponent.class);
 
-    @Override
-    public Object onCall(MuleEventContext context) throws Exception
-    {
-        logger.debug("org.mule.test.usecases.props.PropsComponent");
+  protected static Apple testObjectProperty = new Apple();
 
-        if ("component1".equals(context.getFlowConstruct().getName()))
-        {
-            logger.debug("Adding: " + context.getFlowConstruct().getName());
-            Map props = new HashMap();
-            props.put("stringParam", "param1");
-            props.put("objectParam", testObjectProperty);
-            MuleMessage msg = MuleMessage.builder().payload(context.getMessageAsString()).outboundProperties(props).build();
-            logger.debug("Adding done: " + context.getFlowConstruct().getName());
-            return msg;
-        }
-        else
-        {
-            logger.debug("Verifying: " + context.getFlowConstruct().getName());
-            assertEquals("param1", context.getMessage().getOutboundProperty("stringParam"));
-            assertEquals(testObjectProperty, context.getMessage().getOutboundProperty("objectParam"));
-            logger.debug("Verifying done: " + context.getFlowConstruct().getName());
-        }
+  @Override
+  public Object onCall(MuleEventContext context) throws Exception {
+    logger.debug("org.mule.test.usecases.props.PropsComponent");
 
-        return context;
+    if ("component1".equals(context.getFlowConstruct().getName())) {
+      logger.debug("Adding: " + context.getFlowConstruct().getName());
+      Map props = new HashMap();
+      props.put("stringParam", "param1");
+      props.put("objectParam", testObjectProperty);
+      MuleMessage msg = MuleMessage.builder().payload(context.getMessageAsString()).outboundProperties(props).build();
+      logger.debug("Adding done: " + context.getFlowConstruct().getName());
+      return msg;
+    } else {
+      logger.debug("Verifying: " + context.getFlowConstruct().getName());
+      assertEquals("param1", context.getMessage().getOutboundProperty("stringParam"));
+      assertEquals(testObjectProperty, context.getMessage().getOutboundProperty("objectParam"));
+      logger.debug("Verifying done: " + context.getFlowConstruct().getName());
     }
 
-    static protected void assertEquals(Object theObject, Object theProperty)
-    {
-        if (!theObject.equals(theProperty))
-        {
-            logger.error(String.valueOf(theObject) + " does not equal:" + String.valueOf(theProperty));
-        }
-        else
-        {
-            logger.debug("Woohoo!");
-        }
+    return context;
+  }
+
+  static protected void assertEquals(Object theObject, Object theProperty) {
+    if (!theObject.equals(theProperty)) {
+      logger.error(String.valueOf(theObject) + " does not equal:" + String.valueOf(theProperty));
+    } else {
+      logger.debug("Woohoo!");
     }
+  }
 
 }

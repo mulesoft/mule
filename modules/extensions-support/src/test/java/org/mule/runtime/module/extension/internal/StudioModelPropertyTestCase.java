@@ -34,30 +34,28 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class StudioModelPropertyTestCase extends AbstractMuleTestCase
-{
+public class StudioModelPropertyTestCase extends AbstractMuleTestCase {
 
-    private ExtensionFactory extensionFactory;
+  private ExtensionFactory extensionFactory;
 
-    @Before
-    public void setUp()
-    {
-        ClassLoader classLoader = getClass().getClassLoader();
-        ServiceRegistry serviceRegistry = mock(ServiceRegistry.class);
-        when(serviceRegistry.lookupProviders(ModelEnricher.class, classLoader)).thenReturn(asList(new StudioModelEnricher()));
+  @Before
+  public void setUp() {
+    ClassLoader classLoader = getClass().getClassLoader();
+    ServiceRegistry serviceRegistry = mock(ServiceRegistry.class);
+    when(serviceRegistry.lookupProviders(ModelEnricher.class, classLoader)).thenReturn(asList(new StudioModelEnricher()));
 
-        extensionFactory = new DefaultExtensionFactory(serviceRegistry, getClass().getClassLoader());
-    }
+    extensionFactory = new DefaultExtensionFactory(serviceRegistry, getClass().getClassLoader());
+  }
 
-    @Test
-    public void verifyPropertyIsPopulated() throws Exception
-    {
-        DescribingContext context = new DefaultDescribingContext(HeisenbergExtension.class.getClassLoader());
-        ExtensionDeclarer declarer = new AnnotationsBasedDescriber(HeisenbergExtension.class, new StaticVersionResolver(getProductVersion()))
-                .describe(context);
-        ExtensionModel extensionModel = extensionFactory.createFrom(declarer, context);
-        StudioModelProperty studioModelProperty = extensionModel.getModelProperty(StudioModelProperty.class).get();
-        assertThat(studioModelProperty.getEditorFileName(), is(""));
-        assertThat(studioModelProperty.isDerived(), is(true));
-    }
+  @Test
+  public void verifyPropertyIsPopulated() throws Exception {
+    DescribingContext context = new DefaultDescribingContext(HeisenbergExtension.class.getClassLoader());
+    ExtensionDeclarer declarer =
+        new AnnotationsBasedDescriber(HeisenbergExtension.class, new StaticVersionResolver(getProductVersion()))
+            .describe(context);
+    ExtensionModel extensionModel = extensionFactory.createFrom(declarer, context);
+    StudioModelProperty studioModelProperty = extensionModel.getModelProperty(StudioModelProperty.class).get();
+    assertThat(studioModelProperty.getEditorFileName(), is(""));
+    assertThat(studioModelProperty.isDerived(), is(true));
+  }
 }

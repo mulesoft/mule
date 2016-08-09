@@ -12,31 +12,21 @@ import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.config.i18n.MessageFactory;
 import org.mule.runtime.core.routing.UntilSuccessful;
 
-public class EndpointDlqUntilSuccessful extends UntilSuccessful
-{
+public class EndpointDlqUntilSuccessful extends UntilSuccessful {
 
-    @Override
-    protected void resolveDlqMessageProcessor() throws InitialisationException
-    {
-        if (deadLetterQueue instanceof EndpointBuilder)
-        {
-            try
-            {
+  @Override
+  protected void resolveDlqMessageProcessor() throws InitialisationException {
+    if (deadLetterQueue instanceof EndpointBuilder) {
+      try {
 
-                dlqMP = ((EndpointBuilder) deadLetterQueue).buildOutboundEndpoint();
-            }
-            catch (final EndpointException ee)
-            {
-                throw new InitialisationException(
-                        MessageFactory.createStaticMessage("deadLetterQueue-ref is not a valid endpoint builder: "
-                                                           + deadLetterQueue),
-                        ee, this);
-            }
-        }
-        else
-        {
-            super.resolveDlqMessageProcessor();
-        }
+        dlqMP = ((EndpointBuilder) deadLetterQueue).buildOutboundEndpoint();
+      } catch (final EndpointException ee) {
+        throw new InitialisationException(MessageFactory
+            .createStaticMessage("deadLetterQueue-ref is not a valid endpoint builder: " + deadLetterQueue), ee, this);
+      }
+    } else {
+      super.resolveDlqMessageProcessor();
     }
+  }
 
 }

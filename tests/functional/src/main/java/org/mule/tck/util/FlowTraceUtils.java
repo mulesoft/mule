@@ -21,75 +21,59 @@ import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 
-public class FlowTraceUtils
-{
-    public static class FlowStackAsserter implements MessageProcessor
-    {
+public class FlowTraceUtils {
 
-        public static FlowCallStack stackToAssert;
+  public static class FlowStackAsserter implements MessageProcessor {
 
-        @Override
-        public MuleEvent process(MuleEvent event) throws MuleException
-        {
-            stackToAssert = event.getFlowCallStack().clone();
-            return event;
+    public static FlowCallStack stackToAssert;
+
+    @Override
+    public MuleEvent process(MuleEvent event) throws MuleException {
+      stackToAssert = event.getFlowCallStack().clone();
+      return event;
+    }
+  }
+
+  public static class FlowStackAsyncAsserter extends FlowStackAsserter {
+
+    public static CountDownLatch latch;
+
+    @Override
+    public MuleEvent process(MuleEvent event) throws MuleException {
+      super.process(event);
+      latch.countDown();
+      return event;
+    }
+  }
+
+
+  public static void assertStackElements(FlowCallStack flowStack, Matcher<FlowStackElement>... flowStackElementMatchers) {
+    assertThat(flowStack.getElements(), hasSize(flowStackElementMatchers.length));
+    int i = 0;
+    for (Matcher<FlowStackElement> flowStackElementMatcher : flowStackElementMatchers) {
+      assertThat(flowStack.getElements().get(i), flowStackElementMatcher);
+      ++i;
+    }
+  }
+
+  public static Matcher<FlowStackElement> isFlowStackElement(final String flowName, final String executingMessageProcessor) {
+    return new TypeSafeMatcher<FlowStackElement>() {
+
+      @Override
+      protected boolean matchesSafely(FlowStackElement flowStackElement) {
+        return flowStackElement.getFlowName().startsWith(flowName)
+            && (executingMessageProcessor == null ? flowStackElement.getProcessorPath() == null
+                : flowStackElement.getProcessorPath().startsWith(executingMessageProcessor + " @"));
+      }
+
+      @Override
+      public void describeTo(Description description) {
+        if (executingMessageProcessor == null) {
+          description.appendText("<").appendText(flowName);
+        } else {
+          description.appendText("<").appendText(flowName).appendText("(").appendText(executingMessageProcessor).appendText("*)");
         }
-    }
-
-    public static class FlowStackAsyncAsserter extends FlowStackAsserter
-    {
-
-        public static CountDownLatch latch;
-
-        @Override
-        public MuleEvent process(MuleEvent event) throws MuleException
-        {
-            super.process(event);
-            latch.countDown();
-            return event;
-        }
-    }
-
-
-    public static void assertStackElements(FlowCallStack flowStack, Matcher<FlowStackElement>... flowStackElementMatchers)
-    {
-        assertThat(flowStack.getElements(), hasSize(flowStackElementMatchers.length));
-        int i = 0;
-        for (Matcher<FlowStackElement> flowStackElementMatcher : flowStackElementMatchers)
-        {
-            assertThat(flowStack.getElements().get(i), flowStackElementMatcher);
-            ++i;
-        }
-    }
-
-    public static Matcher<FlowStackElement> isFlowStackElement(final String flowName, final String executingMessageProcessor)
-    {
-        return new TypeSafeMatcher<FlowStackElement>()
-        {
-            @Override
-            protected boolean matchesSafely(FlowStackElement flowStackElement)
-            {
-                return flowStackElement.getFlowName().startsWith(flowName)
-                       && (executingMessageProcessor == null ? flowStackElement.getProcessorPath() == null : flowStackElement.getProcessorPath().startsWith(executingMessageProcessor + " @"));
-            }
-
-            @Override
-            public void describeTo(Description description)
-            {
-                if (executingMessageProcessor == null)
-                {
-                    description.appendText("<")
-                               .appendText(flowName);
-                }
-                else
-                {
-                    description.appendText("<")
-                               .appendText(flowName)
-                               .appendText("(")
-                               .appendText(executingMessageProcessor)
-                               .appendText("*)");
-                }
-            }
-        };
-    }
+      }
+    };
+  }
 }

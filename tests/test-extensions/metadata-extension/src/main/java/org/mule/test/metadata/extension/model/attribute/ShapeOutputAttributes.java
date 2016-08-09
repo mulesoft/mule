@@ -8,26 +8,22 @@ package org.mule.test.metadata.extension.model.attribute;
 
 import org.mule.runtime.core.message.BaseAttributes;
 
-public class ShapeOutputAttributes extends BaseAttributes implements AbstractOutputAttributes
-{
+public class ShapeOutputAttributes extends BaseAttributes implements AbstractOutputAttributes {
 
-    private String outputId = "ShapesOutputAttributes";
+  private String outputId = "ShapesOutputAttributes";
 
-    private String sides;
+  private String sides;
 
-    public String getSides()
-    {
-        return sides;
-    }
+  public String getSides() {
+    return sides;
+  }
 
-    public void setSides(String sides)
-    {
-        this.sides = sides;
-    }
+  public void setSides(String sides) {
+    this.sides = sides;
+  }
 
-    @Override
-    public String getOutputId()
-    {
-        return outputId;
-    }
+  @Override
+  public String getOutputId() {
+    return outputId;
+  }
 }

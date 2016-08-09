@@ -20,41 +20,35 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class InlineParameterizedQueryTestCase extends AbstractDbIntegrationTestCase
-{
+public class InlineParameterizedQueryTestCase extends AbstractDbIntegrationTestCase {
 
-    public InlineParameterizedQueryTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public InlineParameterizedQueryTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Parameterized.Parameters
-    public static List<Object[]> parameters()
-    {
-        return TestDbConfig.getResources();
-    }
+  @Parameterized.Parameters
+  public static List<Object[]> parameters() {
+    return TestDbConfig.getResources();
+  }
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/select/inline-parameterized-query-config.xml"};
-    }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/select/inline-parameterized-query-config.xml"};
+  }
 
-    @Test
-    public void usesParamsInInlineQuery() throws Exception
-    {
-        final MuleEvent responseEvent = flowRunner("inlineQuery").withPayload(TEST_MESSAGE).run();
+  @Test
+  public void usesParamsInInlineQuery() throws Exception {
+    final MuleEvent responseEvent = flowRunner("inlineQuery").withPayload(TEST_MESSAGE).run();
 
-        final MuleMessage response = responseEvent.getMessage();
-        assertMessageContains(response, TestRecordUtil.getMarsRecord());
-    }
+    final MuleMessage response = responseEvent.getMessage();
+    assertMessageContains(response, TestRecordUtil.getMarsRecord());
+  }
 
-    @Test
-    public void usesExpressionParam() throws Exception
-    {
-        final MuleEvent responseEvent = flowRunner("expressionParam").withPayload(TEST_MESSAGE).run();
+  @Test
+  public void usesExpressionParam() throws Exception {
+    final MuleEvent responseEvent = flowRunner("expressionParam").withPayload(TEST_MESSAGE).run();
 
-        final MuleMessage response = responseEvent.getMessage();
-        assertMessageContains(response, TestRecordUtil.getEarthRecord());
-    }
+    final MuleMessage response = responseEvent.getMessage();
+    assertMessageContains(response, TestRecordUtil.getEarthRecord());
+  }
 }

@@ -11,20 +11,17 @@ import org.mule.runtime.module.extension.file.api.FileAttributes;
 import java.util.function.Predicate;
 
 /**
- * A {@link Predicate} of {@link FileAttributes} instances which accepts
- * any value
+ * A {@link Predicate} of {@link FileAttributes} instances which accepts any value
  *
  * @since 4.0
  */
-public final class NullFilePayloadPredicate implements Predicate<FileAttributes>
-{
+public final class NullFilePayloadPredicate implements Predicate<FileAttributes> {
 
-    /**
-     * @return {@code true}
-     */
-    @Override
-    public boolean test(FileAttributes fileAttributes)
-    {
-        return true;
-    }
+  /**
+   * @return {@code true}
+   */
+  @Override
+  public boolean test(FileAttributes fileAttributes) {
+    return true;
+  }
 }

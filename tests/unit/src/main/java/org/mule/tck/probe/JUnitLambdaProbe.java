@@ -11,32 +11,27 @@ import java.util.function.BooleanSupplier;
 /**
  * Implementation of {@link JUnitProbe} which makes it Java 8 Lambda friendly.
  */
-public class JUnitLambdaProbe extends JUnitProbe
-{
+public class JUnitLambdaProbe extends JUnitProbe {
 
-    private final BooleanSupplier probable;
-    private final String failureDescription;
+  private final BooleanSupplier probable;
+  private final String failureDescription;
 
-    public JUnitLambdaProbe(BooleanSupplier probable, String failureDescription)
-    {
-        this.probable = probable;
-        this.failureDescription = failureDescription;
-    }
+  public JUnitLambdaProbe(BooleanSupplier probable, String failureDescription) {
+    this.probable = probable;
+    this.failureDescription = failureDescription;
+  }
 
-    public JUnitLambdaProbe(BooleanSupplier probable)
-    {
-        this(probable, null);
-    }
+  public JUnitLambdaProbe(BooleanSupplier probable) {
+    this(probable, null);
+  }
 
-    @Override
-    public String describeFailure()
-    {
-        return failureDescription == null ? super.describeFailure() : failureDescription;
-    }
+  @Override
+  public String describeFailure() {
+    return failureDescription == null ? super.describeFailure() : failureDescription;
+  }
 
-    @Override
-    protected boolean test() throws Exception
-    {
-        return probable.getAsBoolean();
-    }
+  @Override
+  protected boolean test() throws Exception {
+    return probable.getAsBoolean();
+  }
 }

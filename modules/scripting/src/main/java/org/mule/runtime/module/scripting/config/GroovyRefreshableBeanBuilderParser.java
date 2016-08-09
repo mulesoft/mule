@@ -11,20 +11,17 @@ import org.mule.runtime.module.scripting.component.GroovyRefreshableBeanBuilder;
 
 import org.w3c.dom.Element;
 
-public class GroovyRefreshableBeanBuilderParser extends MuleOrphanDefinitionParser
-{
+public class GroovyRefreshableBeanBuilderParser extends MuleOrphanDefinitionParser {
 
-    public GroovyRefreshableBeanBuilderParser(boolean singleton)
-    {
-        super(singleton);
-        addIgnored("name");
-    }
-    
-    protected Class getBeanClass(Element element)
-    {
-        return GroovyRefreshableBeanBuilder.class;
-    }
-    
+  public GroovyRefreshableBeanBuilderParser(boolean singleton) {
+    super(singleton);
+    addIgnored("name");
+  }
+
+  protected Class getBeanClass(Element element) {
+    return GroovyRefreshableBeanBuilder.class;
+  }
+
 
 }
 

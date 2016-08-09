@@ -9,30 +9,25 @@ package org.mule.runtime.core.api.construct;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.config.i18n.Message;
 
-public class FlowConstructInvalidException extends MuleException
-{
+public class FlowConstructInvalidException extends MuleException {
 
-    private static final long serialVersionUID = -8170840339166473625L;
+  private static final long serialVersionUID = -8170840339166473625L;
 
-    public FlowConstructInvalidException(Message message, Throwable cause)
-    {
-        super(message, cause);
-    }
+  public FlowConstructInvalidException(Message message, Throwable cause) {
+    super(message, cause);
+  }
 
-    public FlowConstructInvalidException(Message message)
-    {
-        super(message);
-    }
+  public FlowConstructInvalidException(Message message) {
+    super(message);
+  }
 
-    public FlowConstructInvalidException(Message message, FlowConstruct flowConstruct)
-    {
-        super(message);
-        addInfo("FlowConstruct", flowConstruct);
-    }
+  public FlowConstructInvalidException(Message message, FlowConstruct flowConstruct) {
+    super(message);
+    addInfo("FlowConstruct", flowConstruct);
+  }
 
-    public FlowConstructInvalidException(Throwable cause)
-    {
-        super(cause);
-    }
+  public FlowConstructInvalidException(Throwable cause) {
+    super(cause);
+  }
 
 }

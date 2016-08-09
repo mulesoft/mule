@@ -26,118 +26,95 @@ import org.junit.Rule;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 
-public abstract class FileConnectorTestCase extends MuleArtifactFunctionalTestCase
-{
+public abstract class FileConnectorTestCase extends MuleArtifactFunctionalTestCase {
 
-    protected static final String HELLO_WORLD = "Hello World!";
-    protected static final String HELLO_FILE_NAME = "hello.json";
-    protected static final String HELLO_PATH = "files/" + HELLO_FILE_NAME;
-    protected static final String TEST_FILE_PATTERN = "test-file-%d.html";
-    protected static final String SUB_DIRECTORY_NAME = "subDirectory";
-    protected static final String CONTENT = "foo";
+  protected static final String HELLO_WORLD = "Hello World!";
+  protected static final String HELLO_FILE_NAME = "hello.json";
+  protected static final String HELLO_PATH = "files/" + HELLO_FILE_NAME;
+  protected static final String TEST_FILE_PATTERN = "test-file-%d.html";
+  protected static final String SUB_DIRECTORY_NAME = "subDirectory";
+  protected static final String CONTENT = "foo";
 
-    @ClassRule
-    public static TemporaryFolder temporaryFolder = new TemporaryFolder();
+  @ClassRule
+  public static TemporaryFolder temporaryFolder = new TemporaryFolder();
 
-    @Rule
-    public ExpectedException expectedException = none();
+  @Rule
+  public ExpectedException expectedException = none();
 
-    @Rule
-    public SystemProperty workingDir = new SystemProperty("workingDir", temporaryFolder.getRoot().getAbsolutePath());
+  @Rule
+  public SystemProperty workingDir = new SystemProperty("workingDir", temporaryFolder.getRoot().getAbsolutePath());
 
-    @Override
-    protected void doSetUpBeforeMuleContextCreation() throws Exception
-    {
-        if (!temporaryFolder.getRoot().exists())
-        {
-            temporaryFolder.getRoot().mkdir();
-        }
+  @Override
+  protected void doSetUpBeforeMuleContextCreation() throws Exception {
+    if (!temporaryFolder.getRoot().exists()) {
+      temporaryFolder.getRoot().mkdir();
     }
+  }
 
-    @Override
-    protected void doTearDownAfterMuleContextDispose() throws Exception
-    {
-        temporaryFolder.delete();
+  @Override
+  protected void doTearDownAfterMuleContextDispose() throws Exception {
+    temporaryFolder.delete();
+  }
+
+  protected void assertExists(boolean exists, File... files) {
+    for (File file : files) {
+      assertThat(file.exists(), is(exists));
     }
+  }
 
-    protected void assertExists(boolean exists, File... files)
-    {
-        for (File file : files)
-        {
-            assertThat(file.exists(), is(exists));
-        }
+  protected MuleEvent readHelloWorld() throws Exception {
+    return getPath(HELLO_PATH);
+  }
+
+  protected MuleMessage readPath(String path) throws Exception {
+    return getPath(path).getMessage();
+  }
+
+  protected MuleEvent getPath(String path) throws Exception {
+    return flowRunner("read").withFlowVariable("path", path).run();
+  }
+
+  protected String readPathAsString(String path) throws Exception {
+    return IOUtils.toString((AbstractFileInputStream) readPath(path).getPayload());
+  }
+
+  protected void doWrite(String path, Object content, FileWriteMode mode, boolean createParent) throws Exception {
+    doWrite("write", path, content, mode, createParent);
+  }
+
+  protected void doWrite(String flow, String path, Object content, FileWriteMode mode, boolean createParent) throws Exception {
+    doWrite(flow, path, content, mode, createParent, null);
+  }
+
+  protected void doWrite(String flow, String path, Object content, FileWriteMode mode, boolean createParent, String encoding)
+      throws Exception {
+    flowRunner(flow).withFlowVariable("path", path).withFlowVariable("createParent", createParent).withFlowVariable("mode", mode)
+        .withFlowVariable("encoding", encoding).withPayload(content).run();
+  }
+
+  protected File createHelloWorldFile() throws IOException {
+    File folder = temporaryFolder.newFolder("files");
+    File hello = new File(folder, HELLO_FILE_NAME);
+    FileUtils.write(hello, HELLO_WORLD);
+
+    return hello;
+  }
+
+  protected void createTestFiles() throws Exception {
+    createTestFiles(temporaryFolder.getRoot(), 0, 5);
+    createSubDirectory();
+  }
+
+  protected void createSubDirectory() throws Exception {
+    createTestFiles(temporaryFolder.newFolder(SUB_DIRECTORY_NAME), 5, 7);
+  }
+
+  protected void createTestFiles(File parentFolder, int startIndex, int endIndex) throws Exception {
+    for (int i = startIndex; i < endIndex; i++) {
+      String name = String.format(TEST_FILE_PATTERN, i);
+      File file = new File(parentFolder, name);
+      file.createNewFile();
+      FileUtils.write(file, CONTENT);
     }
-
-    protected MuleEvent readHelloWorld() throws Exception
-    {
-        return getPath(HELLO_PATH);
-    }
-
-    protected MuleMessage readPath(String path) throws Exception
-    {
-        return getPath(path).getMessage();
-    }
-
-    protected MuleEvent getPath(String path) throws Exception
-    {
-        return flowRunner("read")
-                .withFlowVariable("path", path)
-                .run();
-    }
-
-    protected String readPathAsString(String path) throws Exception
-    {
-        return IOUtils.toString((AbstractFileInputStream) readPath(path).getPayload());
-    }
-
-    protected void doWrite(String path, Object content, FileWriteMode mode, boolean createParent) throws Exception
-    {
-        doWrite("write", path, content, mode, createParent);
-    }
-
-    protected void doWrite(String flow, String path, Object content, FileWriteMode mode, boolean createParent) throws Exception {
-        doWrite(flow, path, content, mode, createParent, null);
-    }
-
-    protected void doWrite(String flow, String path, Object content, FileWriteMode mode, boolean createParent, String encoding) throws Exception
-    {
-        flowRunner(flow)
-                .withFlowVariable("path", path)
-                .withFlowVariable("createParent", createParent)
-                .withFlowVariable("mode", mode)
-                .withFlowVariable("encoding", encoding)
-                .withPayload(content)
-                .run();
-    }
-
-    protected File createHelloWorldFile() throws IOException
-    {
-        File folder = temporaryFolder.newFolder("files");
-        File hello = new File(folder, HELLO_FILE_NAME);
-        FileUtils.write(hello, HELLO_WORLD);
-
-        return hello;
-    }
-
-    protected void createTestFiles() throws Exception
-    {
-        createTestFiles(temporaryFolder.getRoot(), 0, 5);
-        createSubDirectory();
-    }
-
-    protected void createSubDirectory() throws Exception
-    {
-        createTestFiles(temporaryFolder.newFolder(SUB_DIRECTORY_NAME), 5, 7);
-    }
-
-    protected void createTestFiles(File parentFolder, int startIndex, int endIndex) throws Exception
-    {
-        for (int i = startIndex; i < endIndex; i++)
-        {
-            String name = String.format(TEST_FILE_PATTERN, i);
-            File file = new File(parentFolder, name);
-            file.createNewFile();
-            FileUtils.write(file, CONTENT);
-        }
-    }
+  }
 }

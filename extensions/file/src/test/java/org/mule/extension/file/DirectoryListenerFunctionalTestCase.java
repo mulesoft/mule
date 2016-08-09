@@ -36,219 +36,184 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
-public class DirectoryListenerFunctionalTestCase extends FileConnectorTestCase
-{
+public class DirectoryListenerFunctionalTestCase extends FileConnectorTestCase {
 
-    private static final String MATCHERLESS_LISTENER_FOLDER_NAME = "matcherless";
-    private static final String WITH_MATCHER_FOLDER_NAME = "withMatcher";
-    private static final String CREATED_FOLDER_NAME = "createdFolder";
-    private static final String WATCH_FILE = "watchme.txt";
-    private static final String WATCH_CONTENT = "who watches the watchmen?";
-    private static final String DR_MANHATTAN = "Dr. Manhattan";
-    private static final String MATCH_FILE = "matchme.txt";
-    private static final int TIMEOUT_MILLIS = 5000;
-    private static final int POLL_DELAY_MILLIS = 100;
+  private static final String MATCHERLESS_LISTENER_FOLDER_NAME = "matcherless";
+  private static final String WITH_MATCHER_FOLDER_NAME = "withMatcher";
+  private static final String CREATED_FOLDER_NAME = "createdFolder";
+  private static final String WATCH_FILE = "watchme.txt";
+  private static final String WATCH_CONTENT = "who watches the watchmen?";
+  private static final String DR_MANHATTAN = "Dr. Manhattan";
+  private static final String MATCH_FILE = "matchme.txt";
+  private static final int TIMEOUT_MILLIS = 5000;
+  private static final int POLL_DELAY_MILLIS = 100;
 
-    private static List<MuleMessage> receivedMessages;
+  private static List<MuleMessage> receivedMessages;
 
-    private File matcherLessFolder;
-    private File withMatcherFolder;
-    private String listenerFolder;
+  private File matcherLessFolder;
+  private File withMatcherFolder;
+  private String listenerFolder;
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "directory-listener-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "directory-listener-config.xml";
+  }
 
-    @Override
-    protected void doSetUpBeforeMuleContextCreation() throws Exception
-    {
-        super.doSetUpBeforeMuleContextCreation();
-        temporaryFolder.newFolder(MATCHERLESS_LISTENER_FOLDER_NAME);
-        temporaryFolder.newFolder(WITH_MATCHER_FOLDER_NAME);
-        listenerFolder = Paths.get(temporaryFolder.getRoot().getAbsolutePath(), MATCHERLESS_LISTENER_FOLDER_NAME).toString();
-        matcherLessFolder = new File(listenerFolder, CREATED_FOLDER_NAME);
-        withMatcherFolder = Paths.get(temporaryFolder.getRoot().getAbsolutePath(), WITH_MATCHER_FOLDER_NAME).toFile();
-        receivedMessages = new CopyOnWriteArrayList<>();
-    }
+  @Override
+  protected void doSetUpBeforeMuleContextCreation() throws Exception {
+    super.doSetUpBeforeMuleContextCreation();
+    temporaryFolder.newFolder(MATCHERLESS_LISTENER_FOLDER_NAME);
+    temporaryFolder.newFolder(WITH_MATCHER_FOLDER_NAME);
+    listenerFolder = Paths.get(temporaryFolder.getRoot().getAbsolutePath(), MATCHERLESS_LISTENER_FOLDER_NAME).toString();
+    matcherLessFolder = new File(listenerFolder, CREATED_FOLDER_NAME);
+    withMatcherFolder = Paths.get(temporaryFolder.getRoot().getAbsolutePath(), WITH_MATCHER_FOLDER_NAME).toFile();
+    receivedMessages = new CopyOnWriteArrayList<>();
+  }
 
-    @Override
-    protected void doTearDown() throws Exception
-    {
-        receivedMessages = null;
-    }
+  @Override
+  protected void doTearDown() throws Exception {
+    receivedMessages = null;
+  }
 
-    @Test
-    public void onFileCreated() throws Exception
-    {
-        final File file = new File(listenerFolder, WATCH_FILE);
-        write(file, WATCH_CONTENT);
-        assertEvent(listen(CREATE, file), WATCH_CONTENT);
-    }
+  @Test
+  public void onFileCreated() throws Exception {
+    final File file = new File(listenerFolder, WATCH_FILE);
+    write(file, WATCH_CONTENT);
+    assertEvent(listen(CREATE, file), WATCH_CONTENT);
+  }
 
-    @Test
-    public void stopAndRestart() throws Exception
-    {
-        muleContext.getRegistry().lookupObjects(Flow.class).forEach(flow ->
-                                                                    {
-                                                                        try
-                                                                        {
-                                                                            flow.stop();
-                                                                            flow.start();
-                                                                        }
-                                                                        catch (Exception e)
-                                                                        {
-                                                                            throw new RuntimeException(e);
-                                                                        }
-                                                                    });
+  @Test
+  public void stopAndRestart() throws Exception {
+    muleContext.getRegistry().lookupObjects(Flow.class).forEach(flow -> {
+      try {
+        flow.stop();
+        flow.start();
+      } catch (Exception e) {
+        throw new RuntimeException(e);
+      }
+    });
 
+    onFileCreated();
+  }
+
+  @Test
+  public void onFileUpdated() throws Exception {
+    onFileCreated();
+
+    final String appendedContent = "\nNOBODY";
+    final File file = new File(listenerFolder, WATCH_FILE);
+
+    write(file, appendedContent, true);
+    assertEvent(listen(UPDATE, file), WATCH_CONTENT + appendedContent);
+  }
+
+  @Test
+  public void onFileDeleted() throws Exception {
+    onFileCreated();
+
+    final File file = new File(listenerFolder, WATCH_FILE);
+    file.delete();
+    assertEvent(listen(DELETE, file), null);
+  }
+
+  @Test
+  public void onDirectoryCreated() throws Exception {
+    matcherLessFolder.mkdir();
+    assertEvent(listen(CREATE, matcherLessFolder), null);
+
+    final File file = new File(matcherLessFolder, WATCH_FILE);
+    write(file, WATCH_CONTENT);
+    assertEvent(listen(CREATE, file), WATCH_CONTENT);
+  }
+
+  @Test
+  public void onDirectoryDeleted() throws Exception {
+    onDirectoryCreated();
+    deleteTree(matcherLessFolder);
+    assertEvent(listen(DELETE, matcherLessFolder), null);
+  }
+
+  @Test
+  public void onDirectoryRenamed() throws Exception {
+    onDirectoryCreated();
+    final String updatedName = CREATED_FOLDER_NAME + "twist";
+
+    final File renamedDirectory = new File(listenerFolder, updatedName);
+    Files.move(matcherLessFolder.toPath(), renamedDirectory.toPath());
+
+    assertEvent(listen(DELETE, matcherLessFolder), null);
+    assertEvent(listen(CREATE, renamedDirectory), null);
+  }
+
+  @Test
+  public void onDeleteFileAtSubfolder() throws Exception {
+    onDirectoryCreated();
+    deleteTree(matcherLessFolder);
+    assertEvent(listen(DELETE, matcherLessFolder), null);
+  }
+
+  @Test
+  public void matcher() throws Exception {
+    final File file = new File(withMatcherFolder, MATCH_FILE);
+    write(file, "");
+    MuleMessage message = listen(CREATE, file);
+
+    assertThat(message.getPayload(), equalTo(DR_MANHATTAN));
+  }
+
+  @Test
+  public void stop() throws Exception {
+    muleContext.getRegistry().lookupObjects(ExtensionMessageSource.class).forEach(source -> {
+      try {
+        source.stop();
+      } catch (MuleException e) {
+        throw new RuntimeException(e);
+      }
+    });
+
+    PollingProber prober = new PollingProber(TIMEOUT_MILLIS, POLL_DELAY_MILLIS);
+    prober.check(new JUnitLambdaProbe(() -> {
+      try {
         onFileCreated();
+        return false;
+      } catch (Throwable e) {
+        return true;
+      }
+    }, "source did not stop"));
+  }
+
+  private void assertEvent(MuleMessage message, Object expectedContent) throws Exception {
+    Object payload = message.getPayload();
+    if (payload instanceof InputStream) {
+      payload = IOUtils.toString((InputStream) payload);
+      assertThat((String) payload, not(containsString(DR_MANHATTAN)));
     }
 
-    @Test
-    public void onFileUpdated() throws Exception
-    {
-        onFileCreated();
+    assertThat(payload, equalTo(expectedContent));
+  }
 
-        final String appendedContent = "\nNOBODY";
-        final File file = new File(listenerFolder, WATCH_FILE);
-
-        write(file, appendedContent, true);
-        assertEvent(listen(UPDATE, file), WATCH_CONTENT + appendedContent);
-    }
-
-    @Test
-    public void onFileDeleted() throws Exception
-    {
-        onFileCreated();
-
-        final File file = new File(listenerFolder, WATCH_FILE);
-        file.delete();
-        assertEvent(listen(DELETE, file), null);
-    }
-
-    @Test
-    public void onDirectoryCreated() throws Exception
-    {
-        matcherLessFolder.mkdir();
-        assertEvent(listen(CREATE, matcherLessFolder), null);
-
-        final File file = new File(matcherLessFolder, WATCH_FILE);
-        write(file, WATCH_CONTENT);
-        assertEvent(listen(CREATE, file), WATCH_CONTENT);
-    }
-
-    @Test
-    public void onDirectoryDeleted() throws Exception
-    {
-        onDirectoryCreated();
-        deleteTree(matcherLessFolder);
-        assertEvent(listen(DELETE, matcherLessFolder), null);
-    }
-
-    @Test
-    public void onDirectoryRenamed() throws Exception
-    {
-        onDirectoryCreated();
-        final String updatedName = CREATED_FOLDER_NAME + "twist";
-
-        final File renamedDirectory = new File(listenerFolder, updatedName);
-        Files.move(matcherLessFolder.toPath(), renamedDirectory.toPath());
-
-        assertEvent(listen(DELETE, matcherLessFolder), null);
-        assertEvent(listen(CREATE, renamedDirectory), null);
-    }
-
-    @Test
-    public void onDeleteFileAtSubfolder() throws Exception
-    {
-        onDirectoryCreated();
-        deleteTree(matcherLessFolder);
-        assertEvent(listen(DELETE, matcherLessFolder), null);
-    }
-
-    @Test
-    public void matcher() throws Exception
-    {
-        final File file = new File(withMatcherFolder, MATCH_FILE);
-        write(file, "");
-        MuleMessage message = listen(CREATE, file);
-
-        assertThat(message.getPayload(), equalTo(DR_MANHATTAN));
-    }
-
-    @Test
-    public void stop() throws Exception
-    {
-        muleContext.getRegistry().lookupObjects(ExtensionMessageSource.class).forEach(source ->
-                                                                                      {
-                                                                                          try
-                                                                                          {
-                                                                                              source.stop();
-                                                                                          }
-                                                                                          catch (MuleException e)
-                                                                                          {
-                                                                                              throw new RuntimeException(e);
-                                                                                          }
-                                                                                      });
-
-        PollingProber prober = new PollingProber(TIMEOUT_MILLIS, POLL_DELAY_MILLIS);
-        prober.check(new JUnitLambdaProbe(() ->
-                                          {
-                                              try
-                                              {
-                                                  onFileCreated();
-                                                  return false;
-                                              }
-                                              catch (Throwable e)
-                                              {
-                                                  return true;
-                                              }
-                                          }, "source did not stop"));
-    }
-
-    private void assertEvent(MuleMessage message, Object expectedContent) throws Exception
-    {
-        Object payload = message.getPayload();
-        if (payload instanceof InputStream)
-        {
-            payload = IOUtils.toString((InputStream) payload);
-            assertThat((String) payload, not(containsString(DR_MANHATTAN)));
+  private MuleMessage listen(FileEventType type, File file) {
+    PollingProber prober = new PollingProber(TIMEOUT_MILLIS, POLL_DELAY_MILLIS);
+    ValueHolder<MuleMessage> messageHolder = new ValueHolder<>();
+    prober.check(new JUnitLambdaProbe(() -> {
+      for (MuleMessage message : receivedMessages) {
+        ListenerFileAttributes attributes = (ListenerFileAttributes) message.getAttributes();
+        if (attributes.getPath().equals(file.getAbsolutePath()) && attributes.getEventType().equals(type.name())) {
+          messageHolder.set(message);
+          return true;
         }
+      }
 
-        assertThat(payload, equalTo(expectedContent));
-    }
+      return false;
+    }));
 
-    private MuleMessage listen(FileEventType type, File file)
-    {
-        PollingProber prober = new PollingProber(TIMEOUT_MILLIS, POLL_DELAY_MILLIS);
-        ValueHolder<MuleMessage> messageHolder = new ValueHolder<>();
-        prober.check(new JUnitLambdaProbe(() ->
-                                          {
-                                              for (MuleMessage message : receivedMessages)
-                                              {
-                                                  ListenerFileAttributes attributes = (ListenerFileAttributes) message.getAttributes();
-                                                  if (attributes.getPath().equals(file.getAbsolutePath()) && attributes.getEventType().equals(type.name()))
-                                                  {
-                                                      messageHolder.set(message);
-                                                      return true;
-                                                  }
-                                              }
+    return messageHolder.get();
+  }
 
-                                              return false;
-                                          }));
-
-        return messageHolder.get();
-    }
-
-    public static void onMessage(MessageContext messageContext)
-    {
-        Object payload = messageContext.getPayload() != null ? messageContext.getPayload() : null;
-        MuleMessage message = MuleMessage.builder().payload(payload)
-                .mediaType(messageContext.getDataType().getMediaType())
-                .attributes(messageContext.getAttributes())
-                .build();
-        receivedMessages.add(message);
-    }
+  public static void onMessage(MessageContext messageContext) {
+    Object payload = messageContext.getPayload() != null ? messageContext.getPayload() : null;
+    MuleMessage message = MuleMessage.builder().payload(payload).mediaType(messageContext.getDataType().getMediaType())
+        .attributes(messageContext.getAttributes()).build();
+    receivedMessages.add(message);
+  }
 }

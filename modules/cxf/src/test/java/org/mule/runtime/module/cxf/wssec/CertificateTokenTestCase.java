@@ -6,17 +6,13 @@
  */
 package org.mule.runtime.module.cxf.wssec;
 
-public class CertificateTokenTestCase extends UsernameTokenTestCase
-{
+public class CertificateTokenTestCase extends UsernameTokenTestCase {
 
-    @Override
-    protected String[] getConfigFiles()
-    {
-        return new String[] {
-                             "org/mule/runtime/module/cxf/wssec/cxf-secure-service-flow-httpn.xml",
-                             "org/mule/runtime/module/cxf/wssec/certificate-token-conf.xml"
-        };
-    }
+  @Override
+  protected String[] getConfigFiles() {
+    return new String[] {"org/mule/runtime/module/cxf/wssec/cxf-secure-service-flow-httpn.xml",
+        "org/mule/runtime/module/cxf/wssec/certificate-token-conf.xml"};
+  }
 }
 
 

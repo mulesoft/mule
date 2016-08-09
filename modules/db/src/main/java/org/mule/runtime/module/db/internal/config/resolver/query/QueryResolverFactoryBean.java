@@ -20,64 +20,51 @@ import org.mule.runtime.module.db.internal.resolver.query.StaticQueryResolver;
 
 import org.springframework.beans.factory.FactoryBean;
 
-public class QueryResolverFactoryBean implements FactoryBean<QueryResolver>, MuleContextAware
-{
+public class QueryResolverFactoryBean implements FactoryBean<QueryResolver>, MuleContextAware {
 
-    private final Query query;
-    private final ParamValueResolver paramValueResolver;
-    private final DbConfigResolver dbConfigResolver;
-    private MuleContext muleContext;
+  private final Query query;
+  private final ParamValueResolver paramValueResolver;
+  private final DbConfigResolver dbConfigResolver;
+  private MuleContext muleContext;
 
-    public QueryResolverFactoryBean(Query query, ParamValueResolver paramValueResolver, DbConfigResolver dbConfigResolver)
-    {
-        this.query = query;
-        this.paramValueResolver = paramValueResolver;
-        this.dbConfigResolver = dbConfigResolver;
+  public QueryResolverFactoryBean(Query query, ParamValueResolver paramValueResolver, DbConfigResolver dbConfigResolver) {
+    this.query = query;
+    this.paramValueResolver = paramValueResolver;
+    this.dbConfigResolver = dbConfigResolver;
+  }
+
+  @Override
+  public QueryResolver getObject() throws Exception {
+    if (isDynamic(query)) {
+      return new DynamicQueryResolver(query, new SimpleQueryTemplateParser(), muleContext.getExpressionManager());
+    } else if (hasParameters(query)) {
+      return new ParametrizedQueryResolver(query, paramValueResolver);
+    } else {
+      return new StaticQueryResolver(query);
     }
+  }
 
-    @Override
-    public QueryResolver getObject() throws Exception
-    {
-        if (isDynamic(query))
-        {
-            return new DynamicQueryResolver(query, new SimpleQueryTemplateParser(), muleContext.getExpressionManager());
-        }
-        else if (hasParameters(query))
-        {
-            return new ParametrizedQueryResolver(query, paramValueResolver);
-        }
-        else
-        {
-            return new StaticQueryResolver(query);
-        }
-    }
+  private boolean isDynamic(Query query) {
+    return query.getQueryTemplate().isDynamic();
+  }
 
-    private boolean isDynamic(Query query)
-    {
-        return query.getQueryTemplate().isDynamic();
-    }
-
-    private boolean hasParameters(Query query)
-    {
-        return query.getQueryTemplate().getParams().size() > 0;
-    }
+  private boolean hasParameters(Query query) {
+    return query.getQueryTemplate().getParams().size() > 0;
+  }
 
 
-    @Override
-    public Class<?> getObjectType()
-    {
-        return QueryResolver.class;
-    }
+  @Override
+  public Class<?> getObjectType() {
+    return QueryResolver.class;
+  }
 
-    @Override
-    public boolean isSingleton()
-    {
-        return false;
-    }
+  @Override
+  public boolean isSingleton() {
+    return false;
+  }
 
-    @Override
-    public void setMuleContext(MuleContext muleContext)
-    {
-        this.muleContext = muleContext;
-    }
+  @Override
+  public void setMuleContext(MuleContext muleContext) {
+    this.muleContext = muleContext;
+  }
 }

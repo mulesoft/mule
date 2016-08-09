@@ -11,32 +11,29 @@ import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessa
 import org.mule.runtime.core.api.MuleRuntimeException;
 
 /**
- * Is the base {@link RuntimeException} type for the Email Connector any other exceptions
- * thrown by the connector code will use or be based on this exception.
+ * Is the base {@link RuntimeException} type for the Email Connector any other exceptions thrown by the connector code will use or
+ * be based on this exception.
  *
  * @since 4.0
  */
-public class EmailException extends MuleRuntimeException
-{
+public class EmailException extends MuleRuntimeException {
 
-    /**
-     * Creates a new instance with the specified detail {@code message}
-     *
-     * @param message the detail message
-     */
-    public EmailException(String message)
-    {
-        super(createStaticMessage(message));
-    }
+  /**
+   * Creates a new instance with the specified detail {@code message}
+   *
+   * @param message the detail message
+   */
+  public EmailException(String message) {
+    super(createStaticMessage(message));
+  }
 
-    /**
-     * Creates a new instance with the specified detail {@code message} and {@code cause}
-     *
-     * @param message the detail message
-     * @param cause   the exception's cause
-     */
-    public EmailException(String message, Throwable cause)
-    {
-        super(createStaticMessage(message), cause);
-    }
+  /**
+   * Creates a new instance with the specified detail {@code message} and {@code cause}
+   *
+   * @param message the detail message
+   * @param cause the exception's cause
+   */
+  public EmailException(String message, Throwable cause) {
+    super(createStaticMessage(message), cause);
+  }
 }

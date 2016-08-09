@@ -14,14 +14,14 @@ import org.codehaus.jackson.annotate.JsonIgnore;
  * TODO
  */
 
-public interface OrangeMixin
-{
- @JsonIgnore
- FruitCleaner getCleaner();
+public interface OrangeMixin {
 
-        @JsonIgnore
-        boolean isBitten();
+  @JsonIgnore
+  FruitCleaner getCleaner();
 
-        @JsonIgnore
-        void setCleaner(FruitCleaner fc);
-    }
+  @JsonIgnore
+  boolean isBitten();
+
+  @JsonIgnore
+  void setCleaner(FruitCleaner fc);
+}

@@ -14,24 +14,20 @@ import org.mule.runtime.core.metadata.TypedValue;
 /**
  * Propagates data type for session vars used for enrichment target
  */
-public class SessionVarEnricherDataTypePropagator extends AbstractVariableEnricherDataTypePropagator
-{
+public class SessionVarEnricherDataTypePropagator extends AbstractVariableEnricherDataTypePropagator {
 
-    public SessionVarEnricherDataTypePropagator()
-    {
-        super(MessageVariableResolverFactory.SESSION_VARS);
-    }
+  public SessionVarEnricherDataTypePropagator() {
+    super(MessageVariableResolverFactory.SESSION_VARS);
+  }
 
-    @Override
-    protected void addVariable(MuleEvent event, TypedValue typedValue, String propertyName)
-    {
-        event.getSession().setProperty(propertyName, typedValue.getValue(), typedValue.getDataType());
-    }
+  @Override
+  protected void addVariable(MuleEvent event, TypedValue typedValue, String propertyName) {
+    event.getSession().setProperty(propertyName, typedValue.getValue(), typedValue.getDataType());
+  }
 
-    @Override
-    protected boolean containsVariable(MuleEvent event, String propertyName)
-    {
-        return event.getSession().getPropertyNamesAsSet().contains(propertyName);
-    }
+  @Override
+  protected boolean containsVariable(MuleEvent event, String propertyName) {
+    return event.getSession().getPropertyNamesAsSet().contains(propertyName);
+  }
 
 }

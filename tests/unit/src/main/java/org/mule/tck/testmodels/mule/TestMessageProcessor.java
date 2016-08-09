@@ -13,63 +13,52 @@ import org.mule.runtime.api.meta.NameableObject;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.util.ObjectUtils;
 
-public class TestMessageProcessor implements MessageProcessor, NameableObject
-{
-    /** Simple label string to be appended to the payload. */
-    private String label;
-    
-    /** Bean name used by Spring */
-    private String name;
-    
-    public TestMessageProcessor()
-    {
-        // For IoC
-    }
-    
-    public TestMessageProcessor(String label)
-    {
-        this.label = label;
-    }
-    
-    @Override
-    public MuleEvent process(MuleEvent event) throws MuleException
-    {
-        if (event != null && event.getMessage() != null)
-        {
-            event.setMessage(MuleMessage.builder(event.getMessage())
-                                        .payload(event.getMessage().getPayload() + ":" + label)
-                                        .build());
-        }
-        return event;
-    }
+public class TestMessageProcessor implements MessageProcessor, NameableObject {
 
-    public String getLabel()
-    {
-        return label;
-    }
+  /** Simple label string to be appended to the payload. */
+  private String label;
 
-    public void setLabel(String label)
-    {
-        this.label = label;
-    }
+  /** Bean name used by Spring */
+  private String name;
 
-    @Override
-    public void setName(String name)
-    {
-        this.name = name;
-    }
+  public TestMessageProcessor() {
+    // For IoC
+  }
 
-    @Override
-    public String getName()
-    {
-        return name;
-    }
+  public TestMessageProcessor(String label) {
+    this.label = label;
+  }
 
-    @Override
-    public String toString()
-    {
-        return ObjectUtils.toString(this);
+  @Override
+  public MuleEvent process(MuleEvent event) throws MuleException {
+    if (event != null && event.getMessage() != null) {
+      event.setMessage(MuleMessage.builder(event.getMessage()).payload(event.getMessage().getPayload() + ":" + label).build());
     }
+    return event;
+  }
+
+  public String getLabel() {
+    return label;
+  }
+
+  public void setLabel(String label) {
+    this.label = label;
+  }
+
+  @Override
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  @Override
+  public String getName() {
+    return name;
+  }
+
+  @Override
+  public String toString() {
+    return ObjectUtils.toString(this);
+  }
 }
 
 

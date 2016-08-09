@@ -12,62 +12,54 @@ import org.mule.runtime.core.api.config.MuleProperties;
 import java.util.Properties;
 
 /**
- * The HttpPollingConnectors allows for inbound Http endpoints to be configured with an address which it shall use
- * to poll for a result. If a result is received it becomes the inbound event for the component.  This connector is
- * useful for interacting with services that provide pull-only support for obtaining data.  This is typical for many
- * web-based services.
+ * The HttpPollingConnectors allows for inbound Http endpoints to be configured with an address which it shall use to poll for a
+ * result. If a result is received it becomes the inbound event for the component. This connector is useful for interacting with
+ * services that provide pull-only support for obtaining data. This is typical for many web-based services.
  */
-public class HttpPollingConnector extends HttpConnector
-{
-    /**
-     * How long to wait in milliseconds between make a new request
-     */
-    private long pollingFrequency = 1000L;
+public class HttpPollingConnector extends HttpConnector {
 
-    /**
-     * If a zero-length content is returned should the message be discarded
-     */
-    private boolean discardEmptyContent = true;
+  /**
+   * How long to wait in milliseconds between make a new request
+   */
+  private long pollingFrequency = 1000L;
 
-    /**
-     * Should the ETag header get honoured if it is present.
-     */
-    private boolean checkEtag = true;
+  /**
+   * If a zero-length content is returned should the message be discarded
+   */
+  private boolean discardEmptyContent = true;
 
-    public HttpPollingConnector(MuleContext context)
-    {
-        super(context);
-        serviceOverrides = new Properties();
-        serviceOverrides.setProperty(MuleProperties.CONNECTOR_MESSAGE_RECEIVER_CLASS, PollingHttpMessageReceiver.class.getName());
-    }
+  /**
+   * Should the ETag header get honoured if it is present.
+   */
+  private boolean checkEtag = true;
 
-    public boolean isDiscardEmptyContent()
-    {
-        return discardEmptyContent;
-    }
+  public HttpPollingConnector(MuleContext context) {
+    super(context);
+    serviceOverrides = new Properties();
+    serviceOverrides.setProperty(MuleProperties.CONNECTOR_MESSAGE_RECEIVER_CLASS, PollingHttpMessageReceiver.class.getName());
+  }
 
-    public void setDiscardEmptyContent(boolean discardEmptyContent)
-    {
-        this.discardEmptyContent = discardEmptyContent;
-    }
+  public boolean isDiscardEmptyContent() {
+    return discardEmptyContent;
+  }
 
-    public long getPollingFrequency()
-    {
-        return pollingFrequency;
-    }
+  public void setDiscardEmptyContent(boolean discardEmptyContent) {
+    this.discardEmptyContent = discardEmptyContent;
+  }
 
-    public void setPollingFrequency(long pollingFrequency)
-    {
-        this.pollingFrequency = pollingFrequency;
-    }
+  public long getPollingFrequency() {
+    return pollingFrequency;
+  }
 
-    public boolean isCheckEtag()
-    {
-        return checkEtag;
-    }
+  public void setPollingFrequency(long pollingFrequency) {
+    this.pollingFrequency = pollingFrequency;
+  }
 
-    public void setCheckEtag(boolean checkEtag)
-    {
-        this.checkEtag = checkEtag;
-    }
+  public boolean isCheckEtag() {
+    return checkEtag;
+  }
+
+  public void setCheckEtag(boolean checkEtag) {
+    this.checkEtag = checkEtag;
+  }
 }

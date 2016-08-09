@@ -16,44 +16,39 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 @SmallTest
-public class RandomAccessFileQueueStoreTestCase extends AbstractMuleTestCase
-{
+public class RandomAccessFileQueueStoreTestCase extends AbstractMuleTestCase {
 
-    @Rule
-    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+  @Rule
+  public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
-    @Test
-    public void getLengthWithNoFileContent()
-    {
-        final RandomAccessFileQueueStore randomAccessFileQueueStore = createRandomAccessFileQueueStore();
-        assertThat(randomAccessFileQueueStore.getLength(), is(0l));
+  @Test
+  public void getLengthWithNoFileContent() {
+    final RandomAccessFileQueueStore randomAccessFileQueueStore = createRandomAccessFileQueueStore();
+    assertThat(randomAccessFileQueueStore.getLength(), is(0l));
+  }
+
+  @Test
+  public void getLengthWithOneElement() {
+    final RandomAccessFileQueueStore randomAccessFileQueueStore = createRandomAccessFileQueueStore();
+    final long dataSize = 10;
+    randomAccessFileQueueStore.addLast(new byte[(int) dataSize]);
+    assertThat(randomAccessFileQueueStore.getLength(), is(dataSize + RandomAccessFileQueueStore.CONTROL_DATA_SIZE));
+  }
+
+  @Test
+  public void getLengthWithSeveralElements() {
+    final RandomAccessFileQueueStore randomAccessFileQueueStore = createRandomAccessFileQueueStore();
+    final long dataSize = 10;
+    final byte[] data = new byte[(int) dataSize];
+    final int numberOfElements = 10;
+    for (int i = 0; i < numberOfElements; i++) {
+      randomAccessFileQueueStore.addLast(data);
     }
+    assertThat(randomAccessFileQueueStore.getLength(),
+               is((dataSize + RandomAccessFileQueueStore.CONTROL_DATA_SIZE) * numberOfElements));
+  }
 
-    @Test
-    public void getLengthWithOneElement()
-    {
-        final RandomAccessFileQueueStore randomAccessFileQueueStore = createRandomAccessFileQueueStore();
-        final long dataSize = 10;
-        randomAccessFileQueueStore.addLast(new byte[(int) dataSize]);
-        assertThat(randomAccessFileQueueStore.getLength(), is(dataSize + RandomAccessFileQueueStore.CONTROL_DATA_SIZE));
-    }
-
-    @Test
-    public void getLengthWithSeveralElements()
-    {
-        final RandomAccessFileQueueStore randomAccessFileQueueStore = createRandomAccessFileQueueStore();
-        final long dataSize = 10;
-        final byte[] data = new byte[(int) dataSize];
-        final int numberOfElements = 10;
-        for (int i = 0; i < numberOfElements; i++)
-        {
-            randomAccessFileQueueStore.addLast(data);
-        }
-        assertThat(randomAccessFileQueueStore.getLength(), is((dataSize + RandomAccessFileQueueStore.CONTROL_DATA_SIZE) * numberOfElements));
-    }
-
-    private RandomAccessFileQueueStore createRandomAccessFileQueueStore()
-    {
-        return new RandomAccessFileQueueStore(new QueueFileProvider(temporaryFolder.getRoot(), "datafile"));
-    }
+  private RandomAccessFileQueueStore createRandomAccessFileQueueStore() {
+    return new RandomAccessFileQueueStore(new QueueFileProvider(temporaryFolder.getRoot(), "datafile"));
+  }
 }

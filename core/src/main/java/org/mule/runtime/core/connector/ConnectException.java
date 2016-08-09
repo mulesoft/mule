@@ -15,70 +15,59 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
-/** 
+/**
  * When this exception is thrown it will trigger a retry (reconnection) policy to go into effect if one is configured.
  */
-public class ConnectException extends LocatedMuleException
-{
-    /** Serial version */
-    private static final long serialVersionUID = -7802483584780922653L;
+public class ConnectException extends LocatedMuleException {
 
-    /** Resource which has disconnected */
-    private transient Connectable failed;
+  /** Serial version */
+  private static final long serialVersionUID = -7802483584780922653L;
 
-    public ConnectException(Message message, Connectable failed)
-    {
-        super(message, failed);
-        // In the case of a MessageReceiver/MessageDispatcher, what we really want to reconnect is the Connector
-        this.failed = failed;
+  /** Resource which has disconnected */
+  private transient Connectable failed;
+
+  public ConnectException(Message message, Connectable failed) {
+    super(message, failed);
+    // In the case of a MessageReceiver/MessageDispatcher, what we really want to reconnect is the Connector
+    this.failed = failed;
+  }
+
+  public ConnectException(Message message, Throwable cause, Connectable failed) {
+    super(message, cause, failed);
+    // In the case of a MessageReceiver/MessageDispatcher, what we really want to reconnect is the Connector
+    this.failed = failed;
+  }
+
+  public ConnectException(Throwable cause, Connectable failed) {
+    super(cause, failed);
+    // In the case of a MessageReceiver/MessageDispatcher, what we really want to reconnect is the Connector
+    this.failed = failed;
+  }
+
+  public Connectable getFailed() {
+    return failed;
+  }
+
+  private void writeObject(ObjectOutputStream out) throws Exception {
+    out.defaultWriteObject();
+    if (this.failed instanceof Serializable) {
+      out.writeBoolean(true);
+      out.writeObject(this.failed);
+    } else {
+      out.writeBoolean(false);
     }
+  }
 
-    public ConnectException(Message message, Throwable cause, Connectable failed)
-    {
-        super(message, cause, failed);
-        // In the case of a MessageReceiver/MessageDispatcher, what we really want to reconnect is the Connector
-        this.failed = failed;
-    }
+  private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+    in.defaultReadObject();
 
-    public ConnectException(Throwable cause, Connectable failed)
-    {
-        super(cause, failed);
-        // In the case of a MessageReceiver/MessageDispatcher, what we really want to reconnect is the Connector
-        this.failed = failed;
+    boolean failedWasSerialized = in.readBoolean();
+    if (failedWasSerialized) {
+      this.failed = (Connectable) in.readObject();
     }
+  }
 
-    public Connectable getFailed()
-    {
-        return failed;
-    }
-    
-    private void writeObject(ObjectOutputStream out) throws Exception
-    {
-        out.defaultWriteObject();
-        if (this.failed instanceof Serializable)
-        {
-            out.writeBoolean(true);
-            out.writeObject(this.failed);
-        }
-        else
-        {
-            out.writeBoolean(false);
-        }
-    }
-
-    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
-    {
-        in.defaultReadObject();
-
-        boolean failedWasSerialized = in.readBoolean();
-        if (failedWasSerialized)
-        {
-            this.failed = (Connectable) in.readObject();
-        }
-    }
-
-    public void handleReconnection()
-    {
-        // TODO See MULE-9307 - read reconnection behaviour for configs and sources
-    }
+  public void handleReconnection() {
+    // TODO See MULE-9307 - read reconnection behaviour for configs and sources
+  }
 }

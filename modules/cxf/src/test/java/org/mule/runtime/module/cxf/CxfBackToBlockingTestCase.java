@@ -29,59 +29,52 @@ import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class CxfBackToBlockingTestCase extends FunctionalTestCase
-{
+public class CxfBackToBlockingTestCase extends FunctionalTestCase {
 
-    private static final HttpRequestOptions HTTP_REQUEST_OPTIONS = newOptions().method(Methods.POST.name()).build();
+  private static final HttpRequestOptions HTTP_REQUEST_OPTIONS = newOptions().method(Methods.POST.name()).build();
 
-    private String echoWsdl;
+  private String echoWsdl;
 
-    @Rule
-    public DynamicPort dynamicPort = new DynamicPort("port1");
+  @Rule
+  public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "basic-conf-flow-httpn-nb.xml";
+  @Override
+  protected String getConfigFile() {
+    return "basic-conf-flow-httpn-nb.xml";
+  }
+
+  @Override
+  protected void doSetUp() throws Exception {
+    super.doSetUp();
+    echoWsdl = IOUtils.getResourceAsString("cxf-echo-service.wsdl", getClass());
+    XMLUnit.setIgnoreWhitespace(true);
+    try {
+      XMLUnit.getTransformerFactory();
+    } catch (TransformerFactoryConfigurationError e) {
+      XMLUnit.setTransformerFactory(XMLUtils.TRANSFORMER_FACTORY_JDK5);
     }
+  }
 
-    @Override
-    protected void doSetUp() throws Exception
-    {
-        super.doSetUp();
-        echoWsdl = IOUtils.getResourceAsString("cxf-echo-service.wsdl", getClass());
-        XMLUnit.setIgnoreWhitespace(true);
-        try
-        {
-            XMLUnit.getTransformerFactory();
-        }
-        catch (TransformerFactoryConfigurationError e)
-        {
-            XMLUnit.setTransformerFactory(XMLUtils.TRANSFORMER_FACTORY_JDK5);
-        }
-    }
+  @Test
+  public void backToBlocking() throws Exception {
+    MuleClient client = muleContext.getClient();
+    InputStream xml = getClass().getResourceAsStream("/direct/direct-request.xml");
+    MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/Echo",
+                                     MuleMessage.builder().payload(xml).mediaType(APP_SOAP_XML).build(), HTTP_REQUEST_OPTIONS);
+    assertTrue(getPayloadAsString(result).contains("Hello!"));
+    String ct = result.getDataType().getMediaType().toRfcString();
+    assertEquals("text/xml; charset=UTF-8", ct);
+    muleContext.getRegistry().lookupObject(SensingNullRequestResponseMessageProcessor.class).assertRequestResponseThreadsSame();
+  }
 
-    @Test
-    public void backToBlocking() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        InputStream xml = getClass().getResourceAsStream("/direct/direct-request.xml");
-        MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/Echo",
-                MuleMessage.builder().payload(xml).mediaType(APP_SOAP_XML).build(), HTTP_REQUEST_OPTIONS);
-        assertTrue(getPayloadAsString(result).contains("Hello!"));
-        String ct = result.getDataType().getMediaType().toRfcString();
-        assertEquals("text/xml; charset=UTF-8", ct);
-        muleContext.getRegistry().lookupObject(SensingNullRequestResponseMessageProcessor.class).assertRequestResponseThreadsSame();
-    }
-
-    @Test
-    public void backToBlockingWsdl() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/Echo" + "?wsdl", MuleMessage.builder().nullPayload().build(), HTTP_REQUEST_OPTIONS);
-        assertNotNull(result.getPayload());
-        XMLUnit.compareXML(echoWsdl, getPayloadAsString(result));
-        muleContext.getRegistry().lookupObject(SensingNullRequestResponseMessageProcessor.class).assertRequestResponseThreadsSame();
-    }
+  @Test
+  public void backToBlockingWsdl() throws Exception {
+    MuleClient client = muleContext.getClient();
+    MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/Echo" + "?wsdl",
+                                     MuleMessage.builder().nullPayload().build(), HTTP_REQUEST_OPTIONS);
+    assertNotNull(result.getPayload());
+    XMLUnit.compareXML(echoWsdl, getPayloadAsString(result));
+    muleContext.getRegistry().lookupObject(SensingNullRequestResponseMessageProcessor.class).assertRequestResponseThreadsSame();
+  }
 
 }

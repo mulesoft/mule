@@ -15,75 +15,63 @@ import org.mule.runtime.extension.api.introspection.ComponentModel;
 import org.mule.runtime.extension.api.introspection.metadata.NullMetadataResolver;
 
 /**
- * Adapter implementation which expands the {@link MetadataScope} to
- * a more descriptive of the developer's metadata declaration for a {@link ComponentModel component}
+ * Adapter implementation which expands the {@link MetadataScope} to a more descriptive of the developer's metadata declaration
+ * for a {@link ComponentModel component}
  *
  * @since 4.0
  */
-public final class MetadataScopeAdapter
-{
+public final class MetadataScopeAdapter {
 
-    private Class<? extends MetadataKeysResolver> keysResolver = NullMetadataResolver.class;
-    private Class<? extends MetadataContentResolver> contentResolver = NullMetadataResolver.class;
-    private Class<? extends MetadataOutputResolver> outputResolver = NullMetadataResolver.class;
-    private Class<? extends MetadataAttributesResolver> attributesResolver = NullMetadataResolver.class;
-    private boolean customScope = false;
+  private Class<? extends MetadataKeysResolver> keysResolver = NullMetadataResolver.class;
+  private Class<? extends MetadataContentResolver> contentResolver = NullMetadataResolver.class;
+  private Class<? extends MetadataOutputResolver> outputResolver = NullMetadataResolver.class;
+  private Class<? extends MetadataAttributesResolver> attributesResolver = NullMetadataResolver.class;
+  private boolean customScope = false;
 
-    public MetadataScopeAdapter(MetadataScope scope)
-    {
-        if (scope != null)
-        {
-            this.customScope = true;
-            this.keysResolver = scope.keysResolver();
-            this.contentResolver = scope.contentResolver();
-            this.outputResolver = scope.outputResolver();
-            this.attributesResolver = scope.attributesResolver();
-        }
+  public MetadataScopeAdapter(MetadataScope scope) {
+    if (scope != null) {
+      this.customScope = true;
+      this.keysResolver = scope.keysResolver();
+      this.contentResolver = scope.contentResolver();
+      this.outputResolver = scope.outputResolver();
+      this.attributesResolver = scope.attributesResolver();
     }
+  }
 
-    public boolean isCustomScope()
-    {
-         return customScope;
-    }
+  public boolean isCustomScope() {
+    return customScope;
+  }
 
-    public boolean hasKeysResolver()
-    {
-        return !keysResolver.equals(NullMetadataResolver.class);
-    }
+  public boolean hasKeysResolver() {
+    return !keysResolver.equals(NullMetadataResolver.class);
+  }
 
-    public boolean hasContentResolver()
-    {
-        return !contentResolver.equals(NullMetadataResolver.class);
-    }
+  public boolean hasContentResolver() {
+    return !contentResolver.equals(NullMetadataResolver.class);
+  }
 
-    public boolean hasOutputResolver()
-    {
-        return !outputResolver.equals(NullMetadataResolver.class);
-    }
+  public boolean hasOutputResolver() {
+    return !outputResolver.equals(NullMetadataResolver.class);
+  }
 
-    public boolean hasAttributesResolver()
-    {
-        return !attributesResolver.equals(NullMetadataResolver.class);
-    }
+  public boolean hasAttributesResolver() {
+    return !attributesResolver.equals(NullMetadataResolver.class);
+  }
 
-    public Class<? extends MetadataKeysResolver> getKeysResolver()
-    {
-        return keysResolver;
-    }
+  public Class<? extends MetadataKeysResolver> getKeysResolver() {
+    return keysResolver;
+  }
 
-    public Class<? extends MetadataContentResolver> getContentResolver()
-    {
-        return contentResolver;
-    }
+  public Class<? extends MetadataContentResolver> getContentResolver() {
+    return contentResolver;
+  }
 
-    public Class<? extends MetadataOutputResolver> getOutputResolver()
-    {
-        return outputResolver;
-    }
+  public Class<? extends MetadataOutputResolver> getOutputResolver() {
+    return outputResolver;
+  }
 
-    public Class<? extends MetadataAttributesResolver> getAttributesResolver()
-    {
-        return attributesResolver;
-    }
+  public Class<? extends MetadataAttributesResolver> getAttributesResolver() {
+    return attributesResolver;
+  }
 
 }

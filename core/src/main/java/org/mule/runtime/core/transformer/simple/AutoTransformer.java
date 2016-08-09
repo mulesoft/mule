@@ -16,33 +16,29 @@ import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 import java.nio.charset.Charset;
 
 /**
- * A transformer that uses the transform discovery mechanism to convert the message payload. This transformer
- * works much better when transforming custom object types rather that java types since there is less chance for
- * ambiguity.
- * If an exact match cannot be made an execption will be thrown.
+ * A transformer that uses the transform discovery mechanism to convert the message payload. This transformer works much better
+ * when transforming custom object types rather that java types since there is less chance for ambiguity. If an exact match cannot
+ * be made an execption will be thrown.
  */
-public class AutoTransformer extends AbstractMessageTransformer
-{
-    /**
-     * Template method where deriving classes can do any initialisation after the
-     * properties have been set on this transformer
-     *
-     * @throws org.mule.runtime.core.api.lifecycle.InitialisationException
-     *
-     */
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        super.initialise();
-        if (Object.class.equals(getReturnDataType().getType()))
-        {
-            throw new InitialisationException(CoreMessages.transformerInvalidReturnType(Object.class, getName()), this);
-        }
-    }
+public class AutoTransformer extends AbstractMessageTransformer {
 
-    @Override
-    public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException
-    {
-        return muleContext.getTransformationService().transform(event.getMessage(), DataType.fromType(getReturnDataType().getType())).getPayload();
+  /**
+   * Template method where deriving classes can do any initialisation after the properties have been set on this transformer
+   *
+   * @throws org.mule.runtime.core.api.lifecycle.InitialisationException
+   *
+   */
+  @Override
+  public void initialise() throws InitialisationException {
+    super.initialise();
+    if (Object.class.equals(getReturnDataType().getType())) {
+      throw new InitialisationException(CoreMessages.transformerInvalidReturnType(Object.class, getName()), this);
     }
+  }
+
+  @Override
+  public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException {
+    return muleContext.getTransformationService().transform(event.getMessage(), DataType.fromType(getReturnDataType().getType()))
+        .getPayload();
+  }
 }

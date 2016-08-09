@@ -10,18 +10,15 @@ package org.mule.runtime.module.db.integration.config;
 
 import org.junit.Test;
 
-public class OracleMissingUserTestCase extends AbstractConfigurationErrorTestCase
-{
+public class OracleMissingUserTestCase extends AbstractConfigurationErrorTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "integration/config/oracle-missing-user-db-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "integration/config/oracle-missing-user-db-config.xml";
+  }
 
-    @Test
-    public void requiresUserAttribute() throws Exception
-    {
-        assertConfigurationError("Able to define an Oracle config without user attribute", "user");
-    }
+  @Test
+  public void requiresUserAttribute() throws Exception {
+    assertConfigurationError("Able to define an Oracle config without user attribute", "user");
+  }
 }

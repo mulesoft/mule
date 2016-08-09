@@ -51,457 +51,380 @@ import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
 import org.apache.ws.security.handler.WSHandlerConstants;
 
 /**
- * An abstract builder for CXF services. It handles all common operations such
- * as interceptor configuration, mule header enabling, etc. Subclasses can extend
- * this and control how the Server is created and how the {@link CxfInboundMessageProcessor}
- * is configured.
+ * An abstract builder for CXF services. It handles all common operations such as interceptor configuration, mule header enabling,
+ * etc. Subclasses can extend this and control how the Server is created and how the {@link CxfInboundMessageProcessor} is
+ * configured.
  */
-public abstract class AbstractInboundMessageProcessorBuilder extends AbstractAnnotatedObject implements MuleContextAware, MessageProcessorBuilder
-{
-    private CxfConfiguration configuration;
-    private Server server;
-    private boolean enableMuleSoapHeaders = true;
-    private String wsdlLocation;
-    private String bindingId;
-    private String mtomEnabled;
-    private String soapVersion;
-    private String service;
-    private String namespace;
-    private List<AbstractFeature> features;
-    private List<Interceptor<? extends Message>> inInterceptors = new CopyOnWriteArrayList<Interceptor<? extends Message>>();
-    private List<Interceptor<? extends Message>> inFaultInterceptors = new CopyOnWriteArrayList<Interceptor<? extends Message>>();
-    private List<Interceptor<? extends Message>> outInterceptors = new CopyOnWriteArrayList<Interceptor<? extends Message>>();
-    private List<Interceptor<? extends Message>> outFaultInterceptors = new CopyOnWriteArrayList<Interceptor<? extends Message>>();
-    protected MuleContext muleContext;
-    private String port;
-    private Map<String,Object> properties = new HashMap<String, Object>();
-    private boolean validationEnabled;
-    private List<String> schemaLocations;
-    private WsSecurity wsSecurity;
+public abstract class AbstractInboundMessageProcessorBuilder extends AbstractAnnotatedObject
+    implements MuleContextAware, MessageProcessorBuilder {
 
-    @Override
-    public CxfInboundMessageProcessor build() throws MuleException
-    {
-        if (muleContext == null)
-        {
-            throw new IllegalStateException("MuleContext must be supplied.");
+  private CxfConfiguration configuration;
+  private Server server;
+  private boolean enableMuleSoapHeaders = true;
+  private String wsdlLocation;
+  private String bindingId;
+  private String mtomEnabled;
+  private String soapVersion;
+  private String service;
+  private String namespace;
+  private List<AbstractFeature> features;
+  private List<Interceptor<? extends Message>> inInterceptors = new CopyOnWriteArrayList<Interceptor<? extends Message>>();
+  private List<Interceptor<? extends Message>> inFaultInterceptors = new CopyOnWriteArrayList<Interceptor<? extends Message>>();
+  private List<Interceptor<? extends Message>> outInterceptors = new CopyOnWriteArrayList<Interceptor<? extends Message>>();
+  private List<Interceptor<? extends Message>> outFaultInterceptors = new CopyOnWriteArrayList<Interceptor<? extends Message>>();
+  protected MuleContext muleContext;
+  private String port;
+  private Map<String, Object> properties = new HashMap<String, Object>();
+  private boolean validationEnabled;
+  private List<String> schemaLocations;
+  private WsSecurity wsSecurity;
+
+  @Override
+  public CxfInboundMessageProcessor build() throws MuleException {
+    if (muleContext == null) {
+      throw new IllegalStateException("MuleContext must be supplied.");
+    }
+
+    if (configuration == null) {
+      configuration = CxfConfiguration.getConfiguration(muleContext);
+    }
+
+    if (configuration == null) {
+      throw new IllegalStateException("A CxfConfiguration object must be supplied.");
+    }
+
+    ServerFactoryBean sfb;
+    try {
+      sfb = createServerFactory();
+    } catch (Exception e) {
+      throw new DefaultMuleException(e);
+    }
+
+    // The binding - i.e. SOAP, XML, HTTP Binding, etc
+    if (bindingId != null) {
+      sfb.setBindingId(bindingId);
+    }
+
+    if (features != null) {
+      sfb.getFeatures().addAll(features);
+    }
+
+    if (mtomEnabled != null) {
+      properties.put("mtom-enabled", mtomEnabled);
+      properties.put(AttachmentOutInterceptor.WRITE_ATTACHMENTS, true);
+    }
+
+    if (inInterceptors != null) {
+      sfb.getInInterceptors().addAll(inInterceptors);
+    }
+
+    if (inFaultInterceptors != null) {
+      sfb.getInFaultInterceptors().addAll(inFaultInterceptors);
+    }
+
+    if (outInterceptors != null) {
+      sfb.getOutInterceptors().addAll(outInterceptors);
+    }
+
+    if (outFaultInterceptors != null) {
+      sfb.getOutFaultInterceptors().addAll(outFaultInterceptors);
+    }
+
+    if (enableMuleSoapHeaders && !configuration.isEnableMuleSoapHeaders()) {
+      sfb.getInInterceptors().add(new MuleHeadersInInterceptor());
+      sfb.getInFaultInterceptors().add(new MuleHeadersInInterceptor());
+      sfb.getOutInterceptors().add(new MuleHeadersOutInterceptor());
+      sfb.getOutFaultInterceptors().add(new MuleHeadersOutInterceptor());
+    }
+
+    setSecurityConfig(sfb);
+
+    String address = getAddress();
+    address = CxfUtils.mapUnsupportedSchemas(address);
+    sfb.setAddress(address); // dummy URL for CXF
+
+    if (wsdlLocation != null) {
+      sfb.setWsdlURL(wsdlLocation);
+    }
+
+    sfb.setSchemaLocations(schemaLocations);
+
+    ReflectionServiceFactoryBean svcFac = sfb.getServiceFactory();
+    initServiceFactory(svcFac);
+
+    CxfInboundMessageProcessor processor = new CxfInboundMessageProcessor();
+    processor.setMuleContext(muleContext);
+    configureMessageProcessor(sfb, processor);
+    sfb.setStart(false);
+
+    Bus bus = configuration.getCxfBus();
+    sfb.setBus(bus);
+    svcFac.setBus(bus);
+
+    Configurer configurer = bus.getExtension(Configurer.class);
+    if (null != configurer) {
+      configurer.configureBean(svcFac.getEndpointName().toString(), sfb);
+    }
+
+    if (validationEnabled) {
+      properties.put("schema-validation-enabled", "true");
+    }
+
+    // If there's a soapVersion defined then the corresponding bindingId will be set
+    if (soapVersion != null) {
+      sfb.setBindingId(CxfUtils.getBindingIdForSoapVersion(soapVersion));
+    }
+
+    sfb.setProperties(properties);
+    sfb.setInvoker(createInvoker(processor));
+
+    server = sfb.create();
+
+    CxfUtils.removeInterceptor(server.getEndpoint().getService().getInInterceptors(), OneWayProcessorInterceptor.class.getName());
+    configureServer(server);
+
+    processor.setBus(sfb.getBus());
+    processor.setServer(server);
+    processor.setProxy(isProxy());
+    processor.setWSDLQueryHandler(getWSDLQueryHandler());
+    processor.setMimeType(getMimeType());
+
+    return processor;
+  }
+
+  protected MediaType getMimeType() {
+    return MediaType.ANY;
+  }
+
+  protected QueryHandler getWSDLQueryHandler() {
+    return new WSDLQueryHandler(configuration.getCxfBus());
+  }
+
+  protected Invoker createInvoker(CxfInboundMessageProcessor processor) {
+    return new MuleInvoker(processor, getServiceClass());
+  }
+
+  protected void configureServer(Server server2) {
+    // template method
+  }
+
+  protected abstract Class<?> getServiceClass();
+
+  protected void configureMessageProcessor(ServerFactoryBean sfb, CxfInboundMessageProcessor processor) {
+    // template method
+  }
+
+  protected abstract ServerFactoryBean createServerFactory() throws Exception;
+
+  protected String getAddress() {
+    return "http://internalMuleCxfRegistry/" + hashCode();
+  }
+
+  /**
+   * This method configures the {@link ReflectionServiceFactoryBean}.
+   */
+  private void initServiceFactory(ReflectionServiceFactoryBean svcFac) {
+    addIgnoredMethods(svcFac, Callable.class.getName());
+    addIgnoredMethods(svcFac, Initialisable.class.getName());
+    addIgnoredMethods(svcFac, Disposable.class.getName());
+
+    svcFac.getServiceConfigurations().add(0, new MuleServiceConfiguration(this));
+
+    svcFac.setServiceClass(getServiceClass());
+    for (AbstractServiceConfiguration c : svcFac.getServiceConfigurations()) {
+      c.setServiceFactory(svcFac);
+    }
+  }
+
+  public void addIgnoredMethods(ReflectionServiceFactoryBean svcFac, String className) {
+    try {
+      Class<?> c = ClassUtils.loadClass(className, getClass());
+      for (int i = 0; i < c.getMethods().length; i++) {
+        svcFac.getIgnoredMethods().add(c.getMethods()[i]);
+      }
+    } catch (ClassNotFoundException e) {
+      // can be ignored.
+    }
+  }
+
+  private void setSecurityConfig(ServerFactoryBean sfb) {
+    if (wsSecurity != null) {
+      if (wsSecurity.getCustomValidator() != null && !wsSecurity.getCustomValidator().isEmpty()) {
+        for (Map.Entry<String, Object> entry : wsSecurity.getCustomValidator().entrySet()) {
+          properties.put(entry.getKey(), entry.getValue());
         }
+      }
+      if (wsSecurity.getSecurityManager() != null) {
+        properties.put(SecurityConstants.USERNAME_TOKEN_VALIDATOR, wsSecurity.getSecurityManager());
+      }
+      if (wsSecurity.getConfigProperties() != null && !wsSecurity.getConfigProperties().isEmpty()) {
+        sfb.getInInterceptors().add(new WSS4JInInterceptor(wsSecurity.getConfigProperties()));
 
-        if (configuration == null)
-        {
-            configuration = CxfConfiguration.getConfiguration(muleContext);
+        // CXF changed the way it validates SAML subject confirmation from 2.5.x to 2.7.x
+        // see https://issues.apache.org/jira/browse/CXF-4655
+        // In order to keep backwards compatibility we use the previous approach
+        String actionProperty = (String) wsSecurity.getConfigProperties().get(WSHandlerConstants.ACTION);
+        if (!StringUtils.isEmpty(actionProperty) && actionProperty.contains(WSHandlerConstants.SAML_TOKEN_UNSIGNED)) {
+          properties.put("ws-security.validate.saml.subject.conf", false);
         }
-
-        if (configuration == null)
-        {
-            throw new IllegalStateException("A CxfConfiguration object must be supplied.");
-        }
-
-        ServerFactoryBean sfb;
-        try
-        {
-            sfb = createServerFactory();
-        }
-        catch (Exception e)
-        {
-            throw new DefaultMuleException(e);
-        }
-
-        // The binding - i.e. SOAP, XML, HTTP Binding, etc
-        if (bindingId != null)
-        {
-            sfb.setBindingId(bindingId);
-        }
-
-        if (features != null)
-        {
-            sfb.getFeatures().addAll(features);
-        }
-
-        if (mtomEnabled != null)
-        {
-            properties.put("mtom-enabled", mtomEnabled);
-            properties.put(AttachmentOutInterceptor.WRITE_ATTACHMENTS, true);
-        }
-
-        if (inInterceptors != null)
-        {
-            sfb.getInInterceptors().addAll(inInterceptors);
-        }
-
-        if (inFaultInterceptors != null)
-        {
-            sfb.getInFaultInterceptors().addAll(inFaultInterceptors);
-        }
-
-        if (outInterceptors != null)
-        {
-            sfb.getOutInterceptors().addAll(outInterceptors);
-        }
-
-        if (outFaultInterceptors != null)
-        {
-            sfb.getOutFaultInterceptors().addAll(outFaultInterceptors);
-        }
-
-        if (enableMuleSoapHeaders && !configuration.isEnableMuleSoapHeaders())
-        {
-            sfb.getInInterceptors().add(new MuleHeadersInInterceptor());
-            sfb.getInFaultInterceptors().add(new MuleHeadersInInterceptor());
-            sfb.getOutInterceptors().add(new MuleHeadersOutInterceptor());
-            sfb.getOutFaultInterceptors().add(new MuleHeadersOutInterceptor());
-        }
-
-        setSecurityConfig(sfb);
-
-        String address = getAddress();
-        address = CxfUtils.mapUnsupportedSchemas(address);
-        sfb.setAddress(address); // dummy URL for CXF
-
-        if (wsdlLocation != null)
-        {
-            sfb.setWsdlURL(wsdlLocation);
-        }
-
-        sfb.setSchemaLocations(schemaLocations);
-
-        ReflectionServiceFactoryBean svcFac = sfb.getServiceFactory();
-        initServiceFactory(svcFac);
-
-        CxfInboundMessageProcessor processor = new CxfInboundMessageProcessor();
-        processor.setMuleContext(muleContext);
-        configureMessageProcessor(sfb, processor);
-        sfb.setStart(false);
-
-        Bus bus = configuration.getCxfBus();
-        sfb.setBus(bus);
-        svcFac.setBus(bus);
-
-        Configurer configurer = bus.getExtension(Configurer.class);
-        if (null != configurer)
-        {
-            configurer.configureBean(svcFac.getEndpointName().toString(), sfb);
-        }
-
-        if (validationEnabled)
-        {
-            properties.put("schema-validation-enabled", "true");
-        }
-
-        // If there's a soapVersion defined then the corresponding bindingId will be set
-        if(soapVersion != null)
-        {
-            sfb.setBindingId(CxfUtils.getBindingIdForSoapVersion(soapVersion));
-        }
-        
-        sfb.setProperties(properties);
-        sfb.setInvoker(createInvoker(processor));
-
-        server = sfb.create();
-
-        CxfUtils.removeInterceptor(server.getEndpoint().getService().getInInterceptors(), OneWayProcessorInterceptor.class.getName());
-        configureServer(server);
-
-        processor.setBus(sfb.getBus());
-        processor.setServer(server);
-        processor.setProxy(isProxy());
-        processor.setWSDLQueryHandler(getWSDLQueryHandler());
-        processor.setMimeType(getMimeType());
-
-        return processor;
+      }
     }
-
-    protected MediaType getMimeType()
-    {
-        return MediaType.ANY;
-    }
-
-    protected QueryHandler getWSDLQueryHandler()
-    {
-        return new WSDLQueryHandler(configuration.getCxfBus());
-    }
-
-    protected Invoker createInvoker(CxfInboundMessageProcessor processor)
-    {
-        return new MuleInvoker(processor, getServiceClass());
-    }
-
-    protected void configureServer(Server server2)
-    {
-        // template method
-    }
-
-    protected abstract Class<?> getServiceClass();
-
-    protected void configureMessageProcessor(ServerFactoryBean sfb, CxfInboundMessageProcessor processor)
-    {
-        // template method
-    }
-
-    protected abstract ServerFactoryBean createServerFactory() throws Exception;
-
-    protected String getAddress()
-    {
-        return "http://internalMuleCxfRegistry/" + hashCode();
-    }
-
-    /**
-     * This method configures the {@link ReflectionServiceFactoryBean}.
-     */
-    private void initServiceFactory(ReflectionServiceFactoryBean svcFac)
-    {
-        addIgnoredMethods(svcFac, Callable.class.getName());
-        addIgnoredMethods(svcFac, Initialisable.class.getName());
-        addIgnoredMethods(svcFac, Disposable.class.getName());
-
-        svcFac.getServiceConfigurations().add(0, new MuleServiceConfiguration(this));
-
-        svcFac.setServiceClass(getServiceClass());
-        for (AbstractServiceConfiguration c : svcFac.getServiceConfigurations())
-        {
-            c.setServiceFactory(svcFac);
-        }
-    }
-
-    public void addIgnoredMethods(ReflectionServiceFactoryBean svcFac, String className)
-    {
-        try
-        {
-            Class<?> c = ClassUtils.loadClass(className, getClass());
-            for (int i = 0; i < c.getMethods().length; i++)
-            {
-                svcFac.getIgnoredMethods().add(c.getMethods()[i]);
-            }
-        }
-        catch (ClassNotFoundException e)
-        {
-            // can be ignored.
-        }
-    }
-
-    private void setSecurityConfig(ServerFactoryBean sfb)
-    {
-        if(wsSecurity != null)
-        {
-            if(wsSecurity.getCustomValidator() != null && !wsSecurity.getCustomValidator().isEmpty())
-            {
-                for(Map.Entry<String, Object> entry : wsSecurity.getCustomValidator().entrySet())
-                {
-                    properties.put(entry.getKey(), entry.getValue());
-                }
-            }
-            if(wsSecurity.getSecurityManager() != null)
-            {
-                properties.put(SecurityConstants.USERNAME_TOKEN_VALIDATOR, wsSecurity.getSecurityManager());
-            }
-            if(wsSecurity.getConfigProperties() != null && !wsSecurity.getConfigProperties().isEmpty())
-            {
-                sfb.getInInterceptors().add(new WSS4JInInterceptor(wsSecurity.getConfigProperties()));
-
-                // CXF changed the way it validates SAML subject confirmation from 2.5.x to 2.7.x
-                // see https://issues.apache.org/jira/browse/CXF-4655
-                // In order to keep backwards compatibility we use the previous approach
-                String actionProperty = (String) wsSecurity.getConfigProperties().get(WSHandlerConstants.ACTION);
-                if (!StringUtils.isEmpty(actionProperty) && actionProperty.contains(WSHandlerConstants.SAML_TOKEN_UNSIGNED))
-                {
-                    properties.put("ws-security.validate.saml.subject.conf", false);
-                }
-            }
-        }
-    }
+  }
 
 
-    public Server getServer()
-    {
-        return server;
-    }
+  public Server getServer() {
+    return server;
+  }
 
-    public abstract boolean isProxy();
+  public abstract boolean isProxy();
 
-    public CxfConfiguration getConfiguration()
-    {
-        return configuration;
-    }
+  public CxfConfiguration getConfiguration() {
+    return configuration;
+  }
 
-    public void setConfiguration(CxfConfiguration configuration)
-    {
-        this.configuration = configuration;
-    }
+  public void setConfiguration(CxfConfiguration configuration) {
+    this.configuration = configuration;
+  }
 
-    public boolean isEnableMuleSoapHeaders()
-    {
-        return enableMuleSoapHeaders;
-    }
+  public boolean isEnableMuleSoapHeaders() {
+    return enableMuleSoapHeaders;
+  }
 
-    public void setEnableMuleSoapHeaders(boolean enableMuleSoapHeaders)
-    {
-        this.enableMuleSoapHeaders = enableMuleSoapHeaders;
-    }
+  public void setEnableMuleSoapHeaders(boolean enableMuleSoapHeaders) {
+    this.enableMuleSoapHeaders = enableMuleSoapHeaders;
+  }
 
-    public String getWsdlLocation()
-    {
-        return wsdlLocation;
-    }
+  public String getWsdlLocation() {
+    return wsdlLocation;
+  }
 
-    public void setWsdlLocation(String wsdlUrl)
-    {
-        this.wsdlLocation = wsdlUrl;
-    }
+  public void setWsdlLocation(String wsdlUrl) {
+    this.wsdlLocation = wsdlUrl;
+  }
 
-    public String getBindingId()
-    {
-        return bindingId;
-    }
+  public String getBindingId() {
+    return bindingId;
+  }
 
-    public void setBindingId(String bindingId)
-    {
-        this.bindingId = bindingId;
-    }
+  public void setBindingId(String bindingId) {
+    this.bindingId = bindingId;
+  }
 
-    public void setSoapVersion(String soapVersion)
-    {
-        this.soapVersion = soapVersion;
-    }
+  public void setSoapVersion(String soapVersion) {
+    this.soapVersion = soapVersion;
+  }
 
-    public String getSoapVersion()
-    {
-        return soapVersion;
-    }
+  public String getSoapVersion() {
+    return soapVersion;
+  }
 
-    public String getMtomEnabled()
-    {
-        return mtomEnabled;
-    }
+  public String getMtomEnabled() {
+    return mtomEnabled;
+  }
 
-    public void setMtomEnabled(String mtomEnabled)
-    {
-        this.mtomEnabled = mtomEnabled;
-    }
+  public void setMtomEnabled(String mtomEnabled) {
+    this.mtomEnabled = mtomEnabled;
+  }
 
-    public String getService()
-    {
-        return service;
-    }
+  public String getService() {
+    return service;
+  }
 
-    public void setService(String name)
-    {
-        this.service = name;
-    }
+  public void setService(String name) {
+    this.service = name;
+  }
 
-    public String getNamespace()
-    {
-        return namespace;
-    }
+  public String getNamespace() {
+    return namespace;
+  }
 
-    public void setNamespace(String namespace)
-    {
-        this.namespace = namespace;
-    }
+  public void setNamespace(String namespace) {
+    this.namespace = namespace;
+  }
 
-    public List<AbstractFeature> getFeatures()
-    {
-        return features;
-    }
+  public List<AbstractFeature> getFeatures() {
+    return features;
+  }
 
-    public void setFeatures(List<AbstractFeature> features)
-    {
-        this.features = features;
-    }
+  public void setFeatures(List<AbstractFeature> features) {
+    this.features = features;
+  }
 
-    public List<Interceptor<? extends Message>> getInInterceptors()
-    {
-        return inInterceptors;
-    }
+  public List<Interceptor<? extends Message>> getInInterceptors() {
+    return inInterceptors;
+  }
 
-    public void setInInterceptors(List<Interceptor<? extends Message>> inInterceptors)
-    {
-        this.inInterceptors = inInterceptors;
-    }
+  public void setInInterceptors(List<Interceptor<? extends Message>> inInterceptors) {
+    this.inInterceptors = inInterceptors;
+  }
 
-    public List<Interceptor<? extends Message>> getInFaultInterceptors()
-    {
-        return inFaultInterceptors;
-    }
+  public List<Interceptor<? extends Message>> getInFaultInterceptors() {
+    return inFaultInterceptors;
+  }
 
-    public void setInFaultInterceptors(List<Interceptor<? extends Message>> inFaultInterceptors)
-    {
-        this.inFaultInterceptors = inFaultInterceptors;
-    }
+  public void setInFaultInterceptors(List<Interceptor<? extends Message>> inFaultInterceptors) {
+    this.inFaultInterceptors = inFaultInterceptors;
+  }
 
-    public List<Interceptor<? extends Message>> getOutInterceptors()
-    {
-        return outInterceptors;
-    }
+  public List<Interceptor<? extends Message>> getOutInterceptors() {
+    return outInterceptors;
+  }
 
-    public void setOutInterceptors(List<Interceptor<? extends Message>> outInterceptors)
-    {
-        this.outInterceptors = outInterceptors;
-    }
+  public void setOutInterceptors(List<Interceptor<? extends Message>> outInterceptors) {
+    this.outInterceptors = outInterceptors;
+  }
 
-    public List<Interceptor<? extends Message>> getOutFaultInterceptors()
-    {
-        return outFaultInterceptors;
-    }
+  public List<Interceptor<? extends Message>> getOutFaultInterceptors() {
+    return outFaultInterceptors;
+  }
 
-    public void setOutFaultInterceptors(List<Interceptor<? extends Message>> outFaultInterceptors)
-    {
-        this.outFaultInterceptors = outFaultInterceptors;
-    }
-    
-    @Override
-    public void setMuleContext(MuleContext muleContext)
-    {
-        this.muleContext = muleContext;
-    }
+  public void setOutFaultInterceptors(List<Interceptor<? extends Message>> outFaultInterceptors) {
+    this.outFaultInterceptors = outFaultInterceptors;
+  }
 
-    public String getPort()
-    {
-        return port;
-    }
+  @Override
+  public void setMuleContext(MuleContext muleContext) {
+    this.muleContext = muleContext;
+  }
 
-    public void setPort(String endpoint)
-    {
-        this.port = endpoint;
-    }
+  public String getPort() {
+    return port;
+  }
 
-    public Map<String, Object> getProperties()
-    {
-        return properties;
-    }
+  public void setPort(String endpoint) {
+    this.port = endpoint;
+  }
 
-    public void setProperties(Map<String, Object> properties)
-    {
-        this.properties = properties;
-    }
+  public Map<String, Object> getProperties() {
+    return properties;
+  }
 
-    public void setAddProperties(Map<String, Object> properties)
-    {
-        this.properties.putAll(properties);
-    }
+  public void setProperties(Map<String, Object> properties) {
+    this.properties = properties;
+  }
 
-    public boolean isValidationEnabled()
-    {
-        return validationEnabled;
-    }
+  public void setAddProperties(Map<String, Object> properties) {
+    this.properties.putAll(properties);
+  }
 
-    public void setValidationEnabled(boolean validationEnabled)
-    {
-        this.validationEnabled = validationEnabled;
-    }
+  public boolean isValidationEnabled() {
+    return validationEnabled;
+  }
 
-    public List<String> getSchemaLocations()
-    {
-        return schemaLocations;
-    }
+  public void setValidationEnabled(boolean validationEnabled) {
+    this.validationEnabled = validationEnabled;
+  }
 
-    public void setSchemaLocations(List<String> schemaLocations)
-    {
-        this.schemaLocations = schemaLocations;
-    }
+  public List<String> getSchemaLocations() {
+    return schemaLocations;
+  }
 
-    public void setWsSecurity(WsSecurity wsSecurity)
-    {
-        this.wsSecurity = wsSecurity;
-    }
+  public void setSchemaLocations(List<String> schemaLocations) {
+    this.schemaLocations = schemaLocations;
+  }
+
+  public void setWsSecurity(WsSecurity wsSecurity) {
+    this.wsSecurity = wsSecurity;
+  }
 
 }

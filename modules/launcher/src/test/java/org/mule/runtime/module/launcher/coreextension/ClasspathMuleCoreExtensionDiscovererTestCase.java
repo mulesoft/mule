@@ -29,77 +29,66 @@ import java.util.List;
 
 import org.junit.Test;
 
-public class ClasspathMuleCoreExtensionDiscovererTestCase extends AbstractMuleTestCase
-{
+public class ClasspathMuleCoreExtensionDiscovererTestCase extends AbstractMuleTestCase {
 
-    @Test
-    public void setsContainerClassLoaderOnDiscoveredExtensions() throws Exception
-    {
-        final ArtifactClassLoader artifactClassLoader = mock(ArtifactClassLoader.class);
-        final ClassLoader classLoader = mock(ClassLoader.class);
-        final URL resource = getClass().getClassLoader().getResource("test-core-extension.properties");
-        when(classLoader.getResources(CORE_EXTENSION_RESOURCE_NAME)).thenReturn(new EnumerationAdapter<URL>(Collections.singleton(resource)));
-        when(artifactClassLoader.getClassLoader()).thenReturn(classLoader);
+  @Test
+  public void setsContainerClassLoaderOnDiscoveredExtensions() throws Exception {
+    final ArtifactClassLoader artifactClassLoader = mock(ArtifactClassLoader.class);
+    final ClassLoader classLoader = mock(ClassLoader.class);
+    final URL resource = getClass().getClassLoader().getResource("test-core-extension.properties");
+    when(classLoader.getResources(CORE_EXTENSION_RESOURCE_NAME))
+        .thenReturn(new EnumerationAdapter<URL>(Collections.singleton(resource)));
+    when(artifactClassLoader.getClassLoader()).thenReturn(classLoader);
 
-        final ClasspathMuleCoreExtensionDiscoverer discoverer = new ClasspathMuleCoreExtensionDiscoverer(artifactClassLoader);
+    final ClasspathMuleCoreExtensionDiscoverer discoverer = new ClasspathMuleCoreExtensionDiscoverer(artifactClassLoader);
 
-        // Uses context classloader to force discovering of the test properties
-        final List<MuleCoreExtension> discover = withContextClassLoader(artifactClassLoader.getClassLoader(), () -> {
-            try
-            {
-                return discoverer.discover();
-            }
-            catch (DefaultMuleException e)
-            {
-                throw new IllegalStateException(e);
-            }
-        });
+    // Uses context classloader to force discovering of the test properties
+    final List<MuleCoreExtension> discover = withContextClassLoader(artifactClassLoader.getClassLoader(), () -> {
+      try {
+        return discoverer.discover();
+      } catch (DefaultMuleException e) {
+        throw new IllegalStateException(e);
+      }
+    });
 
-        assertThat(discover.size(), equalTo(1));
-        assertThat(discover.get(0), instanceOf(TestCoreExtension.class));
-        assertThat(((TestCoreExtension) discover.get(0)).containerClassLoader, is(artifactClassLoader));
+    assertThat(discover.size(), equalTo(1));
+    assertThat(discover.get(0), instanceOf(TestCoreExtension.class));
+    assertThat(((TestCoreExtension) discover.get(0)).containerClassLoader, is(artifactClassLoader));
+  }
+
+  public static class TestCoreExtension implements MuleCoreExtension {
+
+    private ArtifactClassLoader containerClassLoader;
+
+    @Override
+    public void setContainerClassLoader(ArtifactClassLoader containerClassLoader) {
+
+      this.containerClassLoader = containerClassLoader;
     }
 
-    public static class TestCoreExtension implements MuleCoreExtension
-    {
-
-        private ArtifactClassLoader containerClassLoader;
-
-        @Override
-        public void setContainerClassLoader(ArtifactClassLoader containerClassLoader)
-        {
-
-            this.containerClassLoader = containerClassLoader;
-        }
-
-        @Override
-        public String getName()
-        {
-            return null;
-        }
-
-        @Override
-        public void dispose()
-        {
-
-        }
-
-        @Override
-        public void initialise() throws InitialisationException
-        {
-
-        }
-
-        @Override
-        public void start() throws MuleException
-        {
-
-        }
-
-        @Override
-        public void stop() throws MuleException
-        {
-
-        }
+    @Override
+    public String getName() {
+      return null;
     }
+
+    @Override
+    public void dispose() {
+
+    }
+
+    @Override
+    public void initialise() throws InitialisationException {
+
+    }
+
+    @Override
+    public void start() throws MuleException {
+
+    }
+
+    @Override
+    public void stop() throws MuleException {
+
+    }
+  }
 }

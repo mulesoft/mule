@@ -12,19 +12,16 @@ import org.mule.runtime.module.db.internal.domain.statement.StatementFactory;
 /**
  * Creates {@link BulkUpdateExecutor} instances
  */
-public class BulkUpdateExecutorFactory implements BulkQueryExecutorFactory
-{
+public class BulkUpdateExecutorFactory implements BulkQueryExecutorFactory {
 
-    private final StatementFactory statementFactory;
+  private final StatementFactory statementFactory;
 
-    public BulkUpdateExecutorFactory(StatementFactory statementFactory)
-    {
-        this.statementFactory = statementFactory;
-    }
+  public BulkUpdateExecutorFactory(StatementFactory statementFactory) {
+    this.statementFactory = statementFactory;
+  }
 
-    @Override
-    public BulkUpdateExecutor create()
-    {
-        return new BulkUpdateExecutor(statementFactory);
-    }
+  @Override
+  public BulkUpdateExecutor create() {
+    return new BulkUpdateExecutor(statementFactory);
+  }
 }

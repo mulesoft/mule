@@ -21,46 +21,41 @@ import java.util.Calendar;
 import org.junit.Test;
 
 @SmallTest
-public class WatermarkSelectorTestCase extends AbstractMuleTestCase
-{
-    private SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-    private Calendar calendar = Calendar.getInstance();
+public class WatermarkSelectorTestCase extends AbstractMuleTestCase {
 
-    @Test
-    public void testMaxSelected()
-    {
-        MaxValueWatermarkSelector selector = new MaxValueWatermarkSelector();
+  private SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+  private Calendar calendar = Calendar.getInstance();
 
-        String max = null;
+  @Test
+  public void testMaxSelected() {
+    MaxValueWatermarkSelector selector = new MaxValueWatermarkSelector();
 
-        for (int i = 0; i < 19; i++)
-        {
-            calendar.add(Calendar.DAY_OF_YEAR, 100);
-            max = format.format(calendar.getTime());
-            selector.acceptValue(max);
-        }
+    String max = null;
 
-        assertThat(max, equalTo(selector.getSelectedValue()));
+    for (int i = 0; i < 19; i++) {
+      calendar.add(Calendar.DAY_OF_YEAR, 100);
+      max = format.format(calendar.getTime());
+      selector.acceptValue(max);
     }
 
-    @Test
-    public void testMinSelected()
-    {
-        MinValueWatermarkSelector selector = new MinValueWatermarkSelector();
+    assertThat(max, equalTo(selector.getSelectedValue()));
+  }
 
-        String min = null;
-        for (int i = 0; i < 10; i++)
-        {
-            calendar.add(Calendar.DAY_OF_YEAR, 100);
-            if (min == null)
-            {
-                min = format.format(calendar.getTime());
-            }
+  @Test
+  public void testMinSelected() {
+    MinValueWatermarkSelector selector = new MinValueWatermarkSelector();
 
-            selector.acceptValue(min);
-        }
+    String min = null;
+    for (int i = 0; i < 10; i++) {
+      calendar.add(Calendar.DAY_OF_YEAR, 100);
+      if (min == null) {
+        min = format.format(calendar.getTime());
+      }
 
-        assertThat(min, equalTo(selector.getSelectedValue()));
+      selector.acceptValue(min);
     }
+
+    assertThat(min, equalTo(selector.getSelectedValue()));
+  }
 
 }

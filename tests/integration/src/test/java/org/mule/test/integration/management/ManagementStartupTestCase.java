@@ -14,22 +14,20 @@ import org.mule.runtime.module.management.agent.JmxApplicationAgent;
 
 import org.junit.Test;
 
-public class ManagementStartupTestCase extends AbstractIntegrationTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/integration/management/management-startup-test.xml";
-    }
+public class ManagementStartupTestCase extends AbstractIntegrationTestCase {
 
-    @Test
-    public void testAgentConfiguration() throws MuleException
-    {
-        JmxApplicationAgent agent = muleContext.getRegistry().lookupObject(JmxApplicationAgent.class);
-        assertNotNull(agent);
-        assertNotNull(agent.getConnectorServerUrl());
-        assertEquals("service:jmx:rmi:///jndi/rmi://0.0.0.0:1100/server", agent.getConnectorServerUrl());
-        assertNotNull(agent.getConnectorServerProperties());
-        assertEquals("true", agent.getConnectorServerProperties().get("jmx.remote.jndi.rebind"));
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/integration/management/management-startup-test.xml";
+  }
+
+  @Test
+  public void testAgentConfiguration() throws MuleException {
+    JmxApplicationAgent agent = muleContext.getRegistry().lookupObject(JmxApplicationAgent.class);
+    assertNotNull(agent);
+    assertNotNull(agent.getConnectorServerUrl());
+    assertEquals("service:jmx:rmi:///jndi/rmi://0.0.0.0:1100/server", agent.getConnectorServerUrl());
+    assertNotNull(agent.getConnectorServerProperties());
+    assertEquals("true", agent.getConnectorServerProperties().get("jmx.remote.jndi.rebind"));
+  }
 }

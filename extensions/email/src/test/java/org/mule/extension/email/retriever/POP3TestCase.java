@@ -23,35 +23,30 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 
 @RunnerDelegateTo(Parameterized.class)
-public class POP3TestCase extends AbstractEmailRetrieverTestCase
-{
-    @Parameter
-    public String protocol;
+public class POP3TestCase extends AbstractEmailRetrieverTestCase {
 
-    @Parameters
-    public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][] {
-                {"pop3"}, {"pop3s"}
-        });
-    }
+  @Parameter
+  public String protocol;
 
-    @Override
-    protected String getConfigFile()
-    {
-        return format("retriever/%s.xml", protocol);
-    }
+  @Parameters
+  public static Collection<Object[]> data() {
+    return Arrays.asList(new Object[][] {{"pop3"}, {"pop3s"}});
+  }
 
-    @Override
-    public String getProtocol()
-    {
-        return protocol;
-    }
+  @Override
+  protected String getConfigFile() {
+    return format("retriever/%s.xml", protocol);
+  }
 
-    @Test
-    public void retrieveAndRead() throws Exception
-    {
-        List<MuleMessage> messages = runFlowAndGetMessages(RETRIEVE_AND_READ);
-        assertThat(messages, hasSize(10));
-        messages.forEach(m -> assertBodyContent((String) m.getPayload()));
-    }
+  @Override
+  public String getProtocol() {
+    return protocol;
+  }
+
+  @Test
+  public void retrieveAndRead() throws Exception {
+    List<MuleMessage> messages = runFlowAndGetMessages(RETRIEVE_AND_READ);
+    assertThat(messages, hasSize(10));
+    messages.forEach(m -> assertBodyContent((String) m.getPayload()));
+  }
 }

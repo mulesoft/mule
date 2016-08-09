@@ -26,69 +26,54 @@ import java.util.Collection;
 /**
  * {@inheritDoc}
  */
-public class DefaultConnectivityTestingService implements ConnectivityTestingService
-{
+public class DefaultConnectivityTestingService implements ConnectivityTestingService {
 
-    private TemporaryArtifact temporaryArtifact;
+  private TemporaryArtifact temporaryArtifact;
 
-    /**
-     * Creates a {@code DefaultConnectivityTestingService}.
-     *
-     * @param temporaryArtifact tooling artifact used to do connectivity testing
-     */
-    public DefaultConnectivityTestingService(TemporaryArtifact temporaryArtifact)
-    {
-        this.temporaryArtifact = temporaryArtifact;
+  /**
+   * Creates a {@code DefaultConnectivityTestingService}.
+   *
+   * @param temporaryArtifact tooling artifact used to do connectivity testing
+   */
+  public DefaultConnectivityTestingService(TemporaryArtifact temporaryArtifact) {
+    this.temporaryArtifact = temporaryArtifact;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @throws MuleRuntimeException
+   */
+  @Override
+  public ConnectionValidationResult testConnection(String identifier) {
+    checkArgument(identifier != null, "identifier cannot be null");
+    if (!temporaryArtifact.isStarted()) {
+      try {
+        temporaryArtifact.start();
+      } catch (InitialisationException e) {
+        return failure(e.getMessage(), UNKNOWN, e);
+      } catch (ConfigurationException e) {
+        return failure(e.getMessage(), UNKNOWN, e);
+      } catch (Exception e) {
+        throw new MuleRuntimeException(e);
+      }
     }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @throws MuleRuntimeException
-     */
-    @Override
-    public ConnectionValidationResult testConnection(String identifier)
-    {
-        checkArgument(identifier != null, "identifier cannot be null");
-        if (!temporaryArtifact.isStarted())
-        {
-            try
-            {
-                temporaryArtifact.start();
-            }
-            catch (InitialisationException e)
-            {
-                return failure(e.getMessage(), UNKNOWN, e);
-            }
-            catch (ConfigurationException e)
-            {
-                return failure(e.getMessage(), UNKNOWN, e);
-            }
-            catch (Exception e)
-            {
-                throw new MuleRuntimeException(e);
-            }
-        }
-        Object connectivityTestingObject = temporaryArtifact.getMuleContext().getRegistry().get(identifier);
-        if (connectivityTestingObject == null)
-        {
-            throw new ConnectivityTestingObjectNotFoundException(createStaticMessage("It was not possible to find an object to do connectivity testing"));
-        }
-        Collection<ConnectivityTestingStrategy> connectivityTestingStrategies = temporaryArtifact.getMuleContext().getRegistry().lookupObjects(ConnectivityTestingStrategy.class);
-        for (ConnectivityTestingStrategy connectivityTestingStrategy : connectivityTestingStrategies)
-        {
-            if (connectivityTestingStrategy.accepts(connectivityTestingObject))
-            {
-                try
-                {
-                    return connectivityTestingStrategy.testConnectivity(connectivityTestingObject);
-                }
-                catch (Exception e)
-                {
-                    return failure(e.getMessage(), UNKNOWN, e);
-                }
-            }
-        }
-        throw new UnsupportedConnectivityTestingObjectException(createStaticMessage("Could not do connectivity testing over object of type " + connectivityTestingObject.getClass().getName()));
+    Object connectivityTestingObject = temporaryArtifact.getMuleContext().getRegistry().get(identifier);
+    if (connectivityTestingObject == null) {
+      throw new ConnectivityTestingObjectNotFoundException(createStaticMessage("It was not possible to find an object to do connectivity testing"));
     }
+    Collection<ConnectivityTestingStrategy> connectivityTestingStrategies =
+        temporaryArtifact.getMuleContext().getRegistry().lookupObjects(ConnectivityTestingStrategy.class);
+    for (ConnectivityTestingStrategy connectivityTestingStrategy : connectivityTestingStrategies) {
+      if (connectivityTestingStrategy.accepts(connectivityTestingObject)) {
+        try {
+          return connectivityTestingStrategy.testConnectivity(connectivityTestingObject);
+        } catch (Exception e) {
+          return failure(e.getMessage(), UNKNOWN, e);
+        }
+      }
+    }
+    throw new UnsupportedConnectivityTestingObjectException(createStaticMessage("Could not do connectivity testing over object of type "
+        + connectivityTestingObject.getClass().getName()));
+  }
 }

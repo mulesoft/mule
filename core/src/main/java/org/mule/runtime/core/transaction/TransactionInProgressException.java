@@ -10,31 +10,28 @@ import org.mule.runtime.core.config.i18n.Message;
 
 /**
  * <p>
- * <code>TransactionInProgressException</code> is thrown if a new transaction is
- * started when there is one already in progress.
+ * <code>TransactionInProgressException</code> is thrown if a new transaction is started when there is one already in progress.
  */
-public class TransactionInProgressException extends TransactionStatusException
-{
-    /**
-     * Serial version
-     */
-    private static final long serialVersionUID = -6041127507191183323L;
+public class TransactionInProgressException extends TransactionStatusException {
 
-    /**
-     * @param message the exception message
-     */
-    public TransactionInProgressException(Message message)
-    {
-        super(message);
-    }
+  /**
+   * Serial version
+   */
+  private static final long serialVersionUID = -6041127507191183323L;
 
-    /**
-     * @param message the exception message
-     * @param cause the exception that cause this exception to be thrown
-     */
-    public TransactionInProgressException(Message message, Throwable cause)
-    {
-        super(message, cause);
-    }
+  /**
+   * @param message the exception message
+   */
+  public TransactionInProgressException(Message message) {
+    super(message);
+  }
+
+  /**
+   * @param message the exception message
+   * @param cause the exception that cause this exception to be thrown
+   */
+  public TransactionInProgressException(Message message, Throwable cause) {
+    super(message, cause);
+  }
 
 }

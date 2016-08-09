@@ -11,16 +11,13 @@ import org.mule.runtime.core.config.i18n.Message;
 /**
  *
  */
-public class InstallException extends DeploymentException
-{
+public class InstallException extends DeploymentException {
 
-    public InstallException(Message message)
-    {
-        super(message);
-    }
+  public InstallException(Message message) {
+    super(message);
+  }
 
-    public InstallException(Message message, Throwable cause)
-    {
-        super(message, cause);
-    }
+  public InstallException(Message message, Throwable cause) {
+    super(message, cause);
+  }
 }

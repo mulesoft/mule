@@ -26,54 +26,47 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class DeleteBulkTestCase extends AbstractDbIntegrationTestCase
-{
+public class DeleteBulkTestCase extends AbstractDbIntegrationTestCase {
 
-    public DeleteBulkTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public DeleteBulkTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Parameterized.Parameters
-    public static List<Object[]> parameters()
-    {
-        return TestDbConfig.getResources();
-    }
+  @Parameterized.Parameters
+  public static List<Object[]> parameters() {
+    return TestDbConfig.getResources();
+  }
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/delete/delete-bulk-config.xml"};
-    }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/delete/delete-bulk-config.xml"};
+  }
 
-    @Test
-    public void deletesInBulkMode() throws Exception
-    {
-        List<String> planetNames = new ArrayList<String>();
-        planetNames.add(VENUS.getName());
-        planetNames.add(MARS.getName());
+  @Test
+  public void deletesInBulkMode() throws Exception {
+    List<String> planetNames = new ArrayList<String>();
+    planetNames.add(VENUS.getName());
+    planetNames.add(MARS.getName());
 
-        final MuleEvent responseEvent = flowRunner("deleteBulk").withPayload(planetNames).run();
-        final MuleMessage response = responseEvent.getMessage();
+    final MuleEvent responseEvent = flowRunner("deleteBulk").withPayload(planetNames).run();
+    final MuleMessage response = responseEvent.getMessage();
 
-        assertBulkDelete(response);
-    }
+    assertBulkDelete(response);
+  }
 
-    @Test(expected = MessagingException.class)
-    public void requiresCollectionPayload() throws Exception
-    {
-        final MuleEvent responseEvent = flowRunner("deleteBulk").withPayload(TEST_MESSAGE).run();
-        responseEvent.getMessage();
-    }
+  @Test(expected = MessagingException.class)
+  public void requiresCollectionPayload() throws Exception {
+    final MuleEvent responseEvent = flowRunner("deleteBulk").withPayload(TEST_MESSAGE).run();
+    responseEvent.getMessage();
+  }
 
-    private void assertBulkDelete(MuleMessage response) throws SQLException
-    {
-        assertTrue(response.getPayload() instanceof int[]);
-        int[] counters = (int[]) response.getPayload();
-        assertEquals(2, counters.length);
-        assertExpectedUpdateCount(1, counters[0]);
-        assertExpectedUpdateCount(1, counters[1]);
+  private void assertBulkDelete(MuleMessage response) throws SQLException {
+    assertTrue(response.getPayload() instanceof int[]);
+    int[] counters = (int[]) response.getPayload();
+    assertEquals(2, counters.length);
+    assertExpectedUpdateCount(1, counters[0]);
+    assertExpectedUpdateCount(1, counters[1]);
 
-        assertDeletedPlanetRecords(VENUS.getName());
-    }
+    assertDeletedPlanetRecords(VENUS.getName());
+  }
 }

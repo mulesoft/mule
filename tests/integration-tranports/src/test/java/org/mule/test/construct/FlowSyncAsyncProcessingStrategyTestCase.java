@@ -24,83 +24,70 @@ import org.slf4j.LoggerFactory;
 
 import junit.framework.Assert;
 
-public class FlowSyncAsyncProcessingStrategyTestCase extends FunctionalTestCase
-{
-    public static final String SLEEP_TIME = "sleepTime";
-    private static final String FILE_PATH = "./test/testfile.txt";
-    private File file;
+public class FlowSyncAsyncProcessingStrategyTestCase extends FunctionalTestCase {
 
-    private static final Logger logger = LoggerFactory.getLogger(FlowSyncAsyncProcessingStrategyTestCase.class);
+  public static final String SLEEP_TIME = "sleepTime";
+  private static final String FILE_PATH = "./test/testfile.txt";
+  private File file;
+
+  private static final Logger logger = LoggerFactory.getLogger(FlowSyncAsyncProcessingStrategyTestCase.class);
+
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/construct/flow-sync-async-processing-strategy-config.xml";
+  }
+
+  @After
+  public void cleanUp() {
+    FileUtils.deleteQuietly(file);
+  }
+
+  @Test
+  public void testSynchProcessingStrategy() throws Exception {
+    sendMessage("vm://testSynch");
+    new FlowExecutionListener("synchFlow", muleContext).waitUntilFlowIsComplete();
+    file = new File(FILE_PATH);
+    String str = FileUtils.readFileToString(file);
+
+    Assert.assertEquals("Part 1Part 2", str);
+  }
+
+  @Test
+  public void testAsynch() throws Exception {
+    sendMessage("vm://testAsynch");
+
+    file = new File(FILE_PATH);
+    Prober prober = new PollingProber(10000, 2000);
+    prober.check(new FileCompleteProbe());
+  }
+
+  private void sendMessage(String endpoint) throws Exception {
+    MuleClient client = muleContext.getClient();
+
+    client.dispatch(endpoint, "Part 1;Part 2", null);
+  }
+
+  private class FileCompleteProbe implements Probe {
+
+    private String output;
 
     @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/construct/flow-sync-async-processing-strategy-config.xml";
-    }
-
-    @After
-    public void cleanUp()
-    {
-        FileUtils.deleteQuietly(file);
-    }
-
-    @Test
-    public void testSynchProcessingStrategy() throws Exception
-    {
-        sendMessage("vm://testSynch");
-        new FlowExecutionListener("synchFlow", muleContext).waitUntilFlowIsComplete();
-        file = new File(FILE_PATH);
-        String str = FileUtils.readFileToString(file);
-
-        Assert.assertEquals("Part 1Part 2", str);
-    }
-
-    @Test
-    public void testAsynch() throws Exception
-    {
-        sendMessage("vm://testAsynch");
-
-        file = new File(FILE_PATH);
-        Prober prober = new PollingProber(10000, 2000);
-        prober.check(new FileCompleteProbe());
-    }
-
-    private void sendMessage(String endpoint) throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-
-        client.dispatch(endpoint, "Part 1;Part 2", null);
-    }
-
-    private class FileCompleteProbe implements Probe
-    {
-        private String output;
-
-        @Override
-        public boolean isSatisfied()
-        {
-            if(file.exists())
-            {
-                try
-                {
-                    output = FileUtils.readFileToString(file);
-                }
-                catch (IOException e)
-                {
-                    logger.debug("Could not read from file.");
-                }
-                return "Part 2Part 1".equals(output);
-            }
-            else
-            {
-                return false;
-            }
+    public boolean isSatisfied() {
+      if (file.exists()) {
+        try {
+          output = FileUtils.readFileToString(file);
+        } catch (IOException e) {
+          logger.debug("Could not read from file.");
         }
-
-        @Override
-        public String describeFailure()
-        {
-            return "Expected output was 'Part2Part 1' but actual one was: " + output;
-        }
+        return "Part 2Part 1".equals(output);
+      } else {
+        return false;
+      }
     }
+
+    @Override
+    public String describeFailure() {
+      return "Expected output was 'Part2Part 1' but actual one was: " + output;
+    }
+  }
 }

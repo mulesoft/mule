@@ -17,41 +17,34 @@ import java.math.BigDecimal;
 
 import org.junit.Test;
 
-public class BasicTypeAutoTransformationTestCase extends AbstractMuleContextTestCase
-{
+public class BasicTypeAutoTransformationTestCase extends AbstractMuleContextTestCase {
 
-    @Test
-    public void testTypes() throws TransformerException
-    {
-        testType("1", Integer.class, Integer.TYPE, Integer.valueOf(1));
-        testType("1", Long.class, Long.TYPE, Long.valueOf(1));
-        testType("1", Short.class, Short.TYPE, Short.valueOf((short) 1));
-        testType("1.1", Double.class, Double.TYPE, Double.valueOf(1.1));
-        testType("1.1", Float.class, Float.TYPE, Float.valueOf((float) 1.1));
-        testType("1.1", BigDecimal.class, null, BigDecimal.valueOf(1.1));
-        testType("true", Boolean.class, Boolean.TYPE, Boolean.TRUE);
-    }
+  @Test
+  public void testTypes() throws TransformerException {
+    testType("1", Integer.class, Integer.TYPE, Integer.valueOf(1));
+    testType("1", Long.class, Long.TYPE, Long.valueOf(1));
+    testType("1", Short.class, Short.TYPE, Short.valueOf((short) 1));
+    testType("1.1", Double.class, Double.TYPE, Double.valueOf(1.1));
+    testType("1.1", Float.class, Float.TYPE, Float.valueOf((float) 1.1));
+    testType("1.1", BigDecimal.class, null, BigDecimal.valueOf(1.1));
+    testType("true", Boolean.class, Boolean.TYPE, Boolean.TRUE);
+  }
 
-    protected void testType(String string, Class type, Class primitive, Object value)
-        throws TransformerException
-    {
-        assertEquals(value, lookupFromStringTransformer(type).transform(string));
-        assertEquals(string, lookupToStringTransformer(type).transform(value));
-        if (primitive != null)
-        {
-            assertEquals(value, lookupFromStringTransformer(primitive).transform(string));
-            assertEquals(string, lookupToStringTransformer(primitive).transform(value));
-        }
+  protected void testType(String string, Class type, Class primitive, Object value) throws TransformerException {
+    assertEquals(value, lookupFromStringTransformer(type).transform(string));
+    assertEquals(string, lookupToStringTransformer(type).transform(value));
+    if (primitive != null) {
+      assertEquals(value, lookupFromStringTransformer(primitive).transform(string));
+      assertEquals(string, lookupToStringTransformer(primitive).transform(value));
     }
+  }
 
-    private Transformer lookupFromStringTransformer(Class to) throws TransformerException
-    {
-        return muleContext.getRegistry().lookupTransformer(DataType.STRING, DataType.fromType(to));
-    }
+  private Transformer lookupFromStringTransformer(Class to) throws TransformerException {
+    return muleContext.getRegistry().lookupTransformer(DataType.STRING, DataType.fromType(to));
+  }
 
-    private Transformer lookupToStringTransformer(Class from) throws TransformerException
-    {
-        return muleContext.getRegistry().lookupTransformer(DataType.fromType(from), DataType.STRING);
-    }
+  private Transformer lookupToStringTransformer(Class from) throws TransformerException {
+    return muleContext.getRegistry().lookupTransformer(DataType.fromType(from), DataType.STRING);
+  }
 
 }

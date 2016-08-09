@@ -41,309 +41,255 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * An Outbound endpoint who's URI is a template used to created new non dynamic
- * endpoints based on the current message.
- * This allows for the destination of a message to change based on the contents
- * of the message. Note that this endpoint ONLY substitutes the URI, but other
- * config elements such as the transformers, filters, etc do not change. You
- * cannot change an endpoint scheme dynamically so you can't switch between
- * HTTP and JMS for example using the same dynamic endpoint.
+ * An Outbound endpoint who's URI is a template used to created new non dynamic endpoints based on the current message. This
+ * allows for the destination of a message to change based on the contents of the message. Note that this endpoint ONLY
+ * substitutes the URI, but other config elements such as the transformers, filters, etc do not change. You cannot change an
+ * endpoint scheme dynamically so you can't switch between HTTP and JMS for example using the same dynamic endpoint.
  */
-public class DynamicOutboundEndpoint implements OutboundEndpoint
-{
+public class DynamicOutboundEndpoint implements OutboundEndpoint {
 
-    protected transient final Logger logger = LoggerFactory.getLogger(DynamicOutboundEndpoint.class);
+  protected transient final Logger logger = LoggerFactory.getLogger(DynamicOutboundEndpoint.class);
 
-    private static final long serialVersionUID = 8861985949279708638L;
+  private static final long serialVersionUID = 8861985949279708638L;
 
-    private final EndpointBuilder endpointBuilder;
+  private final EndpointBuilder endpointBuilder;
 
-    private final OutboundEndpoint prototypeEndpoint;
+  private final OutboundEndpoint prototypeEndpoint;
 
-    // Caches resolved static endpoints to improve performance
-    private final Map<String, OutboundEndpoint> staticEndpoints = Collections.synchronizedMap(new LRUMap(64));
+  // Caches resolved static endpoints to improve performance
+  private final Map<String, OutboundEndpoint> staticEndpoints = Collections.synchronizedMap(new LRUMap(64));
 
-    private final DynamicURIBuilder dynamicURIBuilder;
-    
-    private MessagingExceptionHandler exceptionHandler;
+  private final DynamicURIBuilder dynamicURIBuilder;
 
-    public DynamicOutboundEndpoint(EndpointBuilder endpointBuilder, DynamicURIBuilder dynamicURIBuilder)
-    {
-        this.endpointBuilder = endpointBuilder;
-        this.dynamicURIBuilder = dynamicURIBuilder;
+  private MessagingExceptionHandler exceptionHandler;
 
-        try
-        {
-            prototypeEndpoint = endpointBuilder.buildOutboundEndpoint();
-        }
-        catch (Exception e)
-        {
-            throw new RuntimeException(e);
-        }
+  public DynamicOutboundEndpoint(EndpointBuilder endpointBuilder, DynamicURIBuilder dynamicURIBuilder) {
+    this.endpointBuilder = endpointBuilder;
+    this.dynamicURIBuilder = dynamicURIBuilder;
+
+    try {
+      prototypeEndpoint = endpointBuilder.buildOutboundEndpoint();
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  private Properties getServiceOverrides() throws EndpointException {
+    Properties properties = null;
+
+    if (endpointBuilder instanceof AbstractEndpointBuilder) {
+      Connector connector = ((AbstractEndpointBuilder) this.endpointBuilder).getConnector();
+
+      if (connector instanceof AbstractConnector && ((AbstractConnector) connector).getServiceOverrides() != null) {
+        properties = new Properties();
+        properties.putAll(((AbstractConnector) connector).getServiceOverrides());
+      }
     }
 
-    private Properties getServiceOverrides() throws EndpointException
-    {
-        Properties properties = null;
+    return properties;
+  }
 
-        if (endpointBuilder instanceof AbstractEndpointBuilder)
-        {
-            Connector connector = ((AbstractEndpointBuilder) this.endpointBuilder).getConnector();
+  public OutboundEndpoint getStaticEndpoint(MuleEvent event) throws MuleException {
+    final String uri = resolveUri(event);
 
-            if (connector instanceof AbstractConnector && ((AbstractConnector) connector).getServiceOverrides() != null)
-            {
-                properties = new Properties();
-                properties.putAll(((AbstractConnector) connector).getServiceOverrides());
-            }
-        }
+    OutboundEndpoint outboundEndpoint = staticEndpoints.get(uri);
 
-        return properties;
+    if (outboundEndpoint == null) {
+      final EndpointURI endpointURIForMessage = createEndpointUri(uri);
+      outboundEndpoint = createStaticEndpoint(endpointURIForMessage);
+      staticEndpoints.put(uri, outboundEndpoint);
     }
 
-    public OutboundEndpoint getStaticEndpoint(MuleEvent event)  throws MuleException
-    {
-        final String uri = resolveUri(event);
+    return outboundEndpoint;
+  }
 
-        OutboundEndpoint outboundEndpoint = staticEndpoints.get(uri);
+  private EndpointURI createEndpointUri(String uri) throws EndpointException, InitialisationException {
+    final MuleEndpointURI endpointUri = new MuleEndpointURI(uri, getMuleContext(), getServiceOverrides());
+    endpointUri.initialise();
 
-        if (outboundEndpoint == null)
-        {
-            final EndpointURI endpointURIForMessage = createEndpointUri(uri);
-            outboundEndpoint = createStaticEndpoint(endpointURIForMessage);
-            staticEndpoints.put(uri, outboundEndpoint);
-        }
+    return endpointUri;
+  }
 
-        return outboundEndpoint;
+  private String resolveUri(MuleEvent event) throws DispatchException {
+    try {
+      return dynamicURIBuilder.build(event);
+    } catch (Exception e) {
+      throw new DispatchException(event, this, e);
     }
+  }
 
-    private EndpointURI createEndpointUri(String uri) throws EndpointException, InitialisationException
-    {
-        final MuleEndpointURI endpointUri = new MuleEndpointURI(uri, getMuleContext(), getServiceOverrides());
-        endpointUri.initialise();
-
-        return endpointUri;
+  private OutboundEndpoint createStaticEndpoint(EndpointURI uri) throws EndpointException, InitialisationException {
+    try {
+      EndpointBuilder staticBuilder = (EndpointBuilder) endpointBuilder.clone();
+      staticBuilder.setURIBuilder(new URIBuilder(uri));
+      String endpointName = TransportObjectNameHelper.getEndpointNameFor(uri);
+      staticBuilder.setName(endpointName);
+      OutboundEndpoint endpoint = staticBuilder.buildOutboundEndpoint();
+      endpoint.setMessagingExceptionHandler(exceptionHandler);
+      return endpoint;
+    } catch (CloneNotSupportedException e) {
+      // This cannot happen, because we implement Cloneable
+      throw new IllegalStateException("Unable to clone endpoint builder");
     }
+  }
 
-    private String resolveUri(MuleEvent event) throws DispatchException
-    {
-        try
-        {
-            return dynamicURIBuilder.build(event);
-        }
-        catch (Exception e)
-        {
-            throw new DispatchException(event, this, e);
-        }
-    }
+  @Override
+  public boolean equals(Object o) {
+    return this == o;
+  }
 
-    private OutboundEndpoint createStaticEndpoint(EndpointURI uri) throws EndpointException, InitialisationException
-    {
-        try
-        {
-            EndpointBuilder staticBuilder = (EndpointBuilder) endpointBuilder.clone();
-            staticBuilder.setURIBuilder(new URIBuilder(uri));
-            String endpointName = TransportObjectNameHelper.getEndpointNameFor(uri);
-            staticBuilder.setName(endpointName);
-            OutboundEndpoint endpoint = staticBuilder.buildOutboundEndpoint();
-            endpoint.setMessagingExceptionHandler(exceptionHandler);
-            return endpoint;
-        }
-        catch (CloneNotSupportedException e)
-        {
-            // This cannot happen, because we implement Cloneable
-            throw new IllegalStateException("Unable to clone endpoint builder");
-        }
-    }
+  @Override
+  public int hashCode() {
+    return System.identityHashCode(this);
+  }
 
-    @Override
-    public boolean equals(Object o)
-    {
-        return this == o;
-    }
+  @Override
+  public Connector getConnector() {
+    throw new UnsupportedOperationException("No connector available");
+  }
 
-    @Override
-    public int hashCode()
-    {
-        return System.identityHashCode(this);
-    }
+  @Override
+  public EndpointURI getEndpointURI() {
+    return null;
+  }
 
-    @Override
-    public Connector getConnector()
-    {
-        throw new UnsupportedOperationException("No connector available");
-    }
+  @Override
+  public AbstractRedeliveryPolicy getRedeliveryPolicy() {
+    return prototypeEndpoint.getRedeliveryPolicy();
+  }
 
-    @Override
-    public EndpointURI getEndpointURI()
-    {
-        return null;
-    }
+  @Override
+  public String getAddress() {
+    return dynamicURIBuilder.getUriTemplate();
+  }
 
-    @Override
-    public AbstractRedeliveryPolicy getRedeliveryPolicy()
-    {
-        return prototypeEndpoint.getRedeliveryPolicy();
-    }
+  @Override
+  public RetryPolicyTemplate getRetryPolicyTemplate() {
+    return prototypeEndpoint.getRetryPolicyTemplate();
+  }
 
-    @Override
-    public String getAddress()
-    {
-        return dynamicURIBuilder.getUriTemplate();
-    }
+  @Override
+  public Charset getEncoding() {
+    return prototypeEndpoint.getEncoding();
+  }
 
-    @Override
-    public RetryPolicyTemplate getRetryPolicyTemplate()
-    {
-        return prototypeEndpoint.getRetryPolicyTemplate();
-    }
+  @Override
+  public MediaType getMimeType() {
+    return prototypeEndpoint.getMimeType();
+  }
 
-    @Override
-    public Charset getEncoding()
-    {
-        return prototypeEndpoint.getEncoding();
-    }
+  @Override
+  public Filter getFilter() {
+    return prototypeEndpoint.getFilter();
+  }
 
-    @Override
-    public MediaType getMimeType()
-    {
-        return prototypeEndpoint.getMimeType();
-    }
+  @Override
+  public String getInitialState() {
+    return prototypeEndpoint.getInitialState();
+  }
 
-    @Override
-    public Filter getFilter()
-    {
-        return prototypeEndpoint.getFilter();
-    }
+  @Override
+  public MuleContext getMuleContext() {
+    return prototypeEndpoint.getMuleContext();
+  }
 
-    @Override
-    public String getInitialState()
-    {
-        return prototypeEndpoint.getInitialState();
-    }
+  @Override
+  public String getName() {
+    return prototypeEndpoint.getName();
+  }
 
-    @Override
-    public MuleContext getMuleContext()
-    {
-        return prototypeEndpoint.getMuleContext();
-    }
+  @Override
+  public Map<String, Serializable> getProperties() {
+    return prototypeEndpoint.getProperties();
+  }
 
-    @Override
-    public String getName()
-    {
-        return prototypeEndpoint.getName();
-    }
+  @Override
+  public Serializable getProperty(Object key) {
+    return prototypeEndpoint.getProperty(key);
+  }
 
-    @Override
-    public Map<String, Serializable> getProperties()
-    {
-        return prototypeEndpoint.getProperties();
-    }
+  @Override
+  public String getProtocol() {
+    return prototypeEndpoint.getProtocol();
+  }
 
-    @Override
-    public Serializable getProperty(Object key)
-    {
-        return prototypeEndpoint.getProperty(key);
-    }
+  @Override
+  public int getResponseTimeout() {
+    return prototypeEndpoint.getResponseTimeout();
+  }
 
-    @Override
-    public String getProtocol()
-    {
-        return prototypeEndpoint.getProtocol();
-    }
+  @Override
+  public EndpointMessageProcessorChainFactory getMessageProcessorsFactory() {
+    return prototypeEndpoint.getMessageProcessorsFactory();
+  }
 
-    @Override
-    public int getResponseTimeout()
-    {
-        return prototypeEndpoint.getResponseTimeout();
-    }
+  @Override
+  public List<MessageProcessor> getMessageProcessors() {
+    return prototypeEndpoint.getMessageProcessors();
+  }
 
-    @Override
-    public EndpointMessageProcessorChainFactory getMessageProcessorsFactory()
-    {
-        return prototypeEndpoint.getMessageProcessorsFactory();
-    }
+  @Override
+  public List<MessageProcessor> getResponseMessageProcessors() {
+    return prototypeEndpoint.getResponseMessageProcessors();
+  }
 
-    @Override
-    public List<MessageProcessor> getMessageProcessors()
-    {
-        return prototypeEndpoint.getMessageProcessors();
-    }
+  @Override
+  public EndpointSecurityFilter getSecurityFilter() {
+    return prototypeEndpoint.getSecurityFilter();
+  }
 
-    @Override
-    public List<MessageProcessor> getResponseMessageProcessors()
-    {
-        return prototypeEndpoint.getResponseMessageProcessors();
-    }
+  @Override
+  public TransactionConfig getTransactionConfig() {
+    return prototypeEndpoint.getTransactionConfig();
+  }
 
-    @Override
-    public EndpointSecurityFilter getSecurityFilter()
-    {
-        return prototypeEndpoint.getSecurityFilter();
-    }
+  @Override
+  public boolean isDeleteUnacceptedMessages() {
+    return prototypeEndpoint.isDeleteUnacceptedMessages();
+  }
 
-    @Override
-    public TransactionConfig getTransactionConfig()
-    {
-        return prototypeEndpoint.getTransactionConfig();
-    }
+  @Override
+  public boolean isReadOnly() {
+    return prototypeEndpoint.isReadOnly();
+  }
 
-    @Override
-    public boolean isDeleteUnacceptedMessages()
-    {
-        return prototypeEndpoint.isDeleteUnacceptedMessages();
-    }
+  @Override
+  public MessageExchangePattern getExchangePattern() {
+    return prototypeEndpoint.getExchangePattern();
+  }
 
-    @Override
-    public boolean isReadOnly()
-    {
-        return prototypeEndpoint.isReadOnly();
-    }
+  @Override
+  public List<String> getResponseProperties() {
+    return prototypeEndpoint.getResponseProperties();
+  }
 
-    @Override
-    public MessageExchangePattern getExchangePattern()
-    {
-        return prototypeEndpoint.getExchangePattern();
-    }
+  @Override
+  public boolean isDynamic() {
+    return true;
+  }
 
-    @Override
-    public List<String> getResponseProperties()
-    {
-        return prototypeEndpoint.getResponseProperties();
-    }
+  @Override
+  public String getEndpointBuilderName() {
+    return prototypeEndpoint.getEndpointBuilderName();
+  }
 
-    @Override
-    public boolean isDynamic()
-    {
-        return true;
-    }
+  @Override
+  public boolean isProtocolSupported(String protocol) {
+    return prototypeEndpoint.isProtocolSupported(protocol);
+  }
 
-    @Override
-    public String getEndpointBuilderName()
-    {
-        return prototypeEndpoint.getEndpointBuilderName();
-    }
+  @Override
+  public boolean isDisableTransportTransformer() {
+    return prototypeEndpoint.isDisableTransportTransformer();
+  }
 
-    @Override
-    public boolean isProtocolSupported(String protocol)
-    {
-        return prototypeEndpoint.isProtocolSupported(protocol);
-    }
+  @Override
+  public MuleEvent process(MuleEvent event) throws MuleException {
+    return getStaticEndpoint(event).process(event);
+  }
 
-    @Override
-    public boolean isDisableTransportTransformer()
-    {
-        return prototypeEndpoint.isDisableTransportTransformer();
-    }
-
-    @Override
-    public MuleEvent process(MuleEvent event) throws MuleException
-    {
-        return getStaticEndpoint(event).process(event);
-    }
-
-    @Override
-    public void setMessagingExceptionHandler(MessagingExceptionHandler messagingExceptionHandler)
-    {
-        this.exceptionHandler = messagingExceptionHandler;
-    }
+  @Override
+  public void setMessagingExceptionHandler(MessagingExceptionHandler messagingExceptionHandler) {
+    this.exceptionHandler = messagingExceptionHandler;
+  }
 }

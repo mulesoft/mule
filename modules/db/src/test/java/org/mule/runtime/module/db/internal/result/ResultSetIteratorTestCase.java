@@ -25,64 +25,59 @@ import java.sql.ResultSet;
 import org.junit.Test;
 
 @SmallTest
-public class ResultSetIteratorTestCase extends AbstractMuleTestCase
-{
+public class ResultSetIteratorTestCase extends AbstractMuleTestCase {
 
-    private final ResultSet resultSet = mock(ResultSet.class);
-    private final RowHandler rowHandler = mock(RowHandler.class);
-    private final StreamingResultSetCloser streamingResultSetCloser = mock(StreamingResultSetCloser.class);
-    private final DbConnection connection = mock(DbConnection.class);
-    private final ResultSetIterator resultSetIterator = new ResultSetIterator(connection, resultSet, rowHandler, streamingResultSetCloser);
+  private final ResultSet resultSet = mock(ResultSet.class);
+  private final RowHandler rowHandler = mock(RowHandler.class);
+  private final StreamingResultSetCloser streamingResultSetCloser = mock(StreamingResultSetCloser.class);
+  private final DbConnection connection = mock(DbConnection.class);
+  private final ResultSetIterator resultSetIterator =
+      new ResultSetIterator(connection, resultSet, rowHandler, streamingResultSetCloser);
 
-    @Test
-    public void detectsNoMoreRecordsWhenRecordCached() throws Exception
-    {
-        when(resultSet.next()).thenReturn(false);
-        boolean result = resultSetIterator.hasNext();
+  @Test
+  public void detectsNoMoreRecordsWhenRecordCached() throws Exception {
+    when(resultSet.next()).thenReturn(false);
+    boolean result = resultSetIterator.hasNext();
 
-        assertThat(result, equalTo(false));
-        verify(resultSet).next();
-    }
+    assertThat(result, equalTo(false));
+    verify(resultSet).next();
+  }
 
-    @Test
-    public void detectsMoreRecordsWhenRecordCached() throws Exception
-    {
-        when(resultSet.next()).thenReturn(true);
-        resultSetIterator.hasNext();
+  @Test
+  public void detectsMoreRecordsWhenRecordCached() throws Exception {
+    when(resultSet.next()).thenReturn(true);
+    resultSetIterator.hasNext();
 
-        boolean result = resultSetIterator.hasNext();
+    boolean result = resultSetIterator.hasNext();
 
-        assertThat(result, equalTo(true));
-        verify(resultSet, times(1)).next();
-    }
+    assertThat(result, equalTo(true));
+    verify(resultSet, times(1)).next();
+  }
 
-    @Test
-    public void returnsNextRecord() throws Exception
-    {
-        resultSetIterator.next();
+  @Test
+  public void returnsNextRecord() throws Exception {
+    resultSetIterator.next();
 
-        verify(resultSet).next();
-        verify(rowHandler).process(resultSet);
-    }
+    verify(resultSet).next();
+    verify(rowHandler).process(resultSet);
+  }
 
-    @Test
-    public void returnsNextRecordFromCachedInvocation() throws Exception
-    {
-        resultSetIterator.hasNext();
-        resultSetIterator.next();
+  @Test
+  public void returnsNextRecordFromCachedInvocation() throws Exception {
+    resultSetIterator.hasNext();
+    resultSetIterator.next();
 
-        verify(resultSet).next();
-        verify(rowHandler).process(resultSet);
-    }
+    verify(resultSet).next();
+    verify(rowHandler).process(resultSet);
+  }
 
-    @Test
-    public void clearsCachedInvocation() throws Exception
-    {
-        resultSetIterator.hasNext();
-        resultSetIterator.next();
-        resultSetIterator.next();
+  @Test
+  public void clearsCachedInvocation() throws Exception {
+    resultSetIterator.hasNext();
+    resultSetIterator.next();
+    resultSetIterator.next();
 
-        verify(resultSet, times(2)).next();
-        verify(rowHandler, times(2)).process(resultSet);
-    }
+    verify(resultSet, times(2)).next();
+    verify(rowHandler, times(2)).process(resultSet);
+  }
 }

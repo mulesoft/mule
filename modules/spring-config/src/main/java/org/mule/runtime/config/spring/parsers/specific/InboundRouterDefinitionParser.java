@@ -12,20 +12,17 @@ import org.mule.runtime.core.routing.AbstractAggregator;
 /**
  * Generic router definition parser for parsing all Router elements.
  */
-public class InboundRouterDefinitionParser extends ChildDefinitionParser
-{
+public class InboundRouterDefinitionParser extends ChildDefinitionParser {
 
-    public static final String ROUTER = "messageProcessor";
+  public static final String ROUTER = "messageProcessor";
 
-    public InboundRouterDefinitionParser(Class clazz)
-    {
-        super(ROUTER, clazz);
-    }
+  public InboundRouterDefinitionParser(Class clazz) {
+    super(ROUTER, clazz);
+  }
 
-    // specifically for subclasses of AbstractCorrelationAggregator (requires a "class=..." in the config)
-    public InboundRouterDefinitionParser()
-    {
-        super(ROUTER, null, AbstractAggregator.class, true);
-    }
+  // specifically for subclasses of AbstractCorrelationAggregator (requires a "class=..." in the config)
+  public InboundRouterDefinitionParser() {
+    super(ROUTER, null, AbstractAggregator.class, true);
+  }
 
 }

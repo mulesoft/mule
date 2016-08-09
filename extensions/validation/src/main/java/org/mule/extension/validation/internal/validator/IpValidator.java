@@ -15,36 +15,28 @@ import org.mule.extension.validation.internal.ValidationContext;
 import com.google.common.net.InetAddresses;
 
 /**
- * A {@link AbstractValidator} which checks that a given
- * {@link #ip} is valid. It supports both IPV4 and IPV6.
+ * A {@link AbstractValidator} which checks that a given {@link #ip} is valid. It supports both IPV4 and IPV6.
  *
- * In the case of IPV6, both full and collapsed addresses
- * are supported, but addresses containing ports are not
+ * In the case of IPV6, both full and collapsed addresses are supported, but addresses containing ports are not
  *
  * @since 3.7.0
  */
-public class IpValidator extends AbstractValidator
-{
+public class IpValidator extends AbstractValidator {
 
-    private final String ip;
+  private final String ip;
 
-    public IpValidator(String ip, ValidationContext validationContext)
-    {
-        super(validationContext);
-        this.ip = ip;
-    }
+  public IpValidator(String ip, ValidationContext validationContext) {
+    super(validationContext);
+    this.ip = ip;
+  }
 
-    @Override
-    public ValidationResult validate(MuleEvent event)
-    {
-        return InetAddresses.isInetAddress(ip)
-               ? ok()
-               : fail();
-    }
+  @Override
+  public ValidationResult validate(MuleEvent event) {
+    return InetAddresses.isInetAddress(ip) ? ok() : fail();
+  }
 
-    @Override
-    protected Message getDefaultErrorMessage()
-    {
-        return getMessages().invalidIp(ip);
-    }
+  @Override
+  protected Message getDefaultErrorMessage() {
+    return getMessages().invalidIp(ip);
+  }
 }

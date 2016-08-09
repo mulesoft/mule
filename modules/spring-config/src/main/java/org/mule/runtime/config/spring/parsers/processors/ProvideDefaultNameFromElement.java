@@ -13,15 +13,12 @@ import org.mule.runtime.config.spring.parsers.generic.AutoIdUtils;
 
 import org.w3c.dom.Element;
 
-public class ProvideDefaultNameFromElement implements PreProcessor
-{
+public class ProvideDefaultNameFromElement implements PreProcessor {
 
-    public void preProcess(PropertyConfiguration config, Element element)
-    {
-        if (AutoIdUtils.blankAttribute(element, AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME))
-        {
-            element.setAttribute(AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME, element.getLocalName());
-        }
+  public void preProcess(PropertyConfiguration config, Element element) {
+    if (AutoIdUtils.blankAttribute(element, AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME)) {
+      element.setAttribute(AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME, element.getLocalName());
     }
+  }
 
 }

@@ -28,253 +28,215 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 
-public class TransientRegistryTestCase extends AbstractMuleContextTestCase
-{
+public class TransientRegistryTestCase extends AbstractMuleContextTestCase {
 
-    private static final String LIFECYCLE_PHASES = "[setMuleContext, initialise, start, stop, dispose]";
-    public static final String TEST_KEY = "test";
+  private static final String LIFECYCLE_PHASES = "[setMuleContext, initialise, start, stop, dispose]";
+  public static final String TEST_KEY = "test";
 
-    @Test
-    public void testObjectLifecycle() throws Exception
-    {
-        muleContext.start();
+  @Test
+  public void testObjectLifecycle() throws Exception {
+    muleContext.start();
 
-        InterfaceBasedTracker tracker = new InterfaceBasedTracker();
-        muleContext.getRegistry().registerObject(TEST_KEY, tracker);
+    InterfaceBasedTracker tracker = new InterfaceBasedTracker();
+    muleContext.getRegistry().registerObject(TEST_KEY, tracker);
 
-        muleContext.dispose();
-        assertEquals(LIFECYCLE_PHASES, tracker.getTracker().toString());
+    muleContext.dispose();
+    assertEquals(LIFECYCLE_PHASES, tracker.getTracker().toString());
+  }
+
+  @Test
+  public void testObjectLifecycleDoubleRegistration() throws Exception {
+    muleContext.start();
+
+    InterfaceBasedTracker tracker1 = new InterfaceBasedTracker();
+    muleContext.getRegistry().registerObject(TEST_KEY, tracker1);
+
+    InterfaceBasedTracker tracker2 = new InterfaceBasedTracker();
+    muleContext.getRegistry().registerObject(TEST_KEY, tracker2);
+
+    InterfaceBasedTracker tracker3 = new InterfaceBasedTracker();
+    muleContext.getRegistry().registerObject(TEST_KEY, tracker3);
+
+    muleContext.dispose();
+    assertEquals(LIFECYCLE_PHASES, tracker1.getTracker().toString());
+    assertEquals(LIFECYCLE_PHASES, tracker2.getTracker().toString());
+    assertEquals(LIFECYCLE_PHASES, tracker3.getTracker().toString());
+  }
+
+  @Test
+  public void doesNotTracksNonDisposableOverriddenObjects() throws Exception {
+    final Logger log = mock(Logger.class);
+    final TransientRegistry.RegistryMap registryMap = new TransientRegistry.RegistryMap(log);
+    Object value1 = new Object();
+    Object value2 = new Object();
+    registryMap.putAndLogWarningIfDuplicate(TEST_KEY, value1);
+    registryMap.putAndLogWarningIfDuplicate(TEST_KEY, value2);
+
+    assertThat(registryMap.getLostObjects(), is(empty()));
+  }
+
+
+  @Test
+  public void testJSR250ObjectLifecycle() throws Exception {
+    muleContext.start();
+
+    JSR250ObjectLifecycleTracker tracker = new JSR250ObjectLifecycleTracker();
+    muleContext.getRegistry().registerObject(TEST_KEY, tracker);
+
+    muleContext.dispose();
+    assertEquals("[setMuleContext, initialise, dispose]", tracker.getTracker().toString());
+  }
+
+  @Test
+  public void testObjectLifecycleStates() throws Exception {
+    InterfaceBasedTracker tracker = new InterfaceBasedTracker();
+    muleContext.getRegistry().registerObject(TEST_KEY, tracker);
+    assertEquals("[setMuleContext, initialise]", tracker.getTracker().toString());
+
+    try {
+      muleContext.initialise();
+      fail("context already initialised");
+    } catch (IllegalStateException e) {
+      // expected
     }
 
-    @Test
-    public void testObjectLifecycleDoubleRegistration() throws Exception
-    {
-        muleContext.start();
+    muleContext.start();
+    assertEquals("[setMuleContext, initialise, start]", tracker.getTracker().toString());
 
-        InterfaceBasedTracker tracker1 = new InterfaceBasedTracker();
-        muleContext.getRegistry().registerObject(TEST_KEY, tracker1);
-
-        InterfaceBasedTracker tracker2 = new InterfaceBasedTracker();
-        muleContext.getRegistry().registerObject(TEST_KEY, tracker2);
-
-        InterfaceBasedTracker tracker3 = new InterfaceBasedTracker();
-        muleContext.getRegistry().registerObject(TEST_KEY, tracker3);
-
-        muleContext.dispose();
-        assertEquals(LIFECYCLE_PHASES, tracker1.getTracker().toString());
-        assertEquals(LIFECYCLE_PHASES, tracker2.getTracker().toString());
-        assertEquals(LIFECYCLE_PHASES, tracker3.getTracker().toString());
+    try {
+      muleContext.start();
+      fail("context already started");
+    } catch (IllegalStateException e) {
+      // expected
     }
 
-    @Test
-    public void doesNotTracksNonDisposableOverriddenObjects() throws Exception
-    {
-        final Logger log = mock(Logger.class);
-        final TransientRegistry.RegistryMap registryMap = new TransientRegistry.RegistryMap(log);
-        Object value1 = new Object();
-        Object value2 = new Object();
-        registryMap.putAndLogWarningIfDuplicate(TEST_KEY, value1);
-        registryMap.putAndLogWarningIfDuplicate(TEST_KEY, value2);
+    muleContext.stop();
+    assertEquals("[setMuleContext, initialise, start, stop]", tracker.getTracker().toString());
 
-        assertThat(registryMap.getLostObjects(), is(empty()));
+    try {
+      muleContext.stop();
+      fail("context already stopped");
+    } catch (IllegalStateException e) {
+      // expected
     }
 
+    muleContext.dispose();
+    assertEquals(LIFECYCLE_PHASES, tracker.getTracker().toString());
 
-    @Test
-    public void testJSR250ObjectLifecycle() throws Exception
-    {
-        muleContext.start();
+    try {
+      muleContext.dispose();
+      fail("context already disposed");
+    } catch (IllegalStateException e) {
+      // expected
+    }
+  }
 
-        JSR250ObjectLifecycleTracker tracker = new JSR250ObjectLifecycleTracker();
-        muleContext.getRegistry().registerObject(TEST_KEY, tracker);
+  @Test
+  public void testObjectLifecycleRestart() throws Exception {
+    InterfaceBasedTracker tracker = new InterfaceBasedTracker();
+    muleContext.getRegistry().registerObject(TEST_KEY, tracker);
 
-        muleContext.dispose();
-        assertEquals("[setMuleContext, initialise, dispose]", tracker.getTracker().toString());
+    muleContext.start();
+    assertEquals("[setMuleContext, initialise, start]", tracker.getTracker().toString());
+
+    muleContext.stop();
+    assertEquals("[setMuleContext, initialise, start, stop]", tracker.getTracker().toString());
+
+    muleContext.start();
+    assertEquals("[setMuleContext, initialise, start, stop, start]", tracker.getTracker().toString());
+
+    muleContext.dispose();
+    assertEquals("[setMuleContext, initialise, start, stop, start, stop, dispose]", tracker.getTracker().toString());
+  }
+
+  @Test
+  public void testLifecycleStateOutOfSequenceDisposeFirstWithTransientRegistryDirectly() throws Exception {
+    TransientRegistry reg = new TransientRegistry(muleContext);
+
+    reg.fireLifecycle(Disposable.PHASE_NAME);
+
+    InterfaceBasedTracker tracker = new InterfaceBasedTracker();
+    try {
+      reg.registerObject(TEST_KEY, tracker);
+      fail("Cannot register objects on a disposed registry");
+    } catch (RegistrationException e) {
+      // Expected
+    }
+  }
+
+  @Test
+  public void testLifecycleStateOutOfSequenceStartFirst() throws Exception {
+    muleContext.start();
+    InterfaceBasedTracker tracker = new InterfaceBasedTracker();
+    muleContext.getRegistry().registerObject(TEST_KEY, tracker);
+    // Initialise called implicitly because you cannot start a component without initialising it first
+    assertEquals("[setMuleContext, initialise, start]", tracker.getTracker().toString());
+
+    muleContext.dispose();
+    // Stop called implicitly because you cannot dispose component without stopping it first
+    assertEquals(LIFECYCLE_PHASES, tracker.getTracker().toString());
+  }
+
+  @Test
+  public void testLifecycleStateOutOfSequenceStopFirst() throws Exception {
+    try {
+      muleContext.stop();
+      fail("Cannot not stop the context if not started");
+    } catch (IllegalStateException e) {
+      // expected
     }
 
-    @Test
-    public void testObjectLifecycleStates() throws Exception
-    {
-        InterfaceBasedTracker tracker = new InterfaceBasedTracker();
-        muleContext.getRegistry().registerObject(TEST_KEY, tracker);
-        assertEquals("[setMuleContext, initialise]", tracker.getTracker().toString());
+    muleContext.start();
+    muleContext.stop();
+    InterfaceBasedTracker tracker = new InterfaceBasedTracker();
+    muleContext.getRegistry().registerObject(TEST_KEY, tracker);
+    // Start is bypassed because the component was added when the registry was stopped, hence no need to start the component
+    // Stop isn't called either because start was not called
+    // Initialised is called because that pahse has completed in the registry
+    assertEquals("[setMuleContext, initialise]", tracker.getTracker().toString());
 
-        try
-        {
-            muleContext.initialise();
-            fail("context already initialised");
-        }
-        catch (IllegalStateException e)
-        {
-            //expected
-        }
+    muleContext.dispose();
+    assertEquals("[setMuleContext, initialise, dispose]", tracker.getTracker().toString());
+  }
 
-        muleContext.start();
-        assertEquals("[setMuleContext, initialise, start]", tracker.getTracker().toString());
+  @Test
+  public void testLifecycleStateOutOfSequenceDisposeFirst() throws Exception {
+    muleContext.dispose();
 
-        try
-        {
-            muleContext.start();
-            fail("context already started");
-        }
-        catch (IllegalStateException e)
-        {
-            //expected
-        }
+    InterfaceBasedTracker tracker = new InterfaceBasedTracker();
+    try {
+      muleContext.getRegistry().registerObject(TEST_KEY, tracker);
+      fail("cannot register objects on a disposed registry");
+    } catch (RegistrationException e) {
+      // Expected
+    }
+  }
 
-        muleContext.stop();
-        assertEquals("[setMuleContext, initialise, start, stop]", tracker.getTracker().toString());
+  public class InterfaceBasedTracker extends AbstractLifecycleTracker {
+    // no custom methods
+  }
 
-        try
-        {
-            muleContext.stop();
-            fail("context already stopped");
-        }
-        catch (IllegalStateException e)
-        {
-            //expected
-        }
+  public class JSR250ObjectLifecycleTracker implements MuleContextAware {
 
-        muleContext.dispose();
-        assertEquals(LIFECYCLE_PHASES, tracker.getTracker().toString());
+    private final List<String> tracker = new ArrayList<String>();
 
-        try
-        {
-            muleContext.dispose();
-            fail("context already disposed");
-        }
-        catch (IllegalStateException e)
-        {
-            //expected
-        }
+    public List<String> getTracker() {
+      return tracker;
     }
 
-    @Test
-    public void testObjectLifecycleRestart() throws Exception
-    {
-        InterfaceBasedTracker tracker = new InterfaceBasedTracker();
-        muleContext.getRegistry().registerObject(TEST_KEY, tracker);
-
-        muleContext.start();
-        assertEquals("[setMuleContext, initialise, start]", tracker.getTracker().toString());
-
-        muleContext.stop();
-        assertEquals("[setMuleContext, initialise, start, stop]", tracker.getTracker().toString());
-
-        muleContext.start();
-        assertEquals("[setMuleContext, initialise, start, stop, start]", tracker.getTracker().toString());
-
-        muleContext.dispose();
-        assertEquals("[setMuleContext, initialise, start, stop, start, stop, dispose]", tracker.getTracker().toString());
+    @Override
+    public void setMuleContext(MuleContext context) {
+      tracker.add("setMuleContext");
     }
 
-    @Test
-    public void testLifecycleStateOutOfSequenceDisposeFirstWithTransientRegistryDirectly() throws Exception
-    {
-        TransientRegistry reg = new TransientRegistry(muleContext);
-
-        reg.fireLifecycle(Disposable.PHASE_NAME);
-
-        InterfaceBasedTracker tracker = new InterfaceBasedTracker();
-        try
-        {
-            reg.registerObject(TEST_KEY, tracker);
-            fail("Cannot register objects on a disposed registry");
-        }
-        catch (RegistrationException e)
-        {
-            //Expected
-        }
+    @PostConstruct
+    public void init() {
+      tracker.add("initialise");
     }
 
-    @Test
-    public void testLifecycleStateOutOfSequenceStartFirst() throws Exception
-    {
-        muleContext.start();
-        InterfaceBasedTracker tracker = new InterfaceBasedTracker();
-        muleContext.getRegistry().registerObject(TEST_KEY, tracker);
-        //Initialise called implicitly because you cannot start a component without initialising it first
-        assertEquals("[setMuleContext, initialise, start]", tracker.getTracker().toString());
-
-        muleContext.dispose();
-        //Stop called implicitly because you cannot dispose component without stopping it first
-        assertEquals(LIFECYCLE_PHASES, tracker.getTracker().toString());
+    @PreDestroy
+    public void dispose() {
+      tracker.add("dispose");
     }
-
-    @Test
-    public void testLifecycleStateOutOfSequenceStopFirst() throws Exception
-    {
-        try
-        {
-            muleContext.stop();
-            fail("Cannot not stop the context if not started");
-        }
-        catch (IllegalStateException e)
-        {
-            //expected
-        }
-
-        muleContext.start();
-        muleContext.stop();
-        InterfaceBasedTracker tracker = new InterfaceBasedTracker();
-        muleContext.getRegistry().registerObject(TEST_KEY, tracker);
-        //Start is bypassed because the component was added when the registry was stopped, hence no need to start the component
-        //Stop isn't called either because start was not called
-        //Initialised is called because that pahse has completed in the registry
-        assertEquals("[setMuleContext, initialise]", tracker.getTracker().toString());
-
-        muleContext.dispose();
-        assertEquals("[setMuleContext, initialise, dispose]", tracker.getTracker().toString());
-    }
-
-    @Test
-    public void testLifecycleStateOutOfSequenceDisposeFirst() throws Exception
-    {
-        muleContext.dispose();
-
-        InterfaceBasedTracker tracker = new InterfaceBasedTracker();
-        try
-        {
-            muleContext.getRegistry().registerObject(TEST_KEY, tracker);
-            fail("cannot register objects on a disposed registry");
-        }
-        catch (RegistrationException e)
-        {
-            //Expected
-        }
-    }
-
-    public class InterfaceBasedTracker extends AbstractLifecycleTracker
-    {
-        // no custom methods
-    }
-
-    public class JSR250ObjectLifecycleTracker implements MuleContextAware
-    {
-
-        private final List<String> tracker = new ArrayList<String>();
-
-        public List<String> getTracker()
-        {
-            return tracker;
-        }
-
-        @Override
-        public void setMuleContext(MuleContext context)
-        {
-            tracker.add("setMuleContext");
-        }
-
-        @PostConstruct
-        public void init()
-        {
-            tracker.add("initialise");
-        }
-
-        @PreDestroy
-        public void dispose()
-        {
-            tracker.add("dispose");
-        }
-    }
+  }
 }

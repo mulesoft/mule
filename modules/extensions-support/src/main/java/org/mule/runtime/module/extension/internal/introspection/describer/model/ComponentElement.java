@@ -14,7 +14,7 @@ package org.mule.runtime.module.extension.internal.introspection.describer.model
  *
  * @since 4.0
  */
-public interface ComponentElement extends WithMessageSources, WithOperationContainers, WithConnectionProviders, ParameterizableTypeElement
-{
+public interface ComponentElement
+    extends WithMessageSources, WithOperationContainers, WithConnectionProviders, ParameterizableTypeElement {
 
 }

@@ -20,40 +20,32 @@ import java.nio.charset.Charset;
 /**
  * Converts strings to {@link MediaType} instances. See {@link DataTypeBuilder#mediaType(String)}
  */
-public class StringToMediaTypeTransformer extends AbstractTransformer implements DiscoverableTransformer
-{
+public class StringToMediaTypeTransformer extends AbstractTransformer implements DiscoverableTransformer {
 
-    private int priorityWeighting = DiscoverableTransformer.DEFAULT_PRIORITY_WEIGHTING;
+  private int priorityWeighting = DiscoverableTransformer.DEFAULT_PRIORITY_WEIGHTING;
 
-    public StringToMediaTypeTransformer()
-    {
-        this.registerSourceType(DataType.STRING);
-        this.setReturnDataType(DataType.builder().type(MediaType.class).build());
+  public StringToMediaTypeTransformer() {
+    this.registerSourceType(DataType.STRING);
+    this.setReturnDataType(DataType.builder().type(MediaType.class).build());
+  }
+
+  @Override
+  protected Object doTransform(Object src, Charset enc) throws TransformerException {
+    try {
+      return DataType.builder().mediaType((String) src).build().getMediaType();
+    } catch (Exception e) {
+      throw new TransformerException(createStaticMessage("Exception transforming to MediaType."), e);
     }
+  }
 
-    @Override
-    protected Object doTransform(Object src, Charset enc) throws TransformerException
-    {
-        try
-        {
-            return DataType.builder().mediaType((String) src).build().getMediaType();
-        }
-        catch (Exception e)
-        {
-            throw new TransformerException(createStaticMessage("Exception transforming to MediaType."), e);
-        }
-    }
+  @Override
+  public int getPriorityWeighting() {
+    return priorityWeighting;
+  }
 
-    @Override
-    public int getPriorityWeighting()
-    {
-        return priorityWeighting;
-    }
-
-    @Override
-    public void setPriorityWeighting(int priorityWeighting)
-    {
-        this.priorityWeighting = priorityWeighting;
-    }
+  @Override
+  public void setPriorityWeighting(int priorityWeighting) {
+    this.priorityWeighting = priorityWeighting;
+  }
 
 }

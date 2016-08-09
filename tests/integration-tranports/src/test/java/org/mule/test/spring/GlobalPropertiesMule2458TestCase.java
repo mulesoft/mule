@@ -15,26 +15,23 @@ import org.mule.runtime.core.construct.Flow;
 
 import org.junit.Test;
 
-public class GlobalPropertiesMule2458TestCase extends FunctionalTestCase
-{
+public class GlobalPropertiesMule2458TestCase extends FunctionalTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/spring/global-properties-mule-2458-test-flow.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/spring/global-properties-mule-2458-test-flow.xml";
+  }
 
-    @Test
-    public void testProperties()
-    {
-        Object flow = muleContext.getRegistry().lookupObject("service");
-        assertNotNull(flow);
-        ImmutableEndpoint ep = (ImmutableEndpoint) ((Flow) flow).getMessageSource();
+  @Test
+  public void testProperties() {
+    Object flow = muleContext.getRegistry().lookupObject("service");
+    assertNotNull(flow);
+    ImmutableEndpoint ep = (ImmutableEndpoint) ((Flow) flow).getMessageSource();
 
-        assertNotNull(ep);
-        assertEquals("local", ep.getProperties().get("local"));
-        assertEquals("global", ep.getProperties().get("global"));
-        assertEquals("local", ep.getProperties().get("override-me"));
-        assertEquals(3, ep.getProperties().size());
-    }
+    assertNotNull(ep);
+    assertEquals("local", ep.getProperties().get("local"));
+    assertEquals("global", ep.getProperties().get("global"));
+    assertEquals("local", ep.getProperties().get("override-me"));
+    assertEquals(3, ep.getProperties().size());
+  }
 }

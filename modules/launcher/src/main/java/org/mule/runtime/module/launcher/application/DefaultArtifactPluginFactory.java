@@ -16,26 +16,24 @@ import org.mule.runtime.module.launcher.plugin.ArtifactPluginDescriptor;
  *
  * @since 4.0
  */
-public class DefaultArtifactPluginFactory implements ArtifactPluginFactory
-{
-    private ArtifactPluginClassLoaderFactory artifactPluginClassLoaderFactory;
+public class DefaultArtifactPluginFactory implements ArtifactPluginFactory {
 
-    /**
-     * Creates an instance
-     *
-     * @param artifactPluginClassLoaderFactory used to create the {@link ArtifactClassLoader}, cannot be null.
-     */
-    public DefaultArtifactPluginFactory(ArtifactPluginClassLoaderFactory artifactPluginClassLoaderFactory)
-    {
-        checkArgument(artifactPluginClassLoaderFactory != null, "Application plugin classloader factory cannot be null");
-        this.artifactPluginClassLoaderFactory = artifactPluginClassLoaderFactory;
-    }
+  private ArtifactPluginClassLoaderFactory artifactPluginClassLoaderFactory;
 
-    @Override
-    public ArtifactPlugin create(ArtifactPluginDescriptor descriptor, ArtifactClassLoader parent)
-    {
-        final ArtifactClassLoader pluginClassLoader = artifactPluginClassLoaderFactory.create(parent, descriptor);
+  /**
+   * Creates an instance
+   *
+   * @param artifactPluginClassLoaderFactory used to create the {@link ArtifactClassLoader}, cannot be null.
+   */
+  public DefaultArtifactPluginFactory(ArtifactPluginClassLoaderFactory artifactPluginClassLoaderFactory) {
+    checkArgument(artifactPluginClassLoaderFactory != null, "Application plugin classloader factory cannot be null");
+    this.artifactPluginClassLoaderFactory = artifactPluginClassLoaderFactory;
+  }
 
-        return new DefaultArtifactPlugin(descriptor, pluginClassLoader);
-    }
+  @Override
+  public ArtifactPlugin create(ArtifactPluginDescriptor descriptor, ArtifactClassLoader parent) {
+    final ArtifactClassLoader pluginClassLoader = artifactPluginClassLoaderFactory.create(parent, descriptor);
+
+    return new DefaultArtifactPlugin(descriptor, pluginClassLoader);
+  }
 }

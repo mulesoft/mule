@@ -11,18 +11,15 @@ import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 
-public class DefaultJmxSupportAgentDefaultDomainTestCase extends FunctionalTestCase
-{
+public class DefaultJmxSupportAgentDefaultDomainTestCase extends FunctionalTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "agent/jmx-agent-app-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "agent/jmx-agent-app-config.xml";
+  }
 
-    @Test
-    public void testHostPropertyEnablesClientSocketFactory () throws Exception
-    {
-        doTestHostPropertyEnablesClientSocketFactory(muleContext);
-    }
+  @Test
+  public void testHostPropertyEnablesClientSocketFactory() throws Exception {
+    doTestHostPropertyEnablesClientSocketFactory(muleContext);
+  }
 }

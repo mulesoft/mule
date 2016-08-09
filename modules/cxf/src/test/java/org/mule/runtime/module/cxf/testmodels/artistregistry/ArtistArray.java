@@ -17,17 +17,15 @@ import javax.xml.bind.annotation.XmlType;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "artistArray", propOrder = "item")
-public class ArtistArray
-{
-    @XmlElement(nillable = true)
-    protected List<Artist> item;
+public class ArtistArray {
 
-    public List<Artist> getItem()
-    {
-        if(item == null)
-        {
-            item = new ArrayList<Artist>();
-        }
-        return item;
+  @XmlElement(nillable = true)
+  protected List<Artist> item;
+
+  public List<Artist> getItem() {
+    if (item == null) {
+      item = new ArrayList<Artist>();
     }
+    return item;
+  }
 }

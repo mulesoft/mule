@@ -22,120 +22,106 @@ import java.time.LocalDateTime;
 import org.junit.Before;
 import org.junit.Test;
 
-public class EmailPredicateTestCase
-{
-    private static final LocalDateTime RECEIVED_DATE = LocalDateTime.of(2015, 4, 20, 00, 00);
-    private static final LocalDateTime SENT_DATE = LocalDateTime.of(2014, 4, 10, 00, 00);
+public class EmailPredicateTestCase {
 
-    private EmailAttributes attributes;
-    private EmailPredicateBuilder builder;
+  private static final LocalDateTime RECEIVED_DATE = LocalDateTime.of(2015, 4, 20, 00, 00);
+  private static final LocalDateTime SENT_DATE = LocalDateTime.of(2014, 4, 10, 00, 00);
 
-    @Before
-    public void before()
-    {
-        builder = new EmailPredicateBuilder();
+  private EmailAttributes attributes;
+  private EmailPredicateBuilder builder;
 
-        EmailFlags flags = mock(EmailFlags.class);
-        when(flags.isSeen()).thenReturn(true);
-        when(flags.isRecent()).thenReturn(true);
-        when(flags.isDeleted()).thenReturn(false);
+  @Before
+  public void before() {
+    builder = new EmailPredicateBuilder();
 
-        attributes = mock(EmailAttributes.class);
-        when(attributes.getSubject()).thenReturn(EMAIL_SUBJECT);
-        when(attributes.getFromAddresses()).thenReturn(singletonList(JUANI_EMAIL));
-        when(attributes.getFlags()).thenReturn(flags);
-        when(attributes.getReceivedDate()).thenReturn(RECEIVED_DATE);
-        when(attributes.getSentDate()).thenReturn(SENT_DATE);
-    }
+    EmailFlags flags = mock(EmailFlags.class);
+    when(flags.isSeen()).thenReturn(true);
+    when(flags.isRecent()).thenReturn(true);
+    when(flags.isDeleted()).thenReturn(false);
+
+    attributes = mock(EmailAttributes.class);
+    when(attributes.getSubject()).thenReturn(EMAIL_SUBJECT);
+    when(attributes.getFromAddresses()).thenReturn(singletonList(JUANI_EMAIL));
+    when(attributes.getFlags()).thenReturn(flags);
+    when(attributes.getReceivedDate()).thenReturn(RECEIVED_DATE);
+    when(attributes.getSentDate()).thenReturn(SENT_DATE);
+  }
 
 
-    @Test
-    public void matchSubjectRegex()
-    {
-        builder.setSubjectRegex("Email.*");
-        assertMatch();
-    }
+  @Test
+  public void matchSubjectRegex() {
+    builder.setSubjectRegex("Email.*");
+    assertMatch();
+  }
 
-    @Test
-    public void rejectSubjectRegex()
-    {
-        builder.setSubjectRegex("RejectSubject");
-        assertReject();
-    }
+  @Test
+  public void rejectSubjectRegex() {
+    builder.setSubjectRegex("RejectSubject");
+    assertReject();
+  }
 
-    @Test
-    public void matchFromRegex()
-    {
-        builder.setFromRegex(".*@mulesoft.com");
-        assertMatch();
-    }
+  @Test
+  public void matchFromRegex() {
+    builder.setFromRegex(".*@mulesoft.com");
+    assertMatch();
+  }
 
-    @Test
-    public void rejectFromRegex()
-    {
-        builder.setFromRegex(".*@google.com");
-        assertReject();
-    }
+  @Test
+  public void rejectFromRegex() {
+    builder.setFromRegex(".*@google.com");
+    assertReject();
+  }
 
-    @Test
-    public void matchSeen()
-    {
-        builder.setSeen(true);
-        assertMatch();
-    }
+  @Test
+  public void matchSeen() {
+    builder.setSeen(true);
+    assertMatch();
+  }
 
-    @Test
-    public void rejectSeen()
-    {
-        builder.setSeen(false);
-        assertReject();
-    }
+  @Test
+  public void rejectSeen() {
+    builder.setSeen(false);
+    assertReject();
+  }
 
-    @Test
-    public void matchRecent()
-    {
-        builder.setRecent(true);
-        assertMatch();
-    }
+  @Test
+  public void matchRecent() {
+    builder.setRecent(true);
+    assertMatch();
+  }
 
-    @Test
-    public void rejectRecent()
-    {
-        builder.setRecent(false);
-        assertReject();
-    }
+  @Test
+  public void rejectRecent() {
+    builder.setRecent(false);
+    assertReject();
+  }
 
-    @Test
-    public void matchReceivedDate()
-    {
-        builder.setReceivedSince(RECEIVED_DATE.minusYears(1));
-        builder.setReceivedUntil(RECEIVED_DATE.plusYears(1));
-        assertMatch();
-    }
+  @Test
+  public void matchReceivedDate() {
+    builder.setReceivedSince(RECEIVED_DATE.minusYears(1));
+    builder.setReceivedUntil(RECEIVED_DATE.plusYears(1));
+    assertMatch();
+  }
 
-    @Test
-    public void matchSentDate()
-    {
-        builder.setSentSince(SENT_DATE.minusYears(1));
-        builder.setSentUntil(SENT_DATE.plusYears(1));
-        assertMatch();
-    }
+  @Test
+  public void matchSentDate() {
+    builder.setSentSince(SENT_DATE.minusYears(1));
+    builder.setSentUntil(SENT_DATE.plusYears(1));
+    assertMatch();
+  }
 
-    @Test
-    public void rejectReceivedDate()
-    {
-        builder.setReceivedSince(RECEIVED_DATE.plusYears(1));
-        assertReject();
-    }
+  @Test
+  public void rejectReceivedDate() {
+    builder.setReceivedSince(RECEIVED_DATE.plusYears(1));
+    assertReject();
+  }
 
-    private void assertMatch()
-    {
-        assertThat(builder.build().test(attributes), is(true));
-    }
+  private void assertMatch() {
+    assertThat(builder.build().test(attributes), is(true));
+  }
 
-    private void assertReject()
-    {
-        assertThat(builder.build().test(attributes), is(false));
-    }
+  private void assertReject() {
+    assertThat(builder.build().test(attributes), is(false));
+  }
 
 }

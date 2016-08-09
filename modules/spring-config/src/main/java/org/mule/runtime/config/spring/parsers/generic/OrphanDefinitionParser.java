@@ -12,51 +12,44 @@ import org.w3c.dom.Element;
 
 /**
  * <p>
- * Contructs a single, standalone bean from an element - it is not injected into any
- * other object. This parser can be configured to automatically set the class of the
- * object, the init and destroy methods and whether this object is a singleton.
+ * Contructs a single, standalone bean from an element - it is not injected into any other object. This parser can be configured
+ * to automatically set the class of the object, the init and destroy methods and whether this object is a singleton.
  * </p>
  * <p>
- * Typically, you should use {@link MuleOrphanDefinitionParser} instead of this
- * class, since these elements occur in the <mule> top level element.
+ * Typically, you should use {@link MuleOrphanDefinitionParser} instead of this class, since these elements occur in the <mule>
+ * top level element.
  * </p>
  */
-public class OrphanDefinitionParser extends AbstractMuleBeanDefinitionParser
-{
-    private Class<?> beanClass = null;
-    private boolean dynamicClass = false;
+public class OrphanDefinitionParser extends AbstractMuleBeanDefinitionParser {
 
-    /**
-     * This constructor assumes that the class name will be explicitly specified as
-     * an attribute on the element.
-     */
-    public OrphanDefinitionParser(boolean singleton)
-    {
-        this.singleton = singleton;
-        dynamicClass = true;
-    }
+  private Class<?> beanClass = null;
+  private boolean dynamicClass = false;
 
-    public OrphanDefinitionParser(Class<?> beanClass, boolean singleton)
-    {
-        this.beanClass = beanClass;
-        this.singleton = singleton;
-    }
+  /**
+   * This constructor assumes that the class name will be explicitly specified as an attribute on the element.
+   */
+  public OrphanDefinitionParser(boolean singleton) {
+    this.singleton = singleton;
+    dynamicClass = true;
+  }
 
-    @Override
-    protected void preProcess(Element element)
-    {
-        super.preProcess(element);
-        // top level beans need an ID element
-        AutoIdUtils.ensureUniqueId(element, "bean");
-        if (dynamicClass)
-        {
-            beanClass = null;
-        }
-    }
+  public OrphanDefinitionParser(Class<?> beanClass, boolean singleton) {
+    this.beanClass = beanClass;
+    this.singleton = singleton;
+  }
 
-    @Override
-    protected Class<?> getBeanClass(Element element)
-    {
-        return beanClass;
+  @Override
+  protected void preProcess(Element element) {
+    super.preProcess(element);
+    // top level beans need an ID element
+    AutoIdUtils.ensureUniqueId(element, "bean");
+    if (dynamicClass) {
+      beanClass = null;
     }
+  }
+
+  @Override
+  protected Class<?> getBeanClass(Element element) {
+    return beanClass;
+  }
 }

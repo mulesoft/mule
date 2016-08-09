@@ -18,87 +18,70 @@ import org.mule.runtime.core.util.SecurityUtils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openpgp.PGPPublicKey;
 
-public class PGPSecurityProvider extends AbstractSecurityProvider
-{
-    private PGPKeyRing keyManager;
+public class PGPSecurityProvider extends AbstractSecurityProvider {
 
-    public PGPSecurityProvider()
-    {
-        super("pgp");
+  private PGPKeyRing keyManager;
+
+  public PGPSecurityProvider() {
+    super("pgp");
+  }
+
+  @Override
+  public Authentication authenticate(Authentication authentication) throws SecurityException {
+    PGPAuthentication auth = (PGPAuthentication) authentication;
+
+    String userId = (String) auth.getPrincipal();
+
+    if (userId == null) {
+      throw new UnauthorisedException(CoreMessages.objectIsNull("UserId"));
     }
 
-    @Override
-    public Authentication authenticate(Authentication authentication) throws SecurityException
-    {
-        PGPAuthentication auth = (PGPAuthentication) authentication;
+    PGPPublicKey publicKey = keyManager.getPublicKey(userId);
 
-        String userId = (String) auth.getPrincipal();
+    if (publicKey == null) {
+      throw new UnauthorisedException(PGPMessages.noPublicKeyForUser(userId));
+    }
 
-        if (userId == null)
-        {
-            throw new UnauthorisedException(CoreMessages.objectIsNull("UserId"));
+    Message msg = (Message) auth.getCredentials();
+
+    if (msg instanceof SignedMessage) {
+      try {
+        if (!((SignedMessage) msg).verify()) {
+          throw new UnauthorisedException(PGPMessages.invalidSignature());
         }
-
-        PGPPublicKey publicKey = keyManager.getPublicKey(userId);
-
-        if (publicKey == null)
-        {
-            throw new UnauthorisedException(PGPMessages.noPublicKeyForUser(userId));
-        }
-
-        Message msg = (Message) auth.getCredentials();
-
-        if (msg instanceof SignedMessage)
-        {
-            try
-            {
-                if (!((SignedMessage) msg).verify())
-                {
-                    throw new UnauthorisedException(PGPMessages.invalidSignature());
-                }
-            }
-            catch (Exception e)
-            {
-                throw new UnauthorisedException(PGPMessages.errorVerifySignature(), e);
-            }
-        }
-
-        auth.setAuthenticated(true);
-        auth.setDetails(publicKey);
-
-        return auth;
+      } catch (Exception e) {
+        throw new UnauthorisedException(PGPMessages.errorVerifySignature(), e);
+      }
     }
 
-    @Override
-    public boolean supports(Class<?> aClass)
-    {
-        return PGPAuthentication.class.isAssignableFrom(aClass);
-    }
+    auth.setAuthenticated(true);
+    auth.setDetails(publicKey);
 
-    @Override
-    protected void doInitialise() throws InitialisationException
-    {
-        try
-        {
-            if (!SecurityUtils.isFipsSecurityModel())
-            {
-                java.security.Security.addProvider(new BouncyCastleProvider());
-            }
-            setSecurityContextFactory(new PGPSecurityContextFactory());
-        }
-        catch (Exception e)
-        {
-            throw new InitialisationException(CoreMessages.failedToCreate("PGPProvider"), e, this);
-        }
-    }
+    return auth;
+  }
 
-    public PGPKeyRing getKeyManager()
-    {
-        return keyManager;
-    }
+  @Override
+  public boolean supports(Class<?> aClass) {
+    return PGPAuthentication.class.isAssignableFrom(aClass);
+  }
 
-    public void setKeyManager(PGPKeyRing keyManager)
-    {
-        this.keyManager = keyManager;
+  @Override
+  protected void doInitialise() throws InitialisationException {
+    try {
+      if (!SecurityUtils.isFipsSecurityModel()) {
+        java.security.Security.addProvider(new BouncyCastleProvider());
+      }
+      setSecurityContextFactory(new PGPSecurityContextFactory());
+    } catch (Exception e) {
+      throw new InitialisationException(CoreMessages.failedToCreate("PGPProvider"), e, this);
     }
+  }
+
+  public PGPKeyRing getKeyManager() {
+    return keyManager;
+  }
+
+  public void setKeyManager(PGPKeyRing keyManager) {
+    this.keyManager = keyManager;
+  }
 }

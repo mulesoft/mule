@@ -15,33 +15,28 @@ import org.slf4j.Logger;
 /**
  * Helper class to reuse message content logging for troubleshooting using the logs.
  */
-public class MuleEventLogger
-{
+public class MuleEventLogger {
 
-    private final Logger logger;
+  private final Logger logger;
 
-    public MuleEventLogger(Logger logger)
-    {
-        this.logger = logger;
+  public MuleEventLogger(Logger logger) {
+    this.logger = logger;
+  }
+
+  /**
+   * Logs the event message payload type, the payload as string and the message properties.
+   * 
+   * @param muleEvent event to log.
+   */
+  public void logContent(MuleEvent muleEvent) {
+    logger.error("Message content type is " + muleEvent.getMessage().getDataType().getType());
+    logger.error("Message content is " + muleEvent.getMessage());
+    try {
+      String payloadAsString = muleEvent.getMuleContext().getTransformationService().getPayloadForLogging(muleEvent.getMessage());
+      logger.error("Message payload is " + (isEmpty(payloadAsString) ? "EMPTY CONTENT" : payloadAsString));
+    } catch (Exception e) {
+      // just skip the logging message if we couldn't convert the payload to string.
     }
-
-    /**
-     * Logs the event message payload type, the payload as string and the message properties.
-     * @param muleEvent event to log.
-     */
-    public void logContent(MuleEvent muleEvent)
-    {
-        logger.error("Message content type is " + muleEvent.getMessage().getDataType().getType());
-        logger.error("Message content is " + muleEvent.getMessage());
-        try
-        {
-            String payloadAsString = muleEvent.getMuleContext().getTransformationService().getPayloadForLogging(muleEvent.getMessage());
-            logger.error("Message payload is " + (isEmpty(payloadAsString) ? "EMPTY CONTENT" : payloadAsString));
-        }
-        catch (Exception e)
-        {
-            //just skip the logging message if we couldn't convert the payload to string.
-        }
-    }
+  }
 
 }

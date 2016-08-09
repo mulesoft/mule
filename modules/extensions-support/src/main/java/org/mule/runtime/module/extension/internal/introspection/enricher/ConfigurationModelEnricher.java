@@ -29,49 +29,43 @@ import org.mule.runtime.module.extension.internal.util.IdempotentDeclarationWalk
 import java.util.List;
 
 /**
- * {@link ModelEnricher} implementation that walks through a {@link ExtensionDeclaration} and looks for annotated
- * component parameters (Sources and Operations), with {@link Connection} and adds a {@link ConnectivityModelProperty}
- * or annotated with {@link UseConfig} and adds a {@link ConfigTypeModelProperty}
+ * {@link ModelEnricher} implementation that walks through a {@link ExtensionDeclaration} and looks for annotated component
+ * parameters (Sources and Operations), with {@link Connection} and adds a {@link ConnectivityModelProperty} or annotated with
+ * {@link UseConfig} and adds a {@link ConfigTypeModelProperty}
  *
  * @since 4.0
  */
-public class ConfigurationModelEnricher extends AbstractAnnotatedModelEnricher
-{
+public class ConfigurationModelEnricher extends AbstractAnnotatedModelEnricher {
 
-    private ClassTypeLoader typeLoader;
+  private ClassTypeLoader typeLoader;
 
-    @Override
-    public void enrich(DescribingContext describingContext)
-    {
-        final Class<?> extensionType = extractExtensionType(describingContext.getExtensionDeclarer().getDeclaration());
-        if (extensionType != null)
-        {
-            typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(Thread.currentThread().getContextClassLoader());
-            new IdempotentDeclarationWalker()
-            {
-                @Override
-                public void onOperation(OperationDeclaration declaration)
-                {
-                    declaration.getModelProperty(ImplementingMethodModelProperty.class)
-                            .ifPresent(implementingProperty -> contribute(declaration, new MethodWrapper(implementingProperty.getMethod())));
-                }
+  @Override
+  public void enrich(DescribingContext describingContext) {
+    final Class<?> extensionType = extractExtensionType(describingContext.getExtensionDeclarer().getDeclaration());
+    if (extensionType != null) {
+      typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(Thread.currentThread().getContextClassLoader());
+      new IdempotentDeclarationWalker() {
 
-                @Override
-                public void onSource(SourceDeclaration declaration)
-                {
-                    declaration.getModelProperty(ImplementingTypeModelProperty.class)
-                            .ifPresent(implementingProperty -> contribute(declaration, new ParameterizableTypeWrapper(implementingProperty.getType())));
-                }
-            }.walk(describingContext.getExtensionDeclarer().getDeclaration());
+        @Override
+        public void onOperation(OperationDeclaration declaration) {
+          declaration.getModelProperty(ImplementingMethodModelProperty.class)
+              .ifPresent(implementingProperty -> contribute(declaration, new MethodWrapper(implementingProperty.getMethod())));
         }
-    }
 
-    private void contribute(BaseDeclaration declaration, WithParameters methodWrapper)
-    {
-        final List<ExtensionParameter> configParameters = methodWrapper.getParametersAnnotatedWith(UseConfig.class);
-        if (!configParameters.isEmpty())
-        {
-            declaration.addModelProperty(new ConfigTypeModelProperty(configParameters.get(0).getMetadataType(typeLoader)));
+        @Override
+        public void onSource(SourceDeclaration declaration) {
+          declaration.getModelProperty(ImplementingTypeModelProperty.class)
+              .ifPresent(implementingProperty -> contribute(declaration,
+                                                            new ParameterizableTypeWrapper(implementingProperty.getType())));
         }
+      }.walk(describingContext.getExtensionDeclarer().getDeclaration());
     }
+  }
+
+  private void contribute(BaseDeclaration declaration, WithParameters methodWrapper) {
+    final List<ExtensionParameter> configParameters = methodWrapper.getParametersAnnotatedWith(UseConfig.class);
+    if (!configParameters.isEmpty()) {
+      declaration.addModelProperty(new ConfigTypeModelProperty(configParameters.get(0).getMetadataType(typeLoader)));
+    }
+  }
 }

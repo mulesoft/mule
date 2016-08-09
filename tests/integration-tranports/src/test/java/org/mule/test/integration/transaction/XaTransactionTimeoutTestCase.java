@@ -17,22 +17,19 @@ import org.mule.runtime.core.construct.Flow;
 
 import org.junit.Test;
 
-public class XaTransactionTimeoutTestCase extends FunctionalTestCase
-{
+public class XaTransactionTimeoutTestCase extends FunctionalTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/integration/transaction/xa-transaction-timeout-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/integration/transaction/xa-transaction-timeout-config.xml";
+  }
 
-    @Test
-    public void configuresTransactionTimeout() throws Exception
-    {
-        final Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct("main");
-        final InboundEndpoint inboundEndpoint = (InboundEndpoint) flow.getMessageSource();
-        final TransactionConfig transactionConfig = inboundEndpoint.getTransactionConfig();
+  @Test
+  public void configuresTransactionTimeout() throws Exception {
+    final Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct("main");
+    final InboundEndpoint inboundEndpoint = (InboundEndpoint) flow.getMessageSource();
+    final TransactionConfig transactionConfig = inboundEndpoint.getTransactionConfig();
 
-        assertThat(transactionConfig.getTimeout(), equalTo(5000));
-    }
+    assertThat(transactionConfig.getTimeout(), equalTo(5000));
+  }
 }

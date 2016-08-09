@@ -6,16 +6,15 @@
  */
 package org.mule.compatibility.transport.tcp.integration;
 
-public class NonSerializableMessageObject
-{
-    public int i;
-    public String s;
-    public boolean b;
+public class NonSerializableMessageObject {
 
-    public NonSerializableMessageObject(int i, String s, boolean b)
-    {
-        this.i = i;
-        this.s = s;
-        this.b = b;
-    }
+  public int i;
+  public String s;
+  public boolean b;
+
+  public NonSerializableMessageObject(int i, String s, boolean b) {
+    this.i = i;
+    this.s = s;
+    this.b = b;
+  }
 }

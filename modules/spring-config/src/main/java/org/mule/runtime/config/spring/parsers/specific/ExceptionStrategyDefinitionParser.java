@@ -24,49 +24,42 @@ import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
-public class ExceptionStrategyDefinitionParser extends ParentContextDefinitionParser
-{
-    public ExceptionStrategyDefinitionParser(Class exceptionStrategyClass)
-    {
-        super(MuleOrphanDefinitionParser.ROOT_ELEMENT, createRootDefinitionParser(exceptionStrategyClass));
-        otherwise(createInFlowServiceDefinitionParser(exceptionStrategyClass));
-    }
+public class ExceptionStrategyDefinitionParser extends ParentContextDefinitionParser {
 
-    private ChildDefinitionParser createInFlowServiceDefinitionParser(Class exceptionStrategyClass)
-    {
-        ChildDefinitionParser exceptionListenerDefinitionParser = new ChildDefinitionParser("exceptionListener", exceptionStrategyClass, false);
-        exceptionListenerDefinitionParser.registerPreProcessor(createNoNameAttributePreProcessor());
-        return exceptionListenerDefinitionParser;
-    }
+  public ExceptionStrategyDefinitionParser(Class exceptionStrategyClass) {
+    super(MuleOrphanDefinitionParser.ROOT_ELEMENT, createRootDefinitionParser(exceptionStrategyClass));
+    otherwise(createInFlowServiceDefinitionParser(exceptionStrategyClass));
+  }
 
-    static PreProcessor createNoNameAttributePreProcessor()
-    {
-        return new PreProcessor()
-        {
-            @Override
-            public void preProcess(PropertyConfiguration config, Element element)
-            {
-                if (element.hasAttribute("name"))
-                {
-                    throw new MuleRuntimeException(CoreMessages.createStaticMessage("name attribute on exception strategy is only allowed on global exception strategies"));
-                }
-            }
-        };
-    }
+  private ChildDefinitionParser createInFlowServiceDefinitionParser(Class exceptionStrategyClass) {
+    ChildDefinitionParser exceptionListenerDefinitionParser =
+        new ChildDefinitionParser("exceptionListener", exceptionStrategyClass, false);
+    exceptionListenerDefinitionParser.registerPreProcessor(createNoNameAttributePreProcessor());
+    return exceptionListenerDefinitionParser;
+  }
 
-    public static MuleOrphanDefinitionParser createRootDefinitionParser(Class exceptionStrategyClass)
-    {
-        MuleOrphanDefinitionParser globalExceptionStrategyDefinitionParser;
-        if (exceptionStrategyClass == null)
-        {
-            globalExceptionStrategyDefinitionParser = new MuleOrphanDefinitionParser(false);
+  static PreProcessor createNoNameAttributePreProcessor() {
+    return new PreProcessor() {
+
+      @Override
+      public void preProcess(PropertyConfiguration config, Element element) {
+        if (element.hasAttribute("name")) {
+          throw new MuleRuntimeException(CoreMessages
+              .createStaticMessage("name attribute on exception strategy is only allowed on global exception strategies"));
         }
-        else
-        {
-            globalExceptionStrategyDefinitionParser = new MuleOrphanDefinitionParser(exceptionStrategyClass, false);
-        }
-        globalExceptionStrategyDefinitionParser.addIgnored(AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME);
-        return globalExceptionStrategyDefinitionParser;
+      }
+    };
+  }
+
+  public static MuleOrphanDefinitionParser createRootDefinitionParser(Class exceptionStrategyClass) {
+    MuleOrphanDefinitionParser globalExceptionStrategyDefinitionParser;
+    if (exceptionStrategyClass == null) {
+      globalExceptionStrategyDefinitionParser = new MuleOrphanDefinitionParser(false);
+    } else {
+      globalExceptionStrategyDefinitionParser = new MuleOrphanDefinitionParser(exceptionStrategyClass, false);
     }
+    globalExceptionStrategyDefinitionParser.addIgnored(AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME);
+    return globalExceptionStrategyDefinitionParser;
+  }
 
 }

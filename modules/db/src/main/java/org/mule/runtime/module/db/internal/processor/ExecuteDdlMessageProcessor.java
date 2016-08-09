@@ -23,33 +23,29 @@ import java.util.List;
 /**
  * Executes a DDL query on a database
  * <p/>
- * Both database and bulk query are resolved, if required, using the {@link org.mule.runtime.core.api.MuleEvent}
- * being processed.
+ * Both database and bulk query are resolved, if required, using the {@link org.mule.runtime.core.api.MuleEvent} being processed.
  */
-public class ExecuteDdlMessageProcessor extends AbstractSingleQueryDbMessageProcessor
-{
+public class ExecuteDdlMessageProcessor extends AbstractSingleQueryDbMessageProcessor {
 
-    private final QueryExecutorFactory queryExecutorFactory;
-    private final List<QueryType> validQueryTypes;
+  private final QueryExecutorFactory queryExecutorFactory;
+  private final List<QueryType> validQueryTypes;
 
-    public ExecuteDdlMessageProcessor(DbConfigResolver dbConfigResolver, QueryResolver queryResolver, QueryExecutorFactory queryExecutorFactory, TransactionalAction transactionalAction)
-    {
-        super(dbConfigResolver, queryResolver, transactionalAction);
-        this.queryExecutorFactory = queryExecutorFactory;
-        validQueryTypes = new ArrayList<QueryType>();
-        validQueryTypes.add(QueryType.DDL);
-    }
+  public ExecuteDdlMessageProcessor(DbConfigResolver dbConfigResolver, QueryResolver queryResolver,
+                                    QueryExecutorFactory queryExecutorFactory, TransactionalAction transactionalAction) {
+    super(dbConfigResolver, queryResolver, transactionalAction);
+    this.queryExecutorFactory = queryExecutorFactory;
+    validQueryTypes = new ArrayList<QueryType>();
+    validQueryTypes.add(QueryType.DDL);
+  }
 
-    @Override
-    protected List<QueryType> getValidQueryTypes()
-    {
-        return validQueryTypes;
-    }
+  @Override
+  protected List<QueryType> getValidQueryTypes() {
+    return validQueryTypes;
+  }
 
-    @Override
-    protected Object doExecuteQuery(DbConnection connection, Query query) throws SQLException
-    {
-        QueryExecutor queryExecutor = queryExecutorFactory.create();
-        return queryExecutor.execute(connection, query);
-    }
+  @Override
+  protected Object doExecuteQuery(DbConnection connection, Query query) throws SQLException {
+    QueryExecutor queryExecutor = queryExecutorFactory.create();
+    return queryExecutor.execute(connection, query);
+  }
 }

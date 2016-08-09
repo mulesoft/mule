@@ -25,264 +25,207 @@ import javax.security.auth.login.LoginException;
 import javax.security.auth.spi.LoginModule;
 
 /**
- * This is the Default Login Module for the Mule Jaas Authentication.
- * It extends Jaas' own LoginModule interface.
+ * This is the Default Login Module for the Mule Jaas Authentication. It extends Jaas' own LoginModule interface.
  */
-public class DefaultLoginModule implements LoginModule
-{
+public class DefaultLoginModule implements LoginModule {
 
-    // Callback Handlers
-    private CallbackHandler callbackHandler;
+  // Callback Handlers
+  private CallbackHandler callbackHandler;
 
-    // the authentication status
-    private boolean succeeded = false;
-    private boolean commitSucceeded = false;
+  // the authentication status
+  private boolean succeeded = false;
+  private boolean commitSucceeded = false;
 
-    // username and password
-    private String username;
-    private String password;
-    private String credentials;
-    private List<String> credentialList;
-    private Subject subject;
+  // username and password
+  private String username;
+  private String password;
+  private String credentials;
+  private List<String> credentialList;
+  private Subject subject;
 
-    /**
-     * Abort if authentication fails
-     *
-     * @return boolean
-     * @throws LoginException
-     */
-    public final boolean abort() throws LoginException
-    {
-        if (!succeeded)
-        {
-            return false;
-        }
-        else if (succeeded && !commitSucceeded)
-        {
-            // login succeeded but overall authentication failed
-            succeeded = false;
-            username = null;
-            if (password != null)
-            {
-                password = null;
-            }
-        }
-        else
-        {
-            // overall authentication succeeded and commit succeeded,
-            // but someone else's commit failed
-            logout();
-        }
-        return true;
+  /**
+   * Abort if authentication fails
+   *
+   * @return boolean
+   * @throws LoginException
+   */
+  public final boolean abort() throws LoginException {
+    if (!succeeded) {
+      return false;
+    } else if (succeeded && !commitSucceeded) {
+      // login succeeded but overall authentication failed
+      succeeded = false;
+      username = null;
+      if (password != null) {
+        password = null;
+      }
+    } else {
+      // overall authentication succeeded and commit succeeded,
+      // but someone else's commit failed
+      logout();
+    }
+    return true;
+  }
+
+  /**
+   * Commit if authentication succeeds, otherwise return false
+   *
+   * @return boolean
+   * @throws LoginException
+   */
+  public final boolean commit() throws LoginException {
+    if (!succeeded) {
+      return false;
+    } else {
+      // set the principal just authenticated in the subject
+      if (subject == null) {
+        return false;
+      }
+      MuleJaasPrincipal principal = new MuleJaasPrincipal(username);
+      Set entities = subject.getPrincipals();
+      if (!entities.contains(principal)) {
+        entities.add(principal);
+      }
+
+      // in any case, clean out state
+      username = null;
+      password = null;
+      commitSucceeded = true;
+      return true;
+    }
+  }
+
+  /**
+   * Initialises the callbackHandler, the credentials and the credentials list
+   *
+   * @param subject
+   * @param callbackHandler
+   * @param sharedState
+   * @param options
+   */
+  public final void initialize(Subject subject, CallbackHandler callbackHandler, Map sharedState, Map options) {
+    this.subject = subject;
+    this.callbackHandler = callbackHandler;
+
+    this.credentials = (String) options.get("credentials");
+    this.credentialList = getCredentialList(this.credentials);
+  }
+
+  /**
+   * This method attempts to login the user by checking his credentials against those of the authorised users.
+   *
+   * @throws LoginException This is thrown either when there is no callback Handler or else when the user fails to be
+   *         authenticated
+   */
+  public final boolean login() throws LoginException {
+    if (callbackHandler == null) {
+      throw new LoginException("Error: no CallbackHandler available " + "to garner authentication information from the user");
     }
 
-    /**
-     * Commit if authentication succeeds, otherwise return false
-     *
-     * @return boolean
-     * @throws LoginException
-     */
-    public final boolean commit() throws LoginException
-    {
-        if (!succeeded)
-        {
-            return false;
-        }
-        else
-        {
-            // set the principal just authenticated in the subject
-            if (subject == null)
-            {
-                return false;
-            }
-            MuleJaasPrincipal principal = new MuleJaasPrincipal(username);
-            Set entities = subject.getPrincipals();
-            if (!entities.contains(principal))
-            {
-              entities.add(principal);
-            }
-
-            // in any case, clean out state
-            username = null;
-            password = null;
-            commitSucceeded = true;
-            return true;
-        }
+    if (callbackHandler == null) {
+      throw new LoginException("no handler");
     }
 
-    /**
-     * Initialises the callbackHandler, the credentials and the credentials list
-     *
-     * @param subject
-     * @param callbackHandler
-     * @param sharedState
-     * @param options
-     */
-    public final void initialize(Subject subject,
-                                 CallbackHandler callbackHandler,
-                                 Map sharedState,
-                                 Map options)
-    {
-        this.subject = subject;
-        this.callbackHandler = callbackHandler;
+    NameCallback nameCb = new NameCallback("user: ");
+    PasswordCallback passCb = new PasswordCallback("password: ", true);
 
-        this.credentials = (String) options.get("credentials");
-        this.credentialList = getCredentialList(this.credentials);
+    // Create the callbacks to send to the Callback Handler
+    Callback[] callbacks = new Callback[] {nameCb, passCb};
+
+    // Call the handler to get the username and password of the user.
+    try {
+      callbackHandler.handle(callbacks);
+    } catch (IOException e) {
+      throw new LoginException(e.toString());
+    } catch (UnsupportedCallbackException e) {
+      throw new LoginException("Error: " + e.getCallback().toString() + " not available to garner authentication information "
+          + "from the user");
     }
 
-    /**
-     * This method attempts to login the user by checking his credentials against
-     * those of the authorised users.
-     *
-     * @throws LoginException This is thrown either when there is no callback Handler
-     *             or else when the user fails to be authenticated
-     */
-    public final boolean login() throws LoginException
-    {
-        if (callbackHandler == null)
-        {
-            throw new LoginException("Error: no CallbackHandler available "
-                                     + "to garner authentication information from the user");
-        }
+    username = nameCb.getName();
+    password = new String(passCb.getPassword());
 
-        if (callbackHandler == null)
-        {
-            throw new LoginException("no handler");
-        }
+    boolean usernameCorrect = false;
+    boolean passwordCorrect = false;
+    succeeded = false;
 
-        NameCallback nameCb = new NameCallback("user: ");
-        PasswordCallback passCb = new PasswordCallback("password: ", true);
+    // check the username and password against the list of authorised users
+    for (int i = 0; i < credentialList.size(); i = i + 2) {
+      if (username.equals(credentialList.get(i))) {
+        usernameCorrect = true;
+      } else {
+        usernameCorrect = false;
+      }
 
-        // Create the callbacks to send to the Callback Handler
-        Callback[] callbacks = new Callback[]{nameCb, passCb};
+      if (password.equals(credentialList.get(i + 1))) {
+        passwordCorrect = true;
+      } else {
+        passwordCorrect = false;
+      }
 
-        // Call the handler to get the username and password of the user.
-        try
-        {
-            callbackHandler.handle(callbacks);
-        }
-        catch (IOException e)
-        {
-            throw new LoginException(e.toString());
-        }
-        catch (UnsupportedCallbackException e)
-        {
-            throw new LoginException("Error: " + e.getCallback().toString()
-                                     + " not available to garner authentication information "
-                                     + "from the user");
-        }
-
-        username = nameCb.getName();
-        password = new String(passCb.getPassword());
-
-        boolean usernameCorrect = false;
-        boolean passwordCorrect = false;
-        succeeded = false;
-
-        // check the username and password against the list of authorised users
-        for (int i = 0; i < credentialList.size(); i = i + 2)
-        {
-            if (username.equals(credentialList.get(i)))
-            {
-                usernameCorrect = true;
-            }
-            else
-            {
-                usernameCorrect = false;
-            }
-
-            if (password.equals(credentialList.get(i + 1)))
-            {
-                passwordCorrect = true;
-            }
-            else
-            {
-                passwordCorrect = false;
-            }
-
-            // only if both the username and password are correct will the user be
-            // authenticated
-            if ((usernameCorrect) & (passwordCorrect))
-            {
-                succeeded = true;
-            }
-        }
-
-        if (succeeded)
-        {
-            return true;
-        }
-        else
-        {
-            succeeded = false;
-            username = null;
-            password = null;
-            if (!usernameCorrect)
-            {
-                throw new FailedLoginException("User Name Incorrect");
-            }
-            else
-            {
-                throw new FailedLoginException("Password Incorrect");
-            }
-        }
+      // only if both the username and password are correct will the user be
+      // authenticated
+      if ((usernameCorrect) & (passwordCorrect)) {
+        succeeded = true;
+      }
     }
 
-    /**
-     * Returns true when authentication succeeds or false when it fails
-     *
-     * @return succeeded
-     */
-    public final boolean logout()
-    {
-        return succeeded;
+    if (succeeded) {
+      return true;
+    } else {
+      succeeded = false;
+      username = null;
+      password = null;
+      if (!usernameCorrect) {
+        throw new FailedLoginException("User Name Incorrect");
+      } else {
+        throw new FailedLoginException("Password Incorrect");
+      }
     }
+  }
 
-    /**
-     * This method parses the credentials string and populates the credentials list
-     * against which the username and password submitted with the request will be
-     * checked
-     *
-     * @param creds
-     * @return outputList
-     */
-    public final List<String> getCredentialList(String creds)
-    {
-        boolean semicolonIsFound = false;
-        boolean dividerIsFound = false;
-        char[] credentialArray = creds.toCharArray();
-        String user = "";
-        String passwd = "";
-        List<String> outputList = new Vector<String>();
+  /**
+   * Returns true when authentication succeeds or false when it fails
+   *
+   * @return succeeded
+   */
+  public final boolean logout() {
+    return succeeded;
+  }
 
-        for (int i = 0; i < creds.length(); i++)
-        {
-            if ((credentialArray[i] != ':') && (!dividerIsFound))
-            {
-                user = user + credentialArray[i];
-            }
-            else if ((credentialArray[i] == ':') && (!dividerIsFound))
-            {
-                dividerIsFound = true;
-            }
-            else if ((credentialArray[i] != ';') && (!semicolonIsFound) && (dividerIsFound))
-            {
-                passwd = passwd + credentialArray[i];
-            }
-            else if ((credentialArray[i] != ';') && (!semicolonIsFound) && (dividerIsFound))
-            {
-                passwd = passwd + credentialArray[i];
-            }
-            else if ((credentialArray[i] == ';') && (!semicolonIsFound) && (dividerIsFound))
-            {
-                outputList.add(user);
-                outputList.add(passwd);
-                semicolonIsFound = false;
-                dividerIsFound = false;
-                user = "";
-                passwd = "";
-            }
-        }
-        return outputList;
+  /**
+   * This method parses the credentials string and populates the credentials list against which the username and password
+   * submitted with the request will be checked
+   *
+   * @param creds
+   * @return outputList
+   */
+  public final List<String> getCredentialList(String creds) {
+    boolean semicolonIsFound = false;
+    boolean dividerIsFound = false;
+    char[] credentialArray = creds.toCharArray();
+    String user = "";
+    String passwd = "";
+    List<String> outputList = new Vector<String>();
+
+    for (int i = 0; i < creds.length(); i++) {
+      if ((credentialArray[i] != ':') && (!dividerIsFound)) {
+        user = user + credentialArray[i];
+      } else if ((credentialArray[i] == ':') && (!dividerIsFound)) {
+        dividerIsFound = true;
+      } else if ((credentialArray[i] != ';') && (!semicolonIsFound) && (dividerIsFound)) {
+        passwd = passwd + credentialArray[i];
+      } else if ((credentialArray[i] != ';') && (!semicolonIsFound) && (dividerIsFound)) {
+        passwd = passwd + credentialArray[i];
+      } else if ((credentialArray[i] == ';') && (!semicolonIsFound) && (dividerIsFound)) {
+        outputList.add(user);
+        outputList.add(passwd);
+        semicolonIsFound = false;
+        dividerIsFound = false;
+        user = "";
+        passwd = "";
+      }
     }
+    return outputList;
+  }
 }

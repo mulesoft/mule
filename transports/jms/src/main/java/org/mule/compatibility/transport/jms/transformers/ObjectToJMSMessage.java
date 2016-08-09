@@ -17,9 +17,8 @@ import java.nio.charset.Charset;
 import javax.jms.Message;
 
 /**
- * <code>ObjectToJMSMessage</code> will convert any object to a
- * <code>javax.jms.Message</code> or sub-type into an object. One of the 5 types of
- * JMS message will be created based on the type of Object passed in.
+ * <code>ObjectToJMSMessage</code> will convert any object to a <code>javax.jms.Message</code> or sub-type into an object. One of
+ * the 5 types of JMS message will be created based on the type of Object passed in.
  * <ul>
  * <li>java.lang.String - javax.jms.TextMessage</li>
  * <li>byte[] - javax.jms.BytesMessage</li>
@@ -27,47 +26,37 @@ import javax.jms.Message;
  * <li>java.io.InputStream - javax.jms.StreamMessage</li>
  * <li>java.lang.Object - javax.jms.ObjectMessage</li>
  * </ul>
- * Note that if compression is turned on then a <code>javax.jms.BytesMessage</code>
- * is sent.
+ * Note that if compression is turned on then a <code>javax.jms.BytesMessage</code> is sent.
  */
-public class ObjectToJMSMessage extends AbstractJmsTransformer
-{
+public class ObjectToJMSMessage extends AbstractJmsTransformer {
 
-    public ObjectToJMSMessage()
-    {
-        super();
+  public ObjectToJMSMessage() {
+    super();
+  }
+
+  @Override
+  protected void declareInputOutputClasses() {
+    setReturnDataType(DataType.fromType(Message.class));
+  }
+
+  @Override
+  public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException {
+    final MuleMessage message = event.getMessage();
+    try {
+      if (logger.isDebugEnabled()) {
+        logger.debug("Source object is " + ClassUtils.getSimpleName(message.getDataType().getType()));
+      }
+
+      Object result = transformToMessage(message);
+
+      if (logger.isDebugEnabled()) {
+        logger.debug("Resulting object is " + ClassUtils.getSimpleName(result.getClass()));
+      }
+
+      return result;
+    } catch (Exception e) {
+      throw new TransformerException(this, e);
     }
-
-    @Override
-    protected void declareInputOutputClasses()
-    {
-        setReturnDataType(DataType.fromType(Message.class));
-    }
-
-    @Override
-    public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException
-    {
-        final MuleMessage message = event.getMessage();
-        try
-        {
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Source object is " + ClassUtils.getSimpleName(message.getDataType().getType()));
-            }
-
-            Object result = transformToMessage(message);
-
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Resulting object is " + ClassUtils.getSimpleName(result.getClass()));
-            }
-
-            return result;
-        }
-        catch (Exception e)
-        {
-            throw new TransformerException(this, e);
-        }
-    }
+  }
 
 }

@@ -10,17 +10,15 @@ import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Test;
 
-public class NestExampleTestCase extends AbstractIntegrationTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "nest-example.xml";
-    }
+public class NestExampleTestCase extends AbstractIntegrationTestCase {
 
-    @Test
-    public void testParse()
-    {
-        // empty
-    }
+  @Override
+  protected String getConfigFile() {
+    return "nest-example.xml";
+  }
+
+  @Test
+  public void testParse() {
+    // empty
+  }
 }

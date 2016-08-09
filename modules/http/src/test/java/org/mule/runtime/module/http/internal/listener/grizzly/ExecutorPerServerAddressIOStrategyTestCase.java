@@ -30,42 +30,37 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ExecutorPerServerAddressIOStrategyTestCase extends AbstractMuleTestCase
-{
+public class ExecutorPerServerAddressIOStrategyTestCase extends AbstractMuleTestCase {
 
-    @Mock
-    private ExecutorProvider executorProvider;
-    @Mock
-    private Connection connection;
-    @Mock
-    private Executor executor;
+  @Mock
+  private ExecutorProvider executorProvider;
+  @Mock
+  private Connection connection;
+  @Mock
+  private Executor executor;
 
-    private IOStrategy ioStrategy;
+  private IOStrategy ioStrategy;
 
-    @Before
-    public void before() throws UnknownHostException
-    {
-        ioStrategy = new ExecutorPerServerAddressIOStrategy(executorProvider);
-        when(connection.getLocalAddress()).thenReturn(new InetSocketAddress(InetAddress.getLocalHost(), 80));
-        when(executorProvider.getExecutor(any(ServerAddress.class))).thenReturn(executor);
-    }
+  @Before
+  public void before() throws UnknownHostException {
+    ioStrategy = new ExecutorPerServerAddressIOStrategy(executorProvider);
+    when(connection.getLocalAddress()).thenReturn(new InetSocketAddress(InetAddress.getLocalHost(), 80));
+    when(executorProvider.getExecutor(any(ServerAddress.class))).thenReturn(executor);
+  }
 
-    @Test
-    public void serverAcceptIOEventDoesNotUseExecutor()
-    {
-        assertThat(ioStrategy.getThreadPoolFor(connection, IOEvent.SERVER_ACCEPT), is(nullValue()));
-    }
+  @Test
+  public void serverAcceptIOEventDoesNotUseExecutor() {
+    assertThat(ioStrategy.getThreadPoolFor(connection, IOEvent.SERVER_ACCEPT), is(nullValue()));
+  }
 
-    @Test
-    public void readIOEventUsesExecutor()
-    {
-        assertThat(ioStrategy.getThreadPoolFor(connection, IOEvent.READ), is(equalTo(executor)));
-    }
+  @Test
+  public void readIOEventUsesExecutor() {
+    assertThat(ioStrategy.getThreadPoolFor(connection, IOEvent.READ), is(equalTo(executor)));
+  }
 
-    @Test
-    public void closeIOEventUsesExecutor()
-    {
-        assertThat(ioStrategy.getThreadPoolFor(connection, IOEvent.CLOSED), is(equalTo(executor)));
-    }
+  @Test
+  public void closeIOEventUsesExecutor() {
+    assertThat(ioStrategy.getThreadPoolFor(connection, IOEvent.CLOSED), is(equalTo(executor)));
+  }
 
 }

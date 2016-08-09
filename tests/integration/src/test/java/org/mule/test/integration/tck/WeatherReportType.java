@@ -11,8 +11,8 @@ import javax.xml.bind.annotation.XmlType;
 
 @XmlRootElement(name = "weatherReport")
 @XmlType(name = "WeatherReportType")
-public class WeatherReportType
-{
-    public String zipCode;
-    public String report;
+public class WeatherReportType {
+
+  public String zipCode;
+  public String report;
 }

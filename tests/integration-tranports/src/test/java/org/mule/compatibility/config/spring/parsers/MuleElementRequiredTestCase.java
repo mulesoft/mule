@@ -8,19 +8,16 @@ package org.mule.compatibility.config.spring.parsers;
 
 import org.junit.Test;
 
-public class MuleElementRequiredTestCase extends AbstractBadConfigTestCase
-{
+public class MuleElementRequiredTestCase extends AbstractBadConfigTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "mule-element-required-test.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "mule-element-required-test.xml";
+  }
 
-    @Test
-    public void testHelpfulErrorMessage() throws Exception
-    {
-        assertErrorContains("This element should be embedded");
-    }
+  @Test
+  public void testHelpfulErrorMessage() throws Exception {
+    assertErrorContains("This element should be embedded");
+  }
 
 }

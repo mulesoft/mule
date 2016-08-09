@@ -9,18 +9,15 @@ package org.mule.runtime.module.http.internal.request;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.module.http.api.HttpConstants;
 
-public class FailureStatusCodeValidator extends RangeStatusCodeValidator
-{
+public class FailureStatusCodeValidator extends RangeStatusCodeValidator {
 
-    @Override
-    public void validate(MuleEvent responseEvent) throws ResponseValidatorException
-    {
-        int status = responseEvent.getMessage().getInboundProperty(HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY);
+  @Override
+  public void validate(MuleEvent responseEvent) throws ResponseValidatorException {
+    int status = responseEvent.getMessage().getInboundProperty(HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY);
 
-        if (belongs(status))
-        {
-            throw new ResponseValidatorException(String.format("Response code %d mapped as failure", status), responseEvent);
-        }
+    if (belongs(status)) {
+      throw new ResponseValidatorException(String.format("Response code %d mapped as failure", status), responseEvent);
     }
+  }
 
 }

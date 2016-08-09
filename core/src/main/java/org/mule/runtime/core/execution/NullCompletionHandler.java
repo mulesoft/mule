@@ -15,18 +15,15 @@ import org.mule.runtime.api.execution.ExceptionCallback;
  * @since 4.0
  */
 public class NullCompletionHandler<Response, ProcessingException extends Throwable, HandledCompletionExceptionResult>
-        implements CompletionHandler<Response, ProcessingException, HandledCompletionExceptionResult>
-{
+    implements CompletionHandler<Response, ProcessingException, HandledCompletionExceptionResult> {
 
-    @Override
-    public void onCompletion(Response result, ExceptionCallback<HandledCompletionExceptionResult, Exception> exceptionCallback)
-    {
-        //Nothing to do
-    }
+  @Override
+  public void onCompletion(Response result, ExceptionCallback<HandledCompletionExceptionResult, Exception> exceptionCallback) {
+    // Nothing to do
+  }
 
-    @Override
-    public void onFailure(ProcessingException exception)
-    {
-        //Nothing to do
-    }
+  @Override
+  public void onFailure(ProcessingException exception) {
+    // Nothing to do
+  }
 }

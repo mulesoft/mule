@@ -14,11 +14,14 @@ import org.mule.runtime.core.api.processor.MessageProcessor;
  * @deprecated Transport infrastructure is deprecated.
  */
 @Deprecated
-public interface EndpointMessageProcessorChainFactory
-{
-    public MessageProcessor createInboundMessageProcessorChain(InboundEndpoint endpoint, FlowConstruct flowConstruct, MessageProcessor target) throws MuleException;
-    
-    public MessageProcessor createOutboundMessageProcessorChain(OutboundEndpoint endpoint, MessageProcessor target) throws MuleException;
+public interface EndpointMessageProcessorChainFactory {
+
+  public MessageProcessor createInboundMessageProcessorChain(InboundEndpoint endpoint, FlowConstruct flowConstruct,
+                                                             MessageProcessor target)
+      throws MuleException;
+
+  public MessageProcessor createOutboundMessageProcessorChain(OutboundEndpoint endpoint, MessageProcessor target)
+      throws MuleException;
 }
 
 

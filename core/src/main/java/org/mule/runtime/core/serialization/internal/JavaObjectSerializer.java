@@ -16,59 +16,51 @@ import java.io.Serializable;
 
 /**
  * Implementation of {@link org.mule.runtime.core.api.serialization.ObjectSerializer} that uses Java's default serialization
- * mechanism. This means that exceptions will come from serializing objects that do
- * not implement {@link Serializable}
+ * mechanism. This means that exceptions will come from serializing objects that do not implement {@link Serializable}
  *
  * @since 3.7.0
  */
-public class JavaObjectSerializer extends AbstractObjectSerializer
-{
+public class JavaObjectSerializer extends AbstractObjectSerializer {
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void serialize(Object object, OutputStream out) throws SerializationException
-    {
-        validateForSerialization(object);
-        SerializationUtils.serialize((Serializable) object, out);
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void serialize(Object object, OutputStream out) throws SerializationException {
+    validateForSerialization(object);
+    SerializationUtils.serialize((Serializable) object, out);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected byte[] doSerialize(Object object) throws Exception {
+    validateForSerialization(object);
+    return SerializationUtils.serialize((Serializable) object);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected <T> T doDeserialize(InputStream inputStream, ClassLoader classLoader) throws Exception {
+    checkArgument(inputStream != null, "Cannot deserialize a null stream");
+    checkArgument(classLoader != null, "Cannot deserialize with a null classloader");
+
+    return (T) SerializationUtils.deserialize(inputStream, classLoader, muleContext);
+  }
+
+  @Override
+  protected <T> T postInitialize(T object) {
+    // does nothing since SerializationUtils already does this on its own
+    return object;
+  }
+
+  private void validateForSerialization(Object object) {
+    if (object != null && !(object instanceof Serializable)) {
+      throw new SerializationException(String.format("Was expecting a Serializable type. %s was found instead",
+                                                     object.getClass().getName()));
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected byte[] doSerialize(Object object) throws Exception
-    {
-        validateForSerialization(object);
-        return SerializationUtils.serialize((Serializable) object);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected <T> T doDeserialize(InputStream inputStream, ClassLoader classLoader) throws Exception
-    {
-        checkArgument(inputStream != null, "Cannot deserialize a null stream");
-        checkArgument(classLoader != null, "Cannot deserialize with a null classloader");
-
-        return (T) SerializationUtils.deserialize(inputStream, classLoader, muleContext);
-    }
-
-    @Override
-    protected <T> T postInitialize(T object)
-    {
-        //does nothing since SerializationUtils already does this on its own
-        return object;
-    }
-
-    private void validateForSerialization(Object object)
-    {
-        if (object != null && !(object instanceof Serializable))
-        {
-            throw new SerializationException(String.format(
-                    "Was expecting a Serializable type. %s was found instead", object.getClass().getName()));
-        }
-    }
+  }
 }

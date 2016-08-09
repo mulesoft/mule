@@ -24,28 +24,25 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class ConnectionArgumentResolverTestCase extends AbstractMuleTestCase
-{
+public class ConnectionArgumentResolverTestCase extends AbstractMuleTestCase {
 
-    @Mock
-    private OperationContextAdapter operationContext;
+  @Mock
+  private OperationContextAdapter operationContext;
 
-    private ConnectionArgumentResolver resolver = new ConnectionArgumentResolver();
+  private ConnectionArgumentResolver resolver = new ConnectionArgumentResolver();
 
-    @Test
-    public void resolve() throws Exception
-    {
-        ConnectionHandler connectionHandler = mock(ConnectionHandler.class);
-        final Object connection = new Object();
-        when(connectionHandler.getConnection()).thenReturn(connection);
-        when(operationContext.getVariable(CONNECTION_PARAM)).thenReturn(connectionHandler);
+  @Test
+  public void resolve() throws Exception {
+    ConnectionHandler connectionHandler = mock(ConnectionHandler.class);
+    final Object connection = new Object();
+    when(connectionHandler.getConnection()).thenReturn(connection);
+    when(operationContext.getVariable(CONNECTION_PARAM)).thenReturn(connectionHandler);
 
-        assertThat(resolver.resolve(operationContext), is(sameInstance(connection)));
-    }
+    assertThat(resolver.resolve(operationContext), is(sameInstance(connection)));
+  }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void noConnection()
-    {
-        resolver.resolve(operationContext);
-    }
+  @Test(expected = IllegalArgumentException.class)
+  public void noConnection() {
+    resolver.resolve(operationContext);
+  }
 }

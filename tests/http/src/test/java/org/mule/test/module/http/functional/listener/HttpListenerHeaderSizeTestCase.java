@@ -24,44 +24,42 @@ import org.apache.http.client.fluent.Request;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpListenerHeaderSizeTestCase extends AbstractHttpTestCase
-{
+public class HttpListenerHeaderSizeTestCase extends AbstractHttpTestCase {
 
-    private static final int SIZE_DELTA = 1000;
+  private static final int SIZE_DELTA = 1000;
 
-    @Rule
-    public SystemProperty maxHeaderSectionSizeSystemProperty = new SystemProperty(MAXIMUM_HEADER_SECTION_SIZE_PROPERTY_KEY, "10000");
-    @Rule
-    public DynamicPort dynamicPort = new DynamicPort("port");
+  @Rule
+  public SystemProperty maxHeaderSectionSizeSystemProperty =
+      new SystemProperty(MAXIMUM_HEADER_SECTION_SIZE_PROPERTY_KEY, "10000");
+  @Rule
+  public DynamicPort dynamicPort = new DynamicPort("port");
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "http-listener-max-header-size-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "http-listener-max-header-size-config.xml";
+  }
 
-    @Test
-    public void maxHeaderSizeExceeded() throws Exception
-    {
-        HttpResponse response = sendRequestWithQueryParam(Integer.valueOf(maxHeaderSectionSizeSystemProperty.getValue()) + SIZE_DELTA);
-        StatusLine statusLine = response.getStatusLine();
-        assertThat(statusLine.getStatusCode(), is(BAD_REQUEST.getStatusCode()));
-        assertThat(statusLine.getReasonPhrase(), is(BAD_REQUEST.getReasonPhrase()));
-    }
+  @Test
+  public void maxHeaderSizeExceeded() throws Exception {
+    HttpResponse response =
+        sendRequestWithQueryParam(Integer.valueOf(maxHeaderSectionSizeSystemProperty.getValue()) + SIZE_DELTA);
+    StatusLine statusLine = response.getStatusLine();
+    assertThat(statusLine.getStatusCode(), is(BAD_REQUEST.getStatusCode()));
+    assertThat(statusLine.getReasonPhrase(), is(BAD_REQUEST.getReasonPhrase()));
+  }
 
-    @Test
-    public void maxHeaderSizeNotExceeded() throws Exception
-    {
-        int queryParamSize = Integer.valueOf(maxHeaderSectionSizeSystemProperty.getValue()) - SIZE_DELTA;
-        HttpResponse response = sendRequestWithQueryParam(queryParamSize);
-        assertThat(response.getStatusLine().getStatusCode(), is(OK.getStatusCode()));
-        assertThat((int) response.getEntity().getContentLength(), is(queryParamSize));
-    }
+  @Test
+  public void maxHeaderSizeNotExceeded() throws Exception {
+    int queryParamSize = Integer.valueOf(maxHeaderSectionSizeSystemProperty.getValue()) - SIZE_DELTA;
+    HttpResponse response = sendRequestWithQueryParam(queryParamSize);
+    assertThat(response.getStatusLine().getStatusCode(), is(OK.getStatusCode()));
+    assertThat((int) response.getEntity().getContentLength(), is(queryParamSize));
+  }
 
-    private HttpResponse sendRequestWithQueryParam(int queryParamSize) throws Exception
-    {
-        String longQueryParamValue = RandomStringUtils.randomAlphanumeric(queryParamSize);
-        String urlWithQueryParameter = appendQueryParam(format("http://localhost:%d/", dynamicPort.getNumber()), "longQueryParam", longQueryParamValue);
-        return Request.Post(urlWithQueryParameter).execute().returnResponse();
-    }
+  private HttpResponse sendRequestWithQueryParam(int queryParamSize) throws Exception {
+    String longQueryParamValue = RandomStringUtils.randomAlphanumeric(queryParamSize);
+    String urlWithQueryParameter =
+        appendQueryParam(format("http://localhost:%d/", dynamicPort.getNumber()), "longQueryParam", longQueryParamValue);
+    return Request.Post(urlWithQueryParameter).execute().returnResponse();
+  }
 }

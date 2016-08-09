@@ -10,24 +10,21 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 
 /**
- * <code>TooManySatisfiableMethodsException</code> is thrown by EntryPointResolvers
- * when the service passed has more than one method that meets the criteria of the
- * configured EntryPointResolver.
+ * <code>TooManySatisfiableMethodsException</code> is thrown by EntryPointResolvers when the service passed has more than one
+ * method that meets the criteria of the configured EntryPointResolver.
  *
  * @see org.mule.runtime.core.api.model.EntryPointResolver
  */
-public class TooManySatisfiableMethodsException extends MuleException
-{
-    /** Serial version */
-    private static final long serialVersionUID = 7856775581858822364L;
+public class TooManySatisfiableMethodsException extends MuleException {
 
-    public TooManySatisfiableMethodsException(Object component, Object[] types)
-    {
-        super(CoreMessages.tooManyAcceptableMethodsOnObjectForTypes(component, types));
-    }
+  /** Serial version */
+  private static final long serialVersionUID = 7856775581858822364L;
 
-    public TooManySatisfiableMethodsException(Object component, Class<?> returnType)
-    {
-        super(CoreMessages.tooManyMatchingMethodsOnObjectWhichReturn(component, returnType));
-    }
+  public TooManySatisfiableMethodsException(Object component, Object[] types) {
+    super(CoreMessages.tooManyAcceptableMethodsOnObjectForTypes(component, types));
+  }
+
+  public TooManySatisfiableMethodsException(Object component, Class<?> returnType) {
+    super(CoreMessages.tooManyMatchingMethodsOnObjectWhichReturn(component, returnType));
+  }
 }

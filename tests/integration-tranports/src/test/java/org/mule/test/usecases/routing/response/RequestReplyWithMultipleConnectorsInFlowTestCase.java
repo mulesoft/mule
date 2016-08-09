@@ -12,30 +12,26 @@ import org.junit.Ignore;
 import org.junit.Rule;
 
 @Ignore("Depends on http transport")
-public class RequestReplyWithMultipleConnectorsInFlowTestCase extends RequestReplyInFlowTestCase
-{
+public class RequestReplyWithMultipleConnectorsInFlowTestCase extends RequestReplyInFlowTestCase {
 
-    private static final String CONNECTOR_REF_ATTRIBUTE = "?connector=default";
+  private static final String CONNECTOR_REF_ATTRIBUTE = "?connector=default";
 
-    @Rule
-    public DynamicPort port = new DynamicPort("port1");
+  @Rule
+  public DynamicPort port = new DynamicPort("port1");
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/usecases/routing/response/request-reply-with-multiple-connectors-flow.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/usecases/routing/response/request-reply-with-multiple-connectors-flow.xml";
+  }
 
-    @Override
-    protected String getDestinationUrl()
-    {
-        return super.getDestinationUrl() + CONNECTOR_REF_ATTRIBUTE;
-    }
+  @Override
+  protected String getDestinationUrl() {
+    return super.getDestinationUrl() + CONNECTOR_REF_ATTRIBUTE;
+  }
 
-    @Override
-    protected String getDispatchUrl()
-    {
-        return super.getDispatchUrl() + CONNECTOR_REF_ATTRIBUTE;
-    }
+  @Override
+  protected String getDispatchUrl() {
+    return super.getDispatchUrl() + CONNECTOR_REF_ATTRIBUTE;
+  }
 
 }

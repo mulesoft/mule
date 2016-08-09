@@ -17,54 +17,48 @@ import java.util.List;
  * Manages a filter collection. Used as the base clas for the Or and AND filters
  */
 
-public abstract class AbstractFilterCollection implements Filter, ObjectFilter
-{
-    private List<Filter> filters;
+public abstract class AbstractFilterCollection implements Filter, ObjectFilter {
 
-    public AbstractFilterCollection()
-    {
-        filters = new ArrayList<>();
-    }
+  private List<Filter> filters;
 
-    public AbstractFilterCollection(List<Filter> filters)
-    {
-        this();
-        this.filters = filters;
-    }
+  public AbstractFilterCollection() {
+    filters = new ArrayList<>();
+  }
 
-    public AbstractFilterCollection(Filter... filters)
-    {
-        this();
-        for (Filter filter : filters)
-        {
-            this.filters.add(filter);
-        }
-    }
+  public AbstractFilterCollection(List<Filter> filters) {
+    this();
+    this.filters = filters;
+  }
 
-    public List<Filter> getFilters()
-    {
-        return filters;
+  public AbstractFilterCollection(Filter... filters) {
+    this();
+    for (Filter filter : filters) {
+      this.filters.add(filter);
     }
+  }
 
-    public void setFilters(List<Filter> filters)
-    {
-        this.filters = filters;
-    }
-    
-    @Override
-    public boolean equals(Object obj)
-    {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
+  public List<Filter> getFilters() {
+    return filters;
+  }
 
-        final AbstractFilterCollection other = (AbstractFilterCollection) obj;
-        return ClassUtils.equal(filters, other.filters);
-    }
+  public void setFilters(List<Filter> filters) {
+    this.filters = filters;
+  }
 
-    @Override
-    public int hashCode()
-    {
-        return ClassUtils.hash(new Object[]{this.getClass(), filters});
-    }
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null || getClass() != obj.getClass())
+      return false;
+
+    final AbstractFilterCollection other = (AbstractFilterCollection) obj;
+    return ClassUtils.equal(filters, other.filters);
+  }
+
+  @Override
+  public int hashCode() {
+    return ClassUtils.hash(new Object[] {this.getClass(), filters});
+  }
 
 }

@@ -14,88 +14,78 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-public class VersionRangeTestCase extends AbstractMuleTestCase
-{
-    
-    @Test
-    public void testSingleVersionRange()
-    {
-    	VersionRange vr = new VersionRange("[1.5.0_11,1.6)");
-    	assertNotNull(vr);
-    	assertTrue(vr.isLowerBoundInclusive());
-    	assertFalse(vr.isUpperBoundInclusive());
-    	assertEquals("1.5.0_11", vr.getLowerVersion());
-    	assertEquals("1.6", vr.getUpperVersion());
-    	
-    	vr = new VersionRange("(1.5.0_11-b05,2.7.12]");
-    	assertNotNull(vr);
-    	assertFalse(vr.isLowerBoundInclusive());
-    	assertTrue(vr.isUpperBoundInclusive());
-    	assertEquals("1.5.0_11-b05", vr.getLowerVersion());
-    	assertEquals("2.7.12", vr.getUpperVersion());
-    }
-    
-    @Test
-    public void testCreateVersionRanges()
-    {
-    	List<VersionRange> ranges = VersionRange.createVersionRanges("(,1.4.2),[1.5.0_11,1.6),[1.7,]");
-    	assertNotNull(ranges);
-    	assertEquals(3, ranges.size());
-    	
-    	VersionRange vr = ranges.get(0);
-    	assertFalse(vr.isLowerBoundInclusive());
-    	assertFalse(vr.isUpperBoundInclusive());
-    	assertEquals("", vr.getLowerVersion());
-    	assertEquals("1.4.2", vr.getUpperVersion());
-    	
-    	vr = ranges.get(1);
-    	assertTrue(vr.isLowerBoundInclusive());
-    	assertFalse(vr.isUpperBoundInclusive());
-    	assertEquals("1.5.0_11", vr.getLowerVersion());
-    	assertEquals("1.6", vr.getUpperVersion());
-    	
-    	vr = ranges.get(2);
-    	assertTrue(vr.isLowerBoundInclusive());
-    	assertTrue(vr.isUpperBoundInclusive());
-    	assertEquals("1.7", vr.getLowerVersion());
-    	assertEquals("", vr.getUpperVersion());
-    }
+public class VersionRangeTestCase extends AbstractMuleTestCase {
 
-    @Test(expected=IllegalArgumentException.class)
-    public void testInvalidDelimiter()
-    {
-    	VersionRange range = new VersionRange("{1.3,1.4.2)");
-    }
+  @Test
+  public void testSingleVersionRange() {
+    VersionRange vr = new VersionRange("[1.5.0_11,1.6)");
+    assertNotNull(vr);
+    assertTrue(vr.isLowerBoundInclusive());
+    assertFalse(vr.isUpperBoundInclusive());
+    assertEquals("1.5.0_11", vr.getLowerVersion());
+    assertEquals("1.6", vr.getUpperVersion());
 
-    @Test(expected=IllegalArgumentException.class)
-    public void testMissingDelimiter()
-    {
-    	VersionRange range = new VersionRange("1.3,1.4.2)");
-    }
+    vr = new VersionRange("(1.5.0_11-b05,2.7.12]");
+    assertNotNull(vr);
+    assertFalse(vr.isLowerBoundInclusive());
+    assertTrue(vr.isUpperBoundInclusive());
+    assertEquals("1.5.0_11-b05", vr.getLowerVersion());
+    assertEquals("2.7.12", vr.getUpperVersion());
+  }
 
-    @Test(expected=IllegalArgumentException.class)
-    public void testInvalidVersion()
-    {
-    	VersionRange range = new VersionRange("[1.3,0,1.4.2)");
-    }
+  @Test
+  public void testCreateVersionRanges() {
+    List<VersionRange> ranges = VersionRange.createVersionRanges("(,1.4.2),[1.5.0_11,1.6),[1.7,]");
+    assertNotNull(ranges);
+    assertEquals(3, ranges.size());
 
-    @Test(expected=IllegalArgumentException.class)
-    public void testInvalidCreateVersionRanges()
-    {
-    	List<VersionRange> ranges = VersionRange.createVersionRanges("(,1.4.2),1.5.0_11,1.6),[1.7,]");
-    	for (VersionRange vr : ranges)
-    	{
-    		System.out.println(vr);
-    	}
-    }
+    VersionRange vr = ranges.get(0);
+    assertFalse(vr.isLowerBoundInclusive());
+    assertFalse(vr.isUpperBoundInclusive());
+    assertEquals("", vr.getLowerVersion());
+    assertEquals("1.4.2", vr.getUpperVersion());
 
-    @Test(expected=IllegalArgumentException.class)
-    public void testInvalidDelimiterCreateVersionRanges()
-    {
-    	List<VersionRange> ranges = VersionRange.createVersionRanges("(,1.4.2)|[1.5.0_11,1.6)|[1.7,]");
-    	for (VersionRange vr : ranges)
-    	{
-    		System.out.println(vr);
-    	}
+    vr = ranges.get(1);
+    assertTrue(vr.isLowerBoundInclusive());
+    assertFalse(vr.isUpperBoundInclusive());
+    assertEquals("1.5.0_11", vr.getLowerVersion());
+    assertEquals("1.6", vr.getUpperVersion());
+
+    vr = ranges.get(2);
+    assertTrue(vr.isLowerBoundInclusive());
+    assertTrue(vr.isUpperBoundInclusive());
+    assertEquals("1.7", vr.getLowerVersion());
+    assertEquals("", vr.getUpperVersion());
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testInvalidDelimiter() {
+    VersionRange range = new VersionRange("{1.3,1.4.2)");
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testMissingDelimiter() {
+    VersionRange range = new VersionRange("1.3,1.4.2)");
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testInvalidVersion() {
+    VersionRange range = new VersionRange("[1.3,0,1.4.2)");
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testInvalidCreateVersionRanges() {
+    List<VersionRange> ranges = VersionRange.createVersionRanges("(,1.4.2),1.5.0_11,1.6),[1.7,]");
+    for (VersionRange vr : ranges) {
+      System.out.println(vr);
     }
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testInvalidDelimiterCreateVersionRanges() {
+    List<VersionRange> ranges = VersionRange.createVersionRanges("(,1.4.2)|[1.5.0_11,1.6)|[1.7,]");
+    for (VersionRange vr : ranges) {
+      System.out.println(vr);
+    }
+  }
 }

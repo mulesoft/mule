@@ -30,54 +30,50 @@ import org.junit.Test;
 
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 
-public class HttpRequestInboundAttachmentsTestCase extends AbstractHttpRequestTestCase
-{
+public class HttpRequestInboundAttachmentsTestCase extends AbstractHttpRequestTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "http-request-inbound-attachments-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "http-request-inbound-attachments-config.xml";
+  }
 
-    @Test
-    public void processInboundAttachments() throws Exception
-    {
-        MuleEvent event = flowRunner("requestFlow").withPayload(TEST_MESSAGE).run();
+  @Test
+  public void processInboundAttachments() throws Exception {
+    MuleEvent event = flowRunner("requestFlow").withPayload(TEST_MESSAGE).run();
 
-        assertThat(event.getMessage().getPayload(), instanceOf(MultiPartPayload.class));
+    assertThat(event.getMessage().getPayload(), instanceOf(MultiPartPayload.class));
 
-        MultiPartPayload payload = event.getMessage().getPayload();
-        assertThat(payload.getParts(), hasSize(2));
-        assertAttachment(payload, "partName1", "Test part 1", MediaType.TEXT);
-        assertAttachment(payload, "partName2", "Test part 2", MediaType.HTML);
-    }
+    MultiPartPayload payload = event.getMessage().getPayload();
+    assertThat(payload.getParts(), hasSize(2));
+    assertAttachment(payload, "partName1", "Test part 1", MediaType.TEXT);
+    assertAttachment(payload, "partName2", "Test part 2", MediaType.HTML);
+  }
 
-    private void assertAttachment(MultiPartPayload payload, String attachmentName, String attachmentContents, MediaType contentType) throws IOException
-    {
-        assertTrue(payload.getPartNames().contains(attachmentName));
+  private void assertAttachment(MultiPartPayload payload, String attachmentName, String attachmentContents, MediaType contentType)
+      throws IOException {
+    assertTrue(payload.getPartNames().contains(attachmentName));
 
-        org.mule.runtime.api.message.MuleMessage attachment = payload.getPart(attachmentName);
-        assertThat(attachment.getDataType().getMediaType(), equalTo(contentType));
+    org.mule.runtime.api.message.MuleMessage attachment = payload.getPart(attachmentName);
+    assertThat(attachment.getDataType().getMediaType(), equalTo(contentType));
 
-        assertThat(IOUtils.toString((InputStream) attachment.getPayload()), equalTo(attachmentContents));
-    }
+    assertThat(IOUtils.toString((InputStream) attachment.getPayload()), equalTo(attachmentContents));
+  }
 
-    @Override
-    protected void handleRequest(Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException
-    {
-        MultiPartWriter multiPartWriter = new MultiPartWriter(response.getWriter());
+  @Override
+  protected void handleRequest(Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException {
+    MultiPartWriter multiPartWriter = new MultiPartWriter(response.getWriter());
 
-        response.setContentType(HttpHeaders.Values.MULTIPART_FORM_DATA + "; boundary=" + multiPartWriter.getBoundary());
-        response.setStatus(SC_OK);
+    response.setContentType(HttpHeaders.Values.MULTIPART_FORM_DATA + "; boundary=" + multiPartWriter.getBoundary());
+    response.setStatus(SC_OK);
 
-        multiPartWriter.startPart(MediaType.TEXT.toRfcString(), new String[] {"Content-Disposition: form-data; name=\"partName1\""});
-        multiPartWriter.write("Test part 1");
-        multiPartWriter.endPart();
+    multiPartWriter.startPart(MediaType.TEXT.toRfcString(), new String[] {"Content-Disposition: form-data; name=\"partName1\""});
+    multiPartWriter.write("Test part 1");
+    multiPartWriter.endPart();
 
-        multiPartWriter.startPart(MediaType.HTML.toRfcString(), new String[] {"Content-Disposition: form-data; name=\"partName2\""});
-        multiPartWriter.write("Test part 2");
-        multiPartWriter.endPart();
+    multiPartWriter.startPart(MediaType.HTML.toRfcString(), new String[] {"Content-Disposition: form-data; name=\"partName2\""});
+    multiPartWriter.write("Test part 2");
+    multiPartWriter.endPart();
 
-        multiPartWriter.close();
-    }
+    multiPartWriter.close();
+  }
 }

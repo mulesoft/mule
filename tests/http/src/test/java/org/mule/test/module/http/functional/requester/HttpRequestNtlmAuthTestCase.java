@@ -17,55 +17,46 @@ import java.util.Collection;
 import org.junit.runners.Parameterized;
 
 @RunnerDelegateTo(Parameterized.class)
-public class HttpRequestNtlmAuthTestCase extends AbstractNtlmTestCase
-{
+public class HttpRequestNtlmAuthTestCase extends AbstractNtlmTestCase {
 
-    @Parameterized.Parameter(0)
-    public String flowName;
+  @Parameterized.Parameter(0)
+  public String flowName;
 
-    @Parameterized.Parameter(1)
-    public String domain;
+  @Parameterized.Parameter(1)
+  public String domain;
 
-    @Parameterized.Parameter(2)
-    public String workstation;
+  @Parameterized.Parameter(2)
+  public String workstation;
 
-    public HttpRequestNtlmAuthTestCase()
-    {
-        super(AUTHORIZATION, WWW_AUTHENTICATE, SC_UNAUTHORIZED);
-    }
+  public HttpRequestNtlmAuthTestCase() {
+    super(AUTHORIZATION, WWW_AUTHENTICATE, SC_UNAUTHORIZED);
+  }
 
-    @Parameterized.Parameters(name = "{0}")
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][] {
-                {"ntlmAuthRequestWithDomain", "Ursa-Minor", null},
-                {"ntlmAuthRequestWithoutDomain", "", null},
-                {"ntlmAuthRequestWithWorkstation", "Ursa-Minor", "LightCity"}});
-    }
+  @Parameterized.Parameters(name = "{0}")
+  public static Collection<Object[]> parameters() {
+    return Arrays.asList(new Object[][] {{"ntlmAuthRequestWithDomain", "Ursa-Minor", null},
+        {"ntlmAuthRequestWithoutDomain", "", null}, {"ntlmAuthRequestWithWorkstation", "Ursa-Minor", "LightCity"}});
+  }
 
-    @Override
-    protected String getWorkstation()
-    {
-        return workstation;
-    }
+  @Override
+  protected String getWorkstation() {
+    return workstation;
+  }
 
-    @Override
-    protected String getDomain()
-    {
-        return domain;
-    }
+  @Override
+  protected String getDomain() {
+    return domain;
+  }
 
-    @Override
-    protected String getFlowName()
-    {
-        return flowName;
-    }
+  @Override
+  protected String getFlowName() {
+    return flowName;
+  }
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "http-request-ntlm-auth-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "http-request-ntlm-auth-config.xml";
+  }
 
 
 }

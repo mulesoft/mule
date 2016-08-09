@@ -31,70 +31,60 @@ import org.junit.Test;
 /**
  * Test configuration of security filters
  */
-public class SecurityFilterTestCase extends FunctionalTestCase
-{
+public class SecurityFilterTestCase extends FunctionalTestCase {
+
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/config/security-filter-config.xml";
+  }
+
+  @Test
+  public void testConfig() throws Exception {
+    EndpointBuilder epb = lookupEndpointBuilder(muleContext.getRegistry(), "testEndpoint1");
+    assertNotNull(epb);
+    InboundEndpoint iep = epb.buildInboundEndpoint();
+    List<MessageProcessor> mps = iep.getMessageProcessors();
+    int count = 0;
+    SecurityFilterMessageProcessor securityMp = null;
+    for (MessageProcessor mp : mps) {
+      if (mp instanceof SecurityFilterMessageProcessor) {
+        count++;
+        securityMp = (SecurityFilterMessageProcessor) mp;
+      }
+    }
+    assertEquals(1, count);
+    assertEquals(CustomSecurityFilter.class, securityMp.getFilter().getClass());
+
+    epb = lookupEndpointBuilder(muleContext.getRegistry(), "testEndpoint2");
+    assertNotNull(epb);
+    iep = epb.buildInboundEndpoint();
+    mps = iep.getMessageProcessors();
+    count = 0;
+    securityMp = null;
+    for (MessageProcessor mp : mps) {
+      if (mp instanceof SecurityFilterMessageProcessor) {
+        count++;
+        securityMp = (SecurityFilterMessageProcessor) mp;
+      }
+    }
+    assertEquals(1, count);
+    assertEquals(MuleEncryptionEndpointSecurityFilter.class, securityMp.getFilter().getClass());
+  }
+
+  /**
+   * Custom security filter class that does nothing at all
+   */
+  public static class CustomSecurityFilter extends AbstractAuthenticationFilter {
+
     @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/config/security-filter-config.xml";
+    protected void doInitialise() throws InitialisationException {}
+
+    @Override
+    public void authenticate(MuleEvent event) throws SecurityException, UnknownAuthenticationTypeException,
+        CryptoFailureException, SecurityProviderNotFoundException, EncryptionStrategyNotFoundException, InitialisationException {
+      // TODO Auto-generated method stub
+
     }
-
-    @Test
-    public void testConfig() throws Exception
-    {
-        EndpointBuilder epb = lookupEndpointBuilder(muleContext.getRegistry(), "testEndpoint1");
-        assertNotNull(epb);
-        InboundEndpoint iep = epb.buildInboundEndpoint();
-        List<MessageProcessor> mps =iep.getMessageProcessors();
-        int count = 0;
-        SecurityFilterMessageProcessor securityMp = null;
-        for (MessageProcessor mp : mps)
-        {
-            if (mp instanceof SecurityFilterMessageProcessor)
-            {
-                count++;
-                securityMp = (SecurityFilterMessageProcessor) mp;
-            }
-        }
-        assertEquals(1, count);
-        assertEquals(CustomSecurityFilter.class, securityMp.getFilter().getClass());
-
-        epb = lookupEndpointBuilder(muleContext.getRegistry(), "testEndpoint2");
-        assertNotNull(epb);
-        iep = epb.buildInboundEndpoint();
-        mps =iep.getMessageProcessors();
-        count = 0;
-        securityMp = null;
-        for (MessageProcessor mp : mps)
-        {
-            if (mp instanceof SecurityFilterMessageProcessor)
-            {
-                count++;
-                securityMp = (SecurityFilterMessageProcessor) mp;
-            }
-        }
-        assertEquals(1, count);
-        assertEquals(MuleEncryptionEndpointSecurityFilter.class, securityMp.getFilter().getClass());
-    }
-
-    /**
-     * Custom security filter class that does nothing at all
-     */
-    public static class CustomSecurityFilter extends AbstractAuthenticationFilter
-    {
-        @Override
-        protected void doInitialise() throws InitialisationException
-        {
-        }
-
-        @Override
-        public void authenticate(MuleEvent event)
-                throws SecurityException, UnknownAuthenticationTypeException, CryptoFailureException,
-                SecurityProviderNotFoundException, EncryptionStrategyNotFoundException, InitialisationException
-        {
-            // TODO Auto-generated method stub
-
-        }
-    }
+  }
 
 }

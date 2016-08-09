@@ -17,43 +17,35 @@ import org.hamcrest.Factory;
 import org.hamcrest.Matcher;
 import org.junit.internal.matchers.TypeSafeMatcher;
 
-public class ContainsMessage extends TypeSafeMatcher<List<MuleMessage>>
-{
+public class ContainsMessage extends TypeSafeMatcher<List<MuleMessage>> {
 
-    private final String key;
-    private final Object value;
+  private final String key;
+  private final Object value;
 
-    public ContainsMessage(String key, Object value)
-    {
-        this.key = key;
-        this.value = value;
-    }
+  public ContainsMessage(String key, Object value) {
+    this.key = key;
+    this.value = value;
+  }
 
-    @Override
-    public boolean matchesSafely(List<MuleMessage> messages)
-    {
-        for (MuleMessage message : messages)
-        {
-            if (message.getPayload() instanceof Map)
-            {
-                if (((Map) message.getPayload()).get(key).equals(value))
-                {
-                    return true;
-                }
-            }
+  @Override
+  public boolean matchesSafely(List<MuleMessage> messages) {
+    for (MuleMessage message : messages) {
+      if (message.getPayload() instanceof Map) {
+        if (((Map) message.getPayload()).get(key).equals(value)) {
+          return true;
         }
-        return false;
+      }
     }
+    return false;
+  }
 
-    public void describeTo(Description description)
-    {
-        description.appendText("Does not contains a map payload with key = " + key + " and value = " + value);
-    }
+  public void describeTo(Description description) {
+    description.appendText("Does not contains a map payload with key = " + key + " and value = " + value);
+  }
 
-    @Factory
-    public static Matcher<List<MuleMessage>> mapPayloadWith(String key, Object value)
-    {
-        return new ContainsMessage(key, value);
-    }
+  @Factory
+  public static Matcher<List<MuleMessage>> mapPayloadWith(String key, Object value) {
+    return new ContainsMessage(key, value);
+  }
 
 }

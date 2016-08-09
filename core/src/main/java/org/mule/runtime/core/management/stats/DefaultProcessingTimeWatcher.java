@@ -20,106 +20,87 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DefaultProcessingTimeWatcher implements ProcessingTimeWatcher, MuleContextAware
-{
+public class DefaultProcessingTimeWatcher implements ProcessingTimeWatcher, MuleContextAware {
 
-    private static final Logger logger = LoggerFactory.getLogger(DefaultProcessingTimeWatcher.class);
+  private static final Logger logger = LoggerFactory.getLogger(DefaultProcessingTimeWatcher.class);
 
-    private final ReferenceQueue<ProcessingTime> queue = new ReferenceQueue<ProcessingTime>();
-    private final Map<ProcessingTimeReference, Object> refs = new ConcurrentHashMap<ProcessingTimeReference, Object>();
-    private Thread watcherThread;
-    private MuleContext muleContext;
+  private final ReferenceQueue<ProcessingTime> queue = new ReferenceQueue<ProcessingTime>();
+  private final Map<ProcessingTimeReference, Object> refs = new ConcurrentHashMap<ProcessingTimeReference, Object>();
+  private Thread watcherThread;
+  private MuleContext muleContext;
 
-    @Override
-    public void addProcessingTime(ProcessingTime processingTime)
-    {
-        refs.put(new ProcessingTimeReference(processingTime, queue), refs);
+  @Override
+  public void addProcessingTime(ProcessingTime processingTime) {
+    refs.put(new ProcessingTimeReference(processingTime, queue), refs);
+  }
+
+  @Override
+  public void start() throws MuleException {
+    String threadName = String.format("%sprocessing.time.monitor", ThreadNameHelper.getPrefix(muleContext));
+    watcherThread = new Thread(new ProcessingTimeChecker(), threadName);
+    watcherThread.setDaemon(true);
+    watcherThread.start();
+  }
+
+  @Override
+  public void stop() throws MuleException {
+    if (watcherThread != null) {
+      watcherThread.interrupt();
     }
+    refs.clear();
+  }
 
-    @Override
-    public void start() throws MuleException
-    {
-        String threadName = String.format("%sprocessing.time.monitor", ThreadNameHelper.getPrefix(muleContext));
-        watcherThread = new Thread(new ProcessingTimeChecker(), threadName);
-        watcherThread.setDaemon(true);
-        watcherThread.start();
-    }
+  @Override
+  public void setMuleContext(MuleContext muleContext) {
+    this.muleContext = muleContext;
+  }
 
-    @Override
-    public void stop() throws MuleException
-    {
-        if (watcherThread != null)
-        {
-            watcherThread.interrupt();
-        }
-        refs.clear();
-    }
-
-    @Override
-    public void setMuleContext(MuleContext muleContext)
-    {
-        this.muleContext = muleContext;
-    }
-
-    private class ProcessingTimeChecker implements Runnable
-    {
-
-        /**
-         * As weak references to completed ProcessingTimes are delivered, record them
-         */
-        public void run()
-        {
-            while (true)
-            {
-                try
-                {
-                    ProcessingTimeReference ref = (ProcessingTimeReference) queue.remove();
-                    refs.remove(ref);
-
-                    FlowConstructStatistics stats = ref.getStatistics();
-                    if (stats.isEnabled())
-                    {
-                        stats.addCompleteFlowExecutionTime(ref.getAccumulator().longValue());
-                    }
-                }
-                catch (InterruptedException ex)
-                {
-                    Thread.currentThread().interrupt();
-                    break;
-                }
-                catch (Exception ex)
-                {
-                    // Don't let exception escape -- it kills the thread
-                    logger.error("Error running {}. Thread will be stopped", this, ex);
-                }
-            }
-        }
-    }
+  private class ProcessingTimeChecker implements Runnable {
 
     /**
-     * Weak reference that includes flow statistics to be updated
+     * As weak references to completed ProcessingTimes are delivered, record them
      */
-    static class ProcessingTimeReference extends WeakReference<ProcessingTime>
-    {
+    public void run() {
+      while (true) {
+        try {
+          ProcessingTimeReference ref = (ProcessingTimeReference) queue.remove();
+          refs.remove(ref);
 
-        private FlowConstructStatistics statistics;
-        private AtomicLong accumulator;
-
-        ProcessingTimeReference(ProcessingTime time, ReferenceQueue<ProcessingTime> queue)
-        {
-            super(time, queue);
-            this.statistics = time.getStatistics();
-            this.accumulator = time.getAccumulator();
+          FlowConstructStatistics stats = ref.getStatistics();
+          if (stats.isEnabled()) {
+            stats.addCompleteFlowExecutionTime(ref.getAccumulator().longValue());
+          }
+        } catch (InterruptedException ex) {
+          Thread.currentThread().interrupt();
+          break;
+        } catch (Exception ex) {
+          // Don't let exception escape -- it kills the thread
+          logger.error("Error running {}. Thread will be stopped", this, ex);
         }
-
-        public AtomicLong getAccumulator()
-        {
-            return accumulator;
-        }
-
-        public FlowConstructStatistics getStatistics()
-        {
-            return statistics;
-        }
+      }
     }
+  }
+
+  /**
+   * Weak reference that includes flow statistics to be updated
+   */
+  static class ProcessingTimeReference extends WeakReference<ProcessingTime> {
+
+    private FlowConstructStatistics statistics;
+    private AtomicLong accumulator;
+
+    ProcessingTimeReference(ProcessingTime time, ReferenceQueue<ProcessingTime> queue) {
+      super(time, queue);
+      this.statistics = time.getStatistics();
+      this.accumulator = time.getAccumulator();
+    }
+
+    public AtomicLong getAccumulator() {
+      return accumulator;
+    }
+
+    public FlowConstructStatistics getStatistics() {
+      return statistics;
+    }
+  }
 }

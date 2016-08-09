@@ -27,52 +27,46 @@ import java.net.URLClassLoader;
 import org.junit.Test;
 
 @SmallTest
-public class IOUtilsTestCase extends AbstractMuleTestCase
-{
+public class IOUtilsTestCase extends AbstractMuleTestCase {
 
-    @Test
-    public void testLoadingResourcesAsStream() throws Exception
-    {
-        InputStream is = IOUtils.getResourceAsStream("log4j2-test.xml", getClass(), false, false);
-        assertNotNull(is);
+  @Test
+  public void testLoadingResourcesAsStream() throws Exception {
+    InputStream is = IOUtils.getResourceAsStream("log4j2-test.xml", getClass(), false, false);
+    assertNotNull(is);
 
-        is = IOUtils.getResourceAsStream("does-not-exist.properties", getClass(), false, false);
-        assertNull(is);
-    }
+    is = IOUtils.getResourceAsStream("does-not-exist.properties", getClass(), false, false);
+    assertNull(is);
+  }
 
-    @Test
-    public void bufferSize() throws Exception
-    {
-        InputStream in = new ByteArrayInputStream(new byte[8 * 1024]);
-        OutputStream out = mock(OutputStream.class);
+  @Test
+  public void bufferSize() throws Exception {
+    InputStream in = new ByteArrayInputStream(new byte[8 * 1024]);
+    OutputStream out = mock(OutputStream.class);
 
-        IOUtils.copyLarge(in, out);
+    IOUtils.copyLarge(in, out);
 
-        // Default buffer size of 4KB required two reads to copy 8KB input stream
-        verify(out, times(2)).write(any(byte[].class), anyInt(), anyInt());
-    }
+    // Default buffer size of 4KB required two reads to copy 8KB input stream
+    verify(out, times(2)).write(any(byte[].class), anyInt(), anyInt());
+  }
 
-    @Test
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    public void increaseBufferSizeViaSystemProperty() throws Exception
-    {
-        final int newBufferSize = 8 * 1024;
+  @Test
+  @SuppressWarnings({"rawtypes", "unchecked"})
+  public void increaseBufferSizeViaSystemProperty() throws Exception {
+    final int newBufferSize = 8 * 1024;
 
-        testWithSystemProperty(MuleProperties.MULE_STREAMING_BUFFER_SIZE, Integer.toString(newBufferSize),
-                () ->
-                {
-                    InputStream in = new ByteArrayInputStream(new byte[newBufferSize]);
-                    OutputStream out = mock(OutputStream.class);
+    testWithSystemProperty(MuleProperties.MULE_STREAMING_BUFFER_SIZE, Integer.toString(newBufferSize), () -> {
+      InputStream in = new ByteArrayInputStream(new byte[newBufferSize]);
+      OutputStream out = mock(OutputStream.class);
 
-                    Class clazz = ClassUtils.loadClass(IOUtils.class.getCanonicalName(), new URLClassLoader(
-                            ((URLClassLoader) Thread.currentThread().getContextClassLoader()).getURLs(), null));
-                    clazz.getMethod("copyLarge", InputStream.class, OutputStream.class).invoke(
-                            clazz.newInstance(), in, out);
+      Class clazz = ClassUtils
+          .loadClass(IOUtils.class.getCanonicalName(),
+                     new URLClassLoader(((URLClassLoader) Thread.currentThread().getContextClassLoader()).getURLs(), null));
+      clazz.getMethod("copyLarge", InputStream.class, OutputStream.class).invoke(clazz.newInstance(), in, out);
 
-                    // With 8KB buffer define via system property only 1 read is required for 8KB
-                    // input stream
-                    verify(out, times(1)).write(any(byte[].class), anyInt(), anyInt());
-                });
-    }
+      // With 8KB buffer define via system property only 1 read is required for 8KB
+      // input stream
+      verify(out, times(1)).write(any(byte[].class), anyInt(), anyInt());
+    });
+  }
 
 }

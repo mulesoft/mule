@@ -29,54 +29,51 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-public class ClientCredentialsFailureTestCase extends AbstractMuleTestCase
-{
+public class ClientCredentialsFailureTestCase extends AbstractMuleTestCase {
 
-    private static final String TOKEN_PATH = "/tokenUrl";
-    private static final String TOKEN_PATH_PROPERTY_NAME = "token.url";
+  private static final String TOKEN_PATH = "/tokenUrl";
+  private static final String TOKEN_PATH_PROPERTY_NAME = "token.url";
 
-    private DynamicPort dynamicPort = new DynamicPort("port");
+  private DynamicPort dynamicPort = new DynamicPort("port");
 
-    @Rule
-    public SystemProperty clientId = new SystemProperty("client.id", "ndli93xdws2qoe6ms1d389vl6bxquv3e");
-    @Rule
-    public SystemProperty clientSecret = new SystemProperty("client.secret", "yL692Az1cNhfk1VhTzyx4jOjjMKBrO9T");
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
-    @Rule
-    public WireMockRule wireMockRule = new WireMockRule(wireMockConfig().port(dynamicPort.getNumber()));
+  @Rule
+  public SystemProperty clientId = new SystemProperty("client.id", "ndli93xdws2qoe6ms1d389vl6bxquv3e");
+  @Rule
+  public SystemProperty clientSecret = new SystemProperty("client.secret", "yL692Az1cNhfk1VhTzyx4jOjjMKBrO9T");
+  @Rule
+  public ExpectedException expectedException = ExpectedException.none();
+  @Rule
+  public WireMockRule wireMockRule = new WireMockRule(wireMockConfig().port(dynamicPort.getNumber()));
 
-    @Test
-    public void tokenUrlFailsDuringAppStartup() throws Exception
-    {
-        testWithSystemProperty(TOKEN_PATH_PROPERTY_NAME, "http://unkownhost:9999" + TOKEN_PATH, new MuleTestUtils.TestCallback()
-        {
-            @Override
-            public void run() throws Exception
-            {
-                ApplicationContextBuilder applicationContextBuilder = new ApplicationContextBuilder().setApplicationResources(new String[] {"client-credentials/client-credentials-minimal-config.xml"});
-                expectedException.expectCause(isA(IOException.class));
-                applicationContextBuilder.build();
-            }
-        });
-    }
+  @Test
+  public void tokenUrlFailsDuringAppStartup() throws Exception {
+    testWithSystemProperty(TOKEN_PATH_PROPERTY_NAME, "http://unkownhost:9999" + TOKEN_PATH, new MuleTestUtils.TestCallback() {
 
-    @Test
-    public void accessTokenNotRetrieve() throws Exception
-    {
-        wireMockRule.stubFor(post(urlEqualTo(TOKEN_PATH))
-                                     .willReturn(aResponse()
-                                                         .withBody(EMPTY)));
-        testWithSystemProperty(TOKEN_PATH_PROPERTY_NAME, format("http://localhost:%s%s", wireMockRule.port(), TOKEN_PATH), new MuleTestUtils.TestCallback()
-        {
-            @Override
-            public void run() throws Exception
-            {
-                ApplicationContextBuilder applicationContextBuilder = new ApplicationContextBuilder().setApplicationResources(new String[] {"client-credentials/client-credentials-minimal-config.xml"});
-                expectedException.expectCause(isA(TokenNotFoundException.class));
-                applicationContextBuilder.build();
-            }
-        });
-    }
+      @Override
+      public void run() throws Exception {
+        ApplicationContextBuilder applicationContextBuilder = new ApplicationContextBuilder()
+            .setApplicationResources(new String[] {"client-credentials/client-credentials-minimal-config.xml"});
+        expectedException.expectCause(isA(IOException.class));
+        applicationContextBuilder.build();
+      }
+    });
+  }
+
+  @Test
+  public void accessTokenNotRetrieve() throws Exception {
+    wireMockRule.stubFor(post(urlEqualTo(TOKEN_PATH)).willReturn(aResponse().withBody(EMPTY)));
+    testWithSystemProperty(TOKEN_PATH_PROPERTY_NAME, format("http://localhost:%s%s", wireMockRule.port(), TOKEN_PATH),
+                           new MuleTestUtils.TestCallback() {
+
+                             @Override
+                             public void run() throws Exception {
+                               ApplicationContextBuilder applicationContextBuilder =
+                                   new ApplicationContextBuilder().setApplicationResources(new String[] {
+                                       "client-credentials/client-credentials-minimal-config.xml"});
+                               expectedException.expectCause(isA(TokenNotFoundException.class));
+                               applicationContextBuilder.build();
+                             }
+                           });
+  }
 
 }

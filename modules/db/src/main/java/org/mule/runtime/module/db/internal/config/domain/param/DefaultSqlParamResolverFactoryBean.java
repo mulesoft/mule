@@ -15,32 +15,27 @@ import org.mule.runtime.module.db.internal.resolver.param.ParamValueResolver;
 
 import org.springframework.beans.factory.FactoryBean;
 
-public class DefaultSqlParamResolverFactoryBean implements FactoryBean<ParamValueResolver>, MuleContextAware
-{
+public class DefaultSqlParamResolverFactoryBean implements FactoryBean<ParamValueResolver>, MuleContextAware {
 
-    private MuleContext context;
+  private MuleContext context;
 
-    @Override
-    public ParamValueResolver getObject() throws Exception
-    {
-        return new DynamicParamValueResolver(context.getExpressionManager());
-    }
+  @Override
+  public ParamValueResolver getObject() throws Exception {
+    return new DynamicParamValueResolver(context.getExpressionManager());
+  }
 
-    @Override
-    public Class<?> getObjectType()
-    {
-        return ParamValueResolver.class;
-    }
+  @Override
+  public Class<?> getObjectType() {
+    return ParamValueResolver.class;
+  }
 
-    @Override
-    public boolean isSingleton()
-    {
-        return false;
-    }
+  @Override
+  public boolean isSingleton() {
+    return false;
+  }
 
-    @Override
-    public void setMuleContext(MuleContext context)
-    {
-        this.context = context;
-    }
+  @Override
+  public void setMuleContext(MuleContext context) {
+    this.context = context;
+  }
 }

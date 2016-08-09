@@ -14,32 +14,27 @@ import org.mule.runtime.module.db.internal.resolver.database.DefaultDbConfigReso
 
 import org.springframework.beans.factory.FactoryBean;
 
-public class DefaultDbConfigResolverFactoryBean implements FactoryBean<DefaultDbConfigResolver>, MuleContextAware
-{
+public class DefaultDbConfigResolverFactoryBean implements FactoryBean<DefaultDbConfigResolver>, MuleContextAware {
 
-    private MuleContext context;
+  private MuleContext context;
 
-    @Override
-    public DefaultDbConfigResolver getObject() throws Exception
-    {
-        return new DefaultDbConfigResolver(context.getRegistry());
-    }
+  @Override
+  public DefaultDbConfigResolver getObject() throws Exception {
+    return new DefaultDbConfigResolver(context.getRegistry());
+  }
 
-    @Override
-    public Class<?> getObjectType()
-    {
-        return DefaultDbConfigResolver.class;
-    }
+  @Override
+  public Class<?> getObjectType() {
+    return DefaultDbConfigResolver.class;
+  }
 
-    @Override
-    public boolean isSingleton()
-    {
-        return false;
-    }
+  @Override
+  public boolean isSingleton() {
+    return false;
+  }
 
-    @Override
-    public void setMuleContext(MuleContext context)
-    {
-        this.context = context;
-    }
+  @Override
+  public void setMuleContext(MuleContext context) {
+    this.context = context;
+  }
 }

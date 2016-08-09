@@ -24,61 +24,54 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class StoredProcedureMultipleParamsTestCase extends AbstractDbIntegrationTestCase
-{
+public class StoredProcedureMultipleParamsTestCase extends AbstractDbIntegrationTestCase {
 
-    public StoredProcedureMultipleParamsTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public StoredProcedureMultipleParamsTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Parameterized.Parameters
-    public static List<Object[]> parameters()
-    {
-        return TestDbConfig.getResources();
-    }
+  @Parameterized.Parameters
+  public static List<Object[]> parameters() {
+    return TestDbConfig.getResources();
+  }
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/storedprocedure/stored-procedure-multi-param-config.xml"};
-    }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/storedprocedure/stored-procedure-multi-param-config.xml"};
+  }
 
-    @Test
-    public void multipliesIntegers() throws Exception
-    {
-        final MuleEvent responseEvent = flowRunner("multiplyIntsFlow").withPayload(TEST_MESSAGE).run();
+  @Test
+  public void multipliesIntegers() throws Exception {
+    final MuleEvent responseEvent = flowRunner("multiplyIntsFlow").withPayload(TEST_MESSAGE).run();
 
-        final MuleMessage response = responseEvent.getMessage();
-        assertThat(response.getPayload(), is(instanceOf(Map.class)));
-        Map payload = (Map) response.getPayload();
-        // Apparently Derby has a bug: when there are no resultset returned, then
-        // there is a fake updateCount=0 that is returned. Check how this works in other DB vendors.
-        //assertThat(payload.size(), equalTo(2));
-        // Compares string in to avoid problems when different DB return different integer classes (BigDecimal, integer, etc)
-        assertThat(payload.get("result1").toString(), equalTo("12"));
-        assertThat(payload.get("result2").toString(), equalTo("60"));
-    }
+    final MuleMessage response = responseEvent.getMessage();
+    assertThat(response.getPayload(), is(instanceOf(Map.class)));
+    Map payload = (Map) response.getPayload();
+    // Apparently Derby has a bug: when there are no resultset returned, then
+    // there is a fake updateCount=0 that is returned. Check how this works in other DB vendors.
+    // assertThat(payload.size(), equalTo(2));
+    // Compares string in to avoid problems when different DB return different integer classes (BigDecimal, integer, etc)
+    assertThat(payload.get("result1").toString(), equalTo("12"));
+    assertThat(payload.get("result2").toString(), equalTo("60"));
+  }
 
-    @Test
-    public void concatenatesStrings() throws Exception
-    {
-        final MuleEvent responseEvent = flowRunner("concatenateStringsFlow").withPayload(TEST_MESSAGE).run();
+  @Test
+  public void concatenatesStrings() throws Exception {
+    final MuleEvent responseEvent = flowRunner("concatenateStringsFlow").withPayload(TEST_MESSAGE).run();
 
-        final MuleMessage response = responseEvent.getMessage();
-        assertThat(response.getPayload(), is(instanceOf(Map.class)));
-        Map payload = (Map) response.getPayload();
-        // Apparently Derby has a bug: when there are no resultset returned, then
-        // there is a fake updateCount=0 that is returned. Check how this works in other DB vendors.
-        //assertThat(payload.size(), equalTo(2));
-        assertThat((String) payload.get("result"), equalTo("foobar"));
-        //assertThat((Integer) payload.get("updateCount1"), equalTo(0));
-    }
+    final MuleMessage response = responseEvent.getMessage();
+    assertThat(response.getPayload(), is(instanceOf(Map.class)));
+    Map payload = (Map) response.getPayload();
+    // Apparently Derby has a bug: when there are no resultset returned, then
+    // there is a fake updateCount=0 that is returned. Check how this works in other DB vendors.
+    // assertThat(payload.size(), equalTo(2));
+    assertThat((String) payload.get("result"), equalTo("foobar"));
+    // assertThat((Integer) payload.get("updateCount1"), equalTo(0));
+  }
 
-    @Before
-    public void setupStoredProcedure() throws Exception
-    {
-        testDatabase.createStoredProcedureMultiplyInts(getDefaultDataSource());
-        testDatabase.createStoredProcedureConcatenateStrings(getDefaultDataSource());
-    }
+  @Before
+  public void setupStoredProcedure() throws Exception {
+    testDatabase.createStoredProcedureMultiplyInts(getDefaultDataSource());
+    testDatabase.createStoredProcedureConcatenateStrings(getDefaultDataSource());
+  }
 }

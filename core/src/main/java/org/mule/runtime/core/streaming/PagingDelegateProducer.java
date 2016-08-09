@@ -12,45 +12,39 @@ import org.mule.runtime.core.api.MuleException;
 import java.util.List;
 
 /**
- * Implementation of {@link Producer} that uses an instance of {@link PagingDelegate}
- * to get its results
+ * Implementation of {@link Producer} that uses an instance of {@link PagingDelegate} to get its results
  * 
  * @since 3.5.0
  */
-public class PagingDelegateProducer<T> implements Producer<List<T>>
-{
+public class PagingDelegateProducer<T> implements Producer<List<T>> {
 
-    private PagingDelegate<T> delegate;
+  private PagingDelegate<T> delegate;
 
-    public PagingDelegateProducer(PagingDelegate<T> delegate)
-    {
-        this.delegate = delegate;
-    }
+  public PagingDelegateProducer(PagingDelegate<T> delegate) {
+    this.delegate = delegate;
+  }
 
-    /**
-     * Asks the delegate for the next page
-     */
-    @Override
-    public List<T> produce()
-    {
-        return this.delegate.getPage();
-    }
+  /**
+   * Asks the delegate for the next page
+   */
+  @Override
+  public List<T> produce() {
+    return this.delegate.getPage();
+  }
 
-    /**
-     * Returns the total amount of available results informed by delegate
-     */
-    @Override
-    public int size()
-    {
-        return this.delegate.getTotalResults();
-    }
+  /**
+   * Returns the total amount of available results informed by delegate
+   */
+  @Override
+  public int size() {
+    return this.delegate.getTotalResults();
+  }
 
-    /**
-     * Closes the delegate
-     */
-    @Override
-    public void close() throws MuleException
-    {
-        this.delegate.close();
-    }
+  /**
+   * Closes the delegate
+   */
+  @Override
+  public void close() throws MuleException {
+    this.delegate.close();
+  }
 }

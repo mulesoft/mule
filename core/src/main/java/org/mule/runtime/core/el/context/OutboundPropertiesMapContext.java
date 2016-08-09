@@ -15,54 +15,46 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-class OutboundPropertiesMapContext extends AbstractMapContext<Serializable>
-{
-    private MuleEvent event;
+class OutboundPropertiesMapContext extends AbstractMapContext<Serializable> {
 
-    public OutboundPropertiesMapContext(MuleEvent event)
-    {
-        this.event = event;
-    }
+  private MuleEvent event;
 
-    @Override
-    public Serializable doGet(String key)
-    {
-        return event.getMessage().getOutboundProperty(key);
-    }
+  public OutboundPropertiesMapContext(MuleEvent event) {
+    this.event = event;
+  }
 
-    @Override
-    public void doPut(String key, Serializable value)
-    {
-        event.setMessage(MuleMessage.builder(event.getMessage()).addOutboundProperty(key, value).build());
-    }
+  @Override
+  public Serializable doGet(String key) {
+    return event.getMessage().getOutboundProperty(key);
+  }
 
-    @Override
-    public void doRemove(String key)
-    {
-        event.setMessage(MuleMessage.builder(event.getMessage()).removeOutboundProperty(key).build());
-    }
+  @Override
+  public void doPut(String key, Serializable value) {
+    event.setMessage(MuleMessage.builder(event.getMessage()).addOutboundProperty(key, value).build());
+  }
 
-    @Override
-    public Set<String> keySet()
-    {
-        return event.getMessage().getOutboundPropertyNames();
-    }
+  @Override
+  public void doRemove(String key) {
+    event.setMessage(MuleMessage.builder(event.getMessage()).removeOutboundProperty(key).build());
+  }
 
-    @Override
-    public void clear()
-    {
-        event.setMessage(MuleMessage.builder(event.getMessage()).outboundProperties(emptyMap()).build());
-    }
+  @Override
+  public Set<String> keySet() {
+    return event.getMessage().getOutboundPropertyNames();
+  }
 
-    @Override
-    public String toString()
-    {
-        Map<String, Object> map = new HashMap<>();
-        for (String key : event.getMessage().getOutboundPropertyNames())
-        {
-            Object value = event.getMessage().getOutboundProperty(key);
-            map.put(key, value);
-        }
-        return map.toString();
+  @Override
+  public void clear() {
+    event.setMessage(MuleMessage.builder(event.getMessage()).outboundProperties(emptyMap()).build());
+  }
+
+  @Override
+  public String toString() {
+    Map<String, Object> map = new HashMap<>();
+    for (String key : event.getMessage().getOutboundPropertyNames()) {
+      Object value = event.getMessage().getOutboundProperty(key);
+      map.put(key, value);
     }
+    return map.toString();
+  }
 }

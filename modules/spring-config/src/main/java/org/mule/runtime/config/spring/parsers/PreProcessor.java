@@ -13,9 +13,8 @@ import org.w3c.dom.Element;
 /**
  * This interface allows pre-processing of the element.
  */
-public interface PreProcessor
-{
+public interface PreProcessor {
 
-    public void preProcess(PropertyConfiguration config, Element element);
+  public void preProcess(PropertyConfiguration config, Element element);
 
 }

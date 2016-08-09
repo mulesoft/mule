@@ -27,86 +27,68 @@ import org.springframework.beans.PropertyEditorRegistrar;
 import org.springframework.beans.PropertyEditorRegistry;
 
 /**
- * The preferred way to configure property editors in Spring 2/3 is to implement a
- * registrar
+ * The preferred way to configure property editors in Spring 2/3 is to implement a registrar
  */
-public class MulePropertyEditorRegistrar implements PropertyEditorRegistrar, MuleContextAware
-{
-    private MuleContext muleContext;
-    private Map<Class<?>, Class<PropertyEditor>> customPropertyEditorsCache;
-    private static final String CUSTOM_PROPERTY_EDITOR_RESOURCE_NAME = "META-INF/mule.custom-property-editors";
+public class MulePropertyEditorRegistrar implements PropertyEditorRegistrar, MuleContextAware {
 
-    @Override
-    public void setMuleContext(MuleContext context)
-    {
-        muleContext = context;
+  private MuleContext muleContext;
+  private Map<Class<?>, Class<PropertyEditor>> customPropertyEditorsCache;
+  private static final String CUSTOM_PROPERTY_EDITOR_RESOURCE_NAME = "META-INF/mule.custom-property-editors";
+
+  @Override
+  public void setMuleContext(MuleContext context) {
+    muleContext = context;
+  }
+
+  @Override
+  public void registerCustomEditors(PropertyEditorRegistry registry) {
+    registry.registerCustomEditor(MessageExchangePattern.class, new MessageExchangePatternPropertyEditor());
+    registry.registerCustomEditor(Date.class, new DatePropertyEditor(new SimpleDateFormat("yyyy-MM-dd hh:mm:ss"),
+                                                                     new SimpleDateFormat("yyyy-MM-dd"), true));
+    registry.registerCustomEditor(ProcessingStrategy.class, new ProcessingStrategyEditor());
+
+    if (customPropertyEditorsCache == null) {
+      discoverCustomPropertyEditor();
+    }
+    for (Map.Entry<Class<?>, Class<PropertyEditor>> entry : customPropertyEditorsCache.entrySet()) {
+      try {
+        final PropertyEditor customEditor = ClassUtils.instanciateClass(entry.getValue());
+        if (customEditor instanceof MuleContextAware) {
+          ((MuleContextAware) customEditor).setMuleContext(muleContext);
+        }
+        registry.registerCustomEditor(entry.getKey(), customEditor);
+      } catch (Exception e) {
+        throw new IllegalStateException("Error loading custom property editors", e);
+      }
     }
 
-    @Override
-    public void registerCustomEditors(PropertyEditorRegistry registry)
-    {
-        registry.registerCustomEditor(MessageExchangePattern.class,
-            new MessageExchangePatternPropertyEditor());
-        registry.registerCustomEditor(Date.class, new DatePropertyEditor(new SimpleDateFormat("yyyy-MM-dd hh:mm:ss"), new SimpleDateFormat("yyyy-MM-dd"), true));
-        registry.registerCustomEditor(ProcessingStrategy.class, new ProcessingStrategyEditor());
+  }
 
-        if (customPropertyEditorsCache == null)
-        {
-            discoverCustomPropertyEditor();
-        }
-        for (Map.Entry<Class<?>, Class<PropertyEditor>> entry : customPropertyEditorsCache.entrySet())
-        {
-            try
-            {
-                final PropertyEditor customEditor = ClassUtils.instanciateClass(entry.getValue());
-                if (customEditor instanceof MuleContextAware)
-                {
-                    ((MuleContextAware) customEditor).setMuleContext(muleContext);
-                }
-                registry.registerCustomEditor(entry.getKey(), customEditor);
-            }
-            catch (Exception e)
-            {
-                throw new IllegalStateException("Error loading custom property editors", e);
-            }
-        }
+  private void discoverCustomPropertyEditor() {
+    customPropertyEditorsCache = new HashMap<Class<?>, Class<PropertyEditor>>();
 
+    // Look for any editors needed by extensions
+    try {
+      Enumeration<URL> urls = ClassUtils.getResources(CUSTOM_PROPERTY_EDITOR_RESOURCE_NAME, getClass());
+      while (urls.hasMoreElements()) {
+        URL url = urls.nextElement();
+        Properties props = new Properties();
+        InputStream stream = url.openStream();
+        try {
+          props.load(stream);
+          for (Map.Entry<Object, Object> entry : props.entrySet()) {
+            String target = (String) entry.getKey();
+            String editor = (String) entry.getValue();
+            Class<?> requiredType = ClassUtils.loadClass(target, getClass());
+            Class<PropertyEditor> propertyEditorClass = ClassUtils.loadClass(editor, getClass());
+            customPropertyEditorsCache.put(requiredType, propertyEditorClass);
+          }
+        } finally {
+          IOUtils.closeQuietly(stream);
+        }
+      }
+    } catch (Exception e) {
+      throw new IllegalStateException("Error loading custom property editors", e);
     }
-
-    private void discoverCustomPropertyEditor()
-    {
-        customPropertyEditorsCache = new HashMap<Class<?>, Class<PropertyEditor>>();
-
-        // Look for any editors needed by extensions
-        try
-        {
-            Enumeration<URL> urls = ClassUtils.getResources(CUSTOM_PROPERTY_EDITOR_RESOURCE_NAME, getClass());
-            while (urls.hasMoreElements())
-            {
-                URL url = urls.nextElement();
-                Properties props = new Properties();
-                InputStream stream = url.openStream();
-                try
-                {
-                    props.load(stream);
-                    for (Map.Entry<Object, Object> entry : props.entrySet())
-                    {
-                        String target = (String) entry.getKey();
-                        String editor = (String) entry.getValue();
-                        Class<?> requiredType = ClassUtils.loadClass(target, getClass());
-                        Class<PropertyEditor> propertyEditorClass = ClassUtils.loadClass(editor, getClass());
-                        customPropertyEditorsCache.put(requiredType, propertyEditorClass);
-                    }
-                }
-                finally
-                {
-                    IOUtils.closeQuietly(stream);
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            throw new IllegalStateException("Error loading custom property editors", e);
-        }
-    }
+  }
 }

@@ -6,11 +6,11 @@
  */
 package org.mule.runtime.module.spring.remoting;
 
-public interface WorkInterface
-{
-    String executeByteArray(byte[] input);
+public interface WorkInterface {
 
-    String executeString(String input);
+  String executeByteArray(byte[] input);
 
-    ComplexData executeComplexity(ComplexData input);
+  String executeString(String input);
+
+  ComplexData executeComplexity(ComplexData input);
 }

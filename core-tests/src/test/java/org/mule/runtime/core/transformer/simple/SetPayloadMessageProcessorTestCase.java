@@ -33,128 +33,118 @@ import java.nio.charset.StandardCharsets;
 import org.junit.Before;
 import org.junit.Test;
 
-public class SetPayloadMessageProcessorTestCase extends AbstractMuleContextTestCase
-{
+public class SetPayloadMessageProcessorTestCase extends AbstractMuleContextTestCase {
 
-    private static final String PLAIN_TEXT = "This is a plain text";
-    private static final String EXPRESSION = "#[testVariable]";
-    private static final Charset CUSTOM_ENCODING = StandardCharsets.UTF_16;
+  private static final String PLAIN_TEXT = "This is a plain text";
+  private static final String EXPRESSION = "#[testVariable]";
+  private static final Charset CUSTOM_ENCODING = StandardCharsets.UTF_16;
 
-    private SetPayloadMessageProcessor setPayloadMessageProcessor;
-    private MuleContext muleContext;
-    private MuleMessage muleMessage;
-    private MuleEvent muleEvent;
-    private ExpressionManager expressionManager;
+  private SetPayloadMessageProcessor setPayloadMessageProcessor;
+  private MuleContext muleContext;
+  private MuleMessage muleMessage;
+  private MuleEvent muleEvent;
+  private ExpressionManager expressionManager;
 
-    @Before
-    public void setUp() throws Exception
-    {
-        setPayloadMessageProcessor = new SetPayloadMessageProcessor();
-        muleContext = mock(MuleContext.class);
-        setPayloadMessageProcessor.setMuleContext(muleContext);
-        expressionManager = mock(ExpressionManager.class);
+  @Before
+  public void setUp() throws Exception {
+    setPayloadMessageProcessor = new SetPayloadMessageProcessor();
+    muleContext = mock(MuleContext.class);
+    setPayloadMessageProcessor.setMuleContext(muleContext);
+    expressionManager = mock(ExpressionManager.class);
 
-        when(muleContext.getExpressionManager()).thenReturn(expressionManager);
-        when(muleContext.getConfiguration()).thenReturn(mock(MuleConfiguration.class));
-        when(expressionManager.parse(anyString(), any(MuleEvent.class))).thenAnswer(
-                invocation -> (String) invocation.getArguments()[0]);
+    when(muleContext.getExpressionManager()).thenReturn(expressionManager);
+    when(muleContext.getConfiguration()).thenReturn(mock(MuleConfiguration.class));
+    when(expressionManager.parse(anyString(), any(MuleEvent.class)))
+        .thenAnswer(invocation -> (String) invocation.getArguments()[0]);
 
-        muleMessage = MuleMessage.builder().payload("").build();
-        muleEvent = new DefaultMuleEvent(muleMessage, getTestFlow());
-    }
+    muleMessage = MuleMessage.builder().payload("").build();
+    muleEvent = new DefaultMuleEvent(muleMessage, getTestFlow());
+  }
 
-    @Test
-    public void returnsSameMuleEvent() throws MuleException
-    {
-        setPayloadMessageProcessor.setValue(PLAIN_TEXT);
-        setPayloadMessageProcessor.initialise();
+  @Test
+  public void returnsSameMuleEvent() throws MuleException {
+    setPayloadMessageProcessor.setValue(PLAIN_TEXT);
+    setPayloadMessageProcessor.initialise();
 
-        MuleEvent response = setPayloadMessageProcessor.process(muleEvent);
+    MuleEvent response = setPayloadMessageProcessor.process(muleEvent);
 
-        assertThat(response, is(muleEvent));
-    }
+    assertThat(response, is(muleEvent));
+  }
 
-    @Test
-    public void setsNullPayload() throws MuleException
-    {
-        setPayloadMessageProcessor.setValue(null);
-        setPayloadMessageProcessor.initialise();
+  @Test
+  public void setsNullPayload() throws MuleException {
+    setPayloadMessageProcessor.setValue(null);
+    setPayloadMessageProcessor.initialise();
 
-        setPayloadMessageProcessor.process(muleEvent);
+    setPayloadMessageProcessor.process(muleEvent);
 
-        assertThat(muleEvent.getMessage().getPayload(), is(nullValue()));
-    }
+    assertThat(muleEvent.getMessage().getPayload(), is(nullValue()));
+  }
 
-    @Test
-    public void setsPlainText() throws MuleException
-    {
-        setPayloadMessageProcessor.setValue(PLAIN_TEXT);
-        setPayloadMessageProcessor.initialise();
+  @Test
+  public void setsPlainText() throws MuleException {
+    setPayloadMessageProcessor.setValue(PLAIN_TEXT);
+    setPayloadMessageProcessor.initialise();
 
-        when(expressionManager.isExpression(PLAIN_TEXT)).thenReturn(false);
+    when(expressionManager.isExpression(PLAIN_TEXT)).thenReturn(false);
 
-        setPayloadMessageProcessor.process(muleEvent);
+    setPayloadMessageProcessor.process(muleEvent);
 
-        assertThat(muleEvent.getMessage().getPayload(), is(PLAIN_TEXT));
-    }
+    assertThat(muleEvent.getMessage().getPayload(), is(PLAIN_TEXT));
+  }
 
-    @Test
-    public void setsExpressionPayload() throws MuleException
-    {
-        setPayloadMessageProcessor.setValue(EXPRESSION);
-        when(expressionManager.isExpression(EXPRESSION)).thenReturn(true);
-        setPayloadMessageProcessor.initialise();
-        TypedValue typedValue = new TypedValue(PLAIN_TEXT, DataType.STRING);
-        when(expressionManager.evaluateTyped(EXPRESSION, muleEvent)).thenReturn(typedValue);
+  @Test
+  public void setsExpressionPayload() throws MuleException {
+    setPayloadMessageProcessor.setValue(EXPRESSION);
+    when(expressionManager.isExpression(EXPRESSION)).thenReturn(true);
+    setPayloadMessageProcessor.initialise();
+    TypedValue typedValue = new TypedValue(PLAIN_TEXT, DataType.STRING);
+    when(expressionManager.evaluateTyped(EXPRESSION, muleEvent)).thenReturn(typedValue);
 
-        setPayloadMessageProcessor.process(muleEvent);
+    setPayloadMessageProcessor.process(muleEvent);
 
-        assertThat(muleEvent.getMessage().getPayload(), is(PLAIN_TEXT));
-    }
+    assertThat(muleEvent.getMessage().getPayload(), is(PLAIN_TEXT));
+  }
 
-    @Test
-    public void setsDefaultDataTypeForNullPayload() throws MuleException
-    {
-        setPayloadMessageProcessor.setValue(null);
-        setPayloadMessageProcessor.initialise();
+  @Test
+  public void setsDefaultDataTypeForNullPayload() throws MuleException {
+    setPayloadMessageProcessor.setValue(null);
+    setPayloadMessageProcessor.initialise();
 
-        setPayloadMessageProcessor.process(muleEvent);
+    setPayloadMessageProcessor.process(muleEvent);
 
-        assertThat(muleEvent.getMessage().getDataType(), like(Object.class, MediaType.ANY, null));
-    }
+    assertThat(muleEvent.getMessage().getDataType(), like(Object.class, MediaType.ANY, null));
+  }
 
-    @Test
-    public void setsDefaultDataTypeForNonNullValue() throws MuleException
-    {
-        setPayloadMessageProcessor.setValue(PLAIN_TEXT);
-        setPayloadMessageProcessor.initialise();
+  @Test
+  public void setsDefaultDataTypeForNonNullValue() throws MuleException {
+    setPayloadMessageProcessor.setValue(PLAIN_TEXT);
+    setPayloadMessageProcessor.initialise();
 
-        setPayloadMessageProcessor.process(muleEvent);
+    setPayloadMessageProcessor.process(muleEvent);
 
-        assertThat(muleEvent.getMessage().getDataType(), like(String.class, MediaType.ANY, null));
-    }
+    assertThat(muleEvent.getMessage().getDataType(), like(String.class, MediaType.ANY, null));
+  }
 
-    @Test
-    public void setsCustomEncoding() throws MuleException
-    {
-        setPayloadMessageProcessor.setValue(PLAIN_TEXT);
-        setPayloadMessageProcessor.setDataType(DataType.builder().charset(CUSTOM_ENCODING).build());
-        setPayloadMessageProcessor.initialise();
+  @Test
+  public void setsCustomEncoding() throws MuleException {
+    setPayloadMessageProcessor.setValue(PLAIN_TEXT);
+    setPayloadMessageProcessor.setDataType(DataType.builder().charset(CUSTOM_ENCODING).build());
+    setPayloadMessageProcessor.initialise();
 
-        setPayloadMessageProcessor.process(muleEvent);
+    setPayloadMessageProcessor.process(muleEvent);
 
-        assertThat(muleEvent.getMessage().getDataType(), like(String.class, MediaType.ANY, CUSTOM_ENCODING));
-    }
+    assertThat(muleEvent.getMessage().getDataType(), like(String.class, MediaType.ANY, CUSTOM_ENCODING));
+  }
 
-    @Test
-    public void setsCustomMimeType() throws MuleException
-    {
-        setPayloadMessageProcessor.setValue(PLAIN_TEXT);
-        setPayloadMessageProcessor.setDataType(DataType.builder().mediaType(MediaType.APPLICATION_XML).build());
-        setPayloadMessageProcessor.initialise();
+  @Test
+  public void setsCustomMimeType() throws MuleException {
+    setPayloadMessageProcessor.setValue(PLAIN_TEXT);
+    setPayloadMessageProcessor.setDataType(DataType.builder().mediaType(MediaType.APPLICATION_XML).build());
+    setPayloadMessageProcessor.initialise();
 
-        setPayloadMessageProcessor.process(muleEvent);
+    setPayloadMessageProcessor.process(muleEvent);
 
-        assertThat(muleEvent.getMessage().getDataType(), like(String.class, MediaType.APPLICATION_XML, null));
-    }
+    assertThat(muleEvent.getMessage().getDataType(), like(String.class, MediaType.APPLICATION_XML, null));
+  }
 }

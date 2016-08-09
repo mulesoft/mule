@@ -19,60 +19,53 @@ import org.mule.runtime.module.extension.internal.AbstractInterceptableContractT
 import org.junit.Test;
 import org.mockito.Mock;
 
-public class InterceptableOperationExecutorWrapperTestCase extends AbstractInterceptableContractTestCase<InterceptableOperationExecutorWrapper>
-{
+public class InterceptableOperationExecutorWrapperTestCase
+    extends AbstractInterceptableContractTestCase<InterceptableOperationExecutorWrapper> {
 
-    @Mock(extraInterfaces = Lifecycle.class)
-    private OperationExecutor executor;
+  @Mock(extraInterfaces = Lifecycle.class)
+  private OperationExecutor executor;
 
-    @Mock
-    private OperationContext operationContext;
+  @Mock
+  private OperationContext operationContext;
 
-    @Override
-    protected InterceptableOperationExecutorWrapper createInterceptable()
-    {
-        return new InterceptableOperationExecutorWrapper(executor, getInterceptors());
-    }
+  @Override
+  protected InterceptableOperationExecutorWrapper createInterceptable() {
+    return new InterceptableOperationExecutorWrapper(executor, getInterceptors());
+  }
 
-    @Test
-    public void execute() throws Exception
-    {
-        interceptable.execute(operationContext);
-        verify(executor).execute(operationContext);
-    }
+  @Test
+  public void execute() throws Exception {
+    interceptable.execute(operationContext);
+    verify(executor).execute(operationContext);
+  }
 
-    @Test
-    public void executorInjected() throws Exception
-    {
-        interceptable.initialise();
-        verify(injector).inject(executor);
-    }
+  @Test
+  public void executorInjected() throws Exception {
+    interceptable.initialise();
+    verify(injector).inject(executor);
+  }
 
-    @Test
-    public void executorInitialised() throws Exception
-    {
-        interceptable.initialise();
-        verify((Initialisable) executor).initialise();
-    }
+  @Test
+  public void executorInitialised() throws Exception {
+    interceptable.initialise();
+    verify((Initialisable) executor).initialise();
+  }
 
-    @Test
-    public void executorStarted() throws Exception
-    {
-        interceptable.start();
-        verify((Startable) executor).start();
-    }
+  @Test
+  public void executorStarted() throws Exception {
+    interceptable.start();
+    verify((Startable) executor).start();
+  }
 
-    @Test
-    public void executorStopped() throws Exception
-    {
-        interceptable.stop();
-        verify((Stoppable) executor).stop();
-    }
+  @Test
+  public void executorStopped() throws Exception {
+    interceptable.stop();
+    verify((Stoppable) executor).stop();
+  }
 
-    @Test
-    public void executorDisposed() throws Exception
-    {
-        interceptable.dispose();
-        verify((Disposable) executor).dispose();
-    }
+  @Test
+  public void executorDisposed() throws Exception {
+    interceptable.dispose();
+    verify((Disposable) executor).dispose();
+  }
 }

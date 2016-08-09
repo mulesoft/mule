@@ -21,52 +21,47 @@ import java.util.List;
 
 @Extension(name = "petstore", description = "PetStore Test connector")
 @Operations(PetStoreOperations.class)
-@Providers({SimplePetStoreConnectionProvider.class, PooledPetStoreConnectionProvider.class, TransactionalPetStoreConnectionProvider.class})
+@Providers({SimplePetStoreConnectionProvider.class, PooledPetStoreConnectionProvider.class,
+    TransactionalPetStoreConnectionProvider.class})
 @Sources({PetStoreSource.class})
 @Xml(namespaceLocation = "http://www.mulesoft.org/schema/mule/petstore", namespace = "petstore")
-public class PetStoreConnector
-{
+public class PetStoreConnector {
 
-    @Parameter
-    private List<String> pets;
+  @Parameter
+  private List<String> pets;
 
-    @Parameter
-    @Optional
-    private TlsContextFactory tls;
+  @Parameter
+  @Optional
+  private TlsContextFactory tls;
 
-    @Parameter
-    @Optional
-    private ThreadingProfile threadingProfile;
+  @Parameter
+  @Optional
+  private ThreadingProfile threadingProfile;
 
-    @Parameter
-    @Optional
-    private PetCage cage;
+  @Parameter
+  @Optional
+  private PetCage cage;
 
-    @ParameterGroup
-    private ExclusiveCashier cashier;
+  @ParameterGroup
+  private ExclusiveCashier cashier;
 
-    public List<String> getPets()
-    {
-        return pets;
-    }
+  public List<String> getPets() {
+    return pets;
+  }
 
-    public TlsContextFactory getTlsContext()
-    {
-        return tls;
-    }
+  public TlsContextFactory getTlsContext() {
+    return tls;
+  }
 
-    public ThreadingProfile getThreadingProfile()
-    {
-        return threadingProfile;
-    }
+  public ThreadingProfile getThreadingProfile() {
+    return threadingProfile;
+  }
 
-    public PetCage getCage()
-    {
-        return cage;
-    }
+  public PetCage getCage() {
+    return cage;
+  }
 
-    public ExclusiveCashier getCashier()
-    {
-        return cashier;
-    }
+  public ExclusiveCashier getCashier() {
+    return cashier;
+  }
 }

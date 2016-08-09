@@ -23,96 +23,77 @@ import java.util.concurrent.TimeUnit;
 /**
  * Listener for flow execution complete action.
  */
-public class FlowExecutionListener
-{
+public class FlowExecutionListener {
 
-    private final List<Callback<MuleEvent>> callbacks = new ArrayList<Callback<MuleEvent>>();
-    private CountDownLatch flowExecutedLatch = new Latch();
-    private String flowName;
-    private int timeout = 10000;
+  private final List<Callback<MuleEvent>> callbacks = new ArrayList<Callback<MuleEvent>>();
+  private CountDownLatch flowExecutedLatch = new Latch();
+  private String flowName;
+  private int timeout = 10000;
 
-    /**
-     * Constructor for releasing latch when any flow execution completes
-     */
-    public FlowExecutionListener(MuleContext muleContext)
-    {
-        createFlowExecutionListener(muleContext);
-    }
+  /**
+   * Constructor for releasing latch when any flow execution completes
+   */
+  public FlowExecutionListener(MuleContext muleContext) {
+    createFlowExecutionListener(muleContext);
+  }
 
-    /**
-     * Constructor for releasing latch when flow with name flowName completes
-     */
-    public FlowExecutionListener(String flowName, MuleContext muleContext)
-    {
-        this.flowName = flowName;
-        createFlowExecutionListener(muleContext);
-    }
+  /**
+   * Constructor for releasing latch when flow with name flowName completes
+   */
+  public FlowExecutionListener(String flowName, MuleContext muleContext) {
+    this.flowName = flowName;
+    createFlowExecutionListener(muleContext);
+  }
 
-    private void createFlowExecutionListener(MuleContext muleContext)
-    {
-        try
-        {
-            muleContext.registerListener(new PipelineMessageNotificationListener<PipelineMessageNotification>()
-            {
-                @Override
-                public void onNotification(PipelineMessageNotification notification)
-                {
-                    if (flowName != null && !notification.getResourceIdentifier().equals(flowName))
-                    {
-                        return;
-                    }
-                    if (notification.getAction() == PipelineMessageNotification.PROCESS_COMPLETE)
-                    {
-                        for (Callback<MuleEvent> callback : callbacks)
-                        {
-                            callback.execute((MuleEvent) notification.getSource());
-                        }
-                        flowExecutedLatch.countDown();
-                    }
-                }
-            });
-        }
-        catch (NotificationException e)
-        {
-            throw new RuntimeException(e);
-        }
-    }
+  private void createFlowExecutionListener(MuleContext muleContext) {
+    try {
+      muleContext.registerListener(new PipelineMessageNotificationListener<PipelineMessageNotification>() {
 
-    public void waitUntilFlowIsComplete()
-    {
-        try
-        {
-            if (!flowExecutedLatch.await(timeout, TimeUnit.MILLISECONDS))
-            {
-                fail(String.format("Flow %s never completed an execution", (flowName == null ? "ANY FLOW" : flowName)));
+        @Override
+        public void onNotification(PipelineMessageNotification notification) {
+          if (flowName != null && !notification.getResourceIdentifier().equals(flowName)) {
+            return;
+          }
+          if (notification.getAction() == PipelineMessageNotification.PROCESS_COMPLETE) {
+            for (Callback<MuleEvent> callback : callbacks) {
+              callback.execute((MuleEvent) notification.getSource());
             }
+            flowExecutedLatch.countDown();
+          }
         }
-        catch (InterruptedException e)
-        {
-            throw new RuntimeException(e);
-        }
+      });
+    } catch (NotificationException e) {
+      throw new RuntimeException(e);
     }
+  }
 
-    /**
-     * @param numberOfExecutionsRequired number of times that the listener must be notified before releasing the latch.
-     */
-    public FlowExecutionListener setNumberOfExecutionsRequired(int numberOfExecutionsRequired)
-    {
-        this.flowExecutedLatch = new CountDownLatch(numberOfExecutionsRequired);
-        return this;
+  public void waitUntilFlowIsComplete() {
+    try {
+      if (!flowExecutedLatch.await(timeout, TimeUnit.MILLISECONDS)) {
+        fail(String.format("Flow %s never completed an execution", (flowName == null ? "ANY FLOW" : flowName)));
+      }
+    } catch (InterruptedException e) {
+      throw new RuntimeException(e);
     }
+  }
 
-    public FlowExecutionListener setTimeoutInMillis(int timeout)
-    {
-        this.timeout = timeout;
-        return this;
-    }
+  /**
+   * @param numberOfExecutionsRequired number of times that the listener must be notified before releasing the latch.
+   */
+  public FlowExecutionListener setNumberOfExecutionsRequired(int numberOfExecutionsRequired) {
+    this.flowExecutedLatch = new CountDownLatch(numberOfExecutionsRequired);
+    return this;
+  }
 
-    /**
-     * @param callback callback to be executed once a notification is received
-     */
-    public void addListener(Callback<MuleEvent> callback)
-    {
-        this.callbacks.add(callback);
-    }
+  public FlowExecutionListener setTimeoutInMillis(int timeout) {
+    this.timeout = timeout;
+    return this;
+  }
+
+  /**
+   * @param callback callback to be executed once a notification is received
+   */
+  public void addListener(Callback<MuleEvent> callback) {
+    this.callbacks.add(callback);
+  }
 }

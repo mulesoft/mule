@@ -17,52 +17,43 @@ import org.mule.runtime.core.api.routing.filter.Filter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LifecycleTrackerFilter implements Filter, Lifecycle, MuleContextAware
-{
+public class LifecycleTrackerFilter implements Filter, Lifecycle, MuleContextAware {
 
-    private final List<String> tracker = new ArrayList<String>();
+  private final List<String> tracker = new ArrayList<String>();
 
-    public List<String> getTracker()
-    {
-        return tracker;
-    }
+  public List<String> getTracker() {
+    return tracker;
+  }
 
-    public void setProperty(final String value)
-    {
-        tracker.add("setProperty");
-    }
+  public void setProperty(final String value) {
+    tracker.add("setProperty");
+  }
 
-    public void setMuleContext(final MuleContext context)
-    {
-        tracker.add("setMuleContext");
-    }
+  public void setMuleContext(final MuleContext context) {
+    tracker.add("setMuleContext");
+  }
 
 
-    public void initialise() throws InitialisationException
-    {
-        tracker.add("initialise");
-    }
+  public void initialise() throws InitialisationException {
+    tracker.add("initialise");
+  }
 
-    public void start() throws MuleException
-    {
-        tracker.add("start");
-    }
+  public void start() throws MuleException {
+    tracker.add("start");
+  }
 
-    public void stop() throws MuleException
-    {
-        tracker.add("stop");
-    }
+  public void stop() throws MuleException {
+    tracker.add("stop");
+  }
 
-    public void dispose()
-    {
-        tracker.add("dispose");
-    }
+  public void dispose() {
+    tracker.add("dispose");
+  }
 
-    public boolean accept(MuleMessage message)
-    {
-        // TODO Auto-generated method stub
-        return false;
-    }
+  public boolean accept(MuleMessage message) {
+    // TODO Auto-generated method stub
+    return false;
+  }
 
 }
 

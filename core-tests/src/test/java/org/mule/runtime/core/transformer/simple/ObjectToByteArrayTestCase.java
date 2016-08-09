@@ -15,18 +15,16 @@ import org.mule.tck.size.SmallTest;
 import org.junit.Test;
 
 /**
- * This unit test only tests the default priority of the {@link org.mule.runtime.core.transformer.simple.ObjectToByteArray} transformer.
- * Actual transformation logic is tested in the {@link org.mule.runtime.core.transformer.simple.ObjectByteArrayTransformersWithObjectsTestCase}
- * test and its subclasses.
+ * This unit test only tests the default priority of the {@link org.mule.runtime.core.transformer.simple.ObjectToByteArray}
+ * transformer. Actual transformation logic is tested in the
+ * {@link org.mule.runtime.core.transformer.simple.ObjectByteArrayTransformersWithObjectsTestCase} test and its subclasses.
  */
 @SmallTest
-public class ObjectToByteArrayTestCase extends AbstractMuleTestCase
-{
+public class ObjectToByteArrayTestCase extends AbstractMuleTestCase {
 
-    @Test
-    public void transformerHasHigherDefaultPriority() throws Exception
-    {
-        ObjectToByteArray transformer = new ObjectToByteArray();
-        assertThat(transformer.getPriorityWeighting(), equalTo(DEFAULT_PRIORITY_WEIGHTING + 1));
-    }
+  @Test
+  public void transformerHasHigherDefaultPriority() throws Exception {
+    ObjectToByteArray transformer = new ObjectToByteArray();
+    assertThat(transformer.getPriorityWeighting(), equalTo(DEFAULT_PRIORITY_WEIGHTING + 1));
+  }
 }

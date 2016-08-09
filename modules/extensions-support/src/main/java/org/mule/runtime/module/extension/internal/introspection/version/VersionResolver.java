@@ -13,14 +13,13 @@ import org.mule.runtime.extension.api.annotation.Extension;
  *
  * @since 4.0
  */
-public interface VersionResolver
-{
+public interface VersionResolver {
 
-    /**
-     * Resolves the version of the given {@code extension}
-     *
-     * @param extension the {@link Extension} for which the version will be resolved
-     * @return a {@link String} representing the version
-     */
-    String resolveVersion(Extension extension);
+  /**
+   * Resolves the version of the given {@code extension}
+   *
+   * @param extension the {@link Extension} for which the version will be resolved
+   * @return a {@link String} representing the version
+   */
+  String resolveVersion(Extension extension);
 }

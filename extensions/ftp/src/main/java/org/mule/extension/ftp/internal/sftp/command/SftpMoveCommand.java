@@ -20,26 +20,24 @@ import org.slf4j.LoggerFactory;
  *
  * @since 4.0
  */
-public class SftpMoveCommand extends SftpCommand implements MoveCommand
-{
+public class SftpMoveCommand extends SftpCommand implements MoveCommand {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SftpMoveCommand.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(SftpMoveCommand.class);
 
-    /**
-     * {@inheritDoc}
-     */
-    public SftpMoveCommand(SftpFileSystem fileSystem, SftpClient client)
-    {
-        super(fileSystem, client);
-    }
+  /**
+   * {@inheritDoc}
+   */
+  public SftpMoveCommand(SftpFileSystem fileSystem, SftpClient client) {
+    super(fileSystem, client);
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void move(FileConnectorConfig config, String sourcePath, String targetPath, boolean overwrite, boolean createParentDirectories)
-    {
-        copy(config, sourcePath, targetPath, overwrite, createParentDirectories, null, new MoveFtpDelegate(this, fileSystem));
-        LOGGER.debug("Moved '{}' to '{}'", sourcePath, targetPath);
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void move(FileConnectorConfig config, String sourcePath, String targetPath, boolean overwrite,
+                   boolean createParentDirectories) {
+    copy(config, sourcePath, targetPath, overwrite, createParentDirectories, null, new MoveFtpDelegate(this, fileSystem));
+    LOGGER.debug("Moved '{}' to '{}'", sourcePath, targetPath);
+  }
 }

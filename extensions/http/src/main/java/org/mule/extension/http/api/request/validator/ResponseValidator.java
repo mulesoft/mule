@@ -14,16 +14,15 @@ import org.mule.runtime.core.api.MuleContext;
  *
  * @since 4.0
  */
-public interface ResponseValidator
-{
+public interface ResponseValidator {
 
-    /**
-     * Validates whether a message should be accepted or not, failing in that case.
-     *
-     * @param muleMessage the message to validate
-     * @param context the Mule Context for the current application.
-     * @throws ResponseValidatorException if the message is not considered valid.
-     */
-    void validate(MuleMessage muleMessage, MuleContext context) throws ResponseValidatorException;
+  /**
+   * Validates whether a message should be accepted or not, failing in that case.
+   *
+   * @param muleMessage the message to validate
+   * @param context the Mule Context for the current application.
+   * @throws ResponseValidatorException if the message is not considered valid.
+   */
+  void validate(MuleMessage muleMessage, MuleContext context) throws ResponseValidatorException;
 
 }

@@ -22,43 +22,35 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class SelectWithAliasTestCase extends AbstractDbIntegrationTestCase
-{
+public class SelectWithAliasTestCase extends AbstractDbIntegrationTestCase {
 
-    public static final String NAME_FIELD_ALIAS = "PLANETNAME";
+  public static final String NAME_FIELD_ALIAS = "PLANETNAME";
 
-    public SelectWithAliasTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public SelectWithAliasTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Parameterized.Parameters
-    public static List<Object[]> parameters()
-    {
-        return TestDbConfig.getResources();
-    }
+  @Parameterized.Parameters
+  public static List<Object[]> parameters() {
+    return TestDbConfig.getResources();
+  }
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/select/select-with-alias-config.xml"};
-    }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/select/select-with-alias-config.xml"};
+  }
 
-    @Test
-    public void returnsAliasInResultSet() throws Exception
-    {
-        final MuleEvent responseEvent = flowRunner("usesAlias").withPayload(TEST_MESSAGE).run();
+  @Test
+  public void returnsAliasInResultSet() throws Exception {
+    final MuleEvent responseEvent = flowRunner("usesAlias").withPayload(TEST_MESSAGE).run();
 
-        final MuleMessage response = responseEvent.getMessage();
-        assertMessageContains(response, getExpectedRecords());
-    }
+    final MuleMessage response = responseEvent.getMessage();
+    assertMessageContains(response, getExpectedRecords());
+  }
 
-    public Record[] getExpectedRecords()
-    {
-        return new Record[] {
-                new Record(new Field(NAME_FIELD_ALIAS, Planet.VENUS.getName())),
-                new Record(new Field(NAME_FIELD_ALIAS, Planet.EARTH.getName())),
-                new Record(new Field(NAME_FIELD_ALIAS, Planet.MARS.getName())),
-        };
-    }
+  public Record[] getExpectedRecords() {
+    return new Record[] {new Record(new Field(NAME_FIELD_ALIAS, Planet.VENUS.getName())),
+        new Record(new Field(NAME_FIELD_ALIAS, Planet.EARTH.getName())),
+        new Record(new Field(NAME_FIELD_ALIAS, Planet.MARS.getName())),};
+  }
 }

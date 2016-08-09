@@ -11,44 +11,43 @@ import java.net.URL;
 import java.util.List;
 
 /**
- * Defines the list of URLS for each class loader that would be created in order to run the test.
- * It is the result of {@link ClassPathClassifier}.
+ * Defines the list of URLS for each class loader that would be created in order to run the test. It is the result of
+ * {@link ClassPathClassifier}.
  *
  * @since 4.0
  */
-public class ArtifactUrlClassification
-{
+public class ArtifactUrlClassification {
 
-    private final List<URL> containerUrls;
-    private final List<PluginUrlClassification> pluginClassificationsUrls;
-    private final List<URL> applicationUrls;
+  private final List<URL> containerUrls;
+  private final List<PluginUrlClassification> pluginClassificationsUrls;
+  private final List<URL> applicationUrls;
 
-    /**
-     * Creates a instance with the list of {@link URL}s classified in container, plugins and application.
-     *
-     * @param containerUrls list of {@link URL} that define the artifacts that would be loaded with the container {@link ClassLoader}
-     * @param pluginClassificationsUrls for each plugin discovered a list of {@link URL} that define the artifacts that would be loaded by the plugin {@link ClassLoader}
-     * @param applicationUrls list of {@link URL} that define the artifacts that would be loaded with the application {@link ClassLoader}
-     */
-    public ArtifactUrlClassification(List<URL> containerUrls, List<PluginUrlClassification> pluginClassificationsUrls, List<URL> applicationUrls)
-    {
-        this.containerUrls = containerUrls;
-        this.pluginClassificationsUrls = pluginClassificationsUrls;
-        this.applicationUrls = applicationUrls;
-    }
+  /**
+   * Creates a instance with the list of {@link URL}s classified in container, plugins and application.
+   *
+   * @param containerUrls list of {@link URL} that define the artifacts that would be loaded with the container
+   *        {@link ClassLoader}
+   * @param pluginClassificationsUrls for each plugin discovered a list of {@link URL} that define the artifacts that would be
+   *        loaded by the plugin {@link ClassLoader}
+   * @param applicationUrls list of {@link URL} that define the artifacts that would be loaded with the application
+   *        {@link ClassLoader}
+   */
+  public ArtifactUrlClassification(List<URL> containerUrls, List<PluginUrlClassification> pluginClassificationsUrls,
+                                   List<URL> applicationUrls) {
+    this.containerUrls = containerUrls;
+    this.pluginClassificationsUrls = pluginClassificationsUrls;
+    this.applicationUrls = applicationUrls;
+  }
 
-    public List<URL> getContainerUrls()
-    {
-        return containerUrls;
-    }
+  public List<URL> getContainerUrls() {
+    return containerUrls;
+  }
 
-    public List<PluginUrlClassification> getPluginClassificationUrls()
-    {
-        return pluginClassificationsUrls;
-    }
+  public List<PluginUrlClassification> getPluginClassificationUrls() {
+    return pluginClassificationsUrls;
+  }
 
-    public List<URL> getApplicationUrls()
-    {
-        return applicationUrls;
-    }
+  public List<URL> getApplicationUrls() {
+    return applicationUrls;
+  }
 }

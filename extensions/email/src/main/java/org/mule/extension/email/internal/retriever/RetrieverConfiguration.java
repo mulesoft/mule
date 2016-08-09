@@ -7,16 +7,14 @@
 package org.mule.extension.email.internal.retriever;
 
 /**
- * Generic contract for configurations that contains operations
- * for retrieving emails.
+ * Generic contract for configurations that contains operations for retrieving emails.
  *
  * @since 4.0
  */
-public interface RetrieverConfiguration
-{
+public interface RetrieverConfiguration {
 
-    /**
-     * @return a boolean value that indicates whether the retrieved emails should be opened and read or not.
-     */
-    boolean isEagerlyFetchContent();
+  /**
+   * @return a boolean value that indicates whether the retrieved emails should be opened and read or not.
+   */
+  boolean isEagerlyFetchContent();
 }

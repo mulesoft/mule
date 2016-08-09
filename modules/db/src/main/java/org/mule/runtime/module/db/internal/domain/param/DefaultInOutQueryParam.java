@@ -9,21 +9,18 @@ package org.mule.runtime.module.db.internal.domain.param;
 
 import org.mule.runtime.module.db.internal.domain.type.DbType;
 
-public class DefaultInOutQueryParam extends AbstractQueryParam implements InOutQueryParam
-{
+public class DefaultInOutQueryParam extends AbstractQueryParam implements InOutQueryParam {
 
-    private final Object value;
+  private final Object value;
 
-    public DefaultInOutQueryParam(int index, DbType type, String name, Object value)
-    {
-        super(index, type, name);
+  public DefaultInOutQueryParam(int index, DbType type, String name, Object value) {
+    super(index, type, name);
 
-        this.value = value;
-    }
+    this.value = value;
+  }
 
-    @Override
-    public Object getValue()
-    {
-        return value;
-    }
+  @Override
+  public Object getValue() {
+    return value;
+  }
 }

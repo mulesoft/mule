@@ -20,95 +20,90 @@ import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class AuthenticationAgainstMultipleProvidersTestCase extends FunctionalTestCase
-{
+public class AuthenticationAgainstMultipleProvidersTestCase extends FunctionalTestCase {
 
-    @Rule
-    public DynamicPort httpPort1 = new DynamicPort("port1");
+  @Rule
+  public DynamicPort httpPort1 = new DynamicPort("port1");
 
-    @Rule
-    public DynamicPort httpPort2 = new DynamicPort("port2");
+  @Rule
+  public DynamicPort httpPort2 = new DynamicPort("port2");
 
-    @Rule
-    public DynamicPort httpPort3 = new DynamicPort("port3");
+  @Rule
+  public DynamicPort httpPort3 = new DynamicPort("port3");
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "mule-multiple-providers-config-flow.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "mule-multiple-providers-config-flow.xml";
+  }
 
-    @Test
-    public void testProvider1() throws Exception
-    {
-        HttpClient httpClient = new HttpClient();
-        Credentials credentials = new UsernamePasswordCredentials("admin1", "admin1");
-        httpClient.getState().setCredentials(AuthScope.ANY, credentials);
-        httpClient.getParams().setAuthenticationPreemptive(true);
+  @Test
+  public void testProvider1() throws Exception {
+    HttpClient httpClient = new HttpClient();
+    Credentials credentials = new UsernamePasswordCredentials("admin1", "admin1");
+    httpClient.getState().setCredentials(AuthScope.ANY, credentials);
+    httpClient.getParams().setAuthenticationPreemptive(true);
 
-        PostMethod postMethod = new PostMethod("http://localhost:" + httpPort1.getNumber());
-        postMethod.setDoAuthentication(true);
-        postMethod.setRequestEntity(new StringRequestEntity("hello", "text/html", "UTF-8"));
+    PostMethod postMethod = new PostMethod("http://localhost:" + httpPort1.getNumber());
+    postMethod.setDoAuthentication(true);
+    postMethod.setRequestEntity(new StringRequestEntity("hello", "text/html", "UTF-8"));
 
-        assertEquals(HttpStatus.SC_OK, httpClient.executeMethod(postMethod));
-        assertEquals("hello", postMethod.getResponseBodyAsString());
+    assertEquals(HttpStatus.SC_OK, httpClient.executeMethod(postMethod));
+    assertEquals("hello", postMethod.getResponseBodyAsString());
 
-        credentials = new UsernamePasswordCredentials("asdf", "asdf");
-        httpClient.getState().setCredentials(AuthScope.ANY, credentials);
-        assertEquals(HttpStatus.SC_UNAUTHORIZED, httpClient.executeMethod(postMethod));
+    credentials = new UsernamePasswordCredentials("asdf", "asdf");
+    httpClient.getState().setCredentials(AuthScope.ANY, credentials);
+    assertEquals(HttpStatus.SC_UNAUTHORIZED, httpClient.executeMethod(postMethod));
 
-        credentials = new UsernamePasswordCredentials("admin2", "admin2");
-        httpClient.getState().setCredentials(AuthScope.ANY, credentials);
-        assertEquals(HttpStatus.SC_UNAUTHORIZED, httpClient.executeMethod(postMethod));
-    }
+    credentials = new UsernamePasswordCredentials("admin2", "admin2");
+    httpClient.getState().setCredentials(AuthScope.ANY, credentials);
+    assertEquals(HttpStatus.SC_UNAUTHORIZED, httpClient.executeMethod(postMethod));
+  }
 
-    @Test
-    public void testProvider2() throws Exception
-    {
-        HttpClient httpClient = new HttpClient();
-        Credentials credentials = new UsernamePasswordCredentials("admin2", "admin2");
-        httpClient.getState().setCredentials(AuthScope.ANY, credentials);
-        httpClient.getParams().setAuthenticationPreemptive(true);
+  @Test
+  public void testProvider2() throws Exception {
+    HttpClient httpClient = new HttpClient();
+    Credentials credentials = new UsernamePasswordCredentials("admin2", "admin2");
+    httpClient.getState().setCredentials(AuthScope.ANY, credentials);
+    httpClient.getParams().setAuthenticationPreemptive(true);
 
-        PostMethod postMethod = new PostMethod("http://localhost:" + httpPort2.getNumber());
-        postMethod.setDoAuthentication(true);
-        postMethod.setRequestEntity(new StringRequestEntity("hello", "text/html", "UTF-8"));
+    PostMethod postMethod = new PostMethod("http://localhost:" + httpPort2.getNumber());
+    postMethod.setDoAuthentication(true);
+    postMethod.setRequestEntity(new StringRequestEntity("hello", "text/html", "UTF-8"));
 
-        assertEquals(HttpStatus.SC_OK, httpClient.executeMethod(postMethod));
-        assertEquals("hello", postMethod.getResponseBodyAsString());
+    assertEquals(HttpStatus.SC_OK, httpClient.executeMethod(postMethod));
+    assertEquals("hello", postMethod.getResponseBodyAsString());
 
-        credentials = new UsernamePasswordCredentials("asdf", "asdf");
-        httpClient.getState().setCredentials(AuthScope.ANY, credentials);
-        assertEquals(HttpStatus.SC_UNAUTHORIZED, httpClient.executeMethod(postMethod));
+    credentials = new UsernamePasswordCredentials("asdf", "asdf");
+    httpClient.getState().setCredentials(AuthScope.ANY, credentials);
+    assertEquals(HttpStatus.SC_UNAUTHORIZED, httpClient.executeMethod(postMethod));
 
-        credentials = new UsernamePasswordCredentials("admin", "admin");
-        httpClient.getState().setCredentials(AuthScope.ANY, credentials);
-        assertEquals(HttpStatus.SC_UNAUTHORIZED, httpClient.executeMethod(postMethod));
-    }
+    credentials = new UsernamePasswordCredentials("admin", "admin");
+    httpClient.getState().setCredentials(AuthScope.ANY, credentials);
+    assertEquals(HttpStatus.SC_UNAUTHORIZED, httpClient.executeMethod(postMethod));
+  }
 
-    @Test
-    public void testMultipleProviders() throws Exception
-    {
-        HttpClient httpClient = new HttpClient();
-        Credentials credentials = new UsernamePasswordCredentials("admin1", "admin1");
-        httpClient.getState().setCredentials(AuthScope.ANY, credentials);
-        httpClient.getParams().setAuthenticationPreemptive(true);
+  @Test
+  public void testMultipleProviders() throws Exception {
+    HttpClient httpClient = new HttpClient();
+    Credentials credentials = new UsernamePasswordCredentials("admin1", "admin1");
+    httpClient.getState().setCredentials(AuthScope.ANY, credentials);
+    httpClient.getParams().setAuthenticationPreemptive(true);
 
-        PostMethod postMethod = new PostMethod("http://localhost:" + httpPort3.getNumber());
-        postMethod.setDoAuthentication(true);
-        postMethod.setRequestEntity(new StringRequestEntity("hello", "text/html", "UTF-8"));
+    PostMethod postMethod = new PostMethod("http://localhost:" + httpPort3.getNumber());
+    postMethod.setDoAuthentication(true);
+    postMethod.setRequestEntity(new StringRequestEntity("hello", "text/html", "UTF-8"));
 
-        assertEquals(HttpStatus.SC_OK, httpClient.executeMethod(postMethod));
-        assertEquals("hello", postMethod.getResponseBodyAsString());
+    assertEquals(HttpStatus.SC_OK, httpClient.executeMethod(postMethod));
+    assertEquals("hello", postMethod.getResponseBodyAsString());
 
-        credentials = new UsernamePasswordCredentials("asdf", "asdf");
-        httpClient.getState().setCredentials(AuthScope.ANY, credentials);
-        assertEquals(HttpStatus.SC_UNAUTHORIZED, httpClient.executeMethod(postMethod));
+    credentials = new UsernamePasswordCredentials("asdf", "asdf");
+    httpClient.getState().setCredentials(AuthScope.ANY, credentials);
+    assertEquals(HttpStatus.SC_UNAUTHORIZED, httpClient.executeMethod(postMethod));
 
-        credentials = new UsernamePasswordCredentials("admin2", "admin2");
-        httpClient.getState().setCredentials(AuthScope.ANY, credentials);
-        assertEquals(HttpStatus.SC_OK, httpClient.executeMethod(postMethod));
-        assertEquals("hello", postMethod.getResponseBodyAsString());
-    }
+    credentials = new UsernamePasswordCredentials("admin2", "admin2");
+    httpClient.getState().setCredentials(AuthScope.ANY, credentials);
+    assertEquals(HttpStatus.SC_OK, httpClient.executeMethod(postMethod));
+    assertEquals("hello", postMethod.getResponseBodyAsString());
+  }
 
 }

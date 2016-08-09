@@ -13,31 +13,23 @@ import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
 
-public class MessageDispatcherUtils
-{
+public class MessageDispatcherUtils {
 
-    /**
-     * Applies lifecycle to a MessageDispatcher based on the lifecycle state of its connector.
-     */
-    public static void applyLifecycle(MessageDispatcher dispatcher) throws MuleException
-    {
-        String phase = ((AbstractConnector)dispatcher.getConnector()).getLifecycleManager().getCurrentPhase();
-        if(phase.equals(Startable.PHASE_NAME) && !dispatcher.getLifecycleState().isStarted())
-        {
-            if(!dispatcher.getLifecycleState().isInitialised())
-            {
-                dispatcher.initialise();
-            }
-            dispatcher.start();
-        }
-        else if(phase.equals(Stoppable.PHASE_NAME) && dispatcher.getLifecycleState().isStarted())
-        {
-            dispatcher.stop();
-        }
-        else if(Disposable.PHASE_NAME.equals(phase))
-        {
-            dispatcher.dispose();
-        }
+  /**
+   * Applies lifecycle to a MessageDispatcher based on the lifecycle state of its connector.
+   */
+  public static void applyLifecycle(MessageDispatcher dispatcher) throws MuleException {
+    String phase = ((AbstractConnector) dispatcher.getConnector()).getLifecycleManager().getCurrentPhase();
+    if (phase.equals(Startable.PHASE_NAME) && !dispatcher.getLifecycleState().isStarted()) {
+      if (!dispatcher.getLifecycleState().isInitialised()) {
+        dispatcher.initialise();
+      }
+      dispatcher.start();
+    } else if (phase.equals(Stoppable.PHASE_NAME) && dispatcher.getLifecycleState().isStarted()) {
+      dispatcher.stop();
+    } else if (Disposable.PHASE_NAME.equals(phase)) {
+      dispatcher.dispose();
     }
+  }
 
 }

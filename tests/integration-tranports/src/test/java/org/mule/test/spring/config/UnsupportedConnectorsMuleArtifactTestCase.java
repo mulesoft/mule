@@ -33,116 +33,99 @@ import org.xml.sax.SAXException;
 /**
  *
  */
-public class UnsupportedConnectorsMuleArtifactTestCase extends AbstractMuleTestCase
-{
+public class UnsupportedConnectorsMuleArtifactTestCase extends AbstractMuleTestCase {
 
-    private XmlConfigurationMuleArtifactFactory lookupArtifact;
-    private MuleArtifact artifact = null;
+  private XmlConfigurationMuleArtifactFactory lookupArtifact;
+  private MuleArtifact artifact = null;
 
-    @Before
-    public void before()
-    {
-        lookupArtifact = lookupArtifact();
+  @Before
+  public void before() {
+    lookupArtifact = lookupArtifact();
+  }
+
+  @After
+  public void after() {
+    if (artifact != null) {
+      lookupArtifact.returnArtifact(artifact);
     }
+  }
 
-    @After
-    public void after()
-    {
-        if (artifact != null)
-        {
-            lookupArtifact.returnArtifact(artifact);
-        }
-    }
+  @Test
+  public void unsupportedConnectorsHttp() throws SAXException, IOException, MuleArtifactFactoryException {
+    // HTTP
+    checkUnsupportedConnector("<http:connector name=\"HttpConnector\" xmlns:http=\"http://www.mulesoft.org/schema/mule/transport/http\"/>");
+  }
 
-    @Test
-    public void unsupportedConnectorsHttp() throws SAXException, IOException, MuleArtifactFactoryException
-    {
-        //HTTP
-        checkUnsupportedConnector("<http:connector name=\"HttpConnector\" xmlns:http=\"http://www.mulesoft.org/schema/mule/transport/http\"/>");
-    }
+  @Test
+  public void unsupportedConnectorsPollingHttp() throws SAXException, IOException, MuleArtifactFactoryException {
+    // Polling HTTP
+    checkUnsupportedConnector("<http:polling-connector name=\"PollingHttpConnector\"\n"
+        + "        pollingFrequency=\"30000\" reuseAddress=\"true\" xmlns:http=\"http://www.mulesoft.org/schema/mule/transport/http\"/>");
+  }
 
-    @Test
-    public void unsupportedConnectorsPollingHttp() throws SAXException, IOException, MuleArtifactFactoryException
-    {
-        //Polling HTTP
-        checkUnsupportedConnector("<http:polling-connector name=\"PollingHttpConnector\"\n" +
-                                  "        pollingFrequency=\"30000\" reuseAddress=\"true\" xmlns:http=\"http://www.mulesoft.org/schema/mule/transport/http\"/>");
-    }
+  @Test
+  public void unsupportedConnectorsHttps() throws SAXException, IOException, MuleArtifactFactoryException {
+    // HTTPS
+    checkUnsupportedConnector("<https:connector name=\"httpConnector\" xmlns:https=\"http://www.mulesoft.org/schema/mule/transport/https\">\n"
+        + "        <https:tls-key-store path=\"~/ce/tests/integration/src/test/resources/muletest.keystore\" keyPassword=\"mulepassword\" storePassword=\"mulepassword\"/>\n"
+        + "</https:connector>");
+  }
 
-    @Test
-    public void unsupportedConnectorsHttps() throws SAXException, IOException, MuleArtifactFactoryException
-    {
-        //HTTPS
-        checkUnsupportedConnector("<https:connector name=\"httpConnector\" xmlns:https=\"http://www.mulesoft.org/schema/mule/transport/https\">\n" +
-                                  "        <https:tls-key-store path=\"~/ce/tests/integration/src/test/resources/muletest.keystore\" keyPassword=\"mulepassword\" storePassword=\"mulepassword\"/>\n"
-                                  +
-                                  "</https:connector>");
-    }
+  @Test
+  public void unsupportedConnectorsJms() throws SAXException, IOException, MuleArtifactFactoryException {
+    // JMS
+    checkUnsupportedConnector("<jms:activemq-connector name=\"Active_MQ\" brokerURL=\"vm://localhost\" "
+        + "validateConnections=\"true\" xmlns:jms=\"http://www.mulesoft.org/schema/mule/transport/jms\"/>");
+  }
 
-    @Test
-    public void unsupportedConnectorsJms() throws SAXException, IOException, MuleArtifactFactoryException
-    {
-        //JMS
-        checkUnsupportedConnector("<jms:activemq-connector name=\"Active_MQ\" brokerURL=\"vm://localhost\" " +
-                                  "validateConnections=\"true\" xmlns:jms=\"http://www.mulesoft.org/schema/mule/transport/jms\"/>");
-    }
+  @Test
+  public void unsupportedConnectorsVm() throws SAXException, IOException, MuleArtifactFactoryException {
+    // VM
+    checkUnsupportedConnector("<vm:connector name=\"memory\" "
+        + "xmlns:vm=\"http://www.mulesoft.org/schema/mule/transport/vm\"/>");
+  }
 
-    @Test
-    public void unsupportedConnectorsVm() throws SAXException, IOException, MuleArtifactFactoryException
-    {
-        //VM
-        checkUnsupportedConnector("<vm:connector name=\"memory\" " +
-                                  "xmlns:vm=\"http://www.mulesoft.org/schema/mule/transport/vm\"/>");
-    }
+  private void checkUnsupportedConnector(String connectorConfig) throws IOException, SAXException, MuleArtifactFactoryException {
+    Document document = XMLUnit.buildControlDocument(connectorConfig);
+    artifact = lookupArtifact.getArtifact(document.getDocumentElement(), getXmlConfigurationCallbackForUnsupportedConnector());
 
-    private void checkUnsupportedConnector(String connectorConfig) throws IOException, SAXException, MuleArtifactFactoryException
-    {
-        Document document = XMLUnit.buildControlDocument(connectorConfig);
-        artifact = lookupArtifact.getArtifact(document.getDocumentElement(), getXmlConfigurationCallbackForUnsupportedConnector());
+    assertThat(artifact, not(nullValue()));
+    assertThat(artifact.hasCapability(Testable.class), is(false));
+    assertThat(artifact.getCapability(Testable.class), nullValue());
+  }
 
-        assertThat(artifact, not(nullValue()));
-        assertThat(artifact.hasCapability(Testable.class), is(false));
-        assertThat(artifact.getCapability(Testable.class), nullValue());
-    }
+  private XmlConfigurationCallback getXmlConfigurationCallbackForUnsupportedConnector() {
+    return new XmlConfigurationCallback() {
 
-    private XmlConfigurationCallback getXmlConfigurationCallbackForUnsupportedConnector()
-    {
-        return new XmlConfigurationCallback()
-        {
-            @Override
-            public Element getGlobalElement(String s)
-            {
-                return null;
-            }
+      @Override
+      public Element getGlobalElement(String s) {
+        return null;
+      }
 
-            @Override
-            public String getSchemaLocation(String s)
-            {
-                if (s != null){
-                    int connectorNameStart = s.lastIndexOf("/") + 1;
-                    s = s + "/current/mule-transport-" + s.substring(connectorNameStart) + ".xsd";
-                    return s;
-                }
-                else return null;
-            }
+      @Override
+      public String getSchemaLocation(String s) {
+        if (s != null) {
+          int connectorNameStart = s.lastIndexOf("/") + 1;
+          s = s + "/current/mule-transport-" + s.substring(connectorNameStart) + ".xsd";
+          return s;
+        } else
+          return null;
+      }
 
-            @Override
-            public Element[] getPropertyPlaceholders()
-            {
-                return new Element[0];
-            }
+      @Override
+      public Element[] getPropertyPlaceholders() {
+        return new Element[0];
+      }
 
-            @Override
-            public Map<String, String> getEnvironmentProperties()
-            {
-                return null;
-            }
-        };
+      @Override
+      public Map<String, String> getEnvironmentProperties() {
+        return null;
+      }
+    };
 
-    }
+  }
 
-    protected static XmlConfigurationMuleArtifactFactory lookupArtifact()
-    {
-        return ServiceLoader.load(XmlConfigurationMuleArtifactFactory.class).iterator().next();
-    }
+  protected static XmlConfigurationMuleArtifactFactory lookupArtifact() {
+    return ServiceLoader.load(XmlConfigurationMuleArtifactFactory.class).iterator().next();
+  }
 }

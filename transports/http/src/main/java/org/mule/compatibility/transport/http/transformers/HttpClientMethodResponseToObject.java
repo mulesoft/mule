@@ -23,59 +23,47 @@ import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpMethod;
 
 /**
- * <code>HttpClientMethodResponseToObject</code> transforms a http client response
- * to a DefaultMuleMessage.
+ * <code>HttpClientMethodResponseToObject</code> transforms a http client response to a DefaultMuleMessage.
  */
 
-public class HttpClientMethodResponseToObject extends AbstractTransformer
-{
+public class HttpClientMethodResponseToObject extends AbstractTransformer {
 
-    public HttpClientMethodResponseToObject()
-    {
-        registerSourceType(DataType.fromType(HttpMethod.class));
-        setReturnDataType(DataType.MULE_MESSAGE);
+  public HttpClientMethodResponseToObject() {
+    registerSourceType(DataType.fromType(HttpMethod.class));
+    setReturnDataType(DataType.MULE_MESSAGE);
+  }
+
+  @Override
+  public Object doTransform(Object src, Charset encoding) throws TransformerException {
+    Object msg;
+    HttpMethod httpMethod = (HttpMethod) src;
+
+    InputStream is;
+    try {
+      is = httpMethod.getResponseBodyAsStream();
+    } catch (IOException e) {
+      throw new TransformerException(this, e);
     }
 
-    @Override
-    public Object doTransform(Object src, Charset encoding) throws TransformerException
-    {
-        Object msg;
-        HttpMethod httpMethod = (HttpMethod)src;
-        
-        InputStream is;
-        try
-        {
-            is = httpMethod.getResponseBodyAsStream();
-        }
-        catch (IOException e)
-        {
-            throw new TransformerException(this, e);
-        }
-        
-        if (is == null)
-        {
-            msg = null;
-        }
-        else
-        {
-            msg = new ReleasingInputStream(is, httpMethod);
-        }
-        
-        // Standard headers
-        Map headerProps = new HashMap();
-        Header[] headers = httpMethod.getResponseHeaders();
-        String name;
-        for (Header header : headers)
-        {
-            name = header.getName();
-            if (name.startsWith(HttpConstants.X_PROPERTY_PREFIX))
-            {
-                name = name.substring(2);
-            }
-            headerProps.put(name, header.getValue());
-        }
-        // Set Mule Properties
-
-        return MuleMessage.builder().payload(msg).outboundProperties(headerProps).build();
+    if (is == null) {
+      msg = null;
+    } else {
+      msg = new ReleasingInputStream(is, httpMethod);
     }
+
+    // Standard headers
+    Map headerProps = new HashMap();
+    Header[] headers = httpMethod.getResponseHeaders();
+    String name;
+    for (Header header : headers) {
+      name = header.getName();
+      if (name.startsWith(HttpConstants.X_PROPERTY_PREFIX)) {
+        name = name.substring(2);
+      }
+      headerProps.put(name, header.getValue());
+    }
+    // Set Mule Properties
+
+    return MuleMessage.builder().payload(msg).outboundProperties(headerProps).build();
+  }
 }

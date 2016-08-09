@@ -18,32 +18,28 @@ import org.apache.http.entity.StringEntity;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpListenerSocketConfigTestCase extends AbstractHttpTestCase
-{
+public class HttpListenerSocketConfigTestCase extends AbstractHttpTestCase {
 
-    @Rule
-    public DynamicPort listenPort1 = new DynamicPort("port1");
+  @Rule
+  public DynamicPort listenPort1 = new DynamicPort("port1");
 
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "http-listener-socket-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "http-listener-socket-config.xml";
+  }
 
-    @Test
-    public void globalServerSocketProperties() throws Exception
-    {
-        // For now, just test that the context is parsed correctly.
-        assertResponse(listenPort1.getNumber(), "global");
-    }
+  @Test
+  public void globalServerSocketProperties() throws Exception {
+    // For now, just test that the context is parsed correctly.
+    assertResponse(listenPort1.getNumber(), "global");
+  }
 
-    private void assertResponse(int port, String path) throws Exception
-    {
-        final String url = String.format("http://localhost:%s/%s", port, path);
-        final Response response = Request.Post(url).body(new StringEntity(TEST_MESSAGE)).connectTimeout(1000).execute();
-        assertThat(response.returnContent().asString(), equalTo(TEST_MESSAGE));
+  private void assertResponse(int port, String path) throws Exception {
+    final String url = String.format("http://localhost:%s/%s", port, path);
+    final Response response = Request.Post(url).body(new StringEntity(TEST_MESSAGE)).connectTimeout(1000).execute();
+    assertThat(response.returnContent().asString(), equalTo(TEST_MESSAGE));
 
-    }
+  }
 
 }

@@ -14,6 +14,10 @@
     <name>PGP Security</name>
     <description>A Mule implementation of PGP security using cryptix libraries.</description>
 
+    <properties>
+        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
+    </properties>
+
     <build>
         <plugins>
             <plugin>

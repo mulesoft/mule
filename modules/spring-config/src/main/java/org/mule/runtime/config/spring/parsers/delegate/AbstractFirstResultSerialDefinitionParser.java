@@ -13,71 +13,53 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
 /**
- * Extend {@link org.mule.runtime.config.spring.parsers.delegate.AbstractSerialDelegatingDefinitionParser}
- * to return the first definition as the final result
+ * Extend {@link org.mule.runtime.config.spring.parsers.delegate.AbstractSerialDelegatingDefinitionParser} to return the first
+ * definition as the final result
  */
-public class AbstractFirstResultSerialDefinitionParser extends AbstractSerialDelegatingDefinitionParser
-{
+public class AbstractFirstResultSerialDefinitionParser extends AbstractSerialDelegatingDefinitionParser {
 
-    protected AbstractBeanDefinition firstDefinition;
-    private boolean returnFirstResult = true;
+  protected AbstractBeanDefinition firstDefinition;
+  private boolean returnFirstResult = true;
 
-    public AbstractFirstResultSerialDefinitionParser()
-    {
-        super();
-    }
+  public AbstractFirstResultSerialDefinitionParser() {
+    super();
+  }
 
-    public AbstractFirstResultSerialDefinitionParser(boolean doReset)
-    {
-        super(doReset);
-    }
+  public AbstractFirstResultSerialDefinitionParser(boolean doReset) {
+    super(doReset);
+  }
 
-    public void setReturnFirstResult(boolean returnFirstResult)
-    {
-        this.returnFirstResult = returnFirstResult;
-    }
+  public void setReturnFirstResult(boolean returnFirstResult) {
+    this.returnFirstResult = returnFirstResult;
+  }
 
-    protected AbstractBeanDefinition doSingleBean(int index, MuleDefinitionParser parser, Element element, ParserContext parserContext)
-    {
-        try
-        {
-            AbstractBeanDefinition result = null;
-            try
-            {
-                result = super.doSingleBean(index, parser, element, parserContext);
-            }
-            catch (RuntimeException e)
-            {
-                if (!isExceptionHandled(e))
-                {
-                    throw e;
-                }
-            }
-            if (0 == index)
-            {
-                firstDefinition = result;
-            }
-            if (size() == index + 1)
-            {
-                if (returnFirstResult)
-                {
-                    return firstDefinition;
-                }
-                else
-                {
-                    return result;
-                }
-            }
-            else
-            {
-                return null;
-            }
+  protected AbstractBeanDefinition doSingleBean(int index, MuleDefinitionParser parser, Element element,
+                                                ParserContext parserContext) {
+    try {
+      AbstractBeanDefinition result = null;
+      try {
+        result = super.doSingleBean(index, parser, element, parserContext);
+      } catch (RuntimeException e) {
+        if (!isExceptionHandled(e)) {
+          throw e;
         }
-        catch (RuntimeException e)
-        {
-            firstDefinition = null;
-            throw e;
+      }
+      if (0 == index) {
+        firstDefinition = result;
+      }
+      if (size() == index + 1) {
+        if (returnFirstResult) {
+          return firstDefinition;
+        } else {
+          return result;
         }
+      } else {
+        return null;
+      }
+    } catch (RuntimeException e) {
+      firstDefinition = null;
+      throw e;
     }
+  }
 
 }

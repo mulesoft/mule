@@ -9,27 +9,23 @@ package org.mule.runtime.core.retry;
 import org.mule.runtime.core.api.lifecycle.FatalException;
 import org.mule.runtime.core.config.i18n.Message;
 
-/** 
- * This exception is thrown when a Retry policy has made all the retry attempts 
- * it wants to make and is still failing.
+/**
+ * This exception is thrown when a Retry policy has made all the retry attempts it wants to make and is still failing.
  */
-public class RetryPolicyExhaustedException extends FatalException
-{
-    /** Serial version */
-    private static final long serialVersionUID = 3300563235465630595L;
+public class RetryPolicyExhaustedException extends FatalException {
 
-    public RetryPolicyExhaustedException(Message message, Object component)
-    {
-        super(message, component);
-    }
+  /** Serial version */
+  private static final long serialVersionUID = 3300563235465630595L;
 
-    public RetryPolicyExhaustedException(Message message, Throwable cause, Object component)
-    {
-        super(message, cause, component);
-    }
+  public RetryPolicyExhaustedException(Message message, Object component) {
+    super(message, component);
+  }
 
-    public RetryPolicyExhaustedException(Throwable cause, Object component)
-    {
-        super(cause, component);
-    }
+  public RetryPolicyExhaustedException(Message message, Throwable cause, Object component) {
+    super(message, cause, component);
+  }
+
+  public RetryPolicyExhaustedException(Throwable cause, Object component) {
+    super(cause, component);
+  }
 }

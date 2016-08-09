@@ -17,25 +17,22 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class TcpJmsResponseTestCase extends FunctionalTestCase
-{
+public class TcpJmsResponseTestCase extends FunctionalTestCase {
 
-    @Rule
-    public DynamicPort httpPort = new DynamicPort("port");
+  @Rule
+  public DynamicPort httpPort = new DynamicPort("port");
 
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/usecases/sync/tcp-jms-response-flow.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/usecases/sync/tcp-jms-response-flow.xml";
+  }
 
-    @Test
-    public void testSyncResponse() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        MuleMessage message = client.send("tcp://localhost:" + httpPort.getValue(), MuleMessage.builder().payload("request").build());
-        assertNotNull(message);
-        assertEquals("Received: request", getPayloadAsString(message));
-    }
+  @Test
+  public void testSyncResponse() throws Exception {
+    MuleClient client = muleContext.getClient();
+    MuleMessage message = client.send("tcp://localhost:" + httpPort.getValue(), MuleMessage.builder().payload("request").build());
+    assertNotNull(message);
+    assertEquals("Received: request", getPayloadAsString(message));
+  }
 }

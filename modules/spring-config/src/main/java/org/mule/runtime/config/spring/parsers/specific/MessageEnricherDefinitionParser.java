@@ -16,30 +16,24 @@ import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
-public class MessageEnricherDefinitionParser extends ChildDefinitionParser
-{
+public class MessageEnricherDefinitionParser extends ChildDefinitionParser {
 
-    public MessageEnricherDefinitionParser(String setterMethod, Class clazz)
-    {
-        super(setterMethod, clazz);
+  public MessageEnricherDefinitionParser(String setterMethod, Class clazz) {
+    super(setterMethod, clazz);
+  }
+
+  @Override
+  protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
+    if (!StringUtils.isEmpty(element.getAttribute("source")) || !StringUtils.isEmpty(element.getAttribute("target"))) {
+      GenericBeanDefinition objectFactoryBeanDefinition = new GenericBeanDefinition();
+      objectFactoryBeanDefinition.setBeanClass(EnrichExpressionPair.class);
+      objectFactoryBeanDefinition.getPropertyValues().addPropertyValue("source", element.getAttribute("source"));
+      objectFactoryBeanDefinition.getPropertyValues().addPropertyValue("target", element.getAttribute("target"));
+      ManagedList<GenericBeanDefinition> list = new ManagedList<GenericBeanDefinition>();
+      list.add(objectFactoryBeanDefinition);
+      builder.addPropertyValue("enrichExpressionPairs", list);
     }
 
-    @Override
-    protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
-    {
-        if (!StringUtils.isEmpty(element.getAttribute("source")) || !StringUtils.isEmpty(element.getAttribute("target")))
-        {
-            GenericBeanDefinition objectFactoryBeanDefinition = new GenericBeanDefinition();
-            objectFactoryBeanDefinition.setBeanClass(EnrichExpressionPair.class);
-            objectFactoryBeanDefinition.getPropertyValues().addPropertyValue("source",
-                element.getAttribute("source"));
-            objectFactoryBeanDefinition.getPropertyValues().addPropertyValue("target",
-                element.getAttribute("target"));
-            ManagedList<GenericBeanDefinition> list = new ManagedList<GenericBeanDefinition>();
-            list.add(objectFactoryBeanDefinition);
-            builder.addPropertyValue("enrichExpressionPairs", list);
-        }
-
-        super.parseChild(element, parserContext, builder);
-    }
+    super.parseChild(element, parserContext, builder);
+  }
 }

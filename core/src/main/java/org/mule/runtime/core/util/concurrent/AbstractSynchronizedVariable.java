@@ -9,34 +9,29 @@ package org.mule.runtime.core.util.concurrent;
 import java.util.concurrent.Executor;
 
 // @ThreadSafe
-public abstract class AbstractSynchronizedVariable implements Executor
-{
-    // @GuardedBy(itself)
-    protected final Object lock;
+public abstract class AbstractSynchronizedVariable implements Executor {
 
-    public AbstractSynchronizedVariable()
-    {
-        super();
-        lock = this;
-    }
+  // @GuardedBy(itself)
+  protected final Object lock;
 
-    public AbstractSynchronizedVariable(Object lock)
-    {
-        super();
-        this.lock = lock;
-    }
+  public AbstractSynchronizedVariable() {
+    super();
+    lock = this;
+  }
 
-    public Object getLock()
-    {
-        return lock;
-    }
+  public AbstractSynchronizedVariable(Object lock) {
+    super();
+    this.lock = lock;
+  }
 
-    public void execute(Runnable command)
-    {
-        synchronized (lock)
-        {
-            command.run();
-        }
+  public Object getLock() {
+    return lock;
+  }
+
+  public void execute(Runnable command) {
+    synchronized (lock) {
+      command.run();
     }
+  }
 
 }

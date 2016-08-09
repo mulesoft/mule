@@ -16,29 +16,24 @@ import java.util.List;
 
 import org.junit.runners.Parameterized;
 
-public class MySqlHostPortConfigTestCase extends AbstractHostPortConfigTestCase
-{
-    public MySqlHostPortConfigTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+public class MySqlHostPortConfigTestCase extends AbstractHostPortConfigTestCase {
 
-    @Parameterized.Parameters
-    public static List<Object[]> parameters()
-    {
-        if (TestDbConfig.getMySqlResource().isEmpty())
-        {
-            return Collections.emptyList();
-        }
-        else
-        {
-            return Collections.singletonList(new Object[] {"integration/config/mysql-host-port-db-config.xml", new MySqlTestDatabase()});
-        }
-    }
+  public MySqlHostPortConfigTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Override
-    protected String getDatabasePortPropertyValue()
-    {
-        return "3306";
+  @Parameterized.Parameters
+  public static List<Object[]> parameters() {
+    if (TestDbConfig.getMySqlResource().isEmpty()) {
+      return Collections.emptyList();
+    } else {
+      return Collections
+          .singletonList(new Object[] {"integration/config/mysql-host-port-db-config.xml", new MySqlTestDatabase()});
     }
+  }
+
+  @Override
+  protected String getDatabasePortPropertyValue() {
+    return "3306";
+  }
 }

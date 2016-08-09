@@ -21,29 +21,25 @@ import org.apache.cxf.phase.Phase;
 /**
  * Copies any attachments which were stored by the proxy to the outbound CXF message.
  */
-public class CopyAttachmentOutInterceptor extends AbstractPhaseInterceptor
-{
-    public CopyAttachmentOutInterceptor()
-    {
-        super(Phase.SETUP);
+public class CopyAttachmentOutInterceptor extends AbstractPhaseInterceptor {
+
+  public CopyAttachmentOutInterceptor() {
+    super(Phase.SETUP);
+  }
+
+  public void handleMessage(Message message) throws Fault {
+    MuleEvent event = (MuleEvent) message.getExchange().get(CxfConstants.MULE_EVENT);
+
+    if (event == null || event instanceof NonBlockingVoidMuleEvent) {
+      return;
     }
 
-    public void handleMessage(Message message) throws Fault
-    {
-        MuleEvent event = (MuleEvent) message.getExchange().get(CxfConstants.MULE_EVENT);
+    Collection<Attachment> a = event.getFlowVariable(CxfConstants.ATTACHMENTS);
 
-        if (event == null || event instanceof NonBlockingVoidMuleEvent)
-        {
-            return;
-        }
-
-        Collection<Attachment> a = event.getFlowVariable(CxfConstants.ATTACHMENTS);
-        
-        if (a != null) 
-        {
-            message.setAttachments(a);
-        }
+    if (a != null) {
+      message.setAttachments(a);
     }
+  }
 }
 
 

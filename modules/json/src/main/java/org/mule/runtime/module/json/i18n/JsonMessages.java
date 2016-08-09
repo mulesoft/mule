@@ -12,14 +12,13 @@ import org.mule.runtime.core.config.i18n.MessageFactory;
 /**
  * Internationalised messages for the Json module
  */
-public class JsonMessages extends MessageFactory
-{
-    private static final JsonMessages factory = new JsonMessages();
+public class JsonMessages extends MessageFactory {
 
-    private static final String BUNDLE_PATH = getBundlePath("json");
+  private static final JsonMessages factory = new JsonMessages();
 
-    public static Message messageStringIsNotJson()
-    {
-        return factory.createMessage(BUNDLE_PATH, 1);
-    }
+  private static final String BUNDLE_PATH = getBundlePath("json");
+
+  public static Message messageStringIsNotJson() {
+    return factory.createMessage(BUNDLE_PATH, 1);
+  }
 }

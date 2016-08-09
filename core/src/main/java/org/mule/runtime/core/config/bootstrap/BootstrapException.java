@@ -12,21 +12,18 @@ import org.mule.runtime.core.config.i18n.Message;
 /**
  * Represents exceptions during the bootstrap configuration process
  */
-public class BootstrapException extends ConfigurationException
-{
+public class BootstrapException extends ConfigurationException {
 
-    /**
-     * Serial version
-     */
-    private static final long serialVersionUID = 3658223240493754960L;
+  /**
+   * Serial version
+   */
+  private static final long serialVersionUID = 3658223240493754960L;
 
-    public BootstrapException(Message message, Throwable cause)
-    {
-        super(message, cause);
-    }
+  public BootstrapException(Message message, Throwable cause) {
+    super(message, cause);
+  }
 
-    public BootstrapException(Message message)
-    {
-        super(message);
-    }
+  public BootstrapException(Message message) {
+    super(message);
+  }
 }

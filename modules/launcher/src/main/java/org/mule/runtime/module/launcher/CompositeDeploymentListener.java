@@ -14,171 +14,124 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class CompositeDeploymentListener implements DeploymentListener, DeploymentListenerManager
-{
+public class CompositeDeploymentListener implements DeploymentListener, DeploymentListenerManager {
 
-    private transient final Logger logger = LoggerFactory.getLogger(getClass());
+  private transient final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private List<DeploymentListener> deploymentListeners = new CopyOnWriteArrayList<DeploymentListener>();
+  private List<DeploymentListener> deploymentListeners = new CopyOnWriteArrayList<DeploymentListener>();
 
-    @Override
-    public void addDeploymentListener(DeploymentListener listener)
-    {
-        this.deploymentListeners.add(listener);
+  @Override
+  public void addDeploymentListener(DeploymentListener listener) {
+    this.deploymentListeners.add(listener);
+  }
+
+  @Override
+  public void removeDeploymentListener(DeploymentListener listener) {
+    this.deploymentListeners.remove(listener);
+  }
+
+  @Override
+  public void onDeploymentStart(String artifactName) {
+    for (DeploymentListener listener : deploymentListeners) {
+      try {
+        listener.onDeploymentStart(artifactName);
+      } catch (Throwable t) {
+        logNotificationProcessingError(artifactName, listener, "onDeploymentStart", t);
+      }
     }
+  }
 
-    @Override
-    public void removeDeploymentListener(DeploymentListener listener)
-    {
-        this.deploymentListeners.remove(listener);
+  @Override
+  public void onDeploymentSuccess(String appName) {
+    for (DeploymentListener listener : deploymentListeners) {
+      try {
+        listener.onDeploymentSuccess(appName);
+      } catch (Throwable t) {
+        logNotificationProcessingError(appName, listener, "onDeploymentSuccess", t);
+      }
     }
+  }
 
-    @Override
-    public void onDeploymentStart(String artifactName)
-    {
-        for (DeploymentListener listener : deploymentListeners)
-        {
-            try
-            {
-                listener.onDeploymentStart(artifactName);
-            }
-            catch (Throwable t)
-            {
-                logNotificationProcessingError(artifactName, listener, "onDeploymentStart", t);
-            }
-        }
+  @Override
+  public void onDeploymentFailure(String artifactName, Throwable cause) {
+    for (DeploymentListener listener : deploymentListeners) {
+      try {
+        listener.onDeploymentFailure(artifactName, cause);
+      } catch (Throwable t) {
+        logNotificationProcessingError(artifactName, listener, "onDeploymentFailure", t);
+      }
     }
+  }
 
-    @Override
-    public void onDeploymentSuccess(String appName)
-    {
-        for (DeploymentListener listener : deploymentListeners)
-        {
-            try
-            {
-                listener.onDeploymentSuccess(appName);
-            }
-            catch (Throwable t)
-            {
-                logNotificationProcessingError(appName, listener, "onDeploymentSuccess", t);
-            }
-        }
+  @Override
+  public void onUndeploymentStart(String artifactName) {
+    for (DeploymentListener listener : deploymentListeners) {
+      try {
+        listener.onUndeploymentStart(artifactName);
+      } catch (Throwable t) {
+        logNotificationProcessingError(artifactName, listener, "onUndeploymentStart", t);
+      }
     }
+  }
 
-    @Override
-    public void onDeploymentFailure(String artifactName, Throwable cause)
-    {
-        for (DeploymentListener listener : deploymentListeners)
-        {
-            try
-            {
-                listener.onDeploymentFailure(artifactName, cause);
-            }
-            catch (Throwable t)
-            {
-                logNotificationProcessingError(artifactName, listener, "onDeploymentFailure", t);
-            }
-        }
+  @Override
+  public void onUndeploymentSuccess(String artifactName) {
+    for (DeploymentListener listener : deploymentListeners) {
+      try {
+        listener.onUndeploymentSuccess(artifactName);
+      } catch (Throwable t) {
+        logNotificationProcessingError(artifactName, listener, "onUndeploymentSuccess", t);
+      }
     }
+  }
 
-    @Override
-    public void onUndeploymentStart(String artifactName)
-    {
-        for (DeploymentListener listener : deploymentListeners)
-        {
-            try
-            {
-                listener.onUndeploymentStart(artifactName);
-            }
-            catch (Throwable t)
-            {
-                logNotificationProcessingError(artifactName, listener, "onUndeploymentStart", t);
-            }
-        }
+  @Override
+  public void onUndeploymentFailure(String artifactName, Throwable cause) {
+    for (DeploymentListener listener : deploymentListeners) {
+      try {
+        listener.onUndeploymentFailure(artifactName, cause);
+      } catch (Throwable t) {
+        logNotificationProcessingError(artifactName, listener, "onUndeploymentFailure", t);
+      }
     }
+  }
 
-    @Override
-    public void onUndeploymentSuccess(String artifactName)
-    {
-        for (DeploymentListener listener : deploymentListeners)
-        {
-            try
-            {
-                listener.onUndeploymentSuccess(artifactName);
-            }
-            catch (Throwable t)
-            {
-                logNotificationProcessingError(artifactName, listener, "onUndeploymentSuccess", t);
-            }
-        }
+  @Override
+  public void onMuleContextCreated(String artifactName, MuleContext context) {
+    for (DeploymentListener listener : deploymentListeners) {
+      try {
+        listener.onMuleContextCreated(artifactName, context);
+      } catch (Throwable t) {
+        logNotificationProcessingError(artifactName, listener, "onMuleContextCreated", t);
+      }
     }
+  }
 
-    @Override
-    public void onUndeploymentFailure(String artifactName, Throwable cause)
-    {
-        for (DeploymentListener listener : deploymentListeners)
-        {
-            try
-            {
-                listener.onUndeploymentFailure(artifactName, cause);
-            }
-            catch (Throwable t)
-            {
-                logNotificationProcessingError(artifactName, listener, "onUndeploymentFailure", t);
-            }
-        }
+  @Override
+  public void onMuleContextInitialised(String artifactName, MuleContext context) {
+    for (DeploymentListener listener : deploymentListeners) {
+      try {
+        listener.onMuleContextInitialised(artifactName, context);
+      } catch (Throwable t) {
+        logNotificationProcessingError(artifactName, listener, "onMuleContextInitialised", t);
+      }
     }
+  }
 
-    @Override
-    public void onMuleContextCreated(String artifactName, MuleContext context)
-    {
-        for (DeploymentListener listener : deploymentListeners)
-        {
-            try
-            {
-                listener.onMuleContextCreated(artifactName, context);
-            }
-            catch (Throwable t)
-            {
-                logNotificationProcessingError(artifactName, listener, "onMuleContextCreated", t);
-            }
-        }
+  @Override
+  public void onMuleContextConfigured(String artifactName, MuleContext context) {
+    for (DeploymentListener listener : deploymentListeners) {
+      try {
+        listener.onMuleContextConfigured(artifactName, context);
+      } catch (Throwable t) {
+        logNotificationProcessingError(artifactName, listener, "onMuleContextConfigured", t);
+      }
     }
+  }
 
-    @Override
-    public void onMuleContextInitialised(String artifactName, MuleContext context)
-    {
-        for (DeploymentListener listener : deploymentListeners)
-        {
-            try
-            {
-                listener.onMuleContextInitialised(artifactName, context);
-            }
-            catch (Throwable t)
-            {
-                logNotificationProcessingError(artifactName, listener, "onMuleContextInitialised", t);
-            }
-        }
-    }
-
-    @Override
-    public void onMuleContextConfigured(String artifactName, MuleContext context)
-    {
-        for (DeploymentListener listener : deploymentListeners)
-        {
-            try
-            {
-                listener.onMuleContextConfigured(artifactName, context);
-            }
-            catch (Throwable t)
-            {
-                logNotificationProcessingError(artifactName, listener, "onMuleContextConfigured", t);
-            }
-        }
-    }
-
-    private void logNotificationProcessingError(String appName, DeploymentListener listener, String notification, Throwable error)
-    {
-        logger.error(String.format("Listener '%s' failed to process notification '%s' for application '%s'", listener, notification, appName), error);
-    }
+  private void logNotificationProcessingError(String appName, DeploymentListener listener, String notification, Throwable error) {
+    logger.error(String.format("Listener '%s' failed to process notification '%s' for application '%s'", listener, notification,
+                               appName),
+                 error);
+  }
 }

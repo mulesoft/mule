@@ -13,31 +13,27 @@ import org.junit.Test;
  * Send and recieve JmsMessage without any tx
  */
 @Ignore("MULE-9628")
-public class JmsSingleTransactionNoneTestCase extends AbstractJmsFunctionalTestCase
-{
+public class JmsSingleTransactionNoneTestCase extends AbstractJmsFunctionalTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "integration/jms-single-tx-NONE.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "integration/jms-single-tx-NONE.xml";
+  }
 
-    @Override
-    protected void doSetUp() throws Exception
-    {
-        super.doSetUp();
+  @Override
+  protected void doSetUp() throws Exception {
+    super.doSetUp();
 
-        purge(getInboundQueueName());
-        purge(getJmsConfig().getMiddleDestinationName());
-        purge(getOutboundQueueName());
-    }
+    purge(getInboundQueueName());
+    purge(getJmsConfig().getMiddleDestinationName());
+    purge(getOutboundQueueName());
+  }
 
-    @Test
-    public void testNoneTx() throws Exception
-    {
-        send(scenarioNoTx);
-        receive(scenarioNoTx);
-        receive(scenarioNotReceive);
-    }
+  @Test
+  public void testNoneTx() throws Exception {
+    send(scenarioNoTx);
+    receive(scenarioNoTx);
+    receive(scenarioNotReceive);
+  }
 
 }

@@ -16,61 +16,47 @@ import org.mule.runtime.core.api.store.ObjectStore;
 import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.serialization.internal.JavaObjectSerializer;
 
-public abstract class SerializationTestUtils
-{
+public abstract class SerializationTestUtils {
 
-    private static final String key = "SerializationTestComponentKey";
+  private static final String key = "SerializationTestComponentKey";
 
-    public static <T extends Exception> T testException(T exception, MuleContext muleContext)
-    {
-        ObjectStore<T> os = getObjectStore(muleContext);
-        try
-        {
-            os.store(key, exception);
-            return os.retrieve(key);
-        }
-        catch (Exception e)
-        {
-            throw new RuntimeException(e);
-        }
-        finally
-        {
-            try
-            {
-                os.clear();
-            }
-            catch (ObjectStoreException e)
-            {
-                throw new RuntimeException(e);
-            }
-        }
+  public static <T extends Exception> T testException(T exception, MuleContext muleContext) {
+    ObjectStore<T> os = getObjectStore(muleContext);
+    try {
+      os.store(key, exception);
+      return os.retrieve(key);
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    } finally {
+      try {
+        os.clear();
+      } catch (ObjectStoreException e) {
+        throw new RuntimeException(e);
+      }
     }
+  }
 
-    private static <T extends Exception> ObjectStore<T> getObjectStore(MuleContext muleContext)
-    {
-        return muleContext.getObjectStoreManager().getObjectStore("SerializationTestUtils", true);
-    }
+  private static <T extends Exception> ObjectStore<T> getObjectStore(MuleContext muleContext) {
+    return muleContext.getObjectStoreManager().getObjectStore("SerializationTestUtils", true);
+  }
 
-    public static ObjectSerializer getJavaSerializerWithMockContext()
-    {
-        MuleContext muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
-        when(muleContext.getExecutionClassLoader()).thenReturn(ObjectSerializer.class.getClassLoader());
-        return getJavaSerializer(muleContext);
-    }
+  public static ObjectSerializer getJavaSerializerWithMockContext() {
+    MuleContext muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
+    when(muleContext.getExecutionClassLoader()).thenReturn(ObjectSerializer.class.getClassLoader());
+    return getJavaSerializer(muleContext);
+  }
 
-    public static ObjectSerializer addJavaSerializerToMockMuleContext(MuleContext mockMuleContext)
-    {
-        ObjectSerializer objectSerializer = getJavaSerializer(mockMuleContext);
-        when(mockMuleContext.getObjectSerializer()).thenReturn(objectSerializer);
-        return objectSerializer;
-    }
+  public static ObjectSerializer addJavaSerializerToMockMuleContext(MuleContext mockMuleContext) {
+    ObjectSerializer objectSerializer = getJavaSerializer(mockMuleContext);
+    when(mockMuleContext.getObjectSerializer()).thenReturn(objectSerializer);
+    return objectSerializer;
+  }
 
-    private static ObjectSerializer getJavaSerializer(MuleContext muleContext)
-    {
-        JavaObjectSerializer serializer = new JavaObjectSerializer();
-        serializer.setMuleContext(muleContext);
+  private static ObjectSerializer getJavaSerializer(MuleContext muleContext) {
+    JavaObjectSerializer serializer = new JavaObjectSerializer();
+    serializer.setMuleContext(muleContext);
 
-        return serializer;
-    }
+    return serializer;
+  }
 
 }

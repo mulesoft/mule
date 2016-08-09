@@ -23,52 +23,41 @@ import org.w3c.dom.NodeList;
 /**
  * BDP which parses the <return-data> element of the <static-component>.
  */
-public class StaticComponentDefinitionParser extends SimpleComponentDefinitionParser
-{
-    public StaticComponentDefinitionParser()
-    {
-        super(DefaultJavaComponent.class, StaticComponent.class);
+public class StaticComponentDefinitionParser extends SimpleComponentDefinitionParser {
+
+  public StaticComponentDefinitionParser() {
+    super(DefaultJavaComponent.class, StaticComponent.class);
+  }
+
+  @Override
+  protected AbstractBeanDefinition getObjectFactoryDefinition(Element element) {
+    AbstractBeanDefinition objectFactoryBeanDefinition = super.getObjectFactoryDefinition(element);
+
+    String returnData = null;
+
+    NodeList list = element.getChildNodes();
+    for (int i = 0; i < list.getLength(); i++) {
+      if ("return-data".equals(list.item(i).getLocalName())) {
+        Element rData = (Element) list.item(i);
+        if (StringUtils.isNotEmpty(rData.getAttribute("file"))) {
+          String file = rData.getAttribute("file");
+          try {
+            returnData = IOUtils.getResourceAsString(file, getClass());
+          } catch (IOException e) {
+            throw new BeanCreationException("Failed to load test-data resource: " + file, e);
+          }
+        } else {
+          returnData = rData.getTextContent();
+        }
+      }
     }
 
-    @Override
-    protected AbstractBeanDefinition getObjectFactoryDefinition(Element element)
-    {
-        AbstractBeanDefinition objectFactoryBeanDefinition = super.getObjectFactoryDefinition(element);
-        
-        String returnData = null;
-
-        NodeList list = element.getChildNodes();
-        for (int i = 0; i < list.getLength(); i++)
-        {
-            if ("return-data".equals(list.item(i).getLocalName()))
-            {
-                Element rData = (Element) list.item(i);
-                if (StringUtils.isNotEmpty(rData.getAttribute("file")))
-                {
-                    String file = rData.getAttribute("file");
-                    try
-                    {
-                        returnData = IOUtils.getResourceAsString(file, getClass());
-                    }
-                    catch (IOException e)
-                    {
-                        throw new BeanCreationException("Failed to load test-data resource: " + file, e);
-                    }
-                }
-                else
-                {
-                    returnData = rData.getTextContent();
-                }
-            }
-        }
-
-        if (returnData != null)
-        {
-            Map props = new HashMap();
-            props.put("data", returnData);
-            objectFactoryBeanDefinition.getPropertyValues().addPropertyValue("properties", props);
-        }
-        
-        return objectFactoryBeanDefinition;
+    if (returnData != null) {
+      Map props = new HashMap();
+      props.put("data", returnData);
+      objectFactoryBeanDefinition.getPropertyValues().addPropertyValue("properties", props);
     }
+
+    return objectFactoryBeanDefinition;
+  }
 }

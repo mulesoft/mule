@@ -12,53 +12,48 @@ import org.mule.runtime.extension.api.introspection.EnrichableModel;
 import org.mule.runtime.extension.api.introspection.ModelProperty;
 
 /**
- * An immutable model property which specifies that the owning {@link EnrichableModel}
- * requires a configuration of a given {@link #configType}
+ * An immutable model property which specifies that the owning {@link EnrichableModel} requires a configuration of a given
+ * {@link #configType}
  *
  * @since 4.0
  */
-public final class ConfigTypeModelProperty implements ModelProperty
-{
+public final class ConfigTypeModelProperty implements ModelProperty {
 
-    private final MetadataType configType;
+  private final MetadataType configType;
 
-    /**
-     * Creates a new instance for the given {@code configType}
-     *
-     * @param configType
-     */
-    public ConfigTypeModelProperty(MetadataType configType)
-    {
-        this.configType = configType;
-    }
+  /**
+   * Creates a new instance for the given {@code configType}
+   *
+   * @param configType
+   */
+  public ConfigTypeModelProperty(MetadataType configType) {
+    this.configType = configType;
+  }
 
-    /**
-     * @return the {@link {@link #configType }}
-     */
-    public MetadataType getConfigType()
-    {
-        return configType;
-    }
+  /**
+   * @return the {@link {@link #configType }}
+   */
+  public MetadataType getConfigType() {
+    return configType;
+  }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @return {@code configType}
-     */
-    @Override
-    public String getName()
-    {
-        return "configType";
-    }
+  /**
+   * {@inheritDoc}
+   *
+   * @return {@code configType}
+   */
+  @Override
+  public String getName() {
+    return "configType";
+  }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @return {@code false}
-     */
-    @Override
-    public boolean isExternalizable()
-    {
-        return false;
-    }
+  /**
+   * {@inheritDoc}
+   *
+   * @return {@code false}
+   */
+  @Override
+  public boolean isExternalizable() {
+    return false;
+  }
 }

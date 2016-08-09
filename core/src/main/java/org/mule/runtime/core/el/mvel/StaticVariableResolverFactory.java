@@ -15,21 +15,19 @@ import org.mule.runtime.core.el.function.RegexExpressionLanguageFuntion;
 import org.mule.runtime.core.el.function.WildcardExpressionLanguageFuntion;
 import org.mule.mvel2.ParserConfiguration;
 
-public class StaticVariableResolverFactory extends MVELExpressionLanguageContext
-{
+public class StaticVariableResolverFactory extends MVELExpressionLanguageContext {
 
-    private static final long serialVersionUID = -6819292692339684915L;
+  private static final long serialVersionUID = -6819292692339684915L;
 
-    public StaticVariableResolverFactory(ParserConfiguration parserConfiguration, MuleContext muleContext)
-    {
-        super(parserConfiguration, muleContext);
-        addFinalVariable("server", new ServerContext());
-        addFinalVariable("mule", new MuleInstanceContext(muleContext));
-        addFinalVariable("app", new AppContext(muleContext));
-        addFinalVariable(MVELExpressionLanguageContext.MULE_CONTEXT_INTERNAL_VARIABLE, muleContext);
-        declareFunction("regex", new RegexExpressionLanguageFuntion());
-        declareFunction("wildcard", new WildcardExpressionLanguageFuntion());
-        declareFunction("dateTime", new DateTimeExpressionLanguageFuntion());
-    }
+  public StaticVariableResolverFactory(ParserConfiguration parserConfiguration, MuleContext muleContext) {
+    super(parserConfiguration, muleContext);
+    addFinalVariable("server", new ServerContext());
+    addFinalVariable("mule", new MuleInstanceContext(muleContext));
+    addFinalVariable("app", new AppContext(muleContext));
+    addFinalVariable(MVELExpressionLanguageContext.MULE_CONTEXT_INTERNAL_VARIABLE, muleContext);
+    declareFunction("regex", new RegexExpressionLanguageFuntion());
+    declareFunction("wildcard", new WildcardExpressionLanguageFuntion());
+    declareFunction("dateTime", new DateTimeExpressionLanguageFuntion());
+  }
 
 }

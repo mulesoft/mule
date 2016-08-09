@@ -18,77 +18,63 @@ import org.mule.tck.junit4.rule.SystemProperty;
 /**
  * A {@link TestRule} which starts an {@link BrokerService}.
  * <p>
- * It automatically allocates a dynamic port and exposes the
- * selected port on a system property under a configurable key.
+ * It automatically allocates a dynamic port and exposes the selected port on a system property under a configurable key.
  *
  * @since 4.0
  */
-public class ActiveMQBroker extends ExternalResource
-{
+public class ActiveMQBroker extends ExternalResource {
 
-    protected final DynamicPort dynamicPort;
-    
-    private final String connectorUrl;
-    private BrokerService broker;
-    private TransportConnector transportConnector;
-    
-    /**
-     * Creates a new instance
-     *
-     * @param amqBrokerPortName the name of the system property on which the port will be exposed
-     */
-    public ActiveMQBroker(String amqBrokerPortName)
-    {
-        dynamicPort = new DynamicPort(amqBrokerPortName);
+  protected final DynamicPort dynamicPort;
 
-        connectorUrl = "tcp://localhost:" + dynamicPort.getValue();
-    }
+  private final String connectorUrl;
+  private BrokerService broker;
+  private TransportConnector transportConnector;
 
-    @Override
-    public Statement apply(Statement base, Description description)
-    {
-        base = dynamicPort.apply(base, description);
-        return super.apply(base, description);
-    }
+  /**
+   * Creates a new instance
+   *
+   * @param amqBrokerPortName the name of the system property on which the port will be exposed
+   */
+  public ActiveMQBroker(String amqBrokerPortName) {
+    dynamicPort = new DynamicPort(amqBrokerPortName);
 
-    public void start()
-    {
-        broker = new BrokerService();
-        
-        try
-        {
-            broker.setUseJmx(false);
-            broker.setPersistent(false);
-            transportConnector = broker.addConnector(connectorUrl);
-            broker.start(true);
-            broker.waitUntilStarted();
-        }
-        catch (Exception e)
-        {
-            throw new RuntimeException(e);
-        }
-    }
-    
-    public void stop()
-    {
-        try
-        {
-            broker.stop();
-            broker.waitUntilStopped();
-        }
-        catch (Exception e)
-        {
-            throw new RuntimeException(e);
-        }
-    }
+    connectorUrl = "tcp://localhost:" + dynamicPort.getValue();
+  }
 
-    public String getConnectorUrl()
-    {
-        return connectorUrl;
+  @Override
+  public Statement apply(Statement base, Description description) {
+    base = dynamicPort.apply(base, description);
+    return super.apply(base, description);
+  }
+
+  public void start() {
+    broker = new BrokerService();
+
+    try {
+      broker.setUseJmx(false);
+      broker.setPersistent(false);
+      transportConnector = broker.addConnector(connectorUrl);
+      broker.start(true);
+      broker.waitUntilStarted();
+    } catch (Exception e) {
+      throw new RuntimeException(e);
     }
-    
-    public int getConnectionsCount()
-    {
-        return transportConnector.getConnections().size();
+  }
+
+  public void stop() {
+    try {
+      broker.stop();
+      broker.waitUntilStopped();
+    } catch (Exception e) {
+      throw new RuntimeException(e);
     }
+  }
+
+  public String getConnectorUrl() {
+    return connectorUrl;
+  }
+
+  public int getConnectionsCount() {
+    return transportConnector.getConnections().size();
+  }
 }

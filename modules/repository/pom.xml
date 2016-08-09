@@ -16,6 +16,7 @@
     <properties>
         <aetherVersion>1.1.0</aetherVersion>
         <aetherProviderVersion>3.3.9</aetherProviderVersion>
+        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
 
     <dependencies>

@@ -8,27 +8,23 @@ package org.mule.runtime.core.api.store;
 
 import org.mule.runtime.core.config.i18n.Message;
 
-public class ObjectAlreadyExistsException extends ObjectStoreException
-{
-    public ObjectAlreadyExistsException()
-    {
-        super();
-    }
+public class ObjectAlreadyExistsException extends ObjectStoreException {
 
-    public ObjectAlreadyExistsException(Message message, Throwable cause)
-    {
-        super(message, cause);
-    }
+  public ObjectAlreadyExistsException() {
+    super();
+  }
 
-    public ObjectAlreadyExistsException(Message message)
-    {
-        super(message);
-    }
+  public ObjectAlreadyExistsException(Message message, Throwable cause) {
+    super(message, cause);
+  }
 
-    public ObjectAlreadyExistsException(Throwable cause)
-    {
-        super(cause);
-    }
+  public ObjectAlreadyExistsException(Message message) {
+    super(message);
+  }
+
+  public ObjectAlreadyExistsException(Throwable cause) {
+    super(cause);
+  }
 }
 
 

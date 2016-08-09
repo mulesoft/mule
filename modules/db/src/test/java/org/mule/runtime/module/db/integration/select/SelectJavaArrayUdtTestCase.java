@@ -27,49 +27,45 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class SelectJavaArrayUdtTestCase extends AbstractDbIntegrationTestCase
-{
-    public SelectJavaArrayUdtTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
+public class SelectJavaArrayUdtTestCase extends AbstractDbIntegrationTestCase {
+
+  public SelectJavaArrayUdtTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
+
+  @Parameterized.Parameters
+  public static List<Object[]> parameters() {
+    List<Object[]> params = new LinkedList<>();
+
+    if (!getOracleResource().isEmpty()) {
+      params.add(new Object[] {"integration/config/oracle-mapped-udt-db-config.xml", new OracleTestDatabase()});
     }
 
-    @Parameterized.Parameters
-    public static List<Object[]> parameters()
-    {
-        List<Object[]> params = new LinkedList<>();
+    return params;
+  }
 
-        if (!getOracleResource().isEmpty())
-        {
-            params.add(new Object[] {"integration/config/oracle-mapped-udt-db-config.xml", new OracleTestDatabase()});
-        }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/select/select-udt-array-config.xml"};
+  }
 
-        return params;
-    }
+  @Test
+  public void returnsDefaultArray() throws Exception {
+    final MuleEvent responseEvent = flowRunner("returnsDefaultArray").withPayload(TEST_MESSAGE).run();
+    final MuleMessage response = responseEvent.getMessage();
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/select/select-udt-array-config.xml"};
-    }
+    assertRecords(response.getPayload(),
+                  new Record(new Field("REGION_NAME", NORTHWEST.getName()), new Field("ZIPS", NORTHWEST.getZips())),
+                  new Record(new Field("REGION_NAME", SOUTHWEST.getName()), new Field("ZIPS", SOUTHWEST.getZips())));
+  }
 
-    @Test
-    public void returnsDefaultArray() throws Exception
-    {
-        final MuleEvent responseEvent = flowRunner("returnsDefaultArray").withPayload(TEST_MESSAGE).run();
-        final MuleMessage response = responseEvent.getMessage();
+  @Test
+  public void returnsMappedObjectArray() throws Exception {
+    final MuleEvent responseEvent = flowRunner("returnsCustomArray").withPayload(TEST_MESSAGE).run();
+    final MuleMessage response = responseEvent.getMessage();
 
-        assertRecords(response.getPayload(), new Record(new Field("REGION_NAME", NORTHWEST.getName()), new Field("ZIPS", NORTHWEST.getZips())),
-                      new Record(new Field("REGION_NAME", SOUTHWEST.getName()), new Field("ZIPS", SOUTHWEST.getZips())));
-    }
-
-    @Test
-    public void returnsMappedObjectArray() throws Exception
-    {
-        final MuleEvent responseEvent = flowRunner("returnsCustomArray").withPayload(TEST_MESSAGE).run();
-        final MuleMessage response = responseEvent.getMessage();
-
-        assertRecords(response.getPayload(), new Record(new Field("CONTACT_NAME", CONTACT1.getName()), new Field("DETAILS", CONTACT1.getDetails())),
-                      new Record(new Field("CONTACT_NAME", CONTACT2.getName()), new Field("DETAILS", CONTACT2.getDetails())));
-    }
+    assertRecords(response.getPayload(),
+                  new Record(new Field("CONTACT_NAME", CONTACT1.getName()), new Field("DETAILS", CONTACT1.getDetails())),
+                  new Record(new Field("CONTACT_NAME", CONTACT2.getName()), new Field("DETAILS", CONTACT2.getDetails())));
+  }
 }

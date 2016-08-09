@@ -18,30 +18,27 @@ import org.mule.test.transformers.GraphTransformerResolutionTestCase.B;
 
 import org.junit.Test;
 
-public class SpringPrototypesLifecycleTestCase extends AbstractIntegrationTestCase
-{
+public class SpringPrototypesLifecycleTestCase extends AbstractIntegrationTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "spring-prototypes-lifecycle-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "spring-prototypes-lifecycle-config.xml";
+  }
 
-    @Test
-    public void registersTransformerOnce() throws Exception
-    {
-        final MuleEvent muleEvent = flowRunner("testFlow").withPayload(new A(TEST_MESSAGE)).run();
-        final MuleMessage response = muleEvent.getMessage();
+  @Test
+  public void registersTransformerOnce() throws Exception {
+    final MuleEvent muleEvent = flowRunner("testFlow").withPayload(new A(TEST_MESSAGE)).run();
+    final MuleMessage response = muleEvent.getMessage();
 
-        assertThat(response.getPayload(), is(instanceOf(B.class)));
-    }
+    assertThat(response.getPayload(), is(instanceOf(B.class)));
+  }
 
-    @Test
-    public void exceptionHandlerWithTransformerInEndpoint() throws Exception
-    {
-        final MuleEvent muleEvent = flowRunner("testExceptionHandlerWithTransformerInEndpointFlow").withPayload(new A(TEST_MESSAGE)).run();
-        final MuleMessage response = muleEvent.getMessage();
+  @Test
+  public void exceptionHandlerWithTransformerInEndpoint() throws Exception {
+    final MuleEvent muleEvent =
+        flowRunner("testExceptionHandlerWithTransformerInEndpointFlow").withPayload(new A(TEST_MESSAGE)).run();
+    final MuleMessage response = muleEvent.getMessage();
 
-        assertThat(response.getPayload(), is(instanceOf(B.class)));
-    }
+    assertThat(response.getPayload(), is(instanceOf(B.class)));
+  }
 }

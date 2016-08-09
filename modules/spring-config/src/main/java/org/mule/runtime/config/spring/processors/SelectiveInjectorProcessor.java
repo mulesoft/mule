@@ -12,32 +12,29 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.PropertyValues;
 
 /**
- * Base class for specializations of {@link MuleInjectorProcessor}
- * which should only perform injection if a certain condition is met.
+ * Base class for specializations of {@link MuleInjectorProcessor} which should only perform injection if a certain condition is
+ * met.
  *
  * @since 3.7.0
  */
-abstract class SelectiveInjectorProcessor extends MuleInjectorProcessor
-{
+abstract class SelectiveInjectorProcessor extends MuleInjectorProcessor {
 
-    /**
-     * Only performs the injetion if {@link #shouldInject(PropertyValues, PropertyDescriptor[], Object, String)}
-     * returns {@code true}
-     * {@inheritDoc}
-     */
-    @Override
-    public PropertyValues postProcessPropertyValues(PropertyValues pvs, PropertyDescriptor[] pds, Object bean, String beanName) throws BeansException
-    {
-        if (shouldInject(pvs, pds, bean, beanName))
-        {
-            return super.postProcessPropertyValues(pvs, pds, bean, beanName);
-        }
-
-        return pvs;
+  /**
+   * Only performs the injetion if {@link #shouldInject(PropertyValues, PropertyDescriptor[], Object, String)} returns
+   * {@code true} {@inheritDoc}
+   */
+  @Override
+  public PropertyValues postProcessPropertyValues(PropertyValues pvs, PropertyDescriptor[] pds, Object bean, String beanName)
+      throws BeansException {
+    if (shouldInject(pvs, pds, bean, beanName)) {
+      return super.postProcessPropertyValues(pvs, pds, bean, beanName);
     }
 
-    /**
-     * @return whether the injection should be performed or not
-     */
-    protected abstract boolean shouldInject(PropertyValues pvs, PropertyDescriptor[] pds, Object bean, String beanName);
+    return pvs;
+  }
+
+  /**
+   * @return whether the injection should be performed or not
+   */
+  protected abstract boolean shouldInject(PropertyValues pvs, PropertyDescriptor[] pds, Object bean, String beanName);
 }

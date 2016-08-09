@@ -49,180 +49,159 @@ import org.apache.commons.net.ftp.FTPClient;
  *
  * @since 4.0
  */
-public class SftpFileSystem extends AbstractFileSystem implements FtpFileSystem
-{
+public class SftpFileSystem extends AbstractFileSystem implements FtpFileSystem {
 
-    private final MuleContext muleContext;
-    protected final SftpClient client;
-    protected final CopyCommand copyCommand;
-    protected final CreateDirectoryCommand createDirectoryCommand;
-    protected final DeleteCommand deleteCommand;
-    protected final ListCommand listCommand;
-    protected final MoveCommand moveCommand;
-    protected final ReadCommand readCommand;
-    protected final RenameCommand renameCommand;
-    protected final WriteCommand writeCommand;
+  private final MuleContext muleContext;
+  protected final SftpClient client;
+  protected final CopyCommand copyCommand;
+  protected final CreateDirectoryCommand createDirectoryCommand;
+  protected final DeleteCommand deleteCommand;
+  protected final ListCommand listCommand;
+  protected final MoveCommand moveCommand;
+  protected final ReadCommand readCommand;
+  protected final RenameCommand renameCommand;
+  protected final WriteCommand writeCommand;
 
 
-    /**
-     * Creates a new instance
-     *
-     * @param client a ready to use {@link FTPClient}
-     */
-    public SftpFileSystem(SftpClient client, MuleContext muleContext)
-    {
-        this.client = client;
-        this.muleContext = muleContext;
+  /**
+   * Creates a new instance
+   *
+   * @param client a ready to use {@link FTPClient}
+   */
+  public SftpFileSystem(SftpClient client, MuleContext muleContext) {
+    this.client = client;
+    this.muleContext = muleContext;
 
-        copyCommand = new SftpCopyCommand(this, client);
-        createDirectoryCommand = new SftpCreateDirectoryCommand(this, client);
-        deleteCommand = new SftpDeleteCommand(this, client);
-        listCommand = new SftpListCommand(this, client);
-        moveCommand = new SftpMoveCommand(this, client);
-        readCommand = new SftpReadCommand(this, client);
-        renameCommand = new SftpRenameCommand(this, client);
-        writeCommand = new SftpWriteCommand(this, client, muleContext);
+    copyCommand = new SftpCopyCommand(this, client);
+    createDirectoryCommand = new SftpCreateDirectoryCommand(this, client);
+    deleteCommand = new SftpDeleteCommand(this, client);
+    listCommand = new SftpListCommand(this, client);
+    moveCommand = new SftpMoveCommand(this, client);
+    readCommand = new SftpReadCommand(this, client);
+    renameCommand = new SftpRenameCommand(this, client);
+    writeCommand = new SftpWriteCommand(this, client, muleContext);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void disconnect() {
+    client.disconnect();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void changeToBaseDir(FileConnectorConfig config) {
+    client.changeWorkingDirectory(config.getWorkingDir());
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public InputStream retrieveFileContent(FileAttributes filePayload) {
+    return client.getFileContent(filePayload.getPath());
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public ConnectionValidationResult validateConnection() {
+    return client.isConnected() ? ConnectionValidationResult.success()
+        : ConnectionValidationResult.failure("Connection is stale", ConnectionExceptionCode.UNKNOWN, null);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @return a {@link URLPathLock} based on the {@link #client}'s connection information
+   */
+  @Override
+  protected PathLock createLock(Path path, Object... params) {
+    return new URLPathLock(toURL(path), muleContext.getLockFactory());
+  }
+
+  private URL toURL(Path path) {
+    try {
+      return new URL(FTP_PROTOCOL, client.getHost(), client.getPort(), path != null ? path.toString() : EMPTY);
+    } catch (MalformedURLException e) {
+      throw new MuleRuntimeException(createStaticMessage("Could not get URL for SFTP server"), e);
     }
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void disconnect()
-    {
-        client.disconnect();
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public CopyCommand getCopyCommand() {
+    return copyCommand;
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void changeToBaseDir(FileConnectorConfig config)
-    {
-        client.changeWorkingDirectory(config.getWorkingDir());
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public CreateDirectoryCommand getCreateDirectoryCommand() {
+    return createDirectoryCommand;
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public InputStream retrieveFileContent(FileAttributes filePayload)
-    {
-        return client.getFileContent(filePayload.getPath());
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public DeleteCommand getDeleteCommand() {
+    return deleteCommand;
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ConnectionValidationResult validateConnection()
-    {
-        return client.isConnected()
-               ? ConnectionValidationResult.success()
-               : ConnectionValidationResult.failure("Connection is stale", ConnectionExceptionCode.UNKNOWN, null);
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public ListCommand getListCommand() {
+    return listCommand;
+  }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @return a {@link URLPathLock} based on the {@link #client}'s connection information
-     */
-    @Override
-    protected PathLock createLock(Path path, Object... params)
-    {
-        return new URLPathLock(toURL(path), muleContext.getLockFactory());
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public MoveCommand getMoveCommand() {
+    return moveCommand;
+  }
 
-    private URL toURL(Path path)
-    {
-        try
-        {
-            return new URL(FTP_PROTOCOL, client.getHost(), client.getPort(), path != null ? path.toString() : EMPTY);
-        }
-        catch (MalformedURLException e)
-        {
-            throw new MuleRuntimeException(createStaticMessage("Could not get URL for SFTP server"), e);
-        }
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public ReadCommand getReadCommand() {
+    return readCommand;
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public CopyCommand getCopyCommand()
-    {
-        return copyCommand;
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public RenameCommand getRenameCommand() {
+    return renameCommand;
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public CreateDirectoryCommand getCreateDirectoryCommand()
-    {
-        return createDirectoryCommand;
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public WriteCommand getWriteCommand() {
+    return writeCommand;
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public DeleteCommand getDeleteCommand()
-    {
-        return deleteCommand;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ListCommand getListCommand()
-    {
-        return listCommand;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public MoveCommand getMoveCommand()
-    {
-        return moveCommand;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ReadCommand getReadCommand()
-    {
-        return readCommand;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public RenameCommand getRenameCommand()
-    {
-        return renameCommand;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public WriteCommand getWriteCommand()
-    {
-        return writeCommand;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Class<? extends FileAttributes> getAttributesType()
-    {
-        return SftpFileAttributes.class;
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Class<? extends FileAttributes> getAttributesType() {
+    return SftpFileAttributes.class;
+  }
 }

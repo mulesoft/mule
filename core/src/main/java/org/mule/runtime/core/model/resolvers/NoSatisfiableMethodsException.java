@@ -10,30 +10,26 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 
 /**
- * <code>NoSatisfiableMethodsException</code> is thrown by EntryPointResolvers when
- * the service passed has no methods that meet the criteria of the configured
- * EntryPointResolver.
+ * <code>NoSatisfiableMethodsException</code> is thrown by EntryPointResolvers when the service passed has no methods that meet
+ * the criteria of the configured EntryPointResolver.
  *
  * @see org.mule.runtime.core.api.model.EntryPointResolver
  */
-public class NoSatisfiableMethodsException extends MuleException
-{
-    /** Serial version */
-    private static final long serialVersionUID = -4703387041767867189L;
+public class NoSatisfiableMethodsException extends MuleException {
+
+  /** Serial version */
+  private static final long serialVersionUID = -4703387041767867189L;
 
 
-    public NoSatisfiableMethodsException(Object component, String methodName)
-    {
-        super(CoreMessages.noEntryPointFoundForNoArgsMethod(component, methodName));
-    }
+  public NoSatisfiableMethodsException(Object component, String methodName) {
+    super(CoreMessages.noEntryPointFoundForNoArgsMethod(component, methodName));
+  }
 
-    public NoSatisfiableMethodsException(Object component, Class<?>[] args)
-    {
-        super(CoreMessages.noEntryPointFoundWithArgs(component, args));
-    }
+  public NoSatisfiableMethodsException(Object component, Class<?>[] args) {
+    super(CoreMessages.noEntryPointFoundWithArgs(component, args));
+  }
 
-    public NoSatisfiableMethodsException(Object component, Class<?> returnType)
-    {
-        super(CoreMessages.noMatchingMethodsOnObjectReturning(component, returnType));
-    }
+  public NoSatisfiableMethodsException(Object component, Class<?> returnType) {
+    super(CoreMessages.noMatchingMethodsOnObjectReturning(component, returnType));
+  }
 }

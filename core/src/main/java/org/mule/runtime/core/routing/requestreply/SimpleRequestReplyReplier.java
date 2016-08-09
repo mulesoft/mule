@@ -14,20 +14,17 @@ import org.mule.runtime.core.api.processor.RequestReplyReplierMessageProcessor;
 import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
 
 public class SimpleRequestReplyReplier extends AbstractInterceptingMessageProcessor
-    implements RequestReplyReplierMessageProcessor
-{
+    implements RequestReplyReplierMessageProcessor {
 
-    protected MessageProcessor replyMessageProcessor;
+  protected MessageProcessor replyMessageProcessor;
 
-    public MuleEvent process(MuleEvent event) throws MuleException
-    {
-        replyMessageProcessor.process(processNext(event));
-        return VoidMuleEvent.getInstance();
-    }
+  public MuleEvent process(MuleEvent event) throws MuleException {
+    replyMessageProcessor.process(processNext(event));
+    return VoidMuleEvent.getInstance();
+  }
 
-    public void setReplyProcessor(MessageProcessor replyMessageProcessor)
-    {
-        this.replyMessageProcessor = replyMessageProcessor;
-    }
+  public void setReplyProcessor(MessageProcessor replyMessageProcessor) {
+    this.replyMessageProcessor = replyMessageProcessor;
+  }
 
 }

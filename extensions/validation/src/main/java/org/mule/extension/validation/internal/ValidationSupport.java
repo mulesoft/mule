@@ -22,64 +22,51 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Base class for validation operations with common
- * concerns
+ * Base class for validation operations with common concerns
  *
  * @since 3.7.0
  */
-abstract class ValidationSupport
-{
-    protected final Logger logger = LoggerFactory.getLogger(getClass());
+abstract class ValidationSupport {
 
-    protected void validateWith(Validator validator, ValidationContext validationContext, MuleEvent event) throws Exception
-    {
-        ValidationResult result = validator.validate(event);
-        if (result.isError())
-        {
-            result = evaluateCustomMessage(result, validationContext);
-            String customExceptionClass = validationContext.getOptions().getExceptionClass();
-            if (StringUtils.isEmpty(customExceptionClass))
-            {
-                throw validationContext.getConfig().getExceptionFactory().createException(result, ValidationException.class, event);
-            }
-            else
-            {
-                throw validationContext.getConfig().getExceptionFactory().createException(result, customExceptionClass, event);
-            }
-        }
-        else
-        {
-             logSuccessfulValidation(validator, event);
-        }
+  protected final Logger logger = LoggerFactory.getLogger(getClass());
+
+  protected void validateWith(Validator validator, ValidationContext validationContext, MuleEvent event) throws Exception {
+    ValidationResult result = validator.validate(event);
+    if (result.isError()) {
+      result = evaluateCustomMessage(result, validationContext);
+      String customExceptionClass = validationContext.getOptions().getExceptionClass();
+      if (StringUtils.isEmpty(customExceptionClass)) {
+        throw validationContext.getConfig().getExceptionFactory().createException(result, ValidationException.class, event);
+      } else {
+        throw validationContext.getConfig().getExceptionFactory().createException(result, customExceptionClass, event);
+      }
+    } else {
+      logSuccessfulValidation(validator, event);
+    }
+  }
+
+  private ValidationResult evaluateCustomMessage(ValidationResult result, ValidationContext validationContext) {
+    String customMessage = validationContext.getOptions().getMessage();
+    if (!StringUtils.isBlank(customMessage)) {
+      result = error(validationContext.getMuleEvent().getMuleContext().getExpressionManager()
+          .parse(customMessage, validationContext.getMuleEvent()));
     }
 
-    private ValidationResult evaluateCustomMessage(ValidationResult result, ValidationContext validationContext)
-    {
-        String customMessage = validationContext.getOptions().getMessage();
-        if (!StringUtils.isBlank(customMessage))
-        {
-            result = error(validationContext.getMuleEvent().getMuleContext().getExpressionManager().parse(customMessage, validationContext.getMuleEvent()));
-        }
+    return result;
+  }
 
-        return result;
-    }
+  protected ValidationContext createContext(ValidationOptions options, MuleEvent muleEvent, ValidationExtension config) {
+    return new ValidationContext(options, muleEvent, config);
+  }
 
-    protected ValidationContext createContext(ValidationOptions options, MuleEvent muleEvent, ValidationExtension config)
-    {
-        return new ValidationContext(options, muleEvent, config);
-    }
+  protected Locale parseLocale(String locale) {
+    locale = StringUtils.isBlank(locale) ? ValidationExtension.DEFAULT_LOCALE : locale;
+    return new Locale(locale);
+  }
 
-    protected Locale parseLocale(String locale)
-    {
-        locale = StringUtils.isBlank(locale) ? ValidationExtension.DEFAULT_LOCALE : locale;
-        return new Locale(locale);
+  protected void logSuccessfulValidation(Validator validator, MuleEvent event) {
+    if (logger.isDebugEnabled()) {
+      logger.debug("Successfully executed validator {}", ToStringBuilder.reflectionToString(validator));
     }
-
-    protected void logSuccessfulValidation(Validator validator, MuleEvent event)
-    {
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Successfully executed validator {}", ToStringBuilder.reflectionToString(validator));
-        }
-    }
+  }
 }

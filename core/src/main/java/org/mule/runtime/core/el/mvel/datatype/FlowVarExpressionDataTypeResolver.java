@@ -15,17 +15,14 @@ import org.mule.runtime.core.api.MuleEvent;
 /**
  * Resolves data type for flow var when flowVars['x'] syntax is used
  */
-public class FlowVarExpressionDataTypeResolver extends AbstractVariableExpressionDataTypeResolver
-{
+public class FlowVarExpressionDataTypeResolver extends AbstractVariableExpressionDataTypeResolver {
 
-    public FlowVarExpressionDataTypeResolver()
-    {
-        super(FLOW_VARS);
-    }
+  public FlowVarExpressionDataTypeResolver() {
+    super(FLOW_VARS);
+  }
 
-    @Override
-    protected DataType getVariableDataType(MuleEvent event, String propertyName)
-    {
-        return event.getFlowVariableDataType(propertyName);
-    }
+  @Override
+  protected DataType getVariableDataType(MuleEvent event, String propertyName) {
+    return event.getFlowVariableDataType(propertyName);
+  }
 }

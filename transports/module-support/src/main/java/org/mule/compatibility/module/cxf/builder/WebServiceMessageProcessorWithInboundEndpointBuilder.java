@@ -11,22 +11,18 @@ import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.module.cxf.config.WebServiceFactoryBean;
 
-public class WebServiceMessageProcessorWithInboundEndpointBuilder extends WebServiceFactoryBean
-{
+public class WebServiceMessageProcessorWithInboundEndpointBuilder extends WebServiceFactoryBean {
 
-    @Override
-    protected String getAddress()
-    {
-        if (flowConstruct != null)
-        {
-            MessageSource source = ((Pipeline) flowConstruct).getMessageSource();
+  @Override
+  protected String getAddress() {
+    if (flowConstruct != null) {
+      MessageSource source = ((Pipeline) flowConstruct).getMessageSource();
 
-            if (source instanceof InboundEndpoint)
-            {
-                return ((InboundEndpoint) source).getEndpointURI().toString();
-            }
-        }
-        return super.getAddress();
+      if (source instanceof InboundEndpoint) {
+        return ((InboundEndpoint) source).getEndpointURI().toString();
+      }
     }
+    return super.getAddress();
+  }
 
 }

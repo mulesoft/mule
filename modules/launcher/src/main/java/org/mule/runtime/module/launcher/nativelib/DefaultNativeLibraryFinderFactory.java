@@ -12,13 +12,11 @@ import org.mule.runtime.module.launcher.MuleFoldersUtil;
 /**
  * Creates {@link NativeLibraryFinder}
  */
-public class DefaultNativeLibraryFinderFactory implements NativeLibraryFinderFactory
-{
+public class DefaultNativeLibraryFinderFactory implements NativeLibraryFinderFactory {
 
-    @Override
-    public NativeLibraryFinder create(String appName)
-    {
-        return new PerAppNativeLibraryFinder(MuleFoldersUtil.getAppLibFolder(appName));
-    }
+  @Override
+  public NativeLibraryFinder create(String appName) {
+    return new PerAppNativeLibraryFinder(MuleFoldersUtil.getAppLibFolder(appName));
+  }
 
 }

@@ -27,49 +27,39 @@ import org.apache.commons.logging.LogFactory;
 /**
  * @since 4.0
  */
-public class CustomProtocol implements TcpProtocol, Initialisable
-{
+public class CustomProtocol implements TcpProtocol, Initialisable {
 
-    private static final Log LOGGER = LogFactory.getLog(CustomProtocol.class);
+  private static final Log LOGGER = LogFactory.getLog(CustomProtocol.class);
 
-    private TcpProtocol delegate;
+  private TcpProtocol delegate;
 
-    /**
-     * Reference to full qualifier class name that should extend {@link TcpProtocol} that will be used as a custom
-     * protocol
-     */
-    @Parameter
-    @Alias("class")
-    @Summary("Full qualifier class name that must implement 'TcpProtocol' that will be used as a custom protocol")
-    @DisplayName("Protocol Class Name")
-    public String clazz;
+  /**
+   * Reference to full qualifier class name that should extend {@link TcpProtocol} that will be used as a custom protocol
+   */
+  @Parameter
+  @Alias("class")
+  @Summary("Full qualifier class name that must implement 'TcpProtocol' that will be used as a custom protocol")
+  @DisplayName("Protocol Class Name")
+  public String clazz;
 
-    public CustomProtocol()
-    {
+  public CustomProtocol() {}
+
+  @Override
+  public InputStream read(InputStream is) throws IOException {
+    return delegate.read(is);
+  }
+
+  @Override
+  public void write(OutputStream os, Object data, String encoding) throws IOException {
+    delegate.write(os, data, encoding);
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    try {
+      delegate = (TcpProtocol) ClassUtils.instanciateClass(clazz);
+    } catch (Exception e) {
+      throw new RuntimeException(format("Could not load class '%s'", clazz));
     }
-
-    @Override
-    public InputStream read(InputStream is) throws IOException
-    {
-        return delegate.read(is);
-    }
-
-    @Override
-    public void write(OutputStream os, Object data, String encoding) throws IOException
-    {
-        delegate.write(os, data, encoding);
-    }
-
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        try
-        {
-            delegate = (TcpProtocol) ClassUtils.instanciateClass(clazz);
-        }
-        catch (Exception e)
-        {
-            throw new RuntimeException(format("Could not load class '%s'", clazz));
-        }
-    }
+  }
 }

@@ -11,10 +11,9 @@ import org.mule.tck.testmodels.fruit.Orange;
 /**
  * Test class used for classpath searching
  */
-public class MadridOrange extends Orange
-{
-    public MadridOrange()
-    {
-        super(new Integer(12), new Double(4.3), "Madrid");
-    }
+public class MadridOrange extends Orange {
+
+  public MadridOrange() {
+    super(new Integer(12), new Double(4.3), "Madrid");
+  }
 }

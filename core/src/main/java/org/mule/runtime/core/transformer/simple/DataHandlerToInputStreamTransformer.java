@@ -15,25 +15,19 @@ import java.nio.charset.Charset;
 
 import javax.activation.DataHandler;
 
-public class DataHandlerToInputStreamTransformer extends AbstractDiscoverableTransformer
-{
+public class DataHandlerToInputStreamTransformer extends AbstractDiscoverableTransformer {
 
-    public DataHandlerToInputStreamTransformer()
-    {
-        registerSourceType(DataType.fromType(DataHandler.class));
-        setReturnDataType(DataType.INPUT_STREAM);
-    }
+  public DataHandlerToInputStreamTransformer() {
+    registerSourceType(DataType.fromType(DataHandler.class));
+    setReturnDataType(DataType.INPUT_STREAM);
+  }
 
-    @Override
-    public Object doTransform(Object src, Charset enc) throws TransformerException
-    {
-        try
-        {
-            return ((DataHandler) src).getInputStream();
-        }
-        catch (IOException e)
-        {
-            throw new TransformerException(this, e);
-        }
+  @Override
+  public Object doTransform(Object src, Charset enc) throws TransformerException {
+    try {
+      return ((DataHandler) src).getInputStream();
+    } catch (IOException e) {
+      throw new TransformerException(this, e);
     }
+  }
 }

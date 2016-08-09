@@ -14,31 +14,25 @@ import org.mule.runtime.core.api.lifecycle.Callable;
 /**
  * @author David Dossot (david@dossot.net)
  */
-public class LifecycleTrackerComponentObject extends AbstractLifecycleTracker
-        implements FlowConstructAware, Callable
-{
+public class LifecycleTrackerComponentObject extends AbstractLifecycleTracker implements FlowConstructAware, Callable {
 
-    public void springInitialize()
-    {
-        getTracker().add("springInitialize");
-    }
+  public void springInitialize() {
+    getTracker().add("springInitialize");
+  }
 
-    public void springDestroy()
-    {
-        getTracker().add("springDestroy");
-    }
+  public void springDestroy() {
+    getTracker().add("springDestroy");
+  }
 
-    @Override
-    public void setFlowConstruct(FlowConstruct flowConstruct)
-    {
-        getTracker().add("setFlowConstruct");
-    }
+  @Override
+  public void setFlowConstruct(FlowConstruct flowConstruct) {
+    getTracker().add("setFlowConstruct");
+  }
 
-    public Object onCall(final MuleEventContext eventContext) throws Exception
-    {
-        // dirty trick to get the component instance that was used for the
-        // request
-        return this;
-    }
+  public Object onCall(final MuleEventContext eventContext) throws Exception {
+    // dirty trick to get the component instance that was used for the
+    // request
+    return this;
+  }
 
 }

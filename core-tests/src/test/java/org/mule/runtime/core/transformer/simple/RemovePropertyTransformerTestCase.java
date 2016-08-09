@@ -20,29 +20,25 @@ import org.mule.tck.size.SmallTest;
 import java.util.HashSet;
 
 @SmallTest
-public class RemovePropertyTransformerTestCase extends AbstractRemoveVariablePropertyTransformerTestCase
-{
-    public RemovePropertyTransformerTestCase()
-    {
-        super(new RemovePropertyTransformer());
-    }
+public class RemovePropertyTransformerTestCase extends AbstractRemoveVariablePropertyTransformerTestCase {
 
-    @Override
-    protected void addMockedPropeerties(MuleEvent mockEvent, HashSet properties)
-    {
-        MuleMessage mockMessage = mockEvent.getMessage();
-        when(mockMessage.getOutboundPropertyNames()).thenReturn(properties);
-    }
+  public RemovePropertyTransformerTestCase() {
+    super(new RemovePropertyTransformer());
+  }
 
-    @Override
-    protected void verifyRemoved(MuleEvent mockEvent, String key)
-    {
-        assertThat(mockEvent.getMessage().getOutboundProperty(key), is(nullValue()));
-    }
+  @Override
+  protected void addMockedPropeerties(MuleEvent mockEvent, HashSet properties) {
+    MuleMessage mockMessage = mockEvent.getMessage();
+    when(mockMessage.getOutboundPropertyNames()).thenReturn(properties);
+  }
 
-    @Override
-    protected void verifyNotRemoved(MuleEvent mockEvent, String key)
-    {
-        assertThat(mockEvent.getMessage().getOutboundProperty(key), not(nullValue()));
-    }
+  @Override
+  protected void verifyRemoved(MuleEvent mockEvent, String key) {
+    assertThat(mockEvent.getMessage().getOutboundProperty(key), is(nullValue()));
+  }
+
+  @Override
+  protected void verifyNotRemoved(MuleEvent mockEvent, String key) {
+    assertThat(mockEvent.getMessage().getOutboundProperty(key), not(nullValue()));
+  }
 }

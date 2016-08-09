@@ -17,9 +17,9 @@ import org.mule.runtime.core.api.MuleException;
  * @deprecated Transport infrastructure is deprecated.
  */
 @Deprecated
-public interface EndpointCache
-{
-    public InboundEndpoint getInboundEndpoint(String uri, MessageExchangePattern mep) throws MuleException;
+public interface EndpointCache {
 
-    public OutboundEndpoint getOutboundEndpoint(String uri, MessageExchangePattern mep, Long responseTimeout) throws MuleException;
+  public InboundEndpoint getInboundEndpoint(String uri, MessageExchangePattern mep) throws MuleException;
+
+  public OutboundEndpoint getOutboundEndpoint(String uri, MessageExchangePattern mep, Long responseTimeout) throws MuleException;
 }

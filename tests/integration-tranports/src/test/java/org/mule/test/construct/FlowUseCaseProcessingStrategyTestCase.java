@@ -28,60 +28,54 @@ import org.junit.Rule;
 import org.junit.Test;
 
 @Ignore("MULE-9630")
-public class FlowUseCaseProcessingStrategyTestCase extends FunctionalTestCase
-{
+public class FlowUseCaseProcessingStrategyTestCase extends FunctionalTestCase {
 
-    @Rule
-    public DynamicPort dynamicPort = new DynamicPort("port1");
+  @Rule
+  public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/construct/flow-usecase-processing-strategy-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/construct/flow-usecase-processing-strategy-config.xml";
+  }
 
-    @Test
-    public void testHTTPStatusCodeExceptionSyncStrategy() throws MuleException
-    {
-        MuleClient client = muleContext.getClient();
-        final HttpRequestOptions httpRequestOptions = newOptions().disableStatusCodeValidation().build();
-        MuleMessage exception = client.send("http://localhost:" + dynamicPort.getNumber(), MuleMessage.builder().nullPayload().build(), httpRequestOptions);
-        assertThat(exception.getInboundProperty("http.status", 0), is(500));
-    }
+  @Test
+  public void testHTTPStatusCodeExceptionSyncStrategy() throws MuleException {
+    MuleClient client = muleContext.getClient();
+    final HttpRequestOptions httpRequestOptions = newOptions().disableStatusCodeValidation().build();
+    MuleMessage exception = client.send("http://localhost:" + dynamicPort.getNumber(),
+                                        MuleMessage.builder().nullPayload().build(), httpRequestOptions);
+    assertThat(exception.getInboundProperty("http.status", 0), is(500));
+  }
 
-    @Test
-    public void testFileAutoDeleteSyncStrategy() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        File tempFile = createTempFile("mule-file-test-sync-");
-        client.request("vm://exception", 5000);
+  @Test
+  public void testFileAutoDeleteSyncStrategy() throws Exception {
+    MuleClient client = muleContext.getClient();
+    File tempFile = createTempFile("mule-file-test-sync-");
+    client.request("vm://exception", 5000);
 
-        assertTrue(tempFile.exists());
-    }
-    
-    @Test
-    public void testFileAutoDeleteAsyncStrategy() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        File tempFile = createTempFile("mule-file-test-async-");
-        client.request("vm://exception", 5000);
-        
-        assertFalse(tempFile.exists());
-    }
-    
-    private File createTempFile(String fileName) throws IOException
-    {
-        File directory = getWorkingDirectory();
-        File file = File.createTempFile(fileName, ".txt", directory);
-        file.deleteOnExit();
-        FileOutputStream fos = new FileOutputStream(file);
-        IOUtils.write("The quick brown fox jumps over the lazy dog", fos);
-        IOUtils.closeQuietly(fos);
-        
-        return file;
-    }
-         
+    assertTrue(tempFile.exists());
+  }
+
+  @Test
+  public void testFileAutoDeleteAsyncStrategy() throws Exception {
+    MuleClient client = muleContext.getClient();
+    File tempFile = createTempFile("mule-file-test-async-");
+    client.request("vm://exception", 5000);
+
+    assertFalse(tempFile.exists());
+  }
+
+  private File createTempFile(String fileName) throws IOException {
+    File directory = getWorkingDirectory();
+    File file = File.createTempFile(fileName, ".txt", directory);
+    file.deleteOnExit();
+    FileOutputStream fos = new FileOutputStream(file);
+    IOUtils.write("The quick brown fox jumps over the lazy dog", fos);
+    IOUtils.closeQuietly(fos);
+
+    return file;
+  }
+
 }
-
 
 

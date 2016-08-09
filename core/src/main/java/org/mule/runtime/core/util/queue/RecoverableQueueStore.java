@@ -9,25 +9,24 @@ package org.mule.runtime.core.util.queue;
 import java.io.Serializable;
 
 /**
- * Extension of {@link org.mule.runtime.core.util.queue.QueueStore} required to be
- * able to recover a queue store base on a transaction journal.
+ * Extension of {@link org.mule.runtime.core.util.queue.QueueStore} required to be able to recover a queue store base on a
+ * transaction journal.
  */
-public interface RecoverableQueueStore extends QueueStore
-{
+public interface RecoverableQueueStore extends QueueStore {
 
-    /**
-     * Removes the value from the queue.
-     *
-     * @param value object to be removed
-     */
-    void remove(Serializable value);
+  /**
+   * Removes the value from the queue.
+   *
+   * @param value object to be removed
+   */
+  void remove(Serializable value);
 
-    /**
-     * Checks if a certain object exists in the queue.
-     *
-     * @param value object to search in the queue
-     * @return true if contains the object, false otherwise.
-     */
-    boolean contains(Serializable value);
+  /**
+   * Checks if a certain object exists in the queue.
+   *
+   * @param value object to search in the queue
+   * @return true if contains the object, false otherwise.
+   */
+  boolean contains(Serializable value);
 
 }

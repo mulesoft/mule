@@ -14,32 +14,25 @@ import org.apache.commons.io.IOUtils;
 import org.bouncycastle.openpgp.PGPPublicKey;
 import org.bouncycastle.openpgp.PGPSecretKey;
 
-public class SignedMessage implements Message
-{
+public class SignedMessage implements Message {
 
-    private LazyTransformedInputStream encryptedMessage;
+  private LazyTransformedInputStream encryptedMessage;
 
-    public SignedMessage(InputStream toBeDecrypted,
-                         PGPPublicKey publicKey,
-                         PGPSecretKey secretKey,
-                         String password,
-                         Provider provider) throws IOException
-    {
-        StreamTransformer transformer = new DecryptStreamTransformer(toBeDecrypted, publicKey, secretKey,
-            password, provider);
-        this.encryptedMessage = new LazyTransformedInputStream(new TransformContinuouslyPolicy(), transformer);
-    }
+  public SignedMessage(InputStream toBeDecrypted, PGPPublicKey publicKey, PGPSecretKey secretKey, String password,
+                       Provider provider)
+      throws IOException {
+    StreamTransformer transformer = new DecryptStreamTransformer(toBeDecrypted, publicKey, secretKey, password, provider);
+    this.encryptedMessage = new LazyTransformedInputStream(new TransformContinuouslyPolicy(), transformer);
+  }
 
-    public boolean verify()
-    {
-        // TODO Signed messages is not implemented yet
-        return false;
-    }
+  public boolean verify() {
+    // TODO Signed messages is not implemented yet
+    return false;
+  }
 
-    public Message getContents() throws IOException
-    {
-        String contents = IOUtils.toString(this.encryptedMessage);
-        return new LiteralMessage(contents.getBytes());
-    }
+  public Message getContents() throws IOException {
+    String contents = IOUtils.toString(this.encryptedMessage);
+    return new LiteralMessage(contents.getBytes());
+  }
 
 }

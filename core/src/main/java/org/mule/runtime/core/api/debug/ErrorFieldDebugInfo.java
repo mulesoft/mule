@@ -10,26 +10,22 @@ package org.mule.runtime.core.api.debug;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 
 /**
- * Provides debug information for a field when there was an error
- * obtaining the field's information.
+ * Provides debug information for a field when there was an error obtaining the field's information.
  *
  * @since 3.8.0
  */
-public class ErrorFieldDebugInfo extends FieldDebugInfo<Throwable>
-{
+public class ErrorFieldDebugInfo extends FieldDebugInfo<Throwable> {
 
-    /**
-     * Creates a debug info for a field when an error has occurred
-     * obtaining field's information
-     *
-     * @param name name of the created field. Must be a not blank {@link String}
-     * @param type type of the field. Cannot be null.
-     * @param error error that prevents to obtain field debug info. Cannot be null
-     */
-    ErrorFieldDebugInfo(String name, String type, Throwable error)
-    {
-        super(name, type, error);
-        checkArgument(type != null, "Type cannot be null");
-        checkArgument(error != null, "Error cannot be null");
-    }
+  /**
+   * Creates a debug info for a field when an error has occurred obtaining field's information
+   *
+   * @param name name of the created field. Must be a not blank {@link String}
+   * @param type type of the field. Cannot be null.
+   * @param error error that prevents to obtain field debug info. Cannot be null
+   */
+  ErrorFieldDebugInfo(String name, String type, Throwable error) {
+    super(name, type, error);
+    checkArgument(type != null, "Type cannot be null");
+    checkArgument(error != null, "Error cannot be null");
+  }
 }

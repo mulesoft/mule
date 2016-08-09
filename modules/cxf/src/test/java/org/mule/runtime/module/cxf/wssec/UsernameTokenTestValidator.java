@@ -12,19 +12,16 @@ import org.apache.ws.security.validate.Credential;
 import org.apache.ws.security.validate.Validator;
 import org.apache.ws.security.message.token.UsernameToken;
 
-public class UsernameTokenTestValidator implements Validator
-{
+public class UsernameTokenTestValidator implements Validator {
 
-    @Override
-    public Credential validate(Credential credential, RequestData data) throws WSSecurityException
-    {
-        UsernameToken usernameToken = credential.getUsernametoken();
+  @Override
+  public Credential validate(Credential credential, RequestData data) throws WSSecurityException {
+    UsernameToken usernameToken = credential.getUsernametoken();
 
-        if(!"secret".equals(usernameToken.getPassword()))
-        {
-            throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION);
-        }
-
-        return credential;
+    if (!"secret".equals(usernameToken.getPassword())) {
+      throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION);
     }
+
+    return credential;
+  }
 }

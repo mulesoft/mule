@@ -24,32 +24,29 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class SingleValueResolverTestCase extends AbstractMuleTestCase
-{
+public class SingleValueResolverTestCase extends AbstractMuleTestCase {
 
-    private static final String NAME = "name";
+  private static final String NAME = "name";
 
-    @Mock
-    private ParameterModel parameterModel;
+  @Mock
+  private ParameterModel parameterModel;
 
-    @Mock
-    private ResolverSetResult result;
+  @Mock
+  private ResolverSetResult result;
 
 
-    private ValueSetter valueSetter;
+  private ValueSetter valueSetter;
 
-    @Before
-    public void before()
-    {
-        when(result.get(NAME)).thenReturn(NAME);
-        valueSetter = new SingleValueSetter(NAME, getField(PersonalInfo.class, "name"));
-    }
+  @Before
+  public void before() {
+    when(result.get(NAME)).thenReturn(NAME);
+    valueSetter = new SingleValueSetter(NAME, getField(PersonalInfo.class, "name"));
+  }
 
-    @Test
-    public void set() throws Exception
-    {
-        PersonalInfo info = new PersonalInfo();
-        valueSetter.set(info, result);
-        assertThat(info.getName(), is(NAME));
-    }
+  @Test
+  public void set() throws Exception {
+    PersonalInfo info = new PersonalInfo();
+    valueSetter.set(info, result);
+    assertThat(info.getName(), is(NAME));
+  }
 }

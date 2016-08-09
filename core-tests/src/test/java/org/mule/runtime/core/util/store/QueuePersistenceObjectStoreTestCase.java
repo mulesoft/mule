@@ -45,203 +45,179 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-public class QueuePersistenceObjectStoreTestCase extends AbstractObjectStoreContractTestCase
-{
-    private static final String QUEUE_NAME = "the-queue";
+public class QueuePersistenceObjectStoreTestCase extends AbstractObjectStoreContractTestCase {
 
-    @Rule
-    public TemporaryFolder tempFolder = new TemporaryFolder();
+  private static final String QUEUE_NAME = "the-queue";
 
-    private File persistenceFolder;
-    private MuleContext mockMuleContext;
+  @Rule
+  public TemporaryFolder tempFolder = new TemporaryFolder();
 
-    @Override
-    protected void doSetUp() throws Exception
-    {
-        super.doSetUp();
-        initMockMuleContext();
+  private File persistenceFolder;
+  private MuleContext mockMuleContext;
+
+  @Override
+  protected void doSetUp() throws Exception {
+    super.doSetUp();
+    initMockMuleContext();
+  }
+
+  private void initMockMuleContext() throws IOException {
+    persistenceFolder = tempFolder.newFolder("persistence");
+
+    MuleConfiguration mockConfig = mock(MuleConfiguration.class);
+    when(mockConfig.getWorkingDirectory()).thenReturn(persistenceFolder.getAbsolutePath());
+
+    mockMuleContext = spy(muleContext);
+    when(mockMuleContext.getConfiguration()).thenReturn(mockConfig);
+    when(mockMuleContext.getExecutionClassLoader()).thenReturn(getClass().getClassLoader());
+    addJavaSerializerToMockMuleContext(mockMuleContext);
+  }
+
+  @Override
+  public QueuePersistenceObjectStore<Serializable> getObjectStore() throws ObjectStoreException {
+    QueuePersistenceObjectStore<Serializable> store = new QueuePersistenceObjectStore<>(mockMuleContext);
+    store.open();
+    return store;
+  }
+
+  @Override
+  public Serializable getStorableValue() {
+    return MuleMessage.builder().payload(TEST_MESSAGE).build();
+  }
+
+  @Override
+  protected Serializable createKey() {
+    return new QueueKey("theQueue", UUID.getUUID());
+  }
+
+  @Test
+  public void testCreatingTheObjectStoreThrowsMuleRuntimeException() {
+    MuleRuntimeException muleRuntimeException = new MuleRuntimeException(CoreMessages.createStaticMessage("boom"));
+
+    MuleContext mockContext = mock(MuleContext.class);
+    when(mockContext.getConfiguration()).thenThrow(muleRuntimeException);
+
+    QueuePersistenceObjectStore<Serializable> store = new QueuePersistenceObjectStore<>(mockContext);
+
+    try {
+      store.open();
+      fail();
+    } catch (ObjectStoreException ose) {
+      // this one was expected
     }
+  }
 
-    private void initMockMuleContext() throws IOException
-    {
-        persistenceFolder = tempFolder.newFolder("persistence");
+  @Test
+  public void testAllKeysOnNotYetOpenedStore() throws ObjectStoreException {
+    QueuePersistenceObjectStore<Serializable> store = new QueuePersistenceObjectStore<>(mockMuleContext);
 
-        MuleConfiguration mockConfig = mock(MuleConfiguration.class);
-        when(mockConfig.getWorkingDirectory()).thenReturn(persistenceFolder.getAbsolutePath());
+    List<Serializable> allKeys = store.allKeys();
+    assertEquals(0, allKeys.size());
+  }
 
-        mockMuleContext = spy(muleContext);
-        when(mockMuleContext.getConfiguration()).thenReturn(mockConfig);
-        when(mockMuleContext.getExecutionClassLoader()).thenReturn(getClass().getClassLoader());
-        addJavaSerializerToMockMuleContext(mockMuleContext);
+  @Test
+  public void testListExistingFiles() throws Exception {
+    QueuePersistenceObjectStore<Serializable> store = getObjectStore();
+
+    String id = UUID.getUUID();
+    createAndPopulateStoreFile(id, TEST_MESSAGE);
+
+    List<Serializable> allKeys = store.allKeys();
+    assertEquals(1, allKeys.size());
+
+    QueueKey key = (QueueKey) allKeys.get(0);
+    assertEquals(id, key.id);
+  }
+
+  @Test
+  public void testRetrieveFileFromDisk() throws Exception {
+    // create the store first so that the queuestore directory is created as a side effect
+    QueuePersistenceObjectStore<Serializable> store = getObjectStore();
+
+    String id = UUID.getUUID();
+    createAndPopulateStoreFile(id, TEST_MESSAGE);
+
+    QueueKey key = new QueueKey(QUEUE_NAME, id);
+    Serializable value = store.retrieve(key);
+    assertEquals(TEST_MESSAGE, value);
+  }
+
+  @Test
+  public void testRemove() throws Exception {
+    // create the store first so that the queuestore directory is created as a side effect
+    QueuePersistenceObjectStore<Serializable> store = getObjectStore();
+
+    String id = UUID.getUUID();
+    File storeFile = createAndPopulateStoreFile(id, TEST_MESSAGE);
+
+    QueueKey key = new QueueKey(QUEUE_NAME, id);
+    store.remove(key);
+
+    assertFalse(storeFile.exists());
+  }
+
+  @Test
+  public void testMonitoredWrapper() throws Exception {
+    QueuePersistenceObjectStore<Serializable> store = getObjectStore();
+    String id = UUID.getUUID();
+    QueueKey key = new QueueKey(QUEUE_NAME, id);
+    MuleMessage msg = MuleMessage.builder().payload("Hello").build();
+    MuleEvent event = new DefaultMuleEvent(msg, MessageExchangePattern.ONE_WAY, getTestFlow());
+
+    ListableObjectStore<Serializable> monitored = new MonitoredObjectStoreWrapper(store);
+    monitored.store(key, event);
+    MonitoredObjectStoreWrapper.StoredObject retrieved = (MonitoredObjectStoreWrapper.StoredObject) store.retrieve(key);
+    Object item = retrieved.getItem();
+    assertTrue(item instanceof MuleEvent);
+    MuleEvent newEvent = (MuleEvent) item;
+    MuleMessage newMessage = newEvent.getMessage();
+    assertNotNull(newMessage);
+    assertEquals(muleContext, newEvent.getMuleContext());
+    assertEquals("Hello", newMessage.getPayload());
+  }
+
+  @Test
+  public void queueFilesAreRemovedWhenSerializationFails() throws ObjectStoreException {
+    QueuePersistenceObjectStore<Serializable> store = getObjectStore();
+    String id = UUID.getUUID();
+    Serializable value = new SerializableWrapper(new NonSerializableObject());
+    File queueFile = createStoreFile(id);
+
+    try {
+      store.store(new QueueKey(QUEUE_NAME, id), value);
+      fail();
+    } catch (ObjectStoreException e) {
+      assertThat(e.getCause(), instanceOf(SerializationException.class));
+      assertThat(queueFile.exists(), is(false));
     }
+  }
 
-    @Override
-    public QueuePersistenceObjectStore<Serializable> getObjectStore() throws ObjectStoreException
-    {
-        QueuePersistenceObjectStore<Serializable> store =
-            new QueuePersistenceObjectStore<>(mockMuleContext);
-        store.open();
-        return store;
+  private File createAndPopulateStoreFile(String id, String payload) throws IOException {
+    File storeFile = createStoreFile(id);
+
+    // create the directory for the queue
+    storeFile.getParentFile().mkdir();
+
+    FileOutputStream fos = new FileOutputStream(storeFile);
+    muleContext.getObjectSerializer().serialize(payload, fos);
+
+    return storeFile;
+  }
+
+  private File createStoreFile(String id) {
+    String path = String.format("%1s/%2s/%3s/%4s.msg", persistenceFolder.getAbsolutePath(),
+                                QueuePersistenceObjectStore.DEFAULT_QUEUE_STORE, QUEUE_NAME, id);
+    return FileUtils.newFile(path);
+  }
+
+
+  private static class SerializableWrapper implements Serializable {
+
+    Object data;
+
+    SerializableWrapper(Object data) {
+      this.data = data;
     }
-
-    @Override
-    public Serializable getStorableValue()
-    {
-        return MuleMessage.builder().payload(TEST_MESSAGE).build();
-    }
-
-    @Override
-    protected Serializable createKey()
-    {
-        return new QueueKey("theQueue", UUID.getUUID());
-    }
-
-    @Test
-    public void testCreatingTheObjectStoreThrowsMuleRuntimeException()
-    {
-        MuleRuntimeException muleRuntimeException = new MuleRuntimeException(CoreMessages.createStaticMessage("boom"));
-
-        MuleContext mockContext = mock(MuleContext.class);
-        when(mockContext.getConfiguration()).thenThrow(muleRuntimeException);
-
-        QueuePersistenceObjectStore<Serializable> store =
-            new QueuePersistenceObjectStore<>(mockContext);
-
-        try
-        {
-            store.open();
-            fail();
-        }
-        catch (ObjectStoreException ose)
-        {
-            // this one was expected
-        }
-    }
-
-    @Test
-    public void testAllKeysOnNotYetOpenedStore() throws ObjectStoreException
-    {
-        QueuePersistenceObjectStore<Serializable> store =
-            new QueuePersistenceObjectStore<>(mockMuleContext);
-
-        List<Serializable> allKeys = store.allKeys();
-        assertEquals(0, allKeys.size());
-    }
-
-    @Test
-    public void testListExistingFiles() throws Exception
-    {
-        QueuePersistenceObjectStore<Serializable> store = getObjectStore();
-
-        String id = UUID.getUUID();
-        createAndPopulateStoreFile(id, TEST_MESSAGE);
-
-        List<Serializable> allKeys = store.allKeys();
-        assertEquals(1, allKeys.size());
-
-        QueueKey key = (QueueKey)allKeys.get(0);
-        assertEquals(id, key.id);
-    }
-
-    @Test
-    public void testRetrieveFileFromDisk() throws Exception
-    {
-        // create the store first so that the queuestore directory is created as a side effect
-        QueuePersistenceObjectStore<Serializable> store = getObjectStore();
-
-        String id = UUID.getUUID();
-        createAndPopulateStoreFile(id, TEST_MESSAGE);
-
-        QueueKey key = new QueueKey(QUEUE_NAME, id);
-        Serializable value = store.retrieve(key);
-        assertEquals(TEST_MESSAGE, value);
-    }
-
-    @Test
-    public void testRemove() throws Exception
-    {
-        // create the store first so that the queuestore directory is created as a side effect
-        QueuePersistenceObjectStore<Serializable> store = getObjectStore();
-
-        String id = UUID.getUUID();
-        File storeFile = createAndPopulateStoreFile(id, TEST_MESSAGE);
-
-        QueueKey key = new QueueKey(QUEUE_NAME, id);
-        store.remove(key);
-
-        assertFalse(storeFile.exists());
-    }
-
-    @Test
-    public void testMonitoredWrapper() throws Exception
-    {
-        QueuePersistenceObjectStore<Serializable> store = getObjectStore(); 
-        String id = UUID.getUUID();
-        QueueKey key = new QueueKey(QUEUE_NAME, id);
-        MuleMessage msg = MuleMessage.builder().payload("Hello").build();
-        MuleEvent event = new DefaultMuleEvent(msg, MessageExchangePattern.ONE_WAY, getTestFlow());
-
-        ListableObjectStore<Serializable> monitored = new MonitoredObjectStoreWrapper(store);
-        monitored.store(key, event);
-        MonitoredObjectStoreWrapper.StoredObject  retrieved = (MonitoredObjectStoreWrapper.StoredObject) store.retrieve(key);
-        Object item = retrieved.getItem();
-        assertTrue(item instanceof MuleEvent);
-        MuleEvent newEvent = (MuleEvent) item;
-        MuleMessage newMessage = newEvent.getMessage();
-        assertNotNull(newMessage);
-        assertEquals(muleContext, newEvent.getMuleContext());
-        assertEquals("Hello", newMessage.getPayload());
-    }
-
-    @Test
-    public void queueFilesAreRemovedWhenSerializationFails() throws ObjectStoreException
-    {
-        QueuePersistenceObjectStore<Serializable> store = getObjectStore();
-        String id = UUID.getUUID();
-        Serializable value = new SerializableWrapper(new NonSerializableObject());
-        File queueFile = createStoreFile(id);
-
-        try
-        {
-            store.store(new QueueKey(QUEUE_NAME, id), value);
-            fail();
-        }
-        catch (ObjectStoreException e)
-        {
-            assertThat(e.getCause(), instanceOf(SerializationException.class));
-            assertThat(queueFile.exists(), is(false));
-        }
-    }
-
-    private File createAndPopulateStoreFile(String id, String payload) throws IOException
-    {
-        File storeFile = createStoreFile(id);
-
-        // create the directory for the queue
-        storeFile.getParentFile().mkdir();
-
-        FileOutputStream fos = new FileOutputStream(storeFile);
-        muleContext.getObjectSerializer().serialize(payload, fos);
-
-        return storeFile;
-    }
-
-    private File createStoreFile(String id)
-    {
-        String path = String.format("%1s/%2s/%3s/%4s.msg", persistenceFolder.getAbsolutePath(),
-            QueuePersistenceObjectStore.DEFAULT_QUEUE_STORE, QUEUE_NAME, id);
-        return FileUtils.newFile(path);
-    }
-
-
-    private static class SerializableWrapper implements Serializable
-    {
-        Object data;
-
-        SerializableWrapper(Object data)
-        {
-            this.data = data;
-        }
-    }
+  }
 
 }

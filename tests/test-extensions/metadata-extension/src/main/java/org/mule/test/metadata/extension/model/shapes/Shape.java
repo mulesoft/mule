@@ -6,17 +6,15 @@
  */
 package org.mule.test.metadata.extension.model.shapes;
 
-public abstract class Shape
-{
-     private String color;
+public abstract class Shape {
 
-    public String getColor()
-    {
-        return color;
-    }
+  private String color;
 
-    public void setColor(String color)
-    {
-        this.color = color;
-    }
+  public String getColor() {
+    return color;
+  }
+
+  public void setColor(String color) {
+    this.color = color;
+  }
 }

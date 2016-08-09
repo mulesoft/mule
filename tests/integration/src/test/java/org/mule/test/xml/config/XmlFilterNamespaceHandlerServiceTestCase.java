@@ -18,26 +18,23 @@ import java.util.List;
 
 import org.junit.Test;
 
-public class XmlFilterNamespaceHandlerServiceTestCase extends AbstractIntegrationTestCase
-{
+public class XmlFilterNamespaceHandlerServiceTestCase extends AbstractIntegrationTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/module/xml/xml-filter-functional-test-service.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/module/xml/xml-filter-functional-test-service.xml";
+  }
 
-    @Test
-    public void testIsXmlFilter() throws Exception
-    {
-        Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct("test for xml");
+  @Test
+  public void testIsXmlFilter() throws Exception {
+    Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct("test for xml");
 
-        List<MessageProcessor> processors = flow.getMessageProcessors();
+    List<MessageProcessor> processors = flow.getMessageProcessors();
 
-        assertEquals(2, processors.size());
-        assertEquals(IsXmlFilter.class, ((MessageFilter) processors.get(0)).getFilter().getClass());
-        assertEquals(NotFilter.class, ((MessageFilter) processors.get(1)).getFilter().getClass());
-        assertEquals(IsXmlFilter.class, ((MessageFilter) processors.get(0)).getFilter().getClass());
+    assertEquals(2, processors.size());
+    assertEquals(IsXmlFilter.class, ((MessageFilter) processors.get(0)).getFilter().getClass());
+    assertEquals(NotFilter.class, ((MessageFilter) processors.get(1)).getFilter().getClass());
+    assertEquals(IsXmlFilter.class, ((MessageFilter) processors.get(0)).getFilter().getClass());
 
-    }
+  }
 }

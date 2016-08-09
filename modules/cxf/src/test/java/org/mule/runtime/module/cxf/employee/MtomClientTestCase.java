@@ -20,42 +20,38 @@ import org.mule.tck.probe.Prober;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class MtomClientTestCase extends FunctionalTestCase
-{
-    @Rule
-    public DynamicPort dynamicPort = new DynamicPort("port1");
+public class MtomClientTestCase extends FunctionalTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "mtom-client-conf-flow-httpn.xml";
-    }
+  @Rule
+  public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    @Test
-    public void testEchoService() throws Exception
-    {
-        final EmployeeDirectoryImpl svc = (EmployeeDirectoryImpl) getComponent("employeeDirectoryService");
+  @Override
+  protected String getConfigFile() {
+    return "mtom-client-conf-flow-httpn.xml";
+  }
 
-        Prober prober = new PollingProber(6000, 500);
-        prober.check(new JUnitProbe()
-        {
-            @Override
-            protected boolean test() throws Exception
-            {
-                assertThat(svc.getInvocationCount(), is(greaterThanOrEqualTo(1)));
-                return true;
-            }
-            
-            @Override
-            public String describeFailure()
-            {
-                return "Expected invocation count to be at least 1.";
-            }
-        });
+  @Test
+  public void testEchoService() throws Exception {
+    final EmployeeDirectoryImpl svc = (EmployeeDirectoryImpl) getComponent("employeeDirectoryService");
 
-        // ensure that an attachment was actually sent.
-        assertTrue(AttachmentVerifyInterceptor.HasAttachments);
-    }
+    Prober prober = new PollingProber(6000, 500);
+    prober.check(new JUnitProbe() {
+
+      @Override
+      protected boolean test() throws Exception {
+        assertThat(svc.getInvocationCount(), is(greaterThanOrEqualTo(1)));
+        return true;
+      }
+
+      @Override
+      public String describeFailure() {
+        return "Expected invocation count to be at least 1.";
+      }
+    });
+
+    // ensure that an attachment was actually sent.
+    assertTrue(AttachmentVerifyInterceptor.HasAttachments);
+  }
 
 }
 

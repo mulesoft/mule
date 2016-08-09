@@ -30,154 +30,122 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * <code>AbstractRouterCollection</code> provides common method implementations of router collections for in
- * and outbound routers.
+ * <code>AbstractRouterCollection</code> provides common method implementations of router collections for in and outbound routers.
  */
 
-public class AbstractMatchingRouter extends AbstractAnnotatedObject implements MatchingRouter
-{
-    /**
-     * logger used by this class
-     */
-    protected final transient Logger logger = LoggerFactory.getLogger(getClass());
+public class AbstractMatchingRouter extends AbstractAnnotatedObject implements MatchingRouter {
 
-    protected List<MatchableMessageProcessor> matchableRoutes = new CopyOnWriteArrayList<MatchableMessageProcessor>();
-    protected boolean matchAll = false;
-    protected MessageProcessor defaultRoute;
+  /**
+   * logger used by this class
+   */
+  protected final transient Logger logger = LoggerFactory.getLogger(getClass());
 
-    @Override
-    public MuleEvent process(MuleEvent event) throws MuleException
-    {
-        MuleMessage message = event.getMessage();
-        MuleEvent result;
-        boolean matchfound = false;
+  protected List<MatchableMessageProcessor> matchableRoutes = new CopyOnWriteArrayList<MatchableMessageProcessor>();
+  protected boolean matchAll = false;
+  protected MessageProcessor defaultRoute;
 
-        for (Iterator<MatchableMessageProcessor> iterator = matchableRoutes.iterator(); iterator.hasNext();)
-        {
-            MatchableMessageProcessor outboundRouter = iterator.next();
+  @Override
+  public MuleEvent process(MuleEvent event) throws MuleException {
+    MuleMessage message = event.getMessage();
+    MuleEvent result;
+    boolean matchfound = false;
 
-            final MuleEvent eventToRoute;
+    for (Iterator<MatchableMessageProcessor> iterator = matchableRoutes.iterator(); iterator.hasNext();) {
+      MatchableMessageProcessor outboundRouter = iterator.next();
 
-            boolean copyEvent = false;
-            // Create copy of message for router 1..n-1 if matchAll="true" or if
-            // routers require copy because it may mutate payload before match is
-            // chosen
-            if (iterator.hasNext())
-            {
-                if (isMatchAll())
-                {
-                    copyEvent = true;
-                }
-                else if (outboundRouter instanceof TransformingMatchable)
-                {
-                    copyEvent = ((TransformingMatchable) outboundRouter).isTransformBeforeMatch();
-                }
-            }
+      final MuleEvent eventToRoute;
 
-            if (copyEvent)
-            {
-                if (isConsumable(message.getDataType().getType()))
-                {
-                    throw new MessagingException(CoreMessages.cannotCopyStreamPayload(message.getDataType().getType().getName()), event, this);
-                }
-                eventToRoute = OptimizedRequestContext.criticalSetEvent(event);
-            }
-            else
-            {
-                eventToRoute = event;
-            }
-
-            if (outboundRouter.isMatch(eventToRoute))
-            {
-                matchfound = true;
-                result = outboundRouter.process(event);
-                if (!isMatchAll())
-                {
-                    return result;
-                }
-            }
+      boolean copyEvent = false;
+      // Create copy of message for router 1..n-1 if matchAll="true" or if
+      // routers require copy because it may mutate payload before match is
+      // chosen
+      if (iterator.hasNext()) {
+        if (isMatchAll()) {
+          copyEvent = true;
+        } else if (outboundRouter instanceof TransformingMatchable) {
+          copyEvent = ((TransformingMatchable) outboundRouter).isTransformBeforeMatch();
         }
+      }
 
-        if (!matchfound && defaultRoute != null)
-        {
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Message did not match any routers on: " + event.getFlowConstruct().getName()
-                             + " invoking catch all strategy");
-            }
-            return processDefaultRoute(event);
+      if (copyEvent) {
+        if (isConsumable(message.getDataType().getType())) {
+          throw new MessagingException(CoreMessages.cannotCopyStreamPayload(message.getDataType().getType().getName()), event,
+                                       this);
         }
-        else if (!matchfound)
-        {
-            logger.warn("Message did not match any routers on: "
-                        + event.getFlowConstruct().getName()
-                        + " and there is no catch all strategy configured on this router.  Disposing message "
-                        + message);
+        eventToRoute = OptimizedRequestContext.criticalSetEvent(event);
+      } else {
+        eventToRoute = event;
+      }
+
+      if (outboundRouter.isMatch(eventToRoute)) {
+        matchfound = true;
+        result = outboundRouter.process(event);
+        if (!isMatchAll()) {
+          return result;
         }
-        return event;
+      }
     }
 
-    protected MuleEvent processDefaultRoute(MuleEvent event) throws MuleException
-    {
-        return defaultRoute.process(event);
+    if (!matchfound && defaultRoute != null) {
+      if (logger.isDebugEnabled()) {
+        logger.debug("Message did not match any routers on: " + event.getFlowConstruct().getName()
+            + " invoking catch all strategy");
+      }
+      return processDefaultRoute(event);
+    } else if (!matchfound) {
+      logger.warn("Message did not match any routers on: " + event.getFlowConstruct().getName()
+          + " and there is no catch all strategy configured on this router.  Disposing message " + message);
     }
+    return event;
+  }
 
-    public boolean isMatchAll()
-    {
-        return matchAll;
-    }
+  protected MuleEvent processDefaultRoute(MuleEvent event) throws MuleException {
+    return defaultRoute.process(event);
+  }
 
-    public void setMatchAll(boolean matchAll)
-    {
-        this.matchAll = matchAll;
-    }
+  public boolean isMatchAll() {
+    return matchAll;
+  }
 
-    @Override
-    public void addRoute(MatchableMessageProcessor matchable)
-    {
-        matchableRoutes.add(matchable);
-    }
+  public void setMatchAll(boolean matchAll) {
+    this.matchAll = matchAll;
+  }
 
-    @Override
-    public void removeRoute(MatchableMessageProcessor matchable)
-    {
-        matchableRoutes.remove(matchable);
-    }
+  @Override
+  public void addRoute(MatchableMessageProcessor matchable) {
+    matchableRoutes.add(matchable);
+  }
 
-    public void setDefaultRoute(MessageProcessor defaultRoute)
-    {
-        this.defaultRoute = defaultRoute;
-    }
+  @Override
+  public void removeRoute(MatchableMessageProcessor matchable) {
+    matchableRoutes.remove(matchable);
+  }
 
-    public List<MatchableMessageProcessor> getRoutes()
-    {
-        return matchableRoutes;
-    }
+  public void setDefaultRoute(MessageProcessor defaultRoute) {
+    this.defaultRoute = defaultRoute;
+  }
 
-    public MessageProcessor getDefaultRoute()
-    {
-        return defaultRoute;
-    }
+  public List<MatchableMessageProcessor> getRoutes() {
+    return matchableRoutes;
+  }
 
-    public void initialise() throws InitialisationException
-    {
-        for (MatchableMessageProcessor route : matchableRoutes)
-        {
-            if (route instanceof Initialisable)
-            {
-                ((Initialisable) route).initialise();
-            }
-        }
-    }
+  public MessageProcessor getDefaultRoute() {
+    return defaultRoute;
+  }
 
-    public void dispose()
-    {
-        for (MatchableMessageProcessor route : matchableRoutes)
-        {
-            if (route instanceof Disposable)
-            {
-                ((Disposable) route).dispose();
-            }
-        }
+  public void initialise() throws InitialisationException {
+    for (MatchableMessageProcessor route : matchableRoutes) {
+      if (route instanceof Initialisable) {
+        ((Initialisable) route).initialise();
+      }
     }
+  }
+
+  public void dispose() {
+    for (MatchableMessageProcessor route : matchableRoutes) {
+      if (route instanceof Disposable) {
+        ((Disposable) route).dispose();
+      }
+    }
+  }
 }

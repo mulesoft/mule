@@ -14,15 +14,14 @@ import javax.sql.DataSource;
 /**
  * Creates {@link Connection} from {@link DataSource}
  */
-public interface ConnectionFactory
-{
+public interface ConnectionFactory {
 
-    /**
-     * Creates a connection for a {@link DataSource}
-     *
-     * @param dataSource dataSource connecting to
-     * @return a new {@link Connection}
-     * @throws ConnectionCreationException in case of any problem creating the connection
-     */
-    Connection create(DataSource dataSource) throws ConnectionCreationException;
+  /**
+   * Creates a connection for a {@link DataSource}
+   *
+   * @param dataSource dataSource connecting to
+   * @return a new {@link Connection}
+   * @throws ConnectionCreationException in case of any problem creating the connection
+   */
+  Connection create(DataSource dataSource) throws ConnectionCreationException;
 }

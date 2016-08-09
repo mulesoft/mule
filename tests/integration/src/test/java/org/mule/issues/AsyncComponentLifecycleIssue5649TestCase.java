@@ -20,46 +20,42 @@ import java.util.List;
 
 import org.junit.Test;
 
-public class AsyncComponentLifecycleIssue5649TestCase extends AbstractIntegrationTestCase implements FunctionalTestComponent.LifecycleCallback
-{
-    List<String> componentPhases = new ArrayList<String>();
+public class AsyncComponentLifecycleIssue5649TestCase extends AbstractIntegrationTestCase
+    implements FunctionalTestComponent.LifecycleCallback {
 
-    @Override
-    protected MuleContext createMuleContext() throws Exception
-    {
-        componentPhases.clear();
-        FunctionalTestComponent.addLifecycleCallback(this);
-        return super.createMuleContext();    //To change body of overridden methods use File | Settings | File Templates.
-    }
+  List<String> componentPhases = new ArrayList<String>();
 
-    @Override
-    protected void doTearDown() throws Exception
-    {
-        FunctionalTestComponent.removeLifecycleCallback(this);
-    }
+  @Override
+  protected MuleContext createMuleContext() throws Exception {
+    componentPhases.clear();
+    FunctionalTestComponent.addLifecycleCallback(this);
+    return super.createMuleContext(); // To change body of overridden methods use File | Settings | File Templates.
+  }
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/issues/async-component-lifecycle-5649.xml";
-    }
+  @Override
+  protected void doTearDown() throws Exception {
+    FunctionalTestComponent.removeLifecycleCallback(this);
+  }
 
-    @Test
-    public void testConfig() throws Exception
-    {
-        muleContext.stop();
-        muleContext.dispose();
-        FunctionalTestComponent.removeLifecycleCallback(this);
-        System.out.println(componentPhases);
-        assertEquals(4, componentPhases.size());
-        assertEquals(Initialisable.PHASE_NAME, componentPhases.get(0));
-        assertEquals(Startable.PHASE_NAME, componentPhases.get(1));
-        assertEquals(Stoppable.PHASE_NAME, componentPhases.get(2));
-        assertEquals(Disposable.PHASE_NAME, componentPhases.get(3));
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/issues/async-component-lifecycle-5649.xml";
+  }
 
-    public void onTransition(String name, String newPhase)
-    {
-        componentPhases.add(newPhase);
-    }
+  @Test
+  public void testConfig() throws Exception {
+    muleContext.stop();
+    muleContext.dispose();
+    FunctionalTestComponent.removeLifecycleCallback(this);
+    System.out.println(componentPhases);
+    assertEquals(4, componentPhases.size());
+    assertEquals(Initialisable.PHASE_NAME, componentPhases.get(0));
+    assertEquals(Startable.PHASE_NAME, componentPhases.get(1));
+    assertEquals(Stoppable.PHASE_NAME, componentPhases.get(2));
+    assertEquals(Disposable.PHASE_NAME, componentPhases.get(3));
+  }
+
+  public void onTransition(String name, String newPhase) {
+    componentPhases.add(newPhase);
+  }
 }

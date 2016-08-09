@@ -41,103 +41,93 @@ import java.net.Socket;
 import javax.net.ssl.SSLSocket;
 
 /**
- * A {@link ConnectionProvider} which provides instances of
- * {@link TcpRequesterConnection} to be used by the {@link SocketOperations}
+ * A {@link ConnectionProvider} which provides instances of {@link TcpRequesterConnection} to be used by the
+ * {@link SocketOperations}
  *
  * @since 4.0
  */
 @Alias("tcp-requester")
-public final class TcpRequesterProvider implements PoolingConnectionProvider<TcpRequesterConnection>, Initialisable
-{
+public final class TcpRequesterProvider implements PoolingConnectionProvider<TcpRequesterConnection>, Initialisable {
 
-    /**
-     * Its presence will imply the use of {@link SSLSocket}
-     * instead of plain TCP {@link Socket} for establishing a connection over SSL.
-     */
-    @Parameter
-    @Optional
-    @Placement(group = TLS_CONFIGURATION, tab = TLS)
-    @DisplayName(TLS_CONFIGURATION)
-    private TlsContextFactory tlsContext;
+  /**
+   * Its presence will imply the use of {@link SSLSocket} instead of plain TCP {@link Socket} for establishing a connection over
+   * SSL.
+   */
+  @Parameter
+  @Optional
+  @Placement(group = TLS_CONFIGURATION, tab = TLS)
+  @DisplayName(TLS_CONFIGURATION)
+  private TlsContextFactory tlsContext;
 
-    /**
-     * This configuration parameter refers to the address where the {@link Socket} should connect to.
-     */
-    @ParameterGroup
-    private ConnectionSettings connectionSettings;
+  /**
+   * This configuration parameter refers to the address where the {@link Socket} should connect to.
+   */
+  @ParameterGroup
+  private ConnectionSettings connectionSettings;
 
-    /**
-     * {@link Socket} configuration properties
-     */
-    @ParameterGroup
-    private TcpClientSocketProperties tcpClientSocketProperties;
+  /**
+   * {@link Socket} configuration properties
+   */
+  @ParameterGroup
+  private TcpClientSocketProperties tcpClientSocketProperties;
 
-    /**
-     * This configuration parameter refers to the address where the {@link Socket} should bind to.
-     */
-    @Parameter
-    @Optional
-    @Placement(group = "Local Address Settings")
-    ConnectionSettings localAddressSettings = new ConnectionSettings();
+  /**
+   * This configuration parameter refers to the address where the {@link Socket} should bind to.
+   */
+  @Parameter
+  @Optional
+  @Placement(group = "Local Address Settings")
+  ConnectionSettings localAddressSettings = new ConnectionSettings();
 
 
-    /**
-     * {@link TcpProtocol} that knows how the data is going to be read and written.
-     * If not specified, the {@link SafeProtocol} will be used.
-     */
-    @Parameter
-    @Optional
-    @Summary("TCP Protocol to use when doing requests")
-    @Placement(group = CONNECTION, order = 3)
-    private TcpProtocol protocol = new SafeProtocol();
+  /**
+   * {@link TcpProtocol} that knows how the data is going to be read and written. If not specified, the {@link SafeProtocol} will
+   * be used.
+   */
+  @Parameter
+  @Optional
+  @Summary("TCP Protocol to use when doing requests")
+  @Placement(group = CONNECTION, order = 3)
+  private TcpProtocol protocol = new SafeProtocol();
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public TcpRequesterConnection connect() throws ConnectionException
-    {
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public TcpRequesterConnection connect() throws ConnectionException {
 
-        SimpleSocketFactory simpleSocketFactory = null;
+    SimpleSocketFactory simpleSocketFactory = null;
 
-        try
-        {
-            simpleSocketFactory = tlsContext != null
-                                  ? new SslSocketFactory(tlsContext)
-                                  : new TcpSocketFactory();
-        }
-        catch (Exception e)
-        {
-            throw new MuleRuntimeException(e);
-        }
-
-        TcpRequesterConnection connection = new TcpRequesterConnection(connectionSettings, localAddressSettings, protocol,
-                                                                       tcpClientSocketProperties, simpleSocketFactory);
-        connection.connect();
-        return connection;
+    try {
+      simpleSocketFactory = tlsContext != null ? new SslSocketFactory(tlsContext) : new TcpSocketFactory();
+    } catch (Exception e) {
+      throw new MuleRuntimeException(e);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void disconnect(TcpRequesterConnection connection)
-    {
-        connection.disconnect();
-    }
+    TcpRequesterConnection connection = new TcpRequesterConnection(connectionSettings, localAddressSettings, protocol,
+                                                                   tcpClientSocketProperties, simpleSocketFactory);
+    connection.connect();
+    return connection;
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ConnectionValidationResult validate(TcpRequesterConnection connection)
-    {
-        return SocketUtils.validate(connection);
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void disconnect(TcpRequesterConnection connection) {
+    connection.disconnect();
+  }
 
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        initialiseIfNeeded(tlsContext);
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public ConnectionValidationResult validate(TcpRequesterConnection connection) {
+    return SocketUtils.validate(connection);
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    initialiseIfNeeded(tlsContext);
+  }
 }

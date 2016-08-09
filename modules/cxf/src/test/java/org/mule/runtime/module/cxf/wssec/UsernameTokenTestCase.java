@@ -17,42 +17,36 @@ import java.util.concurrent.TimeUnit;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class UsernameTokenTestCase extends FunctionalTestCase
-{
-    private Latch greetLatch;
+public class UsernameTokenTestCase extends FunctionalTestCase {
 
-    @Rule
-    public DynamicPort dynamicPort = new DynamicPort("port1");
+  private Latch greetLatch;
 
-    @Override
-    protected String[] getConfigFiles()
-    {
-        return new String[] {
-                             "org/mule/runtime/module/cxf/wssec/cxf-secure-service-flow-httpn.xml",
-                             "org/mule/runtime/module/cxf/wssec/username-token-conf.xml"
-        };
-    }
+  @Rule
+  public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    @Override
-    protected void doSetUp() throws Exception
-    {
-        ClientPasswordCallback.setPassword("secret");
-        super.doSetUp();
+  @Override
+  protected String[] getConfigFiles() {
+    return new String[] {"org/mule/runtime/module/cxf/wssec/cxf-secure-service-flow-httpn.xml",
+        "org/mule/runtime/module/cxf/wssec/username-token-conf.xml"};
+  }
 
-        greetLatch = getGreeter().getLatch();
-    }
+  @Override
+  protected void doSetUp() throws Exception {
+    ClientPasswordCallback.setPassword("secret");
+    super.doSetUp();
 
-    @Test
-    public void testUsernameToken() throws Exception
-    {
-        assertTrue(greetLatch.await(60, TimeUnit.SECONDS));
-    }
+    greetLatch = getGreeter().getLatch();
+  }
 
-    protected GreeterWithLatch getGreeter() throws Exception
-    {
-        Object instance = getComponent("greeterService");
-        return (GreeterWithLatch) instance;
-    }
+  @Test
+  public void testUsernameToken() throws Exception {
+    assertTrue(greetLatch.await(60, TimeUnit.SECONDS));
+  }
+
+  protected GreeterWithLatch getGreeter() throws Exception {
+    Object instance = getComponent("greeterService");
+    return (GreeterWithLatch) instance;
+  }
 }
 
 

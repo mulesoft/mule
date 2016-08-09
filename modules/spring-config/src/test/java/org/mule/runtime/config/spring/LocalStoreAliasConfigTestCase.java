@@ -17,58 +17,50 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Test;
 
-public class LocalStoreAliasConfigTestCase extends AbstractMuleContextTestCase
-{
+public class LocalStoreAliasConfigTestCase extends AbstractMuleContextTestCase {
 
-    @Override
-    protected ConfigurationBuilder getBuilder() throws Exception
-    {
-        return new SpringXmlConfigurationBuilder(new String[0], emptyMap(), APP);
-    }
+  @Override
+  protected ConfigurationBuilder getBuilder() throws Exception {
+    return new SpringXmlConfigurationBuilder(new String[0], emptyMap(), APP);
+  }
 
-    @Test
-    public void inMemoryObjectStore() throws Exception
-    {
-        this.testSame(MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME, DefaultMuleContext.LOCAL_TRANSIENT_OBJECT_STORE_KEY);
-    }
+  @Test
+  public void inMemoryObjectStore() throws Exception {
+    this.testSame(MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME, DefaultMuleContext.LOCAL_TRANSIENT_OBJECT_STORE_KEY);
+  }
 
-    @Test
-    public void persistentObjectStore() throws Exception
-    {
-        this.testSame(MuleProperties.OBJECT_STORE_DEFAULT_PERSISTENT_NAME, DefaultMuleContext.LOCAL_PERSISTENT_OBJECT_STORE_KEY);
-    }
+  @Test
+  public void persistentObjectStore() throws Exception {
+    this.testSame(MuleProperties.OBJECT_STORE_DEFAULT_PERSISTENT_NAME, DefaultMuleContext.LOCAL_PERSISTENT_OBJECT_STORE_KEY);
+  }
 
 
-    @Test
-    public void userObjectStore() throws Exception
-    {
-        this.testSame(MuleProperties.DEFAULT_USER_OBJECT_STORE_NAME, "_localUserObjectStore");
-    }
+  @Test
+  public void userObjectStore() throws Exception {
+    this.testSame(MuleProperties.DEFAULT_USER_OBJECT_STORE_NAME, "_localUserObjectStore");
+  }
 
-    @Test
-    public void transientUserObjectStore() throws Exception
-    {
-        this.testSame(MuleProperties.DEFAULT_USER_TRANSIENT_OBJECT_STORE_NAME, "_localTransientUserObjectStore");
-    }
+  @Test
+  public void transientUserObjectStore() throws Exception {
+    this.testSame(MuleProperties.DEFAULT_USER_TRANSIENT_OBJECT_STORE_NAME, "_localTransientUserObjectStore");
+  }
 
-    @Test
-    public void queueManager() throws Exception
-    {
-        this.testSame(MuleProperties.OBJECT_QUEUE_MANAGER, DefaultMuleContext.LOCAL_QUEUE_MANAGER_KEY);
-        assertSame(muleContext.getQueueManager(), muleContext.getRegistry().lookupObject(DefaultMuleContext.LOCAL_QUEUE_MANAGER_KEY));
-    }
+  @Test
+  public void queueManager() throws Exception {
+    this.testSame(MuleProperties.OBJECT_QUEUE_MANAGER, DefaultMuleContext.LOCAL_QUEUE_MANAGER_KEY);
+    assertSame(muleContext.getQueueManager(), muleContext.getRegistry().lookupObject(DefaultMuleContext.LOCAL_QUEUE_MANAGER_KEY));
+  }
 
-    @Test
-    public void objectStoreManager() throws Exception
-    {
-        this.testSame(MuleProperties.OBJECT_STORE_MANAGER, DefaultMuleContext.LOCAL_OBJECT_STORE_MANAGER_KEY);
-        assertSame(muleContext.getObjectStoreManager(), muleContext.getRegistry().lookupObject(DefaultMuleContext.LOCAL_OBJECT_STORE_MANAGER_KEY));
-    }
+  @Test
+  public void objectStoreManager() throws Exception {
+    this.testSame(MuleProperties.OBJECT_STORE_MANAGER, DefaultMuleContext.LOCAL_OBJECT_STORE_MANAGER_KEY);
+    assertSame(muleContext.getObjectStoreManager(),
+               muleContext.getRegistry().lookupObject(DefaultMuleContext.LOCAL_OBJECT_STORE_MANAGER_KEY));
+  }
 
-    private void testSame(String key1, String key2)
-    {
-        Object obj1 = muleContext.getRegistry().lookupObject(key1);
-        Object obj2 = muleContext.getRegistry().lookupObject(key2);
-        assertSame(obj1, obj2);
-    }
+  private void testSame(String key1, String key2) {
+    Object obj1 = muleContext.getRegistry().lookupObject(key1);
+    Object obj2 = muleContext.getRegistry().lookupObject(key2);
+    assertSame(obj1, obj2);
+  }
 }

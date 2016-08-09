@@ -10,20 +10,18 @@ import java.io.Serializable;
 import java.util.Map;
 
 /**
- * <code>ExceptionPayload</code> is a message payload that contains exception
- * information that occurred during message processing.
+ * <code>ExceptionPayload</code> is a message payload that contains exception information that occurred during message processing.
  */
-public interface ExceptionPayload extends Serializable
-{
+public interface ExceptionPayload extends Serializable {
 
-    int getCode();
+  int getCode();
 
-    String getMessage();
+  String getMessage();
 
-    Map getInfo();
+  Map getInfo();
 
-    Throwable getException();
+  Throwable getException();
 
-    Throwable getRootException();
+  Throwable getRootException();
 
 }

@@ -9,25 +9,24 @@ package org.mule.test.core.context.notification;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 
 /**
- * An implementation detail - this enforces the guarantee that once
- * {@link Node#serial(RestrictedNode)} is called, {@link Node#parallel(RestrictedNode)} cannot be.
+ * An implementation detail - this enforces the guarantee that once {@link Node#serial(RestrictedNode)} is called,
+ * {@link Node#parallel(RestrictedNode)} cannot be.
  */
-public interface RestrictedNode
-{
+public interface RestrictedNode {
 
-    public RestrictedNode serial(RestrictedNode node);
+  public RestrictedNode serial(RestrictedNode node);
 
-    public int match(ServerNotification notification);
+  public int match(ServerNotification notification);
 
-    public boolean contains(Class clazz, int action);
+  public boolean contains(Class clazz, int action);
 
-    public boolean isExhausted();
+  public boolean isExhausted();
 
-    /**
-     * @return Any remaining node
-     */
-    public RestrictedNode getAnyRemaining();
+  /**
+   * @return Any remaining node
+   */
+  public RestrictedNode getAnyRemaining();
 
-    Class getNotificationClass();
+  Class getNotificationClass();
 
 }

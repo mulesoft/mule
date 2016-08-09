@@ -16,15 +16,14 @@ import javax.management.NotCompliantMBeanException;
 /**
  * JMX agent for domain artifacts
  */
-public class JmxDomainAgent extends AbstractJmxAgent
-{
+public class JmxDomainAgent extends AbstractJmxAgent {
 
-    @Override
-    protected void registerServices() throws MuleException, NotCompliantMBeanException, MBeanRegistrationException, InstanceAlreadyExistsException, MalformedObjectNameException
-    {
-        registerWrapperService();
-        registerMuleService();
-        registerConfigurationService();
-    }
+  @Override
+  protected void registerServices() throws MuleException, NotCompliantMBeanException, MBeanRegistrationException,
+      InstanceAlreadyExistsException, MalformedObjectNameException {
+    registerWrapperService();
+    registerMuleService();
+    registerConfigurationService();
+  }
 
 }

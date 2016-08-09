@@ -21,30 +21,27 @@ import java.util.Iterator;
 
 import org.junit.Test;
 
-public class ManagementNamespaceHandlerTestCase extends FunctionalTestCase
-{
-    public ManagementNamespaceHandlerTestCase()
-    {
-        super();
-        // do not start the muleContext, we're only doing registry lookups in this test case
-        setStartContext(false);
-    }
+public class ManagementNamespaceHandlerTestCase extends FunctionalTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "management-namespace-config.xml";
-    }
+  public ManagementNamespaceHandlerTestCase() {
+    super();
+    // do not start the muleContext, we're only doing registry lookups in this test case
+    setStartContext(false);
+  }
 
-    @Test
-    public void testSimpleJmxAgentConfig() throws Exception
-    {
-        Agent agent = muleContext.getRegistry().lookupObject(JmxApplicationAgent.class);
-        agent = muleContext.getRegistry().lookupAgent("publish-notifications");
-        assertNotNull(agent);
-        assertEquals(EndpointNotificationLoggerAgent.class, agent.getClass());
-        EndpointNotificationLoggerAgent enlAgent = (EndpointNotificationLoggerAgent) agent;
-        assertEquals(enlAgent.getEndpoint().getEndpointURI().toString(), "test://test");
-    }
+  @Override
+  protected String getConfigFile() {
+    return "management-namespace-config.xml";
+  }
+
+  @Test
+  public void testSimpleJmxAgentConfig() throws Exception {
+    Agent agent = muleContext.getRegistry().lookupObject(JmxApplicationAgent.class);
+    agent = muleContext.getRegistry().lookupAgent("publish-notifications");
+    assertNotNull(agent);
+    assertEquals(EndpointNotificationLoggerAgent.class, agent.getClass());
+    EndpointNotificationLoggerAgent enlAgent = (EndpointNotificationLoggerAgent) agent;
+    assertEquals(enlAgent.getEndpoint().getEndpointURI().toString(), "test://test");
+  }
 
 }

@@ -9,39 +9,34 @@ package org.mule.extension.validation.api;
 import java.util.List;
 
 /**
- * A specialization of {@link ValidationResult} which
- * represents a group of validations that were executed together.
+ * A specialization of {@link ValidationResult} which represents a group of validations that were executed together.
  * <p/>
- * This interface redefines the {@link ValidationResult} contract
- * so that the {@link #isError()} and {@link #getMessage()} methods
+ * This interface redefines the {@link ValidationResult} contract so that the {@link #isError()} and {@link #getMessage()} methods
  * consider the results of all the validations.
  * <p/>
- * Additionally, the {@link #getFailedValidationResults()} method
- * is added to give more detailed access to the validations that failed
+ * Additionally, the {@link #getFailedValidationResults()} method is added to give more detailed access to the validations that
+ * failed
  *
  * @since 3.7.0
  */
-public interface MultipleValidationResult extends ValidationResult
-{
+public interface MultipleValidationResult extends ValidationResult {
 
-    /**
-     * @return {@code true} if at least one of the {@link #getFailedValidationResults()} is not empty. {@code false} otherwise
-     */
-    @Override
-    boolean isError();
+  /**
+   * @return {@code true} if at least one of the {@link #getFailedValidationResults()} is not empty. {@code false} otherwise
+   */
+  @Override
+  boolean isError();
 
-    /**
-     * Returns all the messages from the {@link #getFailedValidationResults()} which failed
-     * separated by a {@code \n} character
-     */
-    @Override
-    String getMessage();
+  /**
+   * Returns all the messages from the {@link #getFailedValidationResults()} which failed separated by a {@code \n} character
+   */
+  @Override
+  String getMessage();
 
-    /**
-     * The {@link ValidationResult}s which {@link ValidationResult#isError()} method
-     * returns {@code false}
-     *
-     * @return an immutable view of the successful {@link ValidationResult}
-     */
-    List<ValidationResult> getFailedValidationResults();
+  /**
+   * The {@link ValidationResult}s which {@link ValidationResult#isError()} method returns {@code false}
+   *
+   * @return an immutable view of the successful {@link ValidationResult}
+   */
+  List<ValidationResult> getFailedValidationResults();
 }

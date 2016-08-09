@@ -28,165 +28,134 @@ import org.apache.tools.ant.util.Watchdog;
  * Will start external test servers needed for the integration tests
  */
 
-public class ServerTools
-{
-    public static final String ACTIVEMQ_HOME = "org.activemq.home";
+public class ServerTools {
 
-    private static KillableWatchdog activemq;
-    private static ActiveMQConnectionFactory embeddedFactory = null;
+  public static final String ACTIVEMQ_HOME = "org.activemq.home";
 
-    public static void launchActiveMq()
-    {
-        launchActiveMq(ActiveMQConnection.DEFAULT_BROKER_URL);
+  private static KillableWatchdog activemq;
+  private static ActiveMQConnectionFactory embeddedFactory = null;
+
+  public static void launchActiveMq() {
+    launchActiveMq(ActiveMQConnection.DEFAULT_BROKER_URL);
+  }
+
+  public static ActiveMQConnectionFactory launchEmbeddedActiveMq() throws JMSException {
+    return new ActiveMQConnectionFactory("vm://localhost?broker.persistent=false&broker.useJmx=false");
+  }
+
+  public static void killEmbeddedActiveMq() {
+    if (embeddedFactory != null) {
+      /*
+       * try { embeddedFactory.stop(); } catch (JMSException e) { throw new RuntimeException("Could not stop embedded ActiveMQ!",
+       * e); }
+       */
+      embeddedFactory = null;
+    }
+  }
+
+  public static void launchActiveMq(String brokerUrl) {
+    String activeMqHome = System.getProperty(ACTIVEMQ_HOME);
+    if (activeMqHome == null) {
+      throw new IllegalArgumentException("You must set the " + ACTIVEMQ_HOME
+          + " system property to the root path of an ActiveMq distribution (v3.0 and greater) before running these tests");
+    }
+    Project project = new Project();
+    DefaultLogger consoleLogger = new DefaultLogger();
+    consoleLogger.setErrorPrintStream(System.err);
+    consoleLogger.setOutputPrintStream(System.out);
+    consoleLogger.setMessageOutputLevel(Project.MSG_INFO);
+    project.addBuildListener(consoleLogger);
+    Path path = new Path(project);
+    File[] jars = FileUtils.newFile(activeMqHome + "\\lib").listFiles(new FilenameWildcardFilter("*.jar"));
+    path.add(new Path(project, FileUtils.newFile(activeMqHome, "\\conf").getAbsolutePath()));
+    for (int i = 0; i < jars.length; i++) {
+      path.add(new Path(project, jars[i].getAbsolutePath()));
+    }
+    jars = FileUtils.newFile(activeMqHome + "\\lib\\optional").listFiles(new FilenameWildcardFilter("*.jar"));
+    for (int i = 0; i < jars.length; i++) {
+      path.add(new Path(project, jars[i].getAbsolutePath()));
+    }
+    final JavaTask java = new JavaTask();
+    java.setProject(project);
+    java.setClasspath(path);
+    if (activeMqHome.indexOf("4.") > -1) {
+      java.setClassname("org.apache.activemq.broker.Main");
+    } else {
+      java.setClassname("org.activemq.broker.impl.Main");
+    }
+    java.setArgs(brokerUrl);
+    java.setFork(true);
+    java.setDir(FileUtils.newFile(activeMqHome));
+    java.addSysproperty(createVar("activemq.home", FileUtils.newFile(activeMqHome).getAbsolutePath()));
+    java.addSysproperty(createVar("derby.system.home", FileUtils.newFile(activeMqHome, "\\var").getAbsolutePath()));
+    java.createWatchdog();
+    new Thread() {
+
+      @Override
+      public void run() {
+        java.execute();
+      }
+    }.start();
+    activemq = java.watchDog;
+  }
+
+  public static void killActiveMq() {
+    try {
+      if (activemq != null) {
+        activemq.kill();
+      }
+    } catch (Throwable e) {
+      e.printStackTrace();
+    }
+  }
+
+  static class JavaTask extends Java {
+
+    public KillableWatchdog watchDog;
+    private Long timeout = new Long(Long.MAX_VALUE);
+
+    @Override
+    public void setTimeout(Long value) {
+      this.timeout = value;
+      super.setTimeout(value);
     }
 
-    public static ActiveMQConnectionFactory launchEmbeddedActiveMq() throws JMSException
-    {
-        return new ActiveMQConnectionFactory("vm://localhost?broker.persistent=false&broker.useJmx=false");
+    @Override
+    protected ExecuteWatchdog createWatchdog() throws BuildException {
+      if (watchDog == null) {
+        watchDog = new KillableWatchdog(timeout != null ? timeout.longValue() : 0);
+      }
+      return watchDog;
     }
 
-    public static void killEmbeddedActiveMq()
-    {
-        if (embeddedFactory != null)
-        {
-         /*   try
-            {
-                embeddedFactory.stop();
-            }
-            catch (JMSException e)
-            {
-                throw new RuntimeException("Could not stop embedded ActiveMQ!", e);
-            }*/
-            embeddedFactory = null;
-        }
+  }
+
+  static class KillableWatchdog extends ExecuteWatchdog {
+
+    public KillableWatchdog(long timeout) {
+      super(timeout);
     }
 
-    public static void launchActiveMq(String brokerUrl)
-    {
-        String activeMqHome = System.getProperty(ACTIVEMQ_HOME);
-        if (activeMqHome == null)
-        {
-            throw new IllegalArgumentException(
-                "You must set the "
-                                + ACTIVEMQ_HOME
-                                + " system property to the root path of an ActiveMq distribution (v3.0 and greater) before running these tests");
-        }
-        Project project = new Project();
-        DefaultLogger consoleLogger = new DefaultLogger();
-        consoleLogger.setErrorPrintStream(System.err);
-        consoleLogger.setOutputPrintStream(System.out);
-        consoleLogger.setMessageOutputLevel(Project.MSG_INFO);
-        project.addBuildListener(consoleLogger);
-        Path path = new Path(project);
-        File[] jars = FileUtils.newFile(activeMqHome + "\\lib").listFiles(new FilenameWildcardFilter("*.jar"));
-        path.add(new Path(project, FileUtils.newFile(activeMqHome, "\\conf").getAbsolutePath()));
-        for (int i = 0; i < jars.length; i++)
-        {
-            path.add(new Path(project, jars[i].getAbsolutePath()));
-        }
-        jars = FileUtils.newFile(activeMqHome + "\\lib\\optional").listFiles(new FilenameWildcardFilter("*.jar"));
-        for (int i = 0; i < jars.length; i++)
-        {
-            path.add(new Path(project, jars[i].getAbsolutePath()));
-        }
-        final JavaTask java = new JavaTask();
-        java.setProject(project);
-        java.setClasspath(path);
-        if (activeMqHome.indexOf("4.") > -1)
-        {
-            java.setClassname("org.apache.activemq.broker.Main");
-        }
-        else
-        {
-            java.setClassname("org.activemq.broker.impl.Main");
-        }
-        java.setArgs(brokerUrl);
-        java.setFork(true);
-        java.setDir(FileUtils.newFile(activeMqHome));
-        java.addSysproperty(createVar("activemq.home", FileUtils.newFile(activeMqHome).getAbsolutePath()));
-        java.addSysproperty(createVar("derby.system.home", FileUtils.newFile(activeMqHome, "\\var").getAbsolutePath()));
-        java.createWatchdog();
-        new Thread()
-        {
-            @Override
-            public void run()
-            {
-                java.execute();
-            }
-        }.start();
-        activemq = java.watchDog;
+    @Override
+    public void timeoutOccured(Watchdog w) {
+      // ignore
     }
 
-    public static void killActiveMq()
-    {
-        try
-        {
-            if (activemq != null)
-            {
-                activemq.kill();
-            }
-        }
-        catch (Throwable e)
-        {
-            e.printStackTrace();
-        }
+    @Override
+    public synchronized void start(Process process) {
+      super.start(process);
     }
 
-    static class JavaTask extends Java
-    {
-        public KillableWatchdog watchDog;
-        private Long timeout = new Long(Long.MAX_VALUE);
-
-        @Override
-        public void setTimeout(Long value)
-        {
-            this.timeout = value;
-            super.setTimeout(value);
-        }
-
-        @Override
-        protected ExecuteWatchdog createWatchdog() throws BuildException
-        {
-            if (watchDog == null)
-            {
-                watchDog = new KillableWatchdog(timeout != null ? timeout.longValue() : 0);
-            }
-            return watchDog;
-        }
-
+    public void kill() {
+      super.timeoutOccured(null);
     }
+  }
 
-    static class KillableWatchdog extends ExecuteWatchdog
-    {
-        public KillableWatchdog(long timeout)
-        {
-            super(timeout);
-        }
-
-        @Override
-        public void timeoutOccured(Watchdog w)
-        {
-            // ignore
-        }
-
-        @Override
-        public synchronized void start(Process process)
-        {
-            super.start(process);
-        }
-
-        public void kill()
-        {
-            super.timeoutOccured(null);
-        }
-    }
-
-    static Environment.Variable createVar(String name, String value)
-    {
-        Environment.Variable var = new Environment.Variable();
-        var.setKey(name);
-        var.setValue(value);
-        return var;
-    }
+  static Environment.Variable createVar(String name, String value) {
+    Environment.Variable var = new Environment.Variable();
+    var.setKey(name);
+    var.setValue(value);
+    return var;
+  }
 
 }

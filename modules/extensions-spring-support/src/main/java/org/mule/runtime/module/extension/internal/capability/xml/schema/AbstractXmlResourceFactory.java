@@ -17,52 +17,46 @@ import java.util.Optional;
 import java.util.Properties;
 
 /**
- * Base class for {@link GeneratedResourceFactory} implementations which
- * generate resources needed to support configuring extensions through
- * XML
+ * Base class for {@link GeneratedResourceFactory} implementations which generate resources needed to support configuring
+ * extensions through XML
  *
  * @since 4.0
  */
-abstract class AbstractXmlResourceFactory implements GeneratedResourceFactory
-{
+abstract class AbstractXmlResourceFactory implements GeneratedResourceFactory {
 
-    /**
-     * Tests the given {@code extensionModel} to be enriched with the {@link XmlModelProperty}.
-     * If the property is present, then it delegates into {@link #generateXmlResource(ExtensionModel, XmlModelProperty)}.
-     * <p>
-     * Otherwise, it returns {@link Optional#empty()}
-     *
-     * @param extensionModel the {@link ExtensionModel} that requires the resource
-     * @return an {@link Optional} {@link GeneratedResource}
-     */
-    @Override
-    public Optional<GeneratedResource> generateResource(ExtensionModel extensionModel)
-    {
-        XmlModelProperty xmlProperty = extensionModel.getModelProperty(XmlModelProperty.class).orElse(null);
+  /**
+   * Tests the given {@code extensionModel} to be enriched with the {@link XmlModelProperty}. If the property is present, then it
+   * delegates into {@link #generateXmlResource(ExtensionModel, XmlModelProperty)}.
+   * <p>
+   * Otherwise, it returns {@link Optional#empty()}
+   *
+   * @param extensionModel the {@link ExtensionModel} that requires the resource
+   * @return an {@link Optional} {@link GeneratedResource}
+   */
+  @Override
+  public Optional<GeneratedResource> generateResource(ExtensionModel extensionModel) {
+    XmlModelProperty xmlProperty = extensionModel.getModelProperty(XmlModelProperty.class).orElse(null);
 
-        return xmlProperty == null
-               ? empty()
-               : of(generateXmlResource(extensionModel, xmlProperty));
-    }
+    return xmlProperty == null ? empty() : of(generateXmlResource(extensionModel, xmlProperty));
+  }
 
-    /**
-     * Delegate method which should contain the actual logic to generate the resource
-     *
-     * @param extensionModel   the {@link ExtensionModel} that requires the resource
-     * @param xmlModelProperty the extension's {@link XmlModelProperty}
-     * @return a {@link GeneratedResource}
-     */
-    protected abstract GeneratedResource generateXmlResource(ExtensionModel extensionModel, XmlModelProperty xmlModelProperty);
+  /**
+   * Delegate method which should contain the actual logic to generate the resource
+   *
+   * @param extensionModel the {@link ExtensionModel} that requires the resource
+   * @param xmlModelProperty the extension's {@link XmlModelProperty}
+   * @return a {@link GeneratedResource}
+   */
+  protected abstract GeneratedResource generateXmlResource(ExtensionModel extensionModel, XmlModelProperty xmlModelProperty);
 
-    /**
-     * Escapes special characters for the {@link Properties} class that Spring uses to parse the bundle.
-     *
-     * @param content the content to be escaped
-     * @return the escaped content
-     */
-    protected String escape(String content)
-    {
-        return content.replaceAll(":", "\\\\:");
-    }
+  /**
+   * Escapes special characters for the {@link Properties} class that Spring uses to parse the bundle.
+   *
+   * @param content the content to be escaped
+   * @return the escaped content
+   */
+  protected String escape(String content) {
+    return content.replaceAll(":", "\\\\:");
+  }
 
 }

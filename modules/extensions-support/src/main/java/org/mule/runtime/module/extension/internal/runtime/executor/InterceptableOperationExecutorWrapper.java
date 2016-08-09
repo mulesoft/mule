@@ -29,83 +29,74 @@ import org.slf4j.LoggerFactory;
  *
  * @since 4.0
  */
-public final class InterceptableOperationExecutorWrapper extends AbstractInterceptable implements OperationExecutor
-{
+public final class InterceptableOperationExecutorWrapper extends AbstractInterceptable implements OperationExecutor {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(InterceptableOperationExecutorWrapper.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(InterceptableOperationExecutorWrapper.class);
 
-    private final OperationExecutor delegate;
+  private final OperationExecutor delegate;
 
-    /**
-     * Creates a new instance
-     *
-     * @param delegate     the {@link OperationExecutor} to be decorated
-     * @param interceptors the {@link Interceptor interceptors} that should apply to the {@code delegate}
-     */
-    public InterceptableOperationExecutorWrapper(OperationExecutor delegate, List<Interceptor> interceptors)
-    {
-        super(interceptors);
-        this.delegate = delegate;
-    }
+  /**
+   * Creates a new instance
+   *
+   * @param delegate the {@link OperationExecutor} to be decorated
+   * @param interceptors the {@link Interceptor interceptors} that should apply to the {@code delegate}
+   */
+  public InterceptableOperationExecutorWrapper(OperationExecutor delegate, List<Interceptor> interceptors) {
+    super(interceptors);
+    this.delegate = delegate;
+  }
 
-    /**
-     * Directly delegates into {@link #delegate}
-     * {@inheritDoc}
-     */
-    @Override
-    public <T> T execute(OperationContext operationContext) throws Exception
-    {
-        return delegate.execute(operationContext);
-    }
+  /**
+   * Directly delegates into {@link #delegate} {@inheritDoc}
+   */
+  @Override
+  public <T> T execute(OperationContext operationContext) throws Exception {
+    return delegate.execute(operationContext);
+  }
 
-    /**
-     * Performs dependency injection into the {@link #delegate} and the items in the {@link #interceptors}
-     * list.
-     * <p>
-     * Then it propagates this lifecycle phase into them.
-     *
-     * @throws InitialisationException in case of error
-     */
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        initialiseIfNeeded(delegate, true, muleContext);
-        super.initialise();
-    }
+  /**
+   * Performs dependency injection into the {@link #delegate} and the items in the {@link #interceptors} list.
+   * <p>
+   * Then it propagates this lifecycle phase into them.
+   *
+   * @throws InitialisationException in case of error
+   */
+  @Override
+  public void initialise() throws InitialisationException {
+    initialiseIfNeeded(delegate, true, muleContext);
+    super.initialise();
+  }
 
-    /**
-     * Propagates this lifecycle phase into the items in the {@link #interceptors} list and the {@link #delegate}
-     *
-     * @throws MuleException in case of error
-     */
-    @Override
-    public void start() throws MuleException
-    {
-        super.start();
-        startIfNeeded(delegate);
-    }
+  /**
+   * Propagates this lifecycle phase into the items in the {@link #interceptors} list and the {@link #delegate}
+   *
+   * @throws MuleException in case of error
+   */
+  @Override
+  public void start() throws MuleException {
+    super.start();
+    startIfNeeded(delegate);
+  }
 
-    /**
-     * Propagates this lifecycle phase into the items in the {@link #interceptors} list and the {@link #delegate}
-     *
-     * @throws MuleException in case of error
-     */
-    @Override
-    public void stop() throws MuleException
-    {
-        super.stop();
-        stopIfNeeded(delegate);
-    }
+  /**
+   * Propagates this lifecycle phase into the items in the {@link #interceptors} list and the {@link #delegate}
+   *
+   * @throws MuleException in case of error
+   */
+  @Override
+  public void stop() throws MuleException {
+    super.stop();
+    stopIfNeeded(delegate);
+  }
 
-    /**
-     * Propagates this lifecycle phase into the items in the {@link #interceptors} list and the {@link #delegate}
-     *
-     * @throws MuleException in case of error
-     */
-    @Override
-    public void dispose()
-    {
-        super.dispose();
-        disposeIfNeeded(delegate, LOGGER);
-    }
+  /**
+   * Propagates this lifecycle phase into the items in the {@link #interceptors} list and the {@link #delegate}
+   *
+   * @throws MuleException in case of error
+   */
+  @Override
+  public void dispose() {
+    super.dispose();
+    disposeIfNeeded(delegate, LOGGER);
+  }
 }

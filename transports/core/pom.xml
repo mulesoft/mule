@@ -10,6 +10,10 @@
     <name>Transports Core Infrastructure</name>
     <description>Mule core support for transports.</description>
     
+    <properties>
+        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.mule</groupId>

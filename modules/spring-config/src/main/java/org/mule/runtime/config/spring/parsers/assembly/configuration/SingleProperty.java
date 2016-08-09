@@ -6,19 +6,18 @@
  */
 package org.mule.runtime.config.spring.parsers.assembly.configuration;
 
-public interface SingleProperty
-{
+public interface SingleProperty {
 
-    boolean isCollection();
+  boolean isCollection();
 
-    void setCollection();
+  void setCollection();
 
-    boolean isIgnored();
+  boolean isIgnored();
 
-    void setIgnored();
+  void setIgnored();
 
-    boolean isReference();
+  boolean isReference();
 
-    void setReference();
+  void setReference();
 
 }

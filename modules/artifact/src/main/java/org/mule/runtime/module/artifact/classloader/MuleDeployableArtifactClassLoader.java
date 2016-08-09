@@ -16,33 +16,32 @@ import java.util.List;
  *
  * @since 4.0
  */
-public class MuleDeployableArtifactClassLoader extends MuleArtifactClassLoader
-{
-    private final List<ArtifactClassLoader> artifactPluginClassLoaders;
+public class MuleDeployableArtifactClassLoader extends MuleArtifactClassLoader {
 
-    /**
-     * Creates a {@link MuleDeployableArtifactClassLoader} with the provided configuration.
-     *
-     * @param name artifact name
-     * @param urls the URLs from which to load classes and resources
-     * @param parent parent class loader in the hierarchy
-     * @param lookupPolicy policy for resolving classes and resources
-     * @param artifactPluginClassLoaders class loaders for the plugin artifacts contained by this artifact. Must be not null.
-     */
-    public MuleDeployableArtifactClassLoader(String name, URL[] urls, ClassLoader parent, ClassLoaderLookupPolicy lookupPolicy, List<ArtifactClassLoader> artifactPluginClassLoaders)
-    {
-        super(name, urls, parent, lookupPolicy);
-        checkArgument(artifactPluginClassLoaders != null, "artifact plugin class loaders cannot be null");
-        this.artifactPluginClassLoaders = artifactPluginClassLoaders;
-    }
+  private final List<ArtifactClassLoader> artifactPluginClassLoaders;
 
-    /**
-     * Provides a {@link List} with the plugin name as key and its classloader as value.
-     *
-     * @return {@link List} of plugin class loaders
-     */
-    public List<ArtifactClassLoader> getArtifactPluginClassLoaders()
-    {
-        return artifactPluginClassLoaders;
-    }
+  /**
+   * Creates a {@link MuleDeployableArtifactClassLoader} with the provided configuration.
+   *
+   * @param name artifact name
+   * @param urls the URLs from which to load classes and resources
+   * @param parent parent class loader in the hierarchy
+   * @param lookupPolicy policy for resolving classes and resources
+   * @param artifactPluginClassLoaders class loaders for the plugin artifacts contained by this artifact. Must be not null.
+   */
+  public MuleDeployableArtifactClassLoader(String name, URL[] urls, ClassLoader parent, ClassLoaderLookupPolicy lookupPolicy,
+                                           List<ArtifactClassLoader> artifactPluginClassLoaders) {
+    super(name, urls, parent, lookupPolicy);
+    checkArgument(artifactPluginClassLoaders != null, "artifact plugin class loaders cannot be null");
+    this.artifactPluginClassLoaders = artifactPluginClassLoaders;
+  }
+
+  /**
+   * Provides a {@link List} with the plugin name as key and its classloader as value.
+   *
+   * @return {@link List} of plugin class loaders
+   */
+  public List<ArtifactClassLoader> getArtifactPluginClassLoaders() {
+    return artifactPluginClassLoaders;
+  }
 }

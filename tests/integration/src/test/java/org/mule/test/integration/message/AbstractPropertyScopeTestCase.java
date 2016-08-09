@@ -15,21 +15,17 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.junit.Rule;
 import org.junit.Test;
 
-public abstract class AbstractPropertyScopeTestCase extends AbstractIntegrationTestCase
-{
-    @Rule
-    public DynamicPort port = new DynamicPort("port");
+public abstract class AbstractPropertyScopeTestCase extends AbstractIntegrationTestCase {
 
-    @Test
-    public void testRequestResponse() throws Exception
-    {
-        MuleMessage result = flowRunner("foo").withPayload(TEST_PAYLOAD)
-                                              .withInboundProperty("foo", "fooValue")
-                                              .run()
-                                              .getMessage();
+  @Rule
+  public DynamicPort port = new DynamicPort("port");
 
-        assertThat(result.getPayload(), is("test bar"));
-        assertThat(result.getOutboundProperty("foo"), is("fooValue"));
-    }
+  @Test
+  public void testRequestResponse() throws Exception {
+    MuleMessage result = flowRunner("foo").withPayload(TEST_PAYLOAD).withInboundProperty("foo", "fooValue").run().getMessage();
+
+    assertThat(result.getPayload(), is("test bar"));
+    assertThat(result.getOutboundProperty("foo"), is("fooValue"));
+  }
 
 }

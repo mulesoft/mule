@@ -18,118 +18,96 @@ import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.ActiveMQXAConnectionFactory;
 
 /**
- * Abstracts all the Jms Vendor specific configuration.  This is the implementation for ActiveMQ.
+ * Abstracts all the Jms Vendor specific configuration. This is the implementation for ActiveMQ.
  */
-public class ActiveMQJmsConfiguration implements JmsVendorConfiguration
-{
-    public static final String DEFAULT_BROKER_URL = "vm://localhost?broker.persistent=false&broker.useJmx=false";
+public class ActiveMQJmsConfiguration implements JmsVendorConfiguration {
 
-    public void initialise(Class callingClass) throws Exception
-    {
-        // empty
-    }
-    
-    public Connection getConnection(boolean topic, boolean xa) throws Exception
-    {
-        if (xa)
-        {
-            return new ActiveMQXAConnectionFactory(DEFAULT_BROKER_URL).createConnection();
+  public static final String DEFAULT_BROKER_URL = "vm://localhost?broker.persistent=false&broker.useJmx=false";
 
-        }
-        else
-        {
-            return new ActiveMQConnectionFactory(DEFAULT_BROKER_URL).createConnection();
-        }
-    }
+  public void initialise(Class callingClass) throws Exception {
+    // empty
+  }
 
-    public String getInboundEndpoint()
-    {
-        return getProtocol() + "://" + getInboundDestinationName();
-    }
+  public Connection getConnection(boolean topic, boolean xa) throws Exception {
+    if (xa) {
+      return new ActiveMQXAConnectionFactory(DEFAULT_BROKER_URL).createConnection();
 
-    public String getOutboundEndpoint()
-    {
-        return getProtocol() + "://" + getOutboundDestinationName();
+    } else {
+      return new ActiveMQConnectionFactory(DEFAULT_BROKER_URL).createConnection();
     }
+  }
 
-    public String getMiddleEndpoint()
-    {
-        return getProtocol() + "://" + getMiddleDestinationName();
-    }
+  public String getInboundEndpoint() {
+    return getProtocol() + "://" + getInboundDestinationName();
+  }
 
-    public String getTopicBroadcastEndpoint()
-    {
-        return getProtocol() + "://topic:" + getBroadcastDestinationName();
-    }
+  public String getOutboundEndpoint() {
+    return getProtocol() + "://" + getOutboundDestinationName();
+  }
 
-    public String getDeadLetterEndpoint()
-    {
-        return getProtocol() + "://" + getDeadLetterDestinationName();
-    }
+  public String getMiddleEndpoint() {
+    return getProtocol() + "://" + getMiddleDestinationName();
+  }
 
-    public String getInboundDestinationName()
-    {
-        return "in";
-    }
+  public String getTopicBroadcastEndpoint() {
+    return getProtocol() + "://topic:" + getBroadcastDestinationName();
+  }
 
-    public String getOutboundDestinationName()
-    {
-        return "out";
-    }
+  public String getDeadLetterEndpoint() {
+    return getProtocol() + "://" + getDeadLetterDestinationName();
+  }
 
-    public String getMiddleDestinationName()
-    {
-        return "middle";
-    }
+  public String getInboundDestinationName() {
+    return "in";
+  }
 
-    public String getBroadcastDestinationName()
-    {
-        return "broadcast";
-    }
+  public String getOutboundDestinationName() {
+    return "out";
+  }
 
-    public String getDeadLetterDestinationName()
-    {
-        return "dlq";
-    }
+  public String getMiddleDestinationName() {
+    return "middle";
+  }
 
-    /**
-     * Timeout used when checking that a message is NOT present
-     */
-    public long getSmallTimeout()
-    {
-        return 1000L;
-    }
+  public String getBroadcastDestinationName() {
+    return "broadcast";
+  }
 
-    /**
-     * The timeout used when waiting for a message to arrive
-     */
-    public long getTimeout()
-    {
-        return 5000L;
-    }
+  public String getDeadLetterDestinationName() {
+    return "dlq";
+  }
 
-    public String getProtocol()
-    {
-        return "jms";
-    }
+  /**
+   * Timeout used when checking that a message is NOT present
+   */
+  public long getSmallTimeout() {
+    return 1000L;
+  }
 
-    public String getName()
-    {
-        return "activemq";
-    }
+  /**
+   * The timeout used when waiting for a message to arrive
+   */
+  public long getTimeout() {
+    return 5000L;
+  }
 
-    public Map getProperties()
-    {
-        return Collections.EMPTY_MAP;
-    }
+  public String getProtocol() {
+    return "jms";
+  }
 
-    public ConnectionFactory getTestConnectionFactory()
-    {
-        return new ActiveMQTestReconnectionConnectionFactoryWrapper();       
-    }
-    
-    public boolean isEnabled()
-    {
-        return true;
-    }
+  public String getName() {
+    return "activemq";
+  }
+
+  public Map getProperties() {
+    return Collections.EMPTY_MAP;
+  }
+
+  public ConnectionFactory getTestConnectionFactory() {
+    return new ActiveMQTestReconnectionConnectionFactoryWrapper();
+  }
+
+  public boolean isEnabled() {
+    return true;
+  }
 }

@@ -18,36 +18,32 @@ import javax.management.ObjectName;
 
 import org.junit.Test;
 
-public class MuleContextRestartTestCase extends FunctionalTestCase
-{
+public class MuleContextRestartTestCase extends FunctionalTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "mule-context-restart-config-flow.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "mule-context-restart-config-flow.xml";
+  }
 
-    @Test
-    public void testContextRestart() throws Exception
-    {
-        muleContext.stop();
-        checkCleanShutdown();
+  @Test
+  public void testContextRestart() throws Exception {
+    muleContext.stop();
+    checkCleanShutdown();
 
-        // do it again ;)
-        muleContext.start();
-        muleContext.stop();
-        checkCleanShutdown();
-    }
+    // do it again ;)
+    muleContext.start();
+    muleContext.stop();
+    checkCleanShutdown();
+  }
 
-    protected void checkCleanShutdown() throws MalformedObjectNameException
-    {
-        // check there are no leftover mbeans in mule domain
-        final String contextId = muleContext.getConfiguration().getId();
-        MBeanServer server = MBeanServerFactory.getOrCreateMBeanServer();
-        ObjectName oname = ObjectName.getInstance("Mule." + contextId + ":*");
-        Set mbeans = server.queryMBeans(oname, null);
+  protected void checkCleanShutdown() throws MalformedObjectNameException {
+    // check there are no leftover mbeans in mule domain
+    final String contextId = muleContext.getConfiguration().getId();
+    MBeanServer server = MBeanServerFactory.getOrCreateMBeanServer();
+    ObjectName oname = ObjectName.getInstance("Mule." + contextId + ":*");
+    Set mbeans = server.queryMBeans(oname, null);
 
-        assertEquals("Not all MBeans unregistered on context stop.", 0, mbeans.size());
-    }
+    assertEquals("Not all MBeans unregistered on context stop.", 0, mbeans.size());
+  }
 
 }

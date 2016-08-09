@@ -8,7 +8,6 @@ package org.mule.test.vegan.extension;
 
 import org.mule.runtime.core.message.BaseAttributes;
 
-public class VeganAttributes extends BaseAttributes
-{
+public class VeganAttributes extends BaseAttributes {
 
 }

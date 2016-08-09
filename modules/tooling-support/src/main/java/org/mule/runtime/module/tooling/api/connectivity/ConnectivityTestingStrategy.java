@@ -13,27 +13,26 @@ import org.mule.runtime.api.connection.ConnectionValidationResult;
  *
  * Instances of {@code ConnectivityTestingStrategy} will be discovered through SPI.
  *
- * It's responsible to discover a mule component over the one connectivity testing can be done. Only
- * one mule component for connectivity testing must exists for the strategy to work.
+ * It's responsible to discover a mule component over the one connectivity testing can be done. Only one mule component for
+ * connectivity testing must exists for the strategy to work.
  *
  * @since 4.0
  */
-public interface ConnectivityTestingStrategy
-{
+public interface ConnectivityTestingStrategy {
 
-    /**
-     * Does test connectivity over the provided mule component.
-     *
-     * @return a {@code ConnectionValidationResult} describing the test connectivity result.
-     * @param connectivityTestingObject object over the one connectivity testing must be done
-     */
-    ConnectionValidationResult testConnectivity(Object connectivityTestingObject);
+  /**
+   * Does test connectivity over the provided mule component.
+   *
+   * @return a {@code ConnectionValidationResult} describing the test connectivity result.
+   * @param connectivityTestingObject object over the one connectivity testing must be done
+   */
+  ConnectionValidationResult testConnectivity(Object connectivityTestingObject);
 
-    /**
-     * Determines if this {@code ConnectivityTestingStrategy} must be applied over the provided object.
-     *
-     * @param connectivityTestingObject object over the one connectivity testing must be done
-     * @return true if this strategy can do connectivity testing over the provided component, false otherwise.
-     */
-    boolean accepts(Object connectivityTestingObject);
+  /**
+   * Determines if this {@code ConnectivityTestingStrategy} must be applied over the provided object.
+   *
+   * @param connectivityTestingObject object over the one connectivity testing must be done
+   * @return true if this strategy can do connectivity testing over the provided component, false otherwise.
+   */
+  boolean accepts(Object connectivityTestingObject);
 }

@@ -21,7 +21,6 @@ import org.mule.runtime.extension.api.annotation.connector.Providers;
 @Configuration(name = "request-config")
 @Operations({SocketOperations.class})
 @Providers({TcpRequesterProvider.class, UdpRequesterProvider.class})
-public class RequesterConfig extends AbstractSocketConfig
-{
+public class RequesterConfig extends AbstractSocketConfig {
 
 }

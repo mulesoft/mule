@@ -44,147 +44,126 @@ import org.junit.Rule;
 import org.junit.Test;
 
 //TODO: MULE-9702 Remove once the tests are migrated.
-public class BasicHttpTestCase extends MuleArtifactFunctionalTestCase
-{
-    @Rule
-    public DynamicPort clientPort = new DynamicPort("clientPort");
-    @Rule
-    public DynamicPort serverPort = new DynamicPort("serverPort");
+public class BasicHttpTestCase extends MuleArtifactFunctionalTestCase {
 
-    protected Server server;
+  @Rule
+  public DynamicPort clientPort = new DynamicPort("clientPort");
+  @Rule
+  public DynamicPort serverPort = new DynamicPort("serverPort");
 
-    protected String method;
-    protected String uri;
-    private String query;
-    private Map<String, String> headers = new HashMap<>();
+  protected Server server;
+
+  protected String method;
+  protected String uri;
+  private String query;
+  private Map<String, String> headers = new HashMap<>();
+
+  @Override
+  protected String getConfigFile() {
+    return "basic-http-config.xml";
+  }
+
+  @Before
+  public void startServer() throws Exception {
+    server = createServer();
+    server.setHandler(createHandler(server));
+    server.start();
+  }
+
+  @After
+  public void stopServer() throws Exception {
+    if (server != null) {
+      server.stop();
+    }
+  }
+
+  protected Server createServer() {
+    Server server = new Server(clientPort.getNumber());
+    return server;
+  }
+
+  protected AbstractHandler createHandler(Server server) {
+    return new TestHandler();
+  }
+
+  private class TestHandler extends AbstractHandler {
 
     @Override
-    protected String getConfigFile()
-    {
-        return "basic-http-config.xml";
+    public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
+        throws IOException, ServletException {
+
+      handleRequest(baseRequest, request, response);
+
+      baseRequest.setHandled(true);
     }
+  }
 
-    @Before
-    public void startServer() throws Exception
-    {
-        server = createServer();
-        server.setHandler(createHandler(server));
-        server.start();
+  protected void handleRequest(Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException {
+    extractBaseRequestParts(baseRequest);
+    writeResponse(response);
+  }
+
+  protected void extractBaseRequestParts(Request baseRequest) throws IOException {
+    method = baseRequest.getMethod();
+    uri = baseRequest.getUri().getCompletePath();
+    query = baseRequest.getUri().getQuery();
+    Enumeration<String> headerNames = baseRequest.getHeaderNames();
+    while (headerNames.hasMoreElements()) {
+      String headerName = headerNames.nextElement();
+      headers.put(headerName, baseRequest.getHeader(headerName));
     }
+  }
 
-    @After
-    public void stopServer() throws Exception
-    {
-        if (server != null)
-        {
-            server.stop();
-        }
+  protected void writeResponse(HttpServletResponse response) throws IOException {
+    response.setContentType("text/html");
+    response.setStatus(HttpServletResponse.SC_OK);
+    response.getWriter().print("WOW");
+  }
+
+  @Test
+  public void sendsRequest() throws Exception {
+    MuleEvent response = flowRunner("client").withPayload("PEPE").run();
+    assertThat(IOUtils.toString((InputStream) response.getMessage().getPayload()), is("WOW"));
+    assertThat(method, is("GET"));
+    assertThat(headers, hasEntry("X-Custom", "custom-value"));
+    assertThat(query, is("query=param"));
+  }
+
+  @Test
+  public void receivesRequest() throws Exception {
+    CloseableHttpClient httpClient = HttpClients.createDefault();
+    HttpGet getRequest = new HttpGet(String.format("http://localhost:%s/test?query=param", serverPort.getValue()));
+    getRequest.addHeader("Y-Custom", "value-custom");
+    try {
+      CloseableHttpResponse response = httpClient.execute(getRequest);
+      try {
+        assertThat(IOUtils.toString(response.getEntity().getContent()), is("HEY"));
+      } finally {
+        response.close();
+      }
+    } finally {
+      httpClient.close();
     }
+  }
 
-    protected Server createServer()
-    {
-        Server server = new Server(clientPort.getNumber());
-        return server;
+  protected static class RequestCheckerMessageProcessor implements MessageProcessor {
+
+    @Override
+    public MuleEvent process(MuleEvent event) throws MuleException {
+      MuleMessage message = event.getMessage();
+      Object payload = message.getPayload();
+      assertThat(payload, is(nullValue()));
+      assertThat(message.getAttributes(), instanceOf(HttpRequestAttributes.class));
+      HttpRequestAttributes requestAttributes = (HttpRequestAttributes) message.getAttributes();
+      assertThat(requestAttributes.getMethod(), is("GET"));
+      assertThat(requestAttributes.getScheme(), is("http"));
+      assertThat(requestAttributes.getVersion(), is("HTTP/1.1"));
+      assertThat(requestAttributes.getRequestUri(), is("/test?query=param"));
+      assertThat(requestAttributes.getListenerPath(), is("/test"));
+      assertThat(requestAttributes.getQueryString(), is("query=param"));
+      assertThat(requestAttributes.getQueryParams(), hasEntry("query", "param"));
+      assertThat(requestAttributes.getHeaders(), hasEntry("y-custom", "value-custom"));
+      return event;
     }
-
-    protected AbstractHandler createHandler(Server server)
-    {
-        return new TestHandler();
-    }
-
-    private class TestHandler extends AbstractHandler
-    {
-
-        @Override
-        public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException
-        {
-
-            handleRequest(baseRequest, request, response);
-
-            baseRequest.setHandled(true);
-        }
-    }
-
-    protected void handleRequest(Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException
-    {
-        extractBaseRequestParts(baseRequest);
-        writeResponse(response);
-    }
-
-    protected void extractBaseRequestParts(Request baseRequest) throws IOException
-    {
-        method = baseRequest.getMethod();
-        uri = baseRequest.getUri().getCompletePath();
-        query = baseRequest.getUri().getQuery();
-        Enumeration<String> headerNames = baseRequest.getHeaderNames();
-        while(headerNames.hasMoreElements())
-        {
-            String headerName = headerNames.nextElement();
-            headers.put(headerName, baseRequest.getHeader(headerName));
-        }
-    }
-
-    protected void writeResponse(HttpServletResponse response) throws IOException
-    {
-        response.setContentType("text/html");
-        response.setStatus(HttpServletResponse.SC_OK);
-        response.getWriter().print("WOW");
-    }
-
-    @Test
-    public void sendsRequest() throws Exception
-    {
-        MuleEvent response = flowRunner("client").withPayload("PEPE").run();
-        assertThat(IOUtils.toString((InputStream) response.getMessage().getPayload()), is("WOW"));
-        assertThat(method, is("GET"));
-        assertThat(headers, hasEntry("X-Custom", "custom-value"));
-        assertThat(query, is("query=param"));
-    }
-
-    @Test
-    public void receivesRequest() throws Exception
-    {
-        CloseableHttpClient httpClient = HttpClients.createDefault();
-        HttpGet getRequest = new HttpGet(String.format("http://localhost:%s/test?query=param", serverPort.getValue()));
-        getRequest.addHeader("Y-Custom", "value-custom");
-        try
-        {
-            CloseableHttpResponse response = httpClient.execute(getRequest);
-            try
-            {
-                assertThat(IOUtils.toString(response.getEntity().getContent()), is("HEY"));
-            }
-            finally
-            {
-                response.close();
-            }
-        }
-        finally
-        {
-            httpClient.close();
-        }
-    }
-
-    protected static class RequestCheckerMessageProcessor implements MessageProcessor
-    {
-
-        @Override
-        public MuleEvent process(MuleEvent event) throws MuleException
-        {
-            MuleMessage message = event.getMessage();
-            Object payload = message.getPayload();
-            assertThat(payload, is(nullValue()));
-            assertThat(message.getAttributes(), instanceOf(HttpRequestAttributes.class));
-            HttpRequestAttributes requestAttributes = (HttpRequestAttributes) message.getAttributes();
-            assertThat(requestAttributes.getMethod(), is("GET"));
-            assertThat(requestAttributes.getScheme(), is("http"));
-            assertThat(requestAttributes.getVersion(), is("HTTP/1.1"));
-            assertThat(requestAttributes.getRequestUri(), is("/test?query=param"));
-            assertThat(requestAttributes.getListenerPath(), is("/test"));
-            assertThat(requestAttributes.getQueryString(), is("query=param"));
-            assertThat(requestAttributes.getQueryParams(), hasEntry("query", "param"));
-            assertThat(requestAttributes.getHeaders(), hasEntry("y-custom", "value-custom"));
-            return event;
-        }
-    }
+  }
 }

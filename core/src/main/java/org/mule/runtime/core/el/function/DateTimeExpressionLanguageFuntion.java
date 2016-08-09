@@ -18,58 +18,37 @@ import java.util.Date;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 
-public class DateTimeExpressionLanguageFuntion implements ExpressionLanguageFunction
-{
+public class DateTimeExpressionLanguageFuntion implements ExpressionLanguageFunction {
 
-    @Override
-    public Object call(Object[] params, ExpressionLanguageContext context)
-    {
-        int numParams = params.length;
-        if (numParams < 1 || numParams > 3)
-        {
-            throw new IllegalArgumentException("invalid number of arguments");
-        }
-
-        if (numParams == 1)
-        {
-            Object dateParam = params[0];
-            if (dateParam instanceof Date)
-            {
-                return new DateTime((Date) dateParam);
-            }
-            else if (dateParam instanceof Calendar)
-            {
-                return new DateTime((Calendar) dateParam);
-            }
-            else if (dateParam instanceof XMLGregorianCalendar)
-            {
-                return new DateTime((XMLGregorianCalendar) dateParam);
-            }
-            else
-            {
-                try
-                {
-                    return new DateTime(dateParam.toString());
-                }
-                catch (RuntimeException e)
-                {
-                    throw new ExpressionRuntimeException(
-                        CoreMessages.createStaticMessage("Unable to parse string as a ISO-8601 date"), e);
-                }
-            }
-        }
-        else
-        {
-            try
-            {
-                return new DateTime((String) params[0], (String) params[1]);
-            }
-            catch (ParseException e)
-            {
-                throw new ExpressionRuntimeException(
-                    CoreMessages.createStaticMessage("Unable to parse string as a date using format '"
-                                                     + params[1] + "''"));
-            }
-        }
+  @Override
+  public Object call(Object[] params, ExpressionLanguageContext context) {
+    int numParams = params.length;
+    if (numParams < 1 || numParams > 3) {
+      throw new IllegalArgumentException("invalid number of arguments");
     }
+
+    if (numParams == 1) {
+      Object dateParam = params[0];
+      if (dateParam instanceof Date) {
+        return new DateTime((Date) dateParam);
+      } else if (dateParam instanceof Calendar) {
+        return new DateTime((Calendar) dateParam);
+      } else if (dateParam instanceof XMLGregorianCalendar) {
+        return new DateTime((XMLGregorianCalendar) dateParam);
+      } else {
+        try {
+          return new DateTime(dateParam.toString());
+        } catch (RuntimeException e) {
+          throw new ExpressionRuntimeException(CoreMessages.createStaticMessage("Unable to parse string as a ISO-8601 date"), e);
+        }
+      }
+    } else {
+      try {
+        return new DateTime((String) params[0], (String) params[1]);
+      } catch (ParseException e) {
+        throw new ExpressionRuntimeException(CoreMessages
+            .createStaticMessage("Unable to parse string as a date using format '" + params[1] + "''"));
+      }
+    }
+  }
 }

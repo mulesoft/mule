@@ -13,18 +13,15 @@ import org.mule.runtime.core.util.SystemUtils;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 
-public class MacOsMatcher extends BaseMatcher<AbstractMuleTestCase>
-{
+public class MacOsMatcher extends BaseMatcher<AbstractMuleTestCase> {
 
-    @Override
-    public boolean matches(Object o)
-    {
-        return SystemUtils.IS_OS_MAC;
-    }
+  @Override
+  public boolean matches(Object o) {
+    return SystemUtils.IS_OS_MAC;
+  }
 
-    @Override
-    public void describeTo(Description description)
-    {
-        description.appendText("Need a Mac Os to run");
-    }
+  @Override
+  public void describeTo(Description description) {
+    description.appendText("Need a Mac Os to run");
+  }
 }

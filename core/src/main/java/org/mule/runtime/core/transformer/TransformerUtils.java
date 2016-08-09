@@ -24,182 +24,148 @@ import java.util.StringTokenizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class TransformerUtils
-{
+public class TransformerUtils {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(AbstractTransformer.class);
-    public static final String COMMA = ",";
+  private static Logger LOGGER = LoggerFactory.getLogger(AbstractTransformer.class);
+  public static final String COMMA = ",";
 
-    /**
-     * @deprecated Transport infrastructure is deprecated.
-     */
-    @Deprecated
-    public static void initialiseAllTransformers(List<Transformer> transformers) throws InitialisationException
-    {
-        if (transformers != null)
-        {
-            Iterator<Transformer> transformer = transformers.iterator();
-            while (transformer.hasNext())
-            {
-                (transformer.next()).initialise();
-            }
+  /**
+   * @deprecated Transport infrastructure is deprecated.
+   */
+  @Deprecated
+  public static void initialiseAllTransformers(List<Transformer> transformers) throws InitialisationException {
+    if (transformers != null) {
+      Iterator<Transformer> transformer = transformers.iterator();
+      while (transformer.hasNext()) {
+        (transformer.next()).initialise();
+      }
+    }
+  }
+
+  public static String toString(List<Transformer> transformers) {
+    StringBuilder buffer = new StringBuilder();
+    Iterator<Transformer> transformer = transformers.iterator();
+    while (transformer.hasNext()) {
+      buffer.append(transformer.next().toString());
+      if (transformer.hasNext()) {
+        buffer.append(" -> ");
+      }
+    }
+    return buffer.toString();
+  }
+
+  public static Transformer firstOrNull(List<Transformer> transformers) {
+    if (transformers != null && 0 != transformers.size()) {
+      return transformers.get(0);
+    } else {
+      return null;
+    }
+  }
+
+  /**
+   * Builds a list of Transformers.
+   *
+   * @param names - a list of transformers separated by commands
+   * @param muleContext the current muleContext. This is used to look up transformers in the registry
+   * @return a list (possibly empty) of transformers or
+   * @throws org.mule.runtime.core.api.DefaultMuleException if any of the transformers cannot be found
+   */
+  public static List<Transformer> getTransformers(String names, MuleContext muleContext) throws DefaultMuleException {
+    if (null != names) {
+      List<Transformer> transformers = new LinkedList<>();
+      StringTokenizer st = new StringTokenizer(names, COMMA);
+      while (st.hasMoreTokens()) {
+        String key = st.nextToken().trim();
+        Transformer transformer = muleContext.getRegistry().lookupTransformer(key);
+
+        if (transformer == null) {
+          throw new DefaultMuleException(CoreMessages.objectNotRegistered("Transformer", key));
         }
+        transformers.add(transformer);
+      }
+      return transformers;
+    } else {
+      return null;
+    }
+  }
+
+  /**
+   * Checks whether a given value is a valid output for a transformer.
+   *
+   * @param transformer the transformer used to validate
+   * @param value the output value
+   * @throws TransformerException if the out[ut value is of a unexpected type.
+   */
+  public static void checkTransformerReturnClass(Transformer transformer, Object value) throws TransformerException {
+    if (value == null
+        && (transformer instanceof AbstractTransformer && ((AbstractTransformer) transformer).isAllowNullReturn())) {
+      return;
     }
 
-    public static String toString(List<Transformer> transformers)
-    {
-        StringBuilder buffer = new StringBuilder();
-        Iterator<Transformer> transformer = transformers.iterator();
-        while (transformer.hasNext())
-        {
-            buffer.append(transformer.next().toString());
-            if (transformer.hasNext())
-            {
-                buffer.append(" -> ");
-            }
-        }
-        return buffer.toString();
+    if (transformer.getReturnDataType() != null) {
+      DataType dt = DataType.fromObject(value);
+      if (!transformer.getReturnDataType().isCompatibleWith(dt)) {
+        throw new TransformerException(CoreMessages.transformUnexpectedType(dt, transformer.getReturnDataType()), transformer);
+      }
     }
 
-    public static Transformer firstOrNull(List<Transformer> transformers)
-    {
-        if (transformers != null && 0 != transformers.size())
-        {
-            return transformers.get(0);
-        }
-        else
-        {
-            return null;
-        }
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("The transformed value is of expected type. Type is: " + ClassUtils.getSimpleName(value.getClass()));
+    }
+  }
+
+  public static <T> Object transformToAny(T input, MuleContext muleContext, DataType... supportedTypes) {
+    final DataType sourceType = DataType.fromType(input.getClass());
+    Object transformedData = null;
+
+    for (DataType supportedType : supportedTypes) {
+      transformedData = attemptTransformation(sourceType, input, supportedType, muleContext);
+      if (transformedData != null) {
+        break;
+      }
     }
 
-    /**
-     * Builds a list of Transformers.
-     *
-     * @param names - a list of transformers separated by commands
-     * @param muleContext the current muleContext. This is used to look up transformers in the registry
-     * @return a list (possibly empty) of transformers or
-     * @throws org.mule.runtime.core.api.DefaultMuleException if any of the transformers cannot be found
-     */
-    public static List<Transformer> getTransformers(String names, MuleContext muleContext) throws DefaultMuleException
-    {
-        if (null != names)
-        {
-            List<Transformer> transformers = new LinkedList<>();
-            StringTokenizer st = new StringTokenizer(names, COMMA);
-            while (st.hasMoreTokens())
-            {
-                String key = st.nextToken().trim();
-                Transformer transformer = muleContext.getRegistry().lookupTransformer(key);
+    return transformedData;
+  }
 
-                if (transformer == null)
-                {
-                    throw new DefaultMuleException(CoreMessages.objectNotRegistered("Transformer", key));
-                }
-                transformers.add(transformer);
-            }
-            return transformers;
-        }
-        else
-        {
-            return null;
-        }
+  private static <S, R> R attemptTransformation(DataType sourceDataType, S source, DataType resultDataType,
+                                                MuleContext muleContext) {
+    Transformer transformer;
+    try {
+      transformer = muleContext.getRegistry().lookupTransformer(sourceDataType, resultDataType);
+    } catch (TransformerException e) {
+      LOGGER.debug("Could not find a transformer from type {} to {}", sourceDataType.getType().getName(),
+                   resultDataType.getType().getName());
+      return null;
     }
 
-    /**
-     * Checks whether a given value is a valid output for a transformer.
-     *
-     * @param transformer the transformer used to validate
-     * @param value the output value
-     * @throws TransformerException if the out[ut value is of a unexpected type.
-     */
-    public static void checkTransformerReturnClass(Transformer transformer, Object value) throws TransformerException
-    {
-        if (value == null && (transformer instanceof AbstractTransformer &&((AbstractTransformer) transformer).isAllowNullReturn()))
-        {
-            return;
-        }
+    LOGGER.debug("Located transformer {} from type {} to type {}. Attempting transformation...", transformer.getName(),
+                 sourceDataType.getType().getName(), resultDataType.getType().getName());
 
-        if (transformer.getReturnDataType() != null)
-        {
-            DataType dt = DataType.fromObject(value);
-            if (!transformer.getReturnDataType().isCompatibleWith(dt))
-            {
-                throw new TransformerException(
-                        CoreMessages.transformUnexpectedType(dt, transformer.getReturnDataType()),
-                        transformer);
-            }
-        }
+    try {
+      return (R) transformer.transform(source);
+    } catch (TransformerException e) {
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug(
+                     String.format("Transformer %s threw exception while trying to transform an object of type %s into a %s",
+                                   transformer.getName(), sourceDataType.getType().getName(), resultDataType.getType().getName()),
+                     e);
+      }
 
-        if (LOGGER.isDebugEnabled())
-        {
-            LOGGER.debug("The transformed value is of expected type. Type is: " + ClassUtils.getSimpleName(value.getClass()));
-        }
+      return null;
     }
+  }
 
-    public static <T> Object transformToAny(T input, MuleContext muleContext, DataType... supportedTypes)
-    {
-        final DataType sourceType = DataType.fromType(input.getClass());
-        Object transformedData = null;
-
-        for (DataType supportedType : supportedTypes)
-        {
-            transformedData = attemptTransformation(sourceType, input, supportedType, muleContext);
-            if (transformedData != null)
-            {
-                break;
-            }
-        }
-
-        return transformedData;
+  public static String generateTransformerName(Class<? extends Transformer> transformerClass, DataType returnType) {
+    String transformerName = ClassUtils.getSimpleName(transformerClass);
+    int i = transformerName.indexOf("To");
+    if (i > 0 && returnType != null) {
+      String target = ClassUtils.getSimpleName(returnType.getType());
+      if (target.equals("byte[]")) {
+        target = "byteArray";
+      }
+      transformerName = transformerName.substring(0, i + 2) + StringUtils.capitalize(target);
     }
-
-    private static <S, R> R attemptTransformation(DataType sourceDataType, S source, DataType resultDataType, MuleContext muleContext)
-    {
-        Transformer transformer;
-        try
-        {
-            transformer = muleContext.getRegistry().lookupTransformer(sourceDataType, resultDataType);
-        }
-        catch (TransformerException e)
-        {
-            LOGGER.debug("Could not find a transformer from type {} to {}", sourceDataType.getType().getName(), resultDataType.getType().getName());
-            return null;
-        }
-
-        LOGGER.debug("Located transformer {} from type {} to type {}. Attempting transformation...", transformer.getName(), sourceDataType.getType().getName(), resultDataType.getType().getName());
-
-        try
-        {
-            return (R) transformer.transform(source);
-        }
-        catch (TransformerException e)
-        {
-            if (LOGGER.isDebugEnabled())
-            {
-                LOGGER.debug(
-                        String.format("Transformer %s threw exception while trying to transform an object of type %s into a %s",
-                                      transformer.getName(), sourceDataType.getType().getName(), resultDataType.getType().getName())
-                        , e);
-            }
-
-            return null;
-        }
-    }
-
-    public static String generateTransformerName(Class<? extends Transformer> transformerClass, DataType returnType)
-    {
-        String transformerName = ClassUtils.getSimpleName(transformerClass);
-        int i = transformerName.indexOf("To");
-        if (i > 0 && returnType != null)
-        {
-            String target = ClassUtils.getSimpleName(returnType.getType());
-            if (target.equals("byte[]"))
-            {
-                target = "byteArray";
-            }
-            transformerName = transformerName.substring(0, i + 2) + StringUtils.capitalize(target);
-        }
-        return transformerName;
-    }
+    return transformerName;
+  }
 }

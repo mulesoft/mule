@@ -28,78 +28,70 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-public class MuleRegistryHelperTestCase extends AbstractMuleContextTestCase
-{
+public class MuleRegistryHelperTestCase extends AbstractMuleContextTestCase {
 
-    private static final DataType ORANGE_DATA_TYPE = DataType.fromType(Orange.class);
-    private static final DataType BLOOD_ORANGE_DATA_TYPE = DataType.fromType(BloodOrange.class);
-    private static final DataType FRUIT_DATA_TYPE = DataType.fromType(Fruit.class);
+  private static final DataType ORANGE_DATA_TYPE = DataType.fromType(Orange.class);
+  private static final DataType BLOOD_ORANGE_DATA_TYPE = DataType.fromType(BloodOrange.class);
+  private static final DataType FRUIT_DATA_TYPE = DataType.fromType(Fruit.class);
 
-    private Transformer t1;
-    private Transformer t2;
+  private Transformer t1;
+  private Transformer t2;
 
-    @Before
-    public void setUp() throws Exception
-    {
-        t1 = new MockConverterBuilder().named("t1").from(ORANGE_DATA_TYPE).to(FRUIT_DATA_TYPE).build();
-        muleContext.getRegistry().registerTransformer(t1);
+  @Before
+  public void setUp() throws Exception {
+    t1 = new MockConverterBuilder().named("t1").from(ORANGE_DATA_TYPE).to(FRUIT_DATA_TYPE).build();
+    muleContext.getRegistry().registerTransformer(t1);
 
-        t2 = new MockConverterBuilder().named("t2").from(DataType.OBJECT).to(FRUIT_DATA_TYPE).build();
-        muleContext.getRegistry().registerTransformer(t2);
-    }
+    t2 = new MockConverterBuilder().named("t2").from(DataType.OBJECT).to(FRUIT_DATA_TYPE).build();
+    muleContext.getRegistry().registerTransformer(t2);
+  }
 
-    @Test
-    public void lookupsTransformersByType() throws Exception
-    {
-        List trans = muleContext.getRegistry().lookupTransformers(BLOOD_ORANGE_DATA_TYPE, FRUIT_DATA_TYPE);
-        assertEquals(2, trans.size());
-        assertTrue(trans.contains(t1));
-        assertTrue(trans.contains(t2));
-    }
+  @Test
+  public void lookupsTransformersByType() throws Exception {
+    List trans = muleContext.getRegistry().lookupTransformers(BLOOD_ORANGE_DATA_TYPE, FRUIT_DATA_TYPE);
+    assertEquals(2, trans.size());
+    assertTrue(trans.contains(t1));
+    assertTrue(trans.contains(t2));
+  }
 
-    @Test
-    public void lookupsTransformerByPriority() throws Exception
-    {
-        Transformer result = muleContext.getRegistry().lookupTransformer(BLOOD_ORANGE_DATA_TYPE, FRUIT_DATA_TYPE);
-        assertNotNull(result);
-        assertEquals(t1, result);
-    }
+  @Test
+  public void lookupsTransformerByPriority() throws Exception {
+    Transformer result = muleContext.getRegistry().lookupTransformer(BLOOD_ORANGE_DATA_TYPE, FRUIT_DATA_TYPE);
+    assertNotNull(result);
+    assertEquals(t1, result);
+  }
 
-    @Test
-    public void registerScheduler() throws MuleException
-    {
-        Scheduler scheduler = scheduler();
-        register(scheduler);
-        muleContext.getRegistry().unregisterScheduler(scheduler);
-        assertNull(muleContext.getRegistry().lookupObject("schedulerName"));
-    }
+  @Test
+  public void registerScheduler() throws MuleException {
+    Scheduler scheduler = scheduler();
+    register(scheduler);
+    muleContext.getRegistry().unregisterScheduler(scheduler);
+    assertNull(muleContext.getRegistry().lookupObject("schedulerName"));
+  }
 
-    @Test
-    public void lookupScheduler() throws MuleException
-    {
-        Scheduler scheduler = scheduler();
-        register(scheduler);
-        assertEquals(scheduler, muleContext.getRegistry().lookupScheduler(s -> s.equalsIgnoreCase("schedulerName")).iterator().next());
-    }
+  @Test
+  public void lookupScheduler() throws MuleException {
+    Scheduler scheduler = scheduler();
+    register(scheduler);
+    assertEquals(scheduler,
+                 muleContext.getRegistry().lookupScheduler(s -> s.equalsIgnoreCase("schedulerName")).iterator().next());
+  }
 
-    @Test
-    public void unregisterScheduler() throws MuleException
-    {
-        Scheduler scheduler = scheduler();
-        register(scheduler);
+  @Test
+  public void unregisterScheduler() throws MuleException {
+    Scheduler scheduler = scheduler();
+    register(scheduler);
 
-        assertEquals(scheduler, muleContext.getRegistry().lookupObject("schedulerName"));
-    }
+    assertEquals(scheduler, muleContext.getRegistry().lookupObject("schedulerName"));
+  }
 
-    private void register(Scheduler scheduler) throws MuleException
-    {
-        muleContext.getRegistry().registerScheduler(scheduler);
-    }
+  private void register(Scheduler scheduler) throws MuleException {
+    muleContext.getRegistry().registerScheduler(scheduler);
+  }
 
-    private Scheduler scheduler()
-    {
-        Scheduler scheduler = mock(Scheduler.class);
-        when(scheduler.getName()).thenReturn("schedulerName");
-        return scheduler;
-    }
+  private Scheduler scheduler() {
+    Scheduler scheduler = mock(Scheduler.class);
+    when(scheduler.getName()).thenReturn("schedulerName");
+    return scheduler;
+  }
 }

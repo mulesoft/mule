@@ -13,25 +13,21 @@ import org.mule.runtime.module.db.internal.resolver.param.StaticParamValueResolv
 
 import org.springframework.beans.factory.FactoryBean;
 
-public class StaticQueryParamResolverFactoryBean implements FactoryBean<ParamValueResolver>
-{
+public class StaticQueryParamResolverFactoryBean implements FactoryBean<ParamValueResolver> {
 
-    @Override
-    public ParamValueResolver getObject() throws Exception
-    {
-        return new StaticParamValueResolver();
-    }
+  @Override
+  public ParamValueResolver getObject() throws Exception {
+    return new StaticParamValueResolver();
+  }
 
-    @Override
-    public Class<?> getObjectType()
-    {
-        return ParamValueResolver.class;
-    }
+  @Override
+  public Class<?> getObjectType() {
+    return ParamValueResolver.class;
+  }
 
-    @Override
-    public boolean isSingleton()
-    {
-        return false;
-    }
+  @Override
+  public boolean isSingleton() {
+    return false;
+  }
 
 }

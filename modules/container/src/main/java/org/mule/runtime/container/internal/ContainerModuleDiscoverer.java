@@ -16,25 +16,23 @@ import java.util.List;
  *
  * @since 4.0
  */
-public class ContainerModuleDiscoverer implements ModuleDiscoverer
-{
+public class ContainerModuleDiscoverer implements ModuleDiscoverer {
 
-    private final CompositeModuleDiscoverer moduleDiscoverer;
+  private final CompositeModuleDiscoverer moduleDiscoverer;
 
-    /**
-     * Creates a new instance.
-     *
-     * @param containerClassLoader container classloader used to find modules. Non null.
-     */
-    public ContainerModuleDiscoverer(ClassLoader containerClassLoader)
-    {
-        checkArgument(containerClassLoader != null, "containerClassLoader cannot be null");
-        moduleDiscoverer = new CompositeModuleDiscoverer(new JreModuleDiscoverer(), new ClasspathModuleDiscoverer(containerClassLoader));
-    }
+  /**
+   * Creates a new instance.
+   *
+   * @param containerClassLoader container classloader used to find modules. Non null.
+   */
+  public ContainerModuleDiscoverer(ClassLoader containerClassLoader) {
+    checkArgument(containerClassLoader != null, "containerClassLoader cannot be null");
+    moduleDiscoverer =
+        new CompositeModuleDiscoverer(new JreModuleDiscoverer(), new ClasspathModuleDiscoverer(containerClassLoader));
+  }
 
-    @Override
-    public List<MuleModule> discover()
-    {
-        return moduleDiscoverer.discover();
-    }
+  @Override
+  public List<MuleModule> discover() {
+    return moduleDiscoverer.discover();
+  }
 }

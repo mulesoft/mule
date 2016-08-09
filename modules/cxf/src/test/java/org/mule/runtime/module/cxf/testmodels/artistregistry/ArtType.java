@@ -12,21 +12,15 @@ import javax.xml.bind.annotation.XmlType;
 
 @XmlType(name = "artType")
 @XmlEnum
-public enum ArtType
-{
-    ACTOR,
-    DIRECTOR,
-    AUTHOR,
-    PAINTER;
+public enum ArtType {
+  ACTOR, DIRECTOR, AUTHOR, PAINTER;
 
-    public String value()
-    {
-        return name();
-    }
+  public String value() {
+    return name();
+  }
 
-    public static ArtType fromValue(String value)
-    {
-        return valueOf(value);
-    }
+  public static ArtType fromValue(String value) {
+    return valueOf(value);
+  }
 
 }

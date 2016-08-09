@@ -9,22 +9,18 @@ package org.mule.runtime.core.api.processor;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.config.i18n.Message;
 
-public class DynamicPipelineException extends MuleException
-{
+public class DynamicPipelineException extends MuleException {
 
-    public DynamicPipelineException(Message message, Throwable cause)
-    {
-        super(message, cause);
-    }
+  public DynamicPipelineException(Message message, Throwable cause) {
+    super(message, cause);
+  }
 
-    public DynamicPipelineException(Message message)
-    {
-        super(message);
-    }
+  public DynamicPipelineException(Message message) {
+    super(message);
+  }
 
-    public DynamicPipelineException(Throwable cause)
-    {
-        super(cause);
-    }
+  public DynamicPipelineException(Throwable cause) {
+    super(cause);
+  }
 
 }

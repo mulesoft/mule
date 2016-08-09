@@ -13,36 +13,30 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.CreateException;
 import org.mule.runtime.core.util.MapUtils;
 
-public class PollingHttpsMessageReceiver extends PollingHttpMessageReceiver
-{
-    public PollingHttpsMessageReceiver(Connector connector,
-                                       FlowConstruct flowConstruct,
-                                       InboundEndpoint endpoint) throws CreateException
-    {
-        super(connector, flowConstruct, endpoint);
+public class PollingHttpsMessageReceiver extends PollingHttpMessageReceiver {
+
+  public PollingHttpsMessageReceiver(Connector connector, FlowConstruct flowConstruct, InboundEndpoint endpoint)
+      throws CreateException {
+    super(connector, flowConstruct, endpoint);
+  }
+
+  @Override
+  protected void setupFromConnector(Connector connector) throws CreateException {
+    if (!(connector instanceof HttpsPollingConnector)) {
+      throw new CreateException(HttpMessages.pollingReciverCannotbeUsed(), this);
     }
 
-    @Override
-    protected void setupFromConnector(Connector connector) throws CreateException
-    {
-        if (!(connector instanceof HttpsPollingConnector))
-        {
-            throw new CreateException(HttpMessages.pollingReciverCannotbeUsed(), this);
-        }
-
-        HttpsPollingConnector pollingConnector = (HttpsPollingConnector) connector;
-        long pollingFrequency = MapUtils.getLongValue(endpoint.getProperties(), "pollingFrequency",
-                pollingConnector.getPollingFrequency());
-        if (pollingFrequency > 0)
-        {
-            setFrequency(pollingFrequency);
-        }
-
-        checkEtag = MapUtils.getBooleanValue(endpoint.getProperties(), "checkEtag",
-            pollingConnector.isCheckEtag());
-        discardEmptyContent = MapUtils.getBooleanValue(endpoint.getProperties(),
-            "discardEmptyContent", pollingConnector.isDiscardEmptyContent());
+    HttpsPollingConnector pollingConnector = (HttpsPollingConnector) connector;
+    long pollingFrequency =
+        MapUtils.getLongValue(endpoint.getProperties(), "pollingFrequency", pollingConnector.getPollingFrequency());
+    if (pollingFrequency > 0) {
+      setFrequency(pollingFrequency);
     }
+
+    checkEtag = MapUtils.getBooleanValue(endpoint.getProperties(), "checkEtag", pollingConnector.isCheckEtag());
+    discardEmptyContent =
+        MapUtils.getBooleanValue(endpoint.getProperties(), "discardEmptyContent", pollingConnector.isDiscardEmptyContent());
+  }
 }
 
 

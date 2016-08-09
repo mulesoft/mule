@@ -11,19 +11,16 @@ import org.mule.runtime.module.db.integration.config.AbstractConfigurationErrorT
 
 import org.junit.Test;
 
-public class IncompleteTemplateQueryTestCase extends AbstractConfigurationErrorTestCase
-{
+public class IncompleteTemplateQueryTestCase extends AbstractConfigurationErrorTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "integration/template/incomplete-template-query-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "integration/template/incomplete-template-query-config.xml";
+  }
 
-    @Test
-    public void requires() throws Exception
-    {
-        assertConfigurationError("Able to define an incomplete template query");
+  @Test
+  public void requires() throws Exception {
+    assertConfigurationError("Able to define an incomplete template query");
 
-    }
+  }
 }

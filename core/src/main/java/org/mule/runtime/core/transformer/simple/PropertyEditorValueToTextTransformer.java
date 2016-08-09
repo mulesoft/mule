@@ -15,46 +15,40 @@ import java.beans.PropertyEditor;
 import java.nio.charset.Charset;
 
 /**
- * <code>PropertyEditorValueToTextTransformer</code> adapts a {@link PropertyEditor}
- * instance allowing it to be used to transform from a specific type to a String.
+ * <code>PropertyEditorValueToTextTransformer</code> adapts a {@link PropertyEditor} instance allowing it to be used to transform
+ * from a specific type to a String.
  */
-public class PropertyEditorValueToTextTransformer extends AbstractTransformer implements DiscoverableTransformer
-{
+public class PropertyEditorValueToTextTransformer extends AbstractTransformer implements DiscoverableTransformer {
 
-    private PropertyEditor propertyEditor;
+  private PropertyEditor propertyEditor;
 
-    /**
-     * Give core transformers a slighty higher priority
-     */
-    private int priorityWeighting = DiscoverableTransformer.DEFAULT_PRIORITY_WEIGHTING + 1;
+  /**
+   * Give core transformers a slighty higher priority
+   */
+  private int priorityWeighting = DiscoverableTransformer.DEFAULT_PRIORITY_WEIGHTING + 1;
 
-    public PropertyEditorValueToTextTransformer(PropertyEditor propertyEditor, Class<?> clazz)
-    {
-        registerSourceType(DataType.fromType(clazz));
-        setReturnDataType(DataType.STRING);
-        this.propertyEditor = propertyEditor;
+  public PropertyEditorValueToTextTransformer(PropertyEditor propertyEditor, Class<?> clazz) {
+    registerSourceType(DataType.fromType(clazz));
+    setReturnDataType(DataType.STRING);
+    this.propertyEditor = propertyEditor;
+  }
+
+  @Override
+  public Object doTransform(Object src, Charset encoding) throws TransformerException {
+    synchronized (propertyEditor) {
+      propertyEditor.setValue(src);
+      return propertyEditor.getAsText();
     }
+  }
 
-    @Override
-    public Object doTransform(Object src, Charset encoding) throws TransformerException
-    {
-        synchronized (propertyEditor)
-        {
-            propertyEditor.setValue(src);
-            return propertyEditor.getAsText();
-        }
-    }
+  @Override
+  public int getPriorityWeighting() {
+    return priorityWeighting;
+  }
 
-    @Override
-    public int getPriorityWeighting()
-    {
-        return priorityWeighting;
-    }
-
-    @Override
-    public void setPriorityWeighting(int priorityWeighting)
-    {
-        this.priorityWeighting = priorityWeighting;
-    }
+  @Override
+  public void setPriorityWeighting(int priorityWeighting) {
+    this.priorityWeighting = priorityWeighting;
+  }
 
 }

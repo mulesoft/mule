@@ -21,73 +21,59 @@ import java.util.Optional;
  *
  * @since 4.0
  */
-public class TypeWrapper implements Type
-{
+public class TypeWrapper implements Type {
 
-    private final Class<?> aClass;
+  private final Class<?> aClass;
 
-    TypeWrapper(Class<?> aClass)
-    {
-        this.aClass = aClass;
-    }
+  TypeWrapper(Class<?> aClass) {
+    this.aClass = aClass;
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Annotation[] getAnnotations()
-    {
-        return aClass.getAnnotations();
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Annotation[] getAnnotations() {
+    return aClass.getAnnotations();
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getName()
-    {
-        return aClass.getSimpleName();
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String getName() {
+    return aClass.getSimpleName();
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public <A extends Annotation> Optional<A> getAnnotation(Class<A> annotationClass)
-    {
-        return Optional.ofNullable(aClass.getAnnotation(annotationClass));
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public <A extends Annotation> Optional<A> getAnnotation(Class<A> annotationClass) {
+    return Optional.ofNullable(aClass.getAnnotation(annotationClass));
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public List<FieldElement> getFields()
-    {
-        return IntrospectionUtils.getFields(aClass)
-                .stream()
-                .map(FieldWrapper::new)
-                .collect(toList());
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public List<FieldElement> getFields() {
+    return IntrospectionUtils.getFields(aClass).stream().map(FieldWrapper::new).collect(toList());
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public List<FieldElement> getAnnotatedFields(Class<? extends Annotation> annotation)
-    {
-        return getFields()
-                .stream()
-                .filter(field -> field.isAnnotatedWith(annotation))
-                .collect(toList());
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public List<FieldElement> getAnnotatedFields(Class<? extends Annotation> annotation) {
+    return getFields().stream().filter(field -> field.isAnnotatedWith(annotation)).collect(toList());
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Class<?> getDeclaredClass()
-    {
-        return aClass;
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Class<?> getDeclaredClass() {
+    return aClass;
+  }
 }

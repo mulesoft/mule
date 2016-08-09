@@ -14,25 +14,21 @@ import java.util.List;
 
 import org.junit.Test;
 
-public class AttributeErrorTestCase extends AbstractBadConfigTestCase
-{
+public class AttributeErrorTestCase extends AbstractBadConfigTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/config/spring/parsers/endpoint/attribute-error-test-flow.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/config/spring/parsers/endpoint/attribute-error-test-flow.xml";
+  }
 
-    @Test
-    public void testError() throws Exception
-    {
-        assertErrorContains("do not match the exclusive groups [address] [ref]");
-    }
+  @Test
+  public void testError() throws Exception {
+    assertErrorContains("do not match the exclusive groups [address] [ref]");
+  }
 
-    @Override
-    protected void addBuilders(List<ConfigurationBuilder> builders)
-    {
-        super.addBuilders(builders);
-        builders.add(new TransportsConfigurationBuilder());
-    }
+  @Override
+  protected void addBuilders(List<ConfigurationBuilder> builders) {
+    super.addBuilders(builders);
+    builders.add(new TransportsConfigurationBuilder());
+  }
 }

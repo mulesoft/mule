@@ -22,39 +22,34 @@ import org.mule.tck.size.SmallTest;
 import org.junit.Test;
 
 @SmallTest
-public class DefaultConnectionProviderFactoryTestCase extends AbstractMuleTestCase
-{
+public class DefaultConnectionProviderFactoryTestCase extends AbstractMuleTestCase {
 
-    private ConnectionProviderFactory factory = new DefaultConnectionProviderFactory<>(SimplePetStoreConnectionProvider.class,
-                                                                                       SimplePetStoreConnectionProvider.class.getClassLoader());
+  private ConnectionProviderFactory factory =
+      new DefaultConnectionProviderFactory<>(SimplePetStoreConnectionProvider.class,
+                                             SimplePetStoreConnectionProvider.class.getClassLoader());
 
-    @Test
-    public void getObjectType()
-    {
-        assertThat(factory.getObjectType(), equalTo(SimplePetStoreConnectionProvider.class));
-    }
+  @Test
+  public void getObjectType() {
+    assertThat(factory.getObjectType(), equalTo(SimplePetStoreConnectionProvider.class));
+  }
 
-    @Test
-    public void newInstance() throws Exception
-    {
-        assertThat(factory.newInstance(), is(instanceOf(SimplePetStoreConnectionProvider.class)));
-    }
+  @Test
+  public void newInstance() throws Exception {
+    assertThat(factory.newInstance(), is(instanceOf(SimplePetStoreConnectionProvider.class)));
+  }
 
-    @Test
-    public void returnsDifferentInstances() throws Exception
-    {
-        assertThat(factory.newInstance(), is(not(sameInstance(factory.newInstance()))));
-    }
+  @Test
+  public void returnsDifferentInstances() throws Exception {
+    assertThat(factory.newInstance(), is(not(sameInstance(factory.newInstance()))));
+  }
 
-    @Test(expected = IllegalModelDefinitionException.class)
-    public void notProviderClass()
-    {
-        new DefaultConnectionProviderFactory<>(Object.class, getClass().getClassLoader());
-    }
+  @Test(expected = IllegalModelDefinitionException.class)
+  public void notProviderClass() {
+    new DefaultConnectionProviderFactory<>(Object.class, getClass().getClassLoader());
+  }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void notInstantiable()
-    {
-        new DefaultConnectionProviderFactory<>(ConnectionProvider.class, ConnectionProvider.class.getClassLoader());
-    }
+  @Test(expected = IllegalArgumentException.class)
+  public void notInstantiable() {
+    new DefaultConnectionProviderFactory<>(ConnectionProvider.class, ConnectionProvider.class.getClassLoader());
+  }
 }

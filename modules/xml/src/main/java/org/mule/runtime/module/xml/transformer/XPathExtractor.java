@@ -30,144 +30,120 @@ import java.util.Map;
 import org.xml.sax.InputSource;
 
 /**
- * Simple transformer for using the JAXP XPath library to extract an XPath value from
- * an XPath expression.
+ * Simple transformer for using the JAXP XPath library to extract an XPath value from an XPath expression.
  *
  * @author Ryan Heaton
  */
-public class XPathExtractor extends AbstractTransformer implements MuleContextAware
-{
-    private XPathEvaluator xpathEvaluator;
-    private volatile Map<String, String> prefixToNamespaceMap = null;
-    private volatile String expression;
-    private volatile XPathReturnType resultType = XPathReturnType.STRING;
-    private NamespaceManager namespaceManager;
+public class XPathExtractor extends AbstractTransformer implements MuleContextAware {
 
-    public XPathExtractor()
-    {
-        registerSourceType(DataType.fromType(org.w3c.dom.Node.class));
-        registerSourceType(DataType.fromType(InputSource.class));
+  private XPathEvaluator xpathEvaluator;
+  private volatile Map<String, String> prefixToNamespaceMap = null;
+  private volatile String expression;
+  private volatile XPathReturnType resultType = XPathReturnType.STRING;
+  private NamespaceManager namespaceManager;
+
+  public XPathExtractor() {
+    registerSourceType(DataType.fromType(org.w3c.dom.Node.class));
+    registerSourceType(DataType.fromType(InputSource.class));
+  }
+
+  @Override
+  public void setMuleContext(MuleContext context) {
+    this.muleContext = context;
+    try {
+      namespaceManager = muleContext.getRegistry().lookupObject(NamespaceManager.class);
+    } catch (RegistrationException e) {
+      throw new ExpressionRuntimeException(CoreMessages.failedToLoad("NamespaceManager"), e);
+    }
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    super.initialise();
+
+    if (expression == null) {
+      throw new InitialisationException(MessageFactory
+          .createStaticMessage("An expression must be supplied to the StandardXPathExtractor"), this);
     }
 
-    @Override
-    public void setMuleContext(MuleContext context)
-    {
-        this.muleContext = context;
-        try
-        {
-            namespaceManager = muleContext.getRegistry().lookupObject(NamespaceManager.class);
-        }
-        catch (RegistrationException e)
-        {
-            throw new ExpressionRuntimeException(CoreMessages.failedToLoad("NamespaceManager"), e);
-        }
+    if (xpathEvaluator == null) {
+      xpathEvaluator = new SaxonXpathEvaluator();
     }
 
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        super.initialise();
-
-        if (expression == null)
-        {
-            throw new InitialisationException(
-                MessageFactory.createStaticMessage("An expression must be supplied to the StandardXPathExtractor"),
-                this);
-        }
-
-        if (xpathEvaluator == null)
-        {
-            xpathEvaluator = new SaxonXpathEvaluator();
-        }
-
-        if (namespaceManager != null)
-        {
-            xpathEvaluator.registerNamespaces(namespaceManager);
-        }
-
-        if (prefixToNamespaceMap != null)
-        {
-            xpathEvaluator.registerNamespaces(prefixToNamespaceMap);
-        }
+    if (namespaceManager != null) {
+      xpathEvaluator.registerNamespaces(namespaceManager);
     }
 
-    @Override
-    public Object doTransform(Object src, Charset encoding) throws TransformerException
-    {
-        MuleEvent event = RequestContext.getEvent();
-        try
-        {
-            return xpathEvaluator.evaluate(expression, XMLUtils.toDOMNode(src, event), resultType, event);
-        }
-        catch (Exception e)
-        {
-            throw new TransformerException(this, e);
-        }
+    if (prefixToNamespaceMap != null) {
+      xpathEvaluator.registerNamespaces(prefixToNamespaceMap);
     }
+  }
 
-    /**
-     * @return Returns the expression.
-     */
-    public String getExpression()
-    {
-        return expression;
+  @Override
+  public Object doTransform(Object src, Charset encoding) throws TransformerException {
+    MuleEvent event = RequestContext.getEvent();
+    try {
+      return xpathEvaluator.evaluate(expression, XMLUtils.toDOMNode(src, event), resultType, event);
+    } catch (Exception e) {
+      throw new TransformerException(this, e);
     }
+  }
 
-    /**
-     * @param expression The expression to set.
-     */
-    public void setExpression(String expression)
-    {
-        this.expression = expression;
-    }
+  /**
+   * @return Returns the expression.
+   */
+  public String getExpression() {
+    return expression;
+  }
 
-    /**
-     * Result type from this transformer.
-     *
-     * @return Result type from this transformer.
-     */
-    public XPathReturnType getResultType()
-    {
-        return resultType;
-    }
+  /**
+   * @param expression The expression to set.
+   */
+  public void setExpression(String expression) {
+    this.expression = expression;
+  }
 
-    /**
-     * Result type from this transformer.
-     *
-     * @param resultType Result type from this transformer.
-     */
-    public void setResultType(XPathReturnType resultType)
-    {
-        this.resultType = resultType;
-    }
+  /**
+   * Result type from this transformer.
+   *
+   * @return Result type from this transformer.
+   */
+  public XPathReturnType getResultType() {
+    return resultType;
+  }
 
-    public XPathEvaluator getXpathEvaluator()
-    {
-        return xpathEvaluator;
-    }
+  /**
+   * Result type from this transformer.
+   *
+   * @param resultType Result type from this transformer.
+   */
+  public void setResultType(XPathReturnType resultType) {
+    this.resultType = resultType;
+  }
 
-    public void setXpathEvaluator(XPathEvaluator xpathEvaluator)
-    {
-        this.xpathEvaluator = xpathEvaluator;
-    }
+  public XPathEvaluator getXpathEvaluator() {
+    return xpathEvaluator;
+  }
 
-    /**
-     * The prefix-to-namespace map.
-     *
-     * @return The prefix-to-namespace map.
-     */
-    public Map<String, String> getNamespaces()
-    {
-        return prefixToNamespaceMap;
-    }
+  public void setXpathEvaluator(XPathEvaluator xpathEvaluator) {
+    this.xpathEvaluator = xpathEvaluator;
+  }
 
-    /**
-     * The prefix-to-namespace map.
-     *
-     * @param prefixToNamespaceMap The prefix-to-namespace map.
-     */
-    public void setNamespaces(Map<String, String> prefixToNamespaceMap)
-    {
-        this.prefixToNamespaceMap = prefixToNamespaceMap;
-    }
+  /**
+   * The prefix-to-namespace map.
+   *
+   * @return The prefix-to-namespace map.
+   */
+  public Map<String, String> getNamespaces() {
+    return prefixToNamespaceMap;
+  }
+
+  /**
+   * The prefix-to-namespace map.
+   *
+   * @param prefixToNamespaceMap The prefix-to-namespace map.
+   */
+  public void setNamespaces(Map<String, String> prefixToNamespaceMap) {
+    this.prefixToNamespaceMap = prefixToNamespaceMap;
+  }
 }

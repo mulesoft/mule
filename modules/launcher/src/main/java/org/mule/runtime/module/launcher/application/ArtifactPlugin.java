@@ -15,6 +15,5 @@ import org.mule.runtime.module.launcher.plugin.ArtifactPluginDescriptor;
  *
  * @since 4.0
  */
-public interface ArtifactPlugin extends Artifact<ArtifactPluginDescriptor>
-{
+public interface ArtifactPlugin extends Artifact<ArtifactPluginDescriptor> {
 }

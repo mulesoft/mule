@@ -39,171 +39,154 @@ import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 
 @RunWith(Parameterized.class)
-public class JsonSchemaValidatorTestCase extends AbstractMuleContextTestCase
-{
+public class JsonSchemaValidatorTestCase extends AbstractMuleContextTestCase {
 
-    @Parameters(name = "{0}")
-    public static Iterable<Object[]> data() throws Exception
-    {
-        return Arrays.asList(new Object[][] {
-                {"SimpleV4Schema as String", getFstabValidator(), getGoodFstab(), getBadFstab(), getBadFstab2()},
-                {"SimpleV4Schema as bytes", getFstabValidator(), getGoodFstab().getBytes(), getBadFstab().getBytes(), getBadFstab2().getBytes()},
-                {"SimpleV4Schema as JsonNode", getFstabValidator(), fromString(getGoodFstab()), fromString(getBadFstab()), fromString(getBadFstab2())},
-                {"SimpleV4Schema as JsonData", getFstabValidator(), getGoodFstabAsJsonData(), getBadFstabAsJsonData(), getBadFstabAsJsonData()},
-                {"SimpleV4Schema as Stream", getFstabValidator(), toStream(getGoodFstab()), toStream(getBadFstab()), toStream(getBadFstab2())},
+  @Parameters(name = "{0}")
+  public static Iterable<Object[]> data() throws Exception {
+    return Arrays
+        .asList(new Object[][] {{"SimpleV4Schema as String", getFstabValidator(), getGoodFstab(), getBadFstab(), getBadFstab2()},
+            {"SimpleV4Schema as bytes", getFstabValidator(), getGoodFstab().getBytes(), getBadFstab().getBytes(),
+                getBadFstab2().getBytes()},
+            {"SimpleV4Schema as JsonNode", getFstabValidator(), fromString(getGoodFstab()), fromString(getBadFstab()),
+                fromString(getBadFstab2())},
+            {"SimpleV4Schema as JsonData", getFstabValidator(), getGoodFstabAsJsonData(), getBadFstabAsJsonData(),
+                getBadFstabAsJsonData()},
+            {"SimpleV4Schema as Stream", getFstabValidator(), toStream(getGoodFstab()), toStream(getBadFstab()),
+                toStream(getBadFstab2())},
 
-                {"Inline schema as String", getInlineFstabValidator(), getGoodFstabInline(), getBadFstab(), getBadFstab2()},
-                {"Inline schema as bytes", getInlineFstabValidator(), getGoodFstabInline().getBytes(), getBadFstab().getBytes(), getBadFstab2().getBytes()},
-                {"Inline schema as JsonNode", getInlineFstabValidator(), fromString(getGoodFstabInline()), fromString(getBadFstab()), fromString(getBadFstab2())},
-                {"Inline schema as JsonData", getInlineFstabValidator(), getGoodFstabInlineAsJsonData(), getBadFstabAsJsonData(), getBadFstab2AsJsonData()},
-                {"Inline schema as Stream", getInlineFstabValidator(), toStream(getGoodFstabInline()), toStream(getBadFstab()), toStream(getBadFstab2())},
+            {"Inline schema as String", getInlineFstabValidator(), getGoodFstabInline(), getBadFstab(), getBadFstab2()},
+            {"Inline schema as bytes", getInlineFstabValidator(), getGoodFstabInline().getBytes(), getBadFstab().getBytes(),
+                getBadFstab2().getBytes()},
+            {"Inline schema as JsonNode", getInlineFstabValidator(), fromString(getGoodFstabInline()), fromString(getBadFstab()),
+                fromString(getBadFstab2())},
+            {"Inline schema as JsonData", getInlineFstabValidator(), getGoodFstabInlineAsJsonData(), getBadFstabAsJsonData(),
+                getBadFstab2AsJsonData()},
+            {"Inline schema as Stream", getInlineFstabValidator(), toStream(getGoodFstabInline()), toStream(getBadFstab()),
+                toStream(getBadFstab2())},
 
-                {"Draft3 as String", getDraft3Validator(), getGoodFstab(), getBadFstab(), getBadFstab2()},
-                {"Draft3 as bytes", getDraft3Validator(), getGoodFstab().getBytes(), getBadFstab().getBytes(), getBadFstab2().getBytes()},
-                {"Draft3 as JsonNode", getDraft3Validator(), fromString(getGoodFstab()), fromString(getBadFstab()), fromString(getBadFstab2())},
-                {"Draft3 as JsonData", getDraft3Validator(), getGoodFstabAsJsonData(), getBadFstabAsJsonData(), getBadFstab2AsJsonData()},
-                {"Draft3 as Stream", getDraft3Validator(), toStream(getGoodFstab()), toStream(getBadFstab()), toStream(getBadFstab2())},
+            {"Draft3 as String", getDraft3Validator(), getGoodFstab(), getBadFstab(), getBadFstab2()},
+            {"Draft3 as bytes", getDraft3Validator(), getGoodFstab().getBytes(), getBadFstab().getBytes(),
+                getBadFstab2().getBytes()},
+            {"Draft3 as JsonNode", getDraft3Validator(), fromString(getGoodFstab()), fromString(getBadFstab()),
+                fromString(getBadFstab2())},
+            {"Draft3 as JsonData", getDraft3Validator(), getGoodFstabAsJsonData(), getBadFstabAsJsonData(),
+                getBadFstab2AsJsonData()},
+            {"Draft3 as Stream", getDraft3Validator(), toStream(getGoodFstab()), toStream(getBadFstab()),
+                toStream(getBadFstab2())},
 
 
-                {"Schema with redirects as String", getFstabValidatorWithRedirects(), getGoodFstab(), getBadFstab(), getBadFstab2()},
-                {"Schema with redirects as bytes", getFstabValidatorWithRedirects(), getGoodFstab().getBytes(), getBadFstab().getBytes(), getBadFstab2().getBytes()},
-                {"Schema with redirects as JsonNode", getFstabValidatorWithRedirects(), fromString(getGoodFstab()), fromString(getBadFstab()), fromString(getBadFstab2())},
-                {"Schema with redirects as JsonData", getFstabValidatorWithRedirects(), getGoodFstabAsJsonData(), getBadFstabAsJsonData(), getBadFstab2AsJsonData()},
-                {"Schema with redirects as Stream", getFstabValidatorWithRedirects(), toStream(getGoodFstab()), toStream(getBadFstab()), toStream(getBadFstab2())},
-        });
+            {"Schema with redirects as String", getFstabValidatorWithRedirects(), getGoodFstab(), getBadFstab(), getBadFstab2()},
+            {"Schema with redirects as bytes", getFstabValidatorWithRedirects(), getGoodFstab().getBytes(),
+                getBadFstab().getBytes(), getBadFstab2().getBytes()},
+            {"Schema with redirects as JsonNode", getFstabValidatorWithRedirects(), fromString(getGoodFstab()),
+                fromString(getBadFstab()), fromString(getBadFstab2())},
+            {"Schema with redirects as JsonData", getFstabValidatorWithRedirects(), getGoodFstabAsJsonData(),
+                getBadFstabAsJsonData(), getBadFstab2AsJsonData()},
+            {"Schema with redirects as Stream", getFstabValidatorWithRedirects(), toStream(getGoodFstab()),
+                toStream(getBadFstab()), toStream(getBadFstab2())},});
+  }
+
+  @Parameter(0)
+  public String description;
+
+  @Parameter(1)
+  public JsonSchemaValidator validator;
+
+  @Parameter(2)
+  public Object goodJson;
+
+  @Parameter(3)
+  public Object badJson;
+
+  @Parameter(4)
+  public Object badJson2;
+
+  @Test
+  public void good() throws Exception {
+    validator.validate(getTestEvent(goodJson));
+  }
+
+  @Test(expected = JsonSchemaValidationException.class)
+  public void bad() throws Exception {
+    validator.validate(getTestEvent(badJson));
+  }
+
+  @Test(expected = JsonSchemaValidationException.class)
+  public void bad2() throws Exception {
+    validator.validate(getTestEvent(badJson2));
+  }
+
+  @Test
+  public void goodThroughTransformer() throws Exception {
+    muleContext.getRegistry().registerTransformer(new AppleToJson(goodJson));
+    try {
+      validator.validate(getTestEvent(new Apple()));
+    } catch (JsonSchemaValidationException e) {
+      if (goodJson instanceof InputStream) {
+        // do nothing, streams are not supported through transformation
+      } else {
+        throw e;
+      }
     }
+  }
 
-    @Parameter(0)
-    public String description;
+  @Override
+  public int getTestTimeoutSecs() {
+    // TODO Auto-generated method stub
+    return 100 * super.getTestTimeoutSecs();
+  }
 
-    @Parameter(1)
-    public JsonSchemaValidator validator;
+  private class AppleToJson extends AbstractMessageTransformer implements DiscoverableTransformer {
 
-    @Parameter(2)
-    public Object goodJson;
+    private Object value;
 
-    @Parameter(3)
-    public Object badJson;
-
-    @Parameter(4)
-    public Object badJson2;
-
-    @Test
-    public void good() throws Exception
-    {
-        validator.validate(getTestEvent(goodJson));
-    }
-
-    @Test(expected = JsonSchemaValidationException.class)
-    public void bad() throws Exception
-    {
-        validator.validate(getTestEvent(badJson));
-    }
-
-    @Test(expected = JsonSchemaValidationException.class)
-    public void bad2() throws Exception
-    {
-        validator.validate(getTestEvent(badJson2));
-    }
-
-    @Test
-    public void goodThroughTransformer() throws Exception
-    {
-        muleContext.getRegistry().registerTransformer(new AppleToJson(goodJson));
-        try
-        {
-            validator.validate(getTestEvent(new Apple()));
-        }
-        catch (JsonSchemaValidationException e)
-        {
-            if (goodJson instanceof InputStream)
-            {
-                // do nothing, streams are not supported through transformation
-            }
-            else
-            {
-                throw e;
-            }
-        }
+    private AppleToJson(Object value) {
+      this.value = value;
+      registerSourceType(DataType.fromType(Apple.class));
+      if (value instanceof InputStream) {
+        setReturnDataType(DataType.fromType(InputStream.class));
+      } else {
+        setReturnDataType(DataType.fromType(value.getClass()));
+      }
     }
 
     @Override
-    public int getTestTimeoutSecs()
-    {
-        // TODO Auto-generated method stub
-        return 100 * super.getTestTimeoutSecs();
-    }
-
-    private class AppleToJson extends AbstractMessageTransformer implements DiscoverableTransformer
-    {
-
-        private Object value;
-
-        private AppleToJson(Object value)
-        {
-            this.value = value;
-            registerSourceType(DataType.fromType(Apple.class));
-            if (value instanceof InputStream)
-            {
-                setReturnDataType(DataType.fromType(InputStream.class));
-            }
-            else
-            {
-                setReturnDataType(DataType.fromType(value.getClass()));
-            }
-        }
-
-        @Override
-        public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException
-        {
-            return value;
-        }
-
-
-        @Override
-        public int getPriorityWeighting()
-        {
-            return 100;
-        }
-
-        @Override
-        public void setPriorityWeighting(int weighting)
-        {
-
-        }
-    }
-
-    private static JsonSchemaValidator getFstabValidator()
-    {
-        return getSimpleValidator(SCHEMA_FSTAB_JSON);
-    }
-
-    private static JsonSchemaValidator getFstabValidatorWithRedirects()
-    {
-        return JsonSchemaValidator.builder()
-                .setSchemaLocation(FAKE_SCHEMA_URI)
-                .addSchemaRedirect(FAKE_SCHEMA_URI, SCHEMA_FSTAB_JSON)
-                .build();
-    }
-
-    private static JsonSchemaValidator getDraft3Validator()
-    {
-        return getSimpleValidator(JsonSchemaTestUtils.SCHEMA_FSTAB_DRAFTV3);
-    }
-
-    private static JsonSchemaValidator getInlineFstabValidator()
-    {
-        return JsonSchemaValidator.builder()
-                .setSchemaLocation(SCHEMA_FSTAB_INLINE)
-                .setDereferencing(JsonSchemaDereferencing.INLINE)
-                .build();
+    public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException {
+      return value;
     }
 
 
-    private static JsonSchemaValidator getSimpleValidator(String schemaLocation)
-    {
-        return JsonSchemaValidator.builder()
-                .setSchemaLocation(schemaLocation)
-                .build();
+    @Override
+    public int getPriorityWeighting() {
+      return 100;
     }
+
+    @Override
+    public void setPriorityWeighting(int weighting) {
+
+    }
+  }
+
+  private static JsonSchemaValidator getFstabValidator() {
+    return getSimpleValidator(SCHEMA_FSTAB_JSON);
+  }
+
+  private static JsonSchemaValidator getFstabValidatorWithRedirects() {
+    return JsonSchemaValidator.builder().setSchemaLocation(FAKE_SCHEMA_URI).addSchemaRedirect(FAKE_SCHEMA_URI, SCHEMA_FSTAB_JSON)
+        .build();
+  }
+
+  private static JsonSchemaValidator getDraft3Validator() {
+    return getSimpleValidator(JsonSchemaTestUtils.SCHEMA_FSTAB_DRAFTV3);
+  }
+
+  private static JsonSchemaValidator getInlineFstabValidator() {
+    return JsonSchemaValidator.builder().setSchemaLocation(SCHEMA_FSTAB_INLINE).setDereferencing(JsonSchemaDereferencing.INLINE)
+        .build();
+  }
+
+
+  private static JsonSchemaValidator getSimpleValidator(String schemaLocation) {
+    return JsonSchemaValidator.builder().setSchemaLocation(schemaLocation).build();
+  }
 }

@@ -11,19 +11,16 @@ import org.mule.functional.junit4.runners.RunnerDelegateTo;
 import org.junit.runners.Parameterized;
 
 @RunnerDelegateTo(Parameterized.class)
-public class HttpListenerExpectHeaderStreamingAutoStreamTestCase extends HttpListenerExpectHeaderStreamingAlwaysTestCase
-{
+public class HttpListenerExpectHeaderStreamingAutoStreamTestCase extends HttpListenerExpectHeaderStreamingAlwaysTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "http-listener-expect-header-streaming-auto-stream-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "http-listener-expect-header-streaming-auto-stream-config.xml";
+  }
 
-    public HttpListenerExpectHeaderStreamingAutoStreamTestCase(String persistentConnections)
-    {
-        super(persistentConnections);
-    }
+  public HttpListenerExpectHeaderStreamingAutoStreamTestCase(String persistentConnections) {
+    super(persistentConnections);
+  }
 
 }
 

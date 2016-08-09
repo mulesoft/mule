@@ -10,18 +10,15 @@ package org.mule.runtime.core.api.debug;
 import org.mule.tck.size.SmallTest;
 
 @SmallTest
-public class FiledErrorDebugInfoTestCase extends AbstractFieldDebugInfoTestCase<Exception>
-{
+public class FiledErrorDebugInfoTestCase extends AbstractFieldDebugInfoTestCase<Exception> {
 
-    @Override
-    protected Exception getValue()
-    {
-        return new Exception();
-    }
+  @Override
+  protected Exception getValue() {
+    return new Exception();
+  }
 
-    @Override
-    protected void createFieldDebugInfo(String name, Class type, Exception value)
-    {
-        FieldDebugInfoFactory.createFieldDebugInfo(name, type, value);
-    }
+  @Override
+  protected void createFieldDebugInfo(String name, Class type, Exception value) {
+    FieldDebugInfoFactory.createFieldDebugInfo(name, type, value);
+  }
 }

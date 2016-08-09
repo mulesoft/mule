@@ -20,88 +20,73 @@ import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
 import org.mule.runtime.core.construct.Flow;
 
 /**
- * Abstract implementation of {@link org.mule.runtime.core.processor.NonBlockingMessageProcessor} that determines if processing should
- * be performed blocking or non-blocking..
+ * Abstract implementation of {@link org.mule.runtime.core.processor.NonBlockingMessageProcessor} that determines if processing
+ * should be performed blocking or non-blocking..
  */
-public abstract class AbstractNonBlockingMessageProcessor extends AbstractAnnotatedObject implements NonBlockingMessageProcessor, MessagingExceptionHandlerAware
-{
+public abstract class AbstractNonBlockingMessageProcessor extends AbstractAnnotatedObject
+    implements NonBlockingMessageProcessor, MessagingExceptionHandlerAware {
 
-    private MessagingExceptionHandler messagingExceptionHandler;
+  private MessagingExceptionHandler messagingExceptionHandler;
+
+  @Override
+  public MuleEvent process(MuleEvent event) throws MuleException {
+    if (isNonBlocking(event)) {
+      processNonBlocking(event, createNonBlockingCompletionHandler(event));
+      // Update RequestContext ThreadLocal for backwards compatibility. Clear event as we are done with this
+      // thread.
+      RequestContext.clear();
+      return NonBlockingVoidMuleEvent.getInstance();
+    } else {
+      return processBlocking(event);
+    }
+  }
+
+  protected boolean isNonBlocking(MuleEvent event) {
+    return event.getFlowConstruct() instanceof Flow && event.isAllowNonBlocking() && event.getReplyToHandler() != null;
+  }
+
+  @Override
+  public void setMessagingExceptionHandler(MessagingExceptionHandler messagingExceptionHandler) {
+    this.messagingExceptionHandler = messagingExceptionHandler;
+  }
+
+  abstract protected void processNonBlocking(MuleEvent event, CompletionHandler completionHandler) throws MuleException;
+
+  abstract protected MuleEvent processBlocking(MuleEvent event) throws MuleException;
+
+  protected ExceptionCallback<Void, ? extends Exception> createCompletionExceptionCallback(MuleEvent event) {
+    return (ExceptionCallback<Void, Exception>) exception -> {
+      messagingExceptionHandler.handleException(exception, event);
+      return null;
+    };
+  }
+
+  private NonBlockingCompletionHandler createNonBlockingCompletionHandler(MuleEvent event) {
+    return new NonBlockingCompletionHandler(event);
+  }
+
+  class NonBlockingCompletionHandler implements CompletionHandler<MuleEvent, MessagingException, Void> {
+
+    final private MuleEvent event;
+    final private ReplyToHandler replyToHandler;
+
+    NonBlockingCompletionHandler(MuleEvent event) {
+      this.event = event;
+      this.replyToHandler = event.getReplyToHandler();
+    }
 
     @Override
-    public MuleEvent process(MuleEvent event) throws MuleException
-    {
-        if (isNonBlocking(event))
-        {
-            processNonBlocking(event, createNonBlockingCompletionHandler(event));
-            // Update RequestContext ThreadLocal for backwards compatibility.  Clear event as we are done with this
-            // thread.
-            RequestContext.clear();
-            return NonBlockingVoidMuleEvent.getInstance();
-        }
-        else
-        {
-            return processBlocking(event);
-        }
-    }
-
-    protected boolean isNonBlocking(MuleEvent event)
-    {
-        return event.getFlowConstruct() instanceof Flow && event.isAllowNonBlocking() && event.getReplyToHandler() != null;
+    public void onFailure(final MessagingException exception) {
+      replyToHandler.processExceptionReplyTo(exception, null);
     }
 
     @Override
-    public void setMessagingExceptionHandler(MessagingExceptionHandler messagingExceptionHandler)
-    {
-        this.messagingExceptionHandler = messagingExceptionHandler;
+    public void onCompletion(MuleEvent result, ExceptionCallback<Void, Exception> exceptionCallback) {
+      try {
+        replyToHandler.processReplyTo(event, null, null);
+      } catch (Exception e) {
+        exceptionCallback.onException(e);
+      }
     }
-
-    abstract protected void processNonBlocking(MuleEvent event, CompletionHandler completionHandler) throws MuleException;
-
-    abstract protected MuleEvent processBlocking(MuleEvent event) throws MuleException;
-
-    protected ExceptionCallback<Void, ? extends Exception> createCompletionExceptionCallback(MuleEvent event)
-    {
-        return (ExceptionCallback<Void, Exception>) exception -> {
-            messagingExceptionHandler.handleException(exception, event);
-            return null;
-        };
-    }
-
-    private NonBlockingCompletionHandler createNonBlockingCompletionHandler(MuleEvent event)
-    {
-        return new NonBlockingCompletionHandler(event);
-    }
-
-    class NonBlockingCompletionHandler implements CompletionHandler<MuleEvent, MessagingException, Void>
-    {
-
-        final private MuleEvent event;
-        final private ReplyToHandler replyToHandler;
-
-        NonBlockingCompletionHandler(MuleEvent event)
-        {
-            this.event = event;
-            this.replyToHandler = event.getReplyToHandler();
-        }
-
-        @Override
-        public void onFailure(final MessagingException exception)
-        {
-            replyToHandler.processExceptionReplyTo(exception, null);
-        }
-
-        @Override
-        public void onCompletion(MuleEvent result, ExceptionCallback<Void, Exception> exceptionCallback)
-        {
-            try
-            {
-                replyToHandler.processReplyTo(event, null, null);
-            }
-            catch (Exception e)
-            {
-                exceptionCallback.onException(e);
-            }
-        }
-    }
+  }
 }

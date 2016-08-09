@@ -16,55 +16,49 @@ import org.junit.Test;
 /**
  * Message is sent to and received from simple queue.
  */
-public class JmsQueueMessageTypesTestCase extends AbstractJmsFunctionalTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "integration/jms-queue-message-types.xml";
-    }
+public class JmsQueueMessageTypesTestCase extends AbstractJmsFunctionalTestCase {
 
-    @Test
-    public void testTextMessage() throws Exception
-    {
-        dispatchMessage("TEST MESSAGE");
-        receiveMessage("TEST MESSAGE");
-        receive(scenarioNotReceive);
-    }
+  @Override
+  protected String getConfigFile() {
+    return "integration/jms-queue-message-types.xml";
+  }
 
-    @Test
-    public void testNumberMessage() throws Exception
-    {
-        dispatchMessage(25.75);
-        receiveMessage(25.75);
-        receive(scenarioNotReceive);
-    }
+  @Test
+  public void testTextMessage() throws Exception {
+    dispatchMessage("TEST MESSAGE");
+    receiveMessage("TEST MESSAGE");
+    receive(scenarioNotReceive);
+  }
 
-    @Test
-    public void testBinaryMessage() throws Exception
-    {
-        byte[] bytes = new byte[] {'\u0000', '\u007F', '\u0033', '\u007F', '\u0055'};
-        dispatchMessage(bytes);
-        receiveMessage(bytes);
-        receive(scenarioNotReceive);
-    }
+  @Test
+  public void testNumberMessage() throws Exception {
+    dispatchMessage(25.75);
+    receiveMessage(25.75);
+    receive(scenarioNotReceive);
+  }
 
-    @Test
-    public void testJdkObjectMessage() throws Exception
-    {
-        Serializable obj = new Color(0);
-        dispatchMessage(obj);
-        receiveMessage(obj);
-        receive(scenarioNotReceive);
-    }
+  @Test
+  public void testBinaryMessage() throws Exception {
+    byte[] bytes = new byte[] {'\u0000', '\u007F', '\u0033', '\u007F', '\u0055'};
+    dispatchMessage(bytes);
+    receiveMessage(bytes);
+    receive(scenarioNotReceive);
+  }
 
-    @Test
-    public void testCustomObjectMessage() throws Exception
-    {
-        Serializable obj = new Apple();
-        dispatchMessage(obj);
-        receiveMessage(obj);
-        receive(scenarioNotReceive);
-    }
+  @Test
+  public void testJdkObjectMessage() throws Exception {
+    Serializable obj = new Color(0);
+    dispatchMessage(obj);
+    receiveMessage(obj);
+    receive(scenarioNotReceive);
+  }
+
+  @Test
+  public void testCustomObjectMessage() throws Exception {
+    Serializable obj = new Apple();
+    dispatchMessage(obj);
+    receiveMessage(obj);
+    receive(scenarioNotReceive);
+  }
 
 }

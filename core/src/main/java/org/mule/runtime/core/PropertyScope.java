@@ -11,27 +11,24 @@ import java.io.Serializable;
 /**
  * A PropertyScope is used to associate a message property with a lifetime.
  */
-public enum PropertyScope implements Serializable
-{
+public enum PropertyScope implements Serializable {
 
-    INBOUND (PropertyScope.INBOUND_NAME), OUTBOUND (PropertyScope.OUTBOUND_NAME);
+  INBOUND(PropertyScope.INBOUND_NAME), OUTBOUND(PropertyScope.OUTBOUND_NAME);
 
-    public static final String INBOUND_NAME = "inbound";
-    public static final String OUTBOUND_NAME = "outbound";
-    public static final String FLOW_VAR_NAME = "flow variables";
-    public static final String SESSION_VAR_NAME = "session variables";
+  public static final String INBOUND_NAME = "inbound";
+  public static final String OUTBOUND_NAME = "outbound";
+  public static final String FLOW_VAR_NAME = "flow variables";
+  public static final String SESSION_VAR_NAME = "session variables";
 
-    private String name;
+  private String name;
 
-    PropertyScope(String name)
-    {
-        this.name = name;
-    }
+  PropertyScope(String name) {
+    this.name = name;
+  }
 
-    public String getName()
-    {
-        return name;
-    }
+  public String getName() {
+    return name;
+  }
 
 }
 

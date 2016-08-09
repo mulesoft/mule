@@ -23,25 +23,22 @@ import java.sql.Statement;
 import java.util.List;
 import java.util.Map;
 
-public abstract class AbstractUpdateBulkTestCase extends AbstractDbIntegrationTestCase
-{
+public abstract class AbstractUpdateBulkTestCase extends AbstractDbIntegrationTestCase {
 
-    public AbstractUpdateBulkTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public AbstractUpdateBulkTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    protected void assertBulkModeResult(Object payload) throws SQLException
-    {
-        assertTrue(payload instanceof int[]);
+  protected void assertBulkModeResult(Object payload) throws SQLException {
+    assertTrue(payload instanceof int[]);
 
-        int[] counters = (int[]) payload;
+    int[] counters = (int[]) payload;
 
-        assertThat(counters[0], anyOf(equalTo(1), equalTo(Statement.SUCCESS_NO_INFO)));
-        assertThat(counters[1], anyOf(equalTo(1), equalTo(Statement.SUCCESS_NO_INFO)));
-        assertThat(counters[2], anyOf(equalTo(1), equalTo(Statement.SUCCESS_NO_INFO)));
+    assertThat(counters[0], anyOf(equalTo(1), equalTo(Statement.SUCCESS_NO_INFO)));
+    assertThat(counters[1], anyOf(equalTo(1), equalTo(Statement.SUCCESS_NO_INFO)));
+    assertThat(counters[2], anyOf(equalTo(1), equalTo(Statement.SUCCESS_NO_INFO)));
 
-        List<Map<String, String>> result = selectData("select * from PLANET where POSITION=0 or POSITION=4", getDefaultDataSource());
-        assertRecords(result, new Record(new Field("NAME", "Mercury"), new Field("POSITION", 4)));
-    }
+    List<Map<String, String>> result = selectData("select * from PLANET where POSITION=0 or POSITION=4", getDefaultDataSource());
+    assertRecords(result, new Record(new Field("NAME", "Mercury"), new Field("POSITION", 4)));
+  }
 }

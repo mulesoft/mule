@@ -29,54 +29,48 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-abstract class AbstractConfigurationProviderTestCase<T> extends AbstractMuleContextTestCase
-{
+abstract class AbstractConfigurationProviderTestCase<T> extends AbstractMuleContextTestCase {
 
-    protected static final String CONFIG_NAME = "config";
+  protected static final String CONFIG_NAME = "config";
 
-    @Mock
-    protected RuntimeExtensionModel extensionModel;
+  @Mock
+  protected RuntimeExtensionModel extensionModel;
 
-    @Mock(answer = RETURNS_DEEP_STUBS)
-    protected RuntimeConfigurationModel configurationModel;
+  @Mock(answer = RETURNS_DEEP_STUBS)
+  protected RuntimeConfigurationModel configurationModel;
 
-    @Mock(answer = RETURNS_DEEP_STUBS)
-    protected DefaultOperationContext operationContext;
+  @Mock(answer = RETURNS_DEEP_STUBS)
+  protected DefaultOperationContext operationContext;
 
-    @Mock
-    protected MuleEvent event;
+  @Mock
+  protected MuleEvent event;
 
-    protected TestTimeSupplier timeSupplier = new TestTimeSupplier(System.currentTimeMillis());
-    protected LifecycleAwareConfigurationProvider<T> provider;
+  protected TestTimeSupplier timeSupplier = new TestTimeSupplier(System.currentTimeMillis());
+  protected LifecycleAwareConfigurationProvider<T> provider;
 
-    @Before
-    public void before() throws Exception
-    {
-        muleContext.getRegistry().registerObject(OBJECT_TIME_SUPPLIER, timeSupplier);
-        muleContext.getInjector().inject(provider);
-        spyInjector(muleContext);
+  @Before
+  public void before() throws Exception {
+    muleContext.getRegistry().registerObject(OBJECT_TIME_SUPPLIER, timeSupplier);
+    muleContext.getInjector().inject(provider);
+    spyInjector(muleContext);
+  }
+
+  @Test
+  public void getName() {
+    assertThat(provider.getName(), is(CONFIG_NAME));
+  }
+
+  @Test
+  public void getConfigurationModel() {
+    assertThat(provider.getModel(), is(CoreMatchers.sameInstance(configurationModel)));
+  }
+
+  protected void assertSameInstancesResolved() throws Exception {
+    final int count = 10;
+    Object config = provider.get(event);
+
+    for (int i = 1; i < count; i++) {
+      assertThat(provider.get(event), is(sameInstance(config)));
     }
-
-    @Test
-    public void getName()
-    {
-        assertThat(provider.getName(), is(CONFIG_NAME));
-    }
-
-    @Test
-    public void getConfigurationModel()
-    {
-        assertThat(provider.getModel(), is(CoreMatchers.sameInstance(configurationModel)));
-    }
-
-    protected void assertSameInstancesResolved() throws Exception
-    {
-        final int count = 10;
-        Object config = provider.get(event);
-
-        for (int i = 1; i < count; i++)
-        {
-            assertThat(provider.get(event), is(sameInstance(config)));
-        }
-    }
+  }
 }

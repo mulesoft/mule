@@ -13,21 +13,18 @@ import java.sql.SQLException;
 import org.hamcrest.Description;
 
 /**
- * Checks whether or not a dataSource supports to have multiple ResultSet
- * objects returned from a CallableStatement object simultaneously.
+ * Checks whether or not a dataSource supports to have multiple ResultSet objects returned from a CallableStatement object
+ * simultaneously.
  */
-public class SupportMultipleOpenResults extends AbstractDataSourceFeatureMatcher
-{
+public class SupportMultipleOpenResults extends AbstractDataSourceFeatureMatcher {
 
-    @Override
-    protected boolean supportsFeature(DatabaseMetaData metaData) throws SQLException
-    {
-        return metaData.supportsMultipleOpenResults();
-    }
+  @Override
+  protected boolean supportsFeature(DatabaseMetaData metaData) throws SQLException {
+    return metaData.supportsMultipleOpenResults();
+  }
 
-    @Override
-    public void describeTo(Description description)
-    {
-        description.appendText("database.supportMultipleOpenResults == true");
-    }
+  @Override
+  public void describeTo(Description description) {
+    description.appendText("database.supportMultipleOpenResults == true");
+  }
 }

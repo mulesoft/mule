@@ -8,19 +8,16 @@ package org.mule.test.config.spring.parsers;
 
 import org.junit.Test;
 
-public class DuplicateBeanNameTestCase extends AbstractBadConfigTestCase
-{
+public class DuplicateBeanNameTestCase extends AbstractBadConfigTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/config/spring/parsers/duplicate-bean-name-test.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/config/spring/parsers/duplicate-bean-name-test.xml";
+  }
 
-    @Test
-    public void testBeanError() throws Exception
-    {
-        assertErrorContains("Bean name 'child1' is already used in this <beans> element");
-    }
+  @Test
+  public void testBeanError() throws Exception {
+    assertErrorContains("Bean name 'child1' is already used in this <beans> element");
+  }
 
 }

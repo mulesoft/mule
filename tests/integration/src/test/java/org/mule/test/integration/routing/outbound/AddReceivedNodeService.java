@@ -12,32 +12,28 @@ import org.dom4j.Element;
 /**
  * TODO
  */
-public class AddReceivedNodeService
-{
-    public Document addNodeTo(Document doc)
-    {
-        doc.getRootElement().addElement("Received");
+public class AddReceivedNodeService {
 
-        return doc;
-    }
+  public Document addNodeTo(Document doc) {
+    doc.getRootElement().addElement("Received");
 
-    public Element addNodeTo(Element doc)
-    {
-        doc.addElement("Received");
+    return doc;
+  }
 
-        return doc;
-    }
+  public Element addNodeTo(Element doc) {
+    doc.addElement("Received");
 
-    public org.w3c.dom.Document addNodeTo(org.w3c.dom.Document doc)
-    {
-        doc.appendChild(doc.createElement("Received"));
-        return doc;
-    }
+    return doc;
+  }
 
-    public org.w3c.dom.Element addNodeTo(org.w3c.dom.Element element)
-    {
-        element.appendChild(element.getOwnerDocument().createElement("Received"));
-        return element;
-    }
+  public org.w3c.dom.Document addNodeTo(org.w3c.dom.Document doc) {
+    doc.appendChild(doc.createElement("Received"));
+    return doc;
+  }
+
+  public org.w3c.dom.Element addNodeTo(org.w3c.dom.Element element) {
+    element.appendChild(element.getOwnerDocument().createElement("Received"));
+    return element;
+  }
 
 }

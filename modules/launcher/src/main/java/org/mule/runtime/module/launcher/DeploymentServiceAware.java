@@ -9,8 +9,7 @@ package org.mule.runtime.module.launcher;
 /**
  * Enables {@link DeploymentService} injection.
  */
-public interface DeploymentServiceAware
-{
+public interface DeploymentServiceAware {
 
-    void setDeploymentService(DeploymentService deploymentService);
+  void setDeploymentService(DeploymentService deploymentService);
 }

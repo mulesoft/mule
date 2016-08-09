@@ -13,7 +13,7 @@ import org.mule.runtime.core.context.notification.ClusterNodeNotification;
  *
  * @param <T> cluster node notification type
  */
-public interface ClusterNodeNotificationListener<T extends ClusterNodeNotification> extends ServerNotificationListener<ClusterNodeNotification>
-{
+public interface ClusterNodeNotificationListener<T extends ClusterNodeNotification>
+    extends ServerNotificationListener<ClusterNodeNotification> {
 
 }

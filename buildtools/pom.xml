@@ -14,6 +14,7 @@
     <properties>
       <api.version>1.0-beta-1</api.version>
       <maven.version>2.0.9</maven.version>
+      <formatterConfigPath>../formatter.xml</formatterConfigPath>
     </properties>
 
     <build>

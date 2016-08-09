@@ -17,57 +17,49 @@ import org.mule.runtime.core.util.StringUtils;
 
 import org.junit.Test;
 
-public class HttpRequestKeepAliveTestCase extends AbstractHttpRequestTestCase
-{
+public class HttpRequestKeepAliveTestCase extends AbstractHttpRequestTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "http-request-keep-alive-config.xml";
+  @Override
+  protected String getConfigFile() {
+    return "http-request-keep-alive-config.xml";
+  }
+
+  @Test
+  public void persistentRequestSendsKeepAliveHeader() throws Exception {
+    assertConnectionHeader("persistentRequestFlow", null, KEEP_ALIVE);
+  }
+
+  @Test
+  public void nonPersistentRequestSendsCloseHeader() throws Exception {
+    assertConnectionHeader("nonPersistentRequestFlow", null, CLOSE);
+  }
+
+  @Test
+  public void persistentRequestWithKeepAlivePropertySendsKeepAliveHeader() throws Exception {
+    assertConnectionHeader("persistentRequestFlow", KEEP_ALIVE, KEEP_ALIVE);
+  }
+
+  @Test
+  public void nonPersistentRequestWithKeepAlivePropertySendsCloseHeader() throws Exception {
+    assertConnectionHeader("nonPersistentRequestFlow", KEEP_ALIVE, CLOSE);
+  }
+
+  @Test
+  public void nonPersistentRequestWithClosePropertySendsCloseHeader() throws Exception {
+    assertConnectionHeader("nonPersistentRequestFlow", CLOSE, CLOSE);
+  }
+
+
+  private void assertConnectionHeader(String flow, String connectionOutboundProperty, String expectedConnectionHeader)
+      throws Exception {
+    FlowRunner runner = flowRunner(flow).withPayload(TEST_MESSAGE);
+
+    if (connectionOutboundProperty != null) {
+      runner = runner.withOutboundProperty(CONNECTION, connectionOutboundProperty);
     }
-
-    @Test
-    public void persistentRequestSendsKeepAliveHeader() throws Exception
-    {
-        assertConnectionHeader("persistentRequestFlow", null, KEEP_ALIVE);
-    }
-
-    @Test
-    public void nonPersistentRequestSendsCloseHeader() throws Exception
-    {
-        assertConnectionHeader("nonPersistentRequestFlow", null, CLOSE);
-    }
-
-    @Test
-    public void persistentRequestWithKeepAlivePropertySendsKeepAliveHeader() throws Exception
-    {
-        assertConnectionHeader("persistentRequestFlow", KEEP_ALIVE, KEEP_ALIVE);
-    }
-
-    @Test
-    public void nonPersistentRequestWithKeepAlivePropertySendsCloseHeader() throws Exception
-    {
-        assertConnectionHeader("nonPersistentRequestFlow", KEEP_ALIVE, CLOSE);
-    }
-
-    @Test
-    public void nonPersistentRequestWithClosePropertySendsCloseHeader() throws Exception
-    {
-        assertConnectionHeader("nonPersistentRequestFlow", CLOSE, CLOSE);
-    }
-
-
-    private void assertConnectionHeader(String flow, String connectionOutboundProperty, String expectedConnectionHeader) throws Exception
-    {
-        FlowRunner runner = flowRunner(flow).withPayload(TEST_MESSAGE);
-
-        if (connectionOutboundProperty != null)
-        {
-            runner = runner.withOutboundProperty(CONNECTION, connectionOutboundProperty);
-        }
-        runner.run();
-        String responseConnectionHeaderValue = StringUtils.join(headers.get(CONNECTION), " ");
-        assertThat(responseConnectionHeaderValue, equalTo(expectedConnectionHeader));
-    }
+    runner.run();
+    String responseConnectionHeaderValue = StringUtils.join(headers.get(CONNECTION), " ");
+    assertThat(responseConnectionHeaderValue, equalTo(expectedConnectionHeader));
+  }
 
 }

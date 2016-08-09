@@ -13,12 +13,11 @@ import org.mule.runtime.module.tooling.api.ToolingService;
  *
  * @since 4.0
  */
-public interface ToolingServiceAware
-{
+public interface ToolingServiceAware {
 
-    /**
-     * @param toolingService the tooling service provided by the container
-     */
-    void setToolingService(ToolingService toolingService);
+  /**
+   * @param toolingService the tooling service provided by the container
+   */
+  void setToolingService(ToolingService toolingService);
 
 }

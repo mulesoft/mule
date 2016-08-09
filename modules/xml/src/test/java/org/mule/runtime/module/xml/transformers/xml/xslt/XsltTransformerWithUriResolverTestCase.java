@@ -17,21 +17,20 @@ import javax.xml.transform.URIResolver;
 
 import org.junit.Test;
 
-public class XsltTransformerWithUriResolverTestCase extends FunctionalTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "xslt-transformer-wth-uri-resolver-config.xml";
-    }
+public class XsltTransformerWithUriResolverTestCase extends FunctionalTestCase {
 
-    @Test
-    public void configuresUriResolver() throws Exception  {
-        Transformer transformer = muleContext.getRegistry().lookupTransformer("testTransformer");
-        assertTrue(transformer instanceof XsltTransformer);
-        XsltTransformer xsltTransformer = (XsltTransformer) transformer;
+  @Override
+  protected String getConfigFile() {
+    return "xslt-transformer-wth-uri-resolver-config.xml";
+  }
 
-        URIResolver uriResolver = muleContext.getRegistry().lookupObject("testResolver");
-        assertEquals(uriResolver, xsltTransformer.getUriResolver());
-    }
+  @Test
+  public void configuresUriResolver() throws Exception {
+    Transformer transformer = muleContext.getRegistry().lookupTransformer("testTransformer");
+    assertTrue(transformer instanceof XsltTransformer);
+    XsltTransformer xsltTransformer = (XsltTransformer) transformer;
+
+    URIResolver uriResolver = muleContext.getRegistry().lookupObject("testResolver");
+    assertEquals(uriResolver, xsltTransformer.getUriResolver());
+  }
 }

@@ -15,27 +15,24 @@ import org.mule.runtime.core.api.MuleMessage;
 
 import org.junit.Test;
 
-public class FlowTestCase extends AbstractELTestCase
-{
-    public FlowTestCase(Variant variant, String mvelOptimizer)
-    {
-        super(variant, mvelOptimizer);
-    }
+public class FlowTestCase extends AbstractELTestCase {
 
-    @Test
-    public void flowName() throws Exception
-    {
-        MuleEvent event = new DefaultMuleEvent(MuleMessage.builder().payload("").build(),
-                ONE_WAY, getTestFlow("flowName", Object.class));
-        assertEquals("flowName", evaluate("flow.name", event));
-    }
+  public FlowTestCase(Variant variant, String mvelOptimizer) {
+    super(variant, mvelOptimizer);
+  }
 
-    @Test
-    public void assignToFlowName() throws Exception
-    {
-        MuleEvent event = new DefaultMuleEvent(MuleMessage.builder().payload("").build(),
-                ONE_WAY, getTestFlow("flowName", Object.class));
-        assertFinalProperty("flow.name='foo'", event);
-    }
+  @Test
+  public void flowName() throws Exception {
+    MuleEvent event =
+        new DefaultMuleEvent(MuleMessage.builder().payload("").build(), ONE_WAY, getTestFlow("flowName", Object.class));
+    assertEquals("flowName", evaluate("flow.name", event));
+  }
+
+  @Test
+  public void assignToFlowName() throws Exception {
+    MuleEvent event =
+        new DefaultMuleEvent(MuleMessage.builder().payload("").build(), ONE_WAY, getTestFlow("flowName", Object.class));
+    assertFinalProperty("flow.name='foo'", event);
+  }
 
 }

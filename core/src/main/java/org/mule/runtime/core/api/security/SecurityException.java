@@ -14,20 +14,17 @@ import org.mule.runtime.core.config.i18n.Message;
 /**
  * <code>SecurityException</code> is a generic security exception
  */
-public abstract class SecurityException extends MessagingException
-{
-    protected SecurityException(Message message, MuleEvent event)
-    {
-        super(message, event);
-    }
+public abstract class SecurityException extends MessagingException {
 
-    protected SecurityException(Message message, MuleEvent event, Throwable cause)
-    {
-        super(message, event, cause);
-    }
+  protected SecurityException(Message message, MuleEvent event) {
+    super(message, event);
+  }
 
-    protected SecurityException(Message message, MuleEvent event, Throwable cause, MessageProcessor failingMessageProcessor)
-    {
-        super(message, event, cause, failingMessageProcessor);
-    }
+  protected SecurityException(Message message, MuleEvent event, Throwable cause) {
+    super(message, event, cause);
+  }
+
+  protected SecurityException(Message message, MuleEvent event, Throwable cause, MessageProcessor failingMessageProcessor) {
+    super(message, event, cause, failingMessageProcessor);
+  }
 }

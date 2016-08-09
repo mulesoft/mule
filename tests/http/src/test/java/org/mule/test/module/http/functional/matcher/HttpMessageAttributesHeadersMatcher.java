@@ -13,24 +13,21 @@ import java.util.Map;
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;
 
-public class HttpMessageAttributesHeadersMatcher extends TypeSafeMatcher<HttpAttributes>
-{
-    private Map<String, Object> headers;
+public class HttpMessageAttributesHeadersMatcher extends TypeSafeMatcher<HttpAttributes> {
 
-    public HttpMessageAttributesHeadersMatcher(Map<String, Object> headers)
-    {
-        this.headers = headers;
-    }
+  private Map<String, Object> headers;
 
-    @Override
-    protected boolean matchesSafely(HttpAttributes item)
-    {
-        return false;
-    }
+  public HttpMessageAttributesHeadersMatcher(Map<String, Object> headers) {
+    this.headers = headers;
+  }
 
-    @Override
-    public void describeTo(Description description)
-    {
+  @Override
+  protected boolean matchesSafely(HttpAttributes item) {
+    return false;
+  }
 
-    }
+  @Override
+  public void describeTo(Description description) {
+
+  }
 }

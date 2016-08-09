@@ -25,22 +25,20 @@ import java.util.Collections;
 import org.junit.Test;
 
 @SmallTest
-public class QueryStatementFactoryTestCase extends AbstractMuleTestCase
-{
+public class QueryStatementFactoryTestCase extends AbstractMuleTestCase {
 
-    @Test
-    public void createsPreparedStatements() throws Exception
-    {
+  @Test
+  public void createsPreparedStatements() throws Exception {
 
-        String sqlText = "call test";
-        CallableStatement createdStatement = mock(CallableStatement.class);
-        DbConnection connection = mock(DbConnection.class);
-        when(connection.prepareCall(sqlText, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY)).thenReturn(createdStatement);
+    String sqlText = "call test";
+    CallableStatement createdStatement = mock(CallableStatement.class);
+    DbConnection connection = mock(DbConnection.class);
+    when(connection.prepareCall(sqlText, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY)).thenReturn(createdStatement);
 
-        QueryStatementFactory factory = new QueryStatementFactory();
-        QueryTemplate queryTemplate = new QueryTemplate(sqlText, QueryType.STORE_PROCEDURE_CALL, Collections.<QueryParam>emptyList());
-        CallableStatement statement = (CallableStatement) factory.create(connection, queryTemplate);
+    QueryStatementFactory factory = new QueryStatementFactory();
+    QueryTemplate queryTemplate = new QueryTemplate(sqlText, QueryType.STORE_PROCEDURE_CALL, Collections.<QueryParam>emptyList());
+    CallableStatement statement = (CallableStatement) factory.create(connection, queryTemplate);
 
-        assertThat(statement, is(createdStatement));
-    }
+    assertThat(statement, is(createdStatement));
+  }
 }

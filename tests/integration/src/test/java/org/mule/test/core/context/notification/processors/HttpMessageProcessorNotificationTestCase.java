@@ -24,83 +24,66 @@ import org.junit.Rule;
 import org.junit.runners.Parameterized;
 
 @RunnerDelegateTo(Parameterized.class)
-public class HttpMessageProcessorNotificationTestCase extends AbstractMessageProcessorNotificationTestCase
-{
+public class HttpMessageProcessorNotificationTestCase extends AbstractMessageProcessorNotificationTestCase {
 
-    @Rule
-    public DynamicPort proxyPort = new DynamicPort("port");
+  @Rule
+  public DynamicPort proxyPort = new DynamicPort("port");
 
-    @Rule
-    public SystemProperty systemProperty;
+  @Rule
+  public SystemProperty systemProperty;
 
 
-    public HttpMessageProcessorNotificationTestCase(boolean nonBlocking)
-    {
-        if (nonBlocking)
-        {
-            systemProperty = new SystemProperty(MuleProperties.MULE_DEFAULT_PROCESSING_STRATEGY,
-                                                ProcessingStrategyUtils.NON_BLOCKING_PROCESSING_STRATEGY);
-        }
+  public HttpMessageProcessorNotificationTestCase(boolean nonBlocking) {
+    if (nonBlocking) {
+      systemProperty = new SystemProperty(MuleProperties.MULE_DEFAULT_PROCESSING_STRATEGY,
+                                          ProcessingStrategyUtils.NON_BLOCKING_PROCESSING_STRATEGY);
     }
+  }
 
-    @Parameterized.Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][] {
-                {false},
-                {true}
-        });
-    }
+  @Parameterized.Parameters
+  public static Collection<Object[]> parameters() {
+    return Arrays.asList(new Object[][] {{false}, {true}});
+  }
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/integration/notifications/nonblocking-message-processor-notification-test-flow.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/integration/notifications/nonblocking-message-processor-notification-test-flow.xml";
+  }
 
-    @Override
-    public void doTest() throws Exception
-    {
-        List<String> testList = Arrays.asList("test", "with", "collection");
+  @Override
+  public void doTest() throws Exception {
+    List<String> testList = Arrays.asList("test", "with", "collection");
 
-        MuleClient client = muleContext.getClient();
-        assertNotNull(client.send("http://localhost:" + proxyPort.getValue() + "/in", "test", null));
-    }
+    MuleClient client = muleContext.getClient();
+    assertNotNull(client.send("http://localhost:" + proxyPort.getValue() + "/in", "test", null));
+  }
 
-    @Override
-    public RestrictedNode getSpecification()
-    {
-        return new Node()
+  @Override
+  public RestrictedNode getSpecification() {
+    return new Node()
 
-                // logger
-                .serial(prePost())
+        // logger
+        .serial(prePost())
 
-                // <response> start
-                .serial(pre())
+        // <response> start
+        .serial(pre())
 
-                // logger
-                .serial(prePost())
+        // logger
+        .serial(prePost())
 
-                // request to echo service
-                .serial(pre())
-                .serial(prePost())
-                .serial(post())
+        // request to echo service
+        .serial(pre()).serial(prePost()).serial(post())
 
-                // logger
-                .serial(prePost())
+        // logger
+        .serial(prePost())
 
-                // request to echo service
-                .serial(pre())
-                .serial(prePost())
-                .serial(post())
+        // request to echo service
+        .serial(pre()).serial(prePost()).serial(post())
 
-                // <response> end
-                .serial(prePost())
-                .serial(post());
-    }
+        // <response> end
+        .serial(prePost()).serial(post());
+  }
 
-    @Override
-    public void validateSpecification(RestrictedNode spec) throws Exception
-    {
-    }
+  @Override
+  public void validateSpecification(RestrictedNode spec) throws Exception {}
 }

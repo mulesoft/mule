@@ -30,51 +30,43 @@ import java.nio.file.Paths;
  *
  * @since 4.0
  */
-public final class SftpReadCommand extends SftpCommand implements ReadCommand
-{
+public final class SftpReadCommand extends SftpCommand implements ReadCommand {
 
-    /**
-     * {@inheritDoc}
-     */
-    public SftpReadCommand(SftpFileSystem fileSystem, SftpClient client)
-    {
-        super(fileSystem, client);
+  /**
+   * {@inheritDoc}
+   */
+  public SftpReadCommand(SftpFileSystem fileSystem, SftpClient client) {
+    super(fileSystem, client);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public OperationResult<InputStream, FileAttributes> read(FileConnectorConfig config, MuleMessage message, String filePath,
+                                                           boolean lock) {
+    FtpFileAttributes attributes = getExistingFile(config, filePath);
+    if (attributes.isDirectory()) {
+      throw cannotReadDirectoryException(Paths.get(attributes.getPath()));
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public OperationResult<InputStream, FileAttributes> read(FileConnectorConfig config, MuleMessage message, String filePath, boolean lock)
-    {
-        FtpFileAttributes attributes = getExistingFile(config, filePath);
-        if (attributes.isDirectory())
-        {
-            throw cannotReadDirectoryException(Paths.get(attributes.getPath()));
-        }
+    Path path = Paths.get(attributes.getPath());
 
-        Path path = Paths.get(attributes.getPath());
-
-        PathLock pathLock;
-        if (lock)
-        {
-            pathLock = fileSystem.lock(path);
-        }
-        else
-        {
-            fileSystem.verifyNotLocked(path);
-            pathLock = new NullPathLock();
-        }
-
-        try
-        {
-            InputStream payload = SftpInputStream.newInstance((FtpConnector) config, attributes, pathLock);
-            MediaType mediaType = fileSystem.getFileMessageMediaType(message.getDataType().getMediaType(), attributes);
-            return OperationResult.<InputStream, FileAttributes>builder().output(payload).mediaType(mediaType).attributes(attributes).build();
-        }
-        catch (ConnectionException e)
-        {
-            throw exception("Could not obtain connection to fetch file " + path, e);
-        }
+    PathLock pathLock;
+    if (lock) {
+      pathLock = fileSystem.lock(path);
+    } else {
+      fileSystem.verifyNotLocked(path);
+      pathLock = new NullPathLock();
     }
+
+    try {
+      InputStream payload = SftpInputStream.newInstance((FtpConnector) config, attributes, pathLock);
+      MediaType mediaType = fileSystem.getFileMessageMediaType(message.getDataType().getMediaType(), attributes);
+      return OperationResult.<InputStream, FileAttributes>builder().output(payload).mediaType(mediaType).attributes(attributes)
+          .build();
+    } catch (ConnectionException e) {
+      throw exception("Could not obtain connection to fetch file " + path, e);
+    }
+  }
 }

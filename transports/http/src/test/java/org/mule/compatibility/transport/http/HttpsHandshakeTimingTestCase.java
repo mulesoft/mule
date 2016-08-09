@@ -33,76 +33,70 @@ import org.junit.Test;
 import org.mockito.Answers;
 
 /**
- * Test for SSL handshake timeouts. Unfortunately, there is no easy way to blackbox-test this
- * as it would require a SSLSocket implementation that could actually add arbitrary delays to
- * the SSL handshake.
+ * Test for SSL handshake timeouts. Unfortunately, there is no easy way to blackbox-test this as it would require a SSLSocket
+ * implementation that could actually add arbitrary delays to the SSL handshake.
  * <p/>
- * The approach chosen here is based on reflection and massive subclassing/stubbing to make things
- * work. Yes, this is hacky and fragile but this seems to be the only reasonable alternative
- * for now.
+ * The approach chosen here is based on reflection and massive subclassing/stubbing to make things work. Yes, this is hacky and
+ * fragile but this seems to be the only reasonable alternative for now.
  */
-public class HttpsHandshakeTimingTestCase extends AbstractMuleContextEndpointTestCase
-{
+public class HttpsHandshakeTimingTestCase extends AbstractMuleContextEndpointTestCase {
 
-    @Test(expected = MessagingException.class)
-    public void testHttpsHandshakeExceedsTimeout() throws Exception
-    {
-        MockHttpsMessageReceiver messageReceiver = setupMockHttpsMessageReceiver();
+  @Test(expected = MessagingException.class)
+  public void testHttpsHandshakeExceedsTimeout() throws Exception {
+    MockHttpsMessageReceiver messageReceiver = setupMockHttpsMessageReceiver();
 
-        MockSslSocket socket = new MockSslSocket();
-        HttpMessageProcessTemplate messageProcessTemplate = messageReceiver.createMessageProcessTemplate(new HttpServerConnection(socket, messageReceiver.getEndpoint().getEncoding(), (HttpConnector) messageReceiver.getConnector()));
+    MockSslSocket socket = new MockSslSocket();
+    HttpMessageProcessTemplate messageProcessTemplate =
+        messageReceiver.createMessageProcessTemplate(new HttpServerConnection(socket, messageReceiver.getEndpoint().getEncoding(),
+                                                                              (HttpConnector) messageReceiver.getConnector()));
 
-        MuleMessage message = MuleMessage.builder().payload(TEST_MESSAGE).build();
-        messageProcessTemplate.beforeRouteEvent(getTestEvent(message));
+    MuleMessage message = MuleMessage.builder().payload(TEST_MESSAGE).build();
+    messageProcessTemplate.beforeRouteEvent(getTestEvent(message));
+  }
+
+  @Test
+  public void testHttpsHandshakeCompletesBeforeProcessingMessage() throws Exception {
+    MockHttpsMessageReceiver messageReceiver = setupMockHttpsMessageReceiver();
+
+    MockSslSocket socket = new MockSslSocket();
+    socket.setInputStream(new ByteArrayInputStream("GET /path/to/file/index.html HTTP/1.0\n\n\n".getBytes()));
+    HttpServerConnection serverConnection =
+        new HttpServerConnection(socket, UTF_8, (HttpConnector) messageReceiver.getConnector());
+    HttpMessageProcessTemplate messageContext = messageReceiver.createMessageProcessTemplate(serverConnection);
+
+    invokeHandshakeCompleted(serverConnection, socket);
+
+    MuleMessage message = MuleMessage.builder().payload(TEST_MESSAGE).build();
+    messageContext.acquireMessage();
+    serverConnection.readRequest();
+    MuleEvent muleEvent = messageContext.beforeRouteEvent(getTestEvent(message));
+    assertNotNull(muleEvent.getMessage().getOutboundProperty(HttpsConnector.LOCAL_CERTIFICATES));
+    assertNotNull(muleEvent.getMessage().getOutboundProperty(HttpsConnector.PEER_CERTIFICATES));
+  }
+
+  private void invokeHandshakeCompleted(HttpServerConnection serverConnection, MockSslSocket socket) throws Exception {
+    HandshakeCompletedEvent event = new MockHandshakeCompletedEvent(socket);
+    serverConnection.handshakeCompleted(event);
+  }
+
+  private MockHttpsMessageReceiver setupMockHttpsMessageReceiver() throws CreateException {
+    HttpsConnector httpsConnector = new HttpsConnector(muleContext);
+    httpsConnector.setSslHandshakeTimeout(1000);
+
+    Map<String, Serializable> properties = Collections.emptyMap();
+
+    InboundEndpoint inboundEndpoint = mock(InboundEndpoint.class, Answers.RETURNS_DEEP_STUBS.get());
+    when(inboundEndpoint.getConnector()).thenReturn(httpsConnector);
+    when(inboundEndpoint.getProperties()).thenReturn(properties);
+
+    return new MockHttpsMessageReceiver(httpsConnector, mock(Flow.class), inboundEndpoint);
+  }
+
+  private static class MockHttpsMessageReceiver extends HttpsMessageReceiver {
+
+    public MockHttpsMessageReceiver(Connector connector, FlowConstruct flowConstruct, InboundEndpoint endpoint)
+        throws CreateException {
+      super(connector, flowConstruct, endpoint);
     }
-
-    @Test
-    public void testHttpsHandshakeCompletesBeforeProcessingMessage() throws Exception
-    {
-        MockHttpsMessageReceiver messageReceiver = setupMockHttpsMessageReceiver();
-
-        MockSslSocket socket = new MockSslSocket();
-        socket.setInputStream(new ByteArrayInputStream("GET /path/to/file/index.html HTTP/1.0\n\n\n".getBytes()));
-        HttpServerConnection serverConnection = new HttpServerConnection(socket, UTF_8, (HttpConnector) messageReceiver.getConnector());
-        HttpMessageProcessTemplate messageContext = messageReceiver.createMessageProcessTemplate(serverConnection);
-
-        invokeHandshakeCompleted(serverConnection, socket);
-
-        MuleMessage message = MuleMessage.builder().payload(TEST_MESSAGE).build();
-        messageContext.acquireMessage();
-        serverConnection.readRequest();
-        MuleEvent muleEvent = messageContext.beforeRouteEvent(getTestEvent(message));
-        assertNotNull(muleEvent.getMessage().getOutboundProperty(HttpsConnector.LOCAL_CERTIFICATES));
-        assertNotNull(muleEvent.getMessage().getOutboundProperty(HttpsConnector.PEER_CERTIFICATES));
-    }
-
-    private void invokeHandshakeCompleted(HttpServerConnection serverConnection, MockSslSocket socket) throws Exception
-    {
-        HandshakeCompletedEvent event = new MockHandshakeCompletedEvent(socket);
-        serverConnection.handshakeCompleted(event);
-    }
-
-    private MockHttpsMessageReceiver setupMockHttpsMessageReceiver() throws CreateException
-    {
-        HttpsConnector httpsConnector = new HttpsConnector(muleContext);
-        httpsConnector.setSslHandshakeTimeout(1000);
-
-        Map<String, Serializable> properties = Collections.emptyMap();
-
-        InboundEndpoint inboundEndpoint = mock(InboundEndpoint.class, Answers.RETURNS_DEEP_STUBS.get());
-        when(inboundEndpoint.getConnector()).thenReturn(httpsConnector);
-        when(inboundEndpoint.getProperties()).thenReturn(properties);
-
-        return new MockHttpsMessageReceiver(httpsConnector, mock(Flow.class), inboundEndpoint);
-    }
-
-    private static class MockHttpsMessageReceiver extends HttpsMessageReceiver
-    {
-
-        public MockHttpsMessageReceiver(Connector connector, FlowConstruct flowConstruct,
-                                        InboundEndpoint endpoint) throws CreateException
-        {
-            super(connector, flowConstruct, endpoint);
-        }
-    }
+  }
 }

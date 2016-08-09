@@ -20,79 +20,69 @@ import javax.inject.Named;
 
 import org.junit.Test;
 
-public class ExtensionAsInjectedDependenciesTestCase extends ExtensionFunctionalTestCase
-{
+public class ExtensionAsInjectedDependenciesTestCase extends ExtensionFunctionalTestCase {
 
-    private static final String STATIC_HEISENBERG = "staticHeisenberg";
-    private static final String DYNAMIC_AGE_HEISENBERG = "dynamicAgeHeisenberg";
+  private static final String STATIC_HEISENBERG = "staticHeisenberg";
+  private static final String DYNAMIC_AGE_HEISENBERG = "dynamicAgeHeisenberg";
 
-    private Dependent dependent;
+  private Dependent dependent;
 
-    @Override
-    protected void doSetUp() throws Exception
-    {
-        super.doSetUp();
-        dependent = muleContext.getInjector().inject(new Dependent());
+  @Override
+  protected void doSetUp() throws Exception {
+    super.doSetUp();
+    dependent = muleContext.getInjector().inject(new Dependent());
+  }
+
+  @Override
+  protected String getConfigFile() {
+    return "heisenberg-injected.xml";
+  }
+
+  @Override
+  protected Class<?>[] getAnnotatedExtensionClasses() {
+    return new Class<?>[] {HeisenbergExtension.class};
+  }
+
+
+  @Test
+  public void staticHeisenbergWasInjected() throws Exception {
+    assertCorrectProviderInjected(STATIC_HEISENBERG, dependent.getStaticHeisenberg());
+    HeisenbergExtension heisenberg = ExtensionsTestUtils.getConfigurationFromRegistry(STATIC_HEISENBERG, getTestEvent(""));
+    assertThat(heisenberg.getPersonalInfo().getAge(), is(50));
+  }
+
+  @Test
+  public void dynamicHeisenbergWasInjected() throws Exception {
+    assertCorrectProviderInjected(DYNAMIC_AGE_HEISENBERG, dependent.getDynamicAgeHeisenberg());
+
+    final int age = 52;
+    MuleEvent event = getTestEvent("");
+    event.setFlowVariable("age", age);
+
+    HeisenbergExtension heisenberg = ExtensionsTestUtils.getConfigurationFromRegistry(DYNAMIC_AGE_HEISENBERG, event);
+    assertThat(heisenberg.getPersonalInfo().getAge(), is(age));
+  }
+
+  private void assertCorrectProviderInjected(String key, ConfigurationProvider<?> expected) {
+    assertThat(expected, is(sameInstance(muleContext.getRegistry().get(key))));
+  }
+
+  public static class Dependent {
+
+    @Inject
+    @Named(STATIC_HEISENBERG)
+    private ConfigurationProvider<HeisenbergExtension> staticHeisenberg;
+
+    @Inject
+    @Named(DYNAMIC_AGE_HEISENBERG)
+    private ConfigurationProvider<HeisenbergExtension> dynamicAgeHeisenberg;
+
+    public ConfigurationProvider<HeisenbergExtension> getStaticHeisenberg() {
+      return staticHeisenberg;
     }
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "heisenberg-injected.xml";
+    public ConfigurationProvider<HeisenbergExtension> getDynamicAgeHeisenberg() {
+      return dynamicAgeHeisenberg;
     }
-
-    @Override
-    protected Class<?>[] getAnnotatedExtensionClasses()
-    {
-        return new Class<?>[] {HeisenbergExtension.class};
-    }
-
-
-    @Test
-    public void staticHeisenbergWasInjected() throws Exception
-    {
-        assertCorrectProviderInjected(STATIC_HEISENBERG, dependent.getStaticHeisenberg());
-        HeisenbergExtension heisenberg = ExtensionsTestUtils.getConfigurationFromRegistry(STATIC_HEISENBERG, getTestEvent(""));
-        assertThat(heisenberg.getPersonalInfo().getAge(), is(50));
-    }
-
-    @Test
-    public void dynamicHeisenbergWasInjected() throws Exception
-    {
-        assertCorrectProviderInjected(DYNAMIC_AGE_HEISENBERG, dependent.getDynamicAgeHeisenberg());
-
-        final int age = 52;
-        MuleEvent event = getTestEvent("");
-        event.setFlowVariable("age", age);
-
-        HeisenbergExtension heisenberg = ExtensionsTestUtils.getConfigurationFromRegistry(DYNAMIC_AGE_HEISENBERG, event);
-        assertThat(heisenberg.getPersonalInfo().getAge(), is(age));
-    }
-
-    private void assertCorrectProviderInjected(String key, ConfigurationProvider<?> expected)
-    {
-        assertThat(expected, is(sameInstance(muleContext.getRegistry().get(key))));
-    }
-
-    public static class Dependent
-    {
-
-        @Inject
-        @Named(STATIC_HEISENBERG)
-        private ConfigurationProvider<HeisenbergExtension> staticHeisenberg;
-
-        @Inject
-        @Named(DYNAMIC_AGE_HEISENBERG)
-        private ConfigurationProvider<HeisenbergExtension> dynamicAgeHeisenberg;
-
-        public ConfigurationProvider<HeisenbergExtension> getStaticHeisenberg()
-        {
-            return staticHeisenberg;
-        }
-
-        public ConfigurationProvider<HeisenbergExtension> getDynamicAgeHeisenberg()
-        {
-            return dynamicAgeHeisenberg;
-        }
-    }
+  }
 }

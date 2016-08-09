@@ -9,12 +9,10 @@ package org.mule.runtime.core.management;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.api.context.notification.ServerNotificationListener;
 
-public class DummyListener implements ServerNotificationListener
-{
+public class DummyListener implements ServerNotificationListener {
 
-    public void onNotification(ServerNotification notification)
-    {
-        // empty
-    }
+  public void onNotification(ServerNotification notification) {
+    // empty
+  }
 
 }

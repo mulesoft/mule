@@ -10,12 +10,10 @@ package org.mule.runtime.module.db.internal.result.resultset;
 /**
  * Thrown to indicate an error during the processing of a {@link java.sql.ResultSet}
  */
-public class ResultSetProcessingException extends RuntimeException
-{
+public class ResultSetProcessingException extends RuntimeException {
 
-    public ResultSetProcessingException(String message, Throwable cause)
-    {
-        super(message, cause);
-    }
+  public ResultSetProcessingException(String message, Throwable cause) {
+    super(message, cause);
+  }
 
 }

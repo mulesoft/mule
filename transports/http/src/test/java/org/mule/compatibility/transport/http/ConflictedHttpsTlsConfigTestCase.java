@@ -17,60 +17,46 @@ import java.util.Set;
 
 import org.junit.Test;
 
-public class ConflictedHttpsTlsConfigTestCase extends FunctionalTestCase
-{
-    private int configNumber;
+public class ConflictedHttpsTlsConfigTestCase extends FunctionalTestCase {
 
-    @Override
-    protected MuleContext createMuleContext() throws Exception
-    {
-        return null;
+  private int configNumber;
+
+  @Override
+  protected MuleContext createMuleContext() throws Exception {
+    return null;
+  }
+
+  @Override
+  protected String getConfigFile() {
+    return "conflicted-https-config-" + configNumber + ".xml";
+  }
+
+  @Test
+  public void testConfigs() throws Exception {
+    for (configNumber = 1; configNumber <= 3; configNumber++) {
+      try {
+        super.createMuleContext();
+        fail("No conflict seen");
+      } catch (Exception ex) {
+        assertExceptionIsOfType(ex, CheckExclusiveAttributes.CheckExclusiveAttributesException.class);
+      }
     }
+  }
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "conflicted-https-config-" + configNumber +".xml";
+  public void assertExceptionIsOfType(Throwable ex, Class<? extends Throwable> type) {
+    Set<Throwable> seen = new HashSet<Throwable>();
+
+    while (true) {
+      if (type.isInstance(ex)) {
+        return;
+      } else if (ex == null || seen.contains(ex)) {
+        fail("Bad exception type");
+      } else {
+        seen.add(ex);
+        ex = ex.getCause();
+      }
     }
-
-    @Test
-    public void testConfigs() throws Exception
-    {
-        for (configNumber = 1; configNumber <= 3; configNumber++)
-        {
-            try
-            {
-                super.createMuleContext();
-                fail("No conflict seen");
-            }
-            catch (Exception ex)
-            {
-                assertExceptionIsOfType(ex, CheckExclusiveAttributes.CheckExclusiveAttributesException.class);
-            }
-        }
-    }
-
-    public void assertExceptionIsOfType(Throwable ex, Class<? extends Throwable> type)
-    {
-        Set<Throwable> seen = new HashSet<Throwable>();
-
-        while (true)
-        {
-            if (type.isInstance(ex))
-            {
-                return;
-            }
-            else if (ex == null || seen.contains(ex))
-            {
-                fail("Bad exception type");
-            }
-            else
-            {
-                seen.add(ex);
-                ex = ex.getCause();
-            }
-        }
-    }
+  }
 }
 
 

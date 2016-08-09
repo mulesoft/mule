@@ -9,25 +9,22 @@ package org.mule.runtime.core.api.config;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.config.i18n.Message;
 
-public class ConfigurationException extends MuleException
-{
-    /**
-     * Serial version
-     */
-    private static final long serialVersionUID = 3658822340943734960L;
+public class ConfigurationException extends MuleException {
 
-    public ConfigurationException(Message message)
-    {
-        super(message);
-    }
+  /**
+   * Serial version
+   */
+  private static final long serialVersionUID = 3658822340943734960L;
 
-    public ConfigurationException(Message message, Throwable cause)
-    {
-        super(message, cause);
-    }
+  public ConfigurationException(Message message) {
+    super(message);
+  }
 
-    public ConfigurationException(Throwable cause)
-    {
-        super(cause);
-    }
+  public ConfigurationException(Message message, Throwable cause) {
+    super(message, cause);
+  }
+
+  public ConfigurationException(Throwable cause) {
+    super(cause);
+  }
 }

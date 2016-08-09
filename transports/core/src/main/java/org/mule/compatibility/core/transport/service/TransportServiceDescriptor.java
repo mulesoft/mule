@@ -30,79 +30,76 @@ import java.util.List;
 import java.util.Properties;
 
 /**
- * <code>TransportServiceDescriptor</code> describes the necessary information for
- * creating a connector from a service descriptor. A service descriptor should be
- * located at META-INF/services/org/mule/providers/<protocol> where protocol is the
- * protocol of the connector to be created The service descriptor is in the form of
- * string key value pairs and supports a number of properties, descriptions of which
- * can be found here: http://www.mulesoft.org/documentation/display/MULE3USER/Transport+Service+Descriptors
+ * <code>TransportServiceDescriptor</code> describes the necessary information for creating a connector from a service descriptor.
+ * A service descriptor should be located at META-INF/services/org/mule/providers/<protocol> where protocol is the protocol of the
+ * connector to be created The service descriptor is in the form of string key value pairs and supports a number of properties,
+ * descriptions of which can be found here: http://www.mulesoft.org/documentation/display/MULE3USER/Transport+Service+Descriptors
  */
-public interface TransportServiceDescriptor extends ServiceDescriptor, MuleContextAware
-{
-    public static final String OSGI_HEADER_TRANSPORT = "Mule-Transport";
+public interface TransportServiceDescriptor extends ServiceDescriptor, MuleContextAware {
 
-    MuleMessageFactory createMuleMessageFactory() throws TransportServiceException;
+  public static final String OSGI_HEADER_TRANSPORT = "Mule-Transport";
 
-    SessionHandler createSessionHandler() throws TransportServiceException;
+  MuleMessageFactory createMuleMessageFactory() throws TransportServiceException;
 
-    MessageReceiver createMessageReceiver(Connector connector,
-                                                 FlowConstruct flowConstruct,
-                                                 InboundEndpoint endpoint) throws MuleException;
+  SessionHandler createSessionHandler() throws TransportServiceException;
 
-    MessageReceiver createMessageReceiver(Connector connector,
-                                                 FlowConstruct flowConstruct,
-                                                 InboundEndpoint endpoint,
-                                                 Object... args) throws MuleException;
+  MessageReceiver createMessageReceiver(Connector connector, FlowConstruct flowConstruct, InboundEndpoint endpoint)
+      throws MuleException;
 
-    MessageDispatcherFactory createDispatcherFactory() throws TransportServiceException;
+  MessageReceiver createMessageReceiver(Connector connector, FlowConstruct flowConstruct, InboundEndpoint endpoint,
+                                        Object... args)
+      throws MuleException;
 
-    MessageRequesterFactory createRequesterFactory() throws TransportServiceException;
+  MessageDispatcherFactory createDispatcherFactory() throws TransportServiceException;
 
-    TransactionFactory createTransactionFactory() throws TransportServiceException;
+  MessageRequesterFactory createRequesterFactory() throws TransportServiceException;
 
-    Connector createConnector() throws TransportServiceException;
+  TransactionFactory createTransactionFactory() throws TransportServiceException;
 
-    List<Transformer> createInboundTransformers(ImmutableEndpoint endpoint) throws TransportFactoryException;
+  Connector createConnector() throws TransportServiceException;
 
-    List<Transformer> createOutboundTransformers(ImmutableEndpoint endpoint) throws TransportFactoryException;
+  List<Transformer> createInboundTransformers(ImmutableEndpoint endpoint) throws TransportFactoryException;
 
-    List<Transformer> createResponseTransformers(ImmutableEndpoint endpoint) throws TransportFactoryException;
+  List<Transformer> createOutboundTransformers(ImmutableEndpoint endpoint) throws TransportFactoryException;
 
-    EndpointURIBuilder createEndpointURIBuilder() throws TransportFactoryException;
+  List<Transformer> createResponseTransformers(ImmutableEndpoint endpoint) throws TransportFactoryException;
 
-    @Deprecated
-    EndpointBuilder createEndpointBuilder(String uri) throws TransportFactoryException;
+  EndpointURIBuilder createEndpointURIBuilder() throws TransportFactoryException;
 
-    /**
-     * Creates a {@link EndpointBuilder}
-     *
-     * @param uri  address for the created endpoints
-     * @param muleContext context of the application owning endpoint builder
-     * @return a non null endpoint builder for the given address
-     * @throws TransportFactoryException
-     */
-    EndpointBuilder createEndpointBuilder(String uri, MuleContext muleContext) throws TransportFactoryException;
+  @Deprecated
+  EndpointBuilder createEndpointBuilder(String uri) throws TransportFactoryException;
 
-    @Deprecated
-    EndpointBuilder createEndpointBuilder(EndpointURIEndpointBuilder builder) throws TransportFactoryException;
+  /**
+   * Creates a {@link EndpointBuilder}
+   *
+   * @param uri address for the created endpoints
+   * @param muleContext context of the application owning endpoint builder
+   * @return a non null endpoint builder for the given address
+   * @throws TransportFactoryException
+   */
+  EndpointBuilder createEndpointBuilder(String uri, MuleContext muleContext) throws TransportFactoryException;
 
-    /**
-     * Creates a {@link EndpointBuilder} wrapping an existing builder
-     *
-     * @param builder  instance to be wrapped
-     * @param muleContext context of the application owning endpoint builder
-     * @return a non null endpoint builder for the given builder
-     * @throws TransportFactoryException
-     */
-    EndpointBuilder createEndpointBuilder(EndpointURIEndpointBuilder builder, MuleContext muleContext) throws TransportFactoryException;
+  @Deprecated
+  EndpointBuilder createEndpointBuilder(EndpointURIEndpointBuilder builder) throws TransportFactoryException;
 
-    void setExceptionMappings(Properties props);
+  /**
+   * Creates a {@link EndpointBuilder} wrapping an existing builder
+   *
+   * @param builder instance to be wrapped
+   * @param muleContext context of the application owning endpoint builder
+   * @return a non null endpoint builder for the given builder
+   * @throws TransportFactoryException
+   */
+  EndpointBuilder createEndpointBuilder(EndpointURIEndpointBuilder builder, MuleContext muleContext)
+      throws TransportFactoryException;
 
-    Properties getExceptionMappings();
+  void setExceptionMappings(Properties props);
 
-    List<MessageExchangePattern> getInboundExchangePatterns() throws TransportServiceException;
+  Properties getExceptionMappings();
 
-    List<MessageExchangePattern> getOutboundExchangePatterns() throws TransportServiceException;
+  List<MessageExchangePattern> getInboundExchangePatterns() throws TransportServiceException;
 
-    MessageExchangePattern getDefaultExchangePattern() throws TransportServiceException;
+  List<MessageExchangePattern> getOutboundExchangePatterns() throws TransportServiceException;
+
+  MessageExchangePattern getDefaultExchangePattern() throws TransportServiceException;
 }

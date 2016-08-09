@@ -17,36 +17,32 @@ import java.util.concurrent.TimeUnit;
 import org.junit.Test;
 
 @SmallTest
-public class DefaultMutableConfigurationStatsTestCase extends AbstractMuleTestCase
-{
+public class DefaultMutableConfigurationStatsTestCase extends AbstractMuleTestCase {
 
-    private TestTimeSupplier timeSupplier = new TestTimeSupplier(System.currentTimeMillis());
-    private MutableConfigurationStats stats = new DefaultMutableConfigurationStats(timeSupplier);
+  private TestTimeSupplier timeSupplier = new TestTimeSupplier(System.currentTimeMillis());
+  private MutableConfigurationStats stats = new DefaultMutableConfigurationStats(timeSupplier);
 
-    @Test
-    public void lastUsed()
-    {
-        assertThat(stats.getLastUsedMillis(), is(timeSupplier.get()));
-    }
+  @Test
+  public void lastUsed() {
+    assertThat(stats.getLastUsedMillis(), is(timeSupplier.get()));
+  }
 
-    @Test
-    public void updateLastUsed()
-    {
-        lastUsed();
-        long now = timeSupplier.move(1, TimeUnit.MINUTES);
-        assertThat(stats.getLastUsedMillis() + 60000, is(now));
-        stats.updateLastUsed();
+  @Test
+  public void updateLastUsed() {
+    lastUsed();
+    long now = timeSupplier.move(1, TimeUnit.MINUTES);
+    assertThat(stats.getLastUsedMillis() + 60000, is(now));
+    stats.updateLastUsed();
 
-        assertThat(stats.getLastUsedMillis(), is(now));
-    }
+    assertThat(stats.getLastUsedMillis(), is(now));
+  }
 
-    @Test
-    public void inflightOperations()
-    {
-        assertThat(stats.getInflightOperations(), is(0));
-        assertThat(stats.addInflightOperation(), is(1));
-        assertThat(stats.getInflightOperations(), is(1));
-        assertThat(stats.discountInflightOperation(), is(0));
-        assertThat(stats.getInflightOperations(), is(0));
-    }
+  @Test
+  public void inflightOperations() {
+    assertThat(stats.getInflightOperations(), is(0));
+    assertThat(stats.addInflightOperation(), is(1));
+    assertThat(stats.getInflightOperations(), is(1));
+    assertThat(stats.discountInflightOperation(), is(0));
+    assertThat(stats.getInflightOperations(), is(0));
+  }
 }

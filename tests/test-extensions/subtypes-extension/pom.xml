@@ -15,6 +15,10 @@
     <name>Mule Subtypes Test Extension</name>
     <description>A Mule extension for testing</description>
 
+    <properties>
+        <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.mule.tests</groupId>

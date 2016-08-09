@@ -8,25 +8,21 @@ package org.mule.runtime.module.ws.functional;
 
 import org.junit.Test;
 
-public class TimestampSecurityFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase
-{
+public class TimestampSecurityFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "timestamp-security-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "timestamp-security-config.xml";
+  }
 
-    @Test
-    public void requestWithTimestampReturnsExpectedResult() throws Exception
-    {
-        assertValidResponse("clientWithTimestamp");
-    }
+  @Test
+  public void requestWithTimestampReturnsExpectedResult() throws Exception {
+    assertValidResponse("clientWithTimestamp");
+  }
 
-    @Test
-    public void requestWithoutTimestampFail() throws Exception
-    {
-        assertSoapFault("clientWithoutTimestamp", "InvalidSecurity");
-    }
+  @Test
+  public void requestWithoutTimestampFail() throws Exception {
+    assertSoapFault("clientWithoutTimestamp", "InvalidSecurity");
+  }
 
 }

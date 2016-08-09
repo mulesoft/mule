@@ -13,24 +13,22 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 @Ignore("Currently not supported: Builders meant to be replaced by DW.")
-public class HttpRequestBuilderCompositionTestCase extends AbstractHttpRequestTestCase
-{
+public class HttpRequestBuilderCompositionTestCase extends AbstractHttpRequestTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "http-request-builder-composition-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "http-request-builder-composition-config.xml";
+  }
 
-    @Test
-    public void parameterOverrideInRequestBuilderComposition() throws Exception
-    {
-        flowRunner("testFlow").withPayload(TEST_MESSAGE).run();
+  @Test
+  public void parameterOverrideInRequestBuilderComposition() throws Exception {
+    flowRunner("testFlow").withPayload(TEST_MESSAGE).run();
 
-        assertThat(uri, equalTo("/testPath?queryParam1=testValue1&queryParam2=testValue2&queryParam2=newTestValue2&queryParam3=testValue3"));
-        assertThat(getFirstReceivedHeader("testHeader1"), equalTo("headerValue1"));
-        assertThat(getFirstReceivedHeader("testHeader2"), equalTo("headerValue2"));
-    }
+    assertThat(uri,
+               equalTo("/testPath?queryParam1=testValue1&queryParam2=testValue2&queryParam2=newTestValue2&queryParam3=testValue3"));
+    assertThat(getFirstReceivedHeader("testHeader1"), equalTo("headerValue1"));
+    assertThat(getFirstReceivedHeader("testHeader2"), equalTo("headerValue2"));
+  }
 
 
 }

@@ -12,18 +12,17 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 
-public class TcpSocketFactory extends AbstractTcpSocketFactory
-{
+public class TcpSocketFactory extends AbstractTcpSocketFactory {
 
-    @Override
-    protected Socket createSocket(TcpSocketKey key) throws IOException
-    {
-        Socket socket = new Socket();
+  @Override
+  protected Socket createSocket(TcpSocketKey key) throws IOException {
+    Socket socket = new Socket();
 
-        int timeout = getConnectionTimeout() != Connector.INT_VALUE_NOT_SET ? getConnectionTimeout() : key.getEndpoint().getResponseTimeout();
+    int timeout =
+        getConnectionTimeout() != Connector.INT_VALUE_NOT_SET ? getConnectionTimeout() : key.getEndpoint().getResponseTimeout();
 
-        socket.connect(new InetSocketAddress(key.getInetAddress(), key.getPort()), timeout);
-        return socket;
-    }
+    socket.connect(new InetSocketAddress(key.getInetAddress(), key.getPort()), timeout);
+    return socket;
+  }
 
 }

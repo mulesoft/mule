@@ -21,39 +21,33 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class UpdateSourceTestCase extends AbstractDbIntegrationTestCase
-{
+public class UpdateSourceTestCase extends AbstractDbIntegrationTestCase {
 
-    public UpdateSourceTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public UpdateSourceTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Parameterized.Parameters
-    public static List<Object[]> parameters()
-    {
-        return TestDbConfig.getResources();
-    }
+  @Parameterized.Parameters
+  public static List<Object[]> parameters() {
+    return TestDbConfig.getResources();
+  }
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/update/update-source-config.xml"};
-    }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/update/update-source-config.xml"};
+  }
 
-    @Test
-    public void usesCustomSource() throws Exception
-    {
-        final MuleEvent responseEvent = flowRunner("updateCustomSource").withPayload(TEST_MESSAGE).run();
+  @Test
+  public void usesCustomSource() throws Exception {
+    final MuleEvent responseEvent = flowRunner("updateCustomSource").withPayload(TEST_MESSAGE).run();
 
-        final MuleMessage response = responseEvent.getMessage();
-        assertUpdate(response);
-    }
+    final MuleMessage response = responseEvent.getMessage();
+    assertUpdate(response);
+  }
 
-    private void assertUpdate(MuleMessage response) throws SQLException
-    {
-        assertThat(response.getPayload(), equalTo(1));
+  private void assertUpdate(MuleMessage response) throws SQLException {
+    assertThat(response.getPayload(), equalTo(1));
 
-        assertPlanetRecordsFromQuery("Pluto");
-    }
+    assertPlanetRecordsFromQuery("Pluto");
+  }
 }

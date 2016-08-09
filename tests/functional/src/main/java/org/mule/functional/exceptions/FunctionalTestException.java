@@ -9,17 +9,15 @@ package org.mule.functional.exceptions;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.config.i18n.MessageFactory;
 
-public class FunctionalTestException extends MuleException
-{
-    public static final String EXCEPTION_MESSAGE = "Functional Test Service Exception";
+public class FunctionalTestException extends MuleException {
 
-    public FunctionalTestException()
-    {
-        this(EXCEPTION_MESSAGE);
-    }
+  public static final String EXCEPTION_MESSAGE = "Functional Test Service Exception";
 
-    public FunctionalTestException(String exceptionText)
-    {
-        super(MessageFactory.createStaticMessage(exceptionText));
-    }
+  public FunctionalTestException() {
+    this(EXCEPTION_MESSAGE);
+  }
+
+  public FunctionalTestException(String exceptionText) {
+    super(MessageFactory.createStaticMessage(exceptionText));
+  }
 }

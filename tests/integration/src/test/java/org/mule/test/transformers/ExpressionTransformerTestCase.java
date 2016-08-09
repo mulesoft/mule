@@ -23,68 +23,57 @@ import groovyjarjarasm.asm.ClassWriter;
 import groovyjarjarasm.asm.Opcodes;
 import org.junit.Test;
 
-public class ExpressionTransformerTestCase extends AbstractMuleContextTestCase
-{
+public class ExpressionTransformerTestCase extends AbstractMuleContextTestCase {
 
-    @Test
-    public void testExpressionEvaluationClassLoaderEL() throws ClassNotFoundException, TransformerException
-    {
-        ExpressionTransformer transformer = new ExpressionTransformer();
-        transformer.setMuleContext(muleContext);
-        transformer.addArgument(new ExpressionArgument("test", new ExpressionConfig("payload is org.MyClass"), false));
+  @Test
+  public void testExpressionEvaluationClassLoaderEL() throws ClassNotFoundException, TransformerException {
+    ExpressionTransformer transformer = new ExpressionTransformer();
+    transformer.setMuleContext(muleContext);
+    transformer.addArgument(new ExpressionArgument("test", new ExpressionConfig("payload is org.MyClass"), false));
 
-        withContextClassLoader(new MyClassClassLoader(), () -> {
-            try
-            {
-                transformer.initialise();
-            }
-            catch (Exception e)
-            {
-                fail(e.getMessage());
-            }
-        });
+    withContextClassLoader(new MyClassClassLoader(), () -> {
+      try {
+        transformer.initialise();
+      } catch (Exception e) {
+        fail(e.getMessage());
+      }
+    });
 
-        assertFalse((Boolean) transformer.transform("test"));
+    assertFalse((Boolean) transformer.transform("test"));
+  }
+
+  @Test
+  public void testNullPayloadIsConsideredAsNullResultEL() throws Exception {
+    ExpressionTransformer transformer = new ExpressionTransformer();
+    transformer.setMuleContext(muleContext);
+    transformer.setReturnSourceIfNull(true);
+    ExpressionConfig config = new ExpressionConfig("null");
+
+    // MVL doesn't return NullPayload but rather null. So 'optional' needs to be true.
+    ExpressionArgument argument = new ExpressionArgument("test", config, true);
+    argument.setMuleContext(muleContext);
+    transformer.addArgument(argument);
+
+    MuleEvent event = getTestEvent("Test");
+    Object result = transformer.transformMessage(event, null);
+    assertTrue(result instanceof MuleMessage);
+    MuleMessage transformedMessage = (MuleMessage) result;
+
+    assertEquals("Test", transformedMessage.getPayload());
+
+  }
+
+  class MyClassClassLoader extends ClassLoader {
+
+    @Override
+    protected Class<?> findClass(String className) throws ClassNotFoundException {
+      if (className.equals("org.MyClass")) {
+        ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
+        cw.visit(Opcodes.V1_5, Opcodes.ACC_PUBLIC, "org/MyClass", null, "java/lang/Object", null);
+        return defineClass(className, cw.toByteArray(), 0, cw.toByteArray().length);
+      } else {
+        return super.findClass(className);
+      }
     }
-
-    @Test
-    public void testNullPayloadIsConsideredAsNullResultEL() throws Exception
-    {
-        ExpressionTransformer transformer = new ExpressionTransformer();
-        transformer.setMuleContext(muleContext);
-        transformer.setReturnSourceIfNull(true);
-        ExpressionConfig config = new ExpressionConfig("null");
-
-        // MVL doesn't return NullPayload but rather null.  So 'optional' needs to be true.
-        ExpressionArgument argument = new ExpressionArgument("test", config, true);
-        argument.setMuleContext(muleContext);
-        transformer.addArgument(argument);
-
-        MuleEvent event = getTestEvent("Test");
-        Object result = transformer.transformMessage(event, null);
-        assertTrue(result instanceof MuleMessage);
-        MuleMessage transformedMessage = (MuleMessage) result;
-
-        assertEquals("Test", transformedMessage.getPayload());
-
-    }
-
-    class MyClassClassLoader extends ClassLoader
-    {
-
-        @Override
-        protected Class<?> findClass(String className) throws ClassNotFoundException
-        {
-            if (className.equals("org.MyClass"))
-            {
-                ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
-                cw.visit(Opcodes.V1_5, Opcodes.ACC_PUBLIC, "org/MyClass", null, "java/lang/Object", null);
-                return defineClass(className, cw.toByteArray(), 0, cw.toByteArray().length);
-            }
-            else
-            {
-                return super.findClass(className);
-            }
-        }
-    }
+  }
 }

@@ -32,66 +32,55 @@ import org.springframework.security.core.GrantedAuthority;
 /**
  * Authorizes user access based on the required authorities for a user.
  */
-public class AuthorizationFilter extends AbstractSecurityFilter
-{
-    protected final Logger logger = LoggerFactory.getLogger(getClass());
-    private Collection<String> requiredAuthorities = new HashSet<String>();
+public class AuthorizationFilter extends AbstractSecurityFilter {
 
-    public void doFilter(MuleEvent event)
-        throws SecurityException, UnknownAuthenticationTypeException, CryptoFailureException,
-        SecurityProviderNotFoundException, EncryptionStrategyNotFoundException, InitialisationException
-    {
-        Authentication auth = event.getSession().getSecurityContext().getAuthentication();
-        if (auth == null)
-        {
-            throw new UnauthorisedException(CoreMessages.authNoCredentials());
-        }
+  protected final Logger logger = LoggerFactory.getLogger(getClass());
+  private Collection<String> requiredAuthorities = new HashSet<String>();
 
-        if (!(auth instanceof SpringAuthenticationAdapter))
-        {
-            throw new UnauthorisedException(SpringSecurityMessages.springAuthenticationRequired());
-        }
-
-        SpringAuthenticationAdapter springAuth = (SpringAuthenticationAdapter) auth;
-
-        String principalName = springAuth.getName();
-        GrantedAuthority[] authorities = springAuth.getAuthorities();
-
-        // If the principal has at least one of the granted authorities,
-        // then return.
-        boolean authorized = false;
-        if (authorities != null)
-        {
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Found authorities '" + Arrays.toString(authorities) + "' for principal '"
-                             + principalName + "'.");
-            }
-
-            for (GrantedAuthority authority : authorities)
-            {
-                if (requiredAuthorities.contains(authority.getAuthority()))
-                {
-                    authorized = true;
-                }
-            }
-        }
-
-        if (!authorized)
-        {
-            logger.info(MessageFormat.format("Could not find required authorities for {0}. Required authorities: {1}. Authorities found: {2}.", 
-                principalName, Arrays.toString(requiredAuthorities.toArray()), Arrays.toString(authorities)));
-            throw new NotPermittedException(SpringSecurityMessages.noGrantedAuthority(principalName));
-        }
+  public void doFilter(MuleEvent event) throws SecurityException, UnknownAuthenticationTypeException, CryptoFailureException,
+      SecurityProviderNotFoundException, EncryptionStrategyNotFoundException, InitialisationException {
+    Authentication auth = event.getSession().getSecurityContext().getAuthentication();
+    if (auth == null) {
+      throw new UnauthorisedException(CoreMessages.authNoCredentials());
     }
 
-    public Collection<String> getRequiredAuthorities()
-    {
-        return requiredAuthorities;
+    if (!(auth instanceof SpringAuthenticationAdapter)) {
+      throw new UnauthorisedException(SpringSecurityMessages.springAuthenticationRequired());
     }
 
-    public void setRequiredAuthorities(Collection<String> requiredAuthorities)
-    {
-        this.requiredAuthorities = requiredAuthorities;
+    SpringAuthenticationAdapter springAuth = (SpringAuthenticationAdapter) auth;
+
+    String principalName = springAuth.getName();
+    GrantedAuthority[] authorities = springAuth.getAuthorities();
+
+    // If the principal has at least one of the granted authorities,
+    // then return.
+    boolean authorized = false;
+    if (authorities != null) {
+      if (logger.isDebugEnabled()) {
+        logger.debug("Found authorities '" + Arrays.toString(authorities) + "' for principal '" + principalName + "'.");
+      }
+
+      for (GrantedAuthority authority : authorities) {
+        if (requiredAuthorities.contains(authority.getAuthority())) {
+          authorized = true;
+        }
+      }
     }
+
+    if (!authorized) {
+      logger.info(MessageFormat
+          .format("Could not find required authorities for {0}. Required authorities: {1}. Authorities found: {2}.",
+                  principalName, Arrays.toString(requiredAuthorities.toArray()), Arrays.toString(authorities)));
+      throw new NotPermittedException(SpringSecurityMessages.noGrantedAuthority(principalName));
+    }
+  }
+
+  public Collection<String> getRequiredAuthorities() {
+    return requiredAuthorities;
+  }
+
+  public void setRequiredAuthorities(Collection<String> requiredAuthorities) {
+    this.requiredAuthorities = requiredAuthorities;
+  }
 }

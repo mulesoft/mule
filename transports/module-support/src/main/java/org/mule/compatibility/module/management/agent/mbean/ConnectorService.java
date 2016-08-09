@@ -11,63 +11,54 @@ import org.mule.compatibility.core.util.TransportObjectNameHelper;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 
-public class ConnectorService implements ConnectorServiceMBean
-{
-    private final Connector connector;
-    private final String name;
+public class ConnectorService implements ConnectorServiceMBean {
 
-    public ConnectorService(final Connector connector)
-    {
-        this.connector = connector;
-        name = new TransportObjectNameHelper(connector.getMuleContext()).getConnectorName(connector);
-    }
+  private final Connector connector;
+  private final String name;
 
-    @Override
-    public boolean isStarted()
-    {
-        return connector.isStarted();
-    }
+  public ConnectorService(final Connector connector) {
+    this.connector = connector;
+    name = new TransportObjectNameHelper(connector.getMuleContext()).getConnectorName(connector);
+  }
 
-    @Override
-    public boolean isDisposed()
-    {
-        return connector.isDisposed();
-    }
+  @Override
+  public boolean isStarted() {
+    return connector.isStarted();
+  }
 
-    @Override
-    public String getName()
-    {
-        return name;
-    }
+  @Override
+  public boolean isDisposed() {
+    return connector.isDisposed();
+  }
 
-    @Override
-    public String getProtocol()
-    {
-        return connector.getProtocol();
-    }
+  @Override
+  public String getName() {
+    return name;
+  }
 
-    @Override
-    public void startConnector() throws MuleException
-    {
-        connector.start();
-    }
+  @Override
+  public String getProtocol() {
+    return connector.getProtocol();
+  }
 
-    @Override
-    public void stopConnector() throws MuleException
-    {
-        connector.stop();
-    }
+  @Override
+  public void startConnector() throws MuleException {
+    connector.start();
+  }
 
-    @Override
-    public void dispose()
-    {
-        connector.dispose();
-    }
+  @Override
+  public void stopConnector() throws MuleException {
+    connector.stop();
+  }
 
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        connector.initialise();
-    }
+  @Override
+  public void dispose() {
+    connector.dispose();
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    connector.initialise();
+  }
 
 }

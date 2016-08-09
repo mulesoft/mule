@@ -21,24 +21,23 @@ import java.util.List;
 import org.junit.Test;
 
 @SmallTest
-public class MulticasterTestCase extends AbstractMuleTestCase
-{
-    @Test
-    public void testMulticating() throws Exception
-    {
-        List<Fruit> fruit = new ArrayList<Fruit>();
-        Apple apple = new Apple();
-        Banana banana = new Banana();
-        WaterMelon melon = new WaterMelon();
-        fruit.add(apple);
-        fruit.add(banana);
-        fruit.add(melon);
+public class MulticasterTestCase extends AbstractMuleTestCase {
 
-        Fruit caster = (Fruit)Multicaster.create(Fruit.class, fruit);
-        caster.bite();
+  @Test
+  public void testMulticating() throws Exception {
+    List<Fruit> fruit = new ArrayList<Fruit>();
+    Apple apple = new Apple();
+    Banana banana = new Banana();
+    WaterMelon melon = new WaterMelon();
+    fruit.add(apple);
+    fruit.add(banana);
+    fruit.add(melon);
 
-        assertTrue(apple.isBitten());
-        assertTrue(banana.isBitten());
-        assertTrue(melon.isBitten());
-    }
+    Fruit caster = (Fruit) Multicaster.create(Fruit.class, fruit);
+    caster.bite();
+
+    assertTrue(apple.isBitten());
+    assertTrue(banana.isBitten());
+    assertTrue(melon.isBitten());
+  }
 }

@@ -9,18 +9,15 @@ package org.mule.runtime.module.db.integration.update;
 
 import org.mule.runtime.module.db.integration.model.AbstractTestDatabase;
 
-public class UpdateNamedParamParameterizedQueryTestCase extends UpdateParameterizedQueryTestCase
-{
+public class UpdateNamedParamParameterizedQueryTestCase extends UpdateParameterizedQueryTestCase {
 
-    public UpdateNamedParamParameterizedQueryTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public UpdateNamedParamParameterizedQueryTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/update/update-named-param-parameterized-query-config.xml"};
-    }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/update/update-named-param-parameterized-query-config.xml"};
+  }
 
 }

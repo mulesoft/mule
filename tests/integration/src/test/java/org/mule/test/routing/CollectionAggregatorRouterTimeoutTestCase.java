@@ -24,73 +24,67 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Test;
 
-public class CollectionAggregatorRouterTimeoutTestCase extends AbstractIntegrationTestCase
-{
+public class CollectionAggregatorRouterTimeoutTestCase extends AbstractIntegrationTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "collection-aggregator-router-timeout-test-flow.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "collection-aggregator-router-timeout-test-flow.xml";
+  }
 
-    @Test
-    public void testNoFailOnTimeout() throws Exception
-    {
-        // correlation timeouts should not fire in this scenario, check it
-        final AtomicInteger correlationTimeoutCount = new AtomicInteger(0);
-        muleContext.registerListener(new RoutingNotificationListener<RoutingNotification>()
-        {
-            @Override
-            public void onNotification(RoutingNotification notification)
-            {
-                if (notification.getAction() == RoutingNotification.CORRELATION_TIMEOUT)
-                {
-                    correlationTimeoutCount.incrementAndGet();
-                }
-            }
-        });
+  @Test
+  public void testNoFailOnTimeout() throws Exception {
+    // correlation timeouts should not fire in this scenario, check it
+    final AtomicInteger correlationTimeoutCount = new AtomicInteger(0);
+    muleContext.registerListener(new RoutingNotificationListener<RoutingNotification>() {
 
-        FunctionalTestComponent vortex = (FunctionalTestComponent) getComponent("vortex");
-        FunctionalTestComponent aggregator = (FunctionalTestComponent) getComponent("aggregator");
+      @Override
+      public void onNotification(RoutingNotification notification) {
+        if (notification.getAction() == RoutingNotification.CORRELATION_TIMEOUT) {
+          correlationTimeoutCount.incrementAndGet();
+        }
+      }
+    });
 
-        MuleClient client = muleContext.getClient();
-        List<String> list = Arrays.asList("first", "second");
+    FunctionalTestComponent vortex = (FunctionalTestComponent) getComponent("vortex");
+    FunctionalTestComponent aggregator = (FunctionalTestComponent) getComponent("aggregator");
 
-        flowRunner("splitter").withPayload(list).asynchronously().run();
+    MuleClient client = muleContext.getClient();
+    List<String> list = Arrays.asList("first", "second");
 
-        Thread.sleep(RECEIVE_TIMEOUT);
+    flowRunner("splitter").withPayload(list).asynchronously().run();
 
-        // no correlation timeout should ever fire
-        assertThat("Correlation timeout should not have happened.", correlationTimeoutCount.intValue(), is(0));
+    Thread.sleep(RECEIVE_TIMEOUT);
 
-        // should receive only the second message
-        assertThat("Vortex received wrong number of messages.", vortex.getReceivedMessagesCount(), is(1));
-        assertThat("Wrong message received", vortex.getLastReceivedMessage(), is("second"));
+    // no correlation timeout should ever fire
+    assertThat("Correlation timeout should not have happened.", correlationTimeoutCount.intValue(), is(0));
 
-        // should receive only the first part
-        assertThat("Aggregator received wrong number of messages.", aggregator.getReceivedMessagesCount(), is(1));
-        assertThat("Wrong message received", ((List<MuleMessage>) aggregator.getLastReceivedMessage()).get(0).getPayload(), is("first"));
+    // should receive only the second message
+    assertThat("Vortex received wrong number of messages.", vortex.getReceivedMessagesCount(), is(1));
+    assertThat("Wrong message received", vortex.getLastReceivedMessage(), is("second"));
 
-        // wait for the vortex timeout (6000ms for vortext + 2000ms for aggregator
-        // timeout + some extra for a test)
-        new PollingProber(2 * RECEIVE_TIMEOUT, 200).check(new Probe()
-        {
-            @Override
-            public boolean isSatisfied()
-            {
-                // now get the messages which were lagging behind
-                // it will receive only one (first) as second will be discarded by the worker
-                // because it has already dispatched one with the same group id
-                return aggregator.getReceivedMessagesCount() == 1;
-            }
+    // should receive only the first part
+    assertThat("Aggregator received wrong number of messages.", aggregator.getReceivedMessagesCount(), is(1));
+    assertThat("Wrong message received", ((List<MuleMessage>) aggregator.getLastReceivedMessage()).get(0).getPayload(),
+               is("first"));
 
-            @Override
-            public String describeFailure()
-            {
-                return "Other messages never received by aggregator.";
-            }
-        });
+    // wait for the vortex timeout (6000ms for vortext + 2000ms for aggregator
+    // timeout + some extra for a test)
+    new PollingProber(2 * RECEIVE_TIMEOUT, 200).check(new Probe() {
 
-        assertNotNull(client.request("test://out", RECEIVE_TIMEOUT));
-    }
+      @Override
+      public boolean isSatisfied() {
+        // now get the messages which were lagging behind
+        // it will receive only one (first) as second will be discarded by the worker
+        // because it has already dispatched one with the same group id
+        return aggregator.getReceivedMessagesCount() == 1;
+      }
+
+      @Override
+      public String describeFailure() {
+        return "Other messages never received by aggregator.";
+      }
+    });
+
+    assertNotNull(client.request("test://out", RECEIVE_TIMEOUT));
+  }
 }

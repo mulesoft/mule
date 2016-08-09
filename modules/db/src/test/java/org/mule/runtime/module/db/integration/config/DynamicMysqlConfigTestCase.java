@@ -16,25 +16,19 @@ import java.util.List;
 
 import org.junit.runners.Parameterized;
 
-public class DynamicMysqlConfigTestCase extends AbstractDynamicDatabaseConfigTestCase
-{
+public class DynamicMysqlConfigTestCase extends AbstractDynamicDatabaseConfigTestCase {
 
-    public DynamicMysqlConfigTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public DynamicMysqlConfigTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Parameterized.Parameters
-    public static List<Object[]> parameters()
-    {
-        if (TestDbConfig.getMySqlResource().isEmpty())
-        {
-            return Collections.emptyList();
-        }
-        else
-        {
-            return Collections.singletonList(new Object[] {"integration/config/mysql-dynamic-config.xml", new MySqlTestDatabase()});
-        }
+  @Parameterized.Parameters
+  public static List<Object[]> parameters() {
+    if (TestDbConfig.getMySqlResource().isEmpty()) {
+      return Collections.emptyList();
+    } else {
+      return Collections.singletonList(new Object[] {"integration/config/mysql-dynamic-config.xml", new MySqlTestDatabase()});
     }
+  }
 
 }

@@ -9,7 +9,7 @@ package org.mule.functional.testmodels.services;
 /**
  * <code>DateService</code> defines a Date service
  */
-public interface DateService
-{
-    public String getDate();
+public interface DateService {
+
+  public String getDate();
 }

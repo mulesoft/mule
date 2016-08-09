@@ -11,16 +11,14 @@ import org.mule.tck.junit4.rule.SystemProperty;
 
 import org.junit.Rule;
 
-public abstract class AbstractHostPortConfigTestCase extends AbstractDatabaseConfigTestCase
-{
+public abstract class AbstractHostPortConfigTestCase extends AbstractDatabaseConfigTestCase {
 
-    @Rule
-    public SystemProperty databasePort = new SystemProperty("database.port", getDatabasePortPropertyValue());
+  @Rule
+  public SystemProperty databasePort = new SystemProperty("database.port", getDatabasePortPropertyValue());
 
-    protected abstract String getDatabasePortPropertyValue();
+  protected abstract String getDatabasePortPropertyValue();
 
-    public AbstractHostPortConfigTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public AbstractHostPortConfigTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 }

@@ -18,74 +18,65 @@ import java.util.Optional;
  * Default implementation of {@link OperationResult.Builder}
  *
  * @param <Output> the generic type of the output value
- * @param <A>      the generic type of the message attributes
+ * @param <A> the generic type of the message attributes
  * @since 4.0
  */
-final class DefaultOperationResultBuilder<Output, A extends Attributes> implements OperationResult.Builder<Output, A>
-{
+final class DefaultOperationResultBuilder<Output, A extends Attributes> implements OperationResult.Builder<Output, A> {
 
-    private final DefaultOperationResult<Output, A> operationResult = new DefaultOperationResult<>();
+  private final DefaultOperationResult<Output, A> operationResult = new DefaultOperationResult<>();
 
-    /**
-     * {@inheritDoc}
-     */
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public OperationResult.Builder<Output, A> output(Output output) {
+    operationResult.output = output;
+    return this;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public OperationResult.Builder<Output, A> attributes(A attributes) {
+    operationResult.attributes = ofNullable(attributes);
+    return this;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public OperationResult.Builder<Output, A> mediaType(MediaType dataType) {
+    operationResult.mediaType = ofNullable(dataType);
+    return this;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public OperationResult<Output, A> build() {
+    return operationResult;
+  }
+
+  private final class DefaultOperationResult<Output, A extends Attributes> implements OperationResult<Output, A> {
+
+    private Output output;
+    private Optional<A> attributes = empty();
+    private Optional<MediaType> mediaType = empty();
+
+    public Output getOutput() {
+      return output;
+    }
+
+    public Optional<A> getAttributes() {
+      return attributes;
+    }
+
     @Override
-    public OperationResult.Builder<Output, A> output(Output output)
-    {
-        operationResult.output = output;
-        return this;
+    public Optional<MediaType> getMediaType() {
+      return mediaType;
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public OperationResult.Builder<Output, A> attributes(A attributes)
-    {
-        operationResult.attributes = ofNullable(attributes);
-        return this;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public OperationResult.Builder<Output, A> mediaType(MediaType dataType)
-    {
-        operationResult.mediaType = ofNullable(dataType);
-        return this;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public OperationResult<Output, A> build()
-    {
-        return operationResult;
-    }
-
-    private final class DefaultOperationResult<Output, A extends Attributes> implements OperationResult<Output, A>
-    {
-
-        private Output output;
-        private Optional<A> attributes = empty();
-        private Optional<MediaType> mediaType = empty();
-
-        public Output getOutput()
-        {
-            return output;
-        }
-
-        public Optional<A> getAttributes()
-        {
-            return attributes;
-        }
-
-        @Override
-        public Optional<MediaType> getMediaType()
-        {
-            return mediaType;
-        }
-    }
+  }
 }

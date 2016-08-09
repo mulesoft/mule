@@ -10,17 +10,15 @@ import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
 
 /**
- * Watches {@link ProcessingTime} instances to detect when they are weakly
- * reachable.
+ * Watches {@link ProcessingTime} instances to detect when they are weakly reachable.
  */
-public interface ProcessingTimeWatcher extends Startable, Stoppable
-{
+public interface ProcessingTimeWatcher extends Startable, Stoppable {
 
-    /**
-     * Adds a new instance to watch
-     *
-     * @param processingTime instance to add. Non null
-     */
-    void addProcessingTime(ProcessingTime processingTime);
+  /**
+   * Adds a new instance to watch
+   *
+   * @param processingTime instance to add. Non null
+   */
+  void addProcessingTime(ProcessingTime processingTime);
 
 }

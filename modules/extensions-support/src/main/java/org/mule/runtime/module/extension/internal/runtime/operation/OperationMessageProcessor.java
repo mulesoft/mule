@@ -42,159 +42,131 @@ import org.slf4j.LoggerFactory;
 /**
  * A {@link MessageProcessor} capable of executing extension operations.
  * <p>
- * It obtains a configuration instance, evaluate all the operation parameters
- * and executes a {@link RuntimeOperationModel} by using a {@link #operationExecutor}. This message processor is capable
- * of serving the execution of any {@link OperationModel} of any {@link RuntimeExtensionModel}.
+ * It obtains a configuration instance, evaluate all the operation parameters and executes a {@link RuntimeOperationModel} by
+ * using a {@link #operationExecutor}. This message processor is capable of serving the execution of any {@link OperationModel} of
+ * any {@link RuntimeExtensionModel}.
  * <p>
- * A {@link #operationExecutor} is obtained by invoking {@link RuntimeOperationModel#getExecutor()}. That instance
- * will be use to serve all invokations of {@link #process(MuleEvent)} on {@code this} instance but
- * will not be shared with other instances of {@link OperationMessageProcessor}. All the {@link Lifecycle}
- * events that {@code this} instance receives will be propagated to the {@link #operationExecutor}.
+ * A {@link #operationExecutor} is obtained by invoking {@link RuntimeOperationModel#getExecutor()}. That instance will be use to
+ * serve all invokations of {@link #process(MuleEvent)} on {@code this} instance but will not be shared with other instances of
+ * {@link OperationMessageProcessor}. All the {@link Lifecycle} events that {@code this} instance receives will be propagated to
+ * the {@link #operationExecutor}.
  * <p>
  * The {@link #operationExecutor} is executed directly but by the means of a {@link DefaultExecutionMediator}
  *
  * @since 3.7.0
  */
-public class OperationMessageProcessor extends ExtensionComponent implements MessageProcessor, Lifecycle
-{
+public class OperationMessageProcessor extends ExtensionComponent implements MessageProcessor, Lifecycle {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(OperationMessageProcessor.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(OperationMessageProcessor.class);
 
-    private final RuntimeExtensionModel extensionModel;
-    private final RuntimeOperationModel operationModel;
-    private final ResolverSet resolverSet;
-    private final String target;
+  private final RuntimeExtensionModel extensionModel;
+  private final RuntimeOperationModel operationModel;
+  private final ResolverSet resolverSet;
+  private final String target;
 
-    private ExecutionMediator executionMediator;
-    private ReturnDelegate returnDelegate;
-    private OperationExecutor operationExecutor;
+  private ExecutionMediator executionMediator;
+  private ReturnDelegate returnDelegate;
+  private OperationExecutor operationExecutor;
 
-    public OperationMessageProcessor(RuntimeExtensionModel extensionModel,
-                                     RuntimeOperationModel operationModel,
-                                     String configurationProviderName,
-                                     String target,
-                                     ResolverSet resolverSet,
-                                     ExtensionManagerAdapter extensionManager)
-    {
-        super(extensionModel, operationModel, configurationProviderName, extensionManager);
-        this.extensionModel = extensionModel;
-        this.operationModel = operationModel;
-        this.resolverSet = resolverSet;
-        this.target = target;
+  public OperationMessageProcessor(RuntimeExtensionModel extensionModel, RuntimeOperationModel operationModel,
+                                   String configurationProviderName, String target, ResolverSet resolverSet,
+                                   ExtensionManagerAdapter extensionManager) {
+    super(extensionModel, operationModel, configurationProviderName, extensionManager);
+    this.extensionModel = extensionModel;
+    this.operationModel = operationModel;
+    this.resolverSet = resolverSet;
+    this.target = target;
+  }
+
+  @Override
+  public MuleEvent process(MuleEvent event) throws MuleException {
+    return (MuleEvent) withContextClassLoader(getExtensionClassLoader(), () -> {
+      ConfigurationInstance<Object> configuration = getConfiguration(event);
+      OperationContextAdapter operationContext = createOperationContext(configuration, event);
+      return doProcess(event, operationContext);
+    }, MuleException.class, e -> {
+      throw new DefaultMuleException(e);
+    });
+  }
+
+  protected org.mule.runtime.api.message.MuleEvent doProcess(MuleEvent event, OperationContextAdapter operationContext)
+      throws MuleException {
+    Object result = executeOperation(operationContext, event);
+    return returnDelegate.asReturnValue(result, operationContext);
+  }
+
+  private Object executeOperation(OperationContextAdapter operationContext, MuleEvent event) throws MuleException {
+    try {
+      return executionMediator.execute(operationExecutor, operationContext);
+    } catch (MessagingException e) {
+      if (e.getEvent() == null) {
+        throw wrapInMessagingException(event, e);
+      }
+      throw e;
+    } catch (Throwable e) {
+      throw wrapInMessagingException(event, e);
+    }
+  }
+
+  private MessagingException wrapInMessagingException(MuleEvent event, Throwable e) {
+    return new MessagingException(createStaticMessage(e.getMessage()), event, e, this);
+  }
+
+  private OperationContextAdapter createOperationContext(ConfigurationInstance<Object> configuration, MuleEvent event)
+      throws MuleException {
+    return new DefaultOperationContext(configuration, resolverSet.resolve(event), operationModel, event, muleContext);
+  }
+
+  @Override
+  protected void doInitialise() throws InitialisationException {
+    returnDelegate = createReturnDelegate();
+    operationExecutor = operationModel.getExecutor().createExecutor(operationModel);
+    executionMediator = createExecutionMediator();
+    initialiseIfNeeded(operationExecutor, true, muleContext);
+  }
+
+  private ReturnDelegate createReturnDelegate() {
+    if (isVoid(operationModel)) {
+      return VoidReturnDelegate.INSTANCE;
     }
 
-    @Override
-    public MuleEvent process(MuleEvent event) throws MuleException
-    {
-        return (MuleEvent) withContextClassLoader(
-                getExtensionClassLoader(), () ->
-                {
-                    ConfigurationInstance<Object> configuration = getConfiguration(event);
-                    OperationContextAdapter operationContext = createOperationContext(configuration, event);
-                    return doProcess(event, operationContext);
-                },
-                MuleException.class,
-                e ->
-                {
-                    throw new DefaultMuleException(e);
-                });
-    }
+    return StringUtils.isBlank(target) ? new ValueReturnDelegate(muleContext) : new TargetReturnDelegate(target, muleContext);
+  }
 
-    protected org.mule.runtime.api.message.MuleEvent doProcess(MuleEvent event, OperationContextAdapter operationContext) throws MuleException
-    {
-        Object result = executeOperation(operationContext, event);
-        return returnDelegate.asReturnValue(result, operationContext);
-    }
+  @Override
+  public void doStart() throws MuleException {
+    startIfNeeded(operationExecutor);
+  }
 
-    private Object executeOperation(OperationContextAdapter operationContext, MuleEvent event) throws MuleException
-    {
-        try
-        {
-            return executionMediator.execute(operationExecutor, operationContext);
-        }
-        catch (MessagingException e)
-        {
-            if (e.getEvent() == null)
-            {
-                throw wrapInMessagingException(event, e);
-            }
-            throw e;
-        }
-        catch (Throwable e)
-        {
-            throw wrapInMessagingException(event, e);
-        }
-    }
+  @Override
+  public void doStop() throws MuleException {
+    stopIfNeeded(operationExecutor);
+  }
 
-    private MessagingException wrapInMessagingException(MuleEvent event, Throwable e)
-    {
-        return new MessagingException(createStaticMessage(e.getMessage()), event, e, this);
-    }
+  @Override
+  public void doDispose() {
+    disposeIfNeeded(operationExecutor, LOGGER);
+  }
 
-    private OperationContextAdapter createOperationContext(ConfigurationInstance<Object> configuration, MuleEvent event) throws MuleException
-    {
-        return new DefaultOperationContext(configuration, resolverSet.resolve(event), operationModel, event, muleContext);
-    }
+  protected ExecutionMediator createExecutionMediator() {
+    return new DefaultExecutionMediator(extensionModel, operationModel, connectionManager);
+  }
 
-    @Override
-    protected void doInitialise() throws InitialisationException
-    {
-        returnDelegate = createReturnDelegate();
-        operationExecutor = operationModel.getExecutor().createExecutor(operationModel);
-        executionMediator = createExecutionMediator();
-        initialiseIfNeeded(operationExecutor, true, muleContext);
+  /**
+   * Validates that the {@link #operationModel} is valid for the given {@code configurationProvider}
+   *
+   * @throws IllegalSourceException If the validation fails
+   */
+  @Override
+  protected void validateOperationConfiguration(ConfigurationProvider<Object> configurationProvider) {
+    RuntimeConfigurationModel configurationModel = configurationProvider.getModel();
+    if (!configurationModel.getOperationModel(operationModel.getName()).isPresent()
+        && !configurationModel.getExtensionModel().getOperationModel(operationModel.getName()).isPresent()) {
+      throw new IllegalOperationException(String.format(
+                                                        "Flow '%s' defines an usage of operation '%s' which points to configuration '%s'. "
+                                                            + "The selected config does not support that operation.",
+                                                        flowConstruct.getName(), operationModel.getName(),
+                                                        configurationProvider.getName()));
     }
-
-    private ReturnDelegate createReturnDelegate()
-    {
-        if (isVoid(operationModel))
-        {
-            return VoidReturnDelegate.INSTANCE;
-        }
-
-        return StringUtils.isBlank(target) ? new ValueReturnDelegate(muleContext) : new TargetReturnDelegate(target, muleContext);
-    }
-
-    @Override
-    public void doStart() throws MuleException
-    {
-        startIfNeeded(operationExecutor);
-    }
-
-    @Override
-    public void doStop() throws MuleException
-    {
-        stopIfNeeded(operationExecutor);
-    }
-
-    @Override
-    public void doDispose()
-    {
-        disposeIfNeeded(operationExecutor, LOGGER);
-    }
-
-    protected ExecutionMediator createExecutionMediator()
-    {
-        return new DefaultExecutionMediator(extensionModel, operationModel, connectionManager);
-    }
-
-    /**
-     * Validates that the {@link #operationModel} is valid for the given {@code configurationProvider}
-     *
-     * @throws IllegalSourceException If the validation fails
-     */
-    @Override
-    protected void validateOperationConfiguration(ConfigurationProvider<Object> configurationProvider)
-    {
-        RuntimeConfigurationModel configurationModel = configurationProvider.getModel();
-        if (!configurationModel.getOperationModel(operationModel.getName()).isPresent() &&
-            !configurationModel.getExtensionModel().getOperationModel(operationModel.getName()).isPresent())
-        {
-            throw new IllegalOperationException(String.format("Flow '%s' defines an usage of operation '%s' which points to configuration '%s'. " +
-                                                              "The selected config does not support that operation.",
-                                                              flowConstruct.getName(),
-                                                              operationModel.getName(),
-                                                              configurationProvider.getName()));
-        }
-    }
+  }
 }

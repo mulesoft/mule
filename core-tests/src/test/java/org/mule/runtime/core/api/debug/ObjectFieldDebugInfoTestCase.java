@@ -16,27 +16,23 @@ import java.util.Map;
 import org.junit.Test;
 
 @SmallTest
-public class ObjectFieldDebugInfoTestCase extends AbstractFieldDebugInfoTestCase<List<FieldDebugInfo<?>>>
-{
+public class ObjectFieldDebugInfoTestCase extends AbstractFieldDebugInfoTestCase<List<FieldDebugInfo<?>>> {
 
-    public static final String FIELD_NAME = "foo";
+  public static final String FIELD_NAME = "foo";
 
-    @Override
-    protected List<FieldDebugInfo<?>> getValue()
-    {
-        final SimpleFieldDebugInfo fieldDebugInfo = FieldDebugInfoFactory.createFieldDebugInfo(FIELD_NAME, String.class, "test");
-        return Collections.<FieldDebugInfo<?>>singletonList(fieldDebugInfo);
-    }
+  @Override
+  protected List<FieldDebugInfo<?>> getValue() {
+    final SimpleFieldDebugInfo fieldDebugInfo = FieldDebugInfoFactory.createFieldDebugInfo(FIELD_NAME, String.class, "test");
+    return Collections.<FieldDebugInfo<?>>singletonList(fieldDebugInfo);
+  }
 
-    @Override
-    protected void createFieldDebugInfo(String name, Class type, List<FieldDebugInfo<?>> value)
-    {
-        FieldDebugInfoFactory.createFieldDebugInfo(name, type, value);
-    }
+  @Override
+  protected void createFieldDebugInfo(String name, Class type, List<FieldDebugInfo<?>> value) {
+    FieldDebugInfoFactory.createFieldDebugInfo(name, type, value);
+  }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void validatesNullValue() throws Exception
-    {
-        createFieldDebugInfo(FIELD_NAME, Map.class, null);
-    }
+  @Test(expected = IllegalArgumentException.class)
+  public void validatesNullValue() throws Exception {
+    createFieldDebugInfo(FIELD_NAME, Map.class, null);
+  }
 }

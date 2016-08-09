@@ -25,47 +25,43 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Test the extension type to be annotated with {@link Import}, in which
- * case it adds an {@link ImportedTypesModelProperty} on the extension level.
+ * Test the extension type to be annotated with {@link Import}, in which case it adds an {@link ImportedTypesModelProperty} on the
+ * extension level.
  *
  * @since 4.0
  */
-public final class ImportedTypesModelEnricher extends AbstractAnnotatedModelEnricher
-{
+public final class ImportedTypesModelEnricher extends AbstractAnnotatedModelEnricher {
 
-    private ClassTypeLoader typeLoader;
+  private ClassTypeLoader typeLoader;
 
-    @Override
-    public void enrich(DescribingContext describingContext)
-    {
-        ExtensionDeclarer descriptor = describingContext.getExtensionDeclarer();
-        ExtensionDeclaration extensionDeclaration = descriptor.getDeclaration();
+  @Override
+  public void enrich(DescribingContext describingContext) {
+    ExtensionDeclarer descriptor = describingContext.getExtensionDeclarer();
+    ExtensionDeclaration extensionDeclaration = descriptor.getDeclaration();
 
-        Class<?> type = extractExtensionType(extensionDeclaration);
-        typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(type.getClassLoader());
+    Class<?> type = extractExtensionType(extensionDeclaration);
+    typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(type.getClassLoader());
 
-        List<Import> importTypes = parseRepeatableAnnotation(type, Import.class, c -> ((ImportedTypes) c).value());
-        if (!importTypes.isEmpty())
-        {
-            extensionDeclaration.addModelProperty(declareImportedTypes(importTypes, extensionDeclaration.getName()));
-        }
-
+    List<Import> importTypes = parseRepeatableAnnotation(type, Import.class, c -> ((ImportedTypes) c).value());
+    if (!importTypes.isEmpty()) {
+      extensionDeclaration.addModelProperty(declareImportedTypes(importTypes, extensionDeclaration.getName()));
     }
 
-    private ImportedTypesModelProperty declareImportedTypes(List<Import> importTypes, String name)
-    {
+  }
 
-        if (importTypes.stream().map(Import::type).distinct().collect(toList()).size() != importTypes.size())
-        {
-            throw new IllegalModelDefinitionException(String.format("There should be only one Import declaration for any given type in extension [%s]." +
-                                                                    " Multiple imports of the same type are not allowed", name));
-        }
+  private ImportedTypesModelProperty declareImportedTypes(List<Import> importTypes, String name) {
 
-        Map<MetadataType, MetadataType> importedTypes = importTypes.stream().collect(
-                new ImmutableMapCollector<>(imports -> getMetadataType(imports.type(), typeLoader),
-                                            imports -> getMetadataType(imports.from(), typeLoader)));
-
-        return new ImportedTypesModelProperty(importedTypes);
+    if (importTypes.stream().map(Import::type).distinct().collect(toList()).size() != importTypes.size()) {
+      throw new IllegalModelDefinitionException(String
+          .format("There should be only one Import declaration for any given type in extension [%s]."
+              + " Multiple imports of the same type are not allowed", name));
     }
+
+    Map<MetadataType, MetadataType> importedTypes =
+        importTypes.stream().collect(new ImmutableMapCollector<>(imports -> getMetadataType(imports.type(), typeLoader),
+                                                                 imports -> getMetadataType(imports.from(), typeLoader)));
+
+    return new ImportedTypesModelProperty(importedTypes);
+  }
 
 }

@@ -14,17 +14,14 @@ import java.util.Map;
 /**
  * Processes {@link java.sql.Statement} results without closing the statement.
  */
-public class StreamingStatementResultHandler extends AbstractMapStatementResultHandler
-{
+public class StreamingStatementResultHandler extends AbstractMapStatementResultHandler {
 
-    public StreamingStatementResultHandler(ResultSetHandler resultSetHandler)
-    {
-        super(resultSetHandler);
-    }
+  public StreamingStatementResultHandler(ResultSetHandler resultSetHandler) {
+    super(resultSetHandler);
+  }
 
-    @Override
-    protected Map<String, Object> createResultMap()
-    {
-        return new CloseableMap<String, Object>();
-    }
+  @Override
+  protected Map<String, Object> createResultMap() {
+    return new CloseableMap<String, Object>();
+  }
 }

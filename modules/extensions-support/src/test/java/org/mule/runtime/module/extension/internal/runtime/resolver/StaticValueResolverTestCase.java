@@ -19,36 +19,31 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class StaticValueResolverTestCase extends AbstractMuleTestCase
-{
+public class StaticValueResolverTestCase extends AbstractMuleTestCase {
 
-    @Mock
-    private MuleEvent event;
+  @Mock
+  private MuleEvent event;
 
-    private ValueResolver resolver;
+  private ValueResolver resolver;
 
-    @Test
-    public void staticValue() throws Exception
-    {
-        assertExpected(new Object());
-    }
+  @Test
+  public void staticValue() throws Exception {
+    assertExpected(new Object());
+  }
 
-    @Test
-    public void nullValue() throws Exception
-    {
-        assertExpected(null);
-    }
+  @Test
+  public void nullValue() throws Exception {
+    assertExpected(null);
+  }
 
-    @Test
-    public void nullEvent() throws Exception
-    {
-        event = null;
-        staticValue();
-    }
+  @Test
+  public void nullEvent() throws Exception {
+    event = null;
+    staticValue();
+  }
 
-    private void assertExpected(Object expected) throws Exception
-    {
-        resolver = new StaticValueResolver(expected);
-        assertThat(resolver.resolve(event), is(expected));
-    }
+  private void assertExpected(Object expected) throws Exception {
+    resolver = new StaticValueResolver(expected);
+    assertThat(resolver.resolve(event), is(expected));
+  }
 }

@@ -18,27 +18,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A session handler used to store and retrieve session information on an
- * event. The MuleSession information is stored as a header on the message (does not
- * support Tcp, Udp, etc. unless the MuleMessage object is serialised across the
- * wire). The session is stored in the "MULE_SESSION" property.
+ * A session handler used to store and retrieve session information on an event. The MuleSession information is stored as a header
+ * on the message (does not support Tcp, Udp, etc. unless the MuleMessage object is serialised across the wire). The session is
+ * stored in the "MULE_SESSION" property.
  */
-public class SimpleSessionHandler implements SessionHandler
-{
-    protected transient Logger logger = LoggerFactory.getLogger(getClass());
+public class SimpleSessionHandler implements SessionHandler {
 
-    @Override
-    public MuleSession retrieveSessionInfoFromMessage(MuleMessage message, MuleContext muleContext) throws MuleException
-    {
-        return message.getInboundProperty(MULE_SESSION_PROPERTY);
-    }
+  protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
-    @Override
-    public MuleMessage storeSessionInfoToMessage(MuleSession session, MuleMessage message, MuleContext context) throws MuleException
-    {
-        return MuleMessage.builder(message)
-                          .addOutboundProperty(MULE_SESSION_PROPERTY, session)
-                          .build();
-    }
-    
+  @Override
+  public MuleSession retrieveSessionInfoFromMessage(MuleMessage message, MuleContext muleContext) throws MuleException {
+    return message.getInboundProperty(MULE_SESSION_PROPERTY);
+  }
+
+  @Override
+  public MuleMessage storeSessionInfoToMessage(MuleSession session, MuleMessage message, MuleContext context)
+      throws MuleException {
+    return MuleMessage.builder(message).addOutboundProperty(MULE_SESSION_PROPERTY, session).build();
+  }
+
 }

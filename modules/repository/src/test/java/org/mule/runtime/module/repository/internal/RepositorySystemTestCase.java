@@ -27,91 +27,75 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 
-public class RepositorySystemTestCase extends AbstractMuleTestCase
-{
+public class RepositorySystemTestCase extends AbstractMuleTestCase {
 
-    private static final BundleDescriptor VALIDA_BUNDLE = new BundleDescriptor.Builder()
-            .setGroupId("ant")
-            .setArtifactId("ant-antlr")
-            .setVersion("1.6")
-            .setType("jar")
-            .build();
-    @Rule
-    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+  private static final BundleDescriptor VALIDA_BUNDLE =
+      new BundleDescriptor.Builder().setGroupId("ant").setArtifactId("ant-antlr").setVersion("1.6").setType("jar").build();
+  @Rule
+  public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
-    @Rule
-    public ExpectedException expectedException = none();
+  @Rule
+  public ExpectedException expectedException = none();
 
-    @Test
-    public void existingResourceFromMaven() throws Exception
-    {
-        executeTestWithDefaultRemoteRepo(() -> {
-            RepositoryService defaultRepositoryService = new RepositoryServiceFactory().createRepositoryService();
-            File bundleFile = defaultRepositoryService.lookupBundle(VALIDA_BUNDLE);
-            assertThat(bundleFile, notNullValue());
-            assertThat(bundleFile.exists(), is(true));
-            assertThat(bundleFile.getAbsolutePath().startsWith(temporaryFolder.getRoot().getAbsolutePath()), is(true));
-        });
-    }
+  @Test
+  public void existingResourceFromMaven() throws Exception {
+    executeTestWithDefaultRemoteRepo(() -> {
+      RepositoryService defaultRepositoryService = new RepositoryServiceFactory().createRepositoryService();
+      File bundleFile = defaultRepositoryService.lookupBundle(VALIDA_BUNDLE);
+      assertThat(bundleFile, notNullValue());
+      assertThat(bundleFile.exists(), is(true));
+      assertThat(bundleFile.getAbsolutePath().startsWith(temporaryFolder.getRoot().getAbsolutePath()), is(true));
+    });
+  }
 
-    @Test
-    public void noExistentResource() throws Exception
-    {
-        executeTestWithDefaultRemoteRepo(() -> {
-            RepositoryService defaultRepositoryService = new RepositoryServiceFactory().createRepositoryService();
-            expectedException.expect(BundleNotFoundException.class);
-            defaultRepositoryService.lookupBundle(new BundleDescriptor.Builder()
-                                                          .setGroupId("no")
-                                                          .setArtifactId("existent")
-                                                          .setVersion("bundle")
-                                                          .setType("jar")
-                                                          .build());
-        });
-    }
+  @Test
+  public void noExistentResource() throws Exception {
+    executeTestWithDefaultRemoteRepo(() -> {
+      RepositoryService defaultRepositoryService = new RepositoryServiceFactory().createRepositoryService();
+      expectedException.expect(BundleNotFoundException.class);
+      defaultRepositoryService.lookupBundle(new BundleDescriptor.Builder().setGroupId("no").setArtifactId("existent")
+          .setVersion("bundle").setType("jar").build());
+    });
+  }
 
-    @Test
-    public void invalidExternalRepository() throws Exception
-    {
-        executeTestWithCustomRepoRepo("http://doesnotexists/repo", () -> {
-            RepositoryService defaultRepositoryService = new RepositoryServiceFactory().createRepositoryService();
-            expectedException.expect(RepositoryConnectionException.class);
-            defaultRepositoryService.lookupBundle(VALIDA_BUNDLE);
-        });
-    }
+  @Test
+  public void invalidExternalRepository() throws Exception {
+    executeTestWithCustomRepoRepo("http://doesnotexists/repo", () -> {
+      RepositoryService defaultRepositoryService = new RepositoryServiceFactory().createRepositoryService();
+      expectedException.expect(RepositoryConnectionException.class);
+      defaultRepositoryService.lookupBundle(VALIDA_BUNDLE);
+    });
+  }
 
-    @Test
-    public void noRepositoryConfigured() throws Exception
-    {
-        executeTestWithCustomRepoRepo(null, () -> {
-            RepositoryService defaultRepositoryService = new RepositoryServiceFactory().createRepositoryService();
-            expectedException.expect(RepositoryServiceDisabledException.class);
-            defaultRepositoryService.lookupBundle(VALIDA_BUNDLE);
-        });
-    }
+  @Test
+  public void noRepositoryConfigured() throws Exception {
+    executeTestWithCustomRepoRepo(null, () -> {
+      RepositoryService defaultRepositoryService = new RepositoryServiceFactory().createRepositoryService();
+      expectedException.expect(RepositoryServiceDisabledException.class);
+      defaultRepositoryService.lookupBundle(VALIDA_BUNDLE);
+    });
+  }
 
-    private void executeTestWithDefaultRemoteRepo(TestTask test) throws Exception
-    {
+  private void executeTestWithDefaultRemoteRepo(TestTask test) throws Exception {
 
-        testWithSystemProperty(MULE_REPOSITORY_FOLDER_PROPERTY, temporaryFolder.getRoot().getAbsolutePath(), () -> {
-            testWithSystemProperty(MULE_REMOTE_REPOSITORIES_PROPERTY, "http://central.maven.org/maven2/", () -> {
-                test.execute();
-            });
-        });
-    }
+    testWithSystemProperty(MULE_REPOSITORY_FOLDER_PROPERTY, temporaryFolder.getRoot().getAbsolutePath(), () -> {
+      testWithSystemProperty(MULE_REMOTE_REPOSITORIES_PROPERTY, "http://central.maven.org/maven2/", () -> {
+        test.execute();
+      });
+    });
+  }
 
-    private void executeTestWithCustomRepoRepo(String repositoryUrl, TestTask test) throws Exception
-    {
-        testWithSystemProperty(MULE_REPOSITORY_FOLDER_PROPERTY, temporaryFolder.getRoot().getAbsolutePath(), () -> {
-            testWithSystemProperty(MULE_REMOTE_REPOSITORIES_PROPERTY, repositoryUrl, () -> {
-                test.execute();
-            });
-        });
-    }
+  private void executeTestWithCustomRepoRepo(String repositoryUrl, TestTask test) throws Exception {
+    testWithSystemProperty(MULE_REPOSITORY_FOLDER_PROPERTY, temporaryFolder.getRoot().getAbsolutePath(), () -> {
+      testWithSystemProperty(MULE_REMOTE_REPOSITORIES_PROPERTY, repositoryUrl, () -> {
+        test.execute();
+      });
+    });
+  }
 
-    interface TestTask
-    {
+  interface TestTask {
 
-        void execute() throws Exception;
-    }
+    void execute() throws Exception;
+  }
 
 }

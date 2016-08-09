@@ -21,30 +21,26 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.server.Request;
 import org.junit.Test;
 
-public class HttpRequest401TestCase extends AbstractHttpRequestTestCase
-{
+public class HttpRequest401TestCase extends AbstractHttpRequestTestCase {
 
-    private static final String UNAUTHORIZED_MESSAGE = "Unauthorized: check credetials.";
+  private static final String UNAUTHORIZED_MESSAGE = "Unauthorized: check credetials.";
 
-    @Override
-    protected void handleRequest(Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException
-    {
-        response.setStatus(SC_UNAUTHORIZED);
-        response.getWriter().print(UNAUTHORIZED_MESSAGE);
-    }
+  @Override
+  protected void handleRequest(Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException {
+    response.setStatus(SC_UNAUTHORIZED);
+    response.getWriter().print(UNAUTHORIZED_MESSAGE);
+  }
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "http-request-401-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "http-request-401-config.xml";
+  }
 
-    @Test
-    public void returns401Response() throws Exception
-    {
-        MuleMessage response = runFlow("executeRequest").getMessage();
-        assertThat((HttpResponseAttributes) response.getAttributes(), hasStatusCode(SC_UNAUTHORIZED));
-        assertThat(getPayloadAsString(response), is(UNAUTHORIZED_MESSAGE));
-    }
+  @Test
+  public void returns401Response() throws Exception {
+    MuleMessage response = runFlow("executeRequest").getMessage();
+    assertThat((HttpResponseAttributes) response.getAttributes(), hasStatusCode(SC_UNAUTHORIZED));
+    assertThat(getPayloadAsString(response), is(UNAUTHORIZED_MESSAGE));
+  }
 
 }

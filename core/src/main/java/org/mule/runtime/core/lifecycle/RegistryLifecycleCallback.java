@@ -28,109 +28,94 @@ import org.slf4j.LoggerFactory;
  *
  * @since 3.7.0
  */
-public class RegistryLifecycleCallback<T> implements LifecycleCallback<T>, HasLifecycleInterceptor
-{
+public class RegistryLifecycleCallback<T> implements LifecycleCallback<T>, HasLifecycleInterceptor {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(RegistryLifecycleCallback.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(RegistryLifecycleCallback.class);
 
-    protected final RegistryLifecycleManager registryLifecycleManager;
-    private LifecycleInterceptor interceptor = new NullLifecycleInterceptor();
+  protected final RegistryLifecycleManager registryLifecycleManager;
+  private LifecycleInterceptor interceptor = new NullLifecycleInterceptor();
 
-    public RegistryLifecycleCallback(RegistryLifecycleManager registryLifecycleManager)
-    {
-        this.registryLifecycleManager = registryLifecycleManager;
+  public RegistryLifecycleCallback(RegistryLifecycleManager registryLifecycleManager) {
+    this.registryLifecycleManager = registryLifecycleManager;
+  }
+
+  @Override
+  public void onTransition(String phaseName, T object) throws MuleException {
+    LifecyclePhase phase = registryLifecycleManager.phases.get(phaseName);
+
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug(String.format("Applying lifecycle phase: %s for registry: %s", phase, object.getClass().getSimpleName()));
     }
 
-    @Override
-    public void onTransition(String phaseName, T object) throws MuleException
-    {
-        LifecyclePhase phase = registryLifecycleManager.phases.get(phaseName);
-
-        if (LOGGER.isDebugEnabled())
-        {
-            LOGGER.debug(String.format("Applying lifecycle phase: %s for registry: %s", phase, object.getClass().getSimpleName()));
-        }
-
-        if (phase instanceof ContainerManagedLifecyclePhase)
-        {
-            phase.applyLifecycle(object);
-            return;
-        }
-
-        // overlapping interfaces can cause duplicates
-        // TODO: each LifecycleManager should keep this set per executing phase
-        // and clear it when the phase is fully applied
-        Set<Object> duplicates = new HashSet<>();
-
-        for (LifecycleObject lifecycleObject : phase.getOrderedLifecycleObjects())
-        {
-            lifecycleObject.firePreNotification(registryLifecycleManager.muleContext);
-
-            // TODO Collection -> List API refactoring
-            Collection<?> targetsObj = lookupObjectsForLifecycle(lifecycleObject);
-            doApplyLifecycle(phase, duplicates, lifecycleObject, targetsObj);
-            lifecycleObject.firePostNotification(registryLifecycleManager.muleContext);
-        }
-
-        interceptor.onPhaseCompleted(phase);
+    if (phase instanceof ContainerManagedLifecyclePhase) {
+      phase.applyLifecycle(object);
+      return;
     }
 
-    private void doApplyLifecycle(LifecyclePhase phase, Set<Object> duplicates, LifecycleObject lifecycleObject, Collection<?> targetObjects) throws LifecycleException
-    {
-        if (CollectionUtils.isEmpty(targetObjects))
-        {
-            return;
-        }
+    // overlapping interfaces can cause duplicates
+    // TODO: each LifecycleManager should keep this set per executing phase
+    // and clear it when the phase is fully applied
+    Set<Object> duplicates = new HashSet<>();
 
-        for (Object target : targetObjects)
-        {
-            if (duplicates.contains(target))
-            {
-                continue;
-            }
+    for (LifecycleObject lifecycleObject : phase.getOrderedLifecycleObjects()) {
+      lifecycleObject.firePreNotification(registryLifecycleManager.muleContext);
 
-            if (LOGGER.isDebugEnabled())
-            {
-                LOGGER.debug("lifecycle phase: " + phase.getName() + " for object: " + target);
-            }
-
-            if (interceptor.beforeLifecycle(phase, target))
-            {
-                phase.applyLifecycle(target);
-                duplicates.add(target);
-                interceptor.afterLifecycle(phase, target);
-            }
-            else
-            {
-                if (LOGGER.isDebugEnabled())
-                {
-                    LOGGER.debug(String.format("Skipping the application of the '%s' lifecycle phase over a certain object " +
-                                               "because a %s interceptor of type [%s] indicated so. Object is: %s",
-                                               phase.getName(), LifecycleInterceptor.class.getSimpleName(),
-                                               interceptor.getClass().getName(), target));
-                }
-            }
-        }
-
-        // the target object might have created and registered a new object
-        // (e.g.: an endpoint which registers a connector)
-        // check if there're new objects for the phase
-        int originalTargetCount = targetObjects.size();
-        targetObjects = lookupObjectsForLifecycle(lifecycleObject);
-        if (targetObjects.size() > originalTargetCount)
-        {
-            doApplyLifecycle(phase, duplicates, lifecycleObject, targetObjects);
-        }
+      // TODO Collection -> List API refactoring
+      Collection<?> targetsObj = lookupObjectsForLifecycle(lifecycleObject);
+      doApplyLifecycle(phase, duplicates, lifecycleObject, targetsObj);
+      lifecycleObject.firePostNotification(registryLifecycleManager.muleContext);
     }
 
-    protected Collection<?> lookupObjectsForLifecycle(LifecycleObject lo)
-    {
-        return registryLifecycleManager.getLifecycleObject().lookupObjectsForLifecycle(lo.getType());
+    interceptor.onPhaseCompleted(phase);
+  }
+
+  private void doApplyLifecycle(LifecyclePhase phase, Set<Object> duplicates, LifecycleObject lifecycleObject,
+                                Collection<?> targetObjects)
+      throws LifecycleException {
+    if (CollectionUtils.isEmpty(targetObjects)) {
+      return;
     }
 
-    @Override
-    public void setLifecycleInterceptor(LifecycleInterceptor interceptor)
-    {
-        this.interceptor = interceptor;
+    for (Object target : targetObjects) {
+      if (duplicates.contains(target)) {
+        continue;
+      }
+
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("lifecycle phase: " + phase.getName() + " for object: " + target);
+      }
+
+      if (interceptor.beforeLifecycle(phase, target)) {
+        phase.applyLifecycle(target);
+        duplicates.add(target);
+        interceptor.afterLifecycle(phase, target);
+      } else {
+        if (LOGGER.isDebugEnabled()) {
+          LOGGER.debug(String.format(
+                                     "Skipping the application of the '%s' lifecycle phase over a certain object "
+                                         + "because a %s interceptor of type [%s] indicated so. Object is: %s",
+                                     phase.getName(), LifecycleInterceptor.class.getSimpleName(),
+                                     interceptor.getClass().getName(), target));
+        }
+      }
     }
+
+    // the target object might have created and registered a new object
+    // (e.g.: an endpoint which registers a connector)
+    // check if there're new objects for the phase
+    int originalTargetCount = targetObjects.size();
+    targetObjects = lookupObjectsForLifecycle(lifecycleObject);
+    if (targetObjects.size() > originalTargetCount) {
+      doApplyLifecycle(phase, duplicates, lifecycleObject, targetObjects);
+    }
+  }
+
+  protected Collection<?> lookupObjectsForLifecycle(LifecycleObject lo) {
+    return registryLifecycleManager.getLifecycleObject().lookupObjectsForLifecycle(lo.getType());
+  }
+
+  @Override
+  public void setLifecycleInterceptor(LifecycleInterceptor interceptor) {
+    this.interceptor = interceptor;
+  }
 }

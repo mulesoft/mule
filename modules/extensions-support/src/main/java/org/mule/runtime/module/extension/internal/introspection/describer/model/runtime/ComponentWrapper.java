@@ -26,61 +26,47 @@ import java.util.Optional;
  *
  * @since 4.0
  */
-abstract class ComponentWrapper extends TypeWrapper implements ComponentElement
-{
+abstract class ComponentWrapper extends TypeWrapper implements ComponentElement {
 
-    ComponentWrapper(Class<?> aClass)
-    {
-        super(aClass);
+  ComponentWrapper(Class<?> aClass) {
+    super(aClass);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public List<SourceElement> getSources() {
+    final Optional<Sources> optionalSources = this.getAnnotation(Sources.class);
+    if (optionalSources.isPresent()) {
+      return stream(optionalSources.get().value()).map(SourceTypeWrapper::new).collect(toList());
     }
+    return emptyList();
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public List<SourceElement> getSources()
-    {
-        final Optional<Sources> optionalSources = this.getAnnotation(Sources.class);
-        if (optionalSources.isPresent())
-        {
-            return stream(optionalSources.get().value())
-                    .map(SourceTypeWrapper::new)
-                    .collect(toList());
-        }
-        return emptyList();
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public List<OperationContainerElement> getOperationContainers() {
+
+    final Optional<Operations> optionalOperations = this.getAnnotation(Operations.class);
+    if (optionalOperations.isPresent()) {
+      return stream(optionalOperations.get().value()).map(OperationContainerWrapper::new).collect(toList());
     }
+    return emptyList();
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public List<OperationContainerElement> getOperationContainers()
-    {
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public List<ConnectionProviderElement> getConnectionProviders() {
 
-        final Optional<Operations> optionalOperations = this.getAnnotation(Operations.class);
-        if (optionalOperations.isPresent())
-        {
-            return stream(optionalOperations.get().value())
-                    .map(OperationContainerWrapper::new)
-                    .collect(toList());
-        }
-        return emptyList();
+    final Optional<Providers> optionalProviders = this.getAnnotation(Providers.class);
+    if (optionalProviders.isPresent()) {
+      return stream(optionalProviders.get().value()).map(ConnectionProviderTypeWrapper::new).collect(toList());
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public List<ConnectionProviderElement> getConnectionProviders()
-    {
-
-        final Optional<Providers> optionalProviders = this.getAnnotation(Providers.class);
-        if (optionalProviders.isPresent())
-        {
-            return stream(optionalProviders.get().value())
-                    .map(ConnectionProviderTypeWrapper::new)
-                    .collect(toList());
-        }
-        return emptyList();
-    }
+    return emptyList();
+  }
 }

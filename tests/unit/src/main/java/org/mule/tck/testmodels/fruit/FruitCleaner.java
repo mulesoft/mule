@@ -6,9 +6,9 @@
  */
 package org.mule.tck.testmodels.fruit;
 
-public interface FruitCleaner
-{
-    void wash(Fruit fruit);
+public interface FruitCleaner {
 
-    void polish(Fruit fruit);
+  void wash(Fruit fruit);
+
+  void polish(Fruit fruit);
 }

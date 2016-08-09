@@ -11,15 +11,14 @@ import org.mule.runtime.module.tooling.api.connectivity.ConnectivityTestingServi
 /**
  * Set of services used by tooling to exercise some mule configuration like doing connectivity testing.
  */
-public interface ToolingService
-{
+public interface ToolingService {
 
-    /**
-     * Provides a service to create a connectivity testing service using a builder which can be used to configured
-     * resources of a dynamically created artifact
-     *
-     * @return a builder to create a {@link org.mule.runtime.module.tooling.api.connectivity.ConnectivityTestingService}
-     */
-    ConnectivityTestingServiceBuilder newConnectivityTestingServiceBuilder();
+  /**
+   * Provides a service to create a connectivity testing service using a builder which can be used to configured resources of a
+   * dynamically created artifact
+   *
+   * @return a builder to create a {@link org.mule.runtime.module.tooling.api.connectivity.ConnectivityTestingService}
+   */
+  ConnectivityTestingServiceBuilder newConnectivityTestingServiceBuilder();
 
 }

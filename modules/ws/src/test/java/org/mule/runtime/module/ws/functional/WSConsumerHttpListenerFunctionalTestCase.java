@@ -18,28 +18,26 @@ import org.junit.Rule;
 import org.junit.Test;
 
 /**
- * This test case verifies that an HTTP listener is able to return the response of a WS consumer when
- * no transformation is performed.
+ * This test case verifies that an HTTP listener is able to return the response of a WS consumer when no transformation is
+ * performed.
  */
-public class WSConsumerHttpListenerFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase
-{
-    @Rule
-    public DynamicPort clientPort = new DynamicPort("clientPort");
+public class WSConsumerHttpListenerFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase {
+
+  @Rule
+  public DynamicPort clientPort = new DynamicPort("clientPort");
 
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "ws-consumer-http-listener-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "ws-consumer-http-listener-config.xml";
+  }
 
-    @Test
-    public void listenerReturnsSoapEnvelopeXMLCorrectly() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("http://localhost:" + clientPort.getValue(), getTestMuleMessage(ECHO_REQUEST),
-                                           newOptions().method(POST.name()).build());
-        assertXMLEqual(EXPECTED_ECHO_RESPONSE, getPayloadAsString(response));
-    }
+  @Test
+  public void listenerReturnsSoapEnvelopeXMLCorrectly() throws Exception {
+    MuleClient client = muleContext.getClient();
+    MuleMessage response = client.send("http://localhost:" + clientPort.getValue(), getTestMuleMessage(ECHO_REQUEST),
+                                       newOptions().method(POST.name()).build());
+    assertXMLEqual(EXPECTED_ECHO_RESPONSE, getPayloadAsString(response));
+  }
 
 }

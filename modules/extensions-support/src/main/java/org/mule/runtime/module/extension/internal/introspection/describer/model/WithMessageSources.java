@@ -13,11 +13,10 @@ import java.util.List;
  *
  * @since 4.0
  */
-public interface WithMessageSources
-{
+public interface WithMessageSources {
 
-    /**
-     * @return The list of {@link SourceElement}
-     */
-    List<SourceElement> getSources();
+  /**
+   * @return The list of {@link SourceElement}
+   */
+  List<SourceElement> getSources();
 }

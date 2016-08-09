@@ -16,87 +16,66 @@ import java.nio.charset.Charset;
 import java.text.NumberFormat;
 
 /**
- * <code>StringToNumber</code> converts a String to a Number. A NumberFormat is used
- * if one is provided.
+ * <code>StringToNumber</code> converts a String to a Number. A NumberFormat is used if one is provided.
  */
-public class StringToNumber extends AbstractTransformer implements DiscoverableTransformer
-{
+public class StringToNumber extends AbstractTransformer implements DiscoverableTransformer {
 
-    private NumberFormat numberFormat;
+  private NumberFormat numberFormat;
 
-    /**
-     * Give core transformers a slightly higher priority
-     */
-    private int priorityWeighting = DiscoverableTransformer.DEFAULT_PRIORITY_WEIGHTING + 1;
+  /**
+   * Give core transformers a slightly higher priority
+   */
+  private int priorityWeighting = DiscoverableTransformer.DEFAULT_PRIORITY_WEIGHTING + 1;
 
-    public StringToNumber()
-    {
-        registerSourceType(DataType.STRING);
-        setReturnDataType(DataType.NUMBER);
-    }
+  public StringToNumber() {
+    registerSourceType(DataType.STRING);
+    setReturnDataType(DataType.NUMBER);
+  }
 
-    public StringToNumber(NumberFormat numberFormat)
-    {
-        this();
-        this.numberFormat = numberFormat;
-    }
+  public StringToNumber(NumberFormat numberFormat) {
+    this();
+    this.numberFormat = numberFormat;
+  }
 
-    @Override
-    public Object doTransform(Object src, Charset outputEncoding) throws TransformerException
-    {
-        if (src == null)
-        {
-            return null;
+  @Override
+  public Object doTransform(Object src, Charset outputEncoding) throws TransformerException {
+    if (src == null) {
+      return null;
+    } else {
+      if (numberFormat != null) {
+        try {
+          return NumberUtils.convertNumberToTargetClass(numberFormat.parse((String) src), getType());
+        } catch (Exception e) {
+          throw new TransformerException(this, e);
         }
-        else
-        {
-            if (numberFormat != null)
-            {
-                try
-                {
-                    return NumberUtils.convertNumberToTargetClass(numberFormat.parse((String) src), getType());
-                }
-                catch (Exception e)
-                {
-                    throw new TransformerException(this, e);
-                }
-            }
-            else
-            {
-                return NumberUtils.parseNumber((String) src, getType());
-            }
-        }
+      } else {
+        return NumberUtils.parseNumber((String) src, getType());
+      }
     }
+  }
 
-    @SuppressWarnings({"unchecked"})
-    private Class<? extends Number> getType()
-    {
-        return (Class<Number>) super.getReturnDataType().getType();
-    }
+  @SuppressWarnings({"unchecked"})
+  private Class<? extends Number> getType() {
+    return (Class<Number>) super.getReturnDataType().getType();
+  }
 
-    @Override
-    public void setReturnDataType(DataType type)
-    {
-        if (!Number.class.isAssignableFrom(type.getType()))
-        {
-            throw new IllegalArgumentException("This transformer only supports Number return types.");
-        }
-        else
-        {
-            super.setReturnDataType(type);
-        }
+  @Override
+  public void setReturnDataType(DataType type) {
+    if (!Number.class.isAssignableFrom(type.getType())) {
+      throw new IllegalArgumentException("This transformer only supports Number return types.");
+    } else {
+      super.setReturnDataType(type);
     }
+  }
 
-    @Override
-    public int getPriorityWeighting()
-    {
-        return priorityWeighting;
-    }
+  @Override
+  public int getPriorityWeighting() {
+    return priorityWeighting;
+  }
 
-    @Override
-    public void setPriorityWeighting(int priorityWeighting)
-    {
-        this.priorityWeighting = priorityWeighting;
-    }
+  @Override
+  public void setPriorityWeighting(int priorityWeighting) {
+    this.priorityWeighting = priorityWeighting;
+  }
 
 }

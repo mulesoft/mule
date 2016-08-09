@@ -27,37 +27,34 @@ import org.junit.Before;
 import org.junit.Test;
 
 @SmallTest
-public class MuleRegistryHelperTransformersAsObjectsTestCase extends AbstractMuleTestCase
-{
+public class MuleRegistryHelperTransformersAsObjectsTestCase extends AbstractMuleTestCase {
 
-    private static final DataType APPLE_DATA_TYPE = DataType.fromType(Apple.class);
+  private static final DataType APPLE_DATA_TYPE = DataType.fromType(Apple.class);
 
-    private final DefaultRegistryBroker registry = mock(DefaultRegistryBroker.class);
-    private final MuleContext muleContext = mock(MuleContext.class);
-    private final MuleRegistryHelper muleRegistryHelper = new MuleRegistryHelper(registry, muleContext);
-    private final Converter stringToApple = new MockConverterBuilder().from(DataType.STRING).to(APPLE_DATA_TYPE).build();
-    private final Converter appleToString = new MockConverterBuilder().from(APPLE_DATA_TYPE).to(DataType.STRING).build();
+  private final DefaultRegistryBroker registry = mock(DefaultRegistryBroker.class);
+  private final MuleContext muleContext = mock(MuleContext.class);
+  private final MuleRegistryHelper muleRegistryHelper = new MuleRegistryHelper(registry, muleContext);
+  private final Converter stringToApple = new MockConverterBuilder().from(DataType.STRING).to(APPLE_DATA_TYPE).build();
+  private final Converter appleToString = new MockConverterBuilder().from(APPLE_DATA_TYPE).to(DataType.STRING).build();
 
-    @Before
-    public void setUp() throws Exception
-    {
-        TransformerResolver transformerResolver = mock(TransformerResolver.class);
-        when(transformerResolver.resolve(DataType.STRING, APPLE_DATA_TYPE)).thenReturn(stringToApple);
-        when(transformerResolver.resolve(APPLE_DATA_TYPE, DataType.STRING)).thenReturn(appleToString);
+  @Before
+  public void setUp() throws Exception {
+    TransformerResolver transformerResolver = mock(TransformerResolver.class);
+    when(transformerResolver.resolve(DataType.STRING, APPLE_DATA_TYPE)).thenReturn(stringToApple);
+    when(transformerResolver.resolve(APPLE_DATA_TYPE, DataType.STRING)).thenReturn(appleToString);
 
-        muleRegistryHelper.registerObject("mockTransformerResolver", transformerResolver);
+    muleRegistryHelper.registerObject("mockTransformerResolver", transformerResolver);
 
-        muleRegistryHelper.registerObject("StringToAppleConverter", stringToApple);
-        muleRegistryHelper.registerObject("AppleToStringConverter", appleToString, appleToString.getClass());
-    }
+    muleRegistryHelper.registerObject("StringToAppleConverter", stringToApple);
+    muleRegistryHelper.registerObject("AppleToStringConverter", appleToString, appleToString.getClass());
+  }
 
-    @Test
-    public void testRegisterTransformersAsNamedObjects() throws Exception
-    {
-        Transformer transformer1 = muleRegistryHelper.lookupTransformer(DataType.STRING, APPLE_DATA_TYPE);
-        Transformer transformer2 = muleRegistryHelper.lookupTransformer(APPLE_DATA_TYPE, DataType.STRING);
+  @Test
+  public void testRegisterTransformersAsNamedObjects() throws Exception {
+    Transformer transformer1 = muleRegistryHelper.lookupTransformer(DataType.STRING, APPLE_DATA_TYPE);
+    Transformer transformer2 = muleRegistryHelper.lookupTransformer(APPLE_DATA_TYPE, DataType.STRING);
 
-        assertEquals(stringToApple, transformer1);
-        assertEquals(appleToString, transformer2);
-    }
+    assertEquals(stringToApple, transformer1);
+    assertEquals(appleToString, transformer2);
+  }
 }

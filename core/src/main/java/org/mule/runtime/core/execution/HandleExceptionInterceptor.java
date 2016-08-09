@@ -11,41 +11,31 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 
-class HandleExceptionInterceptor implements ExecutionInterceptor<MuleEvent>
-{
-    final private ExecutionInterceptor<MuleEvent> next;
-    private MessagingExceptionHandler messagingExceptionHandler;
+class HandleExceptionInterceptor implements ExecutionInterceptor<MuleEvent> {
 
-    public HandleExceptionInterceptor(ExecutionInterceptor<MuleEvent> next, MessagingExceptionHandler messagingExceptionHandler)
-    {
-        this.next = next;
-        this.messagingExceptionHandler = messagingExceptionHandler;
-    }
+  final private ExecutionInterceptor<MuleEvent> next;
+  private MessagingExceptionHandler messagingExceptionHandler;
 
-    @Override
-    public MuleEvent execute(ExecutionCallback<MuleEvent> callback, ExecutionContext executionContext) throws Exception
-    {
-        try
-        {
-            return next.execute(callback, executionContext);
-        }
-        catch (MessagingException e)
-        {
-            MuleEvent result;
-            if (messagingExceptionHandler != null)
-            {
-                result = messagingExceptionHandler.handleException(e, e.getEvent());
-            }
-            else
-            {
-                result = e.getEvent().getFlowConstruct().getExceptionListener().handleException(e,e.getEvent());
-            }
-            e.setProcessedEvent(result);
-            throw e;
-        }
-        catch (Exception e)
-        {
-            throw e;
-        }
+  public HandleExceptionInterceptor(ExecutionInterceptor<MuleEvent> next, MessagingExceptionHandler messagingExceptionHandler) {
+    this.next = next;
+    this.messagingExceptionHandler = messagingExceptionHandler;
+  }
+
+  @Override
+  public MuleEvent execute(ExecutionCallback<MuleEvent> callback, ExecutionContext executionContext) throws Exception {
+    try {
+      return next.execute(callback, executionContext);
+    } catch (MessagingException e) {
+      MuleEvent result;
+      if (messagingExceptionHandler != null) {
+        result = messagingExceptionHandler.handleException(e, e.getEvent());
+      } else {
+        result = e.getEvent().getFlowConstruct().getExceptionListener().handleException(e, e.getEvent());
+      }
+      e.setProcessedEvent(result);
+      throw e;
+    } catch (Exception e) {
+      throw e;
     }
+  }
 }

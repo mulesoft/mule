@@ -13,11 +13,9 @@ import java.net.InetSocketAddress;
  *
  * @since 4.0
  */
-public class UnresolvableHostException extends RuntimeException
-{
+public class UnresolvableHostException extends RuntimeException {
 
-    public UnresolvableHostException(String message)
-    {
-        super(message);
-    }
+  public UnresolvableHostException(String message) {
+    super(message);
+  }
 }

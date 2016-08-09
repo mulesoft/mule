@@ -30,43 +30,42 @@ import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ParameterGroupModelEnricherTestCase
-{
+public class ParameterGroupModelEnricherTestCase {
 
-    private ExtensionDeclaration declaration;
+  private ExtensionDeclaration declaration;
 
-    @Before
-    public void setUp()
-    {
-        final AnnotationsBasedDescriber basedDescriber = new AnnotationsBasedDescriber(HeisenbergExtension.class, new StaticVersionResolver(getProductVersion()));
-        ExtensionDeclarer declarer = basedDescriber.describe(new DefaultDescribingContext(getClass().getClassLoader()));
-        new ParameterGroupModelEnricher().enrich(new DefaultDescribingContext(declarer, this.getClass().getClassLoader()));
-        declaration = declarer.getDeclaration();
-    }
+  @Before
+  public void setUp() {
+    final AnnotationsBasedDescriber basedDescriber =
+        new AnnotationsBasedDescriber(HeisenbergExtension.class, new StaticVersionResolver(getProductVersion()));
+    ExtensionDeclarer declarer = basedDescriber.describe(new DefaultDescribingContext(getClass().getClassLoader()));
+    new ParameterGroupModelEnricher().enrich(new DefaultDescribingContext(declarer, this.getClass().getClassLoader()));
+    declaration = declarer.getDeclaration();
+  }
 
-    @Test
-    public void verifyParameterGroupModelPropertyExistance()
-    {
-        final ConfigurationDeclaration config = getDeclaration(declaration.getConfigurations(), "config");
+  @Test
+  public void verifyParameterGroupModelPropertyExistance() {
+    final ConfigurationDeclaration config = getDeclaration(declaration.getConfigurations(), "config");
 
-        final Optional<ParameterGroupModelProperty> modelProperty = config.getModelProperty(ParameterGroupModelProperty.class);
-        assertThat(modelProperty.isPresent(), is(true));
+    final Optional<ParameterGroupModelProperty> modelProperty = config.getModelProperty(ParameterGroupModelProperty.class);
+    assertThat(modelProperty.isPresent(), is(true));
 
-        final List<ParameterGroup> groups = modelProperty.get().getGroups();
-        assertThat(groups.size(), is(1));
+    final List<ParameterGroup> groups = modelProperty.get().getGroups();
+    assertThat(groups.size(), is(1));
 
-        final ParameterGroup parameterGroup = groups.get(0);
-        assertThat(parameterGroup.getParameters().size(), is(2));
-        assertThat(parameterGroup.getType(), is(equalTo(ExtendedPersonalInfo.class)));
+    final ParameterGroup parameterGroup = groups.get(0);
+    assertThat(parameterGroup.getParameters().size(), is(2));
+    assertThat(parameterGroup.getType(), is(equalTo(ExtendedPersonalInfo.class)));
 
-        final Optional<ParameterGroupModelProperty> childParamGroupProperty = parameterGroup.getModelProperty(ParameterGroupModelProperty.class);
-        assertThat(childParamGroupProperty.isPresent(), is(true));
+    final Optional<ParameterGroupModelProperty> childParamGroupProperty =
+        parameterGroup.getModelProperty(ParameterGroupModelProperty.class);
+    assertThat(childParamGroupProperty.isPresent(), is(true));
 
-        final List<ParameterGroup> childGroups = childParamGroupProperty.get().getGroups();
-        assertThat(childGroups.size(), is(1));
+    final List<ParameterGroup> childGroups = childParamGroupProperty.get().getGroups();
+    assertThat(childGroups.size(), is(1));
 
-        final ParameterGroup lifeTimeInfoGroup = childGroups.get(0);
-        assertThat(lifeTimeInfoGroup.getParameters().size(), is(3));
-        assertThat(lifeTimeInfoGroup.getType(), is(equalTo(LifetimeInfo.class)));
-    }
+    final ParameterGroup lifeTimeInfoGroup = childGroups.get(0);
+    assertThat(lifeTimeInfoGroup.getParameters().size(), is(3));
+    assertThat(lifeTimeInfoGroup.getType(), is(equalTo(LifetimeInfo.class)));
+  }
 }

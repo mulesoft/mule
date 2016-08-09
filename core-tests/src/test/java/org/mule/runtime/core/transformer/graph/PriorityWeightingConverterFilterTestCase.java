@@ -25,105 +25,101 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 @SmallTest
-public class PriorityWeightingConverterFilterTestCase extends AbstractMuleTestCase
-{
-    
-    private static final DataType XML_DATA_TYPE = mock(DataType.class, "XML_DATA_TYPE");
-    private static final DataType JSON_DATA_TYPE = mock(DataType.class, "JSON_DATA_TYPE");
-    private static final DataType INPUT_STREAM_DATA_TYPE = mock(DataType.class, "INPUT_STREAM_DATA_TYPE");
-    private static final DataType STRING_DATA_TYPE = mock(DataType.class, "STRING_DATA_TYPE");
+public class PriorityWeightingConverterFilterTestCase extends AbstractMuleTestCase {
 
-    private static class XML_CLASS
-    {
+  private static final DataType XML_DATA_TYPE = mock(DataType.class, "XML_DATA_TYPE");
+  private static final DataType JSON_DATA_TYPE = mock(DataType.class, "JSON_DATA_TYPE");
+  private static final DataType INPUT_STREAM_DATA_TYPE = mock(DataType.class, "INPUT_STREAM_DATA_TYPE");
+  private static final DataType STRING_DATA_TYPE = mock(DataType.class, "STRING_DATA_TYPE");
 
-    }
+  private static class XML_CLASS {
 
-    private static class JSON_CLASS
-    {
+  }
 
-    }
+  private static class JSON_CLASS {
 
-    private static class INPUT_STREAM_CLASS
-    {
+  }
 
-    }
+  private static class INPUT_STREAM_CLASS {
 
-    private static class STRING_CLASS
-    {
+  }
 
-    }
+  private static class STRING_CLASS {
 
-    private PriorityWeightingConverterFilter filter = new PriorityWeightingConverterFilter();
+  }
 
-    @BeforeClass
-    public static void setupDataTypes()
-    {
-        doReturn(true).when(XML_DATA_TYPE).isCompatibleWith(XML_DATA_TYPE);
-        doReturn(XML_CLASS.class).when(XML_DATA_TYPE).getType();
-        doReturn(true).when(JSON_DATA_TYPE).isCompatibleWith(JSON_DATA_TYPE);
-        doReturn(JSON_CLASS.class).when(JSON_DATA_TYPE).getType();
-        doReturn(true).when(INPUT_STREAM_DATA_TYPE).isCompatibleWith(INPUT_STREAM_DATA_TYPE);
-        doReturn(INPUT_STREAM_CLASS.class).when(INPUT_STREAM_DATA_TYPE).getType();
-        doReturn(true).when(STRING_DATA_TYPE).isCompatibleWith(STRING_DATA_TYPE);
-        doReturn(STRING_CLASS.class).when(STRING_DATA_TYPE).getType();
-    }
+  private PriorityWeightingConverterFilter filter = new PriorityWeightingConverterFilter();
 
-    @Test
-    public void filtersEmptyList() throws ResolverException
-    {
-        List<Converter> availableConverters = new ArrayList<Converter>();
+  @BeforeClass
+  public static void setupDataTypes() {
+    doReturn(true).when(XML_DATA_TYPE).isCompatibleWith(XML_DATA_TYPE);
+    doReturn(XML_CLASS.class).when(XML_DATA_TYPE).getType();
+    doReturn(true).when(JSON_DATA_TYPE).isCompatibleWith(JSON_DATA_TYPE);
+    doReturn(JSON_CLASS.class).when(JSON_DATA_TYPE).getType();
+    doReturn(true).when(INPUT_STREAM_DATA_TYPE).isCompatibleWith(INPUT_STREAM_DATA_TYPE);
+    doReturn(INPUT_STREAM_CLASS.class).when(INPUT_STREAM_DATA_TYPE).getType();
+    doReturn(true).when(STRING_DATA_TYPE).isCompatibleWith(STRING_DATA_TYPE);
+    doReturn(STRING_CLASS.class).when(STRING_DATA_TYPE).getType();
+  }
 
-        List<Converter> converters = filter.filter(availableConverters, XML_DATA_TYPE, JSON_DATA_TYPE);
+  @Test
+  public void filtersEmptyList() throws ResolverException {
+    List<Converter> availableConverters = new ArrayList<Converter>();
 
-        assertEquals(0, converters.size());
-    }
+    List<Converter> converters = filter.filter(availableConverters, XML_DATA_TYPE, JSON_DATA_TYPE);
 
-    @Test
-    public void filtersSameWeight() throws ResolverException
-    {
-        Converter xmlToInputStream = new MockConverterBuilder().named("xmlToInputStream").from(XML_DATA_TYPE).to(INPUT_STREAM_DATA_TYPE).weighting(1).build();
-        Converter xmlToString = new MockConverterBuilder().named("xmlToString").from(XML_DATA_TYPE).to(STRING_DATA_TYPE).weighting(1).build();
+    assertEquals(0, converters.size());
+  }
 
-        List<Converter> availableConverters = new ArrayList<Converter>();
-        availableConverters.add(xmlToInputStream);
-        availableConverters.add(xmlToString);
+  @Test
+  public void filtersSameWeight() throws ResolverException {
+    Converter xmlToInputStream =
+        new MockConverterBuilder().named("xmlToInputStream").from(XML_DATA_TYPE).to(INPUT_STREAM_DATA_TYPE).weighting(1).build();
+    Converter xmlToString =
+        new MockConverterBuilder().named("xmlToString").from(XML_DATA_TYPE).to(STRING_DATA_TYPE).weighting(1).build();
 
-        List<Converter> converters = filter.filter(availableConverters, XML_DATA_TYPE, JSON_DATA_TYPE);
+    List<Converter> availableConverters = new ArrayList<Converter>();
+    availableConverters.add(xmlToInputStream);
+    availableConverters.add(xmlToString);
 
-        assertEquals(2, converters.size());
-        assertTrue(converters.contains(xmlToInputStream));
-        assertTrue(converters.contains(xmlToString));
-    }
+    List<Converter> converters = filter.filter(availableConverters, XML_DATA_TYPE, JSON_DATA_TYPE);
 
-    @Test
-    public void filtersSameLengthDifferentWeightsAddingBetterTransformerFirst() throws ResolverException
-    {
-        Converter xmlToInputStream = new MockConverterBuilder().named("xmlToInputStream").from(XML_DATA_TYPE).to(INPUT_STREAM_DATA_TYPE).weighting(2).build();
-        Converter xmlToString = new MockConverterBuilder().named("xmlToString").from(XML_DATA_TYPE).to(STRING_DATA_TYPE).weighting(1).build();
+    assertEquals(2, converters.size());
+    assertTrue(converters.contains(xmlToInputStream));
+    assertTrue(converters.contains(xmlToString));
+  }
 
-        List<Converter> availableConverters = new ArrayList<Converter>();
-        availableConverters.add(xmlToInputStream);
-        availableConverters.add(xmlToString);
+  @Test
+  public void filtersSameLengthDifferentWeightsAddingBetterTransformerFirst() throws ResolverException {
+    Converter xmlToInputStream =
+        new MockConverterBuilder().named("xmlToInputStream").from(XML_DATA_TYPE).to(INPUT_STREAM_DATA_TYPE).weighting(2).build();
+    Converter xmlToString =
+        new MockConverterBuilder().named("xmlToString").from(XML_DATA_TYPE).to(STRING_DATA_TYPE).weighting(1).build();
 
-        List<Converter> converters = filter.filter(availableConverters, XML_DATA_TYPE, JSON_DATA_TYPE);
+    List<Converter> availableConverters = new ArrayList<Converter>();
+    availableConverters.add(xmlToInputStream);
+    availableConverters.add(xmlToString);
 
-        assertEquals(1, converters.size());
-        assertEquals(xmlToInputStream, converters.get(0));
-    }
+    List<Converter> converters = filter.filter(availableConverters, XML_DATA_TYPE, JSON_DATA_TYPE);
 
-    @Test
-    public void filtersSameLengthDifferentWeightsAddingBetterTransformerLast() throws ResolverException
-    {
-        Converter xmlToInputStream = new MockConverterBuilder().named("xmlToInputStream").from(XML_DATA_TYPE).to(INPUT_STREAM_DATA_TYPE).weighting(2).build();
-        Converter xmlToString = new MockConverterBuilder().named("xmlToString").from(XML_DATA_TYPE).to(STRING_DATA_TYPE).weighting(1).build();
+    assertEquals(1, converters.size());
+    assertEquals(xmlToInputStream, converters.get(0));
+  }
 
-        List<Converter> availableConverters = new ArrayList<Converter>();
-        availableConverters.add(xmlToString);
-        availableConverters.add(xmlToInputStream);
+  @Test
+  public void filtersSameLengthDifferentWeightsAddingBetterTransformerLast() throws ResolverException {
+    Converter xmlToInputStream =
+        new MockConverterBuilder().named("xmlToInputStream").from(XML_DATA_TYPE).to(INPUT_STREAM_DATA_TYPE).weighting(2).build();
+    Converter xmlToString =
+        new MockConverterBuilder().named("xmlToString").from(XML_DATA_TYPE).to(STRING_DATA_TYPE).weighting(1).build();
 
-        List<Converter> converters = filter.filter(availableConverters, XML_DATA_TYPE, JSON_DATA_TYPE);
+    List<Converter> availableConverters = new ArrayList<Converter>();
+    availableConverters.add(xmlToString);
+    availableConverters.add(xmlToInputStream);
 
-        assertEquals(1, converters.size());
-        assertEquals(xmlToInputStream, converters.get(0));
-    }
+    List<Converter> converters = filter.filter(availableConverters, XML_DATA_TYPE, JSON_DATA_TYPE);
+
+    assertEquals(1, converters.size());
+    assertEquals(xmlToInputStream, converters.get(0));
+  }
 }

@@ -9,18 +9,16 @@ package org.mule.compatibility.transport.jms.mulemq;
 import org.mule.runtime.core.api.MuleContext;
 
 
-public class MuleMQXAJmsConnector extends MuleMQJmsConnector
-{
-    public static final String MULEMQ_XA_CONNECTION_FACTORY_CLASS = "com.pcbsys.nirvana.nJMS.XAConnectionFactoryImpl";
+public class MuleMQXAJmsConnector extends MuleMQJmsConnector {
 
-    public MuleMQXAJmsConnector(MuleContext context)
-    {
-        super(context);
-    }
+  public static final String MULEMQ_XA_CONNECTION_FACTORY_CLASS = "com.pcbsys.nirvana.nJMS.XAConnectionFactoryImpl";
 
-    @Override
-    protected String getMuleMQFactoryClass()
-    {
-        return MULEMQ_XA_CONNECTION_FACTORY_CLASS;
-    }
+  public MuleMQXAJmsConnector(MuleContext context) {
+    super(context);
+  }
+
+  @Override
+  protected String getMuleMQFactoryClass() {
+    return MULEMQ_XA_CONNECTION_FACTORY_CLASS;
+  }
 }

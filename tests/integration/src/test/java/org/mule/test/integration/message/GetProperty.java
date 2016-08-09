@@ -12,21 +12,17 @@ import org.mule.runtime.core.transformer.AbstractTransformer;
 
 import java.nio.charset.Charset;
 
-public class GetProperty extends AbstractTransformer
-{
-    @Override
-    protected Object doTransform(Object obj, Charset encoding) throws TransformerException
-    {
-        Object prop = RequestContext.getEventContext().getSession().getProperty("foo");
-        if (prop != null && "bar".equals(prop))
-        {
-            return obj;
-        }
-        else
-        {
-            throw new IllegalStateException("Property 'foo' not propagated in session");
-        }
+public class GetProperty extends AbstractTransformer {
+
+  @Override
+  protected Object doTransform(Object obj, Charset encoding) throws TransformerException {
+    Object prop = RequestContext.getEventContext().getSession().getProperty("foo");
+    if (prop != null && "bar".equals(prop)) {
+      return obj;
+    } else {
+      throw new IllegalStateException("Property 'foo' not propagated in session");
     }
+  }
 }
 
 

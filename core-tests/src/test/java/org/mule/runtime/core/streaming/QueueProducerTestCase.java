@@ -28,74 +28,67 @@ import org.mockito.stubbing.Answer;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class QueueProducerTestCase
-{
-    @Mock
-    private Queue queue;;
+public class QueueProducerTestCase {
 
-    private Set<String> values;
-    private Iterator<String> valuesIterator;
-    private QueueProducer<Serializable> producer;
+  @Mock
+  private Queue queue;;
 
-    @Before
-    public void setUp() throws Exception
-    {
-        this.values = new HashSet<String>();
-        this.values.add("banana");
-        this.values.add("chocolate");
-        this.values.add("coke");
+  private Set<String> values;
+  private Iterator<String> valuesIterator;
+  private QueueProducer<Serializable> producer;
 
-        this.valuesIterator = this.values.iterator();
+  @Before
+  public void setUp() throws Exception {
+    this.values = new HashSet<String>();
+    this.values.add("banana");
+    this.values.add("chocolate");
+    this.values.add("coke");
 
-        Mockito.when(this.queue.poll(Mockito.anyLong())).thenAnswer(new Answer<Serializable>()
-        {
-            @Override
-            public Serializable answer(InvocationOnMock invocation) throws Throwable
-            {
-                return valuesIterator.hasNext() ? valuesIterator.next() : null;
-            }
-        });
+    this.valuesIterator = this.values.iterator();
 
-        Mockito.when(this.queue.size()).thenReturn(this.values.size());
+    Mockito.when(this.queue.poll(Mockito.anyLong())).thenAnswer(new Answer<Serializable>() {
 
-        this.producer = new QueueProducer<Serializable>(this.queue);
+      @Override
+      public Serializable answer(InvocationOnMock invocation) throws Throwable {
+        return valuesIterator.hasNext() ? valuesIterator.next() : null;
+      }
+    });
+
+    Mockito.when(this.queue.size()).thenReturn(this.values.size());
+
+    this.producer = new QueueProducer<Serializable>(this.queue);
+  }
+
+  @Test
+  public void happyPath() throws Exception {
+    Set<Serializable> returnedValues = new HashSet<Serializable>();
+
+    Serializable page = this.producer.produce();
+    while (page != null) {
+      returnedValues.add(page);
+      page = this.producer.produce();
     }
 
-    @Test
-    public void happyPath() throws Exception
-    {
-        Set<Serializable> returnedValues = new HashSet<Serializable>();
+    Assert.assertEquals(returnedValues.size(), this.values.size());
 
-        Serializable page = this.producer.produce();
-        while (page != null)
-        {
-            returnedValues.add(page);
-            page = this.producer.produce();
-        }
-
-        Assert.assertEquals(returnedValues.size(), this.values.size());
-
-        for (String value : this.values)
-        {
-            Assert.assertTrue(returnedValues.contains(value));
-        }
-
-        Assert.assertNull(this.producer.produce());
+    for (String value : this.values) {
+      Assert.assertTrue(returnedValues.contains(value));
     }
 
-    @Test
-    public void size() throws Exception
-    {
-        Assert.assertEquals(this.values.size(), this.producer.size());
-    }
+    Assert.assertNull(this.producer.produce());
+  }
 
-    @Test
-    public void earlyClose() throws Exception
-    {
-        this.producer.produce();
-        this.producer.close();
+  @Test
+  public void size() throws Exception {
+    Assert.assertEquals(this.values.size(), this.producer.size());
+  }
 
-        Assert.assertNull(this.producer.produce());
-    }
+  @Test
+  public void earlyClose() throws Exception {
+    this.producer.produce();
+    this.producer.close();
+
+    Assert.assertNull(this.producer.produce());
+  }
 
 }

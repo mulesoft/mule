@@ -13,9 +13,11 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for temp complex type.
+ * <p>
+ * Java class for temp complex type.
  *
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>
+ * The following schema fragment specifies the expected content contained within this class.
  *
  * <pre>
  * &lt;complexType name="temp">
@@ -33,63 +35,52 @@ import javax.xml.bind.annotation.XmlType;
  *
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "temp", namespace = "http://ws.cdyne.com/WeatherWS/", propOrder = {
-    "morningLow",
-    "daytimeHigh"
-})
+@XmlType(name = "temp", namespace = "http://ws.cdyne.com/WeatherWS/", propOrder = {"morningLow", "daytimeHigh"})
 public class Temp {
 
-    @XmlElement(name = "MorningLow", namespace = "http://ws.cdyne.com/WeatherWS/")
-    protected String morningLow;
-    @XmlElement(name = "DaytimeHigh", namespace = "http://ws.cdyne.com/WeatherWS/")
-    protected String daytimeHigh;
+  @XmlElement(name = "MorningLow", namespace = "http://ws.cdyne.com/WeatherWS/")
+  protected String morningLow;
+  @XmlElement(name = "DaytimeHigh", namespace = "http://ws.cdyne.com/WeatherWS/")
+  protected String daytimeHigh;
 
-    /**
-     * Gets the value of the morningLow property.
-     *
-     * @return
-     *     possible object is
-     *     {@link String }
-     *
-     */
-    public String getMorningLow() {
-        return morningLow;
-    }
+  /**
+   * Gets the value of the morningLow property.
+   *
+   * @return possible object is {@link String }
+   *
+   */
+  public String getMorningLow() {
+    return morningLow;
+  }
 
-    /**
-     * Sets the value of the morningLow property.
-     *
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *
-     */
-    public void setMorningLow(String value) {
-        this.morningLow = value;
-    }
+  /**
+   * Sets the value of the morningLow property.
+   *
+   * @param value allowed object is {@link String }
+   *
+   */
+  public void setMorningLow(String value) {
+    this.morningLow = value;
+  }
 
-    /**
-     * Gets the value of the daytimeHigh property.
-     *
-     * @return
-     *     possible object is
-     *     {@link String }
-     *
-     */
-    public String getDaytimeHigh() {
-        return daytimeHigh;
-    }
+  /**
+   * Gets the value of the daytimeHigh property.
+   *
+   * @return possible object is {@link String }
+   *
+   */
+  public String getDaytimeHigh() {
+    return daytimeHigh;
+  }
 
-    /**
-     * Sets the value of the daytimeHigh property.
-     *
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *
-     */
-    public void setDaytimeHigh(String value) {
-        this.daytimeHigh = value;
-    }
+  /**
+   * Sets the value of the daytimeHigh property.
+   *
+   * @param value allowed object is {@link String }
+   *
+   */
+  public void setDaytimeHigh(String value) {
+    this.daytimeHigh = value;
+  }
 
 }

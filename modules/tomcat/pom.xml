@@ -11,6 +11,10 @@
     <name>Mule Tomcat Integration</name>
     <description>Integrates Mule as a global Tomcat service, to be used with deployable configuration builder</description>
 
+    <properties>
+        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.mule</groupId>

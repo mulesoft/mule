@@ -21,41 +21,39 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.junit.ClassRule;
 import org.junit.Test;
 
-public class HttpFunctionalTestCase extends FunctionalTestCase
-{
-    protected static String TEST_MESSAGE = "Test Http Request (R�dgr�d), 57 = \u06f7\u06f5 in Arabic";
-    protected boolean checkPathProperties = true;
+public class HttpFunctionalTestCase extends FunctionalTestCase {
 
-    @ClassRule
-    public static DynamicPort dynamicPort = new DynamicPort("port1");
+  protected static String TEST_MESSAGE = "Test Http Request (R�dgr�d), 57 = \u06f7\u06f5 in Arabic";
+  protected boolean checkPathProperties = true;
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "http-functional-test-flow.xml";
+  @ClassRule
+  public static DynamicPort dynamicPort = new DynamicPort("port1");
+
+  @Override
+  protected String getConfigFile() {
+    return "http-functional-test-flow.xml";
+  }
+
+  @Test
+  public void testSend() throws Exception {
+    FunctionalTestComponent testComponent = getFunctionalTestComponent("testComponent");
+    assertNotNull(testComponent);
+
+    if (checkPathProperties) {
+      EventCallback callback = (context, component) -> {
+        MuleMessage msg = context.getMessage();
+        assertEquals("/", msg.getInboundProperty(HttpConnector.HTTP_REQUEST_PROPERTY));
+        assertEquals("/", msg.getInboundProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY));
+        assertEquals("/", msg.getInboundProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY));
+      };
+
+      testComponent.setEventCallback(callback);
     }
 
-    @Test
-    public void testSend() throws Exception
-    {
-        FunctionalTestComponent testComponent = getFunctionalTestComponent("testComponent");
-        assertNotNull(testComponent);
-
-        if (checkPathProperties)
-        {
-            EventCallback callback = (context, component) ->
-            {
-                MuleMessage msg = context.getMessage();
-                assertEquals("/", msg.getInboundProperty(HttpConnector.HTTP_REQUEST_PROPERTY));
-                assertEquals("/", msg.getInboundProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY));
-                assertEquals("/", msg.getInboundProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY));
-            };
-
-            testComponent.setEventCallback(callback);
-        }
-
-        MuleClient client = muleContext.getClient();
-        MuleMessage result = client.send("clientEndpoint", MuleMessage.builder().payload(TEST_MESSAGE).mediaType(MediaType.parse("text/plain;charset=UTF-8")).build());
-        assertEquals(TEST_MESSAGE + " Received", getPayloadAsString(result));
-    }
+    MuleClient client = muleContext.getClient();
+    MuleMessage result =
+        client.send("clientEndpoint",
+                    MuleMessage.builder().payload(TEST_MESSAGE).mediaType(MediaType.parse("text/plain;charset=UTF-8")).build());
+    assertEquals(TEST_MESSAGE + " Received", getPayloadAsString(result));
+  }
 }

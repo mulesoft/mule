@@ -10,37 +10,31 @@ import org.mule.runtime.config.spring.parsers.MuleChildDefinitionParser;
 import org.mule.runtime.config.spring.parsers.MuleDefinitionParser;
 import org.mule.runtime.config.spring.parsers.MuleDefinitionParserConfiguration;
 
-public class SingleParentFamilyDefinitionParser extends AbstractSingleParentFamilyDefinitionParser
-{
+public class SingleParentFamilyDefinitionParser extends AbstractSingleParentFamilyDefinitionParser {
 
-    public SingleParentFamilyDefinitionParser(MuleDefinitionParser parent)
-    {
-        // avoid the overriden method here
-        super.addDelegate(parent);
-        parent.setIgnoredDefault(false);
-    }
+  public SingleParentFamilyDefinitionParser(MuleDefinitionParser parent) {
+    // avoid the overriden method here
+    super.addDelegate(parent);
+    parent.setIgnoredDefault(false);
+  }
 
-    protected MuleDefinitionParserConfiguration addDelegate(MuleDefinitionParser delegate)
-    {
-        throw new UnsupportedOperationException("Delegates must be associated with attribute names");
-    }
+  protected MuleDefinitionParserConfiguration addDelegate(MuleDefinitionParser delegate) {
+    throw new UnsupportedOperationException("Delegates must be associated with attribute names");
+  }
 
-    public SingleParentFamilyDefinitionParser addChildDelegate(String attribute, MuleChildDefinitionParser delegate)
-    {
-        return addChildDelegate(new String[]{attribute}, delegate);
-    }
+  public SingleParentFamilyDefinitionParser addChildDelegate(String attribute, MuleChildDefinitionParser delegate) {
+    return addChildDelegate(new String[] {attribute}, delegate);
+  }
 
-    public SingleParentFamilyDefinitionParser addChildDelegate(String[] attributes, MuleChildDefinitionParser delegate)
-    {
-        super.addChildDelegate(delegate);
-        delegate.setIgnoredDefault(true);
-        for (int i = 0; i < attributes.length; i++)
-        {
-            getDelegate(0).addIgnored(attributes[i]);
-            delegate.removeIgnored(attributes[i]);
-        }
-        return this;
+  public SingleParentFamilyDefinitionParser addChildDelegate(String[] attributes, MuleChildDefinitionParser delegate) {
+    super.addChildDelegate(delegate);
+    delegate.setIgnoredDefault(true);
+    for (int i = 0; i < attributes.length; i++) {
+      getDelegate(0).addIgnored(attributes[i]);
+      delegate.removeIgnored(attributes[i]);
     }
+    return this;
+  }
 
 }
 

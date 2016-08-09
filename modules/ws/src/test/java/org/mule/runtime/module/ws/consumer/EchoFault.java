@@ -9,18 +9,16 @@ package org.mule.runtime.module.ws.consumer;
 /**
  * Bean that is used as "detail" in the SOAP fault when an EchoException is thrown.
  */
-public class EchoFault
-{
-    private String text;
+public class EchoFault {
 
-    public void setText(String text)
-    {
-        this.text = text;
-    }
+  private String text;
 
-    public String getText()
-    {
-        return text;
-    }
+  public void setText(String text) {
+    this.text = text;
+  }
+
+  public String getText() {
+    return text;
+  }
 
 }

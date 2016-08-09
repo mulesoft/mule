@@ -21,42 +21,38 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Test;
 
-public class MvelExpressionDataTypeResolverTestCase extends AbstractMuleContextTestCase
-{
+public class MvelExpressionDataTypeResolverTestCase extends AbstractMuleContextTestCase {
 
-    public static final String EXPRESSION_VALUE = "bar";
-    public static final String MEL_EXPRESSION = "someExpression";
+  public static final String EXPRESSION_VALUE = "bar";
+  public static final String MEL_EXPRESSION = "someExpression";
 
-    private MvelDataTypeResolver dataTypeResolver;
+  private MvelDataTypeResolver dataTypeResolver;
 
-    @Test
-    public void returnsDefaultDataTypeForNonNullValue() throws Exception
-    {
-        CompiledExpression compiledExpression = compileMelExpression();
+  @Test
+  public void returnsDefaultDataTypeForNonNullValue() throws Exception {
+    CompiledExpression compiledExpression = compileMelExpression();
 
-        MuleEvent testEvent = getTestEvent(TEST_MESSAGE);
+    MuleEvent testEvent = getTestEvent(TEST_MESSAGE);
 
-        dataTypeResolver = new MvelDataTypeResolver(EMPTY_LIST);
+    dataTypeResolver = new MvelDataTypeResolver(EMPTY_LIST);
 
-        assertThat(dataTypeResolver.resolve(EXPRESSION_VALUE, testEvent, compiledExpression), like(String.class, ANY, null));
-    }
+    assertThat(dataTypeResolver.resolve(EXPRESSION_VALUE, testEvent, compiledExpression), like(String.class, ANY, null));
+  }
 
-    @Test
-    public void returnsDefaultDataTypeForNullValue() throws Exception
-    {
-        CompiledExpression compiledExpression = compileMelExpression();
+  @Test
+  public void returnsDefaultDataTypeForNullValue() throws Exception {
+    CompiledExpression compiledExpression = compileMelExpression();
 
-        MuleEvent testEvent = getTestEvent(TEST_MESSAGE);
+    MuleEvent testEvent = getTestEvent(TEST_MESSAGE);
 
-        dataTypeResolver = new MvelDataTypeResolver();
+    dataTypeResolver = new MvelDataTypeResolver();
 
-        assertThat(dataTypeResolver.resolve(null, testEvent, compiledExpression), like(Object.class, ANY, null));
-    }
+    assertThat(dataTypeResolver.resolve(null, testEvent, compiledExpression), like(Object.class, ANY, null));
+  }
 
-    private CompiledExpression compileMelExpression()
-    {
-        MVELExpressionLanguage expressionLanguage = (MVELExpressionLanguage) muleContext.getExpressionLanguage();
-        return (CompiledExpression) compileExpression(MEL_EXPRESSION, new ParserContext(expressionLanguage.getParserConfiguration()));
-    }
+  private CompiledExpression compileMelExpression() {
+    MVELExpressionLanguage expressionLanguage = (MVELExpressionLanguage) muleContext.getExpressionLanguage();
+    return (CompiledExpression) compileExpression(MEL_EXPRESSION, new ParserContext(expressionLanguage.getParserConfiguration()));
+  }
 
 }

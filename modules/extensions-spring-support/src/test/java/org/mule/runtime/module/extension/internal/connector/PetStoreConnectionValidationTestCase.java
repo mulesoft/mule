@@ -15,34 +15,30 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-public class PetStoreConnectionValidationTestCase extends PetStoreConnectionTestCase
-{
+public class PetStoreConnectionValidationTestCase extends PetStoreConnectionTestCase {
 
-    private static final String INVALID_CREDENTIALS_ERROR_MESSAGE = "Invalid credentials.";
+  private static final String INVALID_CREDENTIALS_ERROR_MESSAGE = "Invalid credentials.";
 
 
-    @Rule
-    public ExpectedException expectedEx = ExpectedException.none();
+  @Rule
+  public ExpectedException expectedEx = ExpectedException.none();
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "petstore-simple-connection.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "petstore-simple-connection.xml";
+  }
 
-    @Test
-    public void getInvalidConnection() throws Exception
-    {
-        expectedEx.expect(MessagingException.class);
-        expectedEx.expectCause(is(instanceOf(Exception.class)));
-        expectedEx.expectMessage(is(INVALID_CREDENTIALS_ERROR_MESSAGE));
+  @Test
+  public void getInvalidConnection() throws Exception {
+    expectedEx.expect(MessagingException.class);
+    expectedEx.expectCause(is(instanceOf(Exception.class)));
+    expectedEx.expectMessage(is(INVALID_CREDENTIALS_ERROR_MESSAGE));
 
-        runFlow("getPetsWithInvalidConfigWithConnectionValidation").getMessage().getPayload();
-    }
+    runFlow("getPetsWithInvalidConfigWithConnectionValidation").getMessage().getPayload();
+  }
 
-    @Test
-    public void getInvalidConnectionWithDisabledValidation() throws Exception
-    {
-        runFlow("getPetsWithInvalidConfigAndDisabledValidation").getMessage().getPayload();
-    }
+  @Test
+  public void getInvalidConnectionWithDisabledValidation() throws Exception {
+    runFlow("getPetsWithInvalidConfigAndDisabledValidation").getMessage().getPayload();
+  }
 }

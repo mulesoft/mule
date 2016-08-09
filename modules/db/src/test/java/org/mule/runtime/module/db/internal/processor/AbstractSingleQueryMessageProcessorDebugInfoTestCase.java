@@ -32,72 +32,68 @@ import java.util.List;
 
 import org.junit.Test;
 
-public abstract class AbstractSingleQueryMessageProcessorDebugInfoTestCase extends AbstractMuleTestCase
-{
+public abstract class AbstractSingleQueryMessageProcessorDebugInfoTestCase extends AbstractMuleTestCase {
 
-    protected final MuleEvent event = mock(MuleEvent.class);
-    protected final DbConnection connection = mock(DbConnection.class);
-    protected final DbConnectionFactory dbConnectionFactory = mock(DbConnectionFactory.class);
-    protected final DbConfigResolver dbConfigResolver = mock(DbConfigResolver.class);
-    protected final DbConfig dbConfig = mock(DbConfig.class);
-    protected final QueryResolver queryResolver = mock(QueryResolver.class);
+  protected final MuleEvent event = mock(MuleEvent.class);
+  protected final DbConnection connection = mock(DbConnection.class);
+  protected final DbConnectionFactory dbConnectionFactory = mock(DbConnectionFactory.class);
+  protected final DbConfigResolver dbConfigResolver = mock(DbConfigResolver.class);
+  protected final DbConfig dbConfig = mock(DbConfig.class);
+  protected final QueryResolver queryResolver = mock(QueryResolver.class);
 
-    @Test
-    public void returnsErrorDebugInfoWhenCannotResolveConfig() throws Exception
-    {
-        final UnresolvableDbConfigException connectionErrorDebugInfo = new UnresolvableDbConfigException("Error");
+  @Test
+  public void returnsErrorDebugInfoWhenCannotResolveConfig() throws Exception {
+    final UnresolvableDbConfigException connectionErrorDebugInfo = new UnresolvableDbConfigException("Error");
 
-        when(dbConfigResolver.resolve(event)).thenThrow(connectionErrorDebugInfo);
+    when(dbConfigResolver.resolve(event)).thenThrow(connectionErrorDebugInfo);
 
-        AbstractSingleQueryDbMessageProcessor processor = createMessageProcessor();
+    AbstractSingleQueryDbMessageProcessor processor = createMessageProcessor();
 
-        final List<FieldDebugInfo<?>> debugInfo = processor.getDebugInfo(event);
+    final List<FieldDebugInfo<?>> debugInfo = processor.getDebugInfo(event);
 
-        assertThat(debugInfo.size(), equalTo(1));
-        assertThat(debugInfo, hasItem(fieldLike("Config", DbConfig.class, connectionErrorDebugInfo)));
-    }
+    assertThat(debugInfo.size(), equalTo(1));
+    assertThat(debugInfo, hasItem(fieldLike("Config", DbConfig.class, connectionErrorDebugInfo)));
+  }
 
-    @Test
-    public void returnsErrorDebugInfoWhenCannotObtainConnection() throws Exception
-    {
-        final SQLException debugInfoError = new SQLException();
+  @Test
+  public void returnsErrorDebugInfoWhenCannotObtainConnection() throws Exception {
+    final SQLException debugInfoError = new SQLException();
 
-        when(dbConnectionFactory.createConnection(TransactionalAction.NOT_SUPPORTED)).thenThrow(debugInfoError);
+    when(dbConnectionFactory.createConnection(TransactionalAction.NOT_SUPPORTED)).thenThrow(debugInfoError);
 
-        when(dbConfigResolver.resolve(event)).thenReturn(dbConfig);
-        when(dbConfig.getConnectionFactory()).thenReturn(dbConnectionFactory);
+    when(dbConfigResolver.resolve(event)).thenReturn(dbConfig);
+    when(dbConfig.getConnectionFactory()).thenReturn(dbConnectionFactory);
 
-        AbstractSingleQueryDbMessageProcessor processor = createMessageProcessor();
+    AbstractSingleQueryDbMessageProcessor processor = createMessageProcessor();
 
-        final List<FieldDebugInfo<?>> debugInfo = processor.getDebugInfo(event);
+    final List<FieldDebugInfo<?>> debugInfo = processor.getDebugInfo(event);
 
-        assertThat(debugInfo.size(), equalTo(1));
-        assertThat(debugInfo, hasItem(fieldLike("Connection", DbConnection.class, debugInfoError)));
-    }
+    assertThat(debugInfo.size(), equalTo(1));
+    assertThat(debugInfo, hasItem(fieldLike("Connection", DbConnection.class, debugInfoError)));
+  }
 
-    @Test
-    public void returnsErrorDebugInfoWhenCannotResolveQuery() throws Exception
-    {
-        when(dbConnectionFactory.createConnection(TransactionalAction.NOT_SUPPORTED)).thenReturn(connection);
+  @Test
+  public void returnsErrorDebugInfoWhenCannotResolveQuery() throws Exception {
+    when(dbConnectionFactory.createConnection(TransactionalAction.NOT_SUPPORTED)).thenReturn(connection);
 
-        when(dbConfigResolver.resolve(event)).thenReturn(dbConfig);
-        when(dbConfig.getConnectionFactory()).thenReturn(dbConnectionFactory);
+    when(dbConfigResolver.resolve(event)).thenReturn(dbConfig);
+    when(dbConfig.getConnectionFactory()).thenReturn(dbConnectionFactory);
 
-        final QueryResolutionException resolutionException = new QueryResolutionException("Error");
-        when(queryResolver.resolve(connection, event)).thenThrow(resolutionException);
+    final QueryResolutionException resolutionException = new QueryResolutionException("Error");
+    when(queryResolver.resolve(connection, event)).thenThrow(resolutionException);
 
-        AbstractSingleQueryDbMessageProcessor processor = createMessageProcessor();
+    AbstractSingleQueryDbMessageProcessor processor = createMessageProcessor();
 
-        final List<FieldDebugInfo<?>> debugInfo = processor.getDebugInfo(event);
+    final List<FieldDebugInfo<?>> debugInfo = processor.getDebugInfo(event);
 
-        assertThat(debugInfo.size(), equalTo(1));
-        assertThat(debugInfo, hasItem(fieldLike(SQL_TEXT_DEBUG_FIELD, String.class, resolutionException)));
+    assertThat(debugInfo.size(), equalTo(1));
+    assertThat(debugInfo, hasItem(fieldLike(SQL_TEXT_DEBUG_FIELD, String.class, resolutionException)));
 
-    }
+  }
 
-    protected abstract AbstractSingleQueryDbMessageProcessor createMessageProcessor();
+  protected abstract AbstractSingleQueryDbMessageProcessor createMessageProcessor();
 
-    protected abstract String getSqlText();
+  protected abstract String getSqlText();
 
-    protected abstract QueryType getQueryType();
+  protected abstract QueryType getQueryType();
 }

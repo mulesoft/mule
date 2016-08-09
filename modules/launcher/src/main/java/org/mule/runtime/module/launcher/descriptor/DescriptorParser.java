@@ -12,7 +12,7 @@ import java.io.IOException;
 /**
  * Parses an artifact descriptor
  */
-public interface DescriptorParser<D extends DeployableArtifactDescriptor>
-{
-    D parse(File descriptor, String artifactName) throws IOException;
+public interface DescriptorParser<D extends DeployableArtifactDescriptor> {
+
+  D parse(File descriptor, String artifactName) throws IOException;
 }

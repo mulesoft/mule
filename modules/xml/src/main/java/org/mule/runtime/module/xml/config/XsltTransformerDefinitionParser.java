@@ -9,12 +9,11 @@ package org.mule.runtime.module.xml.config;
 import org.mule.runtime.config.spring.parsers.specific.TransformerMessageProcessorDefinitionParser;
 import org.mule.runtime.module.xml.transformer.XsltTransformer;
 
-public class XsltTransformerDefinitionParser extends TransformerMessageProcessorDefinitionParser
-{
-    public XsltTransformerDefinitionParser()
-    {
-        super(XsltTransformer.class);
-        addAlias("transformerFactoryClass", "xslTransformerFactory");
-    }
+public class XsltTransformerDefinitionParser extends TransformerMessageProcessorDefinitionParser {
+
+  public XsltTransformerDefinitionParser() {
+    super(XsltTransformer.class);
+    addAlias("transformerFactoryClass", "xslTransformerFactory");
+  }
 
 }

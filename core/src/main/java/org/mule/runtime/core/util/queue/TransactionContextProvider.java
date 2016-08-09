@@ -9,18 +9,17 @@ package org.mule.runtime.core.util.queue;
 /**
  * Provides access to the transaction context if there is one for the current session.
  */
-public interface TransactionContextProvider
-{
+public interface TransactionContextProvider {
 
-    /**
-     * @return true if there is a transaction context created for the current session
-     */
-    boolean isTransactional();
+  /**
+   * @return true if there is a transaction context created for the current session
+   */
+  boolean isTransactional();
 
-    /**
-     * @return if {@link #isTransactional()} returns true it will return the {@link org.mule.runtime.core.util.queue.QueueTransactionContext}
-     * related to the current session.
-     * @throws {@link org.mule.runtime.core.api.MuleRuntimeException} if {@link #isTransactional()} is false.
-     */
-    QueueTransactionContext getTransactionalContext();
+  /**
+   * @return if {@link #isTransactional()} returns true it will return the
+   *         {@link org.mule.runtime.core.util.queue.QueueTransactionContext} related to the current session.
+   * @throws {@link org.mule.runtime.core.api.MuleRuntimeException} if {@link #isTransactional()} is false.
+   */
+  QueueTransactionContext getTransactionalContext();
 }

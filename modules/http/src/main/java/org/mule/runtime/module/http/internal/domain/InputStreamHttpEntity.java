@@ -8,35 +8,29 @@ package org.mule.runtime.module.http.internal.domain;
 
 import java.io.InputStream;
 
-public class InputStreamHttpEntity implements HttpEntity
-{
+public class InputStreamHttpEntity implements HttpEntity {
 
-    private Integer contentLength;
-    private InputStream inputStream;
+  private Integer contentLength;
+  private InputStream inputStream;
 
-    public InputStreamHttpEntity(Integer contentLength, InputStream inputStream)
-    {
-        this.contentLength = contentLength;
-        this.inputStream = inputStream;
-    }
+  public InputStreamHttpEntity(Integer contentLength, InputStream inputStream) {
+    this.contentLength = contentLength;
+    this.inputStream = inputStream;
+  }
 
-    public InputStreamHttpEntity(InputStream inputStream)
-    {
-        this.inputStream = inputStream;
-    }
+  public InputStreamHttpEntity(InputStream inputStream) {
+    this.inputStream = inputStream;
+  }
 
-    public int getContentLength()
-    {
-        return this.contentLength;
-    }
+  public int getContentLength() {
+    return this.contentLength;
+  }
 
-    public boolean hasContentLength()
-    {
-        return this.contentLength != null;
-    }
+  public boolean hasContentLength() {
+    return this.contentLength != null;
+  }
 
-    public InputStream getInputStream()
-    {
-        return this.inputStream;
-    }
+  public InputStream getInputStream() {
+    return this.inputStream;
+  }
 }

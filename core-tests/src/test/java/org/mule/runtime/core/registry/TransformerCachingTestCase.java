@@ -22,58 +22,53 @@ import java.nio.charset.Charset;
 
 import org.junit.Test;
 
-public class TransformerCachingTestCase extends AbstractMuleContextTestCase
-{
-    @Test
-    public void testCacheUpdate() throws Exception
-    {
-        DataType sourceType = DataType.fromType(FilterInputStream.class);
-        Transformer trans = muleContext.getRegistry().lookupTransformer(sourceType, DataType.BYTE_ARRAY);
-        assertNotNull(trans);
-        assertTrue(trans instanceof ObjectToByteArray);
+public class TransformerCachingTestCase extends AbstractMuleContextTestCase {
 
-        Transformer trans2 = new FilterInputStreamToByteArray();
-        muleContext.getRegistry().registerTransformer(trans2);
+  @Test
+  public void testCacheUpdate() throws Exception {
+    DataType sourceType = DataType.fromType(FilterInputStream.class);
+    Transformer trans = muleContext.getRegistry().lookupTransformer(sourceType, DataType.BYTE_ARRAY);
+    assertNotNull(trans);
+    assertTrue(trans instanceof ObjectToByteArray);
 
-        trans = muleContext.getRegistry().lookupTransformer(sourceType, DataType.BYTE_ARRAY);
-        assertNotNull(trans);
-        assertTrue(trans instanceof FilterInputStreamToByteArray);
+    Transformer trans2 = new FilterInputStreamToByteArray();
+    muleContext.getRegistry().registerTransformer(trans2);
 
-        trans = muleContext.getRegistry().lookupTransformer(DataType.INPUT_STREAM, DataType.BYTE_ARRAY);
-        assertNotNull(trans);
-        assertTrue(trans instanceof ObjectToByteArray);
+    trans = muleContext.getRegistry().lookupTransformer(sourceType, DataType.BYTE_ARRAY);
+    assertNotNull(trans);
+    assertTrue(trans instanceof FilterInputStreamToByteArray);
 
-        muleContext.getRegistry().unregisterTransformer(trans2.getName());
+    trans = muleContext.getRegistry().lookupTransformer(DataType.INPUT_STREAM, DataType.BYTE_ARRAY);
+    assertNotNull(trans);
+    assertTrue(trans instanceof ObjectToByteArray);
 
-        trans = muleContext.getRegistry().lookupTransformer(sourceType, DataType.BYTE_ARRAY);
-        assertNotNull(trans);
-        assertTrue(trans instanceof ObjectToByteArray);
+    muleContext.getRegistry().unregisterTransformer(trans2.getName());
+
+    trans = muleContext.getRegistry().lookupTransformer(sourceType, DataType.BYTE_ARRAY);
+    assertNotNull(trans);
+    assertTrue(trans instanceof ObjectToByteArray);
+  }
+
+  public static class FilterInputStreamToByteArray extends AbstractTransformer implements DiscoverableTransformer {
+
+    public FilterInputStreamToByteArray() {
+      registerSourceType(DataType.fromType(FilterInputStream.class));
+      setReturnDataType(DataType.BYTE_ARRAY);
     }
 
-    public static class FilterInputStreamToByteArray extends AbstractTransformer implements DiscoverableTransformer
-    {
-        public FilterInputStreamToByteArray()
-        {
-            registerSourceType(DataType.fromType(FilterInputStream.class));
-            setReturnDataType(DataType.BYTE_ARRAY);
-        }
-
-        @Override
-        protected Object doTransform(Object src, Charset outputEncoding) throws TransformerException
-        {
-            throw new UnsupportedOperationException("This is a transformer only to be used for testing");
-        }
-
-        @Override
-        public int getPriorityWeighting()
-        {
-            return 0;
-        }
-
-        @Override
-        public void setPriorityWeighting(int weighting)
-        {
-            //no-op
-        }
+    @Override
+    protected Object doTransform(Object src, Charset outputEncoding) throws TransformerException {
+      throw new UnsupportedOperationException("This is a transformer only to be used for testing");
     }
+
+    @Override
+    public int getPriorityWeighting() {
+      return 0;
+    }
+
+    @Override
+    public void setPriorityWeighting(int weighting) {
+      // no-op
+    }
+  }
 }

@@ -24,51 +24,47 @@ import org.apache.http.message.BasicHeader;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpListenerHeadersTestCase extends AbstractHttpTestCase
-{
-    @Rule
-    public DynamicPort listenPort = new DynamicPort("port");
-    @Rule
-    public SystemProperty header = new SystemProperty("header", "custom");
+public class HttpListenerHeadersTestCase extends AbstractHttpTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "http-listener-headers-config.xml";
-    }
+  @Rule
+  public DynamicPort listenPort = new DynamicPort("port");
+  @Rule
+  public SystemProperty header = new SystemProperty("header", "custom");
 
-    @Test
-    public void handlesEmptyHeader() throws Exception
-    {
-        testHeaders("emptyHeader", EMPTY, new BasicHeader(header.getValue(), null));
-    }
+  @Override
+  protected String getConfigFile() {
+    return "http-listener-headers-config.xml";
+  }
 
-    @Test
-    public void handlesSimpleHeader() throws Exception
-    {
-        testHeaders("simpleHeader", "custom1", new BasicHeader(header.getValue(), "custom1"));
-    }
+  @Test
+  public void handlesEmptyHeader() throws Exception {
+    testHeaders("emptyHeader", EMPTY, new BasicHeader(header.getValue(), null));
+  }
 
-    @Test
-    public void handlesMultipleHeadersString() throws Exception
-    {
-        testHeaders("multipleHeadersString", "custom2", new BasicHeader(header.getValue(), "custom1"), new BasicHeader(header.getValue(), "custom2"));
-    }
+  @Test
+  public void handlesSimpleHeader() throws Exception {
+    testHeaders("simpleHeader", "custom1", new BasicHeader(header.getValue(), "custom1"));
+  }
 
-    @Test
-    public void handlesMultipleHeadersCollection() throws Exception
-    {
-        testHeaders("multipleHeadersCollection", "custom1", new BasicHeader(header.getValue(), "custom1"), new BasicHeader(header.getValue(), "custom2"));
-    }
+  @Test
+  public void handlesMultipleHeadersString() throws Exception {
+    testHeaders("multipleHeadersString", "custom2", new BasicHeader(header.getValue(), "custom1"),
+                new BasicHeader(header.getValue(), "custom2"));
+  }
 
-    public void testHeaders(String path, String expectedResponse, Header... headers) throws IOException
-    {
-        String url = String.format("http://localhost:%s/%s", listenPort.getNumber(), path);
-        HttpResponse response = Request.Post(url).setHeaders(headers).execute().returnResponse();
+  @Test
+  public void handlesMultipleHeadersCollection() throws Exception {
+    testHeaders("multipleHeadersCollection", "custom1", new BasicHeader(header.getValue(), "custom1"),
+                new BasicHeader(header.getValue(), "custom2"));
+  }
 
-        assertThat(response.getStatusLine().getStatusCode(), is(OK.getStatusCode()));
-        assertThat(IOUtils.toString(response.getEntity().getContent()), is(expectedResponse));
-    }
+  public void testHeaders(String path, String expectedResponse, Header... headers) throws IOException {
+    String url = String.format("http://localhost:%s/%s", listenPort.getNumber(), path);
+    HttpResponse response = Request.Post(url).setHeaders(headers).execute().returnResponse();
+
+    assertThat(response.getStatusLine().getStatusCode(), is(OK.getStatusCode()));
+    assertThat(IOUtils.toString(response.getEntity().getContent()), is(expectedResponse));
+  }
 
 
 }

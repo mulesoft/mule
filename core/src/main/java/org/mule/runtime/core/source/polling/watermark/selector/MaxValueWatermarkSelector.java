@@ -8,18 +8,15 @@
 package org.mule.runtime.core.source.polling.watermark.selector;
 
 /**
- * Implementation of {@link WatermarkSelector} that selectes the maximum value of the
- * set. For this to work, received values need to implement the {@link Comparable}
- * interface. Values that don't meet this condition will be discarded
+ * Implementation of {@link WatermarkSelector} that selectes the maximum value of the set. For this to work, received values need
+ * to implement the {@link Comparable} interface. Values that don't meet this condition will be discarded
  * 
  * @since 3.5.0
  */
-public class MaxValueWatermarkSelector extends ComparableWatermarkSelector
-{
+public class MaxValueWatermarkSelector extends ComparableWatermarkSelector {
 
-    @Override
-    protected int comparableQualifier()
-    {
-        return 1;
-    }
+  @Override
+  protected int comparableQualifier() {
+    return 1;
+  }
 }

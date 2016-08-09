@@ -10,14 +10,13 @@ package org.mule.runtime.module.launcher.nativelib;
 /**
  * Creates {@link NativeLibraryFinder} instances
  */
-public interface NativeLibraryFinderFactory
-{
+public interface NativeLibraryFinderFactory {
 
-    /**
-     * Creates a ntive library finder for the given application
-     *
-     * @param appName name of the application owning the finder
-     * @return a non null instance
-     */
-    NativeLibraryFinder create(String appName);
+  /**
+   * Creates a ntive library finder for the given application
+   *
+   * @param appName name of the application owning the finder
+   * @return a non null instance
+   */
+  NativeLibraryFinder create(String appName);
 }

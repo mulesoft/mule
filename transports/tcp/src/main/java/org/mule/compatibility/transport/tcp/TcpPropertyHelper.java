@@ -12,18 +12,18 @@ import java.lang.String;
 /**
  * Helper class to read properties for the TCP transport.
  */
-public class TcpPropertyHelper
-{
-    public static final String MULE_TCP_BIND_LOCALHOST_TO_ALL_LOCAL_INTERFACES_PROPERTY = "mule.tcp.bindlocalhosttoalllocalinterfaces";
+public class TcpPropertyHelper {
 
-    /**
-     * Returns whether localhost should be bound to all local interfaces or not.
-     *
-     * @return True if localhost should be bound to all local interfaces, false otherwise.
-     */
-    public static boolean isBindingLocalhostToAllLocalInterfaces()
-    {
-        return Boolean.valueOf(System.getProperty(MULE_TCP_BIND_LOCALHOST_TO_ALL_LOCAL_INTERFACES_PROPERTY, "false"));
-    }
+  public static final String MULE_TCP_BIND_LOCALHOST_TO_ALL_LOCAL_INTERFACES_PROPERTY =
+      "mule.tcp.bindlocalhosttoalllocalinterfaces";
+
+  /**
+   * Returns whether localhost should be bound to all local interfaces or not.
+   *
+   * @return True if localhost should be bound to all local interfaces, false otherwise.
+   */
+  public static boolean isBindingLocalhostToAllLocalInterfaces() {
+    return Boolean.valueOf(System.getProperty(MULE_TCP_BIND_LOCALHOST_TO_ALL_LOCAL_INTERFACES_PROPERTY, "false"));
+  }
 
 }

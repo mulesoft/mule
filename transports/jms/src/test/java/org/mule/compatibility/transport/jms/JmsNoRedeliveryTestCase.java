@@ -16,44 +16,39 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 
-public class JmsNoRedeliveryTestCase extends AbstractJmsRedeliveryTestCase
-{
+public class JmsNoRedeliveryTestCase extends AbstractJmsRedeliveryTestCase {
 
-    @Override
-    protected int getMaxRedelivery()
-    {
-        return JmsConnector.REDELIVERY_FAIL_ON_FIRST;
-    }
+  @Override
+  protected int getMaxRedelivery() {
+    return JmsConnector.REDELIVERY_FAIL_ON_FIRST;
+  }
 
-    @Override
-    protected int getMaxRedeliveryAttempts()
-    {
-        return AbstractRedeliveryPolicy.REDELIVERY_FAIL_ON_FIRST;
-    }
+  @Override
+  protected int getMaxRedeliveryAttempts() {
+    return AbstractRedeliveryPolicy.REDELIVERY_FAIL_ON_FIRST;
+  }
 
-    @Test
-    public void testNoRedelivery() throws Exception
-    {
-        client.dispatch(JMS_INPUT_QUEUE, TEST_MESSAGE, null);
+  @Test
+  public void testNoRedelivery() throws Exception {
+    client.dispatch(JMS_INPUT_QUEUE, TEST_MESSAGE, null);
 
-        assertTrue(messageRedeliveryExceptionFired.await(timeout, TimeUnit.MILLISECONDS));
-        assertEquals("EndpointMessageRedeliveredException never fired.", 0, messageRedeliveryExceptionFired.getCount());
-        assertEquals("Wrong number of delivery attempts", 1, callback.getCallbackCount());
+    assertTrue(messageRedeliveryExceptionFired.await(timeout, TimeUnit.MILLISECONDS));
+    assertEquals("EndpointMessageRedeliveredException never fired.", 0, messageRedeliveryExceptionFired.getCount());
+    assertEquals("Wrong number of delivery attempts", 1, callback.getCallbackCount());
 
-        assertMessageInDlq();
-    }
+    assertMessageInDlq();
+  }
 
-    @Test
-    public void testRedeliveryWithRollbackExceptionStrategy() throws Exception
-    {
-        client.dispatch(JMS_INPUT_QUEUE2, TEST_MESSAGE, null);
+  @Test
+  public void testRedeliveryWithRollbackExceptionStrategy() throws Exception {
+    client.dispatch(JMS_INPUT_QUEUE2, TEST_MESSAGE, null);
 
-        assertTrue(messageRedeliveryExceptionFired.await(timeout, TimeUnit.MILLISECONDS));
-        assertEquals("EndpointMessageRedeliveredException never fired.", 0, messageRedeliveryExceptionFired.getCount());
-        assertEquals("Wrong number of delivery attempts", 1, callback.getCallbackCount());
+    assertTrue(messageRedeliveryExceptionFired.await(timeout, TimeUnit.MILLISECONDS));
+    assertEquals("EndpointMessageRedeliveredException never fired.", 0, messageRedeliveryExceptionFired.getCount());
+    assertEquals("Wrong number of delivery attempts", 1, callback.getCallbackCount());
 
-        assertMessageInDlqRollbackEs();
-    }
+    assertMessageInDlqRollbackEs();
+  }
 
 
 

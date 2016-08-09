@@ -7,23 +7,21 @@
 package org.mule.compatibility.transport.tcp.protocols;
 
 /**
- * The EOFProtocol class is an application level tcp protocol that does nothing.
- * Reading is terminated by the stream being closed by the client.
+ * The EOFProtocol class is an application level tcp protocol that does nothing. Reading is terminated by the stream being closed
+ * by the client.
  */
-public class EOFProtocol extends DirectProtocol
-{
+public class EOFProtocol extends DirectProtocol {
 
-    /**
-     * Repeat until end of file
-     *
-     * @param len Amount transferred last call (-1 on EOF or socket error)
-     * @param available Amount available
-     * @return true if the transfer should continue
-     */
-    @Override
-    protected boolean isRepeat(int len, int available)
-    {
-        return true;
-    }
+  /**
+   * Repeat until end of file
+   *
+   * @param len Amount transferred last call (-1 on EOF or socket error)
+   * @param available Amount available
+   * @return true if the transfer should continue
+   */
+  @Override
+  protected boolean isRepeat(int len, int available) {
+    return true;
+  }
 
 }

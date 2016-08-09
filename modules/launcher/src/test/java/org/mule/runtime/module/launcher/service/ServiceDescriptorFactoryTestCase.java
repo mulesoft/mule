@@ -25,28 +25,26 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-public class ServiceDescriptorFactoryTestCase extends AbstractMuleTestCase
-{
+public class ServiceDescriptorFactoryTestCase extends AbstractMuleTestCase {
 
-    public static final String SERVICE_NAME = "testService";
-    public static final String PROVIDER_CLASS_NAME = "org.foo.FooServiceProvider";
-    private final ServiceDescriptorFactory serviceDescriptorFactory = new ServiceDescriptorFactory();
-    @Rule
-    public TemporaryFolder muleHome = new SystemPropertyTemporaryFolder(MuleProperties.MULE_HOME_DIRECTORY_PROPERTY);
+  public static final String SERVICE_NAME = "testService";
+  public static final String PROVIDER_CLASS_NAME = "org.foo.FooServiceProvider";
+  private final ServiceDescriptorFactory serviceDescriptorFactory = new ServiceDescriptorFactory();
+  @Rule
+  public TemporaryFolder muleHome = new SystemPropertyTemporaryFolder(MuleProperties.MULE_HOME_DIRECTORY_PROPERTY);
 
-    @Test
-    public void createServiceDescriptor() throws Exception
-    {
-        File servicesFolder = getServicesFolder();
-        assertThat(servicesFolder.mkdirs(), is(true));
+  @Test
+  public void createServiceDescriptor() throws Exception {
+    File servicesFolder = getServicesFolder();
+    assertThat(servicesFolder.mkdirs(), is(true));
 
-        final ServiceFileBuilder fooService = new ServiceFileBuilder(SERVICE_NAME)
-                .configuredWith(SERVICE_PROVIDER_CLASS_NAME, PROVIDER_CLASS_NAME);
-        unzip(fooService.getArtifactFile(), getServiceFolder(SERVICE_NAME));
+    final ServiceFileBuilder fooService =
+        new ServiceFileBuilder(SERVICE_NAME).configuredWith(SERVICE_PROVIDER_CLASS_NAME, PROVIDER_CLASS_NAME);
+    unzip(fooService.getArtifactFile(), getServiceFolder(SERVICE_NAME));
 
-        ServiceDescriptor descriptor = serviceDescriptorFactory.create(getServiceFolder(SERVICE_NAME));
-        assertThat(descriptor.getName(), equalTo(SERVICE_NAME));
-        assertThat(descriptor.getServiceProviderClassName(), equalTo(PROVIDER_CLASS_NAME));
-        assertThat(descriptor.getRootFolder(), equalTo(getServiceFolder(SERVICE_NAME)));
-    }
+    ServiceDescriptor descriptor = serviceDescriptorFactory.create(getServiceFolder(SERVICE_NAME));
+    assertThat(descriptor.getName(), equalTo(SERVICE_NAME));
+    assertThat(descriptor.getServiceProviderClassName(), equalTo(PROVIDER_CLASS_NAME));
+    assertThat(descriptor.getRootFolder(), equalTo(getServiceFolder(SERVICE_NAME)));
+  }
 }

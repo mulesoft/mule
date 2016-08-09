@@ -9,28 +9,28 @@ package org.mule.runtime.core.api.store;
 import java.io.Serializable;
 import java.util.List;
 
-public interface ListableObjectStore<T extends Serializable> extends ObjectStore<T>
-{
-    /**
-     * Open the underlying store.
-     *
-     * @throws ObjectStoreException if an exception occurred while opening the underlying store.
-     */
-    void open() throws ObjectStoreException;
+public interface ListableObjectStore<T extends Serializable> extends ObjectStore<T> {
 
-    /**
-     * Close the underlying store.
-     *
-     * @throws ObjectStoreException if an exception occurred while closing the underlying store.
-     */
-    void close() throws ObjectStoreException;
+  /**
+   * Open the underlying store.
+   *
+   * @throws ObjectStoreException if an exception occurred while opening the underlying store.
+   */
+  void open() throws ObjectStoreException;
 
-    /**
-     * @return list containing all keys that this object store currently holds values for.
-     *
-     * @throws ObjectStoreException if an exception occurred while collecting the list of all keys.
-     */
-    List<Serializable> allKeys() throws ObjectStoreException;
+  /**
+   * Close the underlying store.
+   *
+   * @throws ObjectStoreException if an exception occurred while closing the underlying store.
+   */
+  void close() throws ObjectStoreException;
+
+  /**
+   * @return list containing all keys that this object store currently holds values for.
+   *
+   * @throws ObjectStoreException if an exception occurred while collecting the list of all keys.
+   */
+  List<Serializable> allKeys() throws ObjectStoreException;
 }
 
 

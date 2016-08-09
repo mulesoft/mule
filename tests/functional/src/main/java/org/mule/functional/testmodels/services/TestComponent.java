@@ -11,34 +11,29 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class TestComponent implements ITestComponent
-{
-    public static final String EXCEPTION_MESSAGE = "Test Service fired an Exception";
+public class TestComponent implements ITestComponent {
 
-    protected static final Logger logger = LoggerFactory.getLogger(TestComponent.class);
+  public static final String EXCEPTION_MESSAGE = "Test Service fired an Exception";
 
-    protected AtomicInteger count = new AtomicInteger(0);
+  protected static final Logger logger = LoggerFactory.getLogger(TestComponent.class);
 
-    public String receive(String message) throws Exception
-    {
-        logger.info("Received: " + message + " number: " + inc() + " in thread: "
-                    + Thread.currentThread().getName());
-        return "Received: " + message;
-    }
-    
-    public String receiveBytes(byte[] message) throws Exception
-    {
-        return receive(new String(message)); 
-    }
+  protected AtomicInteger count = new AtomicInteger(0);
 
-    public String throwsException(String message) throws Exception
-    {
-        throw new TestComponentException(EXCEPTION_MESSAGE);
-    }
+  public String receive(String message) throws Exception {
+    logger.info("Received: " + message + " number: " + inc() + " in thread: " + Thread.currentThread().getName());
+    return "Received: " + message;
+  }
 
-    protected int inc()
-    {
-        return count.incrementAndGet();
-    }
+  public String receiveBytes(byte[] message) throws Exception {
+    return receive(new String(message));
+  }
+
+  public String throwsException(String message) throws Exception {
+    throw new TestComponentException(EXCEPTION_MESSAGE);
+  }
+
+  protected int inc() {
+    return count.incrementAndGet();
+  }
 
 }

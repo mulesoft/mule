@@ -12,79 +12,63 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.transaction.Status;
 import javax.transaction.xa.Xid;
 
-public abstract class AbstractXAResourceManager<T extends AbstractXaTransactionContext> extends AbstractResourceManager
-{
+public abstract class AbstractXAResourceManager<T extends AbstractXaTransactionContext> extends AbstractResourceManager {
 
-    protected Map<Xid, T> suspendedContexts = new ConcurrentHashMap<Xid, T>();
-    protected Map<Xid, T> activeContexts = new ConcurrentHashMap<Xid, T>();
+  protected Map<Xid, T> suspendedContexts = new ConcurrentHashMap<Xid, T>();
+  protected Map<Xid, T> activeContexts = new ConcurrentHashMap<Xid, T>();
 
-    public AbstractXAResourceManager()
-    {
-        super();
+  public AbstractXAResourceManager() {
+    super();
+  }
+
+  public int prepareTransaction(T context) throws ResourceManagerException {
+    assureReady();
+    synchronized (context) {
+      if (logger.isDebugEnabled()) {
+        logger.debug("Preparing transaction " + context);
+      }
+      context.status = Status.STATUS_PREPARING;
+      int status = doPrepare(context);
+      context.status = Status.STATUS_PREPARED;
+      if (logger.isDebugEnabled()) {
+        logger.debug("Prepared transaction " + context);
+      }
+      return status;
     }
+  }
 
-    public int prepareTransaction(T context) throws ResourceManagerException
-    {
-        assureReady();
-        synchronized (context)
-        {
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Preparing transaction " + context);
-            }
-            context.status = Status.STATUS_PREPARING;
-            int status = doPrepare(context);
-            context.status = Status.STATUS_PREPARED;
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Prepared transaction " + context);
-            }
-            return status;
-        }
+  protected abstract int doPrepare(T context) throws ResourceManagerException;
+
+  protected T getTransactionalResource(Xid xid) {
+    T context = getActiveTransactionalResource(xid);
+    if (context != null) {
+      return context;
+    } else {
+      return getSuspendedTransactionalResource(xid);
     }
+  }
 
-    protected abstract int doPrepare(T context) throws ResourceManagerException;
+  T getActiveTransactionalResource(Xid xid) {
+    return activeContexts.get(xid);
+  }
 
-    protected T getTransactionalResource(Xid xid)
-    {
-        T context = getActiveTransactionalResource(xid);
-        if (context != null)
-        {
-            return context;
-        }
-        else
-        {
-            return getSuspendedTransactionalResource(xid);
-        }
-    }
+  T getSuspendedTransactionalResource(Xid xid) {
+    return suspendedContexts.get(xid);
+  }
 
-    T getActiveTransactionalResource(Xid xid)
-    {
-        return activeContexts.get(xid);
-    }
+  void addActiveTransactionalResource(Xid xid, T context) {
+    activeContexts.put(xid, context);
+  }
 
-    T getSuspendedTransactionalResource(Xid xid)
-    {
-        return suspendedContexts.get(xid);
-    }
+  void addSuspendedTransactionalResource(Xid xid, T context) {
+    suspendedContexts.put(xid, context);
+  }
 
-    void addActiveTransactionalResource(Xid xid, T context)
-    {
-        activeContexts.put(xid, context);
-    }
+  void removeActiveTransactionalResource(Xid xid) {
+    activeContexts.remove(xid);
+  }
 
-    void addSuspendedTransactionalResource(Xid xid, T context)
-    {
-        suspendedContexts.put(xid, context);
-    }
-
-    void removeActiveTransactionalResource(Xid xid)
-    {
-        activeContexts.remove(xid);
-    }
-
-    void removeSuspendedTransactionalResource(Xid xid)
-    {
-        suspendedContexts.remove(xid);
-    }
+  void removeSuspendedTransactionalResource(Xid xid) {
+    suspendedContexts.remove(xid);
+  }
 }

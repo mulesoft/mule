@@ -14,8 +14,8 @@ import javax.jws.WebService;
  * Simple web service to use for test cases.
  */
 @WebService
-public interface Echo
-{
-    @WebResult(name = "text")
-    public String echo(@WebParam(name = "text") String string);
+public interface Echo {
+
+  @WebResult(name = "text")
+  public String echo(@WebParam(name = "text") String string);
 }

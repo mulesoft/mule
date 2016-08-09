@@ -12,24 +12,21 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 import java.util.List;
 import java.util.Map;
 
-public class PetCage
-{
+public class PetCage {
 
-    @Parameter
-    @Optional
-    Map<String, Integer> birds;
+  @Parameter
+  @Optional
+  Map<String, Integer> birds;
 
-    @Parameter
-    @Optional
-    List<String> ammenities;
+  @Parameter
+  @Optional
+  List<String> ammenities;
 
-    public Map<String, Integer> getBirds()
-    {
-        return birds;
-    }
+  public Map<String, Integer> getBirds() {
+    return birds;
+  }
 
-    public List<String> getAmmenities()
-    {
-        return ammenities;
-    }
+  public List<String> getAmmenities() {
+    return ammenities;
+  }
 }

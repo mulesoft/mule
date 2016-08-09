@@ -6,10 +6,9 @@
  */
 package org.mule.test.subtypes.extension;
 
-public interface Door
-{
+public interface Door {
 
-    void open();
+  void open();
 
-    String getHandle();
+  String getHandle();
 }

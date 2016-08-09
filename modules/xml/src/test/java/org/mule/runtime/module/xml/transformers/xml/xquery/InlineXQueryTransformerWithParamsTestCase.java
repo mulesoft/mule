@@ -20,95 +20,76 @@ import java.util.Map;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.w3c.dom.Document;
 
-public class InlineXQueryTransformerWithParamsTestCase extends AbstractTransformerTestCase
-{
-    private String srcData;
-    private String resultData;
+public class InlineXQueryTransformerWithParamsTestCase extends AbstractTransformerTestCase {
 
-    @Override
-    protected void doSetUp() throws Exception
-    {
-        XMLUnit.setIgnoreWhitespace(true);
-        XMLUnit.setIgnoreComments(true);
-        srcData = IOUtils.getResourceAsString("cd-catalog.xml", getClass());
-        resultData = IOUtils.getResourceAsString("cd-catalog-result-with-params.xml", getClass());
+  private String srcData;
+  private String resultData;
+
+  @Override
+  protected void doSetUp() throws Exception {
+    XMLUnit.setIgnoreWhitespace(true);
+    XMLUnit.setIgnoreComments(true);
+    srcData = IOUtils.getResourceAsString("cd-catalog.xml", getClass());
+    resultData = IOUtils.getResourceAsString("cd-catalog-result-with-params.xml", getClass());
+  }
+
+  @Override
+  public Transformer getTransformer() throws Exception {
+    XQueryTransformer transformer = new XQueryTransformer();
+    transformer.setXquery("declare variable $document external;\n" + "declare variable $title external;\n"
+        + "declare variable $rating external;\n" + " <cd-listings title='{$title}' rating='{$rating}'>\n" + "{\n"
+        + "    for $cd in $document/catalog/cd\n" + "    return <cd-title>{data($cd/title)}</cd-title>\n" + "} \n</cd-listings>");
+    transformer.setReturnDataType(DataType.STRING);
+
+    Map<String, Object> params = new HashMap<>();
+    params.put("title", "#[message.outboundProperties.ListTitle]");
+    params.put("rating", "#[message.outboundProperties.ListRating]");
+    transformer.setContextProperties(params);
+
+    transformer.setMuleContext(muleContext);
+    transformer.initialise();
+    return transformer;
+  }
+
+
+  @Override
+  public Transformer getRoundTripTransformer() throws Exception {
+    return null;
+  }
+
+  @Override
+  public void testRoundtripTransform() throws Exception {
+    // disable this test
+  }
+
+  @Override
+  public Object getTestData() {
+    Map<String, Serializable> props = new HashMap<>(2);
+    props.put("ListTitle", "MyList");
+    props.put("ListRating", new Integer(6));
+    return MuleMessage.builder().payload(srcData).outboundProperties(props).build();
+  }
+
+  @Override
+  public Object getResultData() {
+    return resultData;
+  }
+
+  @Override
+  public boolean compareResults(Object expected, Object result) {
+    if (expected instanceof Document && result instanceof Document) {
+      return XMLUnit.compareXML((Document) expected, (Document) result).similar();
+    } else if (expected instanceof String && result instanceof String) {
+      try {
+        String expectedString = this.normalizeString((String) expected);
+        String resultString = this.normalizeString((String) result);
+        return XMLUnit.compareXML(expectedString, resultString).similar();
+      } catch (Exception ex) {
+        return false;
+      }
     }
 
-    @Override
-    public Transformer getTransformer() throws Exception
-    {
-        XQueryTransformer transformer = new XQueryTransformer();
-        transformer.setXquery(
-                "declare variable $document external;\n" +
-                "declare variable $title external;\n" +
-                "declare variable $rating external;\n" +
-                " <cd-listings title='{$title}' rating='{$rating}'>\n" +
-                "{\n" +
-                "    for $cd in $document/catalog/cd\n" +
-                "    return <cd-title>{data($cd/title)}</cd-title>\n" +
-                "} \n</cd-listings>");
-        transformer.setReturnDataType(DataType.STRING);
-
-        Map<String, Object> params = new HashMap<>();
-        params.put("title", "#[message.outboundProperties.ListTitle]");
-        params.put("rating", "#[message.outboundProperties.ListRating]");
-        transformer.setContextProperties(params);
-
-        transformer.setMuleContext(muleContext);
-        transformer.initialise();
-        return transformer;
-    }
-
-
-    @Override
-    public Transformer getRoundTripTransformer() throws Exception
-    {
-        return null;
-    }
-
-    @Override
-    public void testRoundtripTransform() throws Exception
-    {
-        // disable this test
-    }
-
-    @Override
-    public Object getTestData()
-    {
-        Map<String, Serializable> props = new HashMap<>(2);
-        props.put("ListTitle", "MyList");
-        props.put("ListRating", new Integer(6));
-        return MuleMessage.builder().payload(srcData).outboundProperties(props).build();
-    }
-
-    @Override
-    public Object getResultData()
-    {
-        return resultData;
-    }
-
-    @Override
-    public boolean compareResults(Object expected, Object result)
-    {
-        if (expected instanceof Document && result instanceof Document)
-        {
-            return XMLUnit.compareXML((Document)expected, (Document)result).similar();
-        }
-        else if (expected instanceof String && result instanceof String)
-        {
-            try
-            {
-                String expectedString = this.normalizeString((String)expected);
-                String resultString = this.normalizeString((String)result);
-                return XMLUnit.compareXML(expectedString, resultString).similar();
-            }
-            catch (Exception ex)
-            {
-                return false;
-            }
-        }
-
-        // all other comparisons are passed up
-        return super.compareResults(expected, result);
-    }
+    // all other comparisons are passed up
+    return super.compareResults(expected, result);
+  }
 }

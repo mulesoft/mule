@@ -20,6 +20,7 @@ import org.springframework.beans.factory.support.ManagedList;
  * {@code BeanDefinitionCreator} that handles components that define a mp in the configuration.
  *
  * <p>
+ * 
  * <pre>
  *  <parsers-test:complex-type-map>
  *      <parsers-test:complex-type-entry key="1">
@@ -33,27 +34,22 @@ import org.springframework.beans.factory.support.ManagedList;
  *
  * @since 4.0
  */
-public class MapBeanDefinitionCreator extends BeanDefinitionCreator
-{
+public class MapBeanDefinitionCreator extends BeanDefinitionCreator {
 
-    @Override
-    boolean handleRequest(CreateBeanDefinitionRequest createBeanDefinitionRequest)
-    {
-        ComponentModel componentModel = createBeanDefinitionRequest.getComponentModel();
-        ObjectTypeVisitor objectTypeVisitor = new ObjectTypeVisitor(componentModel);
-        ComponentBuildingDefinition componentBuildingDefinition = createBeanDefinitionRequest.getComponentBuildingDefinition();
-        componentBuildingDefinition.getTypeDefinition().visit(objectTypeVisitor);
-        Class<?> type = objectTypeVisitor.getType();
-        if (Map.class.isAssignableFrom(type) && componentBuildingDefinition.getObjectFactoryType() == null)
-        {
-            ManagedList managedList = componentModel.getInnerComponents().stream().map(ComponentModel::getBeanDefinition).collect(toCollection(ManagedList::new));
-            componentModel.setBeanDefinition(BeanDefinitionBuilder.genericBeanDefinition(MapFactoryBean.class)
-                                                     .addConstructorArgValue(managedList)
-                                                     .addConstructorArgValue(type)
-                                                     .getBeanDefinition()
-            );
-            return true;
-        }
-        return false;
+  @Override
+  boolean handleRequest(CreateBeanDefinitionRequest createBeanDefinitionRequest) {
+    ComponentModel componentModel = createBeanDefinitionRequest.getComponentModel();
+    ObjectTypeVisitor objectTypeVisitor = new ObjectTypeVisitor(componentModel);
+    ComponentBuildingDefinition componentBuildingDefinition = createBeanDefinitionRequest.getComponentBuildingDefinition();
+    componentBuildingDefinition.getTypeDefinition().visit(objectTypeVisitor);
+    Class<?> type = objectTypeVisitor.getType();
+    if (Map.class.isAssignableFrom(type) && componentBuildingDefinition.getObjectFactoryType() == null) {
+      ManagedList managedList = componentModel.getInnerComponents().stream().map(ComponentModel::getBeanDefinition)
+          .collect(toCollection(ManagedList::new));
+      componentModel.setBeanDefinition(BeanDefinitionBuilder.genericBeanDefinition(MapFactoryBean.class)
+          .addConstructorArgValue(managedList).addConstructorArgValue(type).getBeanDefinition());
+      return true;
     }
+    return false;
+  }
 }

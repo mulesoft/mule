@@ -15,57 +15,50 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class DefaultLifecycleEnabledObjectPoolTestCase extends AbstractPoolingTestCase
-{
+public class DefaultLifecycleEnabledObjectPoolTestCase extends AbstractPoolingTestCase {
 
-    @Test
-    public void testPoolStart() throws Exception
-    {
-        DefaultLifecycleEnabledObjectPool pool = createObjectPool();
+  @Test
+  public void testPoolStart() throws Exception {
+    DefaultLifecycleEnabledObjectPool pool = createObjectPool();
 
-        // pool was not started yet, objects must be uninitialized
-        WaterMelon borrowed = borrow(pool);
-        assertEquals("void", borrowed.getState());
+    // pool was not started yet, objects must be uninitialized
+    WaterMelon borrowed = borrow(pool);
+    assertEquals("void", borrowed.getState());
 
-        pool.start();
-        assertEquals("started", borrowed.getState());
-    }
-    
-    @Test
-    public void testPoolStop() throws Exception
-    {
-        DefaultLifecycleEnabledObjectPool pool = createObjectPool();
-        pool.start();
-        
-        WaterMelon borrowed = borrow(pool);
-        
-        pool.stop();
-        assertEquals("stopped", borrowed.getState());
-    }
+    pool.start();
+    assertEquals("started", borrowed.getState());
+  }
 
-    private DefaultLifecycleEnabledObjectPool createObjectPool() throws Exception
-    {
-        PoolingProfile poolingProfile = createDefaultPoolingProfile();
-        ObjectFactory objectFactory = createDefaultObjectFactory();
-        DefaultLifecycleEnabledObjectPool pool =
-            new DefaultLifecycleEnabledObjectPool(objectFactory, poolingProfile, muleContext);
-        
-        pool.initialise();
-        
-        return pool;
-    }
+  @Test
+  public void testPoolStop() throws Exception {
+    DefaultLifecycleEnabledObjectPool pool = createObjectPool();
+    pool.start();
 
-    private ObjectFactory createDefaultObjectFactory()
-    {
-        // WaterMelon implements some lifecycle methods
-        PrototypeObjectFactory factory = new PrototypeObjectFactory(WaterMelon.class);
-        return factory;
-    }
-    
-    private WaterMelon borrow(DefaultLifecycleEnabledObjectPool pool) throws Exception
-    {
-        return (WaterMelon) pool.borrowObject();
-    }
+    WaterMelon borrowed = borrow(pool);
+
+    pool.stop();
+    assertEquals("stopped", borrowed.getState());
+  }
+
+  private DefaultLifecycleEnabledObjectPool createObjectPool() throws Exception {
+    PoolingProfile poolingProfile = createDefaultPoolingProfile();
+    ObjectFactory objectFactory = createDefaultObjectFactory();
+    DefaultLifecycleEnabledObjectPool pool = new DefaultLifecycleEnabledObjectPool(objectFactory, poolingProfile, muleContext);
+
+    pool.initialise();
+
+    return pool;
+  }
+
+  private ObjectFactory createDefaultObjectFactory() {
+    // WaterMelon implements some lifecycle methods
+    PrototypeObjectFactory factory = new PrototypeObjectFactory(WaterMelon.class);
+    return factory;
+  }
+
+  private WaterMelon borrow(DefaultLifecycleEnabledObjectPool pool) throws Exception {
+    return (WaterMelon) pool.borrowObject();
+  }
 }
 
 

@@ -17,30 +17,26 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpListenerCustomTlsConfigMultipleKeysTestCase extends AbstractHttpTestCase
-{
+public class HttpListenerCustomTlsConfigMultipleKeysTestCase extends AbstractHttpTestCase {
 
-    @Rule
-    public DynamicPort port = new DynamicPort("port");
+  @Rule
+  public DynamicPort port = new DynamicPort("port");
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "http-listener-custom-tls-multiple-keys-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "http-listener-custom-tls-multiple-keys-config.xml";
+  }
 
-    @Test
-    public void acceptsConnectionWithValidCertificate() throws Exception
-    {
-        MuleEvent event = flowRunner("testFlowClientWithCertificate").withPayload(TEST_MESSAGE).run();
-        assertThat(getPayloadAsString(event.getMessage()), equalTo(TEST_MESSAGE));
-    }
+  @Test
+  public void acceptsConnectionWithValidCertificate() throws Exception {
+    MuleEvent event = flowRunner("testFlowClientWithCertificate").withPayload(TEST_MESSAGE).run();
+    assertThat(getPayloadAsString(event.getMessage()), equalTo(TEST_MESSAGE));
+  }
 
-    @Test(expected = MessagingException.class)
-    public void rejectsConnectionWithInvalidCertificate() throws Exception
-    {
-        flowRunner("testFlowClientWithoutCertificate").withPayload(TEST_MESSAGE).run();
-    }
+  @Test(expected = MessagingException.class)
+  public void rejectsConnectionWithInvalidCertificate() throws Exception {
+    flowRunner("testFlowClientWithoutCertificate").withPayload(TEST_MESSAGE).run();
+  }
 
 
 }

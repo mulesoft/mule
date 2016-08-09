@@ -19,36 +19,31 @@ import java.nio.charset.Charset;
 /**
  * Transformer that modifies the payload of the message according to the provided value.
  */
-public class SetPayloadTransformer extends AbstractMessageTransformer
-{
-    private AttributeEvaluator valueEvaluator;
+public class SetPayloadTransformer extends AbstractMessageTransformer {
 
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        super.initialise();
-        valueEvaluator.initialize(muleContext.getExpressionManager());
+  private AttributeEvaluator valueEvaluator;
+
+  @Override
+  public void initialise() throws InitialisationException {
+    super.initialise();
+    valueEvaluator.initialize(muleContext.getExpressionManager());
+  }
+
+  public SetPayloadTransformer() {
+    registerSourceType(DataType.OBJECT);
+    setReturnDataType(DataType.OBJECT);
+  }
+
+  @Override
+  public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException {
+    if (valueEvaluator.getRawValue() == null) {
+      return null;
     }
 
-    public SetPayloadTransformer()
-    {
-        registerSourceType(DataType.OBJECT);
-        setReturnDataType(DataType.OBJECT);
-    }
+    return valueEvaluator.resolveValue(event);
+  }
 
-    @Override
-    public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException
-    {
-        if(valueEvaluator.getRawValue() == null)
-        {
-            return null;
-        }
-
-        return valueEvaluator.resolveValue(event);
-    }
-
-    public void setValue(String value)
-    {
-        valueEvaluator = new AttributeEvaluator(value);
-    }
+  public void setValue(String value) {
+    valueEvaluator = new AttributeEvaluator(value);
+  }
 }

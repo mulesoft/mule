@@ -16,8 +16,7 @@ import org.mule.runtime.extension.api.annotation.Export;
 import org.mule.runtime.extension.api.annotation.Extension;
 
 /**
- * Email connector used to list and send emails and perform
- * operations in different mailboxes, such as delete and mark as read.
+ * Email connector used to list and send emails and perform operations in different mailboxes, such as delete and mark as read.
  * <p>
  * This connector supports the SMTP, SMTPS, IMAP, IMAPS, POP3 and POP3s protocols.
  *
@@ -26,8 +25,7 @@ import org.mule.runtime.extension.api.annotation.Extension;
 @Configurations({SMTPConfiguration.class, POP3Configuration.class, IMAPConfiguration.class})
 @Extension(name = "Email", description = "Connector to send and list email messages to and from mailboxes")
 @Export(classes = EmailException.class)
-public class EmailConnector
-{
+public class EmailConnector {
 
-    public static final String TLS_CONFIGURATION = "TLS Configuration";
+  public static final String TLS_CONFIGURATION = "TLS Configuration";
 }

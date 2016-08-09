@@ -11,24 +11,20 @@ import org.mule.test.petstore.extension.PetStoreConnector;
 
 import org.junit.Test;
 
-public class PetStoreExclusiveParameterOperationTestCase extends InvalidExtensionConfigTestCase
-{
+public class PetStoreExclusiveParameterOperationTestCase extends InvalidExtensionConfigTestCase {
 
-    @Override
-    protected Class<?>[] getAnnotatedExtensionClasses()
-    {
-        return new Class<?>[] {PetStoreConnector.class};
-    }
+  @Override
+  protected Class<?>[] getAnnotatedExtensionClasses() {
+    return new Class<?>[] {PetStoreConnector.class};
+  }
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "petstore-exclusive-parameters-operation.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "petstore-exclusive-parameters-operation.xml";
+  }
 
-    @Test
-    public void getBreederOperation() throws Exception
-    {
-        runFlow("getBreederOperation");
-    }
+  @Test
+  public void getBreederOperation() throws Exception {
+    runFlow("getBreederOperation");
+  }
 }

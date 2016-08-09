@@ -12,47 +12,42 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 
-public class SynchronousMessagingExceptionStrategyTestCase extends AbstractExceptionStrategyTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/integration/exceptions/synch-messaging-exception-strategy.xml";
-    }
+public class SynchronousMessagingExceptionStrategyTestCase extends AbstractExceptionStrategyTestCase {
 
-    @Test
-    public void testTransformer() throws Exception
-    {
-        flowRunner("Transformer").withPayload(getTestMuleMessage()).asynchronously().run();
-        latch.await(LATCH_AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);
-        assertEquals(1, serviceExceptionCounter.get());
-        assertEquals(0, systemExceptionCounter.get());
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/integration/exceptions/synch-messaging-exception-strategy.xml";
+  }
 
-    @Test
-    public void testComponent() throws Exception
-    {
-        flowRunner("Component").withPayload(getTestMuleMessage()).asynchronously().run();
-        latch.await(LATCH_AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);
-        assertEquals(1, serviceExceptionCounter.get());
-        assertEquals(0, systemExceptionCounter.get());
-    }
+  @Test
+  public void testTransformer() throws Exception {
+    flowRunner("Transformer").withPayload(getTestMuleMessage()).asynchronously().run();
+    latch.await(LATCH_AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);
+    assertEquals(1, serviceExceptionCounter.get());
+    assertEquals(0, systemExceptionCounter.get());
+  }
 
-    @Test
-    public void testProcessorInboundRouter() throws Exception
-    {
-        flowRunner("ProcessorInboundRouter").withPayload(getTestMuleMessage()).asynchronously().run();
-        latch.await(LATCH_AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);
-        assertEquals(1, serviceExceptionCounter.get());
-        assertEquals(0, systemExceptionCounter.get());
-    }
+  @Test
+  public void testComponent() throws Exception {
+    flowRunner("Component").withPayload(getTestMuleMessage()).asynchronously().run();
+    latch.await(LATCH_AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);
+    assertEquals(1, serviceExceptionCounter.get());
+    assertEquals(0, systemExceptionCounter.get());
+  }
 
-    @Test
-    public void testProcessorOutboundRouter() throws Exception
-    {
-        flowRunner("ProcessorOutboundRouter").withPayload(getTestMuleMessage()).asynchronously().run();
-        latch.await(LATCH_AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);
-        assertEquals(1, serviceExceptionCounter.get());
-        assertEquals(0, systemExceptionCounter.get());
-    }
+  @Test
+  public void testProcessorInboundRouter() throws Exception {
+    flowRunner("ProcessorInboundRouter").withPayload(getTestMuleMessage()).asynchronously().run();
+    latch.await(LATCH_AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);
+    assertEquals(1, serviceExceptionCounter.get());
+    assertEquals(0, systemExceptionCounter.get());
+  }
+
+  @Test
+  public void testProcessorOutboundRouter() throws Exception {
+    flowRunner("ProcessorOutboundRouter").withPayload(getTestMuleMessage()).asynchronously().run();
+    latch.await(LATCH_AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);
+    assertEquals(1, serviceExceptionCounter.get());
+    assertEquals(0, systemExceptionCounter.get());
+  }
 }

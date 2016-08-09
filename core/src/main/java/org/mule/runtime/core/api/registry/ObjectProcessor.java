@@ -9,17 +9,17 @@ package org.mule.runtime.core.api.registry;
 import org.mule.runtime.core.registry.TransientRegistry;
 
 /**
- * The parent interface for all object processors. Object processors can be registered in the Mule registry and fired
- * at the correct time.
+ * The parent interface for all object processors. Object processors can be registered in the Mule registry and fired at the
+ * correct time.
  * <p/>
- * Developers must not implement this interface directly. Instead use either {@link org.mule.runtime.core.api.registry.InjectProcessor} or
- * {@link org.mule.runtime.core.api.registry.PreInitProcessor}.
+ * Developers must not implement this interface directly. Instead use either
+ * {@link org.mule.runtime.core.api.registry.InjectProcessor} or {@link org.mule.runtime.core.api.registry.PreInitProcessor}.
  *
  * @deprecated as of 3.7.0 since these are only used by {@link TransientRegistry} which is also deprecated. Use post processors
- * for currently supported registries instead (i.e: {@link org.mule.runtime.core.config.spring.SpringRegistry})
+ *             for currently supported registries instead (i.e: {@link org.mule.runtime.core.config.spring.SpringRegistry})
  */
 @Deprecated
-public interface ObjectProcessor
-{
-    Object process(Object object);
+public interface ObjectProcessor {
+
+  Object process(Object object);
 }

@@ -6,22 +6,18 @@
  */
 package org.mule.test.integration.resolvers;
 
-public class NoArgsTarget
-{
+public class NoArgsTarget {
 
-    public String notIgnored()
-    {
-        return "notIgnored";
-    }
+  public String notIgnored() {
+    return "notIgnored";
+  }
 
-    public String unused()
-    {
-        return "unused";
-    }
+  public String unused() {
+    return "unused";
+  }
 
-    public String selected()
-    {
-        return "selected";
-    }
+  public String selected() {
+    return "selected";
+  }
 
 }

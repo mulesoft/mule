@@ -20,28 +20,24 @@ import java.util.Map;
 
 
 @MetadataScope(keysResolver = TestContentAndOutputResolverWithKeyResolver.class,
-        contentResolver = TestContentAndOutputResolverWithKeyResolver.class,
-        outputResolver = TestContentAndOutputWithAttributesResolverWithKeyResolver.class,
-        attributesResolver = TestContentAndOutputWithAttributesResolverWithKeyResolver.class)
-public class MetadataSource extends Source<Map<String, Object>, StringAttributes>
-{
+    contentResolver = TestContentAndOutputResolverWithKeyResolver.class,
+    outputResolver = TestContentAndOutputWithAttributesResolverWithKeyResolver.class,
+    attributesResolver = TestContentAndOutputWithAttributesResolverWithKeyResolver.class)
+public class MetadataSource extends Source<Map<String, Object>, StringAttributes> {
 
-    @MetadataKeyId
-    @Parameter
-    public String type;
+  @MetadataKeyId
+  @Parameter
+  public String type;
 
-    @Override
-    public void start()
-    {
-        if (!type.equals(PERSON))
-        {
-            throw new RuntimeException(String.format("Invalid MetadataKey with value [%s], the key should be [%s]", type, PERSON));
-        }
+  @Override
+  public void start() {
+    if (!type.equals(PERSON)) {
+      throw new RuntimeException(String.format("Invalid MetadataKey with value [%s], the key should be [%s]", type, PERSON));
     }
+  }
 
-    @Override
-    public void stop()
-    {
+  @Override
+  public void stop() {
 
-    }
+  }
 }

@@ -28,85 +28,75 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class DefaultConnectionManagerTestCase extends AbstractMuleTestCase
-{
+public class DefaultConnectionManagerTestCase extends AbstractMuleTestCase {
 
-    private Apple config = new Apple();
+  private Apple config = new Apple();
 
-    private Banana connection = new Banana();
+  private Banana connection = new Banana();
 
-    @Mock
-    private CachedConnectionProvider<Banana> connectionProvider;
+  @Mock
+  private CachedConnectionProvider<Banana> connectionProvider;
 
-    @Mock(answer = RETURNS_DEEP_STUBS)
-    private MuleContext muleContext;
+  @Mock(answer = RETURNS_DEEP_STUBS)
+  private MuleContext muleContext;
 
-    private DefaultConnectionManager connectionManager;
+  private DefaultConnectionManager connectionManager;
 
-    @Before
-    public void before() throws Exception
-    {
-        when(connectionProvider.connect()).thenReturn(connection);
-        when(connectionProvider.validate(connection)).thenReturn(ConnectionValidationResult.success());
+  @Before
+  public void before() throws Exception {
+    when(connectionProvider.connect()).thenReturn(connection);
+    when(connectionProvider.validate(connection)).thenReturn(ConnectionValidationResult.success());
 
-        connectionManager = new DefaultConnectionManager(muleContext);
-    }
+    connectionManager = new DefaultConnectionManager(muleContext);
+  }
 
-    @Test
-    public void getConnection() throws Exception
-    {
-        connectionManager.bind(config, connectionProvider);
-        ConnectionHandler<Banana> connectionHandler = connectionManager.getConnection(config);
-        assertThat(connectionHandler.getConnection(), is(sameInstance(connection)));
-    }
+  @Test
+  public void getConnection() throws Exception {
+    connectionManager.bind(config, connectionProvider);
+    ConnectionHandler<Banana> connectionHandler = connectionManager.getConnection(config);
+    assertThat(connectionHandler.getConnection(), is(sameInstance(connection)));
+  }
 
-    @Test(expected = ConnectionException.class)
-    public void assertUnboundedConnection() throws Exception
-    {
-        connectionManager.getConnection(config);
-    }
+  @Test(expected = ConnectionException.class)
+  public void assertUnboundedConnection() throws Exception {
+    connectionManager.getConnection(config);
+  }
 
-    @Test
-    public void hasBinding() throws Exception
-    {
-        assertBound(false);
-        connectionManager.bind(config, connectionProvider);
-        assertBound(true);
-        connectionManager.unbind(config);
-        assertBound(false);
-    }
+  @Test
+  public void hasBinding() throws Exception {
+    assertBound(false);
+    connectionManager.bind(config, connectionProvider);
+    assertBound(true);
+    connectionManager.unbind(config);
+    assertBound(false);
+  }
 
-    private void assertBound(boolean bound)
-    {
-        assertThat(connectionManager.hasBinding(config), is(bound));
-    }
+  private void assertBound(boolean bound) {
+    assertThat(connectionManager.hasBinding(config), is(bound));
+  }
 
-    @Test
-    public void stop() throws Exception
-    {
-        getConnection();
-        connectionManager.stop();
-        verifyDisconnect();
-    }
+  @Test
+  public void stop() throws Exception {
+    getConnection();
+    connectionManager.stop();
+    verifyDisconnect();
+  }
 
-    @Test(expected = ConnectionException.class)
-    public void unbind() throws Exception
-    {
-        getConnection();
-        connectionManager.unbind(config);
-        verifyDisconnect();
-        assertUnboundedConnection();
-    }
+  @Test(expected = ConnectionException.class)
+  public void unbind() throws Exception {
+    getConnection();
+    connectionManager.unbind(config);
+    verifyDisconnect();
+    assertUnboundedConnection();
+  }
 
-    private void verifyDisconnect()
-    {
-        verify(connectionProvider).disconnect(connection);
-    }
+  private void verifyDisconnect() {
+    verify(connectionProvider).disconnect(connection);
+  }
 
-    @Test(expected = IllegalStateException.class)
-    public void bindWithStoppingMuleContext() throws Exception
-    {
-        when(muleContext.isStopped()).thenReturn(true);
-        connectionManager.bind(config, connectionProvider);
-    }
+  @Test(expected = IllegalStateException.class)
+  public void bindWithStoppingMuleContext() throws Exception {
+    when(muleContext.isStopped()).thenReturn(true);
+    connectionManager.bind(config, connectionProvider);
+  }
 }

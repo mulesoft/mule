@@ -15,19 +15,17 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.junit.Test;
 
-public class HttpBadEncodingFunctionalTestCase extends HttpEncodingFunctionalTestCase
-{
+public class HttpBadEncodingFunctionalTestCase extends HttpEncodingFunctionalTestCase {
 
-    @Override
-    @Test
-    public void testSend() throws Exception
-    {
-        GetMethod request = new GetMethod("http://localhost:" + dynamicPort.getValue());
-        request.addRequestHeader(CONTENT_TYPE, "text/bar; charset=UTFF-912");
-        HttpClient httpClient = new HttpClient();
+  @Override
+  @Test
+  public void testSend() throws Exception {
+    GetMethod request = new GetMethod("http://localhost:" + dynamicPort.getValue());
+    request.addRequestHeader(CONTENT_TYPE, "text/bar; charset=UTFF-912");
+    HttpClient httpClient = new HttpClient();
 
-        int responseCode = httpClient.executeMethod(request);
+    int responseCode = httpClient.executeMethod(request);
 
-        assertThat(responseCode, equalTo(SC_INTERNAL_SERVER_ERROR));
-    }
+    assertThat(responseCode, equalTo(SC_INTERNAL_SERVER_ERROR));
+  }
 }

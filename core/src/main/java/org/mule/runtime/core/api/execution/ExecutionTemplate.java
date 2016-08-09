@@ -9,12 +9,11 @@ package org.mule.runtime.core.api.execution;
 /**
  * ExecutionTemplate provides an execution context for message processing.
  *
- * Examples of execution context can be to provide error handling, transaction state verification,
- * transactional demarcation.
+ * Examples of execution context can be to provide error handling, transaction state verification, transactional demarcation.
  *
  * @param <T> type of the return value of the processing execution
  */
-public interface ExecutionTemplate<T>
-{
-    public T execute(ExecutionCallback<T> callback) throws Exception;
+public interface ExecutionTemplate<T> {
+
+  public T execute(ExecutionCallback<T> callback) throws Exception;
 }

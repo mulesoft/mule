@@ -19,41 +19,37 @@ import org.hamcrest.TypeSafeMatcher;
  * @param <T> the type of the object that provides the object to be matched.
  * @param <R> the type of the object to match against.
  */
-public final class FunctionExpressionMatcher<T, R> extends TypeSafeMatcher<T>
-{
-    private Function<T, R> resolver;
-    private Matcher<? extends R> matcher;
+public final class FunctionExpressionMatcher<T, R> extends TypeSafeMatcher<T> {
 
-    private FunctionExpressionMatcher(Function<T, R> resolver, Matcher<? extends R> matcher)
-    {
-        this.resolver = resolver;
-        this.matcher = matcher;
-    }
+  private Function<T, R> resolver;
+  private Matcher<? extends R> matcher;
 
-    /**
-     * Builds a matcher that lazily evaluates against the object returned by the given resolver
-     * {@link Function}.
-     * 
-     * @param resolver the function to use to get the object to run the matcher against.
-     * @param matcher the matcher to run against the resolved object.
-     * @return a matcher that lazily evaluates the object to match.
-     */
-    @Factory
-    public static final <T, R> FunctionExpressionMatcher<T, R> expressionMatches(Function<T, R> resolver, Matcher<? extends R> matcher)
-    {
-        return new FunctionExpressionMatcher<>(resolver, matcher);
-        
-    }
-    
-    @Override
-    protected boolean matchesSafely(T item)
-    {
-        return matcher.matches(resolver.apply(item));
-    }
+  private FunctionExpressionMatcher(Function<T, R> resolver, Matcher<? extends R> matcher) {
+    this.resolver = resolver;
+    this.matcher = matcher;
+  }
 
-    @Override
-    public void describeTo(Description description)
-    {
-        matcher.describeTo(description);
-    }
+  /**
+   * Builds a matcher that lazily evaluates against the object returned by the given resolver {@link Function}.
+   * 
+   * @param resolver the function to use to get the object to run the matcher against.
+   * @param matcher the matcher to run against the resolved object.
+   * @return a matcher that lazily evaluates the object to match.
+   */
+  @Factory
+  public static final <T, R> FunctionExpressionMatcher<T, R> expressionMatches(Function<T, R> resolver,
+                                                                               Matcher<? extends R> matcher) {
+    return new FunctionExpressionMatcher<>(resolver, matcher);
+
+  }
+
+  @Override
+  protected boolean matchesSafely(T item) {
+    return matcher.matches(resolver.apply(item));
+  }
+
+  @Override
+  public void describeTo(Description description) {
+    matcher.describeTo(description);
+  }
 }

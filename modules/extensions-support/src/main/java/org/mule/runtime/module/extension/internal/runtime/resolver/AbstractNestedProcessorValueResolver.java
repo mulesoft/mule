@@ -18,40 +18,35 @@ import org.mule.runtime.core.processor.chain.NestedProcessorChain;
 import org.mule.runtime.core.util.ObjectNameHelper;
 
 /**
- * Base class for a {@link ValueResolver} which needs to create instances
- * of {@link NestedProcessor}, regardless of it being the main return type or not
+ * Base class for a {@link ValueResolver} which needs to create instances of {@link NestedProcessor}, regardless of it being the
+ * main return type or not
  *
  * @param <T> the generic type of the values that {@code this} instance produces
  */
-abstract class AbstractNestedProcessorValueResolver<T> implements ValueResolver<T>
-{
+abstract class AbstractNestedProcessorValueResolver<T> implements ValueResolver<T> {
 
-    /**
-     * Creates and registers a {@link NestedProcessor} that wraps the given {@code messageProcessor}
-     * @param messageProcessor a {@link MessageProcessor}
-     * @param event a {@link MuleEvent}
-     * @return a {@link NestedProcessor}
-     */
-    protected NestedProcessor toNestedProcessor(MessageProcessor messageProcessor, MuleEvent event)
-    {
-        MuleContext muleContext = event.getMuleContext();
-        try
-        {
-            muleContext.getRegistry().registerObject(new ObjectNameHelper(muleContext).getUniqueName(""), messageProcessor);
-        }
-        catch (RegistrationException e)
-        {
-            throw new MuleRuntimeException(createStaticMessage("Could not register nested operation message processor"), e);
-        }
-        return new NestedProcessorChain(event, messageProcessor);
+  /**
+   * Creates and registers a {@link NestedProcessor} that wraps the given {@code messageProcessor}
+   * 
+   * @param messageProcessor a {@link MessageProcessor}
+   * @param event a {@link MuleEvent}
+   * @return a {@link NestedProcessor}
+   */
+  protected NestedProcessor toNestedProcessor(MessageProcessor messageProcessor, MuleEvent event) {
+    MuleContext muleContext = event.getMuleContext();
+    try {
+      muleContext.getRegistry().registerObject(new ObjectNameHelper(muleContext).getUniqueName(""), messageProcessor);
+    } catch (RegistrationException e) {
+      throw new MuleRuntimeException(createStaticMessage("Could not register nested operation message processor"), e);
     }
+    return new NestedProcessorChain(event, messageProcessor);
+  }
 
-    /**
-     * @return {@code false}
-     */
-    @Override
-    public boolean isDynamic()
-    {
-        return false;
-    }
+  /**
+   * @return {@code false}
+   */
+  @Override
+  public boolean isDynamic() {
+    return false;
+  }
 }

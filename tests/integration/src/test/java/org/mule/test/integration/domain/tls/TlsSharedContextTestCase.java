@@ -23,74 +23,65 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class TlsSharedContextTestCase extends DomainFunctionalTestCase
-{
+public class TlsSharedContextTestCase extends DomainFunctionalTestCase {
 
-    private static final String DATA = "data";
-    private static final String FIRST_APP = "firstApp";
-    private static final String SECOND_APP = "secondApp";
+  private static final String DATA = "data";
+  private static final String FIRST_APP = "firstApp";
+  private static final String SECOND_APP = "secondApp";
 
-    @Rule
-    public DynamicPort port1 = new DynamicPort("port1");
-    @Rule
-    public DynamicPort port2 = new DynamicPort("port2");
-    @Rule
-    public DynamicPort port3 = new DynamicPort("port3");
+  @Rule
+  public DynamicPort port1 = new DynamicPort("port1");
+  @Rule
+  public DynamicPort port2 = new DynamicPort("port2");
+  @Rule
+  public DynamicPort port3 = new DynamicPort("port3");
 
-    @Override
-    protected String getDomainConfig()
-    {
-        return "domain/tls/tls-domain-config.xml";
-    }
+  @Override
+  protected String getDomainConfig() {
+    return "domain/tls/tls-domain-config.xml";
+  }
 
-    @Override
-    public ApplicationConfig[] getConfigResources()
-    {
-        return new ApplicationConfig[] {new ApplicationConfig(FIRST_APP, new String[] {"domain/tls/tls-first-app-config.xml"}),
-                new ApplicationConfig(SECOND_APP, new String[] {"domain/tls/tls-second-app-config.xml"})
-        };
-    }
+  @Override
+  public ApplicationConfig[] getConfigResources() {
+    return new ApplicationConfig[] {new ApplicationConfig(FIRST_APP, new String[] {"domain/tls/tls-first-app-config.xml"}),
+        new ApplicationConfig(SECOND_APP, new String[] {"domain/tls/tls-second-app-config.xml"})};
+  }
 
-    @Test
-    public void sharedRequesterUsingSharedTlsContextToLocalListener() throws Exception
-    {
-        testFlowForApp("helloWorldClientFlow", FIRST_APP, "hello world");
-    }
+  @Test
+  public void sharedRequesterUsingSharedTlsContextToLocalListener() throws Exception {
+    testFlowForApp("helloWorldClientFlow", FIRST_APP, "hello world");
+  }
 
-    @Test
-    public void localRequesterToSharedListenerUsingSharedTlsContext() throws Exception
-    {
-        testFlowForApp("helloMuleClientFlow", SECOND_APP, "hello mule");
-    }
+  @Test
+  public void localRequesterToSharedListenerUsingSharedTlsContext() throws Exception {
+    testFlowForApp("helloMuleClientFlow", SECOND_APP, "hello mule");
+  }
 
-    @Test
-    public void muleClientUsingLocalRequesterWithSharedTlsContextToListenerUsingSharedTlsContext() throws Exception
-    {
-        MuleContext secondAppContext = getMuleContextForApp(SECOND_APP);
-        HttpRequesterConfig requesterConfig = secondAppContext.getRegistry().lookupObject("requestConfig");
-        HttpRequestOptions requestConfigOptions = HttpRequestOptionsBuilder.newOptions().requestConfig(requesterConfig).build();
-        testMuleClient(requestConfigOptions);
-    }
+  @Test
+  public void muleClientUsingLocalRequesterWithSharedTlsContextToListenerUsingSharedTlsContext() throws Exception {
+    MuleContext secondAppContext = getMuleContextForApp(SECOND_APP);
+    HttpRequesterConfig requesterConfig = secondAppContext.getRegistry().lookupObject("requestConfig");
+    HttpRequestOptions requestConfigOptions = HttpRequestOptionsBuilder.newOptions().requestConfig(requesterConfig).build();
+    testMuleClient(requestConfigOptions);
+  }
 
-    @Test
-    public void muleClientUsingSharedTlsContextToListenerUsingSharedTlsContext() throws Exception
-    {
-        MuleContext domainContext = getMuleContextForDomain();
-        TlsContextFactory tlsContextFactory = domainContext.getRegistry().lookupObject("sharedTlsContext2");
-        HttpRequestOptions tlsContextOptions = HttpRequestOptionsBuilder.newOptions().tlsContextFactory(tlsContextFactory).build();
-        testMuleClient(tlsContextOptions);
-    }
+  @Test
+  public void muleClientUsingSharedTlsContextToListenerUsingSharedTlsContext() throws Exception {
+    MuleContext domainContext = getMuleContextForDomain();
+    TlsContextFactory tlsContextFactory = domainContext.getRegistry().lookupObject("sharedTlsContext2");
+    HttpRequestOptions tlsContextOptions = HttpRequestOptionsBuilder.newOptions().tlsContextFactory(tlsContextFactory).build();
+    testMuleClient(tlsContextOptions);
+  }
 
-    private void testMuleClient(HttpRequestOptions operationOptions) throws Exception
-    {
-        MuleContext context = getMuleContextForApp(SECOND_APP);
-        MuleMessage response = context.getClient().send(format("https://localhost:%s/helloAll", port3.getValue()), MuleMessage.builder().payload(DATA).build(), operationOptions);
-        assertThat(getPayloadAsString(response, context), is("hello all"));
-    }
+  private void testMuleClient(HttpRequestOptions operationOptions) throws Exception {
+    MuleContext context = getMuleContextForApp(SECOND_APP);
+    MuleMessage response = context.getClient().send(format("https://localhost:%s/helloAll", port3.getValue()),
+                                                    MuleMessage.builder().payload(DATA).build(), operationOptions);
+    assertThat(getPayloadAsString(response, context), is("hello all"));
+  }
 
-    private void testFlowForApp(String flowName, String appName, String expected) throws Exception
-    {
-        MuleEvent response = new FlowRunner(getMuleContextForApp(appName), flowName).withPayload(DATA).run();
-        assertThat(response.getMessageAsString(), is(expected));
-    }
+  private void testFlowForApp(String flowName, String appName, String expected) throws Exception {
+    MuleEvent response = new FlowRunner(getMuleContextForApp(appName), flowName).withPayload(DATA).run();
+    assertThat(response.getMessageAsString(), is(expected));
+  }
 }

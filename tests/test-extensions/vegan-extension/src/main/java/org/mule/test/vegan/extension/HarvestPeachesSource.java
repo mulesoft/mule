@@ -13,23 +13,20 @@ import org.mule.tck.message.StringAttributes;
 import org.mule.tck.testmodels.fruit.Peach;
 
 @Alias("harvest-peaches")
-public class HarvestPeachesSource extends Source<String, StringAttributes>
-{
+public class HarvestPeachesSource extends Source<String, StringAttributes> {
 
-    public static boolean isConnected;
+  public static boolean isConnected;
 
-    @Connection
-    Peach connection;
+  @Connection
+  Peach connection;
 
-    @Override
-    public void start() throws Exception
-    {
-        isConnected = connection != null;
-    }
+  @Override
+  public void start() throws Exception {
+    isConnected = connection != null;
+  }
 
-    @Override
-    public void stop() throws Exception
-    {
+  @Override
+  public void stop() throws Exception {
 
-    }
+  }
 }

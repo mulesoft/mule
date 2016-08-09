@@ -25,47 +25,41 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class DeleteBulkTargetTestCase extends AbstractDbIntegrationTestCase
-{
+public class DeleteBulkTargetTestCase extends AbstractDbIntegrationTestCase {
 
-    public DeleteBulkTargetTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public DeleteBulkTargetTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Parameterized.Parameters
-    public static List<Object[]> parameters()
-    {
-        return TestDbConfig.getResources();
-    }
+  @Parameterized.Parameters
+  public static List<Object[]> parameters() {
+    return TestDbConfig.getResources();
+  }
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/delete/delete-bulk-target-config.xml"};
-    }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/delete/delete-bulk-target-config.xml"};
+  }
 
-    @Test
-    public void usesCustomTarget() throws Exception
-    {
-        List<String> planetNames = new ArrayList<String>();
-        planetNames.add(VENUS.getName());
-        planetNames.add(MARS.getName());
+  @Test
+  public void usesCustomTarget() throws Exception {
+    List<String> planetNames = new ArrayList<String>();
+    planetNames.add(VENUS.getName());
+    planetNames.add(MARS.getName());
 
-        final MuleEvent responseEvent = flowRunner("deleteCustomTarget").withPayload(planetNames).run();
-        final MuleMessage response = responseEvent.getMessage();
+    final MuleEvent responseEvent = flowRunner("deleteCustomTarget").withPayload(planetNames).run();
+    final MuleMessage response = responseEvent.getMessage();
 
-        assertBulkDelete(response.getOutboundProperty("updateCount"));
-    }
+    assertBulkDelete(response.getOutboundProperty("updateCount"));
+  }
 
-    private void assertBulkDelete(Object payload) throws SQLException
-    {
-        assertTrue(payload instanceof int[]);
-        int[] counters = (int[]) payload;
-        assertEquals(2, counters.length);
-        assertExpectedUpdateCount(1, counters[0]);
-        assertExpectedUpdateCount(1, counters[1]);
+  private void assertBulkDelete(Object payload) throws SQLException {
+    assertTrue(payload instanceof int[]);
+    int[] counters = (int[]) payload;
+    assertEquals(2, counters.length);
+    assertExpectedUpdateCount(1, counters[0]);
+    assertExpectedUpdateCount(1, counters[1]);
 
-        assertDeletedPlanetRecords("Pluto", "Venus");
-    }
+    assertDeletedPlanetRecords("Pluto", "Venus");
+  }
 }

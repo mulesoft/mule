@@ -10,38 +10,33 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.config.i18n.MessageFactory;
 
 /**
- * Exception to signal that a given json did not
- * pass validation against a json schema
+ * Exception to signal that a given json did not pass validation against a json schema
  *
  * @since 3.6.0
  */
-public class JsonSchemaValidationException extends MuleException
-{
+public class JsonSchemaValidationException extends MuleException {
 
-    /**
-     * A {@link String} representation of the json
-     */
-    private final String invalidJson;
+  /**
+   * A {@link String} representation of the json
+   */
+  private final String invalidJson;
 
-    public JsonSchemaValidationException(String validationError, String invalidJson)
-    {
-        super(MessageFactory.createStaticMessage(validationError));
-        this.invalidJson = invalidJson;
-    }
+  public JsonSchemaValidationException(String validationError, String invalidJson) {
+    super(MessageFactory.createStaticMessage(validationError));
+    this.invalidJson = invalidJson;
+  }
 
-    public JsonSchemaValidationException(String validationError, String invalidJson, Exception exception)
-    {
-        super(MessageFactory.createStaticMessage(validationError), exception);
-        this.invalidJson = invalidJson;
-    }
+  public JsonSchemaValidationException(String validationError, String invalidJson, Exception exception) {
+    super(MessageFactory.createStaticMessage(validationError), exception);
+    this.invalidJson = invalidJson;
+  }
 
-    /**
-     * Returns a {@link String} representation of the failing json
-     *
-     * @return a {@link String}
-     */
-    public String getInvalidJson()
-    {
-        return invalidJson;
-    }
+  /**
+   * Returns a {@link String} representation of the failing json
+   *
+   * @return a {@link String}
+   */
+  public String getInvalidJson() {
+    return invalidJson;
+  }
 }

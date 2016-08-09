@@ -17,26 +17,23 @@ import org.mule.runtime.module.db.integration.model.AbstractTestDatabase;
 import org.junit.Before;
 import org.junit.Test;
 
-public abstract class AbstractStoredProcedureReturningStreamingResultsetsTestCase extends AbstractDbIntegrationTestCase
-{
+public abstract class AbstractStoredProcedureReturningStreamingResultsetsTestCase extends AbstractDbIntegrationTestCase {
 
-    public AbstractStoredProcedureReturningStreamingResultsetsTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public AbstractStoredProcedureReturningStreamingResultsetsTestCase(String dataSourceConfigResource,
+                                                                     AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Test
-    public void testRequestResponse() throws Exception
-    {
-        final MuleEvent responseEvent = flowRunner("defaultQueryRequestResponse").withPayload(TEST_MESSAGE).run();
+  @Test
+  public void testRequestResponse() throws Exception {
+    final MuleEvent responseEvent = flowRunner("defaultQueryRequestResponse").withPayload(TEST_MESSAGE).run();
 
-        final MuleMessage response = responseEvent.getMessage();
-        assertMessageContains(response, getAllPlanetRecords());
-    }
+    final MuleMessage response = responseEvent.getMessage();
+    assertMessageContains(response, getAllPlanetRecords());
+  }
 
-    @Before
-    public void setupStoredProcedure() throws Exception
-    {
-        testDatabase.createStoredProcedureGetSplitRecords(getDefaultDataSource());
-    }
+  @Before
+  public void setupStoredProcedure() throws Exception {
+    testDatabase.createStoredProcedureGetSplitRecords(getDefaultDataSource());
+  }
 }

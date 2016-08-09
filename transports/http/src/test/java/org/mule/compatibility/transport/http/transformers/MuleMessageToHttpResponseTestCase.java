@@ -35,83 +35,69 @@ import org.apache.commons.httpclient.Header;
 import org.junit.Test;
 
 @SmallTest
-public class MuleMessageToHttpResponseTestCase extends AbstractMuleContextTestCase
-{
+public class MuleMessageToHttpResponseTestCase extends AbstractMuleContextTestCase {
 
-    @Test
-    public void testSetCookieOnOutbound() throws Exception
-    {
-        Cookie[] cookiesOutbound = new Cookie[2];
-        cookiesOutbound[0] = new Cookie("domain", "name-out-1", "value-out-1");
-        cookiesOutbound[1] = new Cookie("domain", "name-out-2", "value-out-2");
+  @Test
+  public void testSetCookieOnOutbound() throws Exception {
+    Cookie[] cookiesOutbound = new Cookie[2];
+    cookiesOutbound[0] = new Cookie("domain", "name-out-1", "value-out-1");
+    cookiesOutbound[1] = new Cookie("domain", "name-out-2", "value-out-2");
 
-        MuleMessage msg = MuleMessage.builder(createMockMessage()).addOutboundProperty("Set-Cookie", cookiesOutbound).build();
+    MuleMessage msg = MuleMessage.builder(createMockMessage()).addOutboundProperty("Set-Cookie", cookiesOutbound).build();
 
-        MuleMessageToHttpResponse transformer = getMuleMessageToHttpResponse();
+    MuleMessageToHttpResponse transformer = getMuleMessageToHttpResponse();
 
-        HttpResponse response = transformer.createResponse(null, UTF_8, msg);
-        Header[] headers = response.getHeaders();
-        int cookiesSet = 0;
-        for(Header header : headers)
-        {
-            if ("Set-Cookie".equals(header.getName()))
-            {
-                cookiesSet++;
-            }
+    HttpResponse response = transformer.createResponse(null, UTF_8, msg);
+    Header[] headers = response.getHeaders();
+    int cookiesSet = 0;
+    for (Header header : headers) {
+      if ("Set-Cookie".equals(header.getName())) {
+        cookiesSet++;
+      }
+    }
+    assertThat(cookiesSet, equalTo(cookiesOutbound.length));
+  }
+
+  @Test
+  public void testSetDateOnOutbound() throws Exception {
+    MuleMessage msg = createMockMessage();
+
+    MuleMessageToHttpResponse transformer = getMuleMessageToHttpResponse();
+    HttpResponse response = transformer.createResponse(null, UTF_8, msg);
+    Header[] headers = response.getHeaders();
+
+    boolean hasDateHeader = false;
+    for (Header header : headers) {
+      if (HttpConstants.HEADER_DATE.equals(header.getName())) {
+        hasDateHeader = true;
+        // validate that the header is in the appropriate format (rfc-1123)
+        SimpleDateFormat formatter = new SimpleDateFormat(HttpConstants.DATE_FORMAT_RFC822, Locale.US);
+        formatter.setLenient(false);
+        try {
+          formatter.parse(header.getValue());
+        } catch (ParseException e) {
+          formatter.setLenient(true);
+          formatter.parse(header.getValue());
         }
-        assertThat(cookiesSet, equalTo(cookiesOutbound.length));
+      }
     }
+    assertThat("Missing 'Date' header", hasDateHeader, is(true));
+  }
 
-    @Test
-    public void testSetDateOnOutbound() throws Exception
-    {
-        MuleMessage msg =
-                createMockMessage();
+  private MuleMessage createMockMessage() throws TransformerException {
+    MuleMessage msg = MuleMessage.builder().payload(new Object()).build();
+    muleContext = spy(muleContext);
+    TransformationService transformationService = mock(TransformationService.class);
+    when(muleContext.getTransformationService()).thenReturn(transformationService);
+    doReturn(MuleMessage.builder().payload((OutputHandler) (event, out) -> {
+    }).build()).when(transformationService).transform(any(MuleMessage.class), any(DataType.class));
+    return msg;
+  }
 
-        MuleMessageToHttpResponse transformer = getMuleMessageToHttpResponse();
-        HttpResponse response = transformer.createResponse(null, UTF_8, msg);
-        Header[] headers = response.getHeaders();
-
-        boolean hasDateHeader = false;
-        for (Header header : headers)
-        {
-            if (HttpConstants.HEADER_DATE.equals(header.getName()))
-            {
-                hasDateHeader = true;
-                // validate that the header is in the appropriate format (rfc-1123)
-                SimpleDateFormat formatter = new SimpleDateFormat(HttpConstants.DATE_FORMAT_RFC822, Locale.US);
-                formatter.setLenient(false);
-                try
-                {
-                    formatter.parse(header.getValue());
-                }
-                catch (ParseException e)
-                {
-                    formatter.setLenient(true);
-                    formatter.parse(header.getValue());
-                }
-            }
-        }
-        assertThat("Missing 'Date' header", hasDateHeader, is(true));
-    }
-
-    private MuleMessage createMockMessage() throws TransformerException
-    {
-        MuleMessage msg = MuleMessage.builder().payload(new Object()).build();
-        muleContext = spy(muleContext);
-        TransformationService transformationService = mock(TransformationService.class);
-        when(muleContext.getTransformationService()).thenReturn(transformationService);
-        doReturn(MuleMessage.builder().payload((OutputHandler) (event, out) ->
-        {
-        }).build()).when(transformationService).transform(any(MuleMessage.class), any(DataType.class));
-        return msg;
-    }
-
-    private MuleMessageToHttpResponse getMuleMessageToHttpResponse() throws Exception
-    {
-        MuleMessageToHttpResponse transformer = new MuleMessageToHttpResponse();
-        transformer.setMuleContext(muleContext);
-        transformer.initialise();
-        return transformer;
-    }
+  private MuleMessageToHttpResponse getMuleMessageToHttpResponse() throws Exception {
+    MuleMessageToHttpResponse transformer = new MuleMessageToHttpResponse();
+    transformer.setMuleContext(muleContext);
+    transformer.initialise();
+    return transformer;
+  }
 }

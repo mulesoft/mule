@@ -17,20 +17,17 @@ import javax.jms.MessageListener;
 /**
  * Registers a single Jms MessageListener for an endpoint
  */
-public class SingleJmsMessageReceiver extends JmsMessageReceiver implements MessageListener
-{
+public class SingleJmsMessageReceiver extends JmsMessageReceiver implements MessageListener {
 
-    public SingleJmsMessageReceiver(Connector connector, FlowConstruct flowConstruct, InboundEndpoint endpoint)
-            throws CreateException
-    {
-        super(connector, flowConstruct, endpoint);
-    }
+  public SingleJmsMessageReceiver(Connector connector, FlowConstruct flowConstruct, InboundEndpoint endpoint)
+      throws CreateException {
+    super(connector, flowConstruct, endpoint);
+  }
 
 
-    @Override
-    public void onMessage(Message message)
-    {
-        JmsWorker worker = new JmsWorker(message, this);
-        worker.run();
-    }
+  @Override
+  public void onMessage(Message message) {
+    JmsWorker worker = new JmsWorker(message, this);
+    worker.run();
+  }
 }

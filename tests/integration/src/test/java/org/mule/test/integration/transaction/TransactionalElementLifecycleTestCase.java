@@ -26,82 +26,70 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 
-public class TransactionalElementLifecycleTestCase extends AbstractIntegrationTestCase
-{
+public class TransactionalElementLifecycleTestCase extends AbstractIntegrationTestCase {
 
-    private static final int POLL_DELAY_MILLIS = 100;
+  private static final int POLL_DELAY_MILLIS = 100;
 
-    private List<TransactionNotification> notifications;
+  private List<TransactionNotification> notifications;
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/integration/transaction/transactional-lifecycle-config.xml";
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/integration/transaction/transactional-lifecycle-config.xml";
+  }
+
+  @Override
+  protected void doSetUp() throws Exception {
+    notifications = new ArrayList<>();
+  }
+
+  @Test
+  public void testInitializeIsCalledInInnerExceptionStrategy() throws Exception {
+    muleContext.getNotificationManager().addListener(new TransactionNotificationListener<TransactionNotification>() {
+
+      @Override
+      public void onNotification(TransactionNotification notification) {
+        notifications.add(notification);
+      }
+    });
+
+    final Latch endDlqFlowLatch = new Latch();
+    FunctionalTestComponent functionalTestComponent = getFunctionalTestComponent("dlq-out");
+    functionalTestComponent.setEventCallback(new EventCallback() {
+
+      @Override
+      public void eventReceived(MuleEventContext context, Object component) throws Exception {
+        endDlqFlowLatch.release();
+      }
+    });
+    flowRunner("in-flow").withPayload("message").run();
+    if (!endDlqFlowLatch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS)) {
+      fail("message wasn't received by dlq flow");
     }
 
-    @Override
-    protected void doSetUp() throws Exception
-    {
-        notifications = new ArrayList<>();
+    assertNotificationsArrived();
+    assertApplicationName();
+  }
+
+  private void assertApplicationName() {
+    for (TransactionNotification notification : notifications) {
+      assertThat(notification.getApplicationName(), is(muleContext.getConfiguration().getId()));
     }
+  }
 
-    @Test
-    public void testInitializeIsCalledInInnerExceptionStrategy() throws Exception
-    {
-        muleContext.getNotificationManager().addListener(new TransactionNotificationListener<TransactionNotification>()
-        {
-            @Override
-            public void onNotification(TransactionNotification notification)
-            {
-                notifications.add(notification);
-            }
-        });
+  private void assertNotificationsArrived() {
+    PollingProber pollingProber = new PollingProber(RECEIVE_TIMEOUT, POLL_DELAY_MILLIS);
+    pollingProber.check(new JUnitProbe() {
 
-        final Latch endDlqFlowLatch = new Latch();
-        FunctionalTestComponent functionalTestComponent = getFunctionalTestComponent("dlq-out");
-        functionalTestComponent.setEventCallback(new EventCallback()
-        {
-            @Override
-            public void eventReceived(MuleEventContext context, Object component) throws Exception
-            {
-                endDlqFlowLatch.release();
-            }
-        });
-        flowRunner("in-flow").withPayload("message").run();
-        if (!endDlqFlowLatch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS))
-        {
-            fail("message wasn't received by dlq flow");
-        }
+      @Override
+      protected boolean test() throws Exception {
+        assertThat(notifications.size(), greaterThanOrEqualTo(2));
+        return true;
+      }
 
-        assertNotificationsArrived();
-        assertApplicationName();
-    }
-
-    private void assertApplicationName()
-    {
-        for (TransactionNotification notification : notifications)
-        {
-            assertThat(notification.getApplicationName(), is(muleContext.getConfiguration().getId()));
-        }
-    }
-
-    private void assertNotificationsArrived()
-    {
-        PollingProber pollingProber = new PollingProber(RECEIVE_TIMEOUT, POLL_DELAY_MILLIS);
-        pollingProber.check(new JUnitProbe()
-        {
-            @Override
-            protected boolean test() throws Exception
-            {
-                assertThat(notifications.size(), greaterThanOrEqualTo(2));
-                return true;
-            }
-
-            @Override
-            public String describeFailure()
-            {
-                return "Notifications did not arrive";
-            }
-        });
-    }
+      @Override
+      public String describeFailure() {
+        return "Notifications did not arrive";
+      }
+    });
+  }
 }

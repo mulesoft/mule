@@ -17,27 +17,23 @@ import java.util.Collection;
  *
  * @since 4.0
  */
-public class TestXmlNamespaceInfoProvider implements XmlNamespaceInfoProvider
-{
+public class TestXmlNamespaceInfoProvider implements XmlNamespaceInfoProvider {
 
-    public static final String TEST_NAMESPACE = "test";
+  public static final String TEST_NAMESPACE = "test";
 
-    @Override
-    public Collection<XmlNamespaceInfo> getXmlNamespacesInfo()
-    {
-        return asList(new XmlNamespaceInfo()
-        {
-            @Override
-            public String getNamespaceUriPrefix()
-            {
-                return "http://www.mulesoft.org/schema/mule/test";
-            }
+  @Override
+  public Collection<XmlNamespaceInfo> getXmlNamespacesInfo() {
+    return asList(new XmlNamespaceInfo() {
 
-            @Override
-            public String getNamespace()
-            {
-                return TEST_NAMESPACE;
-            }
-        });
-    }
+      @Override
+      public String getNamespaceUriPrefix() {
+        return "http://www.mulesoft.org/schema/mule/test";
+      }
+
+      @Override
+      public String getNamespace() {
+        return TEST_NAMESPACE;
+      }
+    });
+  }
 }

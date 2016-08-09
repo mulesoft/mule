@@ -10,33 +10,29 @@ package org.mule.runtime.module.artifact.classloader;
 import java.util.Map;
 
 /**
- * Defines which resources in a class loader should be looked up
- * using parent-first, child-first or child only strategies.
+ * Defines which resources in a class loader should be looked up using parent-first, child-first or child only strategies.
  * <p/>
- * Default lookup strategy is parent first. To use child-first, the
- * corresponding package must be added as an overridden. To use
+ * Default lookup strategy is parent first. To use child-first, the corresponding package must be added as an overridden. To use
  * child-only, the corresponding package must be added as blocked.
  */
-public interface ClassLoaderLookupPolicy
-{
+public interface ClassLoaderLookupPolicy {
 
-    /**
-     * Returns the classloader lookup strategy to use for a given class.
-     *
-     * @param className class to lookup.
-     * @return the configured lookup strategy for the class's package or
-     * {@link ClassLoaderLookupStrategy#CHILD_FIRST} if not explicit configuration
-     * was defined for the package.
-     */
-    ClassLoaderLookupStrategy getLookupStrategy(String className);
+  /**
+   * Returns the classloader lookup strategy to use for a given class.
+   *
+   * @param className class to lookup.
+   * @return the configured lookup strategy for the class's package or {@link ClassLoaderLookupStrategy#CHILD_FIRST} if not
+   *         explicit configuration was defined for the package.
+   */
+  ClassLoaderLookupStrategy getLookupStrategy(String className);
 
-    /**
-     * Creates a new instance extending the original poclicy configuration
-     *
-     * @param lookupStrategies lookup strategies to use with specific packages. Non null.
-     * @return a new policy containing the lookup strategies from the original policy
-     * and the lookup strategies passed on the parameter.
-     */
-    ClassLoaderLookupPolicy extend(Map<String, ClassLoaderLookupStrategy> lookupStrategies);
+  /**
+   * Creates a new instance extending the original poclicy configuration
+   *
+   * @param lookupStrategies lookup strategies to use with specific packages. Non null.
+   * @return a new policy containing the lookup strategies from the original policy and the lookup strategies passed on the
+   *         parameter.
+   */
+  ClassLoaderLookupPolicy extend(Map<String, ClassLoaderLookupStrategy> lookupStrategies);
 
 }

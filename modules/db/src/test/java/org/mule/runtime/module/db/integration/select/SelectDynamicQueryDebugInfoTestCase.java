@@ -32,42 +32,38 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class SelectDynamicQueryDebugInfoTestCase extends AbstractDbIntegrationTestCase
-{
+public class SelectDynamicQueryDebugInfoTestCase extends AbstractDbIntegrationTestCase {
 
-    public SelectDynamicQueryDebugInfoTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public SelectDynamicQueryDebugInfoTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Parameterized.Parameters
-    public static List<Object[]> parameters()
-    {
-        return TestDbConfig.getDerbyResource();
-    }
+  @Parameterized.Parameters
+  public static List<Object[]> parameters() {
+    return TestDbConfig.getDerbyResource();
+  }
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] { "integration/select/select-dynamic-query-config.xml" };
-    }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/select/select-dynamic-query-config.xml"};
+  }
 
-    @Test
-    public void providesDebugInfo() throws Exception
-    {
-        Flow flowConstruct = (Flow) muleContext.getRegistry().lookupFlowConstruct("selectDynamicQuery");
+  @Test
+  public void providesDebugInfo() throws Exception {
+    Flow flowConstruct = (Flow) muleContext.getRegistry().lookupFlowConstruct("selectDynamicQuery");
 
-        List<MessageProcessor> messageProcessors = flowConstruct.getMessageProcessors();
-        AbstractSingleQueryDbMessageProcessor queryMessageProcessor = (AbstractSingleQueryDbMessageProcessor) messageProcessors.get(1);
+    List<MessageProcessor> messageProcessors = flowConstruct.getMessageProcessors();
+    AbstractSingleQueryDbMessageProcessor queryMessageProcessor =
+        (AbstractSingleQueryDbMessageProcessor) messageProcessors.get(1);
 
-        final MuleEvent muleEvent = getTestEvent(TEST_MESSAGE);
-        muleEvent.setFlowVariable("tableName", "PLANET");
-        final List<FieldDebugInfo<?>> debugInfo = queryMessageProcessor.getDebugInfo(muleEvent);
+    final MuleEvent muleEvent = getTestEvent(TEST_MESSAGE);
+    muleEvent.setFlowVariable("tableName", "PLANET");
+    final List<FieldDebugInfo<?>> debugInfo = queryMessageProcessor.getDebugInfo(muleEvent);
 
-        assertThat(debugInfo, is(not(nullValue())));
-        assertThat(debugInfo.size(), equalTo(3));
-        assertThat(debugInfo, hasItem(fieldLike(SQL_TEXT_DEBUG_FIELD, String.class, "select * from PLANET order by ID")));
-        assertThat(debugInfo, hasItem(fieldLike(TYPE_DEBUG_FIELD, String.class, "SELECT")));
-        assertThat(debugInfo, hasItem(fieldLike(INPUT_PARAMS_DEBUG_FIELD, List.class, empty())));
-    }
+    assertThat(debugInfo, is(not(nullValue())));
+    assertThat(debugInfo.size(), equalTo(3));
+    assertThat(debugInfo, hasItem(fieldLike(SQL_TEXT_DEBUG_FIELD, String.class, "select * from PLANET order by ID")));
+    assertThat(debugInfo, hasItem(fieldLike(TYPE_DEBUG_FIELD, String.class, "SELECT")));
+    assertThat(debugInfo, hasItem(fieldLike(INPUT_PARAMS_DEBUG_FIELD, List.class, empty())));
+  }
 }

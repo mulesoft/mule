@@ -10,31 +10,23 @@ import org.dom4j.Node;
 import org.mule.mvel2.ConversionHandler;
 import org.mule.mvel2.conversion.StringCH;
 
-class XMLToStringConversionHandler implements ConversionHandler
-{
+class XMLToStringConversionHandler implements ConversionHandler {
 
-    private StringCH delegate = new StringCH();
+  private StringCH delegate = new StringCH();
 
-    @Override
-    public Object convertFrom(Object in)
-    {
-        if (in instanceof Node)
-        {
-            return ((Node) in).getText();
-        }
-        else if (in instanceof org.w3c.dom.Node)
-        {
-            return ((org.w3c.dom.Node) in).getNodeValue();
-        }
-        else
-        {
-            return delegate.convertFrom(in);
-        }
+  @Override
+  public Object convertFrom(Object in) {
+    if (in instanceof Node) {
+      return ((Node) in).getText();
+    } else if (in instanceof org.w3c.dom.Node) {
+      return ((org.w3c.dom.Node) in).getNodeValue();
+    } else {
+      return delegate.convertFrom(in);
     }
+  }
 
-    @Override
-    public boolean canConvertFrom(@SuppressWarnings("rawtypes") Class cls)
-    {
-        return delegate.canConvertFrom(cls);
-    }
+  @Override
+  public boolean canConvertFrom(@SuppressWarnings("rawtypes") Class cls) {
+    return delegate.canConvertFrom(cls);
+  }
 }

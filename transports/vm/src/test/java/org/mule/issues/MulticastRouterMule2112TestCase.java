@@ -19,50 +19,46 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.junit.Test;
 
-public class MulticastRouterMule2112TestCase  extends FunctionalTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "issues/multicast-router-mule-2112-test.xml";
-    }
+public class MulticastRouterMule2112TestCase extends FunctionalTestCase {
 
-    @Test
-    public void testMulticastRoutingOverTwoEndpoints() throws Exception
-    {
-        FunctionalTestComponent hop1 = getFunctionalTestComponent("hop1");
-        assertNotNull(hop1);
-        FunctionalTestComponent hop2 = getFunctionalTestComponent("hop2");
-        assertNotNull(hop2);
+  @Override
+  protected String getConfigFile() {
+    return "issues/multicast-router-mule-2112-test.xml";
+  }
 
-        final AtomicBoolean hop1made = new AtomicBoolean(false);
-        EventCallback callback1 = new EventCallback()
-        {
-            @Override
-            public void eventReceived(final MuleEventContext context, final Object component) throws Exception
-            {
-                assertTrue(hop1made.compareAndSet(false, true));
-            }
-        };
+  @Test
+  public void testMulticastRoutingOverTwoEndpoints() throws Exception {
+    FunctionalTestComponent hop1 = getFunctionalTestComponent("hop1");
+    assertNotNull(hop1);
+    FunctionalTestComponent hop2 = getFunctionalTestComponent("hop2");
+    assertNotNull(hop2);
 
-        final AtomicBoolean hop2made = new AtomicBoolean(false);
-        EventCallback callback2 = new EventCallback()
-        {
-            @Override
-            public void eventReceived(final MuleEventContext context, final Object component) throws Exception
-            {
-                assertTrue(hop2made.compareAndSet(false, true));
-            }
-        };
+    final AtomicBoolean hop1made = new AtomicBoolean(false);
+    EventCallback callback1 = new EventCallback() {
 
-        hop1.setEventCallback(callback1);
-        hop2.setEventCallback(callback2);
+      @Override
+      public void eventReceived(final MuleEventContext context, final Object component) throws Exception {
+        assertTrue(hop1made.compareAndSet(false, true));
+      }
+    };
 
-        MuleClient client = muleContext.getClient();
-        client.send("vm://inbound", "payload", null);
-        Thread.sleep(1000);
+    final AtomicBoolean hop2made = new AtomicBoolean(false);
+    EventCallback callback2 = new EventCallback() {
 
-        assertTrue("First callback never fired", hop1made.get());
-        assertTrue("Second callback never fired", hop2made.get());
-    }
+      @Override
+      public void eventReceived(final MuleEventContext context, final Object component) throws Exception {
+        assertTrue(hop2made.compareAndSet(false, true));
+      }
+    };
+
+    hop1.setEventCallback(callback1);
+    hop2.setEventCallback(callback2);
+
+    MuleClient client = muleContext.getClient();
+    client.send("vm://inbound", "payload", null);
+    Thread.sleep(1000);
+
+    assertTrue("First callback never fired", hop1made.get());
+    assertTrue("Second callback never fired", hop2made.get());
+  }
 }

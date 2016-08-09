@@ -18,47 +18,41 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-public abstract class AbstractMuleMessageWireFormatTestCase extends AbstractWireFormatTestCase
-{
+public abstract class AbstractMuleMessageWireFormatTestCase extends AbstractWireFormatTestCase {
 
-    @Override
-    public void testWriteReadMessage() throws Exception
-    {
-        // Create message to send over wire
-        Map<String, Serializable> messageProerties = new HashMap<>();
-        messageProerties.put("key1", "val1");
-        MuleMessage inMessage = MuleMessage.builder().payload("testMessage").outboundProperties(messageProerties).build();
+  @Override
+  public void testWriteReadMessage() throws Exception {
+    // Create message to send over wire
+    Map<String, Serializable> messageProerties = new HashMap<>();
+    messageProerties.put("key1", "val1");
+    MuleMessage inMessage = MuleMessage.builder().payload("testMessage").outboundProperties(messageProerties).build();
 
-        Object outMessage = readWrite(inMessage);
+    Object outMessage = readWrite(inMessage);
 
-        // Test deserialized message
-        // NOTE: As we are using SerializedMuleMessageWireFormat we get
-        // MuleMessage rather than just the payload
+    // Test deserialized message
+    // NOTE: As we are using SerializedMuleMessageWireFormat we get
+    // MuleMessage rather than just the payload
 
-        assertTrue(outMessage instanceof MuleMessage);
-        assertEquals("testMessage", ((MuleMessage) outMessage).getPayload());
-        assertEquals("val1", ((MuleMessage) outMessage).getOutboundProperty("key1"));
+    assertTrue(outMessage instanceof MuleMessage);
+    assertEquals("testMessage", ((MuleMessage) outMessage).getPayload());
+    assertEquals("val1", ((MuleMessage) outMessage).getOutboundProperty("key1"));
+  }
+
+  @Override
+  public void testWriteReadPayload() throws Exception {
+    // Create orange to send over the wire
+    Properties messageProerties = new Properties();
+    messageProerties.put("key1", "val1");
+    Orange inOrange = new Orange();
+    inOrange.setBrand("Walmart");
+    inOrange.setMapProperties(messageProerties);
+
+    try {
+      readWrite(inOrange);
+      fail("Expected exception: MuleMessageWireFormat does not support other types");
+    } catch (Exception e) {
+      // Expected
     }
-
-    @Override
-    public void testWriteReadPayload() throws Exception
-    {
-        // Create orange to send over the wire
-        Properties messageProerties = new Properties();
-        messageProerties.put("key1", "val1");
-        Orange inOrange = new Orange();
-        inOrange.setBrand("Walmart");
-        inOrange.setMapProperties(messageProerties);
-
-        try
-        {
-            readWrite(inOrange);
-            fail("Expected exception: MuleMessageWireFormat does not support other types");
-        }
-        catch (Exception e)
-        {
-            // Expected
-        }
-    }
+  }
 
 }

@@ -14,8 +14,7 @@ import java.util.List;
 /**
  * Represents an artifact configuration file and it's content in hierarchical format.
  *
- * A {@code ConfigFile} has a set of {@code ConfigLine} which represents the global definitions
- * in the configuration file.
+ * A {@code ConfigFile} has a set of {@code ConfigLine} which represents the global definitions in the configuration file.
  *
  * Each {@code ConfigLine} may have nested {@code ConfigLine}s inside.
  *
@@ -23,32 +22,32 @@ import java.util.List;
  */
 public class ConfigFile implements Comparable<ConfigFile> {
 
-    private String filename;
-    private List<ConfigLine> configLines;
+  private String filename;
+  private List<ConfigLine> configLines;
 
-    public ConfigFile(String filename, List<ConfigLine> configLines) {
-        checkState(filename != null, "A config file must have a name");
-        checkState(configLines != null, "A config file cannot have config lines");
-        this.filename = filename;
-        this.configLines = configLines;
-    }
+  public ConfigFile(String filename, List<ConfigLine> configLines) {
+    checkState(filename != null, "A config file must have a name");
+    checkState(configLines != null, "A config file cannot have config lines");
+    this.filename = filename;
+    this.configLines = configLines;
+  }
 
-    /**
-     * @return the configuration file name
-     */
-    public String getFilename() {
-        return filename;
-    }
+  /**
+   * @return the configuration file name
+   */
+  public String getFilename() {
+    return filename;
+  }
 
-    /**
-     * @return the configuration file lines as a list in the same order as they appear in the file.
-     */
-    public List<ConfigLine> getConfigLines() {
-        return configLines;
-    }
+  /**
+   * @return the configuration file lines as a list in the same order as they appear in the file.
+   */
+  public List<ConfigLine> getConfigLines() {
+    return configLines;
+  }
 
-    @Override
-    public int compareTo(ConfigFile o) {
-        return filename.compareTo(o.filename);
-    }
+  @Override
+  public int compareTo(ConfigFile o) {
+    return filename.compareTo(o.filename);
+  }
 }

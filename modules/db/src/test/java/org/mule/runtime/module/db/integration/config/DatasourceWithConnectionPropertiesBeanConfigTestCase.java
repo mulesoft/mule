@@ -13,14 +13,13 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Test;
 
-public class DatasourceWithConnectionPropertiesBeanConfigTestCase extends AbstractMuleContextTestCase
-{
+public class DatasourceWithConnectionPropertiesBeanConfigTestCase extends AbstractMuleContextTestCase {
 
-    @Test(expected = InitialisationException.class)
-    public void expectFailure() throws Exception
-    {
-        //TODO MULE-10061 - Review once the MuleContext lifecycle is clearly defined
-        new DefaultMuleContextFactory().createMuleContext(new SpringXmlConfigurationBuilder("integration/config/bean-datasource-with-connection-properties-config.xml"));
-    }
+  @Test(expected = InitialisationException.class)
+  public void expectFailure() throws Exception {
+    // TODO MULE-10061 - Review once the MuleContext lifecycle is clearly defined
+    new DefaultMuleContextFactory()
+        .createMuleContext(new SpringXmlConfigurationBuilder("integration/config/bean-datasource-with-connection-properties-config.xml"));
+  }
 
 }

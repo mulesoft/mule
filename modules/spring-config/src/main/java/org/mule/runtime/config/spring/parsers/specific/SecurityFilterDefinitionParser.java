@@ -17,37 +17,30 @@ import org.mule.runtime.core.processor.SecurityFilterMessageProcessor;
 import org.w3c.dom.Element;
 
 /**
- * This allows a security filter to be defined globally, or embedded within an endpoint. The filter is
- * always wrapped in a SecurityFilterMessageProcessorBuilder instance before being injected into the parent.
+ * This allows a security filter to be defined globally, or embedded within an endpoint. The filter is always wrapped in a
+ * SecurityFilterMessageProcessorBuilder instance before being injected into the parent.
  */
-public class SecurityFilterDefinitionParser extends ParentContextDefinitionParser  implements WrappingChildDefinitionParser.WrappingController
-{
+public class SecurityFilterDefinitionParser extends ParentContextDefinitionParser
+    implements WrappingChildDefinitionParser.WrappingController {
 
-    public static final String SECURITY_FILTER = "filter";
-    public static final String ATTRIBUTE_NAME = AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME;
+  public static final String SECURITY_FILTER = "filter";
+  public static final String ATTRIBUTE_NAME = AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME;
 
-    public SecurityFilterDefinitionParser(Class filter)
-    {
-        super(MuleOrphanDefinitionParser.ROOT_ELEMENT, new OrphanDefinitionParser(filter, false));
-        otherwise(
-            new WrappingChildDefinitionParser(
-                "messageProcessor", filter, SecurityFilter.class, false, SecurityFilterMessageProcessor.class,
-                SECURITY_FILTER, SECURITY_FILTER, this));
-        addIgnored(ATTRIBUTE_NAME);
-    }
+  public SecurityFilterDefinitionParser(Class filter) {
+    super(MuleOrphanDefinitionParser.ROOT_ELEMENT, new OrphanDefinitionParser(filter, false));
+    otherwise(new WrappingChildDefinitionParser("messageProcessor", filter, SecurityFilter.class, false,
+                                                SecurityFilterMessageProcessor.class, SECURITY_FILTER, SECURITY_FILTER, this));
+    addIgnored(ATTRIBUTE_NAME);
+  }
 
-    public SecurityFilterDefinitionParser()
-    {
-        super(MuleOrphanDefinitionParser.ROOT_ELEMENT, new OrphanDefinitionParser(false));
-        otherwise(
-            new WrappingChildDefinitionParser(
-                "messageProcessor", null, SecurityFilter.class, true, SecurityFilterMessageProcessor.class,
-                SECURITY_FILTER, SECURITY_FILTER, this));
-        addIgnored(ATTRIBUTE_NAME);
-    }
+  public SecurityFilterDefinitionParser() {
+    super(MuleOrphanDefinitionParser.ROOT_ELEMENT, new OrphanDefinitionParser(false));
+    otherwise(new WrappingChildDefinitionParser("messageProcessor", null, SecurityFilter.class, true,
+                                                SecurityFilterMessageProcessor.class, SECURITY_FILTER, SECURITY_FILTER, this));
+    addIgnored(ATTRIBUTE_NAME);
+  }
 
-    public boolean shouldWrap(Element elm)
-    {
-        return true;
-    }
+  public boolean shouldWrap(Element elm) {
+    return true;
+  }
 }

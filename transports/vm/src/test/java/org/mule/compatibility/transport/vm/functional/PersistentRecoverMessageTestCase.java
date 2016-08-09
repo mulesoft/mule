@@ -18,42 +18,38 @@ import org.mule.runtime.core.util.queue.TransactionalQueueManager;
 
 import org.junit.Test;
 
-public class PersistentRecoverMessageTestCase extends FunctionalTestCase
-{
+public class PersistentRecoverMessageTestCase extends FunctionalTestCase {
 
-    public static final String TEST_QUEUE_NAME = "flowOut";
+  public static final String TEST_QUEUE_NAME = "flowOut";
 
-    public PersistentRecoverMessageTestCase()
-    {
-        setStartContext(false);
-    }
+  public PersistentRecoverMessageTestCase() {
+    setStartContext(false);
+  }
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "vm/persistent-vmqueue-test.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "vm/persistent-vmqueue-test.xml";
+  }
 
-    @Test
-    public void testRecoverMessage() throws Exception
-    {
-        TransactionalQueueManager transactionalQueueManager = new TransactionalQueueManager();
-        transactionalQueueManager.setMuleContext(muleContext);
-        transactionalQueueManager.setQueueConfiguration(TEST_QUEUE_NAME, new DefaultQueueConfiguration(0, true));
-        transactionalQueueManager.initialise();
-        transactionalQueueManager.start();
-        MuleEvent testEvent = getTestEvent("echo");
-        transactionalQueueManager.getQueueSession().getQueue(TEST_QUEUE_NAME).put(testEvent.getMessage());
+  @Test
+  public void testRecoverMessage() throws Exception {
+    TransactionalQueueManager transactionalQueueManager = new TransactionalQueueManager();
+    transactionalQueueManager.setMuleContext(muleContext);
+    transactionalQueueManager.setQueueConfiguration(TEST_QUEUE_NAME, new DefaultQueueConfiguration(0, true));
+    transactionalQueueManager.initialise();
+    transactionalQueueManager.start();
+    MuleEvent testEvent = getTestEvent("echo");
+    transactionalQueueManager.getQueueSession().getQueue(TEST_QUEUE_NAME).put(testEvent.getMessage());
 
-        transactionalQueueManager.stop();
+    transactionalQueueManager.stop();
 
-        muleContext.start();
+    muleContext.start();
 
-        MuleClient client = muleContext.getClient();
-        MuleMessage result = client.request("vm://" + TEST_QUEUE_NAME, RECEIVE_TIMEOUT);
-        assertNotNull(result);
-        assertEquals(getPayloadAsString(testEvent.getMessage()), result.getPayload());
-    }
+    MuleClient client = muleContext.getClient();
+    MuleMessage result = client.request("vm://" + TEST_QUEUE_NAME, RECEIVE_TIMEOUT);
+    assertNotNull(result);
+    assertEquals(getPayloadAsString(testEvent.getMessage()), result.getPayload());
+  }
 }
 
 

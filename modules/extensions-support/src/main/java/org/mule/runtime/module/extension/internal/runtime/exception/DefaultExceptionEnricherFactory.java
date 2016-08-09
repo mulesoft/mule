@@ -12,26 +12,22 @@ import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.extension.api.introspection.exception.ExceptionEnricher;
 import org.mule.runtime.extension.api.introspection.exception.ExceptionEnricherFactory;
 
-public final class DefaultExceptionEnricherFactory implements ExceptionEnricherFactory
-{
-    private final ExceptionEnricher enricher;
+public final class DefaultExceptionEnricherFactory implements ExceptionEnricherFactory {
 
-    public DefaultExceptionEnricherFactory(Class<? extends ExceptionEnricher> enricherType)
-    {
-        checkArgument(enricherType != null, "ExceptionEnricher type cannot be null");
-        try
-        {
-            enricher = enricherType.newInstance();
-        }
-        catch (Exception e)
-        {
-            throw new MuleRuntimeException(createStaticMessage("Could not create ExceptionEnricher of type " + enricherType.getName()), e);
-        }
-    }
+  private final ExceptionEnricher enricher;
 
-    @Override
-    public ExceptionEnricher createEnricher()
-    {
-        return enricher;
+  public DefaultExceptionEnricherFactory(Class<? extends ExceptionEnricher> enricherType) {
+    checkArgument(enricherType != null, "ExceptionEnricher type cannot be null");
+    try {
+      enricher = enricherType.newInstance();
+    } catch (Exception e) {
+      throw new MuleRuntimeException(createStaticMessage("Could not create ExceptionEnricher of type " + enricherType.getName()),
+                                     e);
     }
+  }
+
+  @Override
+  public ExceptionEnricher createEnricher() {
+    return enricher;
+  }
 }

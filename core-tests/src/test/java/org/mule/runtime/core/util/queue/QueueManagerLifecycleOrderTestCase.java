@@ -31,102 +31,89 @@ import org.junit.Before;
 import org.junit.Test;
 
 @SmallTest
-public class QueueManagerLifecycleOrderTestCase extends AbstractMuleTestCase
-{
-    private List<Object> startStopOrder = new ArrayList<>();
-    private RecordingTQM rtqm = new RecordingTQM();
+public class QueueManagerLifecycleOrderTestCase extends AbstractMuleTestCase {
 
-    private MuleContext muleContext;
+  private List<Object> startStopOrder = new ArrayList<>();
+  private RecordingTQM rtqm = new RecordingTQM();
 
-    @Before
-    public void before() throws InitialisationException, ConfigurationException
-    {
-        muleContext = new DefaultMuleContextFactory().createMuleContext(new QueueManagerOnlyConfigurationBuilder());
+  private MuleContext muleContext;
+
+  @Before
+  public void before() throws InitialisationException, ConfigurationException {
+    muleContext = new DefaultMuleContextFactory().createMuleContext(new QueueManagerOnlyConfigurationBuilder());
+  }
+
+  @After
+  public void after() {
+    muleContext.dispose();
+  }
+
+  @Test
+  public void testStartupOrder() throws Exception {
+    FlowConstruct fc = new RecordingFlow("dummy", muleContext);
+    muleContext.getRegistry().registerFlowConstruct(fc);
+    muleContext.start();
+    muleContext.stop();
+    assertEquals(4, startStopOrder.size());
+    assertSame(rtqm, startStopOrder.get(0));
+    assertSame(fc, startStopOrder.get(1));
+    assertSame(fc, startStopOrder.get(2));
+    assertSame(rtqm, startStopOrder.get(3));
+
+  }
+
+  private class RecordingTQM implements QueueManager {
+
+    @Override
+    public void start() throws MuleException {
+      startStopOrder.add(this);
     }
 
-    @After
-    public void after()
-    {
-        muleContext.dispose();
+    @Override
+    public void stop() throws MuleException {
+      startStopOrder.add(this);
     }
 
-    @Test
-    public void testStartupOrder() throws Exception
-    {
-        FlowConstruct fc = new RecordingFlow("dummy", muleContext);
-        muleContext.getRegistry().registerFlowConstruct(fc);
-        muleContext.start();
-        muleContext.stop();
-        assertEquals(4, startStopOrder.size());
-        assertSame(rtqm, startStopOrder.get(0));
-        assertSame(fc, startStopOrder.get(1));
-        assertSame(fc, startStopOrder.get(2));
-        assertSame(rtqm, startStopOrder.get(3));
-
+    @Override
+    public QueueSession getQueueSession() {
+      throw new NotImplementedException();
     }
 
-    private class RecordingTQM implements QueueManager
-    {
-        @Override
-        public void start() throws MuleException
-        {
-            startStopOrder.add(this);
-        }
-
-        @Override
-        public void stop() throws MuleException
-        {
-            startStopOrder.add(this);
-        }
-
-        @Override
-        public QueueSession getQueueSession()
-        {
-            throw new NotImplementedException();
-        }
-
-        @Override
-        public void setDefaultQueueConfiguration(QueueConfiguration config)
-        {
-            throw new NotImplementedException();
-        }
-
-        @Override
-        public void setQueueConfiguration(String queueName, QueueConfiguration config)
-        {
-            throw new NotImplementedException();
-        }
+    @Override
+    public void setDefaultQueueConfiguration(QueueConfiguration config) {
+      throw new NotImplementedException();
     }
 
-    private class RecordingFlow extends Flow
-    {
-        public RecordingFlow(String name, MuleContext muleContext)
-        {
-            super(name, muleContext);
-        }
+    @Override
+    public void setQueueConfiguration(String queueName, QueueConfiguration config) {
+      throw new NotImplementedException();
+    }
+  }
 
-        @Override
-        public void doStart() throws MuleException
-        {
-            startStopOrder.add(this);
-        }
+  private class RecordingFlow extends Flow {
 
-        @Override
-        public void doStop() throws MuleException
-        {
-            startStopOrder.add(this);
-        }
+    public RecordingFlow(String name, MuleContext muleContext) {
+      super(name, muleContext);
     }
 
-    private class QueueManagerOnlyConfigurationBuilder extends DefaultsConfigurationBuilder
-    {
-        @Override
-        protected void doConfigure(MuleContext muleContext) throws Exception
-        {
-            muleContext.getRegistry().registerObject(MuleProperties.OBJECT_QUEUE_MANAGER, rtqm);
-            muleContext.getRegistry().registerObject(MuleProperties.OBJECT_SECURITY_MANAGER,
-                new MuleSecurityManager());
-
-        }
+    @Override
+    public void doStart() throws MuleException {
+      startStopOrder.add(this);
     }
+
+    @Override
+    public void doStop() throws MuleException {
+      startStopOrder.add(this);
+    }
+  }
+
+  private class QueueManagerOnlyConfigurationBuilder extends DefaultsConfigurationBuilder {
+
+    @Override
+    protected void doConfigure(MuleContext muleContext) throws Exception {
+      muleContext.getRegistry().registerObject(MuleProperties.OBJECT_QUEUE_MANAGER, rtqm);
+      muleContext.getRegistry().registerObject(MuleProperties.OBJECT_SECURITY_MANAGER, new MuleSecurityManager());
+
+    }
+  }
 }

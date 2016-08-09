@@ -13,23 +13,22 @@ import org.mule.runtime.core.api.object.ObjectFactory;
 /**
  * <code>ObjectPool</code> is a simple pooling interface for objects
  */
-public interface ObjectPool extends Initialisable, Disposable
-{
+public interface ObjectPool extends Initialisable, Disposable {
 
-    Object borrowObject() throws Exception;
+  Object borrowObject() throws Exception;
 
-    void returnObject(Object object);
+  void returnObject(Object object);
 
-    int getNumActive();
+  int getNumActive();
 
-    int getMaxActive();
+  int getMaxActive();
 
-    void clear();
+  void clear();
 
-    void close();
+  void close();
 
-    void setObjectFactory(ObjectFactory objectFactory);
-    
-    ObjectFactory getObjectFactory();
+  void setObjectFactory(ObjectFactory objectFactory);
+
+  ObjectFactory getObjectFactory();
 
 }

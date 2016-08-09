@@ -13,26 +13,23 @@ import org.mule.runtime.core.api.routing.filter.FilterUnacceptedException;
 
 import org.junit.Test;
 
-public class ExceptionStrategyFilterMule5342TestCase extends AbstractIntegrationTestCase
-{
+public class ExceptionStrategyFilterMule5342TestCase extends AbstractIntegrationTestCase {
+
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/integration/exceptions/exception-strategy-filter-mule-5342.xml";
+  }
+
+  @Test(expected = FilterUnacceptedException.class)
+  public void exceptionThrownFromMessageFilterIsHandledByExceptionHandler() throws Exception {
+    flowRunner("filter").withPayload(TEST_MESSAGE).run();
+  }
+
+  public static class FalseFilter implements Filter {
+
     @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/integration/exceptions/exception-strategy-filter-mule-5342.xml";
+    public boolean accept(MuleMessage message) {
+      return false;
     }
-
-    @Test(expected = FilterUnacceptedException.class)
-    public void exceptionThrownFromMessageFilterIsHandledByExceptionHandler() throws Exception
-    {
-        flowRunner("filter").withPayload(TEST_MESSAGE).run();
-    }
-
-    public static class FalseFilter implements Filter
-    {
-        @Override
-        public boolean accept(MuleMessage message)
-        {
-            return false;
-        }
-    }
+  }
 }

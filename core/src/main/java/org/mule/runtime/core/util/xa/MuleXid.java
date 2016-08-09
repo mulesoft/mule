@@ -17,69 +17,60 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 /**
  * Mule {@link javax.transaction.xa.Xid} implementation
  */
-public class MuleXid implements Xid, Comparable<Xid>
-{
+public class MuleXid implements Xid, Comparable<Xid> {
 
-    private final int formatId;
-    private final byte[] globalTransactionId;
-    private final byte[] branchQualifier;
+  private final int formatId;
+  private final byte[] globalTransactionId;
+  private final byte[] branchQualifier;
 
-    public MuleXid(int formatId, byte[] globalTransactionId, byte[] branchQualifier)
-    {
-        this.formatId = formatId;
-        this.globalTransactionId = globalTransactionId;
-        this.branchQualifier = branchQualifier;
+  public MuleXid(int formatId, byte[] globalTransactionId, byte[] branchQualifier) {
+    this.formatId = formatId;
+    this.globalTransactionId = globalTransactionId;
+    this.branchQualifier = branchQualifier;
+  }
+
+  public MuleXid(Xid txId) {
+    this.formatId = txId.getFormatId();
+    this.globalTransactionId = txId.getGlobalTransactionId();
+    this.branchQualifier = txId.getBranchQualifier();
+  }
+
+  @Override
+  public int getFormatId() {
+    return formatId;
+  }
+
+  @Override
+  public byte[] getGlobalTransactionId() {
+    return globalTransactionId;
+  }
+
+  @Override
+  public byte[] getBranchQualifier() {
+    return branchQualifier;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (!(obj instanceof Xid)) {
+      return false;
     }
+    Xid other = (Xid) obj;
+    return Arrays.equals(getGlobalTransactionId(), other.getGlobalTransactionId())
+        && Arrays.equals(getBranchQualifier(), other.getBranchQualifier()) && getFormatId() == other.getFormatId();
+  }
 
-    public MuleXid(Xid txId)
-    {
-        this.formatId = txId.getFormatId();
-        this.globalTransactionId = txId.getGlobalTransactionId();
-        this.branchQualifier = txId.getBranchQualifier();
-    }
+  @Override
+  public int hashCode() {
+    return formatId * HashCode.fromBytes(globalTransactionId).asInt() * HashCode.fromBytes(branchQualifier).asInt() * 17;
+  }
 
-    @Override
-    public int getFormatId()
-    {
-        return formatId;
+  @Override
+  public int compareTo(Xid o) {
+    if (formatId == o.getFormatId() && Arrays.equals(globalTransactionId, o.getGlobalTransactionId())
+        && Arrays.equals(branchQualifier, o.getBranchQualifier())) {
+      return 0;
     }
-
-    @Override
-    public byte[] getGlobalTransactionId()
-    {
-        return globalTransactionId;
-    }
-
-    @Override
-    public byte[] getBranchQualifier()
-    {
-        return branchQualifier;
-    }
-
-    @Override
-    public boolean equals(Object obj)
-    {
-        if (!(obj instanceof Xid))
-        {
-            return false;
-        }
-        Xid other = (Xid) obj;
-        return Arrays.equals(getGlobalTransactionId(), other.getGlobalTransactionId()) && Arrays.equals(getBranchQualifier(),other.getBranchQualifier()) && getFormatId() == other.getFormatId();
-    }
-
-    @Override
-    public int hashCode()
-    {
-        return formatId * HashCode.fromBytes(globalTransactionId).asInt() * HashCode.fromBytes(branchQualifier).asInt() * 17;
-    }
-
-    @Override
-    public int compareTo(Xid o)
-    {
-        if (formatId == o.getFormatId() && Arrays.equals(globalTransactionId, o.getGlobalTransactionId()) && Arrays.equals(branchQualifier, o.getBranchQualifier()))
-        {
-            return 0;
-        }
-        return this.hashCode() > o.hashCode() ? 1 : -1;
-    }
+    return this.hashCode() > o.hashCode() ? 1 : -1;
+  }
 }

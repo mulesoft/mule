@@ -21,52 +21,43 @@ import javax.resource.spi.work.Work;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class DefaultMuleWorkManagerTestCase extends AbstractMuleContextTestCase
-{
+public class DefaultMuleWorkManagerTestCase extends AbstractMuleContextTestCase {
 
-    private final static int MAX_NUMBER_OF_THREADS_ALLOWED = 2;
+  private final static int MAX_NUMBER_OF_THREADS_ALLOWED = 2;
 
-    @Rule
-    public SystemProperty systemProperty = new SystemProperty(MULE_CONTEXT_WORKMANAGER_MAXTHREADSACTIVE, String.valueOf(MAX_NUMBER_OF_THREADS_ALLOWED));
+  @Rule
+  public SystemProperty systemProperty =
+      new SystemProperty(MULE_CONTEXT_WORKMANAGER_MAXTHREADSACTIVE, String.valueOf(MAX_NUMBER_OF_THREADS_ALLOWED));
 
-    @Test
-    public void contextWorkManagerCanBeConfiguredThroughSystemProperties() throws Exception
-    {
-        final Thread currentThread = Thread.currentThread();
-        final AtomicBoolean workExecutedInCurrentThread = new AtomicBoolean(false);
-        final Latch holdThreads = new Latch();
-        for (int i = 0; i < MAX_NUMBER_OF_THREADS_ALLOWED + 1; i++)
-        {
-            muleContext.getWorkManager().scheduleWork(new Work()
-            {
-                @Override
-                public void release()
-                {
-                }
+  @Test
+  public void contextWorkManagerCanBeConfiguredThroughSystemProperties() throws Exception {
+    final Thread currentThread = Thread.currentThread();
+    final AtomicBoolean workExecutedInCurrentThread = new AtomicBoolean(false);
+    final Latch holdThreads = new Latch();
+    for (int i = 0; i < MAX_NUMBER_OF_THREADS_ALLOWED + 1; i++) {
+      muleContext.getWorkManager().scheduleWork(new Work() {
 
-                @Override
-                public void run()
-                {
-                    //Since current thread is used to execute work when no there are no more threads
-                    // in the thread pool this should be true for the last work.
-                    if (Thread.currentThread().equals(currentThread))
-                    {
-                        workExecutedInCurrentThread.set(true);
-                        return;
-                    }
-                    try
-                    {
-                        holdThreads.await();
-                    }
-                    catch (InterruptedException e)
-                    {
-                        throw new RuntimeException(e);
-                    }
-                }
-            });
+        @Override
+        public void release() {}
+
+        @Override
+        public void run() {
+          // Since current thread is used to execute work when no there are no more threads
+          // in the thread pool this should be true for the last work.
+          if (Thread.currentThread().equals(currentThread)) {
+            workExecutedInCurrentThread.set(true);
+            return;
+          }
+          try {
+            holdThreads.await();
+          } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+          }
         }
-        assertThat(workExecutedInCurrentThread.get(), is(true));
-        holdThreads.release();
+      });
     }
+    assertThat(workExecutedInCurrentThread.get(), is(true));
+    holdThreads.release();
+  }
 
 }

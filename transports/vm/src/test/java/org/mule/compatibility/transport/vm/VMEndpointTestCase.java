@@ -15,19 +15,17 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Test;
 
-public class VMEndpointTestCase extends AbstractMuleContextTestCase
-{
+public class VMEndpointTestCase extends AbstractMuleContextTestCase {
 
-    @Test
-    public void testUrlWithProvider() throws Exception
-    {
-        EndpointURI url = new MuleEndpointURI("vm://some.queue?endpointName=vmProvider", muleContext);
-        url.initialise();
-        assertEquals(VMConnector.VM, url.getScheme());
-        assertEquals("some.queue", url.getAddress());
-        assertEquals("vmProvider", url.getEndpointName());
-        assertEquals("vm://some.queue?endpointName=vmProvider", url.toString());
-        assertEquals(1, url.getParams().size());
-    }
+  @Test
+  public void testUrlWithProvider() throws Exception {
+    EndpointURI url = new MuleEndpointURI("vm://some.queue?endpointName=vmProvider", muleContext);
+    url.initialise();
+    assertEquals(VMConnector.VM, url.getScheme());
+    assertEquals("some.queue", url.getAddress());
+    assertEquals("vmProvider", url.getEndpointName());
+    assertEquals("vm://some.queue?endpointName=vmProvider", url.toString());
+    assertEquals(1, url.getParams().size());
+  }
 
 }

@@ -14,22 +14,17 @@ import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-abstract class AbstractValueResolverTestCase extends AbstractMuleContextTestCase
-{
+abstract class AbstractValueResolverTestCase extends AbstractMuleContextTestCase {
 
-    protected void assertEvaluation(Object evaluated, Object expected)
-    {
-        if (expected == null)
-        {
-            assertThat(evaluated, is(nullValue()));
-        }
-        else
-        {
-            assertThat(evaluated, is(notNullValue()));
-            assertThat(evaluated, instanceOf(expected.getClass()));
-            assertThat(evaluated, equalTo(expected));
-        }
+  protected void assertEvaluation(Object evaluated, Object expected) {
+    if (expected == null) {
+      assertThat(evaluated, is(nullValue()));
+    } else {
+      assertThat(evaluated, is(notNullValue()));
+      assertThat(evaluated, instanceOf(expected.getClass()));
+      assertThat(evaluated, equalTo(expected));
     }
+  }
 
-    protected abstract ValueResolver getResolver(String expression);
+  protected abstract ValueResolver getResolver(String expression);
 }

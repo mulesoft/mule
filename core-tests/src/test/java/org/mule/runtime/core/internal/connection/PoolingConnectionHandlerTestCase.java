@@ -25,47 +25,42 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class PoolingConnectionHandlerTestCase extends AbstractMuleTestCase
-{
+public class PoolingConnectionHandlerTestCase extends AbstractMuleTestCase {
 
-    @Mock
-    private ObjectPool<Object> pool;
+  @Mock
+  private ObjectPool<Object> pool;
 
-    @Mock
-    private Object config;
+  @Mock
+  private Object config;
 
-    @Mock
-    private Object connection;
+  @Mock
+  private Object connection;
 
-    @Mock
-    private PoolingListener<Object> poolingListener;
+  @Mock
+  private PoolingListener<Object> poolingListener;
 
-    private PoolingConnectionHandler<Object> managedConnection;
+  private PoolingConnectionHandler<Object> managedConnection;
 
-    @Before
-    public void before()
-    {
-        managedConnection = new PoolingConnectionHandler<>(connection, pool, poolingListener);
-    }
+  @Before
+  public void before() {
+    managedConnection = new PoolingConnectionHandler<>(connection, pool, poolingListener);
+  }
 
-    @Test
-    public void getConnection() throws Exception
-    {
-        assertThat(managedConnection.getConnection(), is(sameInstance(connection)));
-    }
+  @Test
+  public void getConnection() throws Exception {
+    assertThat(managedConnection.getConnection(), is(sameInstance(connection)));
+  }
 
-    @Test
-    public void release() throws Exception
-    {
-        managedConnection.release();
-        verify(pool).returnObject(connection);
-        verify(poolingListener).onReturn(connection);
-    }
+  @Test
+  public void release() throws Exception {
+    managedConnection.release();
+    verify(pool).returnObject(connection);
+    verify(poolingListener).onReturn(connection);
+  }
 
-    @Test
-    public void close() throws Exception
-    {
-        managedConnection.close();
-        verify(pool, never()).returnObject(anyObject());
-    }
+  @Test
+  public void close() throws Exception {
+    managedConnection.close();
+    verify(pool, never()).returnObject(anyObject());
+  }
 }

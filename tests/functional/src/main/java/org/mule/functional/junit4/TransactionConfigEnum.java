@@ -11,79 +11,76 @@ import org.mule.runtime.core.api.transaction.TransactionConfig;
 /**
  * Helper to access constants from {@link TransactionConfig}.
  */
-public enum TransactionConfigEnum
-{
-    /**
-     * Whether there is a transaction available or not, ignore it
-     * <p>
-     * J2EE: NotSupported
-     */
-    ACTION_NONE((byte) 0),
+public enum TransactionConfigEnum {
+  /**
+   * Whether there is a transaction available or not, ignore it
+   * <p>
+   * J2EE: NotSupported
+   */
+  ACTION_NONE((byte) 0),
 
-    /**
-     * Will ensure that a new transaction is created for each invocation
-     * <p>
-     * J2EE RequiresNew
-     */
-    ACTION_ALWAYS_BEGIN((byte) 1),
+  /**
+   * Will ensure that a new transaction is created for each invocation
+   * <p>
+   * J2EE RequiresNew
+   */
+  ACTION_ALWAYS_BEGIN((byte) 1),
 
-    /**
-     * Will begin a new transaction if no transaction is already present
-     * <p>
-     * J2EE: Required
-     */
-    ACTION_BEGIN_OR_JOIN((byte) 2),
+  /**
+   * Will begin a new transaction if no transaction is already present
+   * <p>
+   * J2EE: Required
+   */
+  ACTION_BEGIN_OR_JOIN((byte) 2),
 
-    /**
-     * There must always be a transaction present for the invocation
-     * <p>
-     * J2EE: Mandatory
-     */
-    ACTION_ALWAYS_JOIN((byte) 3),
+  /**
+   * There must always be a transaction present for the invocation
+   * <p>
+   * J2EE: Mandatory
+   */
+  ACTION_ALWAYS_JOIN((byte) 3),
 
-    /**
-     * If there is a transaction available, then use it, otherwise continue processing
-     * <p>
-     * J2EE: Supports
-     */
-    ACTION_JOIN_IF_POSSIBLE((byte) 4),
+  /**
+   * If there is a transaction available, then use it, otherwise continue processing
+   * <p>
+   * J2EE: Supports
+   */
+  ACTION_JOIN_IF_POSSIBLE((byte) 4),
 
-    /**
-     * There must not be a transaction present for the invocation
-     * <p>
-     * J2EE Never
-     */
-    ACTION_NEVER((byte) 5),
+  /**
+   * There must not be a transaction present for the invocation
+   * <p>
+   * J2EE Never
+   */
+  ACTION_NEVER((byte) 5),
 
-    /**
-     * Be indifferent to any active transaction. Don;t check for one, and if there is one, don;t commit or abort it
-     * <p>
-     */
-    ACTION_INDIFFERENT((byte) 6),
+  /**
+   * Be indifferent to any active transaction. Don;t check for one, and if there is one, don;t commit or abort it
+   * <p>
+   */
+  ACTION_INDIFFERENT((byte) 6),
 
-    /*
-     * Executes outside any existent transaction
-     */
-    ACTION_NOT_SUPPORTED((byte) 7),
+  /*
+   * Executes outside any existent transaction
+   */
+  ACTION_NOT_SUPPORTED((byte) 7),
 
-    /**
-     * Transaction action by default. Note that before 3.2 it was ACTION_NONE
-     * <p>
-     */
-    ACTION_DEFAULT(ACTION_INDIFFERENT.getAction());
+  /**
+   * Transaction action by default. Note that before 3.2 it was ACTION_NONE
+   * <p>
+   */
+  ACTION_DEFAULT(ACTION_INDIFFERENT.getAction());
 
-    private byte action;
+  private byte action;
 
-    private TransactionConfigEnum(byte action)
-    {
-        this.action = action;
-    }
+  private TransactionConfigEnum(byte action) {
+    this.action = action;
+  }
 
-    /**
-     * @return the constant value that is defined in {@link TransactionConfig}.
-     */
-    public byte getAction()
-    {
-        return action;
-    }
+  /**
+   * @return the constant value that is defined in {@link TransactionConfig}.
+   */
+  public byte getAction() {
+    return action;
+  }
 }

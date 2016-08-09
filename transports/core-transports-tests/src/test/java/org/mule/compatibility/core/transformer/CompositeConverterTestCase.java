@@ -24,32 +24,32 @@ import org.mule.tck.size.SmallTest;
 import org.junit.Test;
 
 @SmallTest
-public class CompositeConverterTestCase
-{
-    private Converter mockConverterA = mock(Converter.class, withSettings().extraInterfaces(EndpointAware.class));
-    private Converter mockConverterB = mock(Converter.class, withSettings().extraInterfaces(EndpointAware.class));
+public class CompositeConverterTestCase {
 
-    @Test
-    public void getEndpoint()
-    {
-        ImmutableEndpoint mockImmutableEndpoint = mock(ImmutableEndpoint.class);
-        doReturn(mockImmutableEndpoint).when((EndpointAware)mockConverterA).getEndpoint();
-        doReturn(mockImmutableEndpoint).when((EndpointAware)mockConverterB).getEndpoint();
-        EndpointAwareTransformer compositeConverter = new DefaultEndpointAwareTransformer(new CompositeConverter(mockConverterA, mockConverterB), null);
+  private Converter mockConverterA = mock(Converter.class, withSettings().extraInterfaces(EndpointAware.class));
+  private Converter mockConverterB = mock(Converter.class, withSettings().extraInterfaces(EndpointAware.class));
 
-        assertEquals(mockImmutableEndpoint, ((EndpointAware) compositeConverter).getEndpoint());
-    }
+  @Test
+  public void getEndpoint() {
+    ImmutableEndpoint mockImmutableEndpoint = mock(ImmutableEndpoint.class);
+    doReturn(mockImmutableEndpoint).when((EndpointAware) mockConverterA).getEndpoint();
+    doReturn(mockImmutableEndpoint).when((EndpointAware) mockConverterB).getEndpoint();
+    EndpointAwareTransformer compositeConverter =
+        new DefaultEndpointAwareTransformer(new CompositeConverter(mockConverterA, mockConverterB), null);
 
-    @Test
-    public void setEndpoint()
-    {
-        ImmutableEndpoint mockImmutableEndpoint = mock(ImmutableEndpoint.class);
-        EndpointAwareTransformer compositeConverter = new DefaultEndpointAwareTransformer(new CompositeConverter(mockConverterA, mockConverterB), null);
+    assertEquals(mockImmutableEndpoint, ((EndpointAware) compositeConverter).getEndpoint());
+  }
 
-        ((EndpointAware) compositeConverter).setEndpoint(mockImmutableEndpoint);
+  @Test
+  public void setEndpoint() {
+    ImmutableEndpoint mockImmutableEndpoint = mock(ImmutableEndpoint.class);
+    EndpointAwareTransformer compositeConverter =
+        new DefaultEndpointAwareTransformer(new CompositeConverter(mockConverterA, mockConverterB), null);
 
-        verify((EndpointAware) mockConverterA, atLeastOnce()).setEndpoint(mockImmutableEndpoint);
-        verify((EndpointAware) mockConverterB, atLeastOnce()).setEndpoint(mockImmutableEndpoint);
-    }
+    ((EndpointAware) compositeConverter).setEndpoint(mockImmutableEndpoint);
+
+    verify((EndpointAware) mockConverterA, atLeastOnce()).setEndpoint(mockImmutableEndpoint);
+    verify((EndpointAware) mockConverterB, atLeastOnce()).setEndpoint(mockImmutableEndpoint);
+  }
 
 }

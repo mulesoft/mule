@@ -25,81 +25,73 @@ import javax.inject.Inject;
 
 import org.junit.Test;
 
-public class ReflectionServiceProviderResolutionHelperTestCase extends AbstractMuleTestCase
-{
+public class ReflectionServiceProviderResolutionHelperTestCase extends AbstractMuleTestCase {
 
-    private final ReflectionServiceProviderResolutionHelper providerResolutionHelper = new ReflectionServiceProviderResolutionHelper();
+  private final ReflectionServiceProviderResolutionHelper providerResolutionHelper =
+      new ReflectionServiceProviderResolutionHelper();
 
 
-    @Test
-    public void findsNoDependencies() throws Exception
-    {
-        final List<Class<? extends Service>> dependencies = providerResolutionHelper.findServiceDependencies(mock(ServiceProvider.class));
-        assertThat(dependencies.size(), equalTo(0));
+  @Test
+  public void findsNoDependencies() throws Exception {
+    final List<Class<? extends Service>> dependencies =
+        providerResolutionHelper.findServiceDependencies(mock(ServiceProvider.class));
+    assertThat(dependencies.size(), equalTo(0));
+  }
+
+  @Test
+  public void findsDependencies() throws Exception {
+    final List<Class<? extends Service>> dependencies =
+        providerResolutionHelper.findServiceDependencies(new InjectableServiceProvider());
+    assertThat(dependencies.size(), equalTo(1));
+    assertThat(dependencies, hasItem(FooService.class));
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void failsIfNonServiceDependencyIsFound() throws Exception {
+    providerResolutionHelper.findServiceDependencies(new NoInjectableServiceProvider());
+  }
+
+  @Test
+  public void injectsDependencies() throws Exception {
+    final InjectableServiceProvider serviceProvider = new InjectableServiceProvider();
+    List<ServiceDefinition> resolvedServices = new ArrayList<>();
+    FooService fooService = mock(FooService.class);
+    resolvedServices.add(new ServiceDefinition(FooService.class, fooService));
+    providerResolutionHelper.injectInstance(serviceProvider, resolvedServices);
+
+    assertThat(serviceProvider.fooService, is(fooService));
+  }
+
+  @Test(expected = ServiceResolutionError.class)
+  public void detectsMissingDependency() throws Exception {
+    final InjectableServiceProvider serviceProvider = new InjectableServiceProvider();
+
+    providerResolutionHelper.injectInstance(serviceProvider, emptyList());
+  }
+
+  public interface FooService extends Service {
+
+  }
+
+  public static class InjectableServiceProvider implements ServiceProvider {
+
+    @Inject
+    FooService fooService;
+
+    @Override
+    public List<ServiceDefinition> providedServices() {
+      return null;
     }
+  }
 
-    @Test
-    public void findsDependencies() throws Exception
-    {
-        final List<Class<? extends Service>> dependencies = providerResolutionHelper.findServiceDependencies(new InjectableServiceProvider());
-        assertThat(dependencies.size(), equalTo(1));
-        assertThat(dependencies, hasItem(FooService.class));
+  public static class NoInjectableServiceProvider implements ServiceProvider {
+
+    @Inject
+    String message;
+
+    @Override
+    public List<ServiceDefinition> providedServices() {
+      return null;
     }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void failsIfNonServiceDependencyIsFound() throws Exception
-    {
-        providerResolutionHelper.findServiceDependencies(new NoInjectableServiceProvider());
-    }
-
-    @Test
-    public void injectsDependencies() throws Exception
-    {
-        final InjectableServiceProvider serviceProvider = new InjectableServiceProvider();
-        List<ServiceDefinition> resolvedServices = new ArrayList<>();
-        FooService fooService = mock(FooService.class);
-        resolvedServices.add(new ServiceDefinition(FooService.class, fooService));
-        providerResolutionHelper.injectInstance(serviceProvider, resolvedServices);
-
-        assertThat(serviceProvider.fooService, is(fooService));
-    }
-
-    @Test(expected = ServiceResolutionError.class)
-    public void detectsMissingDependency() throws Exception
-    {
-        final InjectableServiceProvider serviceProvider = new InjectableServiceProvider();
-
-        providerResolutionHelper.injectInstance(serviceProvider, emptyList());
-    }
-
-    public interface FooService extends Service
-    {
-
-    }
-
-    public static class InjectableServiceProvider implements ServiceProvider
-    {
-
-        @Inject
-        FooService fooService;
-
-        @Override
-        public List<ServiceDefinition> providedServices()
-        {
-            return null;
-        }
-    }
-
-    public static class NoInjectableServiceProvider implements ServiceProvider
-    {
-
-        @Inject
-        String message;
-
-        @Override
-        public List<ServiceDefinition> providedServices()
-        {
-            return null;
-        }
-    }
+  }
 }

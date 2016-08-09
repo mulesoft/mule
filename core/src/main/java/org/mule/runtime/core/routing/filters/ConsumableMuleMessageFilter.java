@@ -17,12 +17,10 @@ import org.mule.runtime.core.api.routing.filter.Filter;
  * The filter accepts only {@link MuleMessage} instances that have a no consumable payload. Check is done using
  * {@link org.mule.runtime.core.util.ClassUtils#isConsumable()} method.
  */
-public class ConsumableMuleMessageFilter implements Filter
-{
+public class ConsumableMuleMessageFilter implements Filter {
 
-    @Override
-    public boolean accept(MuleMessage message)
-    {
-        return !isConsumable(message.getDataType().getType());
-    }
+  @Override
+  public boolean accept(MuleMessage message) {
+    return !isConsumable(message.getDataType().getType());
+  }
 }

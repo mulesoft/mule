@@ -11,25 +11,21 @@ import static org.junit.Assert.assertThat;
 
 import java.io.File;
 
-public class FileMoveTestCase extends FileCopyTestCase
-{
+public class FileMoveTestCase extends FileCopyTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "file-move-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "file-move-config.xml";
+  }
 
-    @Override
-    protected String getFlowName()
-    {
-        return "move";
-    }
+  @Override
+  protected String getFlowName() {
+    return "move";
+  }
 
-    @Override
-    protected void assertCopy(String target) throws Exception
-    {
-        super.assertCopy(target);
-        assertThat(new File(sourcePath).exists(), is(false));
-    }
+  @Override
+  protected void assertCopy(String target) throws Exception {
+    super.assertCopy(target);
+    assertThat(new File(sourcePath).exists(), is(false));
+  }
 }

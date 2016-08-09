@@ -14,49 +14,41 @@ import java.util.Map;
 /**
  * TODO
  */
-public class MapperFactoryBean extends AbstractFactoryBean<ObjectMapper>
-{
-    private String name;
-    private Map<Class<?>, Class<?>> mixins;
+public class MapperFactoryBean extends AbstractFactoryBean<ObjectMapper> {
 
-    @Override
-    public Class<?> getObjectType()
-    {
-        return ObjectMapper.class;
-    }
+  private String name;
+  private Map<Class<?>, Class<?>> mixins;
 
-    @Override
-    protected ObjectMapper createInstance() throws Exception
-    {
-        ObjectMapper mapper = new ObjectMapper();
-        if(mixins!=null)
-        {
-            for (Map.Entry<Class<?>, Class<?>> entry : mixins.entrySet())
-            {
-                mapper.getSerializationConfig().addMixInAnnotations(entry.getKey(), entry.getValue());
-                mapper.getDeserializationConfig().addMixInAnnotations(entry.getKey(), entry.getValue());
-            }
-        }
-        return mapper;
-    }
+  @Override
+  public Class<?> getObjectType() {
+    return ObjectMapper.class;
+  }
 
-    public Map<Class<?>, Class<?>> getMixins()
-    {
-        return mixins;
+  @Override
+  protected ObjectMapper createInstance() throws Exception {
+    ObjectMapper mapper = new ObjectMapper();
+    if (mixins != null) {
+      for (Map.Entry<Class<?>, Class<?>> entry : mixins.entrySet()) {
+        mapper.getSerializationConfig().addMixInAnnotations(entry.getKey(), entry.getValue());
+        mapper.getDeserializationConfig().addMixInAnnotations(entry.getKey(), entry.getValue());
+      }
     }
+    return mapper;
+  }
 
-    public void setMixins(Map<Class<?>, Class<?>> mixins)
-    {
-        this.mixins = mixins;
-    }
+  public Map<Class<?>, Class<?>> getMixins() {
+    return mixins;
+  }
 
-    public String getName()
-    {
-        return name;
-    }
+  public void setMixins(Map<Class<?>, Class<?>> mixins) {
+    this.mixins = mixins;
+  }
 
-    public void setName(String name)
-    {
-        this.name = name;
-    }
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
 }

@@ -15,62 +15,49 @@ import javax.transaction.xa.Xid;
  * @deprecated this class will be removed in Mule 4.0 in favor of the new queue implementation
  */
 @Deprecated
-public abstract class AbstractXAResourceManager extends AbstractResourceManager
-{
+public abstract class AbstractXAResourceManager extends AbstractResourceManager {
 
-    protected Map<Xid, AbstractTransactionContext> suspendedContexts = new ConcurrentHashMap<Xid, AbstractTransactionContext>();
-    protected Map<Xid, AbstractTransactionContext> activeContexts = new ConcurrentHashMap<Xid, AbstractTransactionContext>();
+  protected Map<Xid, AbstractTransactionContext> suspendedContexts = new ConcurrentHashMap<Xid, AbstractTransactionContext>();
+  protected Map<Xid, AbstractTransactionContext> activeContexts = new ConcurrentHashMap<Xid, AbstractTransactionContext>();
 
-    public AbstractXAResourceManager()
-    {
-        super();
+  public AbstractXAResourceManager() {
+    super();
+  }
+
+  protected boolean includeBranchInXid() {
+    return true;
+  }
+
+  protected AbstractTransactionContext getTransactionalResource(Xid xid) {
+    AbstractTransactionContext context = getActiveTransactionalResource(xid);
+    if (context != null) {
+      return context;
+    } else {
+      return getSuspendedTransactionalResource(xid);
     }
+  }
 
-    protected boolean includeBranchInXid()
-    {
-        return true;
-    }
+  AbstractTransactionContext getActiveTransactionalResource(Xid xid) {
+    return activeContexts.get(xid);
+  }
 
-    protected AbstractTransactionContext getTransactionalResource(Xid xid)
-    {
-        AbstractTransactionContext context = getActiveTransactionalResource(xid);
-        if (context != null)
-        {
-            return context;
-        }
-        else
-        {
-            return getSuspendedTransactionalResource(xid);
-        }
-    }
+  AbstractTransactionContext getSuspendedTransactionalResource(Xid xid) {
+    return suspendedContexts.get(xid);
+  }
 
-    AbstractTransactionContext getActiveTransactionalResource(Xid xid)
-    {
-        return activeContexts.get(xid);
-    }
+  void addActiveTransactionalResource(Xid xid, AbstractTransactionContext context) {
+    activeContexts.put(xid, context);
+  }
 
-    AbstractTransactionContext getSuspendedTransactionalResource(Xid xid)
-    {
-        return suspendedContexts.get(xid);
-    }
+  void addSuspendedTransactionalResource(Xid xid, AbstractTransactionContext context) {
+    suspendedContexts.put(xid, context);
+  }
 
-    void addActiveTransactionalResource(Xid xid, AbstractTransactionContext context)
-    {
-        activeContexts.put(xid, context);
-    }
+  void removeActiveTransactionalResource(Xid xid) {
+    activeContexts.remove(xid);
+  }
 
-    void addSuspendedTransactionalResource(Xid xid, AbstractTransactionContext context)
-    {
-        suspendedContexts.put(xid, context);
-    }
-
-    void removeActiveTransactionalResource(Xid xid)
-    {
-        activeContexts.remove(xid);
-    }
-
-    void removeSuspendedTransactionalResource(Xid xid)
-    {
-        suspendedContexts.remove(xid);
-    }
+  void removeSuspendedTransactionalResource(Xid xid) {
+    suspendedContexts.remove(xid);
+  }
 }

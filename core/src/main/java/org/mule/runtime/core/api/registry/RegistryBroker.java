@@ -12,12 +12,11 @@ package org.mule.runtime.core.api.registry;
  * @deprecated as of 3.7.0. This will be removed in Mule 4.0
  */
 @Deprecated
-public interface RegistryBroker extends Registry
-{
+public interface RegistryBroker extends Registry {
 
-    void addRegistry(Registry registry);
+  void addRegistry(Registry registry);
 
-    void removeRegistry(Registry registry);
+  void removeRegistry(Registry registry);
 }
 
 

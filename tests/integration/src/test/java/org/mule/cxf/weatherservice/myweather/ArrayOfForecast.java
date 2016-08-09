@@ -16,9 +16,11 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for ArrayOfForecast complex type.
+ * <p>
+ * Java class for ArrayOfForecast complex type.
  *
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>
+ * The following schema fragment specifies the expected content contained within this class.
  *
  * <pre>
  * &lt;complexType name="ArrayOfForecast">
@@ -35,41 +37,38 @@ import javax.xml.bind.annotation.XmlType;
  *
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "ArrayOfForecast", namespace = "http://ws.cdyne.com/WeatherWS/", propOrder = {
-    "forecast"
-})
+@XmlType(name = "ArrayOfForecast", namespace = "http://ws.cdyne.com/WeatherWS/", propOrder = {"forecast"})
 public class ArrayOfForecast {
 
-    @XmlElement(name = "Forecast", namespace = "http://ws.cdyne.com/WeatherWS/", nillable = true)
-    protected List<Forecast> forecast;
+  @XmlElement(name = "Forecast", namespace = "http://ws.cdyne.com/WeatherWS/", nillable = true)
+  protected List<Forecast> forecast;
 
-    /**
-     * Gets the value of the forecast property.
-     *
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the forecast property.
-     *
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getForecast().add(newItem);
-     * </pre>
-     *
-     *
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link Forecast }
-     *
-     *
-     */
-    public List<Forecast> getForecast() {
-        if (forecast == null) {
-            forecast = new ArrayList<Forecast>();
-        }
-        return this.forecast;
+  /**
+   * Gets the value of the forecast property.
+   *
+   * <p>
+   * This accessor method returns a reference to the live list, not a snapshot. Therefore any modification you make to the
+   * returned list will be present inside the JAXB object. This is why there is not a <CODE>set</CODE> method for the forecast
+   * property.
+   *
+   * <p>
+   * For example, to add a new item, do as follows:
+   * 
+   * <pre>
+   * getForecast().add(newItem);
+   * </pre>
+   *
+   *
+   * <p>
+   * Objects of the following type(s) are allowed in the list {@link Forecast }
+   *
+   *
+   */
+  public List<Forecast> getForecast() {
+    if (forecast == null) {
+      forecast = new ArrayList<Forecast>();
     }
+    return this.forecast;
+  }
 
 }

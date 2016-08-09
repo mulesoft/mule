@@ -12,14 +12,13 @@ import java.util.List;
 /**
  * Discovers available {@link BootstrapService} instances
  */
-public interface BootstrapServiceDiscoverer
-{
+public interface BootstrapServiceDiscoverer {
 
-    /**
-     * Discovers all the services available on the execution context.
-     *
-     * @return a non null list of {@link BootstrapService}
-     */
-    List<BootstrapService> discover();
+  /**
+   * Discovers all the services available on the execution context.
+   *
+   * @return a non null list of {@link BootstrapService}
+   */
+  List<BootstrapService> discover();
 
 }

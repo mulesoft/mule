@@ -17,31 +17,26 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
  * @since 3.7.0
  */
 @Alias("i18n")
-public final class I18NConfig
-{
+public final class I18NConfig {
 
-    /**
-     * The path to a bundle file containing the messages.
-     * If {@code null} then the platform will choose a default one
-     */
-    @Parameter
-    private String bundlePath;
+  /**
+   * The path to a bundle file containing the messages. If {@code null} then the platform will choose a default one
+   */
+  @Parameter
+  private String bundlePath;
 
-    /**
-     * The locale of the {@link #bundlePath}. If {@code null}
-     * the platform will choose the system default
-     */
-    @Parameter
-    @Optional(defaultValue = EMPTY)
-    private String locale;
+  /**
+   * The locale of the {@link #bundlePath}. If {@code null} the platform will choose the system default
+   */
+  @Parameter
+  @Optional(defaultValue = EMPTY)
+  private String locale;
 
-    public String getBundlePath()
-    {
-        return bundlePath;
-    }
+  public String getBundlePath() {
+    return bundlePath;
+  }
 
-    public String getLocale()
-    {
-        return locale;
-    }
+  public String getLocale() {
+    return locale;
+  }
 }

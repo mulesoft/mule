@@ -12,30 +12,28 @@ import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 
 /**
  * Needs to access resources for validating different TLS scenarios and it cannot be done with
- * {@link org.mule.functional.junit4.MuleArtifactFunctionalTestCase}. Therefore this one has to be a {@link ExtensionFunctionalTestCase}.
+ * {@link org.mule.functional.junit4.MuleArtifactFunctionalTestCase}. Therefore this one has to be a
+ * {@link ExtensionFunctionalTestCase}.
  * <p/>
- * Mostly the scenarios are about changing the {@code tls.properties} so it is modified by tests and that cannot be done with an isolated class loader.
+ * Mostly the scenarios are about changing the {@code tls.properties} so it is modified by tests and that cannot be done with an
+ * isolated class loader.
  */
-public abstract class AbstractTlsRestrictedProtocolsAndCiphersTestCase extends ExtensionFunctionalTestCase
-{
+public abstract class AbstractTlsRestrictedProtocolsAndCiphersTestCase extends ExtensionFunctionalTestCase {
 
-    @Override
-    protected Class<?>[] getAnnotatedExtensionClasses()
-    {
-        return new Class[] {SocketsExtension.class, HttpConnector.class};
-    }
+  @Override
+  protected Class<?>[] getAnnotatedExtensionClasses() {
+    return new Class[] {SocketsExtension.class, HttpConnector.class};
+  }
 
-    /**
-     * The test cannot run with isolation due to http ext doesn't have anymore the mule-module.properties.
-     * This test needs to have the complete access to all the classes and resources therefore it just returns the
-     * class loader that loaded the test class.
-     *
-     * @return the {@link ClassLoader} that loaded the test.
-     */
-    @Override
-    protected ClassLoader getExecutionClassLoader()
-    {
-        return this.getClass().getClassLoader();
-    }
+  /**
+   * The test cannot run with isolation due to http ext doesn't have anymore the mule-module.properties. This test needs to have
+   * the complete access to all the classes and resources therefore it just returns the class loader that loaded the test class.
+   *
+   * @return the {@link ClassLoader} that loaded the test.
+   */
+  @Override
+  protected ClassLoader getExecutionClassLoader() {
+    return this.getClass().getClassLoader();
+  }
 
 }

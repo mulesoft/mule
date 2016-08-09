@@ -37,229 +37,194 @@ import org.apache.cxf.wsdl.http.AddressType;
 import org.apache.cxf.wsdl11.WSDLEndpointFactory;
 
 public class MuleUniversalTransport extends AbstractTransportFactory
-    implements ConduitInitiator, DestinationFactory, WSDLEndpointFactory
-{
+    implements ConduitInitiator, DestinationFactory, WSDLEndpointFactory {
 
-    public static final String TRANSPORT_ID = "http://mule.codehaus.org/cxf";
+  public static final String TRANSPORT_ID = "http://mule.codehaus.org/cxf";
 
-    private static Set<String> PREFIXES = new HashSet<String>();
-    static
-    {
-        PREFIXES.add("http://");
-        PREFIXES.add("https://");
-        PREFIXES.add("jms://");
-        PREFIXES.add("tcp://");
+  private static Set<String> PREFIXES = new HashSet<String>();
+  static {
+    PREFIXES.add("http://");
+    PREFIXES.add("https://");
+    PREFIXES.add("jms://");
+    PREFIXES.add("tcp://");
+  }
+
+  private Map<String, Destination> destinations = new HashMap<String, Destination>();
+
+  private Bus bus;
+
+  private CxfConfiguration connector;
+
+  private MuleUniversalConduitFactory muleUniversalConduitFactory;
+
+  public MuleUniversalTransport(CxfConfiguration connector, MuleUniversalConduitFactory muleUniversalConduitFactory) {
+    super();
+
+    ArrayList<String> tids = new ArrayList<String>();
+    tids.add("http://schemas.xmlsoap.org/soap/http");
+    setTransportIds(tids);
+
+    this.connector = connector;
+    this.muleUniversalConduitFactory =
+        muleUniversalConduitFactory == null ? new DefaultMuleUniversalConduitFactory() : muleUniversalConduitFactory;
+  }
+
+  @Override
+  public Destination getDestination(EndpointInfo ei) throws IOException {
+    return getDestination(ei, createReference(ei));
+  }
+
+  protected Destination getDestination(EndpointInfo ei, EndpointReferenceType reference) throws IOException {
+    String uri = reference.getAddress().getValue();
+    int idx = uri.indexOf('?');
+    if (idx != -1) {
+      uri = uri.substring(0, idx);
     }
 
-    private Map<String, Destination> destinations = new HashMap<String, Destination>();
+    synchronized (this) {
+      Destination d = destinations.get(uri);
+      if (d == null) {
+        d = createDestination(ei, reference);
+        destinations.put(uri, d);
+      }
+      return d;
+    }
+  }
 
-    private Bus bus;
+  private Destination createDestination(EndpointInfo ei, EndpointReferenceType reference) {
+    return new MuleUniversalDestination(this, reference, ei);
+  }
 
-    private CxfConfiguration connector;
+  @Override
+  public Conduit getConduit(EndpointInfo ei) throws IOException {
+    return muleUniversalConduitFactory.create(this, connector, ei, null);
+  }
 
-    private MuleUniversalConduitFactory muleUniversalConduitFactory;
+  @Override
+  public Conduit getConduit(EndpointInfo ei, EndpointReferenceType target) throws IOException {
+    return muleUniversalConduitFactory.create(this, connector, ei, target);
+  }
 
-    public MuleUniversalTransport(CxfConfiguration connector, MuleUniversalConduitFactory muleUniversalConduitFactory)
-    {
-        super();
+  EndpointReferenceType createReference(EndpointInfo ei) {
+    EndpointReferenceType epr = new EndpointReferenceType();
+    AttributedURIType address = new AttributedURIType();
+    address.setValue(ei.getAddress());
+    epr.setAddress(address);
+    return epr;
+  }
 
-        ArrayList<String> tids = new ArrayList<String>();
-        tids.add("http://schemas.xmlsoap.org/soap/http");
-        setTransportIds(tids);
+  @Override
+  public Set<String> getUriPrefixes() {
+    return PREFIXES;
+  }
 
-        this.connector = connector;
-        this.muleUniversalConduitFactory = muleUniversalConduitFactory == null ? new DefaultMuleUniversalConduitFactory() : muleUniversalConduitFactory;
+  @Override
+  public Bus getBus() {
+    return bus;
+  }
+
+  @Override
+  public void setBus(Bus bus) {
+    this.bus = bus;
+  }
+
+  void remove(MuleUniversalDestination destination) {
+    destinations.remove(destination.getAddress().getAddress().getValue());
+  }
+
+  public CxfConfiguration getConnector() {
+    return connector;
+  }
+
+  // Stuff relating to building of the <soap:address/> -
+  // I have no idea how this really works, but it does
+
+  @Override
+  public void createPortExtensors(EndpointInfo ei, Service service) {
+    // TODO
+  }
+
+  @Override
+  public EndpointInfo createEndpointInfo(ServiceInfo serviceInfo, BindingInfo b, List<?> ees) {
+    if (ees != null) {
+      for (Iterator<?> itr = ees.iterator(); itr.hasNext();) {
+        Object extensor = itr.next();
+
+        if (extensor instanceof HTTPAddress) {
+          final HTTPAddress httpAdd = (HTTPAddress) extensor;
+
+          EndpointInfo info = new HttpEndpointInfo(serviceInfo, "http://schemas.xmlsoap.org/wsdl/http/");
+          info.setAddress(httpAdd.getLocationURI());
+          info.addExtensor(httpAdd);
+          return info;
+        } else if (extensor instanceof AddressType) {
+          final AddressType httpAdd = (AddressType) extensor;
+
+          EndpointInfo info = new HttpEndpointInfo(serviceInfo, "http://schemas.xmlsoap.org/wsdl/http/");
+          info.setAddress(httpAdd.getLocation());
+          info.addExtensor(httpAdd);
+          return info;
+        }
+      }
+    }
+    HttpEndpointInfo hei = new HttpEndpointInfo(serviceInfo, "http://schemas.xmlsoap.org/wsdl/http/");
+    AddressType at = new HttpAddressType();
+    hei.addExtensor(at);
+
+    return hei;
+  }
+
+  private static class HttpEndpointInfo extends EndpointInfo {
+
+    AddressType saddress;
+
+    HttpEndpointInfo(ServiceInfo serv, String trans) {
+      super(serv, trans);
     }
 
     @Override
-    public Destination getDestination(EndpointInfo ei) throws IOException
-    {
-        return getDestination(ei, createReference(ei));
-    }
-
-    protected Destination getDestination(EndpointInfo ei, EndpointReferenceType reference) throws IOException
-    {
-        String uri = reference.getAddress().getValue();
-        int idx = uri.indexOf('?');
-        if (idx != -1)
-        {
-            uri = uri.substring(0, idx);
-        }
-
-        synchronized (this)
-        {
-            Destination d = destinations.get(uri);
-            if (d == null)
-            {
-                d = createDestination(ei, reference);
-                destinations.put(uri, d);
-            }
-            return d;
-        }
-    }
-
-    private Destination createDestination(EndpointInfo ei, EndpointReferenceType reference)
-    {
-        return new MuleUniversalDestination(this, reference, ei);
+    public void setAddress(String s) {
+      super.setAddress(s);
+      if (saddress != null) {
+        saddress.setLocation(s);
+      }
     }
 
     @Override
-    public Conduit getConduit(EndpointInfo ei) throws IOException
-    {
-        return muleUniversalConduitFactory.create(this, connector, ei, null);
+    public void addExtensor(Object el) {
+      super.addExtensor(el);
+      if (el instanceof AddressType) {
+        saddress = (AddressType) el;
+      }
+    }
+  }
+
+  private static class HttpAddressType extends AddressType implements HTTPAddress, SOAPAddress {
+
+    public HttpAddressType() {
+      super();
+      setElementType(new QName("http://schemas.xmlsoap.org/wsdl/soap/", "address"));
     }
 
     @Override
-    public Conduit getConduit(EndpointInfo ei, EndpointReferenceType target) throws IOException
-    {
-        return muleUniversalConduitFactory.create(this, connector, ei, target);
-    }
-
-    EndpointReferenceType createReference(EndpointInfo ei)
-    {
-        EndpointReferenceType epr = new EndpointReferenceType();
-        AttributedURIType address = new AttributedURIType();
-        address.setValue(ei.getAddress());
-        epr.setAddress(address);
-        return epr;
+    public String getLocationURI() {
+      return getLocation();
     }
 
     @Override
-    public Set<String> getUriPrefixes()
-    {
-        return PREFIXES;
+    public void setLocationURI(String locationURI) {
+      setLocation(locationURI);
     }
+
+  }
+
+  private static class DefaultMuleUniversalConduitFactory implements MuleUniversalConduitFactory {
 
     @Override
-    public Bus getBus()
-    {
-        return bus;
+    public MuleUniversalConduit create(MuleUniversalTransport transport, CxfConfiguration configuration, EndpointInfo ei,
+                                       EndpointReferenceType t) {
+      return new MuleUniversalConduit(transport, configuration, ei, t);
     }
 
-    @Override
-    public void setBus(Bus bus)
-    {
-        this.bus = bus;
-    }
-
-    void remove(MuleUniversalDestination destination)
-    {
-        destinations.remove(destination.getAddress().getAddress().getValue());
-    }
-
-    public CxfConfiguration getConnector()
-    {
-        return connector;
-    }
-
-    // Stuff relating to building of the <soap:address/> -
-    // I have no idea how this really works, but it does
-
-    @Override
-    public void createPortExtensors(EndpointInfo ei, Service service)
-    {
-        // TODO
-    }
-
-    @Override
-    public EndpointInfo createEndpointInfo(ServiceInfo serviceInfo, BindingInfo b, List<?> ees)
-    {
-        if (ees != null)
-        {
-            for (Iterator<?> itr = ees.iterator(); itr.hasNext();)
-            {
-                Object extensor = itr.next();
-
-                if (extensor instanceof HTTPAddress)
-                {
-                    final HTTPAddress httpAdd = (HTTPAddress) extensor;
-
-                    EndpointInfo info = new HttpEndpointInfo(serviceInfo,
-                        "http://schemas.xmlsoap.org/wsdl/http/");
-                    info.setAddress(httpAdd.getLocationURI());
-                    info.addExtensor(httpAdd);
-                    return info;
-                }
-                else if (extensor instanceof AddressType)
-                {
-                    final AddressType httpAdd = (AddressType) extensor;
-
-                    EndpointInfo info = new HttpEndpointInfo(serviceInfo,
-                        "http://schemas.xmlsoap.org/wsdl/http/");
-                    info.setAddress(httpAdd.getLocation());
-                    info.addExtensor(httpAdd);
-                    return info;
-                }
-            }
-        }
-        HttpEndpointInfo hei = new HttpEndpointInfo(serviceInfo, "http://schemas.xmlsoap.org/wsdl/http/");
-        AddressType at = new HttpAddressType();
-        hei.addExtensor(at);
-
-        return hei;
-    }
-
-    private static class HttpEndpointInfo extends EndpointInfo
-    {
-        AddressType saddress;
-
-        HttpEndpointInfo(ServiceInfo serv, String trans)
-        {
-            super(serv, trans);
-        }
-
-        @Override
-        public void setAddress(String s)
-        {
-            super.setAddress(s);
-            if (saddress != null)
-            {
-                saddress.setLocation(s);
-            }
-        }
-
-        @Override
-        public void addExtensor(Object el)
-        {
-            super.addExtensor(el);
-            if (el instanceof AddressType)
-            {
-                saddress = (AddressType) el;
-            }
-        }
-    }
-
-    private static class HttpAddressType extends AddressType implements HTTPAddress, SOAPAddress
-    {
-        public HttpAddressType()
-        {
-            super();
-            setElementType(new QName("http://schemas.xmlsoap.org/wsdl/soap/", "address"));
-        }
-
-        @Override
-        public String getLocationURI()
-        {
-            return getLocation();
-        }
-
-        @Override
-        public void setLocationURI(String locationURI)
-        {
-            setLocation(locationURI);
-        }
-
-    }
-
-    private static class DefaultMuleUniversalConduitFactory implements MuleUniversalConduitFactory
-    {
-
-        @Override
-        public MuleUniversalConduit create(MuleUniversalTransport transport, CxfConfiguration configuration, EndpointInfo ei,
-                                           EndpointReferenceType t)
-        {
-            return new MuleUniversalConduit(transport, configuration, ei, t);
-        }
-
-    }
+  }
 }

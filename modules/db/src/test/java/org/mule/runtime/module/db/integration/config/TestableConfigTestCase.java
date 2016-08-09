@@ -21,34 +21,29 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class TestableConfigTestCase extends AbstractDbIntegrationTestCase
-{
+public class TestableConfigTestCase extends AbstractDbIntegrationTestCase {
 
-    public TestableConfigTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public TestableConfigTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[0];
-    }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[0];
+  }
 
-    @Parameterized.Parameters
-    public static List<Object[]> parameters()
-    {
-        return TestDbConfig.getDerbyResource();
-    }
+  @Parameterized.Parameters
+  public static List<Object[]> parameters() {
+    return TestDbConfig.getDerbyResource();
+  }
 
-    @Test
-    public void testsConnection() throws Exception
-    {
-        Testable testable =  muleContext.getRegistry().lookupObject("dbConfig");
+  @Test
+  public void testsConnection() throws Exception {
+    Testable testable = muleContext.getRegistry().lookupObject("dbConfig");
 
-        TestResult result = testable.test();
+    TestResult result = testable.test();
 
-        assertThat(result.getStatus(), equalTo(SUCCESS));
-    }
+    assertThat(result.getStatus(), equalTo(SUCCESS));
+  }
 }
 

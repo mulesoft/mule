@@ -10,12 +10,10 @@ package org.mule.runtime.module.db.internal.domain.logger;
 /**
  * Null implementation of {@link PreparedBulkQueryLogger}
  */
-public class NullPreparedBulkQueryLogger extends NullSingleQueryLogger implements PreparedBulkQueryLogger
-{
+public class NullPreparedBulkQueryLogger extends NullSingleQueryLogger implements PreparedBulkQueryLogger {
 
-    @Override
-    public void addParameterSet()
-    {
-        // Do nothing
-    }
+  @Override
+  public void addParameterSet() {
+    // Do nothing
+  }
 }

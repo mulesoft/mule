@@ -9,16 +9,14 @@ package org.mule.runtime.module.db.integration.config;
 
 import org.junit.Test;
 
-public abstract class AbstractMissingQueryConfigTestCase extends AbstractConfigurationErrorTestCase
-{
+public abstract class AbstractMissingQueryConfigTestCase extends AbstractConfigurationErrorTestCase {
 
-    @Test
-    public void doMissingQueryTest()
-    {
-        String messageProcessorElement = getMessageProcessorElement();
-        assertConfigurationError(String.format("Able to define an incomplete %s message processor", messageProcessorElement),
-                                 String.format("Element db:%s must contain one of the following elements", messageProcessorElement));
-    }
+  @Test
+  public void doMissingQueryTest() {
+    String messageProcessorElement = getMessageProcessorElement();
+    assertConfigurationError(String.format("Able to define an incomplete %s message processor", messageProcessorElement),
+                             String.format("Element db:%s must contain one of the following elements", messageProcessorElement));
+  }
 
-    protected abstract String getMessageProcessorElement();
+  protected abstract String getMessageProcessorElement();
 }

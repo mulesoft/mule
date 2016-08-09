@@ -8,24 +8,20 @@ package org.mule.test.integration.resolvers;
 
 import org.junit.Test;
 
-public class NoArgsEntryPointResolverTestCase extends AbstractEntryPointResolverTestCase
-{
+public class NoArgsEntryPointResolverTestCase extends AbstractEntryPointResolverTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/integration/resolvers/no-args-entry-point-resolver-test-flow.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/integration/resolvers/no-args-entry-point-resolver-test-flow.xml";
+  }
 
-    @Test
-    public void testIgnored() throws Exception
-    {
-        doTest("NotIgnored", new Object(), "notIgnored");
-    }
+  @Test
+  public void testIgnored() throws Exception {
+    doTest("NotIgnored", new Object(), "notIgnored");
+  }
 
-    @Test
-    public void testSelected() throws Exception
-    {
-        doTest("Selected", new Object(), "selected");
-    }
+  @Test
+  public void testSelected() throws Exception {
+    doTest("Selected", new Object(), "selected");
+  }
 }

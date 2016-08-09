@@ -28,129 +28,115 @@ import org.junit.Rule;
 import org.junit.Test;
 
 /**
- * Verify that no inbound messages are lost when exceptions occur.
- * The message must either make it all the way to the SEDA queue (in the case of
- * an asynchronous inbound endpoint), or be restored/rolled back at the source.
+ * Verify that no inbound messages are lost when exceptions occur. The message must either make it all the way to the SEDA queue
+ * (in the case of an asynchronous inbound endpoint), or be restored/rolled back at the source.
  * 
- * In the case of the HTTP transport, there is no way to restore the source message
- * so an exception is simply returned to the client.
+ * In the case of the HTTP transport, there is no way to restore the source message so an exception is simply returned to the
+ * client.
  */
-public class InboundMessageLossTestCase extends FunctionalTestCase
-{
-    protected HttpClient httpClient = new HttpClient();
-    
-    @Rule
-    public DynamicPort dynamicPort = new DynamicPort("port1");
-    
-    @Override
-    protected String getConfigFile()
-    {
-        return "reliability/inbound-message-loss-flow.xml";
-    }
+public class InboundMessageLossTestCase extends FunctionalTestCase {
+
+  protected HttpClient httpClient = new HttpClient();
+
+  @Rule
+  public DynamicPort dynamicPort = new DynamicPort("port1");
+
+  @Override
+  protected String getConfigFile() {
+    return "reliability/inbound-message-loss-flow.xml";
+  }
+
+  @Override
+  protected void doSetUp() throws Exception {
+    super.doSetUp();
+
+    // Set SystemExceptionStrategy to redeliver messages (this can only be configured programatically for now)
+    ((DefaultSystemExceptionStrategy) muleContext.getExceptionListener()).setRollbackTxFilter(new WildcardFilter("*"));
+  }
+
+  @Test
+  public void testNoException() throws Exception {
+    HttpMethodBase request = createRequest(getBaseUri() + "/noException");
+    int status = httpClient.executeMethod(request);
+    assertEquals(HttpConstants.SC_OK, status);
+    assertEquals("Here you go", request.getResponseBodyAsString());
+  }
+
+  @Test
+  public void testTransformerException() throws Exception {
+    HttpMethodBase request = createRequest(getBaseUri() + "/transformerException");
+    int status = httpClient.executeMethod(request);
+    assertEquals(HttpConstants.SC_INTERNAL_SERVER_ERROR, status);
+    assertTrue(request.getResponseBodyAsString().contains("Failure"));
+  }
+
+  @Test
+  public void testHandledTransformerException() throws Exception {
+    HttpMethodBase request = createRequest(getBaseUri() + "/handledTransformerException");
+    int status = httpClient.executeMethod(request);
+    assertEquals(HttpConstants.SC_OK, status);
+    assertTrue(request.getResponseBodyAsString().contains("Success"));
+  }
+
+  @Test
+  public void testNotHandledTransformerException() throws Exception {
+    HttpMethodBase request = createRequest(getBaseUri() + "/notHandledTransformerException");
+    int status = httpClient.executeMethod(request);
+    assertEquals(HttpConstants.SC_INTERNAL_SERVER_ERROR, status);
+    assertTrue(request.getResponseBodyAsString().contains("Bad news"));
+  }
+
+  @Test
+  public void testRouterException() throws Exception {
+    HttpMethodBase request = createRequest(getBaseUri() + "/routerException");
+    int status = httpClient.executeMethod(request);
+    assertEquals(HttpConstants.SC_INTERNAL_SERVER_ERROR, status);
+    assertTrue(request.getResponseBodyAsString().contains("Failure"));
+  }
+
+  @Test
+  public void testComponentException() throws Exception {
+    HttpMethodBase request = createRequest(getBaseUri() + "/componentException");
+    int status = httpClient.executeMethod(request);
+    // Component exception occurs after the SEDA queue for an asynchronous request, but since
+    // this request is synchronous, the failure propagates back to the client.
+    assertEquals(HttpConstants.SC_INTERNAL_SERVER_ERROR, status);
+    assertTrue(request.getResponseBodyAsString().contains("exception"));
+  }
+
+  protected HttpMethodBase createRequest(String uri) {
+    return new GetMethod(uri);
+  }
+
+  protected String getBaseUri() {
+    return "http://localhost:" + dynamicPort.getNumber();
+  }
+
+  /**
+   * Custom Exception Handler that handles an exception
+   */
+  public static class Handler extends AbstractMessagingExceptionStrategy {
 
     @Override
-    protected void doSetUp() throws Exception
-    {
-        super.doSetUp();
-        
-        // Set SystemExceptionStrategy to redeliver messages (this can only be configured programatically for now)
-        ((DefaultSystemExceptionStrategy) muleContext.getExceptionListener()).setRollbackTxFilter(new WildcardFilter("*"));
+    public MuleEvent handleException(Exception ex, MuleEvent event) {
+      doHandleException(ex, event);
+      ((MessagingException) ex).setHandled(true);
+      return new DefaultMuleEvent(MuleMessage.builder().payload("Success!").build(), event);
     }
+  }
 
-    @Test
-    public void testNoException() throws Exception
-    {
-        HttpMethodBase request = createRequest(getBaseUri() + "/noException");
-        int status = httpClient.executeMethod(request);
-        assertEquals(HttpConstants.SC_OK, status);
-        assertEquals("Here you go", request.getResponseBodyAsString());
-    }
-    
-    @Test
-    public void testTransformerException() throws Exception
-    {
-        HttpMethodBase request = createRequest(getBaseUri() + "/transformerException");
-        int status = httpClient.executeMethod(request);
-        assertEquals(HttpConstants.SC_INTERNAL_SERVER_ERROR, status);
-        assertTrue(request.getResponseBodyAsString().contains("Failure"));
-    }
+  /**
+   * Custom Exception Handler that creates a different exception
+   */
+  public static class BadHandler extends AbstractMessagingExceptionStrategy {
 
-    @Test
-    public void testHandledTransformerException() throws Exception
-    {
-        HttpMethodBase request = createRequest(getBaseUri() + "/handledTransformerException");
-        int status = httpClient.executeMethod(request);
-        assertEquals(HttpConstants.SC_OK, status);
-        assertTrue(request.getResponseBodyAsString().contains("Success"));
+    @Override
+    public MuleEvent handleException(Exception ex, MuleEvent event) {
+      doHandleException(ex, event);
+      MuleMessage message = MuleMessage.builder().nullPayload()
+          .exceptionPayload(new DefaultExceptionPayload(new MessagingException(event, new RuntimeException("Bad news!"))))
+          .build();
+      return new DefaultMuleEvent(message, event);
     }
-
-    @Test
-    public void testNotHandledTransformerException() throws Exception
-    {
-        HttpMethodBase request = createRequest(getBaseUri() + "/notHandledTransformerException");
-        int status = httpClient.executeMethod(request);
-        assertEquals(HttpConstants.SC_INTERNAL_SERVER_ERROR, status);
-        assertTrue(request.getResponseBodyAsString().contains("Bad news"));
-    }
-
-    @Test
-    public void testRouterException() throws Exception
-    {
-        HttpMethodBase request = createRequest(getBaseUri() + "/routerException");
-        int status = httpClient.executeMethod(request);
-        assertEquals(HttpConstants.SC_INTERNAL_SERVER_ERROR, status);
-        assertTrue(request.getResponseBodyAsString().contains("Failure"));
-    }
-    
-    @Test
-    public void testComponentException() throws Exception
-    {
-        HttpMethodBase request = createRequest(getBaseUri() + "/componentException");
-        int status = httpClient.executeMethod(request);
-        // Component exception occurs after the SEDA queue for an asynchronous request, but since
-        // this request is synchronous, the failure propagates back to the client.
-        assertEquals(HttpConstants.SC_INTERNAL_SERVER_ERROR, status);
-        assertTrue(request.getResponseBodyAsString().contains("exception"));
-    }
-
-    protected HttpMethodBase createRequest(String uri)
-    {
-        return new GetMethod(uri);
-    }
-    
-    protected String getBaseUri()
-    {
-        return "http://localhost:" + dynamicPort.getNumber();
-    }
-
-    /**
-     * Custom Exception Handler that handles an exception
-     */
-    public static class Handler extends AbstractMessagingExceptionStrategy
-    {
-        @Override
-        public MuleEvent handleException(Exception ex, MuleEvent event)
-        {
-            doHandleException(ex, event);
-            ((MessagingException)ex).setHandled(true);
-            return new DefaultMuleEvent(MuleMessage.builder().payload("Success!").build(), event);
-        }
-    }
-
-    /**
-     * Custom Exception Handler that creates a different exception
-     */
-    public static class BadHandler extends AbstractMessagingExceptionStrategy
-    {
-        @Override
-        public MuleEvent handleException(Exception ex, MuleEvent event)
-        {
-            doHandleException(ex, event);
-            MuleMessage message = MuleMessage.builder()
-                    .nullPayload()
-                    .exceptionPayload(new DefaultExceptionPayload(new MessagingException(event, new RuntimeException("Bad news!"))))
-                    .build();
-            return new DefaultMuleEvent(message, event);
-        }
-    }
+  }
 }

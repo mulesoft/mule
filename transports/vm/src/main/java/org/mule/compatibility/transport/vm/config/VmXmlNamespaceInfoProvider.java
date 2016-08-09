@@ -17,27 +17,23 @@ import java.util.Collection;
  *
  * @since 4.0
  */
-public class VmXmlNamespaceInfoProvider implements XmlNamespaceInfoProvider
-{
+public class VmXmlNamespaceInfoProvider implements XmlNamespaceInfoProvider {
 
-    public static final String VM_TRANSPORT_NAMESPACE = "vm";
+  public static final String VM_TRANSPORT_NAMESPACE = "vm";
 
-    @Override
-    public Collection<XmlNamespaceInfo> getXmlNamespacesInfo()
-    {
-        return Arrays.asList(new XmlNamespaceInfo()
-        {
-            @Override
-            public String getNamespaceUriPrefix()
-            {
-                return "http://www.mulesoft.org/schema/mule/transport/vm";
-            }
+  @Override
+  public Collection<XmlNamespaceInfo> getXmlNamespacesInfo() {
+    return Arrays.asList(new XmlNamespaceInfo() {
 
-            @Override
-            public String getNamespace()
-            {
-                return VM_TRANSPORT_NAMESPACE;
-            }
-        });
-    }
+      @Override
+      public String getNamespaceUriPrefix() {
+        return "http://www.mulesoft.org/schema/mule/transport/vm";
+      }
+
+      @Override
+      public String getNamespace() {
+        return VM_TRANSPORT_NAMESPACE;
+      }
+    });
+  }
 }

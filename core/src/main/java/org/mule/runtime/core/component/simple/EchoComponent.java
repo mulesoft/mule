@@ -10,22 +10,18 @@ import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.component.simple.EchoService;
 
 /**
- * <code>EchoComponent</code> will log the message and return the payload back as
- * the result.
+ * <code>EchoComponent</code> will log the message and return the payload back as the result.
  */
-public class EchoComponent extends LogComponent implements EchoService
-{
+public class EchoComponent extends LogComponent implements EchoService {
 
-    @Override
-    public Object onCall(MuleEventContext context) throws Exception
-    {
-        super.onCall(context);
-        return context.getMessage();
-    }
+  @Override
+  public Object onCall(MuleEventContext context) throws Exception {
+    super.onCall(context);
+    return context.getMessage();
+  }
 
-    public String echo(String echo)
-    {
-        return echo;
-    }
+  public String echo(String echo) {
+    return echo;
+  }
 
 }

@@ -17,82 +17,72 @@ import org.mule.runtime.core.context.notification.ConnectionNotification;
 import org.mule.runtime.core.lifecycle.SimpleLifecycleManager;
 
 /**
- * Manages the lifecycle of connectors in Mule. Currently only manages the
- * 'initialsie', 'start', 'stop' and 'dispose' phases, not the connect phase which is
- * managed by the Retry handler
+ * Manages the lifecycle of connectors in Mule. Currently only manages the 'initialsie', 'start', 'stop' and 'dispose' phases, not
+ * the connect phase which is managed by the Retry handler
  *
  * @since 3.0
  */
-public class ConnectorLifecycleManager extends SimpleLifecycleManager<Connector>
-{
-    public ConnectorLifecycleManager(AbstractConnector connector)
-    {
-        super(connector.getName(), connector);
+public class ConnectorLifecycleManager extends SimpleLifecycleManager<Connector> {
+
+  public ConnectorLifecycleManager(AbstractConnector connector) {
+    super(connector.getName(), connector);
+  }
+
+  @Override
+  public void fireInitialisePhase(LifecycleCallback<Connector> callback) throws MuleException {
+    checkPhase(Initialisable.PHASE_NAME);
+
+    if (logger.isInfoEnabled()) {
+      logger.info("Initialising connector: " + getLifecycleObject().getName());
     }
 
-    @Override
-    public void fireInitialisePhase(LifecycleCallback<Connector> callback) throws MuleException
-    {
-        checkPhase(Initialisable.PHASE_NAME);
+    // No pre notification
+    invokePhase(Initialisable.PHASE_NAME, getLifecycleObject(), callback);
+    // No post notification
+  }
 
-        if (logger.isInfoEnabled())
-        {
-            logger.info("Initialising connector: " + getLifecycleObject().getName());
-        }
+  @Override
+  public void fireStartPhase(LifecycleCallback<Connector> callback) throws MuleException {
+    checkPhase(Startable.PHASE_NAME);
 
-        // No pre notification
-        invokePhase(Initialisable.PHASE_NAME, getLifecycleObject(), callback);
-        // No post notification
+    if (logger.isInfoEnabled()) {
+      logger.info("Starting connector: " + getLifecycleObject().getName());
     }
 
-    @Override
-    public void fireStartPhase(LifecycleCallback<Connector> callback) throws MuleException
+    // No pre notification
+    invokePhase(Startable.PHASE_NAME, getLifecycleObject(), callback);
+    // No post notification
+  }
+
+  @Override
+  public void fireStopPhase(LifecycleCallback<Connector> callback) throws MuleException {
+    checkPhase(Stoppable.PHASE_NAME);
+    if (logger.isInfoEnabled())
+
     {
-        checkPhase(Startable.PHASE_NAME);
-
-        if (logger.isInfoEnabled())
-        {
-            logger.info("Starting connector: " + getLifecycleObject().getName());
-        }
-
-        // No pre notification
-        invokePhase(Startable.PHASE_NAME, getLifecycleObject(), callback);
-        // No post notification
+      logger.info("Stopping connector: " + getLifecycleObject().getName());
     }
 
-    @Override
-    public void fireStopPhase(LifecycleCallback<Connector> callback) throws MuleException
-    {
-        checkPhase(Stoppable.PHASE_NAME);
-        if (logger.isInfoEnabled())
+    // No pre notification
+    invokePhase(Stoppable.PHASE_NAME, getLifecycleObject(), callback);
+    // No post notification
+  }
 
-        {
-            logger.info("Stopping connector: " + getLifecycleObject().getName());
-        }
+  @Override
+  public void fireDisposePhase(LifecycleCallback<Connector> callback) throws MuleException {
+    checkPhase(Disposable.PHASE_NAME);
 
-        // No pre notification
-        invokePhase(Stoppable.PHASE_NAME, getLifecycleObject(), callback);
-        // No post notification
+    if (logger.isInfoEnabled()) {
+      logger.info("Disposing connector: " + getLifecycleObject().getName());
     }
 
-    @Override
-    public void fireDisposePhase(LifecycleCallback<Connector> callback) throws MuleException
-    {
-        checkPhase(Disposable.PHASE_NAME);
+    // No pre notification
+    invokePhase(Disposable.PHASE_NAME, getLifecycleObject(), callback);
+    // No post notification
+  }
 
-        if (logger.isInfoEnabled())
-        {
-            logger.info("Disposing connector: " + getLifecycleObject().getName());
-        }
-
-        // No pre notification
-        invokePhase(Disposable.PHASE_NAME, getLifecycleObject(), callback);
-        // No post notification
-    }
-
-    protected void fireNotification(int action)
-    {
-        getLifecycleObject().getMuleContext().fireNotification(
-            new ConnectionNotification(getLifecycleObject(), getLifecycleObject().getName(), action));
-    }
+  protected void fireNotification(int action) {
+    getLifecycleObject().getMuleContext()
+        .fireNotification(new ConnectionNotification(getLifecycleObject(), getLifecycleObject().getName(), action));
+  }
 }

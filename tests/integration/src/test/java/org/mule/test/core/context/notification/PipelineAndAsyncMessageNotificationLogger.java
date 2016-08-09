@@ -9,14 +9,12 @@ package org.mule.test.core.context.notification;
 import java.util.LinkedList;
 import java.util.List;
 
-public class PipelineAndAsyncMessageNotificationLogger implements NotificationLogger
-{
+public class PipelineAndAsyncMessageNotificationLogger implements NotificationLogger {
 
-    protected static LinkedList notifications = new LinkedList();
+  protected static LinkedList notifications = new LinkedList();
 
-    public List getNotifications()
-    {
-        return notifications;
-    }
+  public List getNotifications() {
+    return notifications;
+  }
 
 }

@@ -18,44 +18,40 @@ import org.mule.tck.testmodels.mule.TestExceptionStrategy.ExceptionCallback;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpsInvalidKeystoreTestCase extends FunctionalTestCase implements ExceptionCallback
-{
-    @Rule
-    public DynamicPort port1 = new DynamicPort("port1");
+public class HttpsInvalidKeystoreTestCase extends FunctionalTestCase implements ExceptionCallback {
 
-    private Throwable exceptionFromSystemExceptionHandler;
+  @Rule
+  public DynamicPort port1 = new DynamicPort("port1");
 
-    public HttpsInvalidKeystoreTestCase()
-    {
-        super();
-        setStartContext(false);
-    }
+  private Throwable exceptionFromSystemExceptionHandler;
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "https-invalid-keystore-config.xml";
-    }
+  public HttpsInvalidKeystoreTestCase() {
+    super();
+    setStartContext(false);
+  }
 
-    @Test
-    public void startingSslMessageReceiverWithoutKeystoreShouldThrowConnectException() throws Exception
-    {
-        TestExceptionStrategy exceptionListener = new TestExceptionStrategy();
-        exceptionListener.setExceptionCallback(this);
+  @Override
+  protected String getConfigFile() {
+    return "https-invalid-keystore-config.xml";
+  }
 
-        muleContext.setExceptionListener(exceptionListener);
-        muleContext.start();
+  @Test
+  public void startingSslMessageReceiverWithoutKeystoreShouldThrowConnectException() throws Exception {
+    TestExceptionStrategy exceptionListener = new TestExceptionStrategy();
+    exceptionListener.setExceptionCallback(this);
 
-        assertNotNull(exceptionFromSystemExceptionHandler);
-        assertTrue(exceptionFromSystemExceptionHandler instanceof ConnectException);
-        assertTrue(exceptionFromSystemExceptionHandler.getMessage().contains("tls-key-store"));
-    }
+    muleContext.setExceptionListener(exceptionListener);
+    muleContext.start();
 
-    @Override
-    public void onException(Throwable t)
-    {
-        exceptionFromSystemExceptionHandler = t;
-    }
+    assertNotNull(exceptionFromSystemExceptionHandler);
+    assertTrue(exceptionFromSystemExceptionHandler instanceof ConnectException);
+    assertTrue(exceptionFromSystemExceptionHandler.getMessage().contains("tls-key-store"));
+  }
+
+  @Override
+  public void onException(Throwable t) {
+    exceptionFromSystemExceptionHandler = t;
+  }
 }
 
 

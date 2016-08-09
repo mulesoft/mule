@@ -28,58 +28,54 @@ import java.util.Set;
 
 import org.junit.Test;
 
-public class XmlMuleMessageTransformersTestCase extends AbstractMuleContextTestCase
-{
+public class XmlMuleMessageTransformersTestCase extends AbstractMuleContextTestCase {
 
-    @Test
-    public void testMessageSerialization() throws Exception
-    {
-        ObjectToXml t1 = createObject(ObjectToXml.class);
-        t1.setAcceptMuleMessage(true);
+  @Test
+  public void testMessageSerialization() throws Exception {
+    ObjectToXml t1 = createObject(ObjectToXml.class);
+    t1.setAcceptMuleMessage(true);
 
-        MuleMessage msg = MuleMessage.builder().payload("test").mediaType(MediaType.ANY.withCharset(UTF_8))
-                .correlationId("1234").addOutboundProperty("object", new Apple()).addOutboundProperty("string",
-                                                                                                      "hello").build();
+    MuleMessage msg = MuleMessage.builder().payload("test").mediaType(MediaType.ANY.withCharset(UTF_8)).correlationId("1234")
+        .addOutboundProperty("object", new Apple()).addOutboundProperty("string", "hello").build();
 
-        String xml = (String) t1.transform(msg);
-        assertNotNull(xml);
+    String xml = (String) t1.transform(msg);
+    assertNotNull(xml);
 
-        XmlToObject t2 = createObject(XmlToObject.class);
+    XmlToObject t2 = createObject(XmlToObject.class);
 
-        Object result = t2.transform(xml);
-        assertNotNull(result);
-        assertThat(result, instanceOf(MuleMessage.class));
+    Object result = t2.transform(xml);
+    assertNotNull(result);
+    assertThat(result, instanceOf(MuleMessage.class));
 
-        msg = (MuleMessage) result;
+    msg = (MuleMessage) result;
 
-        assertEquals("test", getPayloadAsString(msg));
-        assertEquals(new Apple(), msg.getOutboundProperty("object"));
-        //with different case
-        assertEquals(new Apple(), msg.getOutboundProperty("oBjeCt"));
-        //Make sure we don't have the property in a different scope
-        assertNull(msg.getInboundProperty("oBjeCt"));
+    assertEquals("test", getPayloadAsString(msg));
+    assertEquals(new Apple(), msg.getOutboundProperty("object"));
+    // with different case
+    assertEquals(new Apple(), msg.getOutboundProperty("oBjeCt"));
+    // Make sure we don't have the property in a different scope
+    assertNull(msg.getInboundProperty("oBjeCt"));
 
-        assertEquals("hello", msg.getOutboundProperty("string"));
-        //with different case
-        assertEquals("hello", msg.getOutboundProperty("String"));
-        //Make sure we don't have the property in a different scope
-        assertNull(msg.getInboundProperty("string"));
+    assertEquals("hello", msg.getOutboundProperty("string"));
+    // with different case
+    assertEquals("hello", msg.getOutboundProperty("String"));
+    // Make sure we don't have the property in a different scope
+    assertNull(msg.getInboundProperty("string"));
 
-        //Make sure we don't have the property in a different scope
-        assertNull(msg.getInboundProperty("number"));
-        assertNull(msg.getOutboundProperty("number"));
+    // Make sure we don't have the property in a different scope
+    assertNull(msg.getInboundProperty("number"));
+    assertNull(msg.getOutboundProperty("number"));
 
-        assertThat(msg.getCorrelation().getId().get(), is("1234"));
-        assertThat(msg.getDataType().getMediaType().getCharset().get(), is(UTF_8));
+    assertThat(msg.getCorrelation().getId().get(), is("1234"));
+    assertThat(msg.getDataType().getMediaType().getCharset().get(), is(UTF_8));
 
 
-        Set<String> outboundProps = msg.getOutboundPropertyNames();
-        assertThat(outboundProps, hasSize(2));
+    Set<String> outboundProps = msg.getOutboundPropertyNames();
+    assertThat(outboundProps, hasSize(2));
 
-        for (String key : outboundProps)
-        {
-            assertTrue(key.equals("number") || key.equals("string") || key.equals("object"));
-            assertFalse(key.equals("NUMBER") || key.equals("STRING") || key.equals("OBJECT"));
-        }
+    for (String key : outboundProps) {
+      assertTrue(key.equals("number") || key.equals("string") || key.equals("object"));
+      assertFalse(key.equals("NUMBER") || key.equals("STRING") || key.equals("OBJECT"));
     }
+  }
 }

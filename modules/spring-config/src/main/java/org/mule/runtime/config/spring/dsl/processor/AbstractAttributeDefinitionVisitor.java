@@ -16,61 +16,38 @@ import java.util.Optional;
  *
  * @since 4.0
  */
-public class AbstractAttributeDefinitionVisitor implements AttributeDefinitionVisitor
-{
+public class AbstractAttributeDefinitionVisitor implements AttributeDefinitionVisitor {
 
-    @Override
-    public void onReferenceObject(Class<?> objectType)
-    {
-    }
+  @Override
+  public void onReferenceObject(Class<?> objectType) {}
 
-    @Override
-    public void onReferenceSimpleParameter(String reference)
-    {
-    }
+  @Override
+  public void onReferenceSimpleParameter(String reference) {}
 
-    @Override
-    public void onFixedValue(Object value)
-    {
-    }
+  @Override
+  public void onFixedValue(Object value) {}
 
-    @Override
-    public void onConfigurationParameter(String parameterName, Object defaultValue, Optional<TypeConverter> typeConverter)
-    {
-    }
+  @Override
+  public void onConfigurationParameter(String parameterName, Object defaultValue, Optional<TypeConverter> typeConverter) {}
 
-    @Override
-    public void onUndefinedSimpleParameters()
-    {
-    }
+  @Override
+  public void onUndefinedSimpleParameters() {}
 
-    @Override
-    public void onUndefinedComplexParameters()
-    {
-    }
+  @Override
+  public void onUndefinedComplexParameters() {}
 
-    @Override
-    public void onComplexChildCollection(Class<?> type, Optional<String> wrapperIdentifier)
-    {
-    }
+  @Override
+  public void onComplexChildCollection(Class<?> type, Optional<String> wrapperIdentifier) {}
 
-    @Override
-    public void onComplexChildMap(Class<?> keyType, Class<?> valueType, String wrapperIdentifier)
-    {
-    }
+  @Override
+  public void onComplexChildMap(Class<?> keyType, Class<?> valueType, String wrapperIdentifier) {}
 
-    @Override
-    public void onComplexChild(Class<?> type, Optional<String> wrapperIdentifier, Optional<String> childIdentifier)
-    {
-    }
+  @Override
+  public void onComplexChild(Class<?> type, Optional<String> wrapperIdentifier, Optional<String> childIdentifier) {}
 
-    @Override
-    public void onValueFromTextContent()
-    {
-    }
+  @Override
+  public void onValueFromTextContent() {}
 
-    @Override
-    public void onMultipleValues(KeyAttributeDefinitionPair[] definitions)
-    {
-    }
+  @Override
+  public void onMultipleValues(KeyAttributeDefinitionPair[] definitions) {}
 }

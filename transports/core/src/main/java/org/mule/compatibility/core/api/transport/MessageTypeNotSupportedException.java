@@ -11,23 +11,21 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 
 /**
- * <code>MessageTypeNotSupportedException</code> is thrown when a {@link MuleMessage} instance is to be created with an
- * payload type that is not of supported type by that {@link MuleMessageFactory}.
+ * <code>MessageTypeNotSupportedException</code> is thrown when a {@link MuleMessage} instance is to be created with an payload
+ * type that is not of supported type by that {@link MuleMessageFactory}.
  * 
  * @deprecated Transport infrastructure is deprecated.
  */
 @Deprecated
-public class MessageTypeNotSupportedException extends MuleException
-{
-    private static final long serialVersionUID = -3954838511333933644L;
+public class MessageTypeNotSupportedException extends MuleException {
 
-    public MessageTypeNotSupportedException(Object message, Class<?> creatorClass)
-    {
-        super(TransportCoreMessages.messageNotSupportedByMuleMessageFactory(message, creatorClass));
-    }
+  private static final long serialVersionUID = -3954838511333933644L;
 
-    public MessageTypeNotSupportedException(Object message, Class<?> creatorClass, Throwable cause)
-    {
-        super(TransportCoreMessages.messageNotSupportedByMuleMessageFactory(message, creatorClass), cause);
-    }
+  public MessageTypeNotSupportedException(Object message, Class<?> creatorClass) {
+    super(TransportCoreMessages.messageNotSupportedByMuleMessageFactory(message, creatorClass));
+  }
+
+  public MessageTypeNotSupportedException(Object message, Class<?> creatorClass, Throwable cause) {
+    super(TransportCoreMessages.messageNotSupportedByMuleMessageFactory(message, creatorClass), cause);
+  }
 }

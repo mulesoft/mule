@@ -8,7 +8,7 @@ package org.mule.runtime.core.util.proxy;
 
 import java.lang.reflect.InvocationHandler;
 
-public interface TargetInvocationHandler extends InvocationHandler
-{
-    public Object getTargetObject();
+public interface TargetInvocationHandler extends InvocationHandler {
+
+  public Object getTargetObject();
 }

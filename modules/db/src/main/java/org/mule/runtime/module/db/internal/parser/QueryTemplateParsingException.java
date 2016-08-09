@@ -10,12 +10,10 @@ package org.mule.runtime.module.db.internal.parser;
 /**
  * Thrown to indicate an error parsing a SQL query
  */
-public class QueryTemplateParsingException extends RuntimeException
-{
+public class QueryTemplateParsingException extends RuntimeException {
 
-    public QueryTemplateParsingException(String message)
-    {
-        super(message);
-    }
+  public QueryTemplateParsingException(String message) {
+    super(message);
+  }
 
 }

@@ -16,32 +16,28 @@ import javax.inject.Inject;
 /**
  * A {@link ObjectFactory} instance that produces {@link DynamicConfigPolicy} instances.
  * <p>
- * If a {@link #expirationPolicy} was not set, then {@link DynamicConfigPolicy#getDefault(TimeSupplier)}
- * is used to produce an instance.
+ * If a {@link #expirationPolicy} was not set, then {@link DynamicConfigPolicy#getDefault(TimeSupplier)} is used to produce an
+ * instance.
  *
  * @since 4.0
  */
-public class DynamicConfigPolicyObjectFactory implements ObjectFactory<DynamicConfigPolicy>
-{
+public class DynamicConfigPolicyObjectFactory implements ObjectFactory<DynamicConfigPolicy> {
 
-    private ExpirationPolicy expirationPolicy;
+  private ExpirationPolicy expirationPolicy;
 
-    @Inject
-    private TimeSupplier timeSupplier;
+  @Inject
+  private TimeSupplier timeSupplier;
 
-    @Override
-    public DynamicConfigPolicy getObject() throws Exception
-    {
-        if (expirationPolicy != null)
-        {
-            return new DynamicConfigPolicy(expirationPolicy);
-        }
-
-        return DynamicConfigPolicy.getDefault(timeSupplier);
+  @Override
+  public DynamicConfigPolicy getObject() throws Exception {
+    if (expirationPolicy != null) {
+      return new DynamicConfigPolicy(expirationPolicy);
     }
 
-    public void setExpirationPolicy(ExpirationPolicy expirationPolicy)
-    {
-        this.expirationPolicy = expirationPolicy;
-    }
+    return DynamicConfigPolicy.getDefault(timeSupplier);
+  }
+
+  public void setExpirationPolicy(ExpirationPolicy expirationPolicy) {
+    this.expirationPolicy = expirationPolicy;
+  }
 }

@@ -14,60 +14,50 @@ import org.mule.runtime.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.runtime.config.spring.parsers.processors.BlockAttribute;
 
 /**
- * Generates a transaction config with embedded factory.  If no factory is defined, it's taken from the
- * factory-class or factory-ref attributes.
+ * Generates a transaction config with embedded factory. If no factory is defined, it's taken from the factory-class or
+ * factory-ref attributes.
  */
-public class TransactionDefinitionParser extends AbstractSingleParentFamilyDefinitionParser
-{
+public class TransactionDefinitionParser extends AbstractSingleParentFamilyDefinitionParser {
 
-    public static final String FACTORY = "factory";
+  public static final String FACTORY = "factory";
 
-    public static final String FACTORY_REF = FACTORY + "-ref";
-    public static final String FACTORY_CLASS = FACTORY + "-" + AbstractMuleBeanDefinitionParser.ATTRIBUTE_CLASS;
-    public static final String ACTION = "action";
-    public static final String TIMEOUT = "timeout";
-    public static final String INTERACT_WTH_EXTERNAL = "interactWithExternal";
+  public static final String FACTORY_REF = FACTORY + "-ref";
+  public static final String FACTORY_CLASS = FACTORY + "-" + AbstractMuleBeanDefinitionParser.ATTRIBUTE_CLASS;
+  public static final String ACTION = "action";
+  public static final String TIMEOUT = "timeout";
+  public static final String INTERACT_WTH_EXTERNAL = "interactWithExternal";
 
-    private static String[] IGNORED_ATTRIBUTES = new String[] {FACTORY_REF, ACTION, TIMEOUT, INTERACT_WTH_EXTERNAL};
+  private static String[] IGNORED_ATTRIBUTES = new String[] {FACTORY_REF, ACTION, TIMEOUT, INTERACT_WTH_EXTERNAL};
 
-    public TransactionDefinitionParser()
-    {
-        commonInit(null);
+  public TransactionDefinitionParser() {
+    commonInit(null);
+  }
+
+  public TransactionDefinitionParser(Class factoryClass) {
+    commonInit(factoryClass);
+    MuleDefinitionParser factoryParser = getDelegate(1);
+    // don't allow these if the class is specified in the constructor
+    factoryParser.registerPreProcessor(new BlockAttribute(new String[] {FACTORY_CLASS, FACTORY_REF}));
+  }
+
+  protected void commonInit(Class factoryClass) {
+    addDelegate(new TransactionConfigDefinitionParser()).setIgnoredDefault(true).removeIgnored(FACTORY_REF).removeIgnored(ACTION)
+        .removeIgnored(TIMEOUT).removeIgnored(INTERACT_WTH_EXTERNAL);
+
+    final MuleDefinitionParserConfiguration childDefinitionParser =
+        addDelegateAsChild(new ChildDefinitionParser(FACTORY, factoryClass)).setIgnoredDefault(false)
+            .addAlias(FACTORY_CLASS, AbstractMuleBeanDefinitionParser.ATTRIBUTE_CLASS)
+            // the ref is set on the parent
+            .registerPreProcessor(new BlockAttribute(FACTORY));
+    for (String attribute : getIgnoredAttributes()) {
+      childDefinitionParser.addIgnored(attribute);
     }
 
-    public TransactionDefinitionParser(Class factoryClass)
-    {
-        commonInit(factoryClass);
-        MuleDefinitionParser factoryParser = getDelegate(1);
-        // don't allow these if the class is specified in the constructor
-        factoryParser.registerPreProcessor(new BlockAttribute(new String[] {FACTORY_CLASS, FACTORY_REF}));
-    }
+    addIgnored(AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME);
+    addHandledException(BlockAttribute.BlockAttributeException.class);
+  }
 
-    protected void commonInit(Class factoryClass)
-    {
-        addDelegate(new TransactionConfigDefinitionParser())
-                .setIgnoredDefault(true)
-                .removeIgnored(FACTORY_REF)
-                .removeIgnored(ACTION)
-                .removeIgnored(TIMEOUT)
-                .removeIgnored(INTERACT_WTH_EXTERNAL);
-
-        final MuleDefinitionParserConfiguration childDefinitionParser = addDelegateAsChild(new ChildDefinitionParser(FACTORY, factoryClass))
-                .setIgnoredDefault(false)
-                .addAlias(FACTORY_CLASS, AbstractMuleBeanDefinitionParser.ATTRIBUTE_CLASS)
-                        // the ref is set on the parent
-                .registerPreProcessor(new BlockAttribute(FACTORY));
-        for (String attribute : getIgnoredAttributes())
-        {
-            childDefinitionParser.addIgnored(attribute);
-        }
-
-        addIgnored(AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME);
-        addHandledException(BlockAttribute.BlockAttributeException.class);
-    }
-
-    protected String[] getIgnoredAttributes()
-    {
-        return IGNORED_ATTRIBUTES;
-    }
+  protected String[] getIgnoredAttributes() {
+    return IGNORED_ATTRIBUTES;
+  }
 }

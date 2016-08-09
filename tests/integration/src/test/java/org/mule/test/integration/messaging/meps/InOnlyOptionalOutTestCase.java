@@ -16,32 +16,25 @@ import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Test;
 
-public class InOnlyOptionalOutTestCase extends AbstractIntegrationTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/integration/messaging/meps/pattern_In-Only_Optional-Out-flow.xml";
-    }
+public class InOnlyOptionalOutTestCase extends AbstractIntegrationTestCase {
 
-    @Test
-    public void testExchange() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/integration/messaging/meps/pattern_In-Only_Optional-Out-flow.xml";
+  }
 
-        flowRunner("In-Only_Optional-Out--Service").withPayload("some data")
-                                                   .asynchronously()
-                                                   .run();
-        flowRunner("In-Only_Optional-Out--Service").withPayload("some data")
-                                                   .withInboundProperty("foo", "bar")
-                                                   .asynchronously()
-                                                   .run();
+  @Test
+  public void testExchange() throws Exception {
+    MuleClient client = muleContext.getClient();
 
-        MuleMessage result = client.request("test://received", RECEIVE_TIMEOUT);
-        assertNotNull(result);
-        assertThat(getPayloadAsString(result), is("foo header received"));
+    flowRunner("In-Only_Optional-Out--Service").withPayload("some data").asynchronously().run();
+    flowRunner("In-Only_Optional-Out--Service").withPayload("some data").withInboundProperty("foo", "bar").asynchronously().run();
 
-        result = client.request("test://notReceived", RECEIVE_TIMEOUT);
-        assertNull(result);
-    }
+    MuleMessage result = client.request("test://received", RECEIVE_TIMEOUT);
+    assertNotNull(result);
+    assertThat(getPayloadAsString(result), is("foo header received"));
+
+    result = client.request("test://notReceived", RECEIVE_TIMEOUT);
+    assertNull(result);
+  }
 }

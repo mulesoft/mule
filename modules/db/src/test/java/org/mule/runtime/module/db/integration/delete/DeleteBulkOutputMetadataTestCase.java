@@ -26,38 +26,33 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class DeleteBulkOutputMetadataTestCase extends AbstractDbIntegrationTestCase
-{
+public class DeleteBulkOutputMetadataTestCase extends AbstractDbIntegrationTestCase {
 
-    public DeleteBulkOutputMetadataTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public DeleteBulkOutputMetadataTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Parameterized.Parameters
-    public static List<Object[]> parameters()
-    {
-        return TestDbConfig.getResources();
-    }
+  @Parameterized.Parameters
+  public static List<Object[]> parameters() {
+    return TestDbConfig.getResources();
+  }
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/delete/delete-bulk-output-metadata-config.xml"};
-    }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/delete/delete-bulk-output-metadata-config.xml"};
+  }
 
-    @Test
-    public void returnsDeleteBulkMetadata() throws Exception
-    {
-        Flow flowConstruct = (Flow) muleContext.getRegistry().lookupFlowConstruct("deleteBulkMetadata");
+  @Test
+  public void returnsDeleteBulkMetadata() throws Exception {
+    Flow flowConstruct = (Flow) muleContext.getRegistry().lookupFlowConstruct("deleteBulkMetadata");
 
-        List<MessageProcessor> messageProcessors = flowConstruct.getMessageProcessors();
-        PreparedBulkUpdateMessageProcessor queryMessageProcessor = (PreparedBulkUpdateMessageProcessor) messageProcessors.get(0);
-        Result<MetaData> outputMetaData = queryMessageProcessor.getOutputMetaData(null);
+    List<MessageProcessor> messageProcessors = flowConstruct.getMessageProcessors();
+    PreparedBulkUpdateMessageProcessor queryMessageProcessor = (PreparedBulkUpdateMessageProcessor) messageProcessors.get(0);
+    Result<MetaData> outputMetaData = queryMessageProcessor.getOutputMetaData(null);
 
-        DefaultListMetaDataModel listMetaDataModel = (DefaultListMetaDataModel) outputMetaData.get().getPayload();
-        assertThat(listMetaDataModel.isArray(), equalTo(true));
-        SimpleMetaDataModel elementModel = (SimpleMetaDataModel) listMetaDataModel.getElementModel();
-        assertThat(elementModel.getDataType(), equalTo(DataType.DOUBLE));
-    }
+    DefaultListMetaDataModel listMetaDataModel = (DefaultListMetaDataModel) outputMetaData.get().getPayload();
+    assertThat(listMetaDataModel.isArray(), equalTo(true));
+    SimpleMetaDataModel elementModel = (SimpleMetaDataModel) listMetaDataModel.getElementModel();
+    assertThat(elementModel.getDataType(), equalTo(DataType.DOUBLE));
+  }
 }

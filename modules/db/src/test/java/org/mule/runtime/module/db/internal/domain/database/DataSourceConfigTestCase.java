@@ -22,149 +22,137 @@ import org.mule.tck.size.SmallTest;
 import org.junit.Test;
 
 @SmallTest
-public class DataSourceConfigTestCase extends AbstractMuleTestCase
-{
+public class DataSourceConfigTestCase extends AbstractMuleTestCase {
 
-    public static final String MULE_EXPRESSION = "#[expression]";
-    public static final String RESOLVED_EXPRESSION = "resolved";
+  public static final String MULE_EXPRESSION = "#[expression]";
+  public static final String RESOLVED_EXPRESSION = "resolved";
 
-    private final DataSourceConfig dataSourceConfig = new DataSourceConfig();
+  private final DataSourceConfig dataSourceConfig = new DataSourceConfig();
 
-    @Test
-    public void resolvesConfig() throws Exception
-    {
-        MuleContext context = mock(MuleContext.class);
-        ExpressionManager expressionManager = mock(ExpressionManager.class);
-        when(context.getExpressionManager()).thenReturn(expressionManager);
+  @Test
+  public void resolvesConfig() throws Exception {
+    MuleContext context = mock(MuleContext.class);
+    ExpressionManager expressionManager = mock(ExpressionManager.class);
+    when(context.getExpressionManager()).thenReturn(expressionManager);
 
-        MuleEvent muleEvent = mock(MuleEvent.class);
+    MuleEvent muleEvent = mock(MuleEvent.class);
 
-        final DbPoolingProfile poolingProfile = mock(DbPoolingProfile.class);
-        final String url = "url";
-        final String password = "password";
-        final String user = "user";
-        final int connectionTimeout = 10;
-        final String driverClassName = "driverClassName";
-        final int transactionIsolation = 1;
-        final boolean useXaTransactions = true;
+    final DbPoolingProfile poolingProfile = mock(DbPoolingProfile.class);
+    final String url = "url";
+    final String password = "password";
+    final String user = "user";
+    final int connectionTimeout = 10;
+    final String driverClassName = "driverClassName";
+    final int transactionIsolation = 1;
+    final boolean useXaTransactions = true;
 
-        dataSourceConfig.setMuleContext(context);
-        dataSourceConfig.setPoolingProfile(poolingProfile);
-        dataSourceConfig.setUrl(url);
-        dataSourceConfig.setPassword(password);
-        dataSourceConfig.setUser(user);
-        dataSourceConfig.setConnectionTimeout(connectionTimeout);
-        dataSourceConfig.setDriverClassName(driverClassName);
-        dataSourceConfig.setTransactionIsolation(transactionIsolation);
-        dataSourceConfig.setUseXaTransactions(useXaTransactions);
+    dataSourceConfig.setMuleContext(context);
+    dataSourceConfig.setPoolingProfile(poolingProfile);
+    dataSourceConfig.setUrl(url);
+    dataSourceConfig.setPassword(password);
+    dataSourceConfig.setUser(user);
+    dataSourceConfig.setConnectionTimeout(connectionTimeout);
+    dataSourceConfig.setDriverClassName(driverClassName);
+    dataSourceConfig.setTransactionIsolation(transactionIsolation);
+    dataSourceConfig.setUseXaTransactions(useXaTransactions);
 
-        DataSourceConfig resolvedDataSourceConfig = dataSourceConfig.resolve(muleEvent);
+    DataSourceConfig resolvedDataSourceConfig = dataSourceConfig.resolve(muleEvent);
 
-        assertThat(resolvedDataSourceConfig.getUrl(), equalTo(url));
-        assertThat(resolvedDataSourceConfig.getPassword(), equalTo(password));
-        assertThat(resolvedDataSourceConfig.getUser(), equalTo(user));
-        assertThat(resolvedDataSourceConfig.getConnectionTimeout(), equalTo(connectionTimeout));
-        assertThat(resolvedDataSourceConfig.getDriverClassName(), equalTo(driverClassName));
-        assertThat(resolvedDataSourceConfig.getTransactionIsolation(), equalTo(transactionIsolation));
-        assertThat(resolvedDataSourceConfig.isUseXaTransactions(), equalTo(useXaTransactions));
-    }
+    assertThat(resolvedDataSourceConfig.getUrl(), equalTo(url));
+    assertThat(resolvedDataSourceConfig.getPassword(), equalTo(password));
+    assertThat(resolvedDataSourceConfig.getUser(), equalTo(user));
+    assertThat(resolvedDataSourceConfig.getConnectionTimeout(), equalTo(connectionTimeout));
+    assertThat(resolvedDataSourceConfig.getDriverClassName(), equalTo(driverClassName));
+    assertThat(resolvedDataSourceConfig.getTransactionIsolation(), equalTo(transactionIsolation));
+    assertThat(resolvedDataSourceConfig.isUseXaTransactions(), equalTo(useXaTransactions));
+  }
 
-    @Test
-    public void detectsDynamicUrl() throws Exception
-    {
-        mockDynamicDataSourceConfigDetection();
-        dataSourceConfig.setUrl(MULE_EXPRESSION);
+  @Test
+  public void detectsDynamicUrl() throws Exception {
+    mockDynamicDataSourceConfigDetection();
+    dataSourceConfig.setUrl(MULE_EXPRESSION);
 
-        assertThat(dataSourceConfig.isDynamic(), is(true));
-    }
+    assertThat(dataSourceConfig.isDynamic(), is(true));
+  }
 
-    @Test
-    public void detectsDynamicDriverClassName() throws Exception
-    {
-        mockDynamicDataSourceConfigDetection();
-        dataSourceConfig.setDriverClassName(MULE_EXPRESSION);
+  @Test
+  public void detectsDynamicDriverClassName() throws Exception {
+    mockDynamicDataSourceConfigDetection();
+    dataSourceConfig.setDriverClassName(MULE_EXPRESSION);
 
-        assertThat(dataSourceConfig.isDynamic(), is(true));
-    }
+    assertThat(dataSourceConfig.isDynamic(), is(true));
+  }
 
-    @Test
-    public void detectsDynamicUser() throws Exception
-    {
-        mockDynamicDataSourceConfigDetection();
-        dataSourceConfig.setUser(MULE_EXPRESSION);
+  @Test
+  public void detectsDynamicUser() throws Exception {
+    mockDynamicDataSourceConfigDetection();
+    dataSourceConfig.setUser(MULE_EXPRESSION);
 
-        assertThat(dataSourceConfig.isDynamic(), is(true));
-    }
+    assertThat(dataSourceConfig.isDynamic(), is(true));
+  }
 
-    @Test
-    public void detectsDynamicPassword() throws Exception
-    {
-        mockDynamicDataSourceConfigDetection();
-        dataSourceConfig.setUser(MULE_EXPRESSION);
+  @Test
+  public void detectsDynamicPassword() throws Exception {
+    mockDynamicDataSourceConfigDetection();
+    dataSourceConfig.setUser(MULE_EXPRESSION);
 
-        assertThat(dataSourceConfig.isDynamic(), is(true));
-    }
+    assertThat(dataSourceConfig.isDynamic(), is(true));
+  }
 
-    @Test
-    public void resolvesDynamicUrl() throws Exception
-    {
-        MuleEvent muleEvent = mock(MuleEvent.class);
-        mockDynamicDataSourceConfigEvaluation(muleEvent);
+  @Test
+  public void resolvesDynamicUrl() throws Exception {
+    MuleEvent muleEvent = mock(MuleEvent.class);
+    mockDynamicDataSourceConfigEvaluation(muleEvent);
 
-        DataSourceConfig resolvedDataSourceConfig = dataSourceConfig.resolve(muleEvent);
-        assertThat(resolvedDataSourceConfig.getUrl(), is(RESOLVED_EXPRESSION));
-    }
+    DataSourceConfig resolvedDataSourceConfig = dataSourceConfig.resolve(muleEvent);
+    assertThat(resolvedDataSourceConfig.getUrl(), is(RESOLVED_EXPRESSION));
+  }
 
-    @Test
-    public void resolvesDynamicDriverClassName() throws Exception
-    {
-        MuleEvent muleEvent = mock(MuleEvent.class);
-        mockDynamicDataSourceConfigEvaluation(muleEvent);
-        dataSourceConfig.setDriverClassName(MULE_EXPRESSION);
+  @Test
+  public void resolvesDynamicDriverClassName() throws Exception {
+    MuleEvent muleEvent = mock(MuleEvent.class);
+    mockDynamicDataSourceConfigEvaluation(muleEvent);
+    dataSourceConfig.setDriverClassName(MULE_EXPRESSION);
 
-        DataSourceConfig resolvedDataSourceConfig = dataSourceConfig.resolve(muleEvent);
-        assertThat(resolvedDataSourceConfig.getDriverClassName(), is(RESOLVED_EXPRESSION));
-    }
+    DataSourceConfig resolvedDataSourceConfig = dataSourceConfig.resolve(muleEvent);
+    assertThat(resolvedDataSourceConfig.getDriverClassName(), is(RESOLVED_EXPRESSION));
+  }
 
-    @Test
-    public void resolvesDynamicUser() throws Exception
-    {
-        MuleEvent muleEvent = mock(MuleEvent.class);
-        mockDynamicDataSourceConfigEvaluation(muleEvent);
-        dataSourceConfig.setUser(MULE_EXPRESSION);
+  @Test
+  public void resolvesDynamicUser() throws Exception {
+    MuleEvent muleEvent = mock(MuleEvent.class);
+    mockDynamicDataSourceConfigEvaluation(muleEvent);
+    dataSourceConfig.setUser(MULE_EXPRESSION);
 
-        DataSourceConfig resolvedDataSourceConfig = dataSourceConfig.resolve(muleEvent);
-        assertThat(resolvedDataSourceConfig.getUser(), is(RESOLVED_EXPRESSION));
-    }
+    DataSourceConfig resolvedDataSourceConfig = dataSourceConfig.resolve(muleEvent);
+    assertThat(resolvedDataSourceConfig.getUser(), is(RESOLVED_EXPRESSION));
+  }
 
-    @Test
-    public void resolvesDynamicPassword() throws Exception
-    {
-        MuleEvent muleEvent = mock(MuleEvent.class);
-            mockDynamicDataSourceConfigEvaluation(muleEvent);
-        dataSourceConfig.setPassword(MULE_EXPRESSION);
+  @Test
+  public void resolvesDynamicPassword() throws Exception {
+    MuleEvent muleEvent = mock(MuleEvent.class);
+    mockDynamicDataSourceConfigEvaluation(muleEvent);
+    dataSourceConfig.setPassword(MULE_EXPRESSION);
 
-        DataSourceConfig resolvedDataSourceConfig = dataSourceConfig.resolve(muleEvent);
-        assertThat(resolvedDataSourceConfig.getPassword(), is(RESOLVED_EXPRESSION));
-    }
+    DataSourceConfig resolvedDataSourceConfig = dataSourceConfig.resolve(muleEvent);
+    assertThat(resolvedDataSourceConfig.getPassword(), is(RESOLVED_EXPRESSION));
+  }
 
-    private void mockDynamicDataSourceConfigDetection()
-    {
-        MuleContext context = mock(MuleContext.class);
-        ExpressionManager expressionManager = mock(ExpressionManager.class);
-        when(context.getExpressionManager()).thenReturn(expressionManager);
-        when(expressionManager.isValidExpression(MULE_EXPRESSION)).thenReturn(true);
-        dataSourceConfig.setMuleContext(context);
-    }
+  private void mockDynamicDataSourceConfigDetection() {
+    MuleContext context = mock(MuleContext.class);
+    ExpressionManager expressionManager = mock(ExpressionManager.class);
+    when(context.getExpressionManager()).thenReturn(expressionManager);
+    when(expressionManager.isValidExpression(MULE_EXPRESSION)).thenReturn(true);
+    dataSourceConfig.setMuleContext(context);
+  }
 
-    private void mockDynamicDataSourceConfigEvaluation(MuleEvent muleEvent)
-    {
-        ExpressionManager expressionManager = mock(ExpressionManager.class);
-        MuleContext context = mock(MuleContext.class);
-        when(context.getExpressionManager()).thenReturn(expressionManager);
-        when(expressionManager.isValidExpression(MULE_EXPRESSION)).thenReturn(true);
-        when(expressionManager.parse(MULE_EXPRESSION, muleEvent)).thenReturn(RESOLVED_EXPRESSION);
-        dataSourceConfig.setMuleContext(context);
-        dataSourceConfig.setUrl(MULE_EXPRESSION);
-    }
+  private void mockDynamicDataSourceConfigEvaluation(MuleEvent muleEvent) {
+    ExpressionManager expressionManager = mock(ExpressionManager.class);
+    MuleContext context = mock(MuleContext.class);
+    when(context.getExpressionManager()).thenReturn(expressionManager);
+    when(expressionManager.isValidExpression(MULE_EXPRESSION)).thenReturn(true);
+    when(expressionManager.parse(MULE_EXPRESSION, muleEvent)).thenReturn(RESOLVED_EXPRESSION);
+    dataSourceConfig.setMuleContext(context);
+    dataSourceConfig.setUrl(MULE_EXPRESSION);
+  }
 }

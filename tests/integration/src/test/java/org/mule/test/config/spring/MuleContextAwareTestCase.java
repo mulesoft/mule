@@ -13,19 +13,16 @@ import org.junit.Test;
 /**
  * This tests that we can have references to management context aware objects within a config
  */
-public class MuleContextAwareTestCase extends AbstractIntegrationTestCase
-{
+public class MuleContextAwareTestCase extends AbstractIntegrationTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "management-context-aware-test-flow.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "management-context-aware-test-flow.xml";
+  }
 
-    @Test
-    public void testStartup()
-    {
-        // only want startup to succeed
-    }
+  @Test
+  public void testStartup() {
+    // only want startup to succeed
+  }
 
 }

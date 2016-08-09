@@ -21,149 +21,126 @@ import org.mule.runtime.core.expression.ExpressionConfig;
 /**
  * TODO
  */
-public class ExpressionArgument implements MuleContextAware
-{
-    private ExpressionConfig expressionConfig = new ExpressionConfig();
-    private String name;
-    private boolean optional;
-    private Class<?> returnClass;
-    protected ClassLoader expressionEvaluationClassLoader = ExpressionArgument.class.getClassLoader();
-    private MuleContext muleContext;
+public class ExpressionArgument implements MuleContextAware {
 
-    public ExpressionArgument()
-    {
-        super();
-    }
+  private ExpressionConfig expressionConfig = new ExpressionConfig();
+  private String name;
+  private boolean optional;
+  private Class<?> returnClass;
+  protected ClassLoader expressionEvaluationClassLoader = ExpressionArgument.class.getClassLoader();
+  private MuleContext muleContext;
 
-    public ExpressionArgument(String name, ExpressionConfig expressionConfig, boolean optional)
-    {
-        this(name, expressionConfig, optional, null);
-    }
+  public ExpressionArgument() {
+    super();
+  }
 
-    public ExpressionArgument(String name, ExpressionConfig expressionConfig, boolean optional, 
-        Class<?> returnClass)
-    {
-        this.expressionConfig = expressionConfig;
-        this.name = name;
-        this.optional = optional;
-        this.returnClass = returnClass;
-    }
+  public ExpressionArgument(String name, ExpressionConfig expressionConfig, boolean optional) {
+    this(name, expressionConfig, optional, null);
+  }
 
-    @Override
-    public void setMuleContext(MuleContext context)
-    {
-        this.muleContext = context;
-    }
+  public ExpressionArgument(String name, ExpressionConfig expressionConfig, boolean optional, Class<?> returnClass) {
+    this.expressionConfig = expressionConfig;
+    this.name = name;
+    this.optional = optional;
+    this.returnClass = returnClass;
+  }
 
-    public String getName()
-    {
-        return name;
-    }
+  @Override
+  public void setMuleContext(MuleContext context) {
+    this.muleContext = context;
+  }
 
-    public void setName(String name)
-    {
-        this.name = name;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public ExpressionConfig getExpressionConfig()
-    {
-        return expressionConfig;
-    }
+  public void setName(String name) {
+    this.name = name;
+  }
 
-    public void setExpressionConfig(ExpressionConfig expressionConfig)
-    {
-        this.expressionConfig = expressionConfig;
-    }
+  public ExpressionConfig getExpressionConfig() {
+    return expressionConfig;
+  }
 
-    public boolean isOptional()
-    {
-        return optional;
-    }
+  public void setExpressionConfig(ExpressionConfig expressionConfig) {
+    this.expressionConfig = expressionConfig;
+  }
 
-    public void setOptional(boolean optional)
-    {
-        this.optional = optional;
-    }
+  public boolean isOptional() {
+    return optional;
+  }
 
-    protected String getFullExpression()
-    {
-        return expressionConfig.getFullExpression(muleContext.getExpressionManager());
-    }
+  public void setOptional(boolean optional) {
+    this.optional = optional;
+  }
 
-    protected void validate()
-    {
-        expressionConfig.validate(muleContext.getExpressionManager());
-    }
+  protected String getFullExpression() {
+    return expressionConfig.getFullExpression(muleContext.getExpressionManager());
+  }
 
-    /**
-     * Evaluates this Expression against the passed in Message.  If a returnClass is set on this Expression Argument it
-     * will be checked to ensure the Argument returns the correct class type.
-     * @param event the event to execute the expression on
-     * @return the result of the expression
-     * @throws ExpressionRuntimeException if the wrong return type is returned from the expression.
-     */
-    public Object evaluate(MuleEvent event) throws ExpressionRuntimeException
-    {
+  protected void validate() {
+    expressionConfig.validate(muleContext.getExpressionManager());
+  }
 
-        // MULE-4797 Because there is no way to specify the class-loader that script
-        // engines use and because scripts when used for expressions are compiled in
-        // runtime rather than at initialization the only way to ensure the correct
-        // class-loader to used is to switch it out here. We may want to consider
-        // passing the class-loader to the ExpressionManager and only doing this for
-        // certain ExpressionEvaluators further in.
-        Object result = withContextClassLoader(expressionEvaluationClassLoader, () ->
-                muleContext.getExpressionManager().evaluate(getExpression(), event, !isOptional())
-        );
+  /**
+   * Evaluates this Expression against the passed in Message. If a returnClass is set on this Expression Argument it will be
+   * checked to ensure the Argument returns the correct class type.
+   * 
+   * @param event the event to execute the expression on
+   * @return the result of the expression
+   * @throws ExpressionRuntimeException if the wrong return type is returned from the expression.
+   */
+  public Object evaluate(MuleEvent event) throws ExpressionRuntimeException {
 
-        if (getReturnClass() != null && result != null)
-        {
-            if (!getReturnClass().isInstance(result))
-            {
-                //If the return type does not match, lets attempt to transform it before throwing an error
-                try
-                {
-                    Transformer t = muleContext.getRegistry().lookupTransformer(DataType.fromObject(result),
-                                                                                DataType.fromType(getReturnClass()));
-                    result = t.transform(result);
-                }
-                catch (TransformerException e)
-                {
-                    throw new ExpressionRuntimeException(CoreMessages.transformUnexpectedType(result.getClass(),
-                    getReturnClass()), e);
-                }
+    // MULE-4797 Because there is no way to specify the class-loader that script
+    // engines use and because scripts when used for expressions are compiled in
+    // runtime rather than at initialization the only way to ensure the correct
+    // class-loader to used is to switch it out here. We may want to consider
+    // passing the class-loader to the ExpressionManager and only doing this for
+    // certain ExpressionEvaluators further in.
+    Object result =
+        withContextClassLoader(expressionEvaluationClassLoader,
+                               () -> muleContext.getExpressionManager().evaluate(getExpression(), event, !isOptional()));
 
-            }
-//            if(result instanceof Collection && ((Collection)result).size()==0 && !isOptional())
-//            {
-//                throw new ExpressionRuntimeException(CoreMessages.expressionEvaluatorReturnedNull(this.getEvaluator(), this.getExpression()));
-//            }
+    if (getReturnClass() != null && result != null) {
+      if (!getReturnClass().isInstance(result)) {
+        // If the return type does not match, lets attempt to transform it before throwing an error
+        try {
+          Transformer t =
+              muleContext.getRegistry().lookupTransformer(DataType.fromObject(result), DataType.fromType(getReturnClass()));
+          result = t.transform(result);
+        } catch (TransformerException e) {
+          throw new ExpressionRuntimeException(CoreMessages.transformUnexpectedType(result.getClass(), getReturnClass()), e);
         }
-        return result;
-    }
 
-    public String getExpression()
-    {
-        return expressionConfig.getExpression();
+      }
+      // if(result instanceof Collection && ((Collection)result).size()==0 && !isOptional())
+      // {
+      // throw new ExpressionRuntimeException(CoreMessages.expressionEvaluatorReturnedNull(this.getEvaluator(),
+      // this.getExpression()));
+      // }
     }
+    return result;
+  }
 
-    public void setExpression(String expression)
-    {
-        expressionConfig.setExpression(expression);
-    }
+  public String getExpression() {
+    return expressionConfig.getExpression();
+  }
 
-    public Class<?> getReturnClass()
-    {
-        return returnClass;
-    }
+  public void setExpression(String expression) {
+    expressionConfig.setExpression(expression);
+  }
 
-    public void setReturnDataType(Class<?> returnClass)
-    {
-        this.returnClass = returnClass;
-    }
-    
-    public void setExpressionEvaluationClassLoader(ClassLoader expressionEvaluationClassLoader)
-    {
-        this.expressionEvaluationClassLoader = expressionEvaluationClassLoader;
-    }
+  public Class<?> getReturnClass() {
+    return returnClass;
+  }
+
+  public void setReturnDataType(Class<?> returnClass) {
+    this.returnClass = returnClass;
+  }
+
+  public void setExpressionEvaluationClassLoader(ClassLoader expressionEvaluationClassLoader) {
+    this.expressionEvaluationClassLoader = expressionEvaluationClassLoader;
+  }
 
 }

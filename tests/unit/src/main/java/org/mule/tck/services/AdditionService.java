@@ -9,7 +9,7 @@ package org.mule.tck.services;
 /**
  * Adds an array of numbers together
  */
-public interface AdditionService
-{
-    public int add(int[] args);
+public interface AdditionService {
+
+  public int add(int[] args);
 }

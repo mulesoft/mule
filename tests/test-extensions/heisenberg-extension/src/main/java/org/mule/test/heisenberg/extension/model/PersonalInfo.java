@@ -15,37 +15,32 @@ import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 
-public class PersonalInfo
-{
+public class PersonalInfo {
 
-    @Parameter
-    @Alias("myName")
-    @Optional(defaultValue = HEISENBERG)
-    @Placement(group = PERSONAL_INFORMATION_GROUP_NAME, order = 1)
-    private String name;
+  @Parameter
+  @Alias("myName")
+  @Optional(defaultValue = HEISENBERG)
+  @Placement(group = PERSONAL_INFORMATION_GROUP_NAME, order = 1)
+  private String name;
 
-    @Parameter
-    @Optional(defaultValue = AGE)
-    @Placement(group = PERSONAL_INFORMATION_GROUP_NAME, order = 2)
-    private Integer age;
+  @Parameter
+  @Optional(defaultValue = AGE)
+  @Placement(group = PERSONAL_INFORMATION_GROUP_NAME, order = 2)
+  private Integer age;
 
-    public String getName()
-    {
-        return name;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public void setName(String name)
-    {
-        this.name = name;
-    }
+  public void setName(String name) {
+    this.name = name;
+  }
 
-    public Integer getAge()
-    {
-        return age;
-    }
+  public Integer getAge() {
+    return age;
+  }
 
-    public void setAge(Integer age)
-    {
-        this.age = age;
-    }
+  public void setAge(Integer age) {
+    this.age = age;
+  }
 }

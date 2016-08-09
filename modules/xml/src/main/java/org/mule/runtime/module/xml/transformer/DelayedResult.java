@@ -9,10 +9,9 @@ package org.mule.runtime.module.xml.transformer;
 import javax.xml.transform.Result;
 
 /**
- * A result type which delays writing until something further down
- * stream can setup the underlying output result.
+ * A result type which delays writing until something further down stream can setup the underlying output result.
  */
-public interface DelayedResult extends Result
-{
-    void write(Result result) throws Exception;
+public interface DelayedResult extends Result {
+
+  void write(Result result) throws Exception;
 }

@@ -36,164 +36,143 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Base class for implementations of {@link ConfigurationProvider} which keep track of the
- * {@link ConfigurationInstance} they generate and propagate lifecycle and IoC into them.
+ * Base class for implementations of {@link ConfigurationProvider} which keep track of the {@link ConfigurationInstance} they
+ * generate and propagate lifecycle and IoC into them.
  * <p/>
- * It also implements the other common concerns of every {@link ConfigurationProvider}, leaving implementations
- * with the need to &quot;just&quot; implement {@link #get(Object)}
+ * It also implements the other common concerns of every {@link ConfigurationProvider}, leaving implementations with the need to
+ * &quot;just&quot; implement {@link #get(Object)}
  *
  * @param <T> the generic type for the supplied {@link ConfigurationInstance}
  * @since 4.0
  */
-public abstract class LifecycleAwareConfigurationProvider<T> implements ConfigurationProvider<T>, Lifecycle
-{
+public abstract class LifecycleAwareConfigurationProvider<T> implements ConfigurationProvider<T>, Lifecycle {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(LifecycleAwareConfigurationProvider.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(LifecycleAwareConfigurationProvider.class);
 
-    private final String name;
-    private final RuntimeConfigurationModel configurationModel;
-    private final List<ConfigurationInstance<T>> configurationInstances = new LinkedList<>();
-    private final ClassLoader extensionClassLoader;
-    protected SimpleLifecycleManager lifecycleManager = new DefaultLifecycleManager<>(String.format("%s-%s", getClass().getName(), getName()), this);
+  private final String name;
+  private final RuntimeConfigurationModel configurationModel;
+  private final List<ConfigurationInstance<T>> configurationInstances = new LinkedList<>();
+  private final ClassLoader extensionClassLoader;
+  protected SimpleLifecycleManager lifecycleManager =
+      new DefaultLifecycleManager<>(String.format("%s-%s", getClass().getName(), getName()), this);
 
-    @Inject
-    protected MuleContext muleContext;
+  @Inject
+  protected MuleContext muleContext;
 
-    public LifecycleAwareConfigurationProvider(String name, RuntimeConfigurationModel configurationModel)
-    {
-        this.name = name;
-        this.configurationModel = configurationModel;
-        extensionClassLoader = getClassLoader(configurationModel.getExtensionModel());
-    }
+  public LifecycleAwareConfigurationProvider(String name, RuntimeConfigurationModel configurationModel) {
+    this.name = name;
+    this.configurationModel = configurationModel;
+    extensionClassLoader = getClassLoader(configurationModel.getExtensionModel());
+  }
 
-    /**
-     * Performs dependency injection into all the currently provided configurations,
-     * and when needed, fires the {@link Initialisable#initialise()} phase on them
-     *
-     * @throws InitialisationException if an exception is found
-     */
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        withContextClassLoader(
-                extensionClassLoader, () -> {
-                    lifecycleManager.fireInitialisePhase((phaseName, object) -> {
-                        for (ConfigurationInstance<T> configurationInstance : configurationInstances)
-                        {
-                            initialiseIfNeeded(configurationInstance, true, muleContext);
-                        }
-                    });
-                    return null;
-                },
-                InitialisationException.class, e -> {
-                    throw new InitialisationException(e, this);
-                });
-    }
-
-    /**
-     * When needed, fires the {@link Startable#start()} phase on the currently provided configurations
-     *
-     * @throws MuleException if an exception is found
-     */
-    @Override
-    public void start() throws MuleException
-    {
-        withContextClassLoader(
-                extensionClassLoader, () -> {
-                    lifecycleManager.fireStartPhase((phaseName, object) -> {
-                        for (ConfigurationInstance<T> configurationInstance : configurationInstances)
-                        {
-                            startConfig(configurationInstance);
-                        }
-                    });
-                    return null;
-                }, MuleException.class, e -> {
-                    throw new DefaultMuleException(e);
-                });
-    }
-
-    /**
-     * When needed, fires the {@link Stoppable#stop()} phase on the currently provided configurations
-     *
-     * @throws MuleException if an exception is found
-     */
-    @Override
-    public void stop() throws MuleException
-    {
-        withContextClassLoader(extensionClassLoader,
-                               () -> {
-                                   lifecycleManager.fireStopPhase((phaseName, object) -> {
-                                       for (ConfigurationInstance<T> configurationInstance : configurationInstances)
-                                       {
-                                           stopIfNeeded(configurationInstance);
-                                       }
-                                   });
-                                   return null;
-                               }, MuleException.class, e -> {
-                    throw new DefaultMuleException(e);
-                });
-    }
-
-    /**
-     * When needed, fires the {@link Disposable#dispose()} phase on the currently provided configurations
-     */
-    @Override
-    public void dispose()
-    {
-        try
-        {
-            withContextClassLoader(extensionClassLoader, () -> {
-                lifecycleManager.fireDisposePhase((phaseName, object) -> {
-                    for (ConfigurationInstance<T> configurationInstance : configurationInstances)
-                    {
-                        disposeIfNeeded(configurationInstance, LOGGER);
-                    }
-                });
-                return null;
-            });
+  /**
+   * Performs dependency injection into all the currently provided configurations, and when needed, fires the
+   * {@link Initialisable#initialise()} phase on them
+   *
+   * @throws InitialisationException if an exception is found
+   */
+  @Override
+  public void initialise() throws InitialisationException {
+    withContextClassLoader(extensionClassLoader, () -> {
+      lifecycleManager.fireInitialisePhase((phaseName, object) -> {
+        for (ConfigurationInstance<T> configurationInstance : configurationInstances) {
+          initialiseIfNeeded(configurationInstance, true, muleContext);
         }
-        catch (Exception e)
-        {
-            LOGGER.error("Could not dispose configuration provider of name " + getName(), e);
+      });
+      return null;
+    }, InitialisationException.class, e -> {
+      throw new InitialisationException(e, this);
+    });
+  }
+
+  /**
+   * When needed, fires the {@link Startable#start()} phase on the currently provided configurations
+   *
+   * @throws MuleException if an exception is found
+   */
+  @Override
+  public void start() throws MuleException {
+    withContextClassLoader(extensionClassLoader, () -> {
+      lifecycleManager.fireStartPhase((phaseName, object) -> {
+        for (ConfigurationInstance<T> configurationInstance : configurationInstances) {
+          startConfig(configurationInstance);
         }
-    }
+      });
+      return null;
+    }, MuleException.class, e -> {
+      throw new DefaultMuleException(e);
+    });
+  }
 
-    /**
-     * Implementations are to invoke this method everytime they create a new {@link ConfigurationInstance}
-     * so that they're kept track of and the lifecycle can be propagated
-     *
-     * @param configuration a newly created {@link ConfigurationInstance}
-     */
-    protected void registerConfiguration(ConfigurationInstance<T> configuration)
-    {
-        configurationInstances.add(configuration);
-    }
+  /**
+   * When needed, fires the {@link Stoppable#stop()} phase on the currently provided configurations
+   *
+   * @throws MuleException if an exception is found
+   */
+  @Override
+  public void stop() throws MuleException {
+    withContextClassLoader(extensionClassLoader, () -> {
+      lifecycleManager.fireStopPhase((phaseName, object) -> {
+        for (ConfigurationInstance<T> configurationInstance : configurationInstances) {
+          stopIfNeeded(configurationInstance);
+        }
+      });
+      return null;
+    }, MuleException.class, e -> {
+      throw new DefaultMuleException(e);
+    });
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getName()
-    {
-        return name;
+  /**
+   * When needed, fires the {@link Disposable#dispose()} phase on the currently provided configurations
+   */
+  @Override
+  public void dispose() {
+    try {
+      withContextClassLoader(extensionClassLoader, () -> {
+        lifecycleManager.fireDisposePhase((phaseName, object) -> {
+          for (ConfigurationInstance<T> configurationInstance : configurationInstances) {
+            disposeIfNeeded(configurationInstance, LOGGER);
+          }
+        });
+        return null;
+      });
+    } catch (Exception e) {
+      LOGGER.error("Could not dispose configuration provider of name " + getName(), e);
     }
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public RuntimeConfigurationModel getModel()
-    {
-        return configurationModel;
-    }
+  /**
+   * Implementations are to invoke this method everytime they create a new {@link ConfigurationInstance} so that they're kept
+   * track of and the lifecycle can be propagated
+   *
+   * @param configuration a newly created {@link ConfigurationInstance}
+   */
+  protected void registerConfiguration(ConfigurationInstance<T> configuration) {
+    configurationInstances.add(configuration);
+  }
 
-    protected void startConfig(ConfigurationInstance<T> config) throws MuleException
-    {
-        startIfNeeded(config);
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String getName() {
+    return name;
+  }
 
-    protected ClassLoader getExtensionClassLoader()
-    {
-        return extensionClassLoader;
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public RuntimeConfigurationModel getModel() {
+    return configurationModel;
+  }
+
+  protected void startConfig(ConfigurationInstance<T> config) throws MuleException {
+    startIfNeeded(config);
+  }
+
+  protected ClassLoader getExtensionClassLoader() {
+    return extensionClassLoader;
+  }
 }

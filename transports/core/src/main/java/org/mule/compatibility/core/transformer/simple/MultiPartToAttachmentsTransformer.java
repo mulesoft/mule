@@ -26,46 +26,36 @@ import java.nio.charset.Charset;
  *
  * @since 4.0
  */
-public class MultiPartToAttachmentsTransformer extends AbstractMessageTransformer
-{
+public class MultiPartToAttachmentsTransformer extends AbstractMessageTransformer {
 
-    public MultiPartToAttachmentsTransformer()
-    {
-        registerSourceType(DataType.builder().type(MultiPartPayload.class).build());
-        setReturnDataType(DataType.OBJECT);
+  public MultiPartToAttachmentsTransformer() {
+    registerSourceType(DataType.builder().type(MultiPartPayload.class).build());
+    setReturnDataType(DataType.OBJECT);
+  }
+
+  @Override
+  public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException {
+    final MuleMessage message = event.getMessage();
+    try {
+      final Builder builder = MuleMessage.builder(message);
+
+      final DefaultMultiPartPayload multiPartPayload = (DefaultMultiPartPayload) message.getPayload();
+      if (multiPartPayload.hasBodyPart()) {
+        builder.payload(multiPartPayload.getBodyPart().getPayload());
+      } else {
+        builder.nullPayload();
+      }
+
+      for (org.mule.runtime.api.message.MuleMessage muleMessage : multiPartPayload.getNonBodyParts()) {
+        final PartAttributes attributes = (PartAttributes) muleMessage.getAttributes();
+        builder.addOutboundAttachment(attributes.getName(), toDataHandler(attributes.getName(), muleMessage.getPayload(),
+                                                                          muleMessage.getDataType().getMediaType()));
+      }
+
+      event.setMessage(builder.build());
+    } catch (Exception e) {
+      throw new TransformerException(this, e);
     }
-
-    @Override
-    public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException
-    {
-        final MuleMessage message = event.getMessage();
-        try
-        {
-            final Builder builder = MuleMessage.builder(message);
-
-            final DefaultMultiPartPayload multiPartPayload = (DefaultMultiPartPayload) message.getPayload();
-            if (multiPartPayload.hasBodyPart())
-            {
-                builder.payload(multiPartPayload.getBodyPart().getPayload());
-            }
-            else
-            {
-                builder.nullPayload();
-            }
-
-            for (org.mule.runtime.api.message.MuleMessage muleMessage : multiPartPayload.getNonBodyParts())
-            {
-                final PartAttributes attributes = (PartAttributes) muleMessage.getAttributes();
-                builder.addOutboundAttachment(attributes.getName(),
-                        toDataHandler(attributes.getName(), muleMessage.getPayload(), muleMessage.getDataType().getMediaType()));
-            }
-
-            event.setMessage(builder.build());
-        }
-        catch (Exception e)
-        {
-            throw new TransformerException(this, e);
-        }
-        return event.getMessage();
-    }
+    return event.getMessage();
+  }
 }

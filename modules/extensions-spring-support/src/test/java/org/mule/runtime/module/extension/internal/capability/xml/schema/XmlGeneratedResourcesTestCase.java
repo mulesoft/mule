@@ -42,87 +42,84 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class XmlGeneratedResourcesTestCase extends AbstractGeneratedResourceFactoryTestCase
-{
+public class XmlGeneratedResourcesTestCase extends AbstractGeneratedResourceFactoryTestCase {
 
-    private static final String EXTENSION_NAME = "extension";
-    private static final String EXTENSION_VERSION = "version";
-    private static final String SCHEMA_LOCATION = "mulesoft.com/extension";
-    private static final String UNESCAPED_LOCATION_PREFIX = "http://";
-    private static final String ESCAPED_LOCATION_PREFIX = "http\\://";
-    private static final String SCHEMA_NAME = "mule-extension.xsd";
+  private static final String EXTENSION_NAME = "extension";
+  private static final String EXTENSION_VERSION = "version";
+  private static final String SCHEMA_LOCATION = "mulesoft.com/extension";
+  private static final String UNESCAPED_LOCATION_PREFIX = "http://";
+  private static final String ESCAPED_LOCATION_PREFIX = "http\\://";
+  private static final String SCHEMA_NAME = "mule-extension.xsd";
 
-    @Mock
-    private ExtensionModel extensionModel;
+  @Mock
+  private ExtensionModel extensionModel;
 
-    @Mock(answer = RETURNS_DEEP_STUBS)
-    private ServiceRegistry serviceRegistry;
+  @Mock(answer = RETURNS_DEEP_STUBS)
+  private ServiceRegistry serviceRegistry;
 
-    @Mock
-    private ProcessingEnvironment processingEnvironment;
+  @Mock
+  private ProcessingEnvironment processingEnvironment;
 
-    private ResourcesGenerator generator;
+  private ResourcesGenerator generator;
 
-    private XmlModelProperty xmlModelProperty;
+  private XmlModelProperty xmlModelProperty;
 
-    private SpringHandlerBundleResourceFactory springHandlerFactory = new SpringHandlerBundleResourceFactory();
-    private SpringSchemaBundleResourceFactory springSchemaBundleResourceFactory = new SpringSchemaBundleResourceFactory();
-    private SchemaResourceFactory schemaResourceFactory = new SchemaResourceFactory();
+  private SpringHandlerBundleResourceFactory springHandlerFactory = new SpringHandlerBundleResourceFactory();
+  private SpringSchemaBundleResourceFactory springSchemaBundleResourceFactory = new SpringSchemaBundleResourceFactory();
+  private SchemaResourceFactory schemaResourceFactory = new SchemaResourceFactory();
 
-    @Before
-    public void before()
-    {
-        xmlModelProperty = new XmlModelProperty(EXTENSION_VERSION, EXTENSION_NAME,
-                                                UNESCAPED_LOCATION_PREFIX + SCHEMA_LOCATION,
-                                                SCHEMA_NAME,
-                                                String.format("%s/%s/%s", UNESCAPED_LOCATION_PREFIX + SCHEMA_LOCATION,
-                                                              CURRENT_VERSION, SCHEMA_NAME));
+  @Before
+  public void before() {
+    xmlModelProperty =
+        new XmlModelProperty(EXTENSION_VERSION, EXTENSION_NAME, UNESCAPED_LOCATION_PREFIX + SCHEMA_LOCATION, SCHEMA_NAME, String
+            .format("%s/%s/%s", UNESCAPED_LOCATION_PREFIX + SCHEMA_LOCATION, CURRENT_VERSION, SCHEMA_NAME));
 
-        when(extensionModel.getModelProperty(XmlModelProperty.class)).thenReturn(Optional.of(xmlModelProperty));
-        when(extensionModel.getModelProperty(SubTypesModelProperty.class)).thenReturn(Optional.empty());
-        when(extensionModel.getModelProperty(ImportedTypesModelProperty.class)).thenReturn(Optional.empty());
-        when(extensionModel.getModelProperty(ExportModelProperty.class)).thenReturn(Optional.empty());
+    when(extensionModel.getModelProperty(XmlModelProperty.class)).thenReturn(Optional.of(xmlModelProperty));
+    when(extensionModel.getModelProperty(SubTypesModelProperty.class)).thenReturn(Optional.empty());
+    when(extensionModel.getModelProperty(ImportedTypesModelProperty.class)).thenReturn(Optional.empty());
+    when(extensionModel.getModelProperty(ExportModelProperty.class)).thenReturn(Optional.empty());
 
-        generator = new AnnotationProcessorResourceGenerator(asList(springHandlerFactory, springSchemaBundleResourceFactory, schemaResourceFactory), processingEnvironment);
+    generator = new AnnotationProcessorResourceGenerator(asList(springHandlerFactory, springSchemaBundleResourceFactory,
+                                                                schemaResourceFactory),
+                                                         processingEnvironment);
 
-        when(extensionModel.getName()).thenReturn(EXTENSION_NAME);
-        when(extensionModel.getVersion()).thenReturn(EXTENSION_VERSION);
-    }
+    when(extensionModel.getName()).thenReturn(EXTENSION_NAME);
+    when(extensionModel.getVersion()).thenReturn(EXTENSION_VERSION);
+  }
 
-    @Override
-    protected Class<? extends GeneratedResourceFactory>[] getResourceFactoryTypes()
-    {
-        return new Class[] {SpringHandlerBundleResourceFactory.class, SchemaResourceFactory.class, SpringSchemaBundleResourceFactory.class};
-    }
+  @Override
+  protected Class<? extends GeneratedResourceFactory>[] getResourceFactoryTypes() {
+    return new Class[] {SpringHandlerBundleResourceFactory.class, SchemaResourceFactory.class,
+        SpringSchemaBundleResourceFactory.class};
+  }
 
-    @Test
-    public void generateSchema() throws Exception
-    {
-        GeneratedResource resource = schemaResourceFactory.generateResource(extensionModel).get();
-        assertThat(isBlank(new String(resource.getContent())), is(false));
-    }
+  @Test
+  public void generateSchema() throws Exception {
+    GeneratedResource resource = schemaResourceFactory.generateResource(extensionModel).get();
+    assertThat(isBlank(new String(resource.getContent())), is(false));
+  }
 
-    @Test
-    public void springHandlers() throws Exception
-    {
-        GeneratedResource resource = springHandlerFactory.generateResource(extensionModel).get();
+  @Test
+  public void springHandlers() throws Exception {
+    GeneratedResource resource = springHandlerFactory.generateResource(extensionModel).get();
 
-        assertThat(SpringHandlerBundleResourceFactory.GENERATED_FILE_NAME, equalTo(resource.getPath()));
-        assertThat(new String(resource.getContent()),
-                   equalTo(String.format(SpringHandlerBundleResourceFactory.BUNDLE_MASK, ESCAPED_LOCATION_PREFIX + SCHEMA_LOCATION, ExtensionNamespaceHandler.class.getName())));
-    }
+    assertThat(SpringHandlerBundleResourceFactory.GENERATED_FILE_NAME, equalTo(resource.getPath()));
+    assertThat(new String(resource.getContent()),
+               equalTo(String.format(SpringHandlerBundleResourceFactory.BUNDLE_MASK, ESCAPED_LOCATION_PREFIX + SCHEMA_LOCATION,
+                                     ExtensionNamespaceHandler.class.getName())));
+  }
 
-    @Test
-    public void springSchemas() throws Exception
-    {
-        GeneratedResource resource = springSchemaBundleResourceFactory.generateResource(extensionModel).get();
-        assertThat(resource.getPath(), equalTo(GENERATED_FILE_NAME));
+  @Test
+  public void springSchemas() throws Exception {
+    GeneratedResource resource = springSchemaBundleResourceFactory.generateResource(extensionModel).get();
+    assertThat(resource.getPath(), equalTo(GENERATED_FILE_NAME));
 
-        StringBuilder expected = new StringBuilder();
-        expected.append(String.format(BUNDLE_MASK, ESCAPED_LOCATION_PREFIX + SCHEMA_LOCATION, EXTENSION_VERSION, SCHEMA_NAME, SCHEMA_NAME));
-        expected.append(String.format(BUNDLE_MASK, ESCAPED_LOCATION_PREFIX + SCHEMA_LOCATION, "current", SCHEMA_NAME, SCHEMA_NAME));
+    StringBuilder expected = new StringBuilder();
+    expected.append(String.format(BUNDLE_MASK, ESCAPED_LOCATION_PREFIX + SCHEMA_LOCATION, EXTENSION_VERSION, SCHEMA_NAME,
+                                  SCHEMA_NAME));
+    expected.append(String.format(BUNDLE_MASK, ESCAPED_LOCATION_PREFIX + SCHEMA_LOCATION, "current", SCHEMA_NAME, SCHEMA_NAME));
 
 
-        assertThat(new String(resource.getContent()), equalTo(expected.toString()));
-    }
+    assertThat(new String(resource.getContent()), equalTo(expected.toString()));
+  }
 }

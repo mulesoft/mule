@@ -24,48 +24,42 @@ import org.mule.runtime.core.interceptor.TimerInterceptor;
 
 import org.junit.Test;
 
-public abstract class AbstractConfigBuilderWithBindingsTestCase extends AbstractScriptWithBindingsConfigBuilderTestCase
-{
+public abstract class AbstractConfigBuilderWithBindingsTestCase extends AbstractScriptWithBindingsConfigBuilderTestCase {
 
-    public AbstractConfigBuilderWithBindingsTestCase(boolean legacy)
-    {
-        super(legacy);
-    }
+  public AbstractConfigBuilderWithBindingsTestCase(boolean legacy) {
+    super(legacy);
+  }
 
-    @Override
-    protected boolean isGracefulShutdown()
-    {
-        return true;
-    }
+  @Override
+  protected boolean isGracefulShutdown() {
+    return true;
+  }
 
-    @Test
-    public void testInterceptors()
-    {
-        Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct("orangeComponent");
-        AbstractComponent component = (AbstractComponent) flow.getMessageProcessors().get(0);
-        assertEquals(3, component.getInterceptors().size());
-        assertEquals(LoggingInterceptor.class, component.getInterceptors().get(0).getClass());
-        assertEquals(InterceptorStack.class, component.getInterceptors().get(1).getClass());
-        assertEquals(TimerInterceptor.class, component.getInterceptors().get(2).getClass());
-    }
+  @Test
+  public void testInterceptors() {
+    Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct("orangeComponent");
+    AbstractComponent component = (AbstractComponent) flow.getMessageProcessors().get(0);
+    assertEquals(3, component.getInterceptors().size());
+    assertEquals(LoggingInterceptor.class, component.getInterceptors().get(0).getClass());
+    assertEquals(InterceptorStack.class, component.getInterceptors().get(1).getClass());
+    assertEquals(TimerInterceptor.class, component.getInterceptors().get(2).getClass());
+  }
 
-    @Override
-    public void testEndpointConfig() throws MuleException
-    {
-        super.testEndpointConfig();
+  @Override
+  public void testEndpointConfig() throws MuleException {
+    super.testEndpointConfig();
 
-        // test that targets have been resolved on targets
-        ImmutableEndpoint endpoint = getEndpointFactory(muleContext).getInboundEndpoint("waterMelonEndpoint");
-        assertNotNull(endpoint);
-        assertEquals(UTF_8, endpoint.getEncoding());
-        assertEquals("test.queue", endpoint.getEndpointURI().getAddress());
+    // test that targets have been resolved on targets
+    ImmutableEndpoint endpoint = getEndpointFactory(muleContext).getInboundEndpoint("waterMelonEndpoint");
+    assertNotNull(endpoint);
+    assertEquals(UTF_8, endpoint.getEncoding());
+    assertEquals("test.queue", endpoint.getEndpointURI().getAddress());
 
-        FlowConstruct service = muleContext.getRegistry().lookupFlowConstruct("appleComponent2");
-        assertNotNull(service);
-    }
+    FlowConstruct service = muleContext.getRegistry().lookupFlowConstruct("appleComponent2");
+    assertNotNull(service);
+  }
 
-    private static EndpointFactory getEndpointFactory(MuleContext muleContext)
-    {
-        return (EndpointFactory) muleContext.getRegistry().lookupObject(MuleEndpointProperties.OBJECT_MULE_ENDPOINT_FACTORY);
-    }
+  private static EndpointFactory getEndpointFactory(MuleContext muleContext) {
+    return (EndpointFactory) muleContext.getRegistry().lookupObject(MuleEndpointProperties.OBJECT_MULE_ENDPOINT_FACTORY);
+  }
 }

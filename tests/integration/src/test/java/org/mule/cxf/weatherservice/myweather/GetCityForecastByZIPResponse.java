@@ -14,9 +14,11 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for anonymous complex type.
+ * <p>
+ * Java class for anonymous complex type.
  *
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>
+ * The following schema fragment specifies the expected content contained within this class.
  *
  * <pre>
  * &lt;complexType>
@@ -33,37 +35,31 @@ import javax.xml.bind.annotation.XmlType;
  *
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = {
-    "getCityForecastByZIPResult"
-})
+@XmlType(name = "", propOrder = {"getCityForecastByZIPResult"})
 @XmlRootElement(name = "GetCityForecastByZIPResponse", namespace = "http://ws.cdyne.com/WeatherWS/")
 public class GetCityForecastByZIPResponse {
 
-    @XmlElement(name = "GetCityForecastByZIPResult", namespace = "http://ws.cdyne.com/WeatherWS/")
-    protected ForecastReturn getCityForecastByZIPResult;
+  @XmlElement(name = "GetCityForecastByZIPResult", namespace = "http://ws.cdyne.com/WeatherWS/")
+  protected ForecastReturn getCityForecastByZIPResult;
 
-    /**
-     * Gets the value of the getCityForecastByZIPResult property.
-     *
-     * @return
-     *     possible object is
-     *     {@link ForecastReturn }
-     *
-     */
-    public ForecastReturn getGetCityForecastByZIPResult() {
-        return getCityForecastByZIPResult;
-    }
+  /**
+   * Gets the value of the getCityForecastByZIPResult property.
+   *
+   * @return possible object is {@link ForecastReturn }
+   *
+   */
+  public ForecastReturn getGetCityForecastByZIPResult() {
+    return getCityForecastByZIPResult;
+  }
 
-    /**
-     * Sets the value of the getCityForecastByZIPResult property.
-     *
-     * @param value
-     *     allowed object is
-     *     {@link ForecastReturn }
-     *
-     */
-    public void setGetCityForecastByZIPResult(ForecastReturn value) {
-        this.getCityForecastByZIPResult = value;
-    }
+  /**
+   * Sets the value of the getCityForecastByZIPResult property.
+   *
+   * @param value allowed object is {@link ForecastReturn }
+   *
+   */
+  public void setGetCityForecastByZIPResult(ForecastReturn value) {
+    this.getCityForecastByZIPResult = value;
+  }
 
 }

@@ -13,33 +13,29 @@ import org.mule.runtime.module.http.internal.request.DefaultHttpRequester;
 
 import org.junit.Test;
 
-public class HttpSharedRequestConfigTestCase extends DomainFunctionalTestCase
-{
+public class HttpSharedRequestConfigTestCase extends DomainFunctionalTestCase {
 
-    private static final String FIRST_APP_NAME = "app-1";
-    private static final String SECOND_APP_NAME = "app-2";
+  private static final String FIRST_APP_NAME = "app-1";
+  private static final String SECOND_APP_NAME = "app-2";
 
-    @Override
-    protected String getDomainConfig()
-    {
-        return "domain/http/http-shared-request-config.xml";
-    }
+  @Override
+  protected String getDomainConfig() {
+    return "domain/http/http-shared-request-config.xml";
+  }
 
-    @Override
-    public ApplicationConfig[] getConfigResources()
-    {
-        return new ApplicationConfig[]{
-                new ApplicationConfig(FIRST_APP_NAME, new String[] {"domain/http/http-request-app.xml"}),
-                new ApplicationConfig(SECOND_APP_NAME, new String[] {"domain/http/http-request-app.xml"})
-        };
-    }
+  @Override
+  public ApplicationConfig[] getConfigResources() {
+    return new ApplicationConfig[] {new ApplicationConfig(FIRST_APP_NAME, new String[] {"domain/http/http-request-app.xml"}),
+        new ApplicationConfig(SECOND_APP_NAME, new String[] {"domain/http/http-request-app.xml"})};
+  }
 
-    @Test
-    public void useSameRequestConfig() throws Exception
-    {
-        final DefaultHttpRequester firstAppRequester = getMuleContextForApp(FIRST_APP_NAME).getRegistry().lookupObject(DefaultHttpRequester.class);
-        final DefaultHttpRequester secondAppRequester = getMuleContextForApp(FIRST_APP_NAME).getRegistry().lookupObject(DefaultHttpRequester.class);
-        assertThat(firstAppRequester.getConfig(), is(secondAppRequester.getConfig()));
-    }
+  @Test
+  public void useSameRequestConfig() throws Exception {
+    final DefaultHttpRequester firstAppRequester =
+        getMuleContextForApp(FIRST_APP_NAME).getRegistry().lookupObject(DefaultHttpRequester.class);
+    final DefaultHttpRequester secondAppRequester =
+        getMuleContextForApp(FIRST_APP_NAME).getRegistry().lookupObject(DefaultHttpRequester.class);
+    assertThat(firstAppRequester.getConfig(), is(secondAppRequester.getConfig()));
+  }
 
 }

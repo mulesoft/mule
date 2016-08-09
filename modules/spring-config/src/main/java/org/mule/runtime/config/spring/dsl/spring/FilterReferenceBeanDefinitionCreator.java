@@ -21,35 +21,32 @@ import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 
 /**
- * Processor of the chain of responsibility that knows how to create the {@link org.springframework.beans.factory.config.BeanDefinition}
- * for an filter reference element.
+ * Processor of the chain of responsibility that knows how to create the
+ * {@link org.springframework.beans.factory.config.BeanDefinition} for an filter reference element.
  *
  * @since 4.0
  */
-class FilterReferenceBeanDefinitionCreator extends BeanDefinitionCreator
-{
-    private static final ComponentIdentifier FILTER_REFERENCE_IDENTIFIER = new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(FILTER_REFERENCE_ELEMENT).build();
+class FilterReferenceBeanDefinitionCreator extends BeanDefinitionCreator {
 
-    @Override
-    public boolean handleRequest(CreateBeanDefinitionRequest createBeanDefinitionRequest)
-    {
-        ComponentModel componentModel = createBeanDefinitionRequest.getComponentModel();
-        if (componentModel.getIdentifier().equals(FILTER_REFERENCE_IDENTIFIER))
-        {
-            if (from(componentModel).getNode().getParentNode().getNodeName().equals(MESSAGE_FILTER_ELEMENT))
-            {
-                componentModel.setType(Filter.class);
-                componentModel.setBeanReference(new RuntimeBeanReference(componentModel.getParameters().get(REFERENCE_ATTRIBUTE)));
-            }
-            else
-            {
-                componentModel.setType(MessageProcessor.class);
-                BeanDefinitionBuilder beanDefinitionBuilder = org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition(MessageFilter.class);
-                beanDefinitionBuilder.addConstructorArgReference(componentModel.getParameters().get(REFERENCE_ATTRIBUTE));
-                componentModel.setBeanDefinition(beanDefinitionBuilder.getBeanDefinition());
-            }
-            return true;
-        }
-        return false;
+  private static final ComponentIdentifier FILTER_REFERENCE_IDENTIFIER =
+      new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(FILTER_REFERENCE_ELEMENT).build();
+
+  @Override
+  public boolean handleRequest(CreateBeanDefinitionRequest createBeanDefinitionRequest) {
+    ComponentModel componentModel = createBeanDefinitionRequest.getComponentModel();
+    if (componentModel.getIdentifier().equals(FILTER_REFERENCE_IDENTIFIER)) {
+      if (from(componentModel).getNode().getParentNode().getNodeName().equals(MESSAGE_FILTER_ELEMENT)) {
+        componentModel.setType(Filter.class);
+        componentModel.setBeanReference(new RuntimeBeanReference(componentModel.getParameters().get(REFERENCE_ATTRIBUTE)));
+      } else {
+        componentModel.setType(MessageProcessor.class);
+        BeanDefinitionBuilder beanDefinitionBuilder =
+            org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition(MessageFilter.class);
+        beanDefinitionBuilder.addConstructorArgReference(componentModel.getParameters().get(REFERENCE_ATTRIBUTE));
+        componentModel.setBeanDefinition(beanDefinitionBuilder.getBeanDefinition());
+      }
+      return true;
     }
+    return false;
+  }
 }

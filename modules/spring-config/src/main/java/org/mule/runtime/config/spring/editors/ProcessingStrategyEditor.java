@@ -13,17 +13,14 @@ import java.beans.PropertyEditor;
 import java.beans.PropertyEditorSupport;
 
 /**
- * A {@link PropertyEditor} for parsing instances of
- * {@link ProcessingStrategy}
+ * A {@link PropertyEditor} for parsing instances of {@link ProcessingStrategy}
  *
  * @since 3.7.0
  */
-public class ProcessingStrategyEditor extends PropertyEditorSupport
-{
+public class ProcessingStrategyEditor extends PropertyEditorSupport {
 
-    @Override
-    public void setAsText(String text) throws IllegalArgumentException
-    {
-        setValue(ProcessingStrategyUtils.parseProcessingStrategy(text));
-    }
+  @Override
+  public void setAsText(String text) throws IllegalArgumentException {
+    setValue(ProcessingStrategyUtils.parseProcessingStrategy(text));
+  }
 }

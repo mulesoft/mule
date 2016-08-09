@@ -27,44 +27,38 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 
-public class ToolingServiceTestCase extends AbstractMuleTestCase
-{
+public class ToolingServiceTestCase extends AbstractMuleTestCase {
 
-    @Rule
-    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+  @Rule
+  public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
-    @Rule
-    public ExpectedException expectedException = none();
+  @Rule
+  public ExpectedException expectedException = none();
 
-    @Test
-    public void nonExistentBundle()
-    {
-        ComponentConfiguration componentConfiguration = new ComponentConfiguration.Builder()
-                .setNamespace("mule")
-                .setIdentifier("configuration")
-                .build();
+  @Test
+  public void nonExistentBundle() {
+    ComponentConfiguration componentConfiguration =
+        new ComponentConfiguration.Builder().setNamespace("mule").setIdentifier("configuration").build();
 
-        expectedException.expect(BundleNotFoundException.class);
-        getConnectionTestingService(componentConfiguration);
-    }
+    expectedException.expect(BundleNotFoundException.class);
+    getConnectionTestingService(componentConfiguration);
+  }
 
-    private ConnectivityTestingService getConnectionTestingService(ComponentConfiguration... componentConfigurations)
-    {
-        ArtifactConfiguration artifactConfiguration = new ArtifactConfiguration(asList(componentConfigurations));
-        MuleArtifactResourcesRegistry muleArtifactResourcesRegistry = new MuleArtifactResourcesRegistry();
-        ToolingService toolingService = new DefaultToolingService(createFakeRepositorySystem(), new DefaultTemporaryArtifactBuilderFactory(muleArtifactResourcesRegistry));
+  private ConnectivityTestingService getConnectionTestingService(ComponentConfiguration... componentConfigurations) {
+    ArtifactConfiguration artifactConfiguration = new ArtifactConfiguration(asList(componentConfigurations));
+    MuleArtifactResourcesRegistry muleArtifactResourcesRegistry = new MuleArtifactResourcesRegistry();
+    ToolingService toolingService =
+        new DefaultToolingService(createFakeRepositorySystem(),
+                                  new DefaultTemporaryArtifactBuilderFactory(muleArtifactResourcesRegistry));
 
-        return toolingService.newConnectivityTestingServiceBuilder()
-                .setArtifactConfiguration(artifactConfiguration)
-                .addExtension("org.mule.extensions", "mule-module-file", "4.0-SNAPSHOT")
-                .build();
-    }
+    return toolingService.newConnectivityTestingServiceBuilder().setArtifactConfiguration(artifactConfiguration)
+        .addExtension("org.mule.extensions", "mule-module-file", "4.0-SNAPSHOT").build();
+  }
 
-    private RepositoryService createFakeRepositorySystem()
-    {
-        RepositoryService mockRepositoryService = mock(RepositoryService.class);
-        when(mockRepositoryService.lookupBundle(any())).thenThrow(BundleNotFoundException.class);
-        return mockRepositoryService;
-    }
+  private RepositoryService createFakeRepositorySystem() {
+    RepositoryService mockRepositoryService = mock(RepositoryService.class);
+    when(mockRepositoryService.lookupBundle(any())).thenThrow(BundleNotFoundException.class);
+    return mockRepositoryService;
+  }
 
 }

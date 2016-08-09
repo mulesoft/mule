@@ -15,13 +15,12 @@ import org.xml.sax.Locator;
  * 
  * This interface is an extension point to other Mule projects. Please be careful if you are going to make changes here.
  */
-public interface XmlMetadataAnnotationsFactory
-{
+public interface XmlMetadataAnnotationsFactory {
 
-    /**
-     * @param locator the xml parser context.
-     * @return a fresh {@link XmlMetadataAnnotations}
-     */
-    XmlMetadataAnnotations create(Locator locator);
+  /**
+   * @param locator the xml parser context.
+   * @return a fresh {@link XmlMetadataAnnotations}
+   */
+  XmlMetadataAnnotations create(Locator locator);
 
 }

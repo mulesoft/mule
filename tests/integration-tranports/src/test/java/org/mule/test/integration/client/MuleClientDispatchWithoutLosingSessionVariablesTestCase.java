@@ -23,79 +23,70 @@ import org.junit.ClassRule;
 import org.junit.Test;
 
 /**
- * Tests to validate that MuleClient can be used from MessageProcessor and JavaComponent in order to dispatch an event
- * to a sub-flow, without losing the Session variables.
+ * Tests to validate that MuleClient can be used from MessageProcessor and JavaComponent in order to dispatch an event to a
+ * sub-flow, without losing the Session variables.
  */
-public class MuleClientDispatchWithoutLosingSessionVariablesTestCase extends FunctionalTestCase
-{
-    @ClassRule
-    public static DynamicPort port = new DynamicPort("port");
+public class MuleClientDispatchWithoutLosingSessionVariablesTestCase extends FunctionalTestCase {
+
+  @ClassRule
+  public static DynamicPort port = new DynamicPort("port");
+
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/integration/client/client-session-vars-when-dispatch-flow.xml";
+  }
+
+  private void doSendMessageToHttp(String flowName) throws Exception {
+    MuleMessage result = flowRunner(flowName).withPayload("TEST1").run().getMessage();
+    assertThat(result, notNullValue(MuleMessage.class));
+    FlowAssert.verify(flowName);
+  }
+
+  @Test
+  public void testSessionVarsAfterDispatchFromMessageProcessor() throws Exception {
+    doSendMessageToHttp("sessionVarsFlowUsingProcessor");
+  }
+
+  @Test
+  public void testSessionVarsAfterDispatchFromJavaComponent() throws Exception {
+    doSendMessageToHttp("sessionVarsFlowUsingJavaComponent");
+  }
+
+  @Test
+  public void testSessionVarsFlowUsingJavaComponentRequestResponse() throws Exception {
+    doSendMessageToHttp("sessionVarsFlowUsingJavaComponentRequestResponse");
+  }
+
+  public static class MessageProcessorDispatchFlowUsingNewMuleClient implements MessageProcessor {
 
     @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/integration/client/client-session-vars-when-dispatch-flow.xml";
-    }
+    public MuleEvent process(MuleEvent event) throws MuleException {
+      event.getMuleContext().getClient().dispatch(getUrl("innertest"), MuleMessage.builder().payload("payload").build());
+      return event;
 
-    private void doSendMessageToHttp(String flowName) throws Exception
-    {
-        MuleMessage result = flowRunner(flowName).withPayload("TEST1").run().getMessage();
-        assertThat(result, notNullValue(MuleMessage.class));
-        FlowAssert.verify(flowName);
     }
+  }
 
-    @Test
-    public void testSessionVarsAfterDispatchFromMessageProcessor() throws Exception
-    {
-        doSendMessageToHttp("sessionVarsFlowUsingProcessor");
+  public static class JavaComponentDispatchFlowUsingNewMuleClient implements Callable {
+
+    @Override
+    public Object onCall(MuleEventContext eventContext) throws Exception {
+      eventContext.getMuleContext().getClient().dispatch(getUrl("innertest"), MuleMessage.builder().payload("payload").build());
+      return eventContext.getMessage();
     }
+  }
 
-    @Test
-    public void testSessionVarsAfterDispatchFromJavaComponent() throws Exception
-    {
-        doSendMessageToHttp("sessionVarsFlowUsingJavaComponent");
+  public static class JavaComponentSendFlowUsingNewMuleClient implements Callable {
+
+    @Override
+    public Object onCall(MuleEventContext eventContext) throws Exception {
+      eventContext.sendEvent(MuleMessage.builder().payload("payload").build(), getUrl("innerrequestresponsetest"));
+      return eventContext.getMessage();
     }
+  }
 
-    @Test
-    public void testSessionVarsFlowUsingJavaComponentRequestResponse() throws Exception
-    {
-        doSendMessageToHttp("sessionVarsFlowUsingJavaComponentRequestResponse");
-    }
-
-    public static class MessageProcessorDispatchFlowUsingNewMuleClient implements MessageProcessor
-    {
-        @Override
-        public MuleEvent process(MuleEvent event) throws MuleException
-        {
-            event.getMuleContext().getClient().dispatch(getUrl("innertest"), MuleMessage.builder().payload("payload").build());
-            return event;
-
-        }
-    }
-
-    public static class JavaComponentDispatchFlowUsingNewMuleClient implements Callable
-    {
-        @Override
-        public Object onCall(MuleEventContext eventContext) throws Exception
-        {
-            eventContext.getMuleContext().getClient().dispatch(getUrl("innertest"), MuleMessage.builder().payload("payload").build());
-            return eventContext.getMessage();
-        }
-    }
-
-    public static class JavaComponentSendFlowUsingNewMuleClient implements Callable
-    {
-        @Override
-        public Object onCall(MuleEventContext eventContext) throws Exception
-        {
-            eventContext.sendEvent(MuleMessage.builder().payload("payload").build(), getUrl("innerrequestresponsetest"));
-            return eventContext.getMessage();
-        }
-    }
-
-    private static String getUrl(String path)
-    {
-        return String.format("http://localhost:%s/%s", port.getValue(), path);
-    }
+  private static String getUrl(String path) {
+    return String.format("http://localhost:%s/%s", port.getValue(), path);
+  }
 
 }

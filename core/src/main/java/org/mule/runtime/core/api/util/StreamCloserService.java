@@ -11,9 +11,8 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 /**
  * Simple service to close streams of different types.
  */
-public interface StreamCloserService extends MuleContextAware
-{
+public interface StreamCloserService extends MuleContextAware {
 
-    void closeStream(Object stream);
+  void closeStream(Object stream);
 
 }

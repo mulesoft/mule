@@ -26,65 +26,56 @@ import org.dom4j.DocumentHelper;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-public class XMLTestUtils
-{
+public class XMLTestUtils {
 
-    public static List<?> getXmlMessageVariants(String resource) throws Exception
-    {
-        List<Object> list = new ArrayList<Object>();
+  public static List<?> getXmlMessageVariants(String resource) throws Exception {
+    List<Object> list = new ArrayList<Object>();
 
-        list.add(toInputStream(resource));
-        list.add(toDom4jDocument(resource));
-        list.add(toW3cDocument(resource));
-        list.add(toInputSource(resource));
-        list.add(toSource(resource));
-        list.add(toXmlStreamReader(resource));
+    list.add(toInputStream(resource));
+    list.add(toDom4jDocument(resource));
+    list.add(toW3cDocument(resource));
+    list.add(toInputSource(resource));
+    list.add(toSource(resource));
+    list.add(toXmlStreamReader(resource));
 
-        return list;
-    }
+    return list;
+  }
 
-    public static XMLStreamReader toXmlStreamReader(String resource)
-            throws IOException, XMLStreamException
-    {
-        InputStream is = toInputStream(resource);
+  public static XMLStreamReader toXmlStreamReader(String resource) throws IOException, XMLStreamException {
+    InputStream is = toInputStream(resource);
 
-        return XMLUtils.toXMLStreamReader(XMLInputFactory.newInstance(), is);
-    }
+    return XMLUtils.toXMLStreamReader(XMLInputFactory.newInstance(), is);
+  }
 
-    public static Source toSource(String resource) throws Exception
-    {
-        InputStream is = toInputStream(resource);
+  public static Source toSource(String resource) throws Exception {
+    InputStream is = toInputStream(resource);
 
-        return XMLUtils.toXmlSource(XMLInputFactory.newInstance(), false, is);
-    }
+    return XMLUtils.toXmlSource(XMLInputFactory.newInstance(), false, is);
+  }
 
-    public static org.w3c.dom.Document toW3cDocument(String resource) throws IOException, SAXException, ParserConfigurationException
-    {
-        InputStream is = toInputStream(resource);
+  public static org.w3c.dom.Document toW3cDocument(String resource)
+      throws IOException, SAXException, ParserConfigurationException {
+    InputStream is = toInputStream(resource);
 
-        return DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(is);
-    }
+    return DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(is);
+  }
 
-    public static InputSource toInputSource(String resource) throws IOException
-    {
-        InputStream is = toInputStream(resource);
+  public static InputSource toInputSource(String resource) throws IOException {
+    InputStream is = toInputStream(resource);
 
-        return new InputSource(is);
-    }
+    return new InputSource(is);
+  }
 
-    public static Document toDom4jDocument(String resource) throws IOException, DocumentException
-    {
-        String xml = toString(resource);
-        return DocumentHelper.parseText(xml);
-    }
+  public static Document toDom4jDocument(String resource) throws IOException, DocumentException {
+    String xml = toString(resource);
+    return DocumentHelper.parseText(xml);
+  }
 
-    public static String toString(String resource) throws IOException
-    {
-        return IOUtils.getResourceAsString(resource, XMLTestUtils.class);
-    }
+  public static String toString(String resource) throws IOException {
+    return IOUtils.getResourceAsString(resource, XMLTestUtils.class);
+  }
 
-    public static InputStream toInputStream(String resource) throws IOException
-    {
-        return IOUtils.getResourceAsStream(resource, XMLTestUtils.class);
-    }
+  public static InputStream toInputStream(String resource) throws IOException {
+    return IOUtils.getResourceAsStream(resource, XMLTestUtils.class);
+  }
 }

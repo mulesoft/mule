@@ -29,54 +29,47 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class InsertBulkTestCase extends AbstractDbIntegrationTestCase
-{
+public class InsertBulkTestCase extends AbstractDbIntegrationTestCase {
 
-    public InsertBulkTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public InsertBulkTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Parameterized.Parameters
-    public static List<Object[]> parameters()
-    {
-        return TestDbConfig.getResources();
-    }
+  @Parameterized.Parameters
+  public static List<Object[]> parameters() {
+    return TestDbConfig.getResources();
+  }
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/insert/insert-bulk-config.xml"};
-    }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/insert/insert-bulk-config.xml"};
+  }
 
-    @Test
-    public void insertsInBulkMode() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        List<String> planetNames = new ArrayList<String>();
-        planetNames.add("Pluto");
-        planetNames.add("Saturn");
+  @Test
+  public void insertsInBulkMode() throws Exception {
+    MuleClient client = muleContext.getClient();
+    List<String> planetNames = new ArrayList<String>();
+    planetNames.add("Pluto");
+    planetNames.add("Saturn");
 
-        final MuleEvent responseEvent = flowRunner("insertBulk").withPayload(planetNames).run();
+    final MuleEvent responseEvent = flowRunner("insertBulk").withPayload(planetNames).run();
 
-        final MuleMessage response = responseEvent.getMessage();
-        assertBulkInsert(response.getPayload());
-    }
+    final MuleMessage response = responseEvent.getMessage();
+    assertBulkInsert(response.getPayload());
+  }
 
-    @Test(expected = MessagingException.class)
-    public void requiresCollectionPayload() throws Exception
-    {
-        flowRunner("insertBulk").withPayload(TEST_MESSAGE).run();
-    }
+  @Test(expected = MessagingException.class)
+  public void requiresCollectionPayload() throws Exception {
+    flowRunner("insertBulk").withPayload(TEST_MESSAGE).run();
+  }
 
-    private void assertBulkInsert(Object payload) throws SQLException
-    {
-        assertTrue(payload instanceof int[]);
-        int[] counters = (int[]) payload;
-        assertEquals(2, counters.length);
-        assertThat(counters[0], anyOf(equalTo(1), equalTo(Statement.SUCCESS_NO_INFO)));
-        assertThat(counters[1], anyOf(equalTo(1), equalTo(Statement.SUCCESS_NO_INFO)));
+  private void assertBulkInsert(Object payload) throws SQLException {
+    assertTrue(payload instanceof int[]);
+    int[] counters = (int[]) payload;
+    assertEquals(2, counters.length);
+    assertThat(counters[0], anyOf(equalTo(1), equalTo(Statement.SUCCESS_NO_INFO)));
+    assertThat(counters[1], anyOf(equalTo(1), equalTo(Statement.SUCCESS_NO_INFO)));
 
-        assertPlanetRecordsFromQuery("Pluto", "Saturn");
-    }
+    assertPlanetRecordsFromQuery("Pluto", "Saturn");
+  }
 }

@@ -17,51 +17,41 @@ import org.mule.tck.size.SmallTest;
 import org.junit.Test;
 
 @SmallTest
-public class EventProcessingThreadTestCase extends AbstractMuleTestCase
-{
+public class EventProcessingThreadTestCase extends AbstractMuleTestCase {
 
-    @Test
-    public void survivesProcessRuntimeExceptions()
-    {
-        final TestEventProcessingThread processingThread = new TestEventProcessingThread("testEventProcessingThread", 1);
-        try
-        {
-            processingThread.start();
-            Prober prober = new PollingProber(100, 1);
-            prober.check(new Probe()
-            {
-                public boolean isSatisfied()
-                {
-                    return processingThread.count > 1;
-                }
+  @Test
+  public void survivesProcessRuntimeExceptions() {
+    final TestEventProcessingThread processingThread = new TestEventProcessingThread("testEventProcessingThread", 1);
+    try {
+      processingThread.start();
+      Prober prober = new PollingProber(100, 1);
+      prober.check(new Probe() {
 
-                public String describeFailure()
-                {
-                    return "Expected more than one invocation of the thread processing method";
-                }
-            });
+        public boolean isSatisfied() {
+          return processingThread.count > 1;
         }
-        finally
-        {
-            processingThread.interrupt();
+
+        public String describeFailure() {
+          return "Expected more than one invocation of the thread processing method";
         }
+      });
+    } finally {
+      processingThread.interrupt();
+    }
+  }
+
+  private static class TestEventProcessingThread extends EventProcessingThread {
+
+    volatile int count;
+
+    public TestEventProcessingThread(String name, long delayTime) {
+      super(name, delayTime);
     }
 
-    private static class TestEventProcessingThread extends EventProcessingThread
-    {
-
-        volatile int count;
-
-        public TestEventProcessingThread(String name, long delayTime)
-        {
-            super(name, delayTime);
-        }
-
-        @Override
-        protected void doRun()
-        {
-            count++;
-            throw new RuntimeException();
-        }
+    @Override
+    protected void doRun() {
+      count++;
+      throw new RuntimeException();
     }
+  }
 }

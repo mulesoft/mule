@@ -22,35 +22,31 @@ import org.junit.Rule;
 import org.junit.Test;
 
 /**
- * Sets up two HTTPS servers with regular trust-stores, except one is insecure.
- * Verifies that a request using a certificate not present in the trust-store
- * only works for the insecure server.
+ * Sets up two HTTPS servers with regular trust-stores, except one is insecure. Verifies that a request using a certificate not
+ * present in the trust-store only works for the insecure server.
  */
-public class HttpListenerTlsInsecureTestCase extends AbstractHttpTestCase
-{
-    @Rule
-    public DynamicPort port1 = new DynamicPort("port1");
-    @Rule
-    public DynamicPort port2 = new DynamicPort("port2");
+public class HttpListenerTlsInsecureTestCase extends AbstractHttpTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "http-listener-insecure-config.xml";
-    }
+  @Rule
+  public DynamicPort port1 = new DynamicPort("port1");
+  @Rule
+  public DynamicPort port2 = new DynamicPort("port2");
 
-    @Test
-    public void acceptsInvalidCertificateIfInsecure() throws Exception
-    {
-        final MuleEvent res = flowRunner("testRequestToInsecure").withPayload(TEST_PAYLOAD).run();
-        assertThat(res.getMessageAsString(), is(TEST_PAYLOAD));
-    }
+  @Override
+  protected String getConfigFile() {
+    return "http-listener-insecure-config.xml";
+  }
 
-    @Test
-    public void rejectsInvalidCertificateIfSecure() throws Exception
-    {
-        MessagingException expecteException = flowRunner("testRequestToSecure").withPayload("data").runExpectingException();
-        assertThat(expecteException.getCause(), instanceOf(IOException.class));
-        assertThat(expecteException.getCause(), hasMessage(containsString("Remotely close")));
-    }
+  @Test
+  public void acceptsInvalidCertificateIfInsecure() throws Exception {
+    final MuleEvent res = flowRunner("testRequestToInsecure").withPayload(TEST_PAYLOAD).run();
+    assertThat(res.getMessageAsString(), is(TEST_PAYLOAD));
+  }
+
+  @Test
+  public void rejectsInvalidCertificateIfSecure() throws Exception {
+    MessagingException expecteException = flowRunner("testRequestToSecure").withPayload("data").runExpectingException();
+    assertThat(expecteException.getCause(), instanceOf(IOException.class));
+    assertThat(expecteException.getCause(), hasMessage(containsString("Remotely close")));
+  }
 }

@@ -14,92 +14,75 @@ import java.util.Map;
 /**
  * Creates an instance of the object once and then always returns the same instance.
  */
-public class SingletonObjectFactory extends AbstractObjectFactory
-{
-    private Object instance;
+public class SingletonObjectFactory extends AbstractObjectFactory {
 
-    /**
-     * For Spring only
-     */
-    public SingletonObjectFactory()
-    {
-        super();
-    }
+  private Object instance;
 
-    public SingletonObjectFactory(String objectClassName)
-    {
-        super(objectClassName);
-    }
+  /**
+   * For Spring only
+   */
+  public SingletonObjectFactory() {
+    super();
+  }
 
-    public SingletonObjectFactory(String objectClassName, Map properties)
-    {
-        super(objectClassName, properties);
-    }
+  public SingletonObjectFactory(String objectClassName) {
+    super(objectClassName);
+  }
 
-    public SingletonObjectFactory(Class objectClass)
-    {
-        super(objectClass);
-    }
+  public SingletonObjectFactory(String objectClassName, Map properties) {
+    super(objectClassName, properties);
+  }
 
-    public SingletonObjectFactory(Class<?> objectClass, Map properties)
-    {
-        super(objectClass, properties);
-    }
+  public SingletonObjectFactory(Class objectClass) {
+    super(objectClass);
+  }
 
-    /**
-     * Create the singleton based on a previously created object.
-     */
-    public SingletonObjectFactory(Object instance)
-    {
-        super(instance.getClass());
-        this.instance = instance;
-    }
+  public SingletonObjectFactory(Class<?> objectClass, Map properties) {
+    super(objectClass, properties);
+  }
 
-    @Override
-    public void dispose()
-    {
-        instance = null;
-        super.dispose();
-    }
+  /**
+   * Create the singleton based on a previously created object.
+   */
+  public SingletonObjectFactory(Object instance) {
+    super(instance.getClass());
+    this.instance = instance;
+  }
 
-    /**
-     * Always returns the same instance of the object.
-     * 
-     * @param muleContext
-     */
-    @Override
-    public Object getInstance(MuleContext muleContext) throws Exception
-    {
-        if (instance == null)
-        {
-            try
-            {
-                instance = super.getInstance(muleContext);
-            }
-            catch (Exception e)
-            {
-                throw new InitialisationException(e, this);
-            }
-        }
-        return instance;
-    }
+  @Override
+  public void dispose() {
+    instance = null;
+    super.dispose();
+  }
 
-    @Override
-    public Class<?> getObjectClass()
-    {
-        if (instance != null)
-        {
-            return instance.getClass();
-        }
-        else
-        {
-            return super.getObjectClass();
-        }
+  /**
+   * Always returns the same instance of the object.
+   * 
+   * @param muleContext
+   */
+  @Override
+  public Object getInstance(MuleContext muleContext) throws Exception {
+    if (instance == null) {
+      try {
+        instance = super.getInstance(muleContext);
+      } catch (Exception e) {
+        throw new InitialisationException(e, this);
+      }
     }
+    return instance;
+  }
 
-    @Override
-    public boolean isSingleton()
-    {
-        return true;
+  @Override
+  public Class<?> getObjectClass() {
+    if (instance != null) {
+      return instance.getClass();
+    } else {
+      return super.getObjectClass();
     }
+  }
+
+  @Override
+  public boolean isSingleton() {
+    return true;
+  }
 }

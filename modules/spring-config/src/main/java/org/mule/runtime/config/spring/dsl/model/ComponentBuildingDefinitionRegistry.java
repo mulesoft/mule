@@ -15,33 +15,31 @@ import java.util.Optional;
 /**
  * Registry with all {@link ComponentBuildingDefinition} that where discovered in the classpath.
  * <p/>
- * {@code ComponentBuildingDefinition}s are located using SPI class {@link org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinitionProvider}.
+ * {@code ComponentBuildingDefinition}s are located using SPI class
+ * {@link org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinitionProvider}.
  *
  * @since 4.0
  */
-public class ComponentBuildingDefinitionRegistry
-{
+public class ComponentBuildingDefinitionRegistry {
 
-    private Map<ComponentIdentifier, ComponentBuildingDefinition> builderDefinitionsMap = new HashMap<>();
+  private Map<ComponentIdentifier, ComponentBuildingDefinition> builderDefinitionsMap = new HashMap<>();
 
-    /**
-     * Adds a new {@code ComponentBuildingDefinition} to the registry.
-     *
-     * @param builderDefinition definition to be added in the registry
-     */
-    public void register(ComponentBuildingDefinition builderDefinition)
-    {
-        builderDefinitionsMap.put(builderDefinition.getComponentIdentifier(), builderDefinition);
-    }
+  /**
+   * Adds a new {@code ComponentBuildingDefinition} to the registry.
+   *
+   * @param builderDefinition definition to be added in the registry
+   */
+  public void register(ComponentBuildingDefinition builderDefinition) {
+    builderDefinitionsMap.put(builderDefinition.getComponentIdentifier(), builderDefinition);
+  }
 
-    /**
-     * Lookups a {@code ComponentBuildingDefinition} for a certain configuration component.
-     *
-     * @param identifier the component identifier
-     * @return the definition to build the component
-     */
-    public Optional<ComponentBuildingDefinition> getBuildingDefinition(ComponentIdentifier identifier)
-    {
-        return Optional.ofNullable(builderDefinitionsMap.get(identifier));
-    }
+  /**
+   * Lookups a {@code ComponentBuildingDefinition} for a certain configuration component.
+   *
+   * @param identifier the component identifier
+   * @return the definition to build the component
+   */
+  public Optional<ComponentBuildingDefinition> getBuildingDefinition(ComponentIdentifier identifier) {
+    return Optional.ofNullable(builderDefinitionsMap.get(identifier));
+  }
 }

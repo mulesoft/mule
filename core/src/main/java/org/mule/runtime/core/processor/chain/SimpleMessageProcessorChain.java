@@ -13,45 +13,36 @@ import org.mule.runtime.core.api.processor.MessageProcessor;
 
 import java.util.List;
 
-public class SimpleMessageProcessorChain extends DefaultMessageProcessorChain
-{
-    public SimpleMessageProcessorChain(List<MessageProcessor> processors)
-    {
-        super(processors);
-    }
+public class SimpleMessageProcessorChain extends DefaultMessageProcessorChain {
 
-    public SimpleMessageProcessorChain(MessageProcessor... processors)
-    {
-        super(processors);
-    }
+  public SimpleMessageProcessorChain(List<MessageProcessor> processors) {
+    super(processors);
+  }
 
-    public SimpleMessageProcessorChain(String name, List<MessageProcessor> processors)
-    {
-        super(name, processors);
-    }
+  public SimpleMessageProcessorChain(MessageProcessor... processors) {
+    super(processors);
+  }
 
-    public SimpleMessageProcessorChain(String name, MessageProcessor... processors)
-    {
-        super(name, processors);
-    }
+  public SimpleMessageProcessorChain(String name, List<MessageProcessor> processors) {
+    super(name, processors);
+  }
 
-    @Override
-    protected MuleEvent doProcess(MuleEvent event) throws MuleException
-    {
-        for (int i = 0; i < processors.size(); i++)
-        {
-            MessageProcessor processor = processors.get(i);
-            event = messageProcessorExecutionTemplate.execute(processor, event);
-            if (event == null)
-            {
-                return null;
-            }
-            else if (event instanceof VoidMuleEvent)
-            {
-                return event;
-            }
-        }
+  public SimpleMessageProcessorChain(String name, MessageProcessor... processors) {
+    super(name, processors);
+  }
+
+  @Override
+  protected MuleEvent doProcess(MuleEvent event) throws MuleException {
+    for (int i = 0; i < processors.size(); i++) {
+      MessageProcessor processor = processors.get(i);
+      event = messageProcessorExecutionTemplate.execute(processor, event);
+      if (event == null) {
+        return null;
+      } else if (event instanceof VoidMuleEvent) {
         return event;
+      }
     }
+    return event;
+  }
 
 }

@@ -16,23 +16,20 @@ import org.mule.runtime.module.extension.file.api.command.RenameCommand;
  *
  * @since 4.0
  */
-public final class SftpRenameCommand extends SftpCommand implements RenameCommand
-{
+public final class SftpRenameCommand extends SftpCommand implements RenameCommand {
 
-    /**
-     * {@inheritDoc}
-     */
-    public SftpRenameCommand(SftpFileSystem fileSystem, SftpClient client)
-    {
-        super(fileSystem, client);
-    }
+  /**
+   * {@inheritDoc}
+   */
+  public SftpRenameCommand(SftpFileSystem fileSystem, SftpClient client) {
+    super(fileSystem, client);
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void rename(FileConnectorConfig config, String filePath, String newName, boolean overwrite)
-    {
-        super.rename(config, filePath, newName, overwrite);
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void rename(FileConnectorConfig config, String filePath, String newName, boolean overwrite) {
+    super.rename(config, filePath, newName, overwrite);
+  }
 }

@@ -48,240 +48,198 @@ import org.mule.runtime.core.work.SerialWorkManager;
  * <li>Rejects inbound events when Flow is not started</li>
  * <li>Gathers statistics and processing time data</li>
  * <li>Implements MessagePorcessor allowing direct invocation of the pipeline</li>
- * <li>Supports the optional configuration of a {@link ProcessingStrategy} that determines how message
- * processors are processed. The default {@link ProcessingStrategy} is {@link AsynchronousProcessingStrategy}.
- * With this strategy when messages are received from a one-way message source and there is no current
- * transactions message processing in another thread asynchronously.</li>
+ * <li>Supports the optional configuration of a {@link ProcessingStrategy} that determines how message processors are processed.
+ * The default {@link ProcessingStrategy} is {@link AsynchronousProcessingStrategy}. With this strategy when messages are received
+ * from a one-way message source and there is no current transactions message processing in another thread asynchronously.</li>
  * </ul>
  */
-public class Flow extends AbstractPipeline implements MessageProcessor, StageNameSourceProvider, DynamicPipeline
-{
-    private int stageCount = 0;
-    private final StageNameSource sequentialStageNameSource;
-    private DynamicPipelineMessageProcessor dynamicPipelineMessageProcessor;
-    private WorkManager workManager;
+public class Flow extends AbstractPipeline implements MessageProcessor, StageNameSourceProvider, DynamicPipeline {
 
-    public Flow(String name, MuleContext muleContext)
-    {
-        super(name, muleContext);
-        this.sequentialStageNameSource = new SequentialStageNameSource(name);
-        initialiseProcessingStrategy();
+  private int stageCount = 0;
+  private final StageNameSource sequentialStageNameSource;
+  private DynamicPipelineMessageProcessor dynamicPipelineMessageProcessor;
+  private WorkManager workManager;
+
+  public Flow(String name, MuleContext muleContext) {
+    super(name, muleContext);
+    this.sequentialStageNameSource = new SequentialStageNameSource(name);
+    initialiseProcessingStrategy();
+  }
+
+  @Override
+  protected void doInitialise() throws MuleException {
+    super.doInitialise();
+    if (processingStrategy instanceof NonBlockingProcessingStrategy) {
+      workManager = ((NonBlockingProcessingStrategy) processingStrategy).createWorkManager(this);
+    } else {
+      new SerialWorkManager();
     }
+  }
 
-    @Override
-    protected void doInitialise() throws MuleException
-    {
-        super.doInitialise();
-        if (processingStrategy instanceof NonBlockingProcessingStrategy)
-        {
-            workManager = ((NonBlockingProcessingStrategy) processingStrategy).createWorkManager(this);
+  @Override
+  protected void doStart() throws MuleException {
+    if (workManager != null) {
+      workManager.start();
+    }
+    super.doStart();
+  }
+
+  @Override
+  protected void doStop() throws MuleException {
+    super.doStop();
+    if (workManager != null) {
+      workManager.dispose();
+    }
+  }
+
+  @Override
+  public MuleEvent process(final MuleEvent event) throws MuleException {
+    final MuleEvent newEvent = createMuleEventForCurrentFlow(event, event.getReplyToDestination(), event.getReplyToHandler());
+    try {
+      ExecutionTemplate<MuleEvent> executionTemplate =
+          ErrorHandlingExecutionTemplate.createErrorHandlingExecutionTemplate(muleContext, getExceptionListener());
+      MuleEvent result = executionTemplate.execute(new ExecutionCallback<MuleEvent>() {
+
+        @Override
+        public MuleEvent process() throws Exception {
+          return pipeline.process(newEvent);
         }
-        else
-        {
-            new SerialWorkManager();
-        }
+      });
+      return createReturnEventForParentFlowConstruct(result, event);
+    } catch (MessagingException e) {
+      e.setProcessedEvent(createReturnEventForParentFlowConstruct(e.getEvent(), event));
+      throw e;
+    } catch (Exception e) {
+      resetRequestContextEvent(event);
+      throw new DefaultMuleException(CoreMessages.createStaticMessage("Flow execution exception"), e);
+    }
+  }
+
+  private MuleEvent createMuleEventForCurrentFlow(MuleEvent event, Object replyToDestination, ReplyToHandler replyToHandler) {
+    // Wrap and propagte reply to handler only if it's not a standard DefaultReplyToHandler.
+    if (replyToHandler != null && replyToHandler instanceof NonBlockingReplyToHandler) {
+      replyToHandler = createNonBlockingReplyToHandler(event, replyToHandler);
+    } else {
+      // DefaultReplyToHandler is used differently and should only be invoked by the first flow and not any
+      // referenced flows. If it is passded on they two replyTo responses are sent.
+      replyToHandler = null;
     }
 
-    @Override
-    protected void doStart() throws MuleException
-    {
-        if (workManager != null)
-        {
-            workManager.start();
-        }
-        super.doStart();
+    // Create new event for current flow with current flowConstruct, replyToHandler etc.
+    event = new DefaultMuleEvent(event, this, replyToHandler, replyToDestination, event.isSynchronous() || isSynchronous());
+    resetRequestContextEvent(event);
+    return event;
+  }
+
+  private ReplyToHandler createNonBlockingReplyToHandler(final MuleEvent event, final ReplyToHandler replyToHandler) {
+    return new ExceptionHandlingReplyToHandlerDecorator(new NonBlockingReplyToHandler() {
+
+      @Override
+      public void processReplyTo(MuleEvent result, MuleMessage returnMessage, Object replyTo) throws MuleException {
+        replyToHandler.processReplyTo(createReturnEventForParentFlowConstruct(result, event), null, null);
+      }
+
+      @Override
+      public void processExceptionReplyTo(MessagingException exception, Object replyTo) {
+        exception.setProcessedEvent(createReturnEventForParentFlowConstruct(exception.getEvent(), event));
+        replyToHandler.processExceptionReplyTo(exception, null);
+      }
+    }, getExceptionListener());
+  }
+
+  private MuleEvent createReturnEventForParentFlowConstruct(MuleEvent result, MuleEvent original) {
+    if (result != null && !(result instanceof VoidMuleEvent)) {
+      // Create new event with original FlowConstruct, ReplyToHandler and synchronous
+      result = new DefaultMuleEvent(result, original.getFlowConstruct(), original.getReplyToHandler(),
+                                    original.getReplyToDestination(), original.isSynchronous());
     }
+    resetRequestContextEvent(result);
+    return result;
+  }
 
-    @Override
-    protected void doStop() throws MuleException
-    {
-        super.doStop();
-        if (workManager != null)
-        {
-            workManager.dispose();
-        }
+  private void resetRequestContextEvent(MuleEvent event) {
+    // Update RequestContext ThreadLocal for backwards compatibility
+    OptimizedRequestContext.unsafeSetEvent(event);
+  }
+
+  @Override
+  protected void configurePreProcessors(MessageProcessorChainBuilder builder) throws MuleException {
+    super.configurePreProcessors(builder);
+    builder.chain(new ProcessIfPipelineStartedMessageProcessor());
+    builder.chain(new ProcessingTimeInterceptor());
+    builder.chain(new FlowConstructStatisticsMessageProcessor());
+
+    dynamicPipelineMessageProcessor = new DynamicPipelineMessageProcessor(this);
+    builder.chain(dynamicPipelineMessageProcessor);
+  }
+
+  @Override
+  protected void configurePostProcessors(MessageProcessorChainBuilder builder) throws MuleException {
+    builder.chain(new AsyncReplyToPropertyRequestReplyReplier());
+    super.configurePostProcessors(builder);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @return a {@link DefaultFlowProcessingStrategy}
+   */
+  @Override
+  protected ProcessingStrategy createDefaultProcessingStrategy() {
+    return new DefaultFlowProcessingStrategy();
+  }
+
+  @Override
+  public String getConstructType() {
+    return "Flow";
+  }
+
+  @Override
+  protected void configureStatistics() {
+    if (processingStrategy instanceof AsynchronousProcessingStrategy
+        && ((AsynchronousProcessingStrategy) processingStrategy).getMaxThreads() != null) {
+      statistics = new FlowConstructStatistics(getConstructType(), name,
+                                               ((AsynchronousProcessingStrategy) processingStrategy).getMaxThreads());
+    } else {
+      statistics = new FlowConstructStatistics(getConstructType(), name);
     }
+    statistics.setEnabled(muleContext.getStatistics().isEnabled());
+    muleContext.getStatistics().add(statistics);
+  }
 
-    @Override
-    public MuleEvent process(final MuleEvent event) throws MuleException
-    {
-        final MuleEvent newEvent = createMuleEventForCurrentFlow(event, event.getReplyToDestination(), event.getReplyToHandler());
-        try
-        {
-            ExecutionTemplate<MuleEvent> executionTemplate = ErrorHandlingExecutionTemplate.createErrorHandlingExecutionTemplate(muleContext, getExceptionListener());
-            MuleEvent result = executionTemplate.execute(new ExecutionCallback<MuleEvent>()
-            {
+  @Override
+  protected void configureMessageProcessors(MessageProcessorChainBuilder builder) throws MuleException {
+    getProcessingStrategy().configureProcessors(getMessageProcessors(), new StageNameSource() {
 
-                @Override
-                public MuleEvent process() throws Exception
-                {
-                    return pipeline.process(newEvent);
-                }
-            });
-            return createReturnEventForParentFlowConstruct(result, event);
-        }
-        catch (MessagingException e)
-        {
-            e.setProcessedEvent(createReturnEventForParentFlowConstruct(e.getEvent(), event));
-            throw e;
-        }
-        catch (Exception e)
-        {
-            resetRequestContextEvent(event);
-            throw new DefaultMuleException(CoreMessages.createStaticMessage("Flow execution exception"),e);
-        }
-    }
+      @Override
+      public String getName() {
+        return String.format("%s.stage%s", Flow.this.getName(), ++stageCount);
+      }
+    }, builder, muleContext);
+  }
 
-    private MuleEvent createMuleEventForCurrentFlow(MuleEvent event, Object replyToDestination, ReplyToHandler
-            replyToHandler)
-    {
-        // Wrap and propagte reply to handler only if it's not a standard DefaultReplyToHandler.
-        if (replyToHandler != null && replyToHandler instanceof NonBlockingReplyToHandler)
-        {
-            replyToHandler = createNonBlockingReplyToHandler(event, replyToHandler);
-        }
-        else
-        {
-            // DefaultReplyToHandler is used differently and should only be invoked by the first flow and not any
-            // referenced flows. If it is passded on they two replyTo responses are sent.
-            replyToHandler = null;
-        }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public StageNameSource getAsyncStageNameSource() {
+    return this.sequentialStageNameSource;
+  }
 
-        // Create new event for current flow with current flowConstruct, replyToHandler etc.
-        event = new DefaultMuleEvent(event, this, replyToHandler, replyToDestination, event.isSynchronous() || isSynchronous());
-        resetRequestContextEvent(event);
-        return event;
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public StageNameSource getAsyncStageNameSource(String asyncName) {
+    return new NamedStageNameSource(this.name, asyncName);
+  }
 
-    private ReplyToHandler createNonBlockingReplyToHandler(final MuleEvent event, final ReplyToHandler replyToHandler)
-    {
-        return new ExceptionHandlingReplyToHandlerDecorator(new NonBlockingReplyToHandler()
-        {
-            @Override
-            public void processReplyTo(MuleEvent result, MuleMessage returnMessage, Object replyTo) throws MuleException
-            {
-                replyToHandler.processReplyTo(createReturnEventForParentFlowConstruct(result, event), null, null);
-            }
+  @Override
+  public DynamicPipelineBuilder dynamicPipeline(String id) throws DynamicPipelineException {
+    return dynamicPipelineMessageProcessor.dynamicPipeline(id);
+  }
 
-            @Override
-            public void processExceptionReplyTo(MessagingException exception, Object replyTo)
-            {
-                exception.setProcessedEvent(createReturnEventForParentFlowConstruct(exception.getEvent(), event));
-                replyToHandler.processExceptionReplyTo(exception, null);
-            }
-        }, getExceptionListener());
-    }
-
-    private MuleEvent createReturnEventForParentFlowConstruct(MuleEvent result, MuleEvent original)
-    {
-        if (result != null && !(result instanceof VoidMuleEvent))
-        {
-            // Create new event with original FlowConstruct, ReplyToHandler and synchronous
-            result = new DefaultMuleEvent(result, original.getFlowConstruct(), original.getReplyToHandler(),
-                                        original.getReplyToDestination(), original.isSynchronous());
-        }
-        resetRequestContextEvent(result);
-        return result;
-    }
-
-    private void resetRequestContextEvent(MuleEvent event)
-    {
-        // Update RequestContext ThreadLocal for backwards compatibility
-        OptimizedRequestContext.unsafeSetEvent(event);
-    }
-
-    @Override
-    protected void configurePreProcessors(MessageProcessorChainBuilder builder) throws MuleException
-    {
-        super.configurePreProcessors(builder);
-        builder.chain(new ProcessIfPipelineStartedMessageProcessor());
-        builder.chain(new ProcessingTimeInterceptor());
-        builder.chain(new FlowConstructStatisticsMessageProcessor());
-
-        dynamicPipelineMessageProcessor = new DynamicPipelineMessageProcessor(this);
-        builder.chain(dynamicPipelineMessageProcessor);
-    }
-
-    @Override
-    protected void configurePostProcessors(MessageProcessorChainBuilder builder) throws MuleException
-    {
-        builder.chain(new AsyncReplyToPropertyRequestReplyReplier());
-        super.configurePostProcessors(builder);
-    }
-
-    /**
-     * {@inheritDoc}
-     * @return a {@link DefaultFlowProcessingStrategy}
-     */
-    @Override
-    protected ProcessingStrategy createDefaultProcessingStrategy()
-    {
-        return new DefaultFlowProcessingStrategy();
-    }
-
-    @Override
-    public String getConstructType()
-    {
-        return "Flow";
-    }
-
-    @Override
-    protected void configureStatistics()
-    {
-        if (processingStrategy instanceof AsynchronousProcessingStrategy
-            && ((AsynchronousProcessingStrategy) processingStrategy).getMaxThreads() != null)
-        {
-            statistics = new FlowConstructStatistics(getConstructType(), name,
-                ((AsynchronousProcessingStrategy) processingStrategy).getMaxThreads());
-        }
-        else
-        {
-            statistics = new FlowConstructStatistics(getConstructType(), name);
-        }
-        statistics.setEnabled(muleContext.getStatistics().isEnabled());
-        muleContext.getStatistics().add(statistics);
-    }
-
-    @Override
-    protected void configureMessageProcessors(MessageProcessorChainBuilder builder) throws MuleException
-    {
-        getProcessingStrategy().configureProcessors(getMessageProcessors(),
-            new StageNameSource()
-            {
-                @Override
-                public String getName()
-                {
-                    return String.format("%s.stage%s", Flow.this.getName(), ++stageCount);
-                }
-            }, builder, muleContext);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public StageNameSource getAsyncStageNameSource()
-    {
-        return this.sequentialStageNameSource;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public StageNameSource getAsyncStageNameSource(String asyncName)
-    {
-        return new NamedStageNameSource(this.name, asyncName);
-    }
-
-    @Override
-    public DynamicPipelineBuilder dynamicPipeline(String id) throws DynamicPipelineException
-    {
-        return dynamicPipelineMessageProcessor.dynamicPipeline(id);
-    }
-
-    public WorkManager getWorkManager()
-    {
-        return workManager;
-    }
+  public WorkManager getWorkManager() {
+    return workManager;
+  }
 }

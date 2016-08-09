@@ -8,10 +8,9 @@ package org.mule.extension.socket.protocol;
 
 import org.mule.extension.socket.api.connection.tcp.protocol.EOFProtocol;
 
-public class EofProtocolTestCase extends DefaultProtocolTestCase
-{
-    public EofProtocolTestCase()
-    {
-        super(new EOFProtocol(), SlowInputStream.FULL_LENGTH);
-    }
+public class EofProtocolTestCase extends DefaultProtocolTestCase {
+
+  public EofProtocolTestCase() {
+    super(new EOFProtocol(), SlowInputStream.FULL_LENGTH);
+  }
 }

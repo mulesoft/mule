@@ -11,21 +11,16 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  *
  */
-public class DebuggableReentrantLock extends ReentrantLock
-{
+public class DebuggableReentrantLock extends ReentrantLock {
 
-    public DebuggableReentrantLock()
-    {
-    }
+  public DebuggableReentrantLock() {}
 
-    public DebuggableReentrantLock(boolean fair)
-    {
-        super(fair);
-    }
+  public DebuggableReentrantLock(boolean fair) {
+    super(fair);
+  }
 
-    @Override
-    public Thread getOwner()
-    {
-        return super.getOwner();
-    }
+  @Override
+  public Thread getOwner() {
+    return super.getOwner();
+  }
 }

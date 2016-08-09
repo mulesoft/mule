@@ -27,51 +27,44 @@ import javax.sql.DataSource;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class SelectStreamingExceptionTestCase extends AbstractDbIntegrationTestCase
-{
+public class SelectStreamingExceptionTestCase extends AbstractDbIntegrationTestCase {
 
-    private static final int POOL_CONNECTIONS = 2;
+  private static final int POOL_CONNECTIONS = 2;
 
-    public SelectStreamingExceptionTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
+  public SelectStreamingExceptionTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
+
+  @Parameterized.Parameters
+  public static List<Object[]> parameters() {
+    return Collections.singletonList(new Object[] {"integration/config/derby-pooling-db-config.xml", new DerbyTestDatabase()});
+  }
+
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/select/select-streaming-exception-config.xml"};
+  }
+
+  @Override
+  protected DataSource getDefaultDataSource() {
+    DbConfigResolver dbConfigResolver = muleContext.getRegistry().get("pooledJdbcConfig");
+    DbConfig config = resolveConfig(dbConfigResolver);
+
+    return config.getDataSource();
+  }
+
+  @Test
+  public void streamingException() throws Exception {
+    for (int i = 0; i < POOL_CONNECTIONS + 1; ++i) {
+      MessagingException e = flowRunner("selectStreamingException").withPayload(TEST_MESSAGE).runExpectingException();
+      assertThat("Iteration " + i, e.getMessage(),
+                 is("Table/View 'NOT_EXISTS' does not exist. (java.sql.SQLSyntaxErrorException)."));
     }
+  }
 
-    @Parameterized.Parameters
-    public static List<Object[]> parameters()
-    {
-        return Collections.singletonList(new Object[] {"integration/config/derby-pooling-db-config.xml", new DerbyTestDatabase()});
-    }
-
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/select/select-streaming-exception-config.xml"};
-    }
-
-    @Override
-    protected DataSource getDefaultDataSource()
-    {
-        DbConfigResolver dbConfigResolver = muleContext.getRegistry().get("pooledJdbcConfig");
-        DbConfig config = resolveConfig(dbConfigResolver);
-
-        return config.getDataSource();
-    }
-
-    @Test
-    public void streamingException() throws Exception
-    {
-        for (int i = 0; i < POOL_CONNECTIONS + 1; ++i)
-        {
-            MessagingException e = flowRunner("selectStreamingException").withPayload(TEST_MESSAGE).runExpectingException();
-            assertThat("Iteration " + i, e.getMessage(), is("Table/View 'NOT_EXISTS' does not exist. (java.sql.SQLSyntaxErrorException)."));
-        }
-    }
-
-    @Test
-    public void selectExceptionClosesPreviousResultSets() throws Exception
-    {
-        MuleMessage response = runFlow("selectExceptionClosesPreviousResultSets").getMessage();
-        assertThat(response.getPayload(), is((Object) FALSE));
-    }
+  @Test
+  public void selectExceptionClosesPreviousResultSets() throws Exception {
+    MuleMessage response = runFlow("selectExceptionClosesPreviousResultSets").getMessage();
+    assertThat(response.getPayload(), is((Object) FALSE));
+  }
 }

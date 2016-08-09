@@ -9,9 +9,8 @@ package org.mule.runtime.config.spring.parsers.assembly.configuration;
 /**
  * Allow arbitrary processing of a value
  */
-public interface ValueMap
-{
+public interface ValueMap {
 
-    Object rewrite(String value);
+  Object rewrite(String value);
 
 }

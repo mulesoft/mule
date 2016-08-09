@@ -17,25 +17,22 @@ import org.mule.runtime.core.util.ObjectUtils;
  *
  * @see SessionHandler
  */
-public class OutboundSessionHandlerMessageProcessor implements MessageProcessor
-{
-    private SessionHandler sessionHandler;
+public class OutboundSessionHandlerMessageProcessor implements MessageProcessor {
 
-    public OutboundSessionHandlerMessageProcessor(SessionHandler sessionHandler)
-    {
-        this.sessionHandler = sessionHandler;
-    }
+  private SessionHandler sessionHandler;
 
-    @Override
-    public MuleEvent process(MuleEvent event) throws MuleException
-    {
-        sessionHandler.storeSessionInfoToMessage(event.getSession(), event.getMessage(), event.getMuleContext());
-        return event;
-    }
+  public OutboundSessionHandlerMessageProcessor(SessionHandler sessionHandler) {
+    this.sessionHandler = sessionHandler;
+  }
 
-    @Override
-    public String toString()
-    {
-        return ObjectUtils.toString(this);
-    }
+  @Override
+  public MuleEvent process(MuleEvent event) throws MuleException {
+    sessionHandler.storeSessionInfoToMessage(event.getSession(), event.getMessage(), event.getMuleContext());
+    return event;
+  }
+
+  @Override
+  public String toString() {
+    return ObjectUtils.toString(this);
+  }
 }

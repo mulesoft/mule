@@ -11,16 +11,14 @@ import org.mule.runtime.module.http.api.HttpAuthentication;
 /**
  * Common interface for all grant types must extend this interface.
  */
-public abstract class AbstractGrantType implements HttpAuthentication, ApplicationCredentials
-{
+public abstract class AbstractGrantType implements HttpAuthentication, ApplicationCredentials {
 
-    /**
-     * @param accessToken an ouath access token
-     * @return the content of the HTTP authentication header.
-     */
-    public static String buildAuthorizationHeaderContent(String accessToken)
-    {
-        return "Bearer " + accessToken;
-    }
+  /**
+   * @param accessToken an ouath access token
+   * @return the content of the HTTP authentication header.
+   */
+  public static String buildAuthorizationHeaderContent(String accessToken) {
+    return "Bearer " + accessToken;
+  }
 
 }

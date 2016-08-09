@@ -12,33 +12,28 @@ import org.mule.runtime.core.api.routing.RoutingException;
 import org.mule.runtime.core.config.i18n.Message;
 
 /**
- * <code>DispatchException</code> is thrown when a connector operation dispatcher fails to
- * send, dispatch or receive a message.
+ * <code>DispatchException</code> is thrown when a connector operation dispatcher fails to send, dispatch or receive a message.
  */
-public class DispatchException extends RoutingException
-{
-    /**
-     * Serial version
-     */
-    private static final long serialVersionUID = -8204621943732496606L;
+public class DispatchException extends RoutingException {
 
-    public DispatchException(MuleEvent event, MessageProcessor target)
-    {
-        super(event, target);
-    }
+  /**
+   * Serial version
+   */
+  private static final long serialVersionUID = -8204621943732496606L;
 
-    public DispatchException(MuleEvent event, MessageProcessor target, Throwable cause)
-    {
-        super(event, target, cause);
-    }
+  public DispatchException(MuleEvent event, MessageProcessor target) {
+    super(event, target);
+  }
 
-    public DispatchException(Message message, MuleEvent event, MessageProcessor target)
-    {
-        super(message, event, target);
-    }
+  public DispatchException(MuleEvent event, MessageProcessor target, Throwable cause) {
+    super(event, target, cause);
+  }
 
-    public DispatchException(Message message, MuleEvent event, MessageProcessor target, Throwable cause)
-    {
-        super(message, event, target, cause);
-    }
+  public DispatchException(Message message, MuleEvent event, MessageProcessor target) {
+    super(message, event, target);
+  }
+
+  public DispatchException(Message message, MuleEvent event, MessageProcessor target, Throwable cause) {
+    super(message, event, target, cause);
+  }
 }

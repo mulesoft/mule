@@ -46,228 +46,196 @@ import org.powermock.modules.junit4.PowerMockRunner;
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(Session.class)
 @PowerMockIgnore("javax.management.*")
-public class RetrieverConnectionTestCase
-{
+public class RetrieverConnectionTestCase {
 
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
+  @Rule
+  public ExpectedException expectedException = ExpectedException.none();
 
-    private static final String RECENT_FOLDER = "Recent";
+  private static final String RECENT_FOLDER = "Recent";
 
-    private Store store;
-    private RetrieverConnection connection;
+  private Store store;
+  private RetrieverConnection connection;
 
-    @Before
-    public void setUpTestConnection() throws Exception
-    {
-        store = mock(Store.class);
-        doNothing().when(store).connect(anyString(), anyString());
+  @Before
+  public void setUpTestConnection() throws Exception {
+    store = mock(Store.class);
+    doNothing().when(store).connect(anyString(), anyString());
 
-        TestFolder inbox = new TestFolder(store, INBOX_FOLDER);
-        when(store.getFolder(INBOX_FOLDER)).thenReturn(inbox);
+    TestFolder inbox = new TestFolder(store, INBOX_FOLDER);
+    when(store.getFolder(INBOX_FOLDER)).thenReturn(inbox);
 
-        TestFolder recent = new TestFolder(store, RECENT_FOLDER);
-        when(store.getFolder(RECENT_FOLDER)).thenReturn(recent);
+    TestFolder recent = new TestFolder(store, RECENT_FOLDER);
+    when(store.getFolder(RECENT_FOLDER)).thenReturn(recent);
 
-        PowerMockito.mockStatic(Session.class);
-        Session session = mock(Session.class);
-        when(session.getStore(anyString())).thenReturn(store);
-        when(Session.getInstance(anyObject(), anyObject())).thenReturn(session);
+    PowerMockito.mockStatic(Session.class);
+    Session session = mock(Session.class);
+    when(session.getStore(anyString())).thenReturn(store);
+    when(Session.getInstance(anyObject(), anyObject())).thenReturn(session);
 
-        connection = new RetrieverConnection(IMAP, JUANI_EMAIL, "password", "127.0.0.1", "123", 1000, 1000, 1000, null);
+    connection = new RetrieverConnection(IMAP, JUANI_EMAIL, "password", "127.0.0.1", "123", 1000, 1000, 1000, null);
+  }
+
+  @Test
+  public void getFolder() {
+    Folder folder = connection.getFolder(INBOX_FOLDER, READ_WRITE);
+    assertFolder(folder, INBOX_FOLDER, READ_WRITE);
+  }
+
+  @Test
+  public void changeFolder() throws MessagingException {
+    getFolder();
+    Folder recent = connection.getFolder(RECENT_FOLDER, READ_WRITE);
+    assertFolder(recent, RECENT_FOLDER, READ_WRITE);
+    assertThat(store.getFolder(INBOX_FOLDER).isOpen(), is(false));
+  }
+
+  @Test
+  public void getSameFolder() throws MessagingException {
+    getFolder();
+    getFolder();
+  }
+
+  @Test
+  public void changeFolderMode() throws MessagingException {
+    getFolder();
+    Folder inbox = connection.getFolder(INBOX_FOLDER, READ_ONLY);
+    assertFolder(inbox, INBOX_FOLDER, READ_ONLY);
+  }
+
+  @Test
+  public void usernameMissingPassword() throws MessagingException, EmailConnectionException {
+    expectedException.expect(EmailException.class);
+    expectedException.expectMessage(is(PASSWORD_NO_USERNAME_ERROR));
+    new RetrieverConnection(IMAP, null, "password", "127.0.0.1", "123", 1000, 1000, 1000, null);
+  }
+
+  @Test
+  public void passwordMissingUsername() throws MessagingException, EmailConnectionException {
+    expectedException.expect(EmailException.class);
+    expectedException.expectMessage(is(USERNAME_NO_PASSWORD_ERROR));
+    new RetrieverConnection(IMAP, JUANI_EMAIL, null, "127.0.0.1", "123", 1000, 1000, 1000, null);
+  }
+
+  private void assertFolder(Folder folder, String name, int mode) {
+    assertThat(folder, is(not(nullValue())));
+    assertThat(folder.getName(), is(name));
+    assertThat(folder.getMode(), is(mode));
+  }
+
+  private class TestFolder extends Folder {
+
+    private final String folderName;
+    private boolean isOpen;
+
+    public TestFolder(Store store, String folderName) {
+      super(store);
+      this.folderName = folderName;
+      this.isOpen = false;
     }
 
-    @Test
-    public void getFolder()
-    {
-        Folder folder = connection.getFolder(INBOX_FOLDER, READ_WRITE);
-        assertFolder(folder, INBOX_FOLDER, READ_WRITE);
+    @Override
+    public String getName() {
+      return folderName;
     }
 
-    @Test
-    public void changeFolder() throws MessagingException
-    {
-        getFolder();
-        Folder recent = connection.getFolder(RECENT_FOLDER, READ_WRITE);
-        assertFolder(recent, RECENT_FOLDER, READ_WRITE);
-        assertThat(store.getFolder(INBOX_FOLDER).isOpen(), is(false));
+    @Override
+    public String getFullName() {
+      return folderName;
     }
 
-    @Test
-    public void getSameFolder() throws MessagingException
-    {
-        getFolder();
-        getFolder();
+    @Override
+    public Folder getParent() throws MessagingException {
+      return null;
     }
 
-    @Test
-    public void changeFolderMode() throws MessagingException
-    {
-        getFolder();
-        Folder inbox = connection.getFolder(INBOX_FOLDER, READ_ONLY);
-        assertFolder(inbox, INBOX_FOLDER, READ_ONLY);
+    @Override
+    public boolean exists() throws MessagingException {
+      return false;
     }
 
-    @Test
-    public void usernameMissingPassword() throws MessagingException, EmailConnectionException
-    {
-        expectedException.expect(EmailException.class);
-        expectedException.expectMessage(is(PASSWORD_NO_USERNAME_ERROR));
-        new RetrieverConnection(IMAP, null, "password", "127.0.0.1", "123", 1000, 1000, 1000, null);
+    @Override
+    public Folder[] list(String pattern) throws MessagingException {
+      return new Folder[0];
     }
 
-    @Test
-    public void passwordMissingUsername() throws MessagingException, EmailConnectionException
-    {
-        expectedException.expect(EmailException.class);
-        expectedException.expectMessage(is(USERNAME_NO_PASSWORD_ERROR));
-        new RetrieverConnection(IMAP, JUANI_EMAIL, null, "127.0.0.1", "123", 1000, 1000, 1000, null);
+    @Override
+    public char getSeparator() throws MessagingException {
+      return 0;
     }
 
-    private void assertFolder(Folder folder, String name, int mode)
-    {
-        assertThat(folder, is(not(nullValue())));
-        assertThat(folder.getName(), is(name));
-        assertThat(folder.getMode(), is(mode));
+    @Override
+    public int getType() throws MessagingException {
+      return 0;
     }
 
-    private class TestFolder extends Folder
-    {
-
-        private final String folderName;
-        private boolean isOpen;
-
-        public TestFolder(Store store, String folderName)
-        {
-            super(store);
-            this.folderName = folderName;
-            this.isOpen = false;
-        }
-
-        @Override
-        public String getName()
-        {
-            return folderName;
-        }
-
-        @Override
-        public String getFullName()
-        {
-            return folderName;
-        }
-
-        @Override
-        public Folder getParent() throws MessagingException
-        {
-            return null;
-        }
-
-        @Override
-        public boolean exists() throws MessagingException
-        {
-            return false;
-        }
-
-        @Override
-        public Folder[] list(String pattern) throws MessagingException
-        {
-            return new Folder[0];
-        }
-
-        @Override
-        public char getSeparator() throws MessagingException
-        {
-            return 0;
-        }
-
-        @Override
-        public int getType() throws MessagingException
-        {
-            return 0;
-        }
-
-        @Override
-        public boolean create(int type) throws MessagingException
-        {
-            return false;
-        }
-
-        @Override
-        public boolean hasNewMessages() throws MessagingException
-        {
-            return false;
-        }
-
-        @Override
-        public Folder getFolder(String name) throws MessagingException
-        {
-            return null;
-        }
-
-        @Override
-        public boolean delete(boolean recurse) throws MessagingException
-        {
-            return false;
-        }
-
-        @Override
-        public boolean renameTo(Folder f) throws MessagingException
-        {
-            return false;
-        }
-
-        @Override
-        public void open(int mode) throws MessagingException
-        {
-            this.isOpen = true;
-            this.mode = mode;
-        }
-
-        @Override
-        public void close(boolean expunge) throws MessagingException
-        {
-            if (!isOpen)
-            {
-                throw new MessagingException("Cannot close: Folder is already closed");
-            }
-            this.isOpen = false;
-        }
-
-        @Override
-        public boolean isOpen()
-        {
-            return isOpen;
-        }
-
-        @Override
-        public Flags getPermanentFlags()
-        {
-            return null;
-        }
-
-        @Override
-        public int getMessageCount() throws MessagingException
-        {
-            return 0;
-        }
-
-        @Override
-        public Message getMessage(int msgnum) throws MessagingException
-        {
-            return null;
-        }
-
-        @Override
-        public void appendMessages(Message[] msgs) throws MessagingException
-        {
-
-        }
-
-        @Override
-        public Message[] expunge() throws MessagingException
-        {
-            return new Message[0];
-        }
+    @Override
+    public boolean create(int type) throws MessagingException {
+      return false;
     }
+
+    @Override
+    public boolean hasNewMessages() throws MessagingException {
+      return false;
+    }
+
+    @Override
+    public Folder getFolder(String name) throws MessagingException {
+      return null;
+    }
+
+    @Override
+    public boolean delete(boolean recurse) throws MessagingException {
+      return false;
+    }
+
+    @Override
+    public boolean renameTo(Folder f) throws MessagingException {
+      return false;
+    }
+
+    @Override
+    public void open(int mode) throws MessagingException {
+      this.isOpen = true;
+      this.mode = mode;
+    }
+
+    @Override
+    public void close(boolean expunge) throws MessagingException {
+      if (!isOpen) {
+        throw new MessagingException("Cannot close: Folder is already closed");
+      }
+      this.isOpen = false;
+    }
+
+    @Override
+    public boolean isOpen() {
+      return isOpen;
+    }
+
+    @Override
+    public Flags getPermanentFlags() {
+      return null;
+    }
+
+    @Override
+    public int getMessageCount() throws MessagingException {
+      return 0;
+    }
+
+    @Override
+    public Message getMessage(int msgnum) throws MessagingException {
+      return null;
+    }
+
+    @Override
+    public void appendMessages(Message[] msgs) throws MessagingException {
+
+    }
+
+    @Override
+    public Message[] expunge() throws MessagingException {
+      return new Message[0];
+    }
+  }
 
 }

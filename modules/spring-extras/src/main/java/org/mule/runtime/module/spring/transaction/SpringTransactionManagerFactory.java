@@ -14,19 +14,16 @@ import javax.transaction.TransactionManager;
 /**
  * A holder to a transaction manager set via a Spring Application context
  */
-public class SpringTransactionManagerFactory implements TransactionManagerFactory
-{
+public class SpringTransactionManagerFactory implements TransactionManagerFactory {
 
-    private TransactionManager transactionManager;
+  private TransactionManager transactionManager;
 
-    synchronized public void setTransactionManager(TransactionManager transactionManager)
-    {
-        this.transactionManager = transactionManager;
-    }
+  synchronized public void setTransactionManager(TransactionManager transactionManager) {
+    this.transactionManager = transactionManager;
+  }
 
-    synchronized public TransactionManager create(MuleConfiguration config) throws Exception
-    {
-        return transactionManager;
-    }
+  synchronized public TransactionManager create(MuleConfiguration config) throws Exception {
+    return transactionManager;
+  }
 
 }

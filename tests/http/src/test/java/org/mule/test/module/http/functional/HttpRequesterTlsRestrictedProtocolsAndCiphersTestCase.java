@@ -6,11 +6,11 @@
  */
 package org.mule.test.module.http.functional;
 
-public class HttpRequesterTlsRestrictedProtocolsAndCiphersTestCase extends AbstractClientTlsRestrictedTlsProtocolsAndCiphersTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "http-request-restricted-protocols-ciphers-config.xml";
-    }
+public class HttpRequesterTlsRestrictedProtocolsAndCiphersTestCase
+    extends AbstractClientTlsRestrictedTlsProtocolsAndCiphersTestCase {
+
+  @Override
+  protected String getConfigFile() {
+    return "http-request-restricted-protocols-ciphers-config.xml";
+  }
 }

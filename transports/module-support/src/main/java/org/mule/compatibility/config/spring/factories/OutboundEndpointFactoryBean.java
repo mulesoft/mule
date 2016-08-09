@@ -20,48 +20,42 @@ import org.mule.runtime.core.processor.AbstractRedeliveryPolicy;
 /**
  * Spring FactoryBean used to create concrete instances of outbound endpoints
  */
-public class OutboundEndpointFactoryBean extends AbstractEndpointFactoryBean
-{
+public class OutboundEndpointFactoryBean extends AbstractEndpointFactoryBean {
 
-    public OutboundEndpointFactoryBean(EndpointURIEndpointBuilder global) throws EndpointException
-    {
-        super(global);
+  public OutboundEndpointFactoryBean(EndpointURIEndpointBuilder global) throws EndpointException {
+    super(global);
+  }
+
+  public OutboundEndpointFactoryBean() {
+    super();
+  }
+
+  @Override
+  public Class getObjectType() {
+    return OutboundEndpoint.class;
+  }
+
+  @Override
+  public Object doGetObject() throws Exception {
+    // If this is a meta endpoint, then we can wrap it using the meta endpoint builder from the TransportServiceDescriptor
+    String scheme = getEndpointBuilder().getEndpoint().getFullScheme();
+    TransportServiceDescriptor tsd =
+        (TransportServiceDescriptor) lookupServiceDescriptor(muleContext.getRegistry(), LegacyServiceType.TRANSPORT, scheme,
+                                                             null);
+    EndpointBuilder endpointBuilder = tsd.createEndpointBuilder(this, muleContext);
+
+    OutboundEndpoint outboundEndpoint = getEndpointFactory().getOutboundEndpoint(endpointBuilder);
+    if (outboundEndpoint instanceof AbstractEndpoint) {
+      AbstractEndpoint.class.cast(outboundEndpoint).setAnnotations(getAnnotations());
     }
-
-    public OutboundEndpointFactoryBean()
-    {
-        super();
-    }
-    
-    @Override
-    public Class getObjectType()
-    {
-        return OutboundEndpoint.class;
-    }
-
-    @Override
-    public Object doGetObject() throws Exception
-    {
-        // If this is a meta endpoint, then we can wrap it using the meta endpoint builder from the TransportServiceDescriptor
-        String scheme = getEndpointBuilder().getEndpoint().getFullScheme();
-        TransportServiceDescriptor tsd =
-                (TransportServiceDescriptor) lookupServiceDescriptor(muleContext.getRegistry(), LegacyServiceType.TRANSPORT, scheme, null);
-        EndpointBuilder endpointBuilder = tsd.createEndpointBuilder(this, muleContext);
-
-        OutboundEndpoint outboundEndpoint = getEndpointFactory().getOutboundEndpoint(endpointBuilder);
-        if (outboundEndpoint instanceof AbstractEndpoint)
-        {
-            AbstractEndpoint.class.cast(outboundEndpoint).setAnnotations(getAnnotations());
-        }
-        return outboundEndpoint;
-    }
+    return outboundEndpoint;
+  }
 
 
 
-    @Override
-    public void setRedeliveryPolicy(AbstractRedeliveryPolicy redeliveryPolicy)
-    {
-        throw new IllegalStateException("A redelivery policy cannot be specified for an outbound endpoint.");
-    }
+  @Override
+  public void setRedeliveryPolicy(AbstractRedeliveryPolicy redeliveryPolicy) {
+    throw new IllegalStateException("A redelivery policy cannot be specified for an outbound endpoint.");
+  }
 
 }

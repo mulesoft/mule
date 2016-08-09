@@ -22,129 +22,106 @@ import java.util.Optional;
  *
  * @since 4.0
  */
-//TODO: MULE-8946 TransactionalConnection should throw TransactionException
-public class ExtensionTransaction extends AbstractSingleResourceTransaction
-{
+// TODO: MULE-8946 TransactionalConnection should throw TransactionException
+public class ExtensionTransaction extends AbstractSingleResourceTransaction {
 
-    private Optional<ExtensionTransactionalResource> boundResource = empty();
+  private Optional<ExtensionTransactionalResource> boundResource = empty();
 
-    /**
-     * {@inheritDoc}
-     */
-    public ExtensionTransaction(MuleContext muleContext)
-    {
-        super(muleContext);
+  /**
+   * {@inheritDoc}
+   */
+  public ExtensionTransaction(MuleContext muleContext) {
+    super(muleContext);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void bindResource(Object key, Object resource) throws TransactionException {
+    if (!(key instanceof ExtensionTransactionKey) || !(resource instanceof ExtensionTransactionalResource)) {
+      throw new IllegalTransactionStateException(transactionCanOnlyBindToResources(format("%s/%s", ExtensionTransactionKey.class
+          .getName(), ExtensionTransactionalResource.class.getName())));
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void bindResource(Object key, Object resource) throws TransactionException
-    {
-        if (!(key instanceof ExtensionTransactionKey) || !(resource instanceof ExtensionTransactionalResource))
-        {
-            throw new IllegalTransactionStateException(transactionCanOnlyBindToResources(format(
-                    "%s/%s", ExtensionTransactionKey.class.getName(), ExtensionTransactionalResource.class.getName())));
-        }
+    ExtensionTransactionalResource txResource = (ExtensionTransactionalResource) resource;
 
-        ExtensionTransactionalResource txResource = (ExtensionTransactionalResource) resource;
+    boundResource = Optional.of(txResource);
+    super.bindResource(key, resource);
+    doBegin();
+  }
 
-        boundResource = Optional.of(txResource);
-        super.bindResource(key, resource);
-        doBegin();
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean hasResource(Object key) {
+    return this.key != null && this.key.equals(key);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Object getResource(Object key) {
+    return Objects.equals(this.key, key) ? this.resource : null;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected void doCommit() throws TransactionException {
+    if (boundResource.isPresent()) {
+      try {
+        boundResource.get().commit();
+      } catch (Exception e) {
+        throw new TransactionException(e);
+      }
     }
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean hasResource(Object key)
-    {
-        return this.key != null && this.key.equals(key);
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected void doRollback() throws TransactionException {
+    if (boundResource.isPresent()) {
+      try {
+        boundResource.get().rollback();
+      } catch (Exception e) {
+        throw new TransactionException(e);
+      }
     }
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Object getResource(Object key)
-    {
-        return Objects.equals(this.key, key) ? this.resource : null;
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected Class getKeyType() {
+    return ExtensionTransactionKey.class;
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void doCommit() throws TransactionException
-    {
-        if (boundResource.isPresent())
-        {
-            try
-            {
-                boundResource.get().commit();
-            }
-            catch (Exception e)
-            {
-                throw new TransactionException(e);
-            }
-        }
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected Class getResourceType() {
+    return ExtensionTransactionalResource.class;
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void doRollback() throws TransactionException
-    {
-        if (boundResource.isPresent())
-        {
-            try
-            {
-                boundResource.get().rollback();
-            }
-            catch (Exception e)
-            {
-                throw new TransactionException(e);
-            }
-        }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected void doBegin() throws TransactionException {
+    try {
+      if (boundResource.isPresent()) {
+        boundResource.get().begin();
+      }
+    } catch (Exception e) {
+      throw new TransactionException(e);
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected Class getKeyType()
-    {
-        return ExtensionTransactionKey.class;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected Class getResourceType()
-    {
-        return ExtensionTransactionalResource.class;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void doBegin() throws TransactionException
-    {
-        try
-        {
-            if (boundResource.isPresent())
-            {
-                boundResource.get().begin();
-            }
-        }
-        catch (Exception e)
-        {
-            throw new TransactionException(e);
-        }
-    }
+  }
 }

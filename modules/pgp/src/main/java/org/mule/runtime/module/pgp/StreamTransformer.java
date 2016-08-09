@@ -12,23 +12,23 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * A writer of {@link OutputStream}
  */
-public interface StreamTransformer
-{
-    /**
-     * Initialize this writer to write in the out OutputStream
-     *
-     * @param out the OutputStream where this writer is going to write information
-     * @throws Exception
-     */
-    void initialize(OutputStream out) throws Exception;
+public interface StreamTransformer {
 
-    /**
-     * Writes into out the number of bytes requested
-     *
-     * @param out the OutputStream where this writer is going to write information
-     * @param bytesRequested how many bytes this writer needs to write
-     * @return whether this writer has finished writing (no more bytes need to be written)
-     * @throws Exception
-     */
-    boolean write(OutputStream out, AtomicLong bytesRequested) throws Exception;
+  /**
+   * Initialize this writer to write in the out OutputStream
+   *
+   * @param out the OutputStream where this writer is going to write information
+   * @throws Exception
+   */
+  void initialize(OutputStream out) throws Exception;
+
+  /**
+   * Writes into out the number of bytes requested
+   *
+   * @param out the OutputStream where this writer is going to write information
+   * @param bytesRequested how many bytes this writer needs to write
+   * @return whether this writer has finished writing (no more bytes need to be written)
+   * @throws Exception
+   */
+  boolean write(OutputStream out, AtomicLong bytesRequested) throws Exception;
 }

@@ -12,25 +12,22 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class MultiConnectorMULE3669TestCase extends FunctionalTestCase
-{
+public class MultiConnectorMULE3669TestCase extends FunctionalTestCase {
 
-    @Rule
-    public DynamicPort dynamicPort1 = new DynamicPort("port1");
+  @Rule
+  public DynamicPort dynamicPort1 = new DynamicPort("port1");
 
-    @Rule
-    public DynamicPort dynamicPort2 = new DynamicPort("port2");
+  @Rule
+  public DynamicPort dynamicPort2 = new DynamicPort("port2");
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "multiconnector-mule3669-test-flow.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "multiconnector-mule3669-test-flow.xml";
+  }
 
-    @Test
-    public void testInitialisation() throws Exception
-    {
-        // Just need to ensure the test sets up correctly
-    }
+  @Test
+  public void testInitialisation() throws Exception {
+    // Just need to ensure the test sets up correctly
+  }
 
 }

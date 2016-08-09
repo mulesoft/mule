@@ -21,75 +21,67 @@ import java.io.IOException;
 import org.junit.Test;
 
 @SmallTest
-public class FileBulkQueryResolverTestCase extends AbstractBulkQueryResolverTestCase
-{
+public class FileBulkQueryResolverTestCase extends AbstractBulkQueryResolverTestCase {
 
-    @Test
-    public void doesNotResolvesBulkQueryWhenThereIsNoEvent() throws Exception
-    {
-        BulkQueryResolver bulkQueryResolver = new FileBulkQueryResolver(null, null, null);
+  @Test
+  public void doesNotResolvesBulkQueryWhenThereIsNoEvent() throws Exception {
+    BulkQueryResolver bulkQueryResolver = new FileBulkQueryResolver(null, null, null);
 
-        BulkQuery resolvedBulkQuery = bulkQueryResolver.resolve(null);
+    BulkQuery resolvedBulkQuery = bulkQueryResolver.resolve(null);
 
-        assertThat(resolvedBulkQuery, nullValue());
-    }
+    assertThat(resolvedBulkQuery, nullValue());
+  }
 
-    @Test
-    public void resolvesBulkQueryWithLinuxLineSeparator() throws Exception
-    {
-        doResolveBulkQueryTest(BULK_SQL_QUERY);
-    }
+  @Test
+  public void resolvesBulkQueryWithLinuxLineSeparator() throws Exception {
+    doResolveBulkQueryTest(BULK_SQL_QUERY);
+  }
 
-    @Test
-    public void resolvesBulkQueryWithWindowsLineSeparator() throws Exception
-    {
-        doResolveBulkQueryTest(STATIC_SQL_1 + ";\r\n" + STATIC_SQL_2);
-    }
+  @Test
+  public void resolvesBulkQueryWithWindowsLineSeparator() throws Exception {
+    doResolveBulkQueryTest(STATIC_SQL_1 + ";\r\n" + STATIC_SQL_2);
+  }
 
-    @Test
-    public void resolvesBulkQueryWithOldMacLineSeparator() throws Exception
-    {
-        doResolveBulkQueryTest(STATIC_SQL_1 + ";\r" + STATIC_SQL_2);
-    }
+  @Test
+  public void resolvesBulkQueryWithOldMacLineSeparator() throws Exception {
+    doResolveBulkQueryTest(STATIC_SQL_1 + ";\r" + STATIC_SQL_2);
+  }
 
-    private void doResolveBulkQueryTest(String bulkSqlQuery) throws IOException
-    {
-        String fileName = "fileName";
+  private void doResolveBulkQueryTest(String bulkSqlQuery) throws IOException {
+    String fileName = "fileName";
 
-        QueryTemplateParser queryTemplateParser = createQueryTemplateParser();
-        FileReader fileReader = mock(FileReader.class);
-        when(fileReader.getResourceAsString(fileName)).thenReturn(bulkSqlQuery);
+    QueryTemplateParser queryTemplateParser = createQueryTemplateParser();
+    FileReader fileReader = mock(FileReader.class);
+    when(fileReader.getResourceAsString(fileName)).thenReturn(bulkSqlQuery);
 
-        BulkQueryResolver bulkQueryResolver = new FileBulkQueryResolver(fileName, queryTemplateParser, fileReader);
+    BulkQueryResolver bulkQueryResolver = new FileBulkQueryResolver(fileName, queryTemplateParser, fileReader);
 
-        BulkQuery resolvedBulkQuery = bulkQueryResolver.resolve(muleEvent);
+    BulkQuery resolvedBulkQuery = bulkQueryResolver.resolve(muleEvent);
 
-        assertResolvedBulkQuery(resolvedBulkQuery);
-    }
+    assertResolvedBulkQuery(resolvedBulkQuery);
+  }
 
-    @Test(expected = QueryResolutionException.class)
-    public void throwsErrorOnEmptyBulkQuery() throws Exception
-    {
-        String fileName = "fileName";
+  @Test(expected = QueryResolutionException.class)
+  public void throwsErrorOnEmptyBulkQuery() throws Exception {
+    String fileName = "fileName";
 
-        FileReader fileReader = mock(FileReader.class);
-        when(fileReader.getResourceAsString(fileName)).thenReturn("");
+    FileReader fileReader = mock(FileReader.class);
+    when(fileReader.getResourceAsString(fileName)).thenReturn("");
 
-        FileBulkQueryResolver bulkQueryResolver = new FileBulkQueryResolver(fileName, null, fileReader);
+    FileBulkQueryResolver bulkQueryResolver = new FileBulkQueryResolver(fileName, null, fileReader);
 
-        bulkQueryResolver.resolve(muleEvent);
-    }
+    bulkQueryResolver.resolve(muleEvent);
+  }
 
-    @Test(expected = QueryResolutionException.class)
-    public void throwsErrorOnFileReadError() throws Exception
-    {
-        String fileName = "fileName";
+  @Test(expected = QueryResolutionException.class)
+  public void throwsErrorOnFileReadError() throws Exception {
+    String fileName = "fileName";
 
-        FileReader fileReader = mock(FileReader.class);
-        when(fileReader.getResourceAsString(fileName)).thenThrow(new IOException("Error"));
+    FileReader fileReader = mock(FileReader.class);
+    when(fileReader.getResourceAsString(fileName)).thenThrow(new IOException("Error"));
 
-        FileBulkQueryResolver bulkQueryResolver = new FileBulkQueryResolver(fileName, null, fileReader);
+    FileBulkQueryResolver bulkQueryResolver = new FileBulkQueryResolver(fileName, null, fileReader);
 
-        bulkQueryResolver.resolve(muleEvent);
-    }
+    bulkQueryResolver.resolve(muleEvent);
+  }
 }

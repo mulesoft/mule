@@ -9,16 +9,13 @@ package org.mule.extension.socket.api.exceptions;
 import java.io.IOException;
 
 /**
- * Thrown to indicate that a timeout has been reached while awaiting
- * for new data to arrive and be read.
+ * Thrown to indicate that a timeout has been reached while awaiting for new data to arrive and be read.
  *
  * @since 4.0
  */
-public class ReadingTimeoutException extends IOException
-{
+public class ReadingTimeoutException extends IOException {
 
-    public ReadingTimeoutException(String message, Throwable cause)
-    {
-        super(message, cause);
-    }
+  public ReadingTimeoutException(String message, Throwable cause) {
+    super(message, cause);
+  }
 }

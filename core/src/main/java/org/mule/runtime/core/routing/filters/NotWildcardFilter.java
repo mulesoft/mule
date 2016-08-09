@@ -13,18 +13,15 @@ import org.mule.runtime.core.api.MuleMessage;
  *
  * @since 4.0
  */
-public class NotWildcardFilter extends WildcardFilter
-{
+public class NotWildcardFilter extends WildcardFilter {
 
-    @Override
-    public boolean accept(Object object)
-    {
-        return !super.accept(object);
-    }
+  @Override
+  public boolean accept(Object object) {
+    return !super.accept(object);
+  }
 
-    @Override
-    public boolean accept(MuleMessage message)
-    {
-        return !super.accept(message);
-    }
+  @Override
+  public boolean accept(MuleMessage message) {
+    return !super.accept(message);
+  }
 }

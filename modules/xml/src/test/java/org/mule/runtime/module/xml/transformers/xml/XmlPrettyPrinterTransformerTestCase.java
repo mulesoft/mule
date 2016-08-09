@@ -16,52 +16,46 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class XmlPrettyPrinterTransformerTestCase extends AbstractTransformerTestCase
-{
-    // Do not normalize any Strings for this test since we need to test formatting
-    @Override
-    protected String normalizeString(String rawString)
-    {
-        return rawString;
-    }
+public class XmlPrettyPrinterTransformerTestCase extends AbstractTransformerTestCase {
 
-    @Override
-    public Object getResultData()
-    {
-        return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n" + "<just>\n" + "  <a>\n"
-               + "    <test>test</test>\n" + "  </a>\n" + "</just>\n";
-    }
+  // Do not normalize any Strings for this test since we need to test formatting
+  @Override
+  protected String normalizeString(String rawString) {
+    return rawString;
+  }
 
-    @Override
-    public Transformer getRoundTripTransformer() throws Exception
-    {
-        // there is no XmlUnprettyPrinter :)
-        return null;
-    }
+  @Override
+  public Object getResultData() {
+    return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n" + "<just>\n" + "  <a>\n" + "    <test>test</test>\n" + "  </a>\n"
+        + "</just>\n";
+  }
 
-    @Override
-    public Object getTestData()
-    {
-        return "<?xml version=\"1.0\" encoding=\"UTF-8\"?><just><a><test>test</test></a></just>";
-    }
+  @Override
+  public Transformer getRoundTripTransformer() throws Exception {
+    // there is no XmlUnprettyPrinter :)
+    return null;
+  }
 
-    @Override
-    public Transformer getTransformer() throws Exception
-    {
-        return createObject(XmlPrettyPrinter.class);
-    }
+  @Override
+  public Object getTestData() {
+    return "<?xml version=\"1.0\" encoding=\"UTF-8\"?><just><a><test>test</test></a></just>";
+  }
 
-    @Test
-    public void testOutputOptions()
-    {
-        XmlPrettyPrinter t = new XmlPrettyPrinter();
-        OutputFormat f = t.getOutputFormat();
-        assertEquals(2, f.getIndent().length());
-        assertTrue(f.isPadText());
+  @Override
+  public Transformer getTransformer() throws Exception {
+    return createObject(XmlPrettyPrinter.class);
+  }
 
-        t.setIndentSize(4);
-        t.setPadText(true);
-        assertEquals(4, f.getIndent().length());
-        assertTrue(f.isPadText());
-    }
+  @Test
+  public void testOutputOptions() {
+    XmlPrettyPrinter t = new XmlPrettyPrinter();
+    OutputFormat f = t.getOutputFormat();
+    assertEquals(2, f.getIndent().length());
+    assertTrue(f.isPadText());
+
+    t.setIndentSize(4);
+    t.setPadText(true);
+    assertEquals(4, f.getIndent().length());
+    assertTrue(f.isPadText());
+  }
 }

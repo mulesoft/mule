@@ -20,37 +20,34 @@ import org.mule.runtime.core.util.StringUtils;
 
 
 /**
- * Sets the inbound endpoint uri on as a property of the message using the following
- * key: {@link MuleProperties#MULE_ORIGINATING_ENDPOINT_PROPERTY}.
+ * Sets the inbound endpoint uri on as a property of the message using the following key:
+ * {@link MuleProperties#MULE_ORIGINATING_ENDPOINT_PROPERTY}.
  */
-public class InboundEndpointPropertyMessageProcessor implements MessageProcessor
-{
-    private InboundEndpoint endpoint;
+public class InboundEndpointPropertyMessageProcessor implements MessageProcessor {
 
-    public InboundEndpointPropertyMessageProcessor(InboundEndpoint endpoint)
-    {
-        this.endpoint = endpoint;
+  private InboundEndpoint endpoint;
+
+  public InboundEndpointPropertyMessageProcessor(InboundEndpoint endpoint) {
+    this.endpoint = endpoint;
+  }
+
+  @Override
+  public MuleEvent process(MuleEvent event) throws MuleException {
+    // If the endpoint has a logical name, use it, otherwise use the URI.
+    String inboundEndpoint = endpoint.getName();
+
+    if (StringUtils.isBlank(inboundEndpoint)) {
+      // URI
+      inboundEndpoint = endpoint.getEndpointURI().getUri().toString();
     }
+    String finalInboundEndpoint = inboundEndpoint;
+    event.setMessage(MuleMessage.builder(event.getMessage())
+        .addInboundProperty(MULE_ORIGINATING_ENDPOINT_PROPERTY, finalInboundEndpoint).build());
+    return event;
+  }
 
-    @Override
-    public MuleEvent process(MuleEvent event) throws MuleException
-    {
-        // If the endpoint has a logical name, use it, otherwise use the URI.
-        String inboundEndpoint = endpoint.getName();
-
-        if (StringUtils.isBlank(inboundEndpoint))
-        {
-            // URI
-            inboundEndpoint = endpoint.getEndpointURI().getUri().toString();
-        }
-        String finalInboundEndpoint = inboundEndpoint;
-        event.setMessage(MuleMessage.builder(event.getMessage()).addInboundProperty(MULE_ORIGINATING_ENDPOINT_PROPERTY, finalInboundEndpoint).build());
-        return event;
-    }
-
-    @Override
-    public String toString()
-    {
-        return ObjectUtils.toString(this);
-    }
+  @Override
+  public String toString() {
+    return ObjectUtils.toString(this);
+  }
 }

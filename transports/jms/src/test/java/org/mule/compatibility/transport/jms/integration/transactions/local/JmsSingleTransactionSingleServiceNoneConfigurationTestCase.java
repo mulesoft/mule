@@ -11,29 +11,26 @@ import org.mule.compatibility.transport.jms.integration.AbstractJmsSingleTransac
 import org.junit.Test;
 
 /**
- * Test all combinations of (inbound) NONE. They should all pass, except for
- * ALWAYS_JOIN on the outbound endpoint.
+ * Test all combinations of (inbound) NONE. They should all pass, except for ALWAYS_JOIN on the outbound endpoint.
  */
-public class JmsSingleTransactionSingleServiceNoneConfigurationTestCase extends
-    AbstractJmsSingleTransactionSingleServiceTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "integration/transactions/local/jms-single-tx-single-service-none.xml";
-    }
+public class JmsSingleTransactionSingleServiceNoneConfigurationTestCase
+    extends AbstractJmsSingleTransactionSingleServiceTestCase {
 
-    @Override
-    @Test
-    public void testAlwaysJoin() throws Exception
-    {
-        scenarioCommit.setInputDestinationName(JMS_QUEUE_INPUT_CONF_D);
-        scenarioRollback.setInputDestinationName(JMS_QUEUE_INPUT_CONF_D);
-        scenarioNotReceive.setInputDestinationName(JMS_QUEUE_INPUT_CONF_D);
-        scenarioCommit.setOutputDestinationName(JMS_QUEUE_OUTPUT_CONF_D);
-        scenarioRollback.setOutputDestinationName(JMS_QUEUE_OUTPUT_CONF_D);
-        scenarioNotReceive.setOutputDestinationName(JMS_QUEUE_OUTPUT_CONF_D);
+  @Override
+  protected String getConfigFile() {
+    return "integration/transactions/local/jms-single-tx-single-service-none.xml";
+  }
 
-        runTransactionFail("testAlwaysJoin");
-    }
+  @Override
+  @Test
+  public void testAlwaysJoin() throws Exception {
+    scenarioCommit.setInputDestinationName(JMS_QUEUE_INPUT_CONF_D);
+    scenarioRollback.setInputDestinationName(JMS_QUEUE_INPUT_CONF_D);
+    scenarioNotReceive.setInputDestinationName(JMS_QUEUE_INPUT_CONF_D);
+    scenarioCommit.setOutputDestinationName(JMS_QUEUE_OUTPUT_CONF_D);
+    scenarioRollback.setOutputDestinationName(JMS_QUEUE_OUTPUT_CONF_D);
+    scenarioNotReceive.setOutputDestinationName(JMS_QUEUE_OUTPUT_CONF_D);
+
+    runTransactionFail("testAlwaysJoin");
+  }
 }

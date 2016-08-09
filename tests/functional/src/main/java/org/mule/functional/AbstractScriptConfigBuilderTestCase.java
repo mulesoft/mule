@@ -17,36 +17,31 @@ import org.mule.tck.testmodels.mule.TestCompressionTransformer;
 
 import org.junit.Test;
 
-public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTestCase
-{
+public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTestCase {
 
-    // use legacy entry point resolver?
-    private boolean legacy;
+  // use legacy entry point resolver?
+  private boolean legacy;
 
-    protected AbstractScriptConfigBuilderTestCase()
-    {
-        this(false);
-    }
+  protected AbstractScriptConfigBuilderTestCase() {
+    this(false);
+  }
 
-    protected AbstractScriptConfigBuilderTestCase(boolean legacy)
-    {
-        this.legacy = legacy;
-    }
+  protected AbstractScriptConfigBuilderTestCase(boolean legacy) {
+    this.legacy = legacy;
+  }
 
-    @Test
-    public void testManagerConfig() throws Exception
-    {
-        assertEquals("true", muleContext.getRegistry().lookupObject("doCompression"));
-        assertNotNull(muleContext.getTransactionManager());
-    }
+  @Test
+  public void testManagerConfig() throws Exception {
+    assertEquals("true", muleContext.getRegistry().lookupObject("doCompression"));
+    assertNotNull(muleContext.getTransactionManager());
+  }
 
-    @Test
-    public void testTransformerConfig()
-    {
-        Transformer t = muleContext.getRegistry().lookupTransformer("TestCompressionTransformer");
-        assertNotNull(t);
-        assertTrue(t instanceof TestCompressionTransformer);
-        assertEquals(t.getReturnDataType(), DataType.STRING);
-        assertNotNull(((TestCompressionTransformer) t).getContainerProperty());
-    }
+  @Test
+  public void testTransformerConfig() {
+    Transformer t = muleContext.getRegistry().lookupTransformer("TestCompressionTransformer");
+    assertNotNull(t);
+    assertTrue(t instanceof TestCompressionTransformer);
+    assertEquals(t.getReturnDataType(), DataType.STRING);
+    assertNotNull(((TestCompressionTransformer) t).getContainerProperty());
+  }
 }

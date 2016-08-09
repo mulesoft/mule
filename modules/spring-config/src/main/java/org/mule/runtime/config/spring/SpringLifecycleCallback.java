@@ -21,110 +21,92 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * A {@link RegistryLifecycleCallback} to be used with instances
- * of {@link SpringRegistry}. For each object in which a {@link Lifecycle} phase
- * is going to be applied, it detects all the dependencies for that object
- * and applies the same phase on those dependencies first (recursively).
+ * A {@link RegistryLifecycleCallback} to be used with instances of {@link SpringRegistry}. For each object in which a
+ * {@link Lifecycle} phase is going to be applied, it detects all the dependencies for that object and applies the same phase on
+ * those dependencies first (recursively).
  * <p/>
- * This guarantees that if object A depends on object B and C, necessary lifecycle phases will have
- * been applied on B and C before it is applied to A
+ * This guarantees that if object A depends on object B and C, necessary lifecycle phases will have been applied on B and C before
+ * it is applied to A
  *
  * @since 3.7.0
  */
-class SpringLifecycleCallback extends RegistryLifecycleCallback<SpringRegistry>
-{
+class SpringLifecycleCallback extends RegistryLifecycleCallback<SpringRegistry> {
 
-    public SpringLifecycleCallback(RegistryLifecycleManager registryLifecycleManager)
-    {
-        super(registryLifecycleManager);
+  public SpringLifecycleCallback(RegistryLifecycleManager registryLifecycleManager) {
+    super(registryLifecycleManager);
+  }
+
+  @Override
+  protected Collection<?> lookupObjectsForLifecycle(LifecycleObject lo) {
+    Map<String, Object> objects = getSpringRegistry().lookupEntriesForLifecycle(lo.getType());
+
+    final DependencyNode root = new DependencyNode(null);
+
+    for (Map.Entry<String, Object> entry : objects.entrySet()) {
+      addDependency(root, entry.getKey(), entry.getValue());
     }
 
-    @Override
-    protected Collection<?> lookupObjectsForLifecycle(LifecycleObject lo)
-    {
-        Map<String, Object> objects = getSpringRegistry().lookupEntriesForLifecycle(lo.getType());
+    Iterable<DependencyNode> orderedNodes = new TreeTraverser<DependencyNode>() {
 
-        final DependencyNode root = new DependencyNode(null);
+      @Override
+      public Iterable children(DependencyNode node) {
+        return node.getChilds();
+      }
+    }.postOrderTraversal(root);
 
-        for (Map.Entry<String, Object> entry : objects.entrySet())
-        {
-            addDependency(root, entry.getKey(), entry.getValue());
-        }
+    List<Object> orderedObjects = new LinkedList<>();
+    for (DependencyNode node : orderedNodes) {
+      if (node == root) {
+        break;
+      }
 
-        Iterable<DependencyNode> orderedNodes = new TreeTraverser<DependencyNode>()
-        {
-            @Override
-            public Iterable children(DependencyNode node)
-            {
-                return node.getChilds();
-            }
-        }.postOrderTraversal(root);
-
-        List<Object> orderedObjects = new LinkedList<>();
-        for (DependencyNode node : orderedNodes)
-        {
-            if (node == root)
-            {
-                break;
-            }
-
-            orderedObjects.add(node.getValue());
-        }
-
-        return orderedObjects;
+      orderedObjects.add(node.getValue());
     }
 
-    private SpringRegistry getSpringRegistry()
-    {
-        return (SpringRegistry) registryLifecycleManager.getLifecycleObject();
+    return orderedObjects;
+  }
+
+  private SpringRegistry getSpringRegistry() {
+    return (SpringRegistry) registryLifecycleManager.getLifecycleObject();
+  }
+
+
+  private void addDependency(DependencyNode parent, String key, Object object) {
+    addDependency(parent, key, object, new HashSet<String>());
+  }
+
+  private void addDependency(DependencyNode parent, String key, Object object, Set<String> processedKeys) {
+    final DependencyNode node = new DependencyNode(object);
+    parent.addChild(node);
+
+    if (!processedKeys.contains(key)) {
+      processedKeys.add(key);
+      for (Map.Entry<String, Object> dependency : getSpringRegistry().getDependencies(key).entrySet()) {
+        addDependency(node, dependency.getKey(), dependency.getValue(), processedKeys);
+      }
+    }
+  }
+
+  private class DependencyNode {
+
+    private final Object value;
+    private final List<DependencyNode> childs = new LinkedList<>();
+
+    private DependencyNode(Object value) {
+      this.value = value;
     }
 
-
-    private void addDependency(DependencyNode parent, String key, Object object)
-    {
-        addDependency(parent, key, object, new HashSet<String>());
+    public DependencyNode addChild(DependencyNode child) {
+      childs.add(child);
+      return this;
     }
 
-    private void addDependency(DependencyNode parent, String key, Object object, Set<String> processedKeys)
-    {
-        final DependencyNode node = new DependencyNode(object);
-        parent.addChild(node);
-
-        if (!processedKeys.contains(key))
-        {
-            processedKeys.add(key);
-            for (Map.Entry<String, Object> dependency : getSpringRegistry().getDependencies(key).entrySet())
-            {
-                addDependency(node, dependency.getKey(), dependency.getValue(), processedKeys);
-            }
-        }
+    public List<DependencyNode> getChilds() {
+      return childs;
     }
 
-    private class DependencyNode
-    {
-
-        private final Object value;
-        private final List<DependencyNode> childs = new LinkedList<>();
-
-        private DependencyNode(Object value)
-        {
-            this.value = value;
-        }
-
-        public DependencyNode addChild(DependencyNode child)
-        {
-            childs.add(child);
-            return this;
-        }
-
-        public List<DependencyNode> getChilds()
-        {
-            return childs;
-        }
-
-        public Object getValue()
-        {
-            return value;
-        }
+    public Object getValue() {
+      return value;
     }
+  }
 }

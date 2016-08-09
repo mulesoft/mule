@@ -15,20 +15,17 @@ import org.mule.runtime.core.api.transaction.TransactionFactory;
 /**
  * Creates database transactions
  */
-public class DbTransactionFactory implements TransactionFactory
-{
+public class DbTransactionFactory implements TransactionFactory {
 
-    @Override
-    public Transaction beginTransaction(MuleContext muleContext) throws TransactionException
-    {
-        DbTransaction tx = new DbTransaction(muleContext);
-        tx.begin();
-        return tx;
-    }
+  @Override
+  public Transaction beginTransaction(MuleContext muleContext) throws TransactionException {
+    DbTransaction tx = new DbTransaction(muleContext);
+    tx.begin();
+    return tx;
+  }
 
-    @Override
-    public boolean isTransacted()
-    {
-        return true;
-    }
+  @Override
+  public boolean isTransacted() {
+    return true;
+  }
 }

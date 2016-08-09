@@ -24,84 +24,74 @@ import org.springframework.core.ResolvableType;
  *
  * @since 4.0
  */
-public class FieldWrapper implements FieldElement
-{
+public class FieldWrapper implements FieldElement {
 
-    private final Field field;
+  private final Field field;
 
-    public FieldWrapper(Field field)
-    {
-        this.field = field;
-    }
+  public FieldWrapper(Field field) {
+    this.field = field;
+  }
 
-    /**
-     * @return the wrapped {@link Field}
-     */
-    public Field getField()
-    {
-        return field;
-    }
+  /**
+   * @return the wrapped {@link Field}
+   */
+  public Field getField() {
+    return field;
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getName()
-    {
-        return field.getName();
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String getName() {
+    return field.getName();
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Annotation[] getAnnotations()
-    {
-        return field.getAnnotations();
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Annotation[] getAnnotations() {
+    return field.getAnnotations();
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public <A extends Annotation> Optional<A> getAnnotation(Class<A> annotationClass)
-    {
-        return Optional.ofNullable(field.getAnnotation(annotationClass));
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public <A extends Annotation> Optional<A> getAnnotation(Class<A> annotationClass) {
+    return Optional.ofNullable(field.getAnnotation(annotationClass));
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public TypeWrapper getType()
-    {
-        return new TypeWrapper(field.getType());
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public TypeWrapper getType() {
+    return new TypeWrapper(field.getType());
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public MetadataType getMetadataType(ClassTypeLoader typeLoader)
-    {
-        return typeLoader.load(ResolvableType.forField(field).getType());
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public MetadataType getMetadataType(ClassTypeLoader typeLoader) {
+    return typeLoader.load(ResolvableType.forField(field).getType());
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getAlias()
-    {
-        return InfrastructureTypeMapping.getMap().getOrDefault(field.getType(), FieldElement.super.getAlias());
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String getAlias() {
+    return InfrastructureTypeMapping.getMap().getOrDefault(field.getType(), FieldElement.super.getAlias());
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getOwnerDescription()
-    {
-        return format("Class: '%s'", field.getDeclaringClass().getSimpleName());
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String getOwnerDescription() {
+    return format("Class: '%s'", field.getDeclaringClass().getSimpleName());
+  }
 }

@@ -18,56 +18,47 @@ import java.io.InputStream;
 import org.junit.Test;
 
 
-public class HttpRequestSourceTargetTestCase extends AbstractHttpRequestTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "http-request-source-target-config.xml";
-    }
+public class HttpRequestSourceTargetTestCase extends AbstractHttpRequestTestCase {
 
-    @Test
-    public void requestBodyFromPayloadSource() throws Exception
-    {
-        flowRunner("payloadSourceFlow").withPayload(TEST_MESSAGE).run();
-        assertThat(body, equalTo(TEST_MESSAGE));
-    }
+  @Override
+  protected String getConfigFile() {
+    return "http-request-source-target-config.xml";
+  }
 
-    @Test
-    public void requestBodyFromCustomSource() throws Exception
-    {
-        sendRequestFromCustomSourceAndAssertResponse(TEST_MESSAGE);
-    }
+  @Test
+  public void requestBodyFromPayloadSource() throws Exception {
+    flowRunner("payloadSourceFlow").withPayload(TEST_MESSAGE).run();
+    assertThat(body, equalTo(TEST_MESSAGE));
+  }
 
-    @Test
-    public void requestBodyFromCustomSourceAndNullPayload() throws Exception
-    {
-        sendRequestFromCustomSourceAndAssertResponse(null);
-    }
+  @Test
+  public void requestBodyFromCustomSource() throws Exception {
+    sendRequestFromCustomSourceAndAssertResponse(TEST_MESSAGE);
+  }
 
-    private void sendRequestFromCustomSourceAndAssertResponse(Object payload) throws Exception
-    {
-        flowRunner("customSourceFlow").withPayload(payload)
-                                      .withFlowVariable("customSource", "customValue")
-                                      .run();
-        assertThat(body, equalTo("customValue"));
-    }
+  @Test
+  public void requestBodyFromCustomSourceAndNullPayload() throws Exception {
+    sendRequestFromCustomSourceAndAssertResponse(null);
+  }
 
-    @Test
-    public void responseBodyToPayloadTarget() throws Exception
-    {
-        MuleEvent event = flowRunner("payloadTargetFlow").withPayload(TEST_MESSAGE).run();
-        assertThat(getPayloadAsString(event.getMessage()), equalTo(DEFAULT_RESPONSE));
-    }
+  private void sendRequestFromCustomSourceAndAssertResponse(Object payload) throws Exception {
+    flowRunner("customSourceFlow").withPayload(payload).withFlowVariable("customSource", "customValue").run();
+    assertThat(body, equalTo("customValue"));
+  }
 
-    @Test
-    public void responseBodyToCustomTarget() throws Exception
-    {
-        MuleEvent event = flowRunner("customTargetFlow").withPayload(TEST_MESSAGE).run();
-        MuleMessage customTarget = event.getFlowVariable("customTarget");
-        assertThat(customTarget, notNullValue());
-        assertThat(IOUtils.toString((InputStream) customTarget.getPayload()), equalTo(DEFAULT_RESPONSE));
-        assertThat(getPayloadAsString(event.getMessage()), equalTo(TEST_MESSAGE));
-    }
+  @Test
+  public void responseBodyToPayloadTarget() throws Exception {
+    MuleEvent event = flowRunner("payloadTargetFlow").withPayload(TEST_MESSAGE).run();
+    assertThat(getPayloadAsString(event.getMessage()), equalTo(DEFAULT_RESPONSE));
+  }
+
+  @Test
+  public void responseBodyToCustomTarget() throws Exception {
+    MuleEvent event = flowRunner("customTargetFlow").withPayload(TEST_MESSAGE).run();
+    MuleMessage customTarget = event.getFlowVariable("customTarget");
+    assertThat(customTarget, notNullValue());
+    assertThat(IOUtils.toString((InputStream) customTarget.getPayload()), equalTo(DEFAULT_RESPONSE));
+    assertThat(getPayloadAsString(event.getMessage()), equalTo(TEST_MESSAGE));
+  }
 
 }

@@ -15,61 +15,52 @@ import org.mule.runtime.module.db.internal.parser.QueryTemplateParser;
 /**
  * Base class for {@link BulkQueryResolver} implementations
  */
-public abstract class AbstractBulkQueryResolver implements BulkQueryResolver
-{
+public abstract class AbstractBulkQueryResolver implements BulkQueryResolver {
 
-    private static final String BULK_QUERY_SEPARATOR = ";[\\r\\n]+";
+  private static final String BULK_QUERY_SEPARATOR = ";[\\r\\n]+";
 
-    protected final String bulkQueryText;
-    private final QueryTemplateParser parser;
+  protected final String bulkQueryText;
+  private final QueryTemplateParser parser;
 
-    public AbstractBulkQueryResolver(String bulkQueryText, QueryTemplateParser queryTemplateParser)
-    {
-        this.bulkQueryText = bulkQueryText;
-        this.parser = queryTemplateParser;
+  public AbstractBulkQueryResolver(String bulkQueryText, QueryTemplateParser queryTemplateParser) {
+    this.bulkQueryText = bulkQueryText;
+    this.parser = queryTemplateParser;
+  }
+
+  @Override
+  public BulkQuery resolve(MuleEvent muleEvent) {
+    if (muleEvent == null) {
+      return null;
     }
 
-    @Override
-    public BulkQuery resolve(MuleEvent muleEvent)
-    {
-        if (muleEvent == null)
-        {
-            return null;
-        }
+    BulkQuery bulkQuery = createBulkQuery(muleEvent);
 
-        BulkQuery bulkQuery = createBulkQuery(muleEvent);
-
-        if (bulkQuery.getQueryTemplates().size() == 0)
-        {
-            throw new QueryResolutionException("There are no queries on the resolved dynamic bulk query: " + this.bulkQueryText);
-        }
-
-        return bulkQuery;
+    if (bulkQuery.getQueryTemplates().size() == 0) {
+      throw new QueryResolutionException("There are no queries on the resolved dynamic bulk query: " + this.bulkQueryText);
     }
 
-    protected String resolveBulkQueries(MuleEvent muleEvent, String bulkQuery)
-    {
-        return bulkQuery.trim();
+    return bulkQuery;
+  }
+
+  protected String resolveBulkQueries(MuleEvent muleEvent, String bulkQuery) {
+    return bulkQuery.trim();
+  }
+
+  protected BulkQuery createBulkQuery(MuleEvent muleEvent) {
+    String queries = resolveBulkQueries(muleEvent, this.bulkQueryText);
+
+    BulkQuery bulkQuery = new BulkQuery();
+
+    String[] splitQueries = queries.split(BULK_QUERY_SEPARATOR);
+    for (String sql : splitQueries) {
+      if ("".equals(sql.trim())) {
+        continue;
+      }
+
+      QueryTemplate queryTemplate = parser.parse(sql);
+      bulkQuery.add(queryTemplate);
     }
 
-    protected BulkQuery createBulkQuery(MuleEvent muleEvent)
-    {
-        String queries = resolveBulkQueries(muleEvent, this.bulkQueryText);
-
-        BulkQuery bulkQuery = new BulkQuery();
-
-        String[] splitQueries = queries.split(BULK_QUERY_SEPARATOR);
-        for (String sql : splitQueries)
-        {
-            if ("".equals(sql.trim()))
-            {
-                continue;
-            }
-
-            QueryTemplate queryTemplate = parser.parse(sql);
-            bulkQuery.add(queryTemplate);
-        }
-
-        return bulkQuery;
-    }
+    return bulkQuery;
+  }
 }

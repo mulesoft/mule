@@ -23,40 +23,31 @@ import org.slf4j.LoggerFactory;
 /**
  * Transport customizer that adds a probe for logging HTTP messages.
  */
-public class LoggerTransportCustomizer implements TransportCustomizer
-{
+public class LoggerTransportCustomizer implements TransportCustomizer {
 
-    private static final Logger logger = LoggerFactory.getLogger(LoggerTransportCustomizer.class);
+  private static final Logger logger = LoggerFactory.getLogger(LoggerTransportCustomizer.class);
 
-    @Override
-    public void customize(TCPNIOTransport transport, FilterChainBuilder filterChainBuilder)
-    {
-        HttpCodecFilter httpCodecFilter = findHttpCodecFilter(filterChainBuilder);
-        httpCodecFilter.getMonitoringConfig().addProbes(new HttpMessageLogger(REQUESTER));
-    }
+  @Override
+  public void customize(TCPNIOTransport transport, FilterChainBuilder filterChainBuilder) {
+    HttpCodecFilter httpCodecFilter = findHttpCodecFilter(filterChainBuilder);
+    httpCodecFilter.getMonitoringConfig().addProbes(new HttpMessageLogger(REQUESTER));
+  }
 
-    private HttpCodecFilter findHttpCodecFilter(FilterChainBuilder filterChainBuilder)
-    {
-        HttpCodecFilter httpCodecFilter = null;
-        try
-        {
-            int i = 0;
-            do
-            {
-                Filter filter = filterChainBuilder.get(i);
-                if (filter instanceof HttpCodecFilter)
-                {
-                    httpCodecFilter = (HttpCodecFilter) filter;
-                }
-                i++;
-            }
-            while (httpCodecFilter == null);
+  private HttpCodecFilter findHttpCodecFilter(FilterChainBuilder filterChainBuilder) {
+    HttpCodecFilter httpCodecFilter = null;
+    try {
+      int i = 0;
+      do {
+        Filter filter = filterChainBuilder.get(i);
+        if (filter instanceof HttpCodecFilter) {
+          httpCodecFilter = (HttpCodecFilter) filter;
         }
-        catch (IndexOutOfBoundsException e)
-        {
-            logger.error(String.format("Failure looking for %s in grizzly client transport", HttpCodecFilter.class.getName()));
-            throw new MuleRuntimeException(e);
-        }
-        return httpCodecFilter;
+        i++;
+      } while (httpCodecFilter == null);
+    } catch (IndexOutOfBoundsException e) {
+      logger.error(String.format("Failure looking for %s in grizzly client transport", HttpCodecFilter.class.getName()));
+      throw new MuleRuntimeException(e);
     }
+    return httpCodecFilter;
+  }
 }

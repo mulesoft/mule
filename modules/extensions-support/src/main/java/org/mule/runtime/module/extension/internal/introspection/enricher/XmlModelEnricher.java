@@ -15,25 +15,22 @@ import org.mule.runtime.extension.api.introspection.declaration.fluent.Extension
 import org.mule.runtime.extension.xml.dsl.api.property.XmlModelProperty;
 
 /**
- * Verifies if the extension is annotated with {@link Xml} and if so, enriches the {@link ExtensionDeclarer}
- * with a {@link XmlModelProperty}.
+ * Verifies if the extension is annotated with {@link Xml} and if so, enriches the {@link ExtensionDeclarer} with a
+ * {@link XmlModelProperty}.
  * <p>
- * To get a hold of the {@link Class} on which the {@link Xml} annotation is expected to be, the
- * {@link DescribingContext} will be queried for such a model property. If such property is not present,
- * then this enricher will return without any side effects
+ * To get a hold of the {@link Class} on which the {@link Xml} annotation is expected to be, the {@link DescribingContext} will be
+ * queried for such a model property. If such property is not present, then this enricher will return without any side effects
  *
  * @since 4.0
  */
-public final class XmlModelEnricher extends AbstractAnnotatedModelEnricher
-{
+public final class XmlModelEnricher extends AbstractAnnotatedModelEnricher {
 
-    @Override
-    public void enrich(DescribingContext describingContext)
-    {
-        Xml xml = extractAnnotation(describingContext.getExtensionDeclarer().getDeclaration(), Xml.class);
-        ExtensionDeclarer descriptor = describingContext.getExtensionDeclarer();
-        ExtensionDeclaration extensionDeclaration = descriptor.getDeclaration();
-        descriptor.withModelProperty(createXmlModelProperty(xml, extensionDeclaration.getName(), extensionDeclaration.getVersion()));
-    }
+  @Override
+  public void enrich(DescribingContext describingContext) {
+    Xml xml = extractAnnotation(describingContext.getExtensionDeclarer().getDeclaration(), Xml.class);
+    ExtensionDeclarer descriptor = describingContext.getExtensionDeclarer();
+    ExtensionDeclaration extensionDeclaration = descriptor.getDeclaration();
+    descriptor.withModelProperty(createXmlModelProperty(xml, extensionDeclaration.getName(), extensionDeclaration.getVersion()));
+  }
 
 }

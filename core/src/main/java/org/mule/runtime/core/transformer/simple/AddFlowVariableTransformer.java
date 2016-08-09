@@ -9,18 +9,15 @@ package org.mule.runtime.core.transformer.simple;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.api.metadata.DataType;
 
-public class AddFlowVariableTransformer extends AbstractAddVariablePropertyTransformer<Object>
-{
+public class AddFlowVariableTransformer extends AbstractAddVariablePropertyTransformer<Object> {
 
-    @Override
-    protected void addProperty(MuleEvent event, String propertyName, Object value, DataType dataType)
-    {
-        event.setFlowVariable(propertyName, value, dataType);
-    }
+  @Override
+  protected void addProperty(MuleEvent event, String propertyName, Object value, DataType dataType) {
+    event.setFlowVariable(propertyName, value, dataType);
+  }
 
-    @Override
-    protected void removeProperty(MuleEvent event, String propertyName)
-    {
-        event.removeFlowVariable(propertyName);
-    }
+  @Override
+  protected void removeProperty(MuleEvent event, String propertyName) {
+    event.removeFlowVariable(propertyName);
+  }
 }

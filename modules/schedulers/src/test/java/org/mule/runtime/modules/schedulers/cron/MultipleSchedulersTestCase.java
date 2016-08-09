@@ -18,61 +18,53 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 
-public class MultipleSchedulersTestCase extends FunctionalTestCase
-{
+public class MultipleSchedulersTestCase extends FunctionalTestCase {
 
-    private static CountDownLatch firstRequest = new CountDownLatch(2);
-    private static Latch stoppedFlowLatch = new Latch();
-    private static int counter = 0;
+  private static CountDownLatch firstRequest = new CountDownLatch(2);
+  private static Latch stoppedFlowLatch = new Latch();
+  private static int counter = 0;
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "multiple-schedulers-config.xml";
+  @Override
+  protected String getConfigFile() {
+    return "multiple-schedulers-config.xml";
+  }
+
+  @Test
+  public void schedulersAreNotSharedAcrossPollers() throws Exception {
+    firstRequest.await(getTestTimeoutSecs(), TimeUnit.SECONDS);
+
+    Flow poll1 = (Flow) muleContext.getRegistry().lookupFlowConstruct("poll1");
+    poll1.stop();
+
+    stoppedFlowLatch.countDown();
+
+    PollingProber pollingProber = new PollingProber(5000, 100);
+    pollingProber.check(new Probe() {
+
+      @Override
+      public boolean isSatisfied() {
+        return counter == 2;
+      }
+
+      @Override
+      public String describeFailure() {
+        return "Poll2 was not executed after stopping Poll1 flow";
+      }
+    });
+
+  }
+
+  public static class SynchronizedPollExecutionCounter {
+
+    public Object process(Object payload) throws InterruptedException {
+      if ("poll2".equals(payload)) {
+        counter++;
+      }
+
+      firstRequest.countDown();
+      stoppedFlowLatch.await();
+
+      return payload;
     }
-
-    @Test
-    public void schedulersAreNotSharedAcrossPollers() throws Exception
-    {
-        firstRequest.await(getTestTimeoutSecs(), TimeUnit.SECONDS);
-
-        Flow poll1 = (Flow) muleContext.getRegistry().lookupFlowConstruct("poll1");
-        poll1.stop();
-
-        stoppedFlowLatch.countDown();
-
-        PollingProber pollingProber = new PollingProber(5000, 100);
-        pollingProber.check(new Probe()
-        {
-            @Override
-            public boolean isSatisfied()
-            {
-                return counter == 2;
-            }
-
-            @Override
-            public String describeFailure()
-            {
-                return "Poll2 was not executed after stopping Poll1 flow";
-            }
-        });
-
-    }
-
-    public static class SynchronizedPollExecutionCounter
-    {
-
-        public Object process(Object payload) throws InterruptedException
-        {
-            if ("poll2".equals(payload))
-            {
-                counter++;
-            }
-
-            firstRequest.countDown();
-            stoppedFlowLatch.await();
-
-            return payload;
-        }
-    }
+  }
 }

@@ -10,10 +10,8 @@ import org.mule.compatibility.core.processor.AbstractMessageProcessorTestCase;
 
 import org.junit.Test;
 
-public class OutboundTransformerMessageProcessorTestCase extends AbstractMessageProcessorTestCase
-{
-    @Test
-    public void testProcess()
-    {
-    }
+public class OutboundTransformerMessageProcessorTestCase extends AbstractMessageProcessorTestCase {
+
+  @Test
+  public void testProcess() {}
 }

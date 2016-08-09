@@ -19,18 +19,15 @@ import java.sql.SQLException;
  * <p/>
  * The consumer of the returned {@link ResultSet} will be responsible of closing it.
  */
-public class NullResultSetHandler implements ResultSetHandler
-{
+public class NullResultSetHandler implements ResultSetHandler {
 
-    @Override
-    public ResultSet processResultSet(DbConnection connection, ResultSet resultSet) throws SQLException
-    {
-        return resultSet;
-    }
+  @Override
+  public ResultSet processResultSet(DbConnection connection, ResultSet resultSet) throws SQLException {
+    return resultSet;
+  }
 
-    @Override
-    public boolean requiresMultipleOpenedResults()
-    {
-        return false;
-    }
+  @Override
+  public boolean requiresMultipleOpenedResults() {
+    return false;
+  }
 }

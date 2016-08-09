@@ -11,18 +11,15 @@ import org.mule.runtime.module.db.integration.config.AbstractConfigurationErrorT
 
 import org.junit.Test;
 
-public class SelectUnresolvedNamedParamTestCase extends AbstractConfigurationErrorTestCase
-{
+public class SelectUnresolvedNamedParamTestCase extends AbstractConfigurationErrorTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "integration/select/select-unresolved-named-param-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "integration/select/select-unresolved-named-param-config.xml";
+  }
 
-    @Test
-    public void requires() throws Exception
-    {
-        assertConfigurationError("Able to define a query with an unresolved named parameter", "wrongName");
-    }
+  @Test
+  public void requires() throws Exception {
+    assertConfigurationError("Able to define a query with an unresolved named parameter", "wrongName");
+  }
 }

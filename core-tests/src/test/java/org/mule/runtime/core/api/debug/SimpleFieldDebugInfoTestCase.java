@@ -10,18 +10,15 @@ package org.mule.runtime.core.api.debug;
 import org.mule.tck.size.SmallTest;
 
 @SmallTest
-public class SimpleFieldDebugInfoTestCase extends AbstractFieldDebugInfoTestCase<String>
-{
+public class SimpleFieldDebugInfoTestCase extends AbstractFieldDebugInfoTestCase<String> {
 
-    @Override
-    protected String getValue()
-    {
-        return "foo";
-    }
+  @Override
+  protected String getValue() {
+    return "foo";
+  }
 
-    @Override
-    protected void createFieldDebugInfo(String name, Class type, String value)
-    {
-        FieldDebugInfoFactory.createFieldDebugInfo(name, type, value);
-    }
+  @Override
+  protected void createFieldDebugInfo(String name, Class type, String value) {
+    FieldDebugInfoFactory.createFieldDebugInfo(name, type, value);
+  }
 }

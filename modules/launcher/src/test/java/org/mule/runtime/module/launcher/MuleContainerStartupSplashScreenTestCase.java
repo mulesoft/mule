@@ -16,46 +16,41 @@ import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.BeforeClass;
 
-public class MuleContainerStartupSplashScreenTestCase extends AbstractSplashScreenTestCase<MuleContainerStartupSplashScreen>
-{
-    private static final String FIRST_PATCH = "SE-4242-3.8.0.jar";
-    private static final String SECOND_PATCH = "SE-9999-3.7.3.jar";
-    private static final String COMPLEX_LOG_PART = "* Applied patches:                                                   *\n" +
-                                                   "*  - " + FIRST_PATCH + "                                               *\n" +
-                                                   "*  - " + SECOND_PATCH + "                                               *\n" +
-                                                   "* Mule system properties:                                            *\n";
+public class MuleContainerStartupSplashScreenTestCase extends AbstractSplashScreenTestCase<MuleContainerStartupSplashScreen> {
 
-    @BeforeClass
-    public static void setUpPatches()
-    {
-        File libFolder = newFile(workingDirectory.getRoot(), "lib/user");
-        libFolder.mkdirs();
-        newFile(libFolder, FIRST_PATCH).mkdir();
-        newFile(libFolder, "library.jar").mkdir();
-        newFile(libFolder, SECOND_PATCH).mkdir();
-    }
+  private static final String FIRST_PATCH = "SE-4242-3.8.0.jar";
+  private static final String SECOND_PATCH = "SE-9999-3.7.3.jar";
+  private static final String COMPLEX_LOG_PART = "* Applied patches:                                                   *\n"
+      + "*  - " + FIRST_PATCH + "                                               *\n" + "*  - " + SECOND_PATCH
+      + "                                               *\n"
+      + "* Mule system properties:                                            *\n";
 
-    @Before
-    public void setUp()
-    {
-        splashScreen = new MuleContainerStartupSplashScreen();
-    }
+  @BeforeClass
+  public static void setUpPatches() {
+    File libFolder = newFile(workingDirectory.getRoot(), "lib/user");
+    libFolder.mkdirs();
+    newFile(libFolder, FIRST_PATCH).mkdir();
+    newFile(libFolder, "library.jar").mkdir();
+    newFile(libFolder, SECOND_PATCH).mkdir();
+  }
 
-    @Override
-    protected void setUpSplashScreen()
-    {
-        splashScreen.doBody();
-    }
+  @Before
+  public void setUp() {
+    splashScreen = new MuleContainerStartupSplashScreen();
+  }
 
-    @Override
-    protected Matcher<String> getSimpleLogMatcher()
-    {
-        return not(containsString(COMPLEX_LOG_PART));
-    }
+  @Override
+  protected void setUpSplashScreen() {
+    splashScreen.doBody();
+  }
 
-    @Override
-    protected Matcher<String> getComplexLogMatcher()
-    {
-        return containsString(COMPLEX_LOG_PART);
-    }
+  @Override
+  protected Matcher<String> getSimpleLogMatcher() {
+    return not(containsString(COMPLEX_LOG_PART));
+  }
+
+  @Override
+  protected Matcher<String> getComplexLogMatcher() {
+    return containsString(COMPLEX_LOG_PART);
+  }
 }

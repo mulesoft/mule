@@ -14,97 +14,83 @@ import java.io.Serializable;
 
 import javax.transaction.xa.Xid;
 
-public class XaQueueTypeTransactionContextAdapter extends AbstractXaTransactionContext implements XaQueueTransactionContext, QueueTransactionContextFactory<XaQueueTransactionContext>
-{
+public class XaQueueTypeTransactionContextAdapter extends AbstractXaTransactionContext
+    implements XaQueueTransactionContext, QueueTransactionContextFactory<XaQueueTransactionContext> {
 
-    private final XaTxQueueTransactionJournal xaTxQueueTransactionJournal;
-    private final QueueProvider queueProvider;
-    private final QueueTypeTransactionContextAdapter<XaQueueTransactionContext> delegate;
-    private final Xid xid;
+  private final XaTxQueueTransactionJournal xaTxQueueTransactionJournal;
+  private final QueueProvider queueProvider;
+  private final QueueTypeTransactionContextAdapter<XaQueueTransactionContext> delegate;
+  private final Xid xid;
 
-    public XaQueueTypeTransactionContextAdapter(XaTxQueueTransactionJournal xaTxQueueTransactionJournal, QueueProvider queueProvider, Xid xid)
-    {
-        this.xaTxQueueTransactionJournal = xaTxQueueTransactionJournal;
-        this.queueProvider = queueProvider;
-        this.xid = xid;
-        this.delegate = new QueueTypeTransactionContextAdapter(this);
+  public XaQueueTypeTransactionContextAdapter(XaTxQueueTransactionJournal xaTxQueueTransactionJournal,
+                                              QueueProvider queueProvider, Xid xid) {
+    this.xaTxQueueTransactionJournal = xaTxQueueTransactionJournal;
+    this.queueProvider = queueProvider;
+    this.xid = xid;
+    this.delegate = new QueueTypeTransactionContextAdapter(this);
+  }
+
+  @Override
+  public XaQueueTransactionContext createPersistentTransactionContext() {
+    return new PersistentXaTransactionContext(xaTxQueueTransactionJournal, queueProvider, xid);
+  }
+
+  @Override
+  public XaQueueTransactionContext createTransientTransactionContext() {
+    return new TransientXaTransactionAdapter(new TransientQueueTransactionContext());
+  }
+
+  @Override
+  public void doCommit() throws ResourceManagerException {
+    XaQueueTransactionContext transactionContext = delegate.getTransactionContext();
+    if (transactionContext != null) {
+      transactionContext.doCommit();
     }
+  }
 
-    @Override
-    public XaQueueTransactionContext createPersistentTransactionContext()
-    {
-        return new PersistentXaTransactionContext(xaTxQueueTransactionJournal, queueProvider, xid);
+  @Override
+  public void doRollback() throws ResourceManagerException {
+    XaQueueTransactionContext transactionContext = delegate.getTransactionContext();
+    if (transactionContext != null) {
+      transactionContext.doRollback();
     }
+  }
 
-    @Override
-    public XaQueueTransactionContext createTransientTransactionContext()
-    {
-        return new TransientXaTransactionAdapter(new TransientQueueTransactionContext());
+  @Override
+  public void doPrepare() throws ResourceManagerException {
+    XaQueueTransactionContext transactionContext = delegate.getTransactionContext();
+    if (transactionContext != null) {
+      transactionContext.doPrepare();
     }
+  }
 
-    @Override
-    public void doCommit() throws ResourceManagerException
-    {
-        XaQueueTransactionContext transactionContext = delegate.getTransactionContext();
-        if (transactionContext != null)
-        {
-            transactionContext.doCommit();
-        }
-    }
+  @Override
+  public boolean offer(QueueStore queue, Serializable item, long offerTimeout) throws InterruptedException {
+    return delegate.offer(queue, item, offerTimeout);
+  }
 
-    @Override
-    public void doRollback() throws ResourceManagerException
-    {
-        XaQueueTransactionContext transactionContext = delegate.getTransactionContext();
-        if (transactionContext != null)
-        {
-            transactionContext.doRollback();
-        }
-    }
+  @Override
+  public void untake(QueueStore queue, Serializable item) throws InterruptedException {
+    delegate.untake(queue, item);
+  }
 
-    @Override
-    public void doPrepare() throws ResourceManagerException
-    {
-        XaQueueTransactionContext transactionContext = delegate.getTransactionContext();
-        if (transactionContext != null)
-        {
-            transactionContext.doPrepare();
-        }
-    }
+  @Override
+  public void clear(QueueStore queue) throws InterruptedException {
+    delegate.clear(queue);
+  }
 
-    @Override
-    public boolean offer(QueueStore queue, Serializable item, long offerTimeout) throws InterruptedException
-    {
-        return delegate.offer(queue, item, offerTimeout);
-    }
+  @Override
+  public Serializable poll(QueueStore queue, long pollTimeout) throws InterruptedException {
+    return delegate.poll(queue, pollTimeout);
+  }
 
-    @Override
-    public void untake(QueueStore queue, Serializable item) throws InterruptedException
-    {
-        delegate.untake(queue, item);
-    }
+  @Override
+  public Serializable peek(QueueStore queue) throws InterruptedException {
+    return delegate.peek(queue);
+  }
 
-    @Override
-    public void clear(QueueStore queue) throws InterruptedException
-    {
-        delegate.clear(queue);
-    }
-
-    @Override
-    public Serializable poll(QueueStore queue, long pollTimeout) throws InterruptedException
-    {
-        return delegate.poll(queue, pollTimeout);
-    }
-
-    @Override
-    public Serializable peek(QueueStore queue) throws InterruptedException
-    {
-        return delegate.peek(queue);
-    }
-
-    @Override
-    public int size(QueueStore queue)
-    {
-        return delegate.size(queue);
-    }
+  @Override
+  public int size(QueueStore queue) {
+    return delegate.size(queue);
+  }
 }

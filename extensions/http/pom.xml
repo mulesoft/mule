@@ -16,6 +16,10 @@
     <name>Mule HTTP Extension</name>
     <description>A Mule extension that provides HTTP server and client functionality</description>
 
+    <properties>
+        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
+    </properties>
+
     <build>
         <plugins>
             <plugin>

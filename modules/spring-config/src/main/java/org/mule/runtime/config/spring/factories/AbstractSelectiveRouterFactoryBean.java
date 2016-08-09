@@ -17,52 +17,46 @@ import java.util.Collection;
 
 import org.springframework.beans.factory.FactoryBean;
 
-public abstract class AbstractSelectiveRouterFactoryBean extends AbstractAnnotatedObject implements FactoryBean, MuleContextAware
-{
-    private MessageProcessor defaultProcessor;
-    private Collection<MessageProcessorFilterPair> conditionalMessageProcessors;
-    private MuleContext muleContext;
+public abstract class AbstractSelectiveRouterFactoryBean extends AbstractAnnotatedObject
+    implements FactoryBean, MuleContextAware {
 
-    public AbstractSelectiveRouterFactoryBean()
-    {
-        super();
+  private MessageProcessor defaultProcessor;
+  private Collection<MessageProcessorFilterPair> conditionalMessageProcessors;
+  private MuleContext muleContext;
+
+  public AbstractSelectiveRouterFactoryBean() {
+    super();
+  }
+
+  public void setDefaultRoute(MessageProcessorFilterPair conditionalProcessor) {
+    defaultProcessor = conditionalProcessor.getMessageProcessor();
+  }
+
+  public void setRoutes(Collection<MessageProcessorFilterPair> conditionalMessageProcessors) {
+    this.conditionalMessageProcessors = conditionalMessageProcessors;
+  }
+
+  public Object getObject() throws Exception {
+    final AbstractSelectiveRouter router = newAbstractSelectiveRouter();
+    router.setAnnotations(getAnnotations());
+    router.setDefaultRoute(defaultProcessor);
+    router.setMuleContext(muleContext);
+
+    for (final MessageProcessorFilterPair mpfp : conditionalMessageProcessors) {
+      router.addRoute(mpfp.getMessageProcessor(), mpfp.getFilter());
     }
 
-    public void setDefaultRoute(MessageProcessorFilterPair conditionalProcessor)
-    {
-        defaultProcessor = conditionalProcessor.getMessageProcessor();
-    }
+    return router;
+  }
 
-    public void setRoutes(Collection<MessageProcessorFilterPair> conditionalMessageProcessors)
-    {
-        this.conditionalMessageProcessors = conditionalMessageProcessors;
-    }
+  protected abstract AbstractSelectiveRouter newAbstractSelectiveRouter();
 
-    public Object getObject() throws Exception
-    {
-        final AbstractSelectiveRouter router = newAbstractSelectiveRouter();
-        router.setAnnotations(getAnnotations());
-        router.setDefaultRoute(defaultProcessor);
-        router.setMuleContext(muleContext);
+  public boolean isSingleton() {
+    return true;
+  }
 
-        for (final MessageProcessorFilterPair mpfp : conditionalMessageProcessors)
-        {
-            router.addRoute(mpfp.getMessageProcessor(), mpfp.getFilter());
-        }
-
-        return router;
-    }
-
-    protected abstract AbstractSelectiveRouter newAbstractSelectiveRouter();
-
-    public boolean isSingleton()
-    {
-        return true;
-    }
-
-    @Override
-    public void setMuleContext(MuleContext context)
-    {
-        this.muleContext = context;
-    }
+  @Override
+  public void setMuleContext(MuleContext context) {
+    this.muleContext = context;
+  }
 }

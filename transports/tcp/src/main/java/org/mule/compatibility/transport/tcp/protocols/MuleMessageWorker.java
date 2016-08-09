@@ -17,61 +17,46 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * Helper class for Mule message handling so that we can apply the same logic across all
- * sub-protocols (default, EOF and length).
+ * Helper class for Mule message handling so that we can apply the same logic across all sub-protocols (default, EOF and length).
  */
-class MuleMessageWorker
-{
+class MuleMessageWorker {
 
-    private final WireFormat wireFormat;
+  private final WireFormat wireFormat;
 
-    MuleMessageWorker(WireFormat wireFormat)
-    {
-        this.wireFormat = wireFormat;
+  MuleMessageWorker(WireFormat wireFormat) {
+    this.wireFormat = wireFormat;
+  }
+
+  public byte[] doWrite() throws IOException {
+    // TODO fix the api here so there is no need to use the RequestContext
+    MuleMessage msg = RequestContext.getEvent().getMessage();
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    try {
+      wireFormat.write(baos, msg, msg.getDataType().getMediaType().getCharset().orElse(null));
+    } catch (MuleException e) {
+      throw new IOException(e.getDetailedMessage());
+    }
+    return baos.toByteArray();
+  }
+
+  public Object doRead(Object message) throws IOException {
+    if (message == null) {
+      return null;
     }
 
-    public byte[] doWrite() throws IOException
-    {
-        //TODO fix the api here so there is no need to use the RequestContext
-        MuleMessage msg = RequestContext.getEvent().getMessage();
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try
-        {
-            wireFormat.write(baos, msg, msg.getDataType().getMediaType().getCharset().orElse(null));
-        }
-        catch (MuleException e)
-        {
-            throw new IOException(e.getDetailedMessage());
-        }
-        return baos.toByteArray();
+    InputStream in;
+    if (message instanceof byte[]) {
+      in = new ByteArrayInputStream((byte[]) message);
+    } else {
+      in = (InputStream) message;
     }
 
-    public Object doRead(Object message) throws IOException
-    {
-        if (message == null)
-        {
-            return null;
-        }
-
-        InputStream in;
-        if (message instanceof byte[])
-        {
-            in = new ByteArrayInputStream((byte[]) message);
-        }
-        else
-        {
-            in = (InputStream) message;
-        }
-
-        try
-        {
-            return wireFormat.read(in);
-        }
-        catch (MuleException e)
-        {
-            throw new IOException(e.getDetailedMessage());
-        }
-
+    try {
+      return wireFormat.read(in);
+    } catch (MuleException e) {
+      throw new IOException(e.getDetailedMessage());
     }
+
+  }
 
 }

@@ -20,49 +20,42 @@ import com.google.common.collect.ImmutableList;
 import java.util.List;
 
 /**
- * Validates that all {@link OperationModel operations} specify
- * a valid return type.
+ * Validates that all {@link OperationModel operations} specify a valid return type.
  * <p>
- * A return type is considered valid when it's not {@code null} and
- * not a {@link MuleEvent}
+ * A return type is considered valid when it's not {@code null} and not a {@link MuleEvent}
  *
  * @since 4.0
  */
-public class OperationReturnTypeModelValidator implements ModelValidator
-{
+public class OperationReturnTypeModelValidator implements ModelValidator {
 
-    private final List<Class<?>> illegalReturnTypes = ImmutableList.of(MuleEvent.class, MuleMessage.class);
+  private final List<Class<?>> illegalReturnTypes = ImmutableList.of(MuleEvent.class, MuleMessage.class);
 
-    @Override
-    public void validate(ExtensionModel extensionModel) throws IllegalModelDefinitionException
-    {
-        new IdempotentExtensionWalker()
-        {
-            @Override
-            protected void onOperation(OperationModel operationModel)
-            {
-                if (operationModel.getOutput() == null || operationModel.getOutput().getType() == null)
-                {
-                    throw missingReturnTypeException(extensionModel, operationModel);
-                }
+  @Override
+  public void validate(ExtensionModel extensionModel) throws IllegalModelDefinitionException {
+    new IdempotentExtensionWalker() {
 
-                final Class<Object> returnType = getType(operationModel.getOutput().getType());
+      @Override
+      protected void onOperation(OperationModel operationModel) {
+        if (operationModel.getOutput() == null || operationModel.getOutput().getType() == null) {
+          throw missingReturnTypeException(extensionModel, operationModel);
+        }
 
-                illegalReturnTypes.stream()
-                        .filter(forbiddenType -> forbiddenType.isAssignableFrom(returnType))
-                        .findFirst()
-                        .ifPresent(forbiddenType -> {
-                            throw new IllegalOperationModelDefinitionException(String.format("Operation '%s' in Extension '%s' specifies '%s' as a return type. Operations are " +
-                                                                                             "not allowed to return objects of that type",
-                                                                                             operationModel.getName(), extensionModel.getName(), forbiddenType.getName()));
-                        });
-            }
-        }.walk(extensionModel);
-    }
+        final Class<Object> returnType = getType(operationModel.getOutput().getType());
 
-    private IllegalModelDefinitionException missingReturnTypeException(ExtensionModel model, OperationModel operationModel)
-    {
-        throw new IllegalOperationModelDefinitionException(String.format("Operation '%s' in Extension '%s' is missing a return type",
-                                                                         operationModel.getName(), model.getName()));
-    }
+        illegalReturnTypes.stream().filter(forbiddenType -> forbiddenType.isAssignableFrom(returnType)).findFirst()
+            .ifPresent(forbiddenType -> {
+              throw new IllegalOperationModelDefinitionException(String.format(
+                                                                               "Operation '%s' in Extension '%s' specifies '%s' as a return type. Operations are "
+                                                                                   + "not allowed to return objects of that type",
+                                                                               operationModel.getName(), extensionModel.getName(),
+                                                                               forbiddenType.getName()));
+            });
+      }
+    }.walk(extensionModel);
+  }
+
+  private IllegalModelDefinitionException missingReturnTypeException(ExtensionModel model, OperationModel operationModel) {
+    throw new IllegalOperationModelDefinitionException(String.format("Operation '%s' in Extension '%s' is missing a return type",
+                                                                     operationModel.getName(), model.getName()));
+  }
 }

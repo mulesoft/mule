@@ -27,52 +27,47 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class OperationParametersModelValidatorTestCase extends AbstractMuleTestCase
-{
+public class OperationParametersModelValidatorTestCase extends AbstractMuleTestCase {
 
-    public static final String EXTENSION_NAME = "extension";
-    public static final String OPERATION_NAME = "operation";
-    @Mock
-    private ExtensionModel extensionModel;
+  public static final String EXTENSION_NAME = "extension";
+  public static final String OPERATION_NAME = "operation";
+  @Mock
+  private ExtensionModel extensionModel;
 
-    @Mock
-    private OperationModel operationModel;
+  @Mock
+  private OperationModel operationModel;
 
-    @Mock
-    private ParameterModel goodParameter;
+  @Mock
+  private ParameterModel goodParameter;
 
-    private ModelValidator validator = new OperationParametersModelValidator();
+  private ModelValidator validator = new OperationParametersModelValidator();
 
-    @Before
-    public void before()
-    {
-        when(extensionModel.getName()).thenReturn(EXTENSION_NAME);
-        when(operationModel.getName()).thenReturn(OPERATION_NAME);
-        when(goodParameter.getName()).thenReturn("valid");
-        when(extensionModel.getOperationModels()).thenReturn(asList(operationModel));
-        when(operationModel.getParameterModels()).thenReturn(asList(goodParameter));
-    }
+  @Before
+  public void before() {
+    when(extensionModel.getName()).thenReturn(EXTENSION_NAME);
+    when(operationModel.getName()).thenReturn(OPERATION_NAME);
+    when(goodParameter.getName()).thenReturn("valid");
+    when(extensionModel.getOperationModels()).thenReturn(asList(operationModel));
+    when(operationModel.getParameterModels()).thenReturn(asList(goodParameter));
+  }
 
-    @Test
-    public void valid()
-    {
-        validator.validate(extensionModel);
-    }
+  @Test
+  public void valid() {
+    validator.validate(extensionModel);
+  }
 
-    @Test(expected = IllegalOperationModelDefinitionException.class)
-    public void targetParameter()
-    {
-        ParameterModel offending = mock(ParameterModel.class);
-        when(offending.getName()).thenReturn(TARGET_ATTRIBUTE);
+  @Test(expected = IllegalOperationModelDefinitionException.class)
+  public void targetParameter() {
+    ParameterModel offending = mock(ParameterModel.class);
+    when(offending.getName()).thenReturn(TARGET_ATTRIBUTE);
 
-        when(operationModel.getParameterModels()).thenReturn(asList(goodParameter, offending));
-        validator.validate(extensionModel);
-    }
+    when(operationModel.getParameterModels()).thenReturn(asList(goodParameter, offending));
+    validator.validate(extensionModel);
+  }
 
-    @Test
-    public void validForParameterLessOperation()
-    {
-        when(operationModel.getParameterModels()).thenReturn(ImmutableList.of());
-        validator.validate(extensionModel);
-    }
+  @Test
+  public void validForParameterLessOperation() {
+    when(operationModel.getParameterModels()).thenReturn(ImmutableList.of());
+    validator.validate(extensionModel);
+  }
 }

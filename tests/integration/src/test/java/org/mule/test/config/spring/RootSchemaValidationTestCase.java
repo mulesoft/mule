@@ -12,13 +12,11 @@ import org.junit.Test;
 import org.xml.sax.SAXException;
 
 
-public class RootSchemaValidationTestCase extends AbstractSchemaValidationTestCase
-{
+public class RootSchemaValidationTestCase extends AbstractSchemaValidationTestCase {
 
-    @Test
-    public void testRootSchema() throws IOException, SAXException
-    {
-        doTest("org/mule/config/spring/root-validation-test.xml");
-    }
+  @Test
+  public void testRootSchema() throws IOException, SAXException {
+    doTest("org/mule/config/spring/root-validation-test.xml");
+  }
 
 }

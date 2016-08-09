@@ -22,46 +22,41 @@ import org.mule.test.heisenberg.extension.model.Ricin;
 
 import org.junit.Test;
 
-public class SingleConfigParserTestCase extends AbstractConfigParserTestCase
-{
+public class SingleConfigParserTestCase extends AbstractConfigParserTestCase {
 
-    @Test
-    public void configWithExpressionFunctionIsSameInstanceForDifferentEvents() throws Exception
-    {
-        MuleEvent event = getHeisenbergEvent();
-        MuleEvent anotherEvent = getTestEvent("");
-        HeisenbergExtension config = lookupHeisenberg(HEISENBERG_BYNAME, event);
-        HeisenbergExtension anotherConfig = lookupHeisenberg(HEISENBERG_BYNAME, anotherEvent);
-        assertThat(config, is(sameInstance(anotherConfig)));
-    }
+  @Test
+  public void configWithExpressionFunctionIsSameInstanceForDifferentEvents() throws Exception {
+    MuleEvent event = getHeisenbergEvent();
+    MuleEvent anotherEvent = getTestEvent("");
+    HeisenbergExtension config = lookupHeisenberg(HEISENBERG_BYNAME, event);
+    HeisenbergExtension anotherConfig = lookupHeisenberg(HEISENBERG_BYNAME, anotherEvent);
+    assertThat(config, is(sameInstance(anotherConfig)));
+  }
 
-    @Test
-    public void configWithExpressionFunctionStillDynamic() throws Exception
-    {
-        MuleEvent event = getHeisenbergEvent();
-        MuleEvent anotherEvent = getHeisenbergEvent();
-        anotherEvent.setFlowVariable("age", 40);
-        HeisenbergExtension config = lookupHeisenberg(HEISENBERG_EXPRESSION, event);
-        HeisenbergExtension anotherConfig = lookupHeisenberg(HEISENBERG_EXPRESSION, anotherEvent);
-        assertThat(config, is(not(sameInstance(anotherConfig))));
-    }
+  @Test
+  public void configWithExpressionFunctionStillDynamic() throws Exception {
+    MuleEvent event = getHeisenbergEvent();
+    MuleEvent anotherEvent = getHeisenbergEvent();
+    anotherEvent.setFlowVariable("age", 40);
+    HeisenbergExtension config = lookupHeisenberg(HEISENBERG_EXPRESSION, event);
+    HeisenbergExtension anotherConfig = lookupHeisenberg(HEISENBERG_EXPRESSION, anotherEvent);
+    assertThat(config, is(not(sameInstance(anotherConfig))));
+  }
 
-    @Test
-    public void initializedOptionalValueWithoutDefaultValue() throws Exception
-    {
-        MuleEvent event = getHeisenbergEvent();
-        HeisenbergExtension config = lookupHeisenberg(HEISENBERG_EXPRESSION_BYREF, event);
-        assertThat(config.getWeapon(), is(not(nullValue())));
-        assertThat(config.getWeapon(), is(instanceOf(Ricin.class)));
-    }
+  @Test
+  public void initializedOptionalValueWithoutDefaultValue() throws Exception {
+    MuleEvent event = getHeisenbergEvent();
+    HeisenbergExtension config = lookupHeisenberg(HEISENBERG_EXPRESSION_BYREF, event);
+    assertThat(config.getWeapon(), is(not(nullValue())));
+    assertThat(config.getWeapon(), is(instanceOf(Ricin.class)));
+  }
 
-    @Test
-    public void getHealthProgression() throws Exception
-    {
-        HeisenbergExtension config = lookupHeisenberg(HEISENBERG_BYNAME, getHeisenbergEvent());
-        assertThat(config.getHealthProgression(), is(not(nullValue())));
-        assertThat(config.getHealthProgression().size(), is(3));
-        assertThat(config.getHealthProgression(), contains(HEALTHY, CANCER, DEAD));
-    }
+  @Test
+  public void getHealthProgression() throws Exception {
+    HeisenbergExtension config = lookupHeisenberg(HEISENBERG_BYNAME, getHeisenbergEvent());
+    assertThat(config.getHealthProgression(), is(not(nullValue())));
+    assertThat(config.getHealthProgression().size(), is(3));
+    assertThat(config.getHealthProgression(), contains(HEALTHY, CANCER, DEAD));
+  }
 
 }

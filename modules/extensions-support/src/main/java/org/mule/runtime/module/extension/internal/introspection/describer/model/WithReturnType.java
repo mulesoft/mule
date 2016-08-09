@@ -11,11 +11,10 @@ package org.mule.runtime.module.extension.internal.introspection.describer.model
  *
  * @since 4.0
  */
-interface WithReturnType
-{
+interface WithReturnType {
 
-    /**
-     * @return the return type {@link Class} of the implementer component
-     */
-    Class<?> getReturnType();
+  /**
+   * @return the return type {@link Class} of the implementer component
+   */
+  Class<?> getReturnType();
 }

@@ -15,17 +15,15 @@ import java.sql.SQLException;
 /**
  * Processes all the records from a given {@link @ResultSet} in a stateless way.
  */
-public interface ResultSetHandler
-{
+public interface ResultSetHandler {
 
-    Object processResultSet(DbConnection connection, ResultSet resultSet) throws SQLException;
+  Object processResultSet(DbConnection connection, ResultSet resultSet) throws SQLException;
 
-    /**
-     * Indicates whether or not the resultSet handler requires that the
-     * connection supports multiple opened results in order to process
-     * the resultSet.
-     *
-     * @return {@code true} is multiple opened results is required, {@code false} otherwise
-     */
-    boolean requiresMultipleOpenedResults();
+  /**
+   * Indicates whether or not the resultSet handler requires that the connection supports multiple opened results in order to
+   * process the resultSet.
+   *
+   * @return {@code true} is multiple opened results is required, {@code false} otherwise
+   */
+  boolean requiresMultipleOpenedResults();
 }

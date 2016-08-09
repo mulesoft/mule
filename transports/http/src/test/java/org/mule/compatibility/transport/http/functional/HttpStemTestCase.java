@@ -21,50 +21,47 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpStemTestCase extends FunctionalTestCase
-{
-    @Rule
-    public DynamicPort dynamicPort = new DynamicPort("port1");
+public class HttpStemTestCase extends FunctionalTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "http-stem-test.xml";
-    }
+  @Rule
+  public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    @Test
-    public void testStemMatching() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        int port = dynamicPort.getNumber();
-        doTest(client, "http://localhost:" + port + "/foo", "/foo", "/foo");
-        doTest(client, "http://localhost:" + port + "/foo/baz", "/foo", "/foo/baz");
-        doTest(client, "http://localhost:" + port + "/bar", "/bar", "/bar");
-        doTest(client, "http://localhost:" + port + "/bar/baz", "/bar", "/bar/baz");
-    }
+  @Override
+  protected String getConfigFile() {
+    return "http-stem-test.xml";
+  }
 
-    protected void doTest(MuleClient client, final String url, final String contextPath, final String requestPath) throws Exception
-    {
-        FunctionalTestComponent testComponent = (FunctionalTestComponent) getComponent(contextPath);
-        assertNotNull(testComponent);
+  @Test
+  public void testStemMatching() throws Exception {
+    MuleClient client = muleContext.getClient();
+    int port = dynamicPort.getNumber();
+    doTest(client, "http://localhost:" + port + "/foo", "/foo", "/foo");
+    doTest(client, "http://localhost:" + port + "/foo/baz", "/foo", "/foo/baz");
+    doTest(client, "http://localhost:" + port + "/bar", "/bar", "/bar");
+    doTest(client, "http://localhost:" + port + "/bar/baz", "/bar", "/bar/baz");
+  }
 
-        EventCallback callback = new EventCallback()
-        {
-            @Override
-            public void eventReceived(final MuleEventContext context, final Object component) throws Exception
-            {
-                MuleMessage msg = context.getMessage();
-                assertEquals(requestPath, msg.getInboundProperty(HttpConnector.HTTP_REQUEST_PROPERTY));
-                assertEquals(requestPath, msg.getInboundProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY));
-                assertEquals(contextPath, msg.getInboundProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY));
-            }
-        };
+  protected void doTest(MuleClient client, final String url, final String contextPath, final String requestPath)
+      throws Exception {
+    FunctionalTestComponent testComponent = (FunctionalTestComponent) getComponent(contextPath);
+    assertNotNull(testComponent);
 
-        testComponent.setEventCallback(callback);
+    EventCallback callback = new EventCallback() {
 
-        MuleMessage result = client.send(url, "Hello World", null);
-        assertEquals("Hello World Received", getPayloadAsString(result));
-        final int status = result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0);
-        assertEquals(200, status);
-    }
+      @Override
+      public void eventReceived(final MuleEventContext context, final Object component) throws Exception {
+        MuleMessage msg = context.getMessage();
+        assertEquals(requestPath, msg.getInboundProperty(HttpConnector.HTTP_REQUEST_PROPERTY));
+        assertEquals(requestPath, msg.getInboundProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY));
+        assertEquals(contextPath, msg.getInboundProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY));
+      }
+    };
+
+    testComponent.setEventCallback(callback);
+
+    MuleMessage result = client.send(url, "Hello World", null);
+    assertEquals("Hello World Received", getPayloadAsString(result));
+    final int status = result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0);
+    assertEquals(200, status);
+  }
 }

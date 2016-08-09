@@ -20,31 +20,30 @@ import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class QueueTypeTransactionContextAdapterTestCase extends AbstractMuleTestCase
-{
+public class QueueTypeTransactionContextAdapterTestCase extends AbstractMuleTestCase {
 
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private QueueTransactionContextFactory<QueueTransactionContext> mockQueueTransactionContextFactory;
-    @Mock
-    private QueueStore mockQueueStore;
-    @Mock
-    private Serializable mockValue;
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  private QueueTransactionContextFactory<QueueTransactionContext> mockQueueTransactionContextFactory;
+  @Mock
+  private QueueStore mockQueueStore;
+  @Mock
+  private Serializable mockValue;
 
-    @Test
-    public void createPersistentContextWhenQueueIsPersistent() throws InterruptedException
-    {
-        QueueTransactionContext queueTransactionContext = new QueueTypeTransactionContextAdapter<QueueTransactionContext>(mockQueueTransactionContextFactory);
-        Mockito.when(mockQueueStore.isPersistent()).thenReturn(true);
-        queueTransactionContext.offer(mockQueueStore, mockValue, 10);
-        verify(mockQueueTransactionContextFactory.createPersistentTransactionContext());
-    }
+  @Test
+  public void createPersistentContextWhenQueueIsPersistent() throws InterruptedException {
+    QueueTransactionContext queueTransactionContext =
+        new QueueTypeTransactionContextAdapter<QueueTransactionContext>(mockQueueTransactionContextFactory);
+    Mockito.when(mockQueueStore.isPersistent()).thenReturn(true);
+    queueTransactionContext.offer(mockQueueStore, mockValue, 10);
+    verify(mockQueueTransactionContextFactory.createPersistentTransactionContext());
+  }
 
-    @Test
-    public void createTransientContextWhenQueueIsPersistent() throws InterruptedException
-    {
-        QueueTransactionContext queueTransactionContext = new QueueTypeTransactionContextAdapter<QueueTransactionContext>(mockQueueTransactionContextFactory);
-        Mockito.when(mockQueueStore.isPersistent()).thenReturn(false);
-        queueTransactionContext.offer(mockQueueStore, mockValue, 10);
-        verify(mockQueueTransactionContextFactory.createTransientTransactionContext());
-    }
+  @Test
+  public void createTransientContextWhenQueueIsPersistent() throws InterruptedException {
+    QueueTransactionContext queueTransactionContext =
+        new QueueTypeTransactionContextAdapter<QueueTransactionContext>(mockQueueTransactionContextFactory);
+    Mockito.when(mockQueueStore.isPersistent()).thenReturn(false);
+    queueTransactionContext.offer(mockQueueStore, mockValue, 10);
+    verify(mockQueueTransactionContextFactory.createTransientTransactionContext());
+  }
 }

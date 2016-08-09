@@ -10,13 +10,11 @@ import org.mule.mvel2.integration.VariableResolver;
 import org.mule.mvel2.integration.impl.ImmutableDefaultFactory;
 
 @SuppressWarnings("serial")
-public class NullVariableResolverFactory extends ImmutableDefaultFactory
-{
+public class NullVariableResolverFactory extends ImmutableDefaultFactory {
 
-    @Override
-    public VariableResolver getVariableResolver(String name)
-    {
-        return null;
-    }
+  @Override
+  public VariableResolver getVariableResolver(String name) {
+    return null;
+  }
 
 }

@@ -7,17 +7,15 @@
 package org.mule.compatibility.transport.jms.config;
 
 
-public class MuleMQConnectorDefinitionParser extends JmsConnectorDefinitionParser
-{
-    public MuleMQConnectorDefinitionParser()
-    {
-        super();
-        addAlias("brokerURL", "realmURL");
-    }
+public class MuleMQConnectorDefinitionParser extends JmsConnectorDefinitionParser {
 
-    public MuleMQConnectorDefinitionParser(Class clazz)
-    {
-        super(clazz);
-        addAlias("brokerURL", "realmURL");
-    }
+  public MuleMQConnectorDefinitionParser() {
+    super();
+    addAlias("brokerURL", "realmURL");
+  }
+
+  public MuleMQConnectorDefinitionParser(Class clazz) {
+    super(clazz);
+    addAlias("brokerURL", "realmURL");
+  }
 }

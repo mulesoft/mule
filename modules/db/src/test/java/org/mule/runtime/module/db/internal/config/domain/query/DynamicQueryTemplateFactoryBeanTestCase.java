@@ -19,20 +19,18 @@ import org.mule.tck.size.SmallTest;
 import org.junit.Test;
 
 @SmallTest
-public class DynamicQueryTemplateFactoryBeanTestCase extends AbstractMuleTestCase
-{
+public class DynamicQueryTemplateFactoryBeanTestCase extends AbstractMuleTestCase {
 
-    @Test
-    public void createsDynamicQuery() throws Exception
-    {
-        String dynamicQuery = "select from #[table]";
+  @Test
+  public void createsDynamicQuery() throws Exception {
+    String dynamicQuery = "select from #[table]";
 
-        DynamicQueryTemplateFactoryBean factoryBean = new DynamicQueryTemplateFactoryBean(dynamicQuery);
+    DynamicQueryTemplateFactoryBean factoryBean = new DynamicQueryTemplateFactoryBean(dynamicQuery);
 
-        QueryTemplate queryTemplate = factoryBean.getObject();
+    QueryTemplate queryTemplate = factoryBean.getObject();
 
-        assertThat(queryTemplate.getSqlText(), equalTo(dynamicQuery));
-        assertThat(queryTemplate.getType(), equalTo(QueryType.DDL));
-        assertThat(queryTemplate.getParams(), is(empty()));
-    }
+    assertThat(queryTemplate.getSqlText(), equalTo(dynamicQuery));
+    assertThat(queryTemplate.getType(), equalTo(QueryType.DDL));
+    assertThat(queryTemplate.getParams(), is(empty()));
+  }
 }

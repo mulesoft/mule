@@ -18,55 +18,47 @@ import java.util.Collection;
 
 import javax.transaction.xa.Xid;
 
-public class XaTxQueueTransactionJournal extends AbstractQueueTransactionJournal<Xid, XaQueueTxJournalEntry>
-{
+public class XaTxQueueTransactionJournal extends AbstractQueueTransactionJournal<Xid, XaQueueTxJournalEntry> {
 
-    public XaTxQueueTransactionJournal(String logFilesDirectory, final MuleContext muleContext, Integer maximumFileSizeInMegabytes)
-    {
-        super(logFilesDirectory, new JournalEntrySerializer<Xid, XaQueueTxJournalEntry>()
-        {
+  public XaTxQueueTransactionJournal(String logFilesDirectory, final MuleContext muleContext,
+                                     Integer maximumFileSizeInMegabytes) {
+    super(logFilesDirectory, new JournalEntrySerializer<Xid, XaQueueTxJournalEntry>() {
 
-            @Override
-            public XaQueueTxJournalEntry deserialize(DataInputStream inputStream) throws IOException
-            {
-                return new XaQueueTxJournalEntry(inputStream, muleContext);
-            }
+      @Override
+      public XaQueueTxJournalEntry deserialize(DataInputStream inputStream) throws IOException {
+        return new XaQueueTxJournalEntry(inputStream, muleContext);
+      }
 
-            @Override
-            public void serialize(XaQueueTxJournalEntry journalEntry, DataOutputStream dataOutputStream)
-            {
-                journalEntry.write(dataOutputStream, muleContext);
-            }
-        }, maximumFileSizeInMegabytes);
-    }
+      @Override
+      public void serialize(XaQueueTxJournalEntry journalEntry, DataOutputStream dataOutputStream) {
+        journalEntry.write(dataOutputStream, muleContext);
+      }
+    }, maximumFileSizeInMegabytes);
+  }
 
-    public XaTxQueueTransactionJournal(String logFilesDirectory, final MuleContext muleContext)
-    {
-        this(logFilesDirectory, muleContext, null);
-    }
+  public XaTxQueueTransactionJournal(String logFilesDirectory, final MuleContext muleContext) {
+    this(logFilesDirectory, muleContext, null);
+  }
 
-    @Override
-    protected XaQueueTxJournalEntry createUpdateJournalEntry(Xid txId, byte operation, String queueName, Serializable serialize)
-    {
-        return new XaQueueTxJournalEntry(txId, operation, queueName, serialize);
-    }
+  @Override
+  protected XaQueueTxJournalEntry createUpdateJournalEntry(Xid txId, byte operation, String queueName, Serializable serialize) {
+    return new XaQueueTxJournalEntry(txId, operation, queueName, serialize);
+  }
 
-    @Override
-    protected XaQueueTxJournalEntry createCheckpointJournalEntry(Xid txId, byte operation)
-    {
-        return new XaQueueTxJournalEntry(txId, operation);
-    }
+  @Override
+  protected XaQueueTxJournalEntry createCheckpointJournalEntry(Xid txId, byte operation) {
+    return new XaQueueTxJournalEntry(txId, operation);
+  }
 
-    public void logPrepare(Xid xid)
-    {
-        getJournal().logCheckpointOperation(createCheckpointJournalEntry(xid, AbstractQueueTxJournalEntry.Operation.PREPARE.getByteRepresentation()));
-    }
+  public void logPrepare(Xid xid) {
+    getJournal().logCheckpointOperation(createCheckpointJournalEntry(xid, AbstractQueueTxJournalEntry.Operation.PREPARE
+        .getByteRepresentation()));
+  }
 
-    @Override
-    public Collection<XaQueueTxJournalEntry> getLogEntriesForTx(Xid txId)
-    {
-        return super.getLogEntriesForTx(new MuleXid(txId));
-    }
+  @Override
+  public Collection<XaQueueTxJournalEntry> getLogEntriesForTx(Xid txId) {
+    return super.getLogEntriesForTx(new MuleXid(txId));
+  }
 
 
 }

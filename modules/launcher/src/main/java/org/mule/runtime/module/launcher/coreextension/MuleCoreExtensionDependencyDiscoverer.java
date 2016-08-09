@@ -13,14 +13,13 @@ import java.util.List;
 /**
  * Discovers dependencies between {@link MuleCoreExtension} instances
  */
-public interface MuleCoreExtensionDependencyDiscoverer
-{
+public interface MuleCoreExtensionDependencyDiscoverer {
 
-    /**
-     * Finds dependencies defined in a given {@link MuleCoreExtension}
-     *
-     * @param coreExtension dependant core extension
-     * @return a not null list of dependencies found in the extension class
-     */
-    List<LinkedMuleCoreExtensionDependency> findDependencies(MuleCoreExtension coreExtension);
+  /**
+   * Finds dependencies defined in a given {@link MuleCoreExtension}
+   *
+   * @param coreExtension dependant core extension
+   * @return a not null list of dependencies found in the extension class
+   */
+  List<LinkedMuleCoreExtensionDependency> findDependencies(MuleCoreExtension coreExtension);
 }

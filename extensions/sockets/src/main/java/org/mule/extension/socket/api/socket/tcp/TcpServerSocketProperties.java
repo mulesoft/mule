@@ -19,41 +19,38 @@ import java.net.ServerSocket;
  *
  * @since 4.0
  */
-public class TcpServerSocketProperties extends AbstractTcpSocketProperties
-{
+public class TcpServerSocketProperties extends AbstractTcpSocketProperties {
 
-    /**
-     * This sets the SO_TIMEOUT value when the socket is used as a server. This is the timeout that applies to the "accept" operation.
-     * A value of 0 (the {@link ServerSocket} default) causes the accept to wait indefinitely (if no connection arrives).
-     */
-    @Parameter
-    @Optional
-    @Placement(group = TIMEOUT_CONFIGURATION)
-    private Integer serverTimeout;
+  /**
+   * This sets the SO_TIMEOUT value when the socket is used as a server. This is the timeout that applies to the "accept"
+   * operation. A value of 0 (the {@link ServerSocket} default) causes the accept to wait indefinitely (if no connection arrives).
+   */
+  @Parameter
+  @Optional
+  @Placement(group = TIMEOUT_CONFIGURATION)
+  private Integer serverTimeout;
 
-    /**
-     * The maximum queue length for incoming connections.
-     */
-    @Parameter
-    @Optional(defaultValue = "50")
-    @Placement(group = ADVANCED)
-    private int receiveBacklog = 50;
+  /**
+   * The maximum queue length for incoming connections.
+   */
+  @Parameter
+  @Optional(defaultValue = "50")
+  @Placement(group = ADVANCED)
+  private int receiveBacklog = 50;
 
-    /**
-     * The maximum queue length for incoming connections.
-     */
-    public int getReceiveBacklog()
-    {
-        return receiveBacklog;
-    }
+  /**
+   * The maximum queue length for incoming connections.
+   */
+  public int getReceiveBacklog() {
+    return receiveBacklog;
+  }
 
-    /**
-     * Sets the SO_TIMEOUT value when the socket is used as a server.
-     * Reading from the socket will block for up to this long (in milliseconds) before the read fails.
-     * A value of 0 (the {@link ServerSocket} default) causes the read to wait indefinitely (if no data arrives).
-     */
-    public Integer getServerTimeout()
-    {
-        return serverTimeout;
-    }
+  /**
+   * Sets the SO_TIMEOUT value when the socket is used as a server. Reading from the socket will block for up to this long (in
+   * milliseconds) before the read fails. A value of 0 (the {@link ServerSocket} default) causes the read to wait indefinitely (if
+   * no data arrives).
+   */
+  public Integer getServerTimeout() {
+    return serverTimeout;
+  }
 }

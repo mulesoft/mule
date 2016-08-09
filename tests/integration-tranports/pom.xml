@@ -15,6 +15,7 @@
     <properties>
         <skipExportTests>false</skipExportTests>
         <skipTests>${skipIntegrationTests}</skipTests>
+        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
 
 	<build>

@@ -13,7 +13,6 @@ import org.mule.runtime.core.api.lifecycle.Stoppable;
 /**
  * Manages the lifecycle of the services avaialbe in the {@link ServiceRepository}
  */
-public interface ServiceManager extends Startable, Stoppable, ServiceRepository
-{
+public interface ServiceManager extends Startable, Stoppable, ServiceRepository {
 
 }

@@ -14,24 +14,21 @@ import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 
 /**
- * Processor of the chain of responsibility that knows how to create the {@link org.springframework.beans.factory.config.BeanDefinition}
- * for an exception strategy reference element.
+ * Processor of the chain of responsibility that knows how to create the
+ * {@link org.springframework.beans.factory.config.BeanDefinition} for an exception strategy reference element.
  *
  * @since 4.0
  */
-class ExceptionStrategyRefBeanDefinitionCreator extends BeanDefinitionCreator
-{
+class ExceptionStrategyRefBeanDefinitionCreator extends BeanDefinitionCreator {
 
-    @Override
-    public boolean handleRequest(CreateBeanDefinitionRequest createBeanDefinitionRequest)
-    {
-        ComponentModel componentModel = createBeanDefinitionRequest.getComponentModel();
-        if (componentModel.getIdentifier().equals(EXCEPTION_STRATEGY_REFERENCE_IDENTIFIER))
-        {
-            componentModel.setType(MessagingExceptionHandler.class);
-            componentModel.setBeanReference(new RuntimeBeanReference(componentModel.getParameters().get(REFERENCE_ATTRIBUTE)));
-            return true;
-        }
-        return false;
+  @Override
+  public boolean handleRequest(CreateBeanDefinitionRequest createBeanDefinitionRequest) {
+    ComponentModel componentModel = createBeanDefinitionRequest.getComponentModel();
+    if (componentModel.getIdentifier().equals(EXCEPTION_STRATEGY_REFERENCE_IDENTIFIER)) {
+      componentModel.setType(MessagingExceptionHandler.class);
+      componentModel.setBeanReference(new RuntimeBeanReference(componentModel.getParameters().get(REFERENCE_ATTRIBUTE)));
+      return true;
     }
+    return false;
+  }
 }

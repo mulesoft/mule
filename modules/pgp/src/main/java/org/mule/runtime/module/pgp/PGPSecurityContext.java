@@ -9,22 +9,19 @@ package org.mule.runtime.module.pgp;
 import org.mule.runtime.core.api.security.Authentication;
 import org.mule.runtime.core.api.security.SecurityContext;
 
-public class PGPSecurityContext implements SecurityContext
-{
-    private transient PGPAuthentication authentication;
+public class PGPSecurityContext implements SecurityContext {
 
-    public PGPSecurityContext(PGPAuthentication authentication)
-    {
-        this.setAuthentication(authentication);
-    }
+  private transient PGPAuthentication authentication;
 
-    public void setAuthentication(Authentication authentication)
-    {
-        this.authentication = (PGPAuthentication)authentication;
-    }
+  public PGPSecurityContext(PGPAuthentication authentication) {
+    this.setAuthentication(authentication);
+  }
 
-    public Authentication getAuthentication()
-    {
-        return authentication;
-    }
+  public void setAuthentication(Authentication authentication) {
+    this.authentication = (PGPAuthentication) authentication;
+  }
+
+  public Authentication getAuthentication() {
+    return authentication;
+  }
 }

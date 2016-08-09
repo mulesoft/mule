@@ -10,22 +10,20 @@ import java.lang.reflect.Type;
 import java.util.List;
 
 /**
- * A generic contract for any kind of component that could contain generic for their extended Super Class or implemented
- * interface
+ * A generic contract for any kind of component that could contain generic for their extended Super Class or implemented interface
  *
  * @since 4.0
  */
-public interface WithGenerics
-{
+public interface WithGenerics {
 
-    /**
-     * @return A list of {@link Type} generic that the super class holds
-     */
-    List<Type> getSuperClassGenerics();
+  /**
+   * @return A list of {@link Type} generic that the super class holds
+   */
+  List<Type> getSuperClassGenerics();
 
-    /**
-     * @param clazz Interface class to look for their generics
-     * @return A list of {@link Class} generic that the implemented interface, indicated by {@code clazz}, holds
-     */
-    List<Class<?>> getInterfaceGenerics(Class clazz);
+  /**
+   * @param clazz Interface class to look for their generics
+   * @return A list of {@link Class} generic that the implemented interface, indicated by {@code clazz}, holds
+   */
+  List<Class<?>> getInterfaceGenerics(Class clazz);
 }

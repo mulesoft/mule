@@ -28,131 +28,115 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-public class DataTypeBuilderTestCase extends AbstractMuleTestCase
-{
+public class DataTypeBuilderTestCase extends AbstractMuleTestCase {
 
-    @Rule
-    public ExpectedException expected = ExpectedException.none();
+  @Rule
+  public ExpectedException expected = ExpectedException.none();
 
-    @Test
-    public void buildSimple()
-    {
-        final DataType dataType = DataType.fromType(String.class);
-        assertThat(dataType, instanceOf(SimpleDataType.class));
-        assertThat(dataType.getType(), is(equalTo(String.class)));
-    }
+  @Test
+  public void buildSimple() {
+    final DataType dataType = DataType.fromType(String.class);
+    assertThat(dataType, instanceOf(SimpleDataType.class));
+    assertThat(dataType.getType(), is(equalTo(String.class)));
+  }
 
-    @Test
-    public void buildCollection()
-    {
-        final DataType dataType = DataType.fromType(Set.class);
-        assertThat(dataType, instanceOf(DefaultCollectionDataType.class));
-        assertThat(dataType.getType(), is(equalTo(Set.class)));
-        assertThat(((DefaultCollectionDataType) dataType).getItemDataType(), is(DataType.OBJECT));
-    }
+  @Test
+  public void buildCollection() {
+    final DataType dataType = DataType.fromType(Set.class);
+    assertThat(dataType, instanceOf(DefaultCollectionDataType.class));
+    assertThat(dataType.getType(), is(equalTo(Set.class)));
+    assertThat(((DefaultCollectionDataType) dataType).getItemDataType(), is(DataType.OBJECT));
+  }
 
-    @Test
-    public void buildTypedCollection()
-    {
-        final DataType dataType = DataType.builder().collectionType(List.class).itemType(String.class).build();
-        assertThat(dataType, instanceOf(DefaultCollectionDataType.class));
-        assertThat(dataType.getType(), is(equalTo(List.class)));
-        assertThat(((DefaultCollectionDataType) dataType).getItemDataType(), is(DataType.STRING));
-    }
+  @Test
+  public void buildTypedCollection() {
+    final DataType dataType = DataType.builder().collectionType(List.class).itemType(String.class).build();
+    assertThat(dataType, instanceOf(DefaultCollectionDataType.class));
+    assertThat(dataType.getType(), is(equalTo(List.class)));
+    assertThat(((DefaultCollectionDataType) dataType).getItemDataType(), is(DataType.STRING));
+  }
 
-    @Test
-    public void templateSimple()
-    {
-        final DataType template = DataType.builder().type(String.class).mediaType("text/plain;charset=ASCII").build();
-        final DataType dataType = DataType.builder(template).build();
+  @Test
+  public void templateSimple() {
+    final DataType template = DataType.builder().type(String.class).mediaType("text/plain;charset=ASCII").build();
+    final DataType dataType = DataType.builder(template).build();
 
-        assertThat(dataType, instanceOf(SimpleDataType.class));
-        assertThat(dataType.getType(), is(equalTo(String.class)));
-        assertThat(dataType.getMediaType().getPrimaryType(), is("text"));
-        assertThat(dataType.getMediaType().getSubType(), is("plain"));
-        assertThat(dataType.getMediaType().getCharset().get(), is(US_ASCII));
-    }
+    assertThat(dataType, instanceOf(SimpleDataType.class));
+    assertThat(dataType.getType(), is(equalTo(String.class)));
+    assertThat(dataType.getMediaType().getPrimaryType(), is("text"));
+    assertThat(dataType.getMediaType().getSubType(), is("plain"));
+    assertThat(dataType.getMediaType().getCharset().get(), is(US_ASCII));
+  }
 
-    @Test
-    public void templateCollection()
-    {
-        final DataType template = DataType.builder().type(Set.class).mediaType("text/plain;charset=ASCII").build();
-        final DataType dataType = DataType.builder(template).build();
+  @Test
+  public void templateCollection() {
+    final DataType template = DataType.builder().type(Set.class).mediaType("text/plain;charset=ASCII").build();
+    final DataType dataType = DataType.builder(template).build();
 
-        assertThat(dataType, instanceOf(DefaultCollectionDataType.class));
-        assertThat(dataType.getType(), is(equalTo(Set.class)));
-        assertThat(((DefaultCollectionDataType) dataType).getItemDataType(), is(DataType.OBJECT));
-        assertThat(dataType.getMediaType().getPrimaryType(), is("text"));
-        assertThat(dataType.getMediaType().getSubType(), is("plain"));
-        assertThat(dataType.getMediaType().getCharset().get(), is(US_ASCII));
-    }
+    assertThat(dataType, instanceOf(DefaultCollectionDataType.class));
+    assertThat(dataType.getType(), is(equalTo(Set.class)));
+    assertThat(((DefaultCollectionDataType) dataType).getItemDataType(), is(DataType.OBJECT));
+    assertThat(dataType.getMediaType().getPrimaryType(), is("text"));
+    assertThat(dataType.getMediaType().getSubType(), is("plain"));
+    assertThat(dataType.getMediaType().getCharset().get(), is(US_ASCII));
+  }
 
-    @Test
-    public void templateTypedCollection()
-    {
-        final DataType template = DataType.builder()
-                                               .collectionType(List.class)
-                                               .itemType(String.class)
-                                               .mediaType("text/plain;charset=ASCII")
-                                               .build();
-        final DataType dataType = DataType.builder(template).build();
+  @Test
+  public void templateTypedCollection() {
+    final DataType template =
+        DataType.builder().collectionType(List.class).itemType(String.class).mediaType("text/plain;charset=ASCII").build();
+    final DataType dataType = DataType.builder(template).build();
 
-        assertThat(dataType, instanceOf(DefaultCollectionDataType.class));
-        assertThat(dataType.getType(), is(equalTo(List.class)));
-        assertThat(((DefaultCollectionDataType) dataType).getItemDataType(), is(DataType.STRING));
-    }
+    assertThat(dataType, instanceOf(DefaultCollectionDataType.class));
+    assertThat(dataType.getType(), is(equalTo(List.class)));
+    assertThat(((DefaultCollectionDataType) dataType).getItemDataType(), is(DataType.STRING));
+  }
 
-    @Test
-    public void proxy()
-    {
-        final Class<?> muleMessageProxy = Proxy.getProxyClass(DataTypeBuilderTestCase.class.getClassLoader(), MuleMessage.class);
+  @Test
+  public void proxy() {
+    final Class<?> muleMessageProxy = Proxy.getProxyClass(DataTypeBuilderTestCase.class.getClassLoader(), MuleMessage.class);
 
-        final DataType dataType = DataType.fromType(muleMessageProxy);
+    final DataType dataType = DataType.fromType(muleMessageProxy);
 
-        assertThat(dataType.getType(), is(equalTo(MuleMessage.class)));
-    }
+    assertThat(dataType.getType(), is(equalTo(MuleMessage.class)));
+  }
 
-    @Test
-    public void mimeTypeWithEncoding()
-    {
-        final DataType dataType = DataType.builder().mediaType("text/plain;charset=ASCII").build();
+  @Test
+  public void mimeTypeWithEncoding() {
+    final DataType dataType = DataType.builder().mediaType("text/plain;charset=ASCII").build();
 
-        assertThat(dataType.getMediaType().getPrimaryType(), is("text"));
-        assertThat(dataType.getMediaType().getSubType(), is("plain"));
-        assertThat(dataType.getMediaType().getCharset().get(), is(US_ASCII));
-    }
+    assertThat(dataType.getMediaType().getPrimaryType(), is("text"));
+    assertThat(dataType.getMediaType().getSubType(), is("plain"));
+    assertThat(dataType.getMediaType().getCharset().get(), is(US_ASCII));
+  }
 
-    @Test
-    public void invalidMimeType()
-    {
-        expected.expect(IllegalArgumentException.class);
-        final DataType dataType = DataType.builder().mediaType("imInvalid").build();
-    }
+  @Test
+  public void invalidMimeType() {
+    expected.expect(IllegalArgumentException.class);
+    final DataType dataType = DataType.builder().mediaType("imInvalid").build();
+  }
 
-    @Test
-    public void invalidEncoding()
-    {
-        expected.expect(IllegalArgumentException.class);
-        final DataType dataType = DataType.builder().charset("imInvalid").build();
-    }
+  @Test
+  public void invalidEncoding() {
+    expected.expect(IllegalArgumentException.class);
+    final DataType dataType = DataType.builder().charset("imInvalid").build();
+  }
 
-    @Test
-    public void recycleBuilder()
-    {
-        final DataTypeParamsBuilder builder = DataType.builder().type(String.class);
-        builder.build();
+  @Test
+  public void recycleBuilder() {
+    final DataTypeParamsBuilder builder = DataType.builder().type(String.class);
+    builder.build();
 
-        expected.expect(IllegalStateException.class);
-        builder.build();
-    }
+    expected.expect(IllegalStateException.class);
+    builder.build();
+  }
 
-    @Test
-    public void cachedInstances()
-    {
-        final DataTypeParamsBuilder builder1 = DataType.builder().type(String.class);
-        final DataTypeParamsBuilder builder2 = DataType.builder().type(String.class);
+  @Test
+  public void cachedInstances() {
+    final DataTypeParamsBuilder builder1 = DataType.builder().type(String.class);
+    final DataTypeParamsBuilder builder2 = DataType.builder().type(String.class);
 
-        assertThat(builder1, equalTo(builder2));
-        assertThat(builder1.build(), sameInstance(builder2.build()));
-    }
+    assertThat(builder1, equalTo(builder2));
+    assertThat(builder1.build(), sameInstance(builder2.build()));
+  }
 }

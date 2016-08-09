@@ -20,80 +20,71 @@ import org.mule.tck.testmodels.fruit.Orange;
 
 import org.junit.Test;
 
-public class DefaultJavaComponentTestCase extends AbstractComponentTestCase
-{
+public class DefaultJavaComponentTestCase extends AbstractComponentTestCase {
 
-    protected ObjectFactory createObjectFactory() throws InitialisationException
-    {
-        PrototypeObjectFactory objectFactory = new PrototypeObjectFactory(Orange.class);
-        objectFactory.initialise();
-        return objectFactory;
-    }
+  protected ObjectFactory createObjectFactory() throws InitialisationException {
+    PrototypeObjectFactory objectFactory = new PrototypeObjectFactory(Orange.class);
+    objectFactory.initialise();
+    return objectFactory;
+  }
 
-    @Test
-    public void testComponentCreation() throws Exception
-    {
-        ObjectFactory objectFactory = createObjectFactory();
-        DefaultJavaComponent component = new DefaultJavaComponent(objectFactory);
+  @Test
+  public void testComponentCreation() throws Exception {
+    ObjectFactory objectFactory = createObjectFactory();
+    DefaultJavaComponent component = new DefaultJavaComponent(objectFactory);
 
-        assertNotNull(component.getObjectFactory());
-        assertEquals(objectFactory, component.getObjectFactory());
-        assertEquals(Orange.class, component.getObjectFactory().getObjectClass());
-        assertEquals(Orange.class, component.getObjectType());
-    }
+    assertNotNull(component.getObjectFactory());
+    assertEquals(objectFactory, component.getObjectFactory());
+    assertEquals(Orange.class, component.getObjectFactory().getObjectClass());
+    assertEquals(Orange.class, component.getObjectType());
+  }
 
-    @Test
-    public void testLifecycle() throws Exception
-    {
-        DefaultJavaComponent component = new DefaultJavaComponent(createObjectFactory());
-        component.setFlowConstruct(getTestFlow());
-        component.setMuleContext(muleContext);
-        component.initialise();
-        component.start();
+  @Test
+  public void testLifecycle() throws Exception {
+    DefaultJavaComponent component = new DefaultJavaComponent(createObjectFactory());
+    component.setFlowConstruct(getTestFlow());
+    component.setMuleContext(muleContext);
+    component.initialise();
+    component.start();
 
-        assertNotSame(component.borrowComponentLifecycleAdaptor(),
-                      component.borrowComponentLifecycleAdaptor());
+    assertNotSame(component.borrowComponentLifecycleAdaptor(), component.borrowComponentLifecycleAdaptor());
 
-        Object obj = component.getObjectFactory().getInstance(muleContext);
-        assertNotNull(obj);
+    Object obj = component.getObjectFactory().getInstance(muleContext);
+    assertNotNull(obj);
 
-        component.stop();
-        component.start();
+    component.stop();
+    component.start();
 
-        assertNotSame(
-                ((DefaultComponentLifecycleAdapter) component.borrowComponentLifecycleAdaptor()).componentObject,
-                ((DefaultComponentLifecycleAdapter) component.borrowComponentLifecycleAdaptor()).componentObject);
+    assertNotSame(((DefaultComponentLifecycleAdapter) component.borrowComponentLifecycleAdaptor()).componentObject,
+                  ((DefaultComponentLifecycleAdapter) component.borrowComponentLifecycleAdaptor()).componentObject);
 
-    }
+  }
 
-    @Test
-    public void testComponentDisposal() throws Exception
-    {
-        DefaultJavaComponent component = new DefaultJavaComponent(
-                createObjectFactory());
+  @Test
+  public void testComponentDisposal() throws Exception {
+    DefaultJavaComponent component = new DefaultJavaComponent(createObjectFactory());
 
-        component.setFlowConstruct(getTestFlow());
-        component.setMuleContext(muleContext);
-        component.initialise();
-        component.start();
+    component.setFlowConstruct(getTestFlow());
+    component.setMuleContext(muleContext);
+    component.initialise();
+    component.start();
 
-        DefaultComponentLifecycleAdapter lifecycleAdapter = (DefaultComponentLifecycleAdapter)
-                component.borrowComponentLifecycleAdaptor();
-        component.returnComponentLifecycleAdaptor(lifecycleAdapter);
-        component.stop();
-        component.dispose();
+    DefaultComponentLifecycleAdapter lifecycleAdapter =
+        (DefaultComponentLifecycleAdapter) component.borrowComponentLifecycleAdaptor();
+    component.returnComponentLifecycleAdaptor(lifecycleAdapter);
+    component.stop();
+    component.dispose();
 
-        assertNull(lifecycleAdapter.componentObject);
-    }
+    assertNull(lifecycleAdapter.componentObject);
+  }
 
-    @Test
-    public void testServicePropagatedLifecycle() throws Exception
-    {
+  @Test
+  public void testServicePropagatedLifecycle() throws Exception {
 
-        LifecycleTrackerComponent component = new LifecycleTrackerComponent();
-        Flow flow = getTestFlow(component);
-        flow.initialise();
-        assertTrue(component.getTracker().contains("initialise"));
-    }
+    LifecycleTrackerComponent component = new LifecycleTrackerComponent();
+    Flow flow = getTestFlow(component);
+    flow.initialise();
+    assertTrue(component.getTracker().contains("initialise"));
+  }
 
 }

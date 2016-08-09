@@ -16,34 +16,33 @@ import org.mule.runtime.core.api.client.MuleClient;
 
 import org.junit.Test;
 
-public class ReplyToChainIntegration1TestCase extends FunctionalTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/integration/routing/replyto/replyto-chain-integration-test-1.xml";
-    }
+public class ReplyToChainIntegration1TestCase extends FunctionalTestCase {
 
-    @Test
-    public void testReplyToChain() throws Exception
-    {
-        String message = "test";
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/integration/routing/replyto/replyto-chain-integration-test-1.xml";
+  }
 
-        MuleClient client = muleContext.getClient();
-        MuleMessage result = client.send("vm://pojo1", MuleMessage.builder().payload(message).addOutboundProperty(MULE_REMOTE_SYNC_PROPERTY, "false").build());
-        assertNotNull(result);
-        assertEquals("Received: " + message, getPayloadAsString(result));
-    }
+  @Test
+  public void testReplyToChain() throws Exception {
+    String message = "test";
 
-    @Test
-    public void testReplyToChainWithoutProps() throws Exception
-    {
-        String message = "test";
+    MuleClient client = muleContext.getClient();
+    MuleMessage result =
+        client.send("vm://pojo1",
+                    MuleMessage.builder().payload(message).addOutboundProperty(MULE_REMOTE_SYNC_PROPERTY, "false").build());
+    assertNotNull(result);
+    assertEquals("Received: " + message, getPayloadAsString(result));
+  }
 
-        MuleClient client = muleContext.getClient();
-        MuleMessage result = client.send("vm://pojo1", MuleMessage.builder().payload(message).build());
-        assertNotNull(result);
-        assertEquals("Received: " + message, getPayloadAsString(result));
-    }
+  @Test
+  public void testReplyToChainWithoutProps() throws Exception {
+    String message = "test";
+
+    MuleClient client = muleContext.getClient();
+    MuleMessage result = client.send("vm://pojo1", MuleMessage.builder().payload(message).build());
+    assertNotNull(result);
+    assertEquals("Received: " + message, getPayloadAsString(result));
+  }
 
 }

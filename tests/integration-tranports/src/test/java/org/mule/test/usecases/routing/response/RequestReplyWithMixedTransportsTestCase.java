@@ -12,16 +12,14 @@ import org.junit.Ignore;
 import org.junit.Rule;
 
 @Ignore("See MULE-9198")
-public class RequestReplyWithMixedTransportsTestCase extends RequestReplyInFlowTestCase
-{
+public class RequestReplyWithMixedTransportsTestCase extends RequestReplyInFlowTestCase {
 
-    @Rule
-    public DynamicPort port = new DynamicPort("http.port");
+  @Rule
+  public DynamicPort port = new DynamicPort("http.port");
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/usecases/routing/response/request-reply-with-mixed-transports-flow.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/usecases/routing/response/request-reply-with-mixed-transports-flow.xml";
+  }
 
 }

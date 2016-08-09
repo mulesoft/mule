@@ -17,68 +17,55 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang.StringUtils;
 
 /**
- * A {@link Predicate} which tests random paths in {@link String}
- * representation to match a specific pattern.
+ * A {@link Predicate} which tests random paths in {@link String} representation to match a specific pattern.
  * <p>
- * The pattern can be either a regex or glob expression. The pattern
- * can qualify itself by using thee &quot;glob:&quot; or &quot;regex:&quot;
- * prefixes. If no prefix is supplied, glob is assumed by default.
+ * The pattern can be either a regex or glob expression. The pattern can qualify itself by using thee &quot;glob:&quot; or
+ * &quot;regex:&quot; prefixes. If no prefix is supplied, glob is assumed by default.
  *
  * @since 4.0
  */
-public final class PathMatcherPredicate implements Predicate<String>
-{
+public final class PathMatcherPredicate implements Predicate<String> {
 
-    private static final String GLOB_PREFIX = "glob:";
-    private static final String REGEX_PREFIX = "regex:";
+  private static final String GLOB_PREFIX = "glob:";
+  private static final String REGEX_PREFIX = "regex:";
 
-    private final Predicate<String> delegate;
+  private final Predicate<String> delegate;
 
-    /**
-     * Creates a new instance using the given pattern
-     *
-     * @param pattern the pattern to be used to test paths.
-     */
-    public PathMatcherPredicate(String pattern)
-    {
-        delegate = getPredicateForFilename(pattern);
+  /**
+   * Creates a new instance using the given pattern
+   *
+   * @param pattern the pattern to be used to test paths.
+   */
+  public PathMatcherPredicate(String pattern) {
+    delegate = getPredicateForFilename(pattern);
+  }
+
+  /**
+   * @param path the path to test
+   * @return whether the given {@code path} matches {@code this} instance pattern
+   */
+  @Override
+  public boolean test(String path) {
+    checkArgument(!StringUtils.isBlank(path), "Cannot match a blank filename");
+    return delegate.test(path);
+  }
+
+  private Predicate<String> getPredicateForFilename(String pattern) {
+    if (pattern.startsWith(REGEX_PREFIX)) {
+      return Pattern.compile(stripRegexPrefix(pattern)).asPredicate();
+    } else if (pattern.startsWith(GLOB_PREFIX)) {
+      return getGlobPredicate(pattern);
+    } else {
+      return getGlobPredicate(GLOB_PREFIX + pattern);
     }
+  }
 
-    /**
-     * @param path the path to test
-     * @return whether the given {@code path} matches {@code this} instance pattern
-     */
-    @Override
-    public boolean test(String path)
-    {
-        checkArgument(!StringUtils.isBlank(path), "Cannot match a blank filename");
-        return delegate.test(path);
-    }
+  private Predicate<String> getGlobPredicate(String pattern) {
+    PathMatcher matcher = FileSystems.getDefault().getPathMatcher(pattern);
+    return path -> matcher.matches(Paths.get(path));
+  }
 
-    private Predicate<String> getPredicateForFilename(String pattern)
-    {
-        if (pattern.startsWith(REGEX_PREFIX))
-        {
-            return Pattern.compile(stripRegexPrefix(pattern)).asPredicate();
-        }
-        else if (pattern.startsWith(GLOB_PREFIX))
-        {
-            return getGlobPredicate(pattern);
-        }
-        else
-        {
-            return getGlobPredicate(GLOB_PREFIX + pattern);
-        }
-    }
-
-    private Predicate<String> getGlobPredicate(String pattern)
-    {
-        PathMatcher matcher = FileSystems.getDefault().getPathMatcher(pattern);
-        return path -> matcher.matches(Paths.get(path));
-    }
-
-    private String stripRegexPrefix(String pattern)
-    {
-        return pattern.replaceAll(REGEX_PREFIX, "");
-    }
+  private String stripRegexPrefix(String pattern) {
+    return pattern.replaceAll(REGEX_PREFIX, "");
+  }
 }

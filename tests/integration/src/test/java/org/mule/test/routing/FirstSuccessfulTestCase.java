@@ -18,58 +18,50 @@ import org.mule.runtime.core.api.routing.CouldNotRouteOutboundMessageException;
 
 import org.junit.Test;
 
-public class FirstSuccessfulTestCase extends AbstractIntegrationTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "first-successful-test.xml";
+public class FirstSuccessfulTestCase extends AbstractIntegrationTestCase {
+
+  @Override
+  protected String getConfigFile() {
+    return "first-successful-test.xml";
+  }
+
+  @Test
+  public void testFirstSuccessful() throws Exception {
+    MuleMessage response = flowRunner("test-router").withPayload("XYZ").run().getMessage();
+    assertThat(getPayloadAsString(response), is("XYZ is a string"));
+
+    response = flowRunner("test-router").withPayload(Integer.valueOf(9)).run().getMessage();
+    assertThat(getPayloadAsString(response), is("9 is an integer"));
+
+    response = flowRunner("test-router").withPayload(Long.valueOf(42)).run().getMessage();
+    assertThat(getPayloadAsString(response), is("42 is a number"));
+
+    try {
+      response = flowRunner("test-router").withPayload(Boolean.TRUE).run().getMessage();
+    } catch (MessagingException e) {
+      assertThat(e, instanceOf(CouldNotRouteOutboundMessageException.class));
     }
+  }
 
-    @Test
-    public void testFirstSuccessful() throws Exception
-    {
-        MuleMessage response = flowRunner("test-router").withPayload("XYZ").run().getMessage();
-        assertThat(getPayloadAsString(response), is("XYZ is a string"));
+  @Test
+  public void testFirstSuccessfulWithExpression() throws Exception {
+    MuleMessage response = flowRunner("test-router2").withPayload("XYZ").run().getMessage();
+    assertThat(getPayloadAsString(response), is("XYZ is a string"));
+  }
 
-        response = flowRunner("test-router").withPayload(Integer.valueOf(9)).run().getMessage();
-        assertThat(getPayloadAsString(response), is("9 is an integer"));
+  @Test
+  public void testFirstSuccessfulWithExpressionAllFail() throws Exception {
+    MessagingException e = flowRunner("test-router3").withPayload("XYZ").runExpectingException();
+    assertThat(e, instanceOf(CouldNotRouteOutboundMessageException.class));
+  }
 
-        response = flowRunner("test-router").withPayload(Long.valueOf(42)).run().getMessage();
-        assertThat(getPayloadAsString(response), is("42 is a number"));
+  @Test
+  public void testFirstSuccessfulWithOneWayEndpoints() throws Exception {
+    flowRunner("test-router4").withPayload(TEST_MESSAGE).asynchronously().run();
 
-        try
-        {
-        response = flowRunner("test-router").withPayload(Boolean.TRUE).run().getMessage();
-        }
-        catch (MessagingException e)
-        {
-            assertThat(e, instanceOf(CouldNotRouteOutboundMessageException.class));
-        }
-    }
-
-    @Test
-    public void testFirstSuccessfulWithExpression() throws Exception
-    {
-        MuleMessage response = flowRunner("test-router2").withPayload("XYZ").run().getMessage();
-        assertThat(getPayloadAsString(response), is("XYZ is a string"));
-    }
-
-    @Test
-    public void testFirstSuccessfulWithExpressionAllFail() throws Exception
-    {
-        MessagingException e = flowRunner("test-router3").withPayload("XYZ").runExpectingException();
-        assertThat(e, instanceOf(CouldNotRouteOutboundMessageException.class));
-    }
-
-    @Test
-    public void testFirstSuccessfulWithOneWayEndpoints() throws Exception
-    {
-        flowRunner("test-router4").withPayload(TEST_MESSAGE).asynchronously().run();
-
-        MuleClient client = muleContext.getClient();
-        MuleMessage response = client.request("test://output4.out", RECEIVE_TIMEOUT);
-        assertNotNull(response);
-        assertThat(response.getPayload(), is(TEST_MESSAGE));
-    }
+    MuleClient client = muleContext.getClient();
+    MuleMessage response = client.request("test://output4.out", RECEIVE_TIMEOUT);
+    assertNotNull(response);
+    assertThat(response.getPayload(), is(TEST_MESSAGE));
+  }
 }

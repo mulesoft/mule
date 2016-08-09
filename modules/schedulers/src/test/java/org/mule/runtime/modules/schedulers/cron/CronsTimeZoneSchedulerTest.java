@@ -21,43 +21,38 @@ import org.junit.Test;
 
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 
-public class CronsTimeZoneSchedulerTest extends FunctionalTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "cron-timezone-scheduler-config.xml";
-    }
+public class CronsTimeZoneSchedulerTest extends FunctionalTestCase {
 
-    @Test
-    public void timeZoneInScheduler() throws Exception
-    {
-        Collection<Scheduler> schedulers = muleContext.getRegistry().lookupScheduler(
-                Schedulers.flowConstructPollingSchedulers("pollWithTimeZone"));
-        
-        assertThat(schedulers, hasSize(1));
-        for (Scheduler scheduler : schedulers)
-        {
-            assertThat(scheduler, instanceOf(CronScheduler.class));
-            // Just can assert that the tx in the config gets to the mule scheduler. To instrospect the quatz object to
-            // check its there would be very complex.
-            assertThat(((CronScheduler) scheduler).getTimeZone(), is(getTimeZone("America/Argentina/Buenos_Aires")));
-        }
-    }
+  @Override
+  protected String getConfigFile() {
+    return "cron-timezone-scheduler-config.xml";
+  }
 
-    @Test
-    public void invalidTimeZoneInScheduler() throws Exception
-    {
-        Collection<Scheduler> schedulers = muleContext.getRegistry().lookupScheduler(
-                Schedulers.flowConstructPollingSchedulers("pollWithInvalidTimeZone"));
+  @Test
+  public void timeZoneInScheduler() throws Exception {
+    Collection<Scheduler> schedulers =
+        muleContext.getRegistry().lookupScheduler(Schedulers.flowConstructPollingSchedulers("pollWithTimeZone"));
 
-        assertThat(schedulers, hasSize(1));
-        for (Scheduler scheduler : schedulers)
-        {
-            assertThat(scheduler, instanceOf(CronScheduler.class));
-            // Just can assert that the tx in the config gets to the mule scheduler. To instrospect the quatz object to
-            // check its there would be very complex.
-            assertThat(((CronScheduler) scheduler).getTimeZone(), is(getTimeZone("GMT")));
-        }
+    assertThat(schedulers, hasSize(1));
+    for (Scheduler scheduler : schedulers) {
+      assertThat(scheduler, instanceOf(CronScheduler.class));
+      // Just can assert that the tx in the config gets to the mule scheduler. To instrospect the quatz object to
+      // check its there would be very complex.
+      assertThat(((CronScheduler) scheduler).getTimeZone(), is(getTimeZone("America/Argentina/Buenos_Aires")));
     }
+  }
+
+  @Test
+  public void invalidTimeZoneInScheduler() throws Exception {
+    Collection<Scheduler> schedulers =
+        muleContext.getRegistry().lookupScheduler(Schedulers.flowConstructPollingSchedulers("pollWithInvalidTimeZone"));
+
+    assertThat(schedulers, hasSize(1));
+    for (Scheduler scheduler : schedulers) {
+      assertThat(scheduler, instanceOf(CronScheduler.class));
+      // Just can assert that the tx in the config gets to the mule scheduler. To instrospect the quatz object to
+      // check its there would be very complex.
+      assertThat(((CronScheduler) scheduler).getTimeZone(), is(getTimeZone("GMT")));
+    }
+  }
 }

@@ -32,90 +32,82 @@ import org.mule.runtime.module.extension.internal.util.IdempotentExtensionWalker
 import java.util.Optional;
 
 /**
- * This validator makes sure that all the {@link ParameterizedModel}s which contains any {@link ParameterGroup} using
- * exclusion complies the following condition:
+ * This validator makes sure that all the {@link ParameterizedModel}s which contains any {@link ParameterGroup} using exclusion
+ * complies the following condition:
  * <p>
- * The class of the {@link ParameterGroup} doesn't contain any nested {@link ParameterGroup} or any other parameter of a complex type.
+ * The class of the {@link ParameterGroup} doesn't contain any nested {@link ParameterGroup} or any other parameter of a complex
+ * type.
  *
  * @since 4.0
  */
-public final class ExclusiveParameterModelValidator implements ModelValidator
-{
+public final class ExclusiveParameterModelValidator implements ModelValidator {
 
-    private ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
+  private ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void validate(ExtensionModel model) throws IllegalModelDefinitionException
-    {
-        new IdempotentExtensionWalker()
-        {
-            @Override
-            protected void onOperation(OperationModel model)
-            {
-                validateExclusiveParameterGroups(model);
-            }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void validate(ExtensionModel model) throws IllegalModelDefinitionException {
+    new IdempotentExtensionWalker() {
 
-            @Override
-            public void onConfiguration(ConfigurationModel model)
-            {
-                validateExclusiveParameterGroups(model);
-            }
+      @Override
+      protected void onOperation(OperationModel model) {
+        validateExclusiveParameterGroups(model);
+      }
 
-            @Override
-            protected void onConnectionProvider(ConnectionProviderModel model)
-            {
-                validateExclusiveParameterGroups(model);
-            }
+      @Override
+      public void onConfiguration(ConfigurationModel model) {
+        validateExclusiveParameterGroups(model);
+      }
 
-            @Override
-            protected void onSource(SourceModel model)
-            {
-                validateExclusiveParameterGroups(model);
-            }
-        }.walk(model);
-    }
+      @Override
+      protected void onConnectionProvider(ConnectionProviderModel model) {
+        validateExclusiveParameterGroups(model);
+      }
 
-    /**
-     * @param model     to be validated
-     * @throws IllegalModelDefinitionException if there is a nested {@link ParameterGroup} or
-     *                                         the parameter {@link MetadataType} is not a {@link SimpleType}
-     */
-    private void validateExclusiveParameterGroups(EnrichableModel model) throws IllegalModelDefinitionException
-    {
+      @Override
+      protected void onSource(SourceModel model) {
+        validateExclusiveParameterGroups(model);
+      }
+    }.walk(model);
+  }
 
-        model.getModelProperty(ParameterGroupModelProperty.class).filter(mp -> mp.hasExclusiveOptionals()).ifPresent(property -> {
-            for (ParameterGroup<?> pg : property.getGroups())
-            {
-                Optional<ParameterGroupModelProperty> nestedParameterGroup = pg.getModelProperty(ParameterGroupModelProperty.class);
-                if (nestedParameterGroup.isPresent())
-                {
-                    throw new IllegalModelDefinitionException(format("Parameter group of class '%s' is annotated with '%s' so it cannot contain any nested parameter group on its inside.",
-                                                                     pg.getType().getName(), ExclusiveOptionals.class.getName()));
-                }
+  /**
+   * @param model to be validated
+   * @throws IllegalModelDefinitionException if there is a nested {@link ParameterGroup} or the parameter {@link MetadataType} is
+   *         not a {@link SimpleType}
+   */
+  private void validateExclusiveParameterGroups(EnrichableModel model) throws IllegalModelDefinitionException {
 
-                long optionalParametersCount = pg.getOptionalParameters().stream().count();
-                if (optionalParametersCount <= 1)
-                {
-                    throw new IllegalParameterModelDefinitionException(format("In %s '%s', parameter group '%s' should contain more than one field marked as optional inside but %d was/were found", getComponentModelTypeName(model), getModelName(model), pg.getType().getName(), optionalParametersCount));
-                }
+    model.getModelProperty(ParameterGroupModelProperty.class).filter(mp -> mp.hasExclusiveOptionals()).ifPresent(property -> {
+      for (ParameterGroup<?> pg : property.getGroups()) {
+        Optional<ParameterGroupModelProperty> nestedParameterGroup = pg.getModelProperty(ParameterGroupModelProperty.class);
+        if (nestedParameterGroup.isPresent()) {
+          throw new IllegalModelDefinitionException(format("Parameter group of class '%s' is annotated with '%s' so it cannot contain any nested parameter group on its inside.",
+                                                           pg.getType().getName(), ExclusiveOptionals.class.getName()));
+        }
 
-                pg.getOptionalParameters().forEach(f -> getFieldMetadataType(f, typeLoader).accept(new MetadataTypeVisitor()
-                {
-                    @Override
-                    protected void defaultVisit(MetadataType metadataType)
-                    {
-                        throw new IllegalModelDefinitionException(format("In %s '%s', parameter group '%s' uses exclusion and cannot contain any complex field inside but '%s' was found", getComponentModelTypeName(model), getModelName(model), pg.getType().getName(), f.getType().getName()));
-                    }
+        long optionalParametersCount = pg.getOptionalParameters().stream().count();
+        if (optionalParametersCount <= 1) {
+          throw new IllegalParameterModelDefinitionException(format("In %s '%s', parameter group '%s' should contain more than one field marked as optional inside but %d was/were found",
+                                                                    getComponentModelTypeName(model), getModelName(model),
+                                                                    pg.getType().getName(), optionalParametersCount));
+        }
 
-                    @Override
-                    public void visitSimpleType(SimpleType simpleType)
-                    {
-                    }
-                }));
-            }
-        });
-    }
+        pg.getOptionalParameters().forEach(f -> getFieldMetadataType(f, typeLoader).accept(new MetadataTypeVisitor() {
+
+          @Override
+          protected void defaultVisit(MetadataType metadataType) {
+            throw new IllegalModelDefinitionException(format("In %s '%s', parameter group '%s' uses exclusion and cannot contain any complex field inside but '%s' was found",
+                                                             getComponentModelTypeName(model), getModelName(model),
+                                                             pg.getType().getName(), f.getType().getName()));
+          }
+
+          @Override
+          public void visitSimpleType(SimpleType simpleType) {}
+        }));
+      }
+    });
+  }
 }

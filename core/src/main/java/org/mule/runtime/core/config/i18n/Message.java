@@ -8,54 +8,47 @@ package org.mule.runtime.core.config.i18n;
 
 import java.io.Serializable;
 
-public class Message implements Serializable
-{
-    /**
-     * Serial version
-     */
-    private static final long serialVersionUID = -6109760447384477924L;
+public class Message implements Serializable {
 
-    private String message;
-    private int code = 0;
-    private Object[] args;
-    private Message nextMessage;
+  /**
+   * Serial version
+   */
+  private static final long serialVersionUID = -6109760447384477924L;
 
-    protected Message(String message, int code, Object... args)
-    {
-        super();
-        this.message = message;
-        this.code = code;
-        this.args = args;
-    }
+  private String message;
+  private int code = 0;
+  private Object[] args;
+  private Message nextMessage;
 
-    public int getCode()
-    {
-        return code;
-    }
+  protected Message(String message, int code, Object... args) {
+    super();
+    this.message = message;
+    this.code = code;
+    this.args = args;
+  }
 
-    public Object[] getArgs()
-    {
-        return args;
-    }
+  public int getCode() {
+    return code;
+  }
 
-    public String getMessage()
-    {
-        return message + (nextMessage != null ? ". " + nextMessage.getMessage() : "");
-    }
+  public Object[] getArgs() {
+    return args;
+  }
 
-    public Message setNextMessage(Message nextMessage)
-    {
-        this.nextMessage = nextMessage;
-        return this;
-    }
+  public String getMessage() {
+    return message + (nextMessage != null ? ". " + nextMessage.getMessage() : "");
+  }
 
-    public Message getNextMessage()
-    {
-        return nextMessage;
-    }
+  public Message setNextMessage(Message nextMessage) {
+    this.nextMessage = nextMessage;
+    return this;
+  }
 
-    public String toString()
-    {
-        return this.getMessage();
-    }
+  public Message getNextMessage() {
+    return nextMessage;
+  }
+
+  public String toString() {
+    return this.getMessage();
+  }
 }

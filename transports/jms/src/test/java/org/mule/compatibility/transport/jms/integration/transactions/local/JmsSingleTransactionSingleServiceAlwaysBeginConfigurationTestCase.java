@@ -9,14 +9,13 @@ package org.mule.compatibility.transport.jms.integration.transactions.local;
 import org.mule.compatibility.transport.jms.integration.AbstractJmsSingleTransactionSingleServiceTestCase;
 
 /**
- * Test all combinations of (inbound) ALWAYS_BEGIN.  They should all pass.
+ * Test all combinations of (inbound) ALWAYS_BEGIN. They should all pass.
  */
-public class JmsSingleTransactionSingleServiceAlwaysBeginConfigurationTestCase extends
-    AbstractJmsSingleTransactionSingleServiceTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "integration/transactions/local/jms-single-tx-single-service-always-begin.xml";
-    }
+public class JmsSingleTransactionSingleServiceAlwaysBeginConfigurationTestCase
+    extends AbstractJmsSingleTransactionSingleServiceTestCase {
+
+  @Override
+  protected String getConfigFile() {
+    return "integration/transactions/local/jms-single-tx-single-service-always-begin.xml";
+  }
 }

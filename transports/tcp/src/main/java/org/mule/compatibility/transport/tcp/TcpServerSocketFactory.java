@@ -19,49 +19,42 @@ import java.net.URI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class TcpServerSocketFactory implements SimpleServerSocketFactory
-{
-    protected final Logger logger = LoggerFactory.getLogger(getClass());
+public class TcpServerSocketFactory implements SimpleServerSocketFactory {
 
-    @Override
-    public ServerSocket createServerSocket(URI uri, int backlog, Boolean reuse) throws IOException
-    {
-        String host = StringUtils.defaultIfEmpty(uri.getHost(), "localhost");
-        InetAddress inetAddress = InetAddress.getByName(host);
+  protected final Logger logger = LoggerFactory.getLogger(getClass());
 
-        if ((inetAddress.equals(NetworkUtils.getLocalHost()) || host.trim().equals("localhost")) && TcpPropertyHelper.isBindingLocalhostToAllLocalInterfaces())
-        {
-            logger.warn(TcpMessages.localhostBoundToAllLocalInterfaces().toString());
-            return createServerSocket(uri.getPort(), backlog, reuse);
-        }
-        else
-        {
-            return createServerSocket(inetAddress, uri.getPort(), backlog, reuse);
-        }
+  @Override
+  public ServerSocket createServerSocket(URI uri, int backlog, Boolean reuse) throws IOException {
+    String host = StringUtils.defaultIfEmpty(uri.getHost(), "localhost");
+    InetAddress inetAddress = InetAddress.getByName(host);
+
+    if ((inetAddress.equals(NetworkUtils.getLocalHost()) || host.trim().equals("localhost"))
+        && TcpPropertyHelper.isBindingLocalhostToAllLocalInterfaces()) {
+      logger.warn(TcpMessages.localhostBoundToAllLocalInterfaces().toString());
+      return createServerSocket(uri.getPort(), backlog, reuse);
+    } else {
+      return createServerSocket(inetAddress, uri.getPort(), backlog, reuse);
     }
+  }
 
-    @Override
-    public ServerSocket createServerSocket(InetAddress address, int port, int backlog, Boolean reuse) throws IOException
-    {
-        return configure(new ServerSocket(), reuse, new InetSocketAddress(address, port), backlog);
-    }
+  @Override
+  public ServerSocket createServerSocket(InetAddress address, int port, int backlog, Boolean reuse) throws IOException {
+    return configure(new ServerSocket(), reuse, new InetSocketAddress(address, port), backlog);
+  }
 
-    @Override
-    public ServerSocket createServerSocket(int port, int backlog, Boolean reuse) throws IOException
-    {
-        return configure(new ServerSocket(), reuse, new InetSocketAddress(port), backlog);
-    }
+  @Override
+  public ServerSocket createServerSocket(int port, int backlog, Boolean reuse) throws IOException {
+    return configure(new ServerSocket(), reuse, new InetSocketAddress(port), backlog);
+  }
 
-    protected ServerSocket configure(ServerSocket socket, Boolean reuse, InetSocketAddress address, int backlog)
-            throws IOException
-    {
-        if (null != reuse && reuse.booleanValue() != socket.getReuseAddress())
-        {
-            socket.setReuseAddress(reuse.booleanValue());
-        }
-        // bind *after* setting so_reuseaddress
-        socket.bind(address, backlog);
-        return socket;
+  protected ServerSocket configure(ServerSocket socket, Boolean reuse, InetSocketAddress address, int backlog)
+      throws IOException {
+    if (null != reuse && reuse.booleanValue() != socket.getReuseAddress()) {
+      socket.setReuseAddress(reuse.booleanValue());
     }
+    // bind *after* setting so_reuseaddress
+    socket.bind(address, backlog);
+    return socket;
+  }
 
 }

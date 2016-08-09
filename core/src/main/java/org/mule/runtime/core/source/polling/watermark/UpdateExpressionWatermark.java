@@ -23,83 +23,61 @@ import java.io.Serializable;
 import org.apache.commons.lang.StringUtils;
 
 /**
- * Implementation of {@link Watermark} in which the value is updated through a MEL
- * expression
+ * Implementation of {@link Watermark} in which the value is updated through a MEL expression
  */
-public class UpdateExpressionWatermark extends Watermark implements Initialisable, MuleContextAware
-{
+public class UpdateExpressionWatermark extends Watermark implements Initialisable, MuleContextAware {
 
-    /**
-     * The update expression to update the watermark value in the object store. It is
-     * optional so it can be null.
-     */
-    private final String updateExpression;
-    private final MessageProcessorPollingInterceptor interceptor;
+  /**
+   * The update expression to update the watermark value in the object store. It is optional so it can be null.
+   */
+  private final String updateExpression;
+  private final MessageProcessorPollingInterceptor interceptor;
 
-    private MuleContext muleContext;
+  private MuleContext muleContext;
 
-    public UpdateExpressionWatermark(ObjectStore<Serializable> objectStore,
-                                     String variable,
-                                     String defaultExpression,
-                                     String updateExpression)
-    {
-        super(objectStore, variable, defaultExpression);
-        this.updateExpression = updateExpression;
-        this.interceptor = new WatermarkPollingInterceptor(this);
+  public UpdateExpressionWatermark(ObjectStore<Serializable> objectStore, String variable, String defaultExpression,
+                                   String updateExpression) {
+    super(objectStore, variable, defaultExpression);
+    this.updateExpression = updateExpression;
+    this.interceptor = new WatermarkPollingInterceptor(this);
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    if (!StringUtils.isEmpty(this.updateExpression)) {
+      try {
+        this.muleContext.getExpressionManager().validateExpression(this.updateExpression);
+      } catch (InvalidExpressionException e) {
+        throw new InitialisationException(MessageFactory.createStaticMessage(String
+            .format("update-expression requires a valid MEL expression. '%s' was found instead", this.updateExpression)), e,
+                                          this);
+      }
     }
+  }
 
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        if (!StringUtils.isEmpty(this.updateExpression))
-        {
-            try
-            {
-                this.muleContext.getExpressionManager().validateExpression(this.updateExpression);
-            }
-            catch (InvalidExpressionException e)
-            {
-                throw new InitialisationException(
-                        MessageFactory.createStaticMessage(
-                                String.format("update-expression requires a valid MEL expression. '%s' was found instead", this.updateExpression))
-                        , e, this);
-            }
-        }
+  /**
+   * Returns the new watermark value by evaluating {@link #updateExpression} on the flowVar of the given name
+   * 
+   * @param event the @{link {@link MuleEvent} in which the watermark is being evaluated
+   * @return a {@link Serializable} value
+   */
+  @Override
+  protected Object getUpdatedValue(MuleEvent event) {
+    try {
+      return StringUtils.isEmpty(this.updateExpression) ? event.getFlowVariable(this.resolveVariable(event))
+          : WatermarkUtils.evaluate(this.updateExpression, event);
+    } catch (NotSerializableException e) {
+      throw new IllegalArgumentException(e);
     }
+  }
 
-    /**
-     * Returns the new watermark value by evaluating {@link #updateExpression} on the
-     * flowVar of the given name
-     * 
-     * @param event the @{link {@link MuleEvent} in which the watermark is being
-     *            evaluated
-     * @return a {@link Serializable} value
-     */
-    @Override
-    protected Object getUpdatedValue(MuleEvent event)
-    {
-        try
-        {
-            return StringUtils.isEmpty(this.updateExpression)
-                   ? event.getFlowVariable(this.resolveVariable(event))
-                   : WatermarkUtils.evaluate(this.updateExpression,
-                                             event);
-        }
-        catch (NotSerializableException e)
-        {
-            throw new IllegalArgumentException(e);
-        }
-    }
+  @Override
+  public MessageProcessorPollingInterceptor interceptor() {
+    return this.interceptor;
+  }
 
-    @Override
-    public MessageProcessorPollingInterceptor interceptor()
-    {
-        return this.interceptor;
-    }
-
-    @Override
-    public void setMuleContext(MuleContext muleContext)
-    {
-        this.muleContext = muleContext;
-    }
+  @Override
+  public void setMuleContext(MuleContext muleContext) {
+    this.muleContext = muleContext;
+  }
 }

@@ -25,31 +25,22 @@ import org.mule.runtime.extension.api.annotation.param.display.Placement;
  */
 @Alias("smtp")
 @DisplayName("SMTP Connection")
-public class SMTPProvider extends AbstractSenderProvider
-{
+public class SMTPProvider extends AbstractSenderProvider {
 
-    /**
-     * The port number of the mail server. '25' by default.
-     */
-    @Parameter
-    @Optional(defaultValue = SMTP_PORT)
-    @Placement(group = CONNECTION, order = 2)
-    private String port;
+  /**
+   * The port number of the mail server. '25' by default.
+   */
+  @Parameter
+  @Optional(defaultValue = SMTP_PORT)
+  @Placement(group = CONNECTION, order = 2)
+  private String port;
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public SenderConnection connect() throws ConnectionException
-    {
-        return new SenderConnection(SMTP,
-                                    settings.getUser(),
-                                    settings.getPassword(),
-                                    settings.getHost(),
-                                    port,
-                                    getConnectionTimeout(),
-                                    getReadTimeout(),
-                                    getWriteTimeout(),
-                                    getProperties());
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public SenderConnection connect() throws ConnectionException {
+    return new SenderConnection(SMTP, settings.getUser(), settings.getPassword(), settings.getHost(), port,
+                                getConnectionTimeout(), getReadTimeout(), getWriteTimeout(), getProperties());
+  }
 }

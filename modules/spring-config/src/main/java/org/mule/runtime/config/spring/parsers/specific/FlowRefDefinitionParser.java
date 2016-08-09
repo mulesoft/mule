@@ -14,29 +14,24 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
-public class FlowRefDefinitionParser extends ChildDefinitionParser
-{
+public class FlowRefDefinitionParser extends ChildDefinitionParser {
 
-    public FlowRefDefinitionParser()
-    {
-        super("messageProcessor", FlowRefFactoryBean.class);
-    }
+  public FlowRefDefinitionParser() {
+    super("messageProcessor", FlowRefFactoryBean.class);
+  }
 
-    @Override
-    protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
-    {
-        super.parseChild(element, parserContext, builder);
-    }
+  @Override
+  protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
+    super.parseChild(element, parserContext, builder);
+  }
 
-    public String getBeanName(Element element)
-    {
-        return AutoIdUtils.uniqueValue("flow-ref." + element.getAttribute(ATTRIBUTE_NAME));
-    }
+  public String getBeanName(Element element) {
+    return AutoIdUtils.uniqueValue("flow-ref." + element.getAttribute(ATTRIBUTE_NAME));
+  }
 
-    @Override
-    protected void checkElementNameUnique(Element element)
-    {
-        // We want to check element name exists
-    }
+  @Override
+  protected void checkElementNameUnique(Element element) {
+    // We want to check element name exists
+  }
 
 }

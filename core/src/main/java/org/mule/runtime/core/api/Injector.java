@@ -11,15 +11,14 @@ package org.mule.runtime.core.api;
  *
  * @since 3.7.0
  */
-public interface Injector
-{
+public interface Injector {
 
-    /**
-     * Injects dependencies into the given object
-     *
-     * @param object the object on which dependencies are to be injected on
-     * @return the injected object or a proxy to it
-     * @throws MuleException
-     */
-    <T> T inject(T object) throws MuleException;
+  /**
+   * Injects dependencies into the given object
+   *
+   * @param object the object on which dependencies are to be injected on
+   * @return the injected object or a proxy to it
+   * @throws MuleException
+   */
+  <T> T inject(T object) throws MuleException;
 }

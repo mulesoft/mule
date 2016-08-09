@@ -7,18 +7,17 @@
 package org.mule.runtime.config.spring.dsl.processor;
 
 /**
- * A configuration line provider allows to have a parent child relationship
- * between {@code ConfigLine} while keeping the object immutable.
+ * A configuration line provider allows to have a parent child relationship between {@code ConfigLine} while keeping the object
+ * immutable.
  *
  * @since 4.0
  */
 @FunctionalInterface
-public interface ConfigLineProvider
-{
+public interface ConfigLineProvider {
 
-    /**
-     * @return a {@code ConfigLine}.
-     */
-    ConfigLine getConfigLine();
+  /**
+   * @return a {@code ConfigLine}.
+   */
+  ConfigLine getConfigLine();
 
 }

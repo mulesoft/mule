@@ -13,30 +13,26 @@ import org.mule.runtime.core.api.MessagingException;
 
 import org.junit.Test;
 
-public class LengthProtocolTestCase extends SocketExtensionTestCase
-{
+public class LengthProtocolTestCase extends SocketExtensionTestCase {
 
-    public static final String LONG_TEST_STRING = "this is a long test string";
-    public static final String SHORT_TEST_STRING = "stringy";
+  public static final String LONG_TEST_STRING = "this is a long test string";
+  public static final String SHORT_TEST_STRING = "stringy";
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "length-protocol-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "length-protocol-config.xml";
+  }
 
-    @Test
-    public void sendLongerMsg() throws Exception
-    {
-        expectedException.expect(MessagingException.class);
-        expectedException.expectCause(instanceOf(LengthExceededException.class));
-        flowRunner("tcp-send").withPayload(LONG_TEST_STRING).run();
-    }
+  @Test
+  public void sendLongerMsg() throws Exception {
+    expectedException.expect(MessagingException.class);
+    expectedException.expectCause(instanceOf(LengthExceededException.class));
+    flowRunner("tcp-send").withPayload(LONG_TEST_STRING).run();
+  }
 
-    @Test
-    public void sendShorterMsg() throws Exception
-    {
-        flowRunner("tcp-send").withPayload(SHORT_TEST_STRING).run();
-        assertEvent(receiveConnection(), SHORT_TEST_STRING);
-    }
+  @Test
+  public void sendShorterMsg() throws Exception {
+    flowRunner("tcp-send").withPayload(SHORT_TEST_STRING).run();
+    assertEvent(receiveConnection(), SHORT_TEST_STRING);
+  }
 }

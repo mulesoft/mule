@@ -9,18 +9,15 @@ package org.mule.runtime.module.db.integration.select;
 
 import org.mule.runtime.module.db.integration.config.AbstractMissingQueryConfigTestCase;
 
-public class SelectMissingQueryConfigTestCase extends AbstractMissingQueryConfigTestCase
-{
+public class SelectMissingQueryConfigTestCase extends AbstractMissingQueryConfigTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "integration/select/select-missing-query-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "integration/select/select-missing-query-config.xml";
+  }
 
-    @Override
-    protected String getMessageProcessorElement()
-    {
-        return "select";
-    }
+  @Override
+  protected String getMessageProcessorElement() {
+    return "select";
+  }
 }

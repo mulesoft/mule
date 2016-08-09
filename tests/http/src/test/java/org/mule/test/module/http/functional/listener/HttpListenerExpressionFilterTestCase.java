@@ -20,39 +20,33 @@ import org.apache.http.entity.StringEntity;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpListenerExpressionFilterTestCase extends AbstractHttpTestCase
-{
+public class HttpListenerExpressionFilterTestCase extends AbstractHttpTestCase {
 
-    @Rule
-    public DynamicPort listenPort = new DynamicPort("port");
+  @Rule
+  public DynamicPort listenPort = new DynamicPort("port");
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "http-listener-expression-filter-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "http-listener-expression-filter-config.xml";
+  }
 
-    @Test
-    public void returnsEmptyResponseWhenFilteringMessage() throws Exception
-    {
-        sendRequestAndAssertResponse(false, "");
-    }
+  @Test
+  public void returnsEmptyResponseWhenFilteringMessage() throws Exception {
+    sendRequestAndAssertResponse(false, "");
+  }
 
-    @Test
-    public void returnsExpectedResponseWhenMessageIsNotFiltered() throws Exception
-    {
-        sendRequestAndAssertResponse(true, TEST_MESSAGE);
-    }
+  @Test
+  public void returnsExpectedResponseWhenMessageIsNotFiltered() throws Exception {
+    sendRequestAndAssertResponse(true, TEST_MESSAGE);
+  }
 
-    private void sendRequestAndAssertResponse(boolean filterExpression, String expectedBody) throws IOException
-    {
-        Request request = Request.Post(String.format("http://localhost:%s", listenPort.getValue()))
-                .body(new StringEntity(TEST_MESSAGE))
-                .addHeader("filterExpression", Boolean.toString(filterExpression));
+  private void sendRequestAndAssertResponse(boolean filterExpression, String expectedBody) throws IOException {
+    Request request = Request.Post(String.format("http://localhost:%s", listenPort.getValue()))
+        .body(new StringEntity(TEST_MESSAGE)).addHeader("filterExpression", Boolean.toString(filterExpression));
 
-        HttpResponse response = request.execute().returnResponse();
+    HttpResponse response = request.execute().returnResponse();
 
-        assertThat(response.getStatusLine().getStatusCode(), equalTo(200));
-        assertThat(IOUtils.toString(response.getEntity().getContent()), equalTo(expectedBody));
-    }
+    assertThat(response.getStatusLine().getStatusCode(), equalTo(200));
+    assertThat(IOUtils.toString(response.getEntity().getContent()), equalTo(expectedBody));
+  }
 }

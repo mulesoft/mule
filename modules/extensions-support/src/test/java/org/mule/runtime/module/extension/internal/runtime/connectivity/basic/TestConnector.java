@@ -17,41 +17,40 @@ import org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport;
 @Extension(name = "Basic", description = "Basic Test connector")
 @Operations(VoidOperations.class)
 @Providers(TestConnectionProvider.class)
-public class TestConnector
-{
+public class TestConnector {
 
-    @Parameter
-    private Owner requiredPojoDefault;
+  @Parameter
+  private Owner requiredPojoDefault;
 
-    @Parameter
-    @Expression(ExpressionSupport.NOT_SUPPORTED)
-    private Owner requiredPojoNoExpression;
+  @Parameter
+  @Expression(ExpressionSupport.NOT_SUPPORTED)
+  private Owner requiredPojoNoExpression;
 
-    @Parameter
-    @Expression(ExpressionSupport.REQUIRED)
-    private Owner requiredPojoExpressionRequired;
+  @Parameter
+  @Expression(ExpressionSupport.REQUIRED)
+  private Owner requiredPojoExpressionRequired;
 
-    @Parameter
-    @Expression(ExpressionSupport.SUPPORTED)
-    private Owner requiredPojoExpressionSupported;
+  @Parameter
+  @Expression(ExpressionSupport.SUPPORTED)
+  private Owner requiredPojoExpressionSupported;
 
-    @Parameter
-    @Optional
-    private Owner optionalPojoDefault;
+  @Parameter
+  @Optional
+  private Owner optionalPojoDefault;
 
-    @Parameter
-    @Expression(ExpressionSupport.NOT_SUPPORTED)
-    @Optional
-    private Owner optionalPojoNoExpression;
+  @Parameter
+  @Expression(ExpressionSupport.NOT_SUPPORTED)
+  @Optional
+  private Owner optionalPojoNoExpression;
 
-    @Parameter
-    @Expression(ExpressionSupport.REQUIRED)
-    @Optional
-    private Owner optionalPojoExpressionRequired;
+  @Parameter
+  @Expression(ExpressionSupport.REQUIRED)
+  @Optional
+  private Owner optionalPojoExpressionRequired;
 
-    @Parameter
-    @Expression(ExpressionSupport.SUPPORTED)
-    @Optional
-    private Owner optionalPojoExpressionSupported;
+  @Parameter
+  @Expression(ExpressionSupport.SUPPORTED)
+  @Optional
+  private Owner optionalPojoExpressionSupported;
 
 }

@@ -7,34 +7,33 @@
 package org.mule.runtime.module.http.api.requester.proxy;
 
 /**
- *  HTTP proxy configuration for making http requests
+ * HTTP proxy configuration for making http requests
  */
-public interface ProxyConfig
-{
+public interface ProxyConfig {
 
-    /**
-     * @return the global config name. May be null.
-     */
-    public String getName();
+  /**
+   * @return the global config name. May be null.
+   */
+  public String getName();
 
-    /**
-     * @return the http proxy host
-     */
-    public String getHost();
+  /**
+   * @return the http proxy host
+   */
+  public String getHost();
 
-    /**
-     * @return the http proxy port
-     */
-    public int getPort();
+  /**
+   * @return the http proxy port
+   */
+  public int getPort();
 
-    /**
-     * @return the http proxy authentication username
-     */
-    public String getUsername();
+  /**
+   * @return the http proxy authentication username
+   */
+  public String getUsername();
 
-    /**
-     * @return the http proxy authentication password
-     */
-    public String getPassword();
+  /**
+   * @return the http proxy authentication password
+   */
+  public String getPassword();
 
 }

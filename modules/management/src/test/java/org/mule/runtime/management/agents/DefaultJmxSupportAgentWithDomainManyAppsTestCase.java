@@ -11,27 +11,21 @@ import org.mule.functional.junit4.DomainFunctionalTestCase;
 
 import org.junit.Test;
 
-public class DefaultJmxSupportAgentWithDomainManyAppsTestCase extends DomainFunctionalTestCase
-{
+public class DefaultJmxSupportAgentWithDomainManyAppsTestCase extends DomainFunctionalTestCase {
 
-    @Override
-    protected String getDomainConfig()
-    {
-        return "agent/empty-domain-config.xml";
-    }
+  @Override
+  protected String getDomainConfig() {
+    return "agent/empty-domain-config.xml";
+  }
 
-    @Override
-    public ApplicationConfig[] getConfigResources()
-    {
-        return new ApplicationConfig[] {
-                                        new ApplicationConfig("app1", new String[] {"agent/jmx-agent-app-config.xml"}),
-                                        new ApplicationConfig("app2", new String[] {"agent/jmx-agent-app-config.xml"})
-        };
-    }
+  @Override
+  public ApplicationConfig[] getConfigResources() {
+    return new ApplicationConfig[] {new ApplicationConfig("app1", new String[] {"agent/jmx-agent-app-config.xml"}),
+        new ApplicationConfig("app2", new String[] {"agent/jmx-agent-app-config.xml"})};
+  }
 
-    @Test
-    public void testHostPropertyEnablesClientSocketFactory () throws Exception
-    {
-        doTestHostPropertyEnablesClientSocketFactory(getMuleContextForApp("app1"));
-    }
+  @Test
+  public void testHostPropertyEnablesClientSocketFactory() throws Exception {
+    doTestHostPropertyEnablesClientSocketFactory(getMuleContextForApp("app1"));
+  }
 }

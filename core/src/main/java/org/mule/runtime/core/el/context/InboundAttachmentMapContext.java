@@ -13,45 +13,36 @@ import java.util.Set;
 
 import javax.activation.DataHandler;
 
-public class InboundAttachmentMapContext extends AbstractMapContext<DataHandler>
-{
-    private MuleEvent event;
+public class InboundAttachmentMapContext extends AbstractMapContext<DataHandler> {
 
-    public InboundAttachmentMapContext(MuleEvent event)
-    {
-        this.event = event;
-    }
+  private MuleEvent event;
 
-    @Override
-    public DataHandler doGet(String key)
-    {
-        return event.getMessage().getInboundAttachment(key);
-    }
+  public InboundAttachmentMapContext(MuleEvent event) {
+    this.event = event;
+  }
 
-    @Override
-    public void doPut(String key, DataHandler value)
-    {
-        throw new UnsupportedOperationException(CoreMessages.inboundMessageAttachmentsImmutable(key)
-            .getMessage());
-    }
+  @Override
+  public DataHandler doGet(String key) {
+    return event.getMessage().getInboundAttachment(key);
+  }
 
-    @Override
-    public void doRemove(String key)
-    {
-        throw new UnsupportedOperationException(CoreMessages.inboundMessageAttachmentsImmutable(key)
-            .getMessage());
-    }
+  @Override
+  public void doPut(String key, DataHandler value) {
+    throw new UnsupportedOperationException(CoreMessages.inboundMessageAttachmentsImmutable(key).getMessage());
+  }
 
-    @Override
-    public Set<String> keySet()
-    {
-        return event.getMessage().getInboundAttachmentNames();
-    }
+  @Override
+  public void doRemove(String key) {
+    throw new UnsupportedOperationException(CoreMessages.inboundMessageAttachmentsImmutable(key).getMessage());
+  }
 
-    @Override
-    public void clear()
-    {
-        throw new UnsupportedOperationException(CoreMessages.inboundMessageAttachmentsImmutable()
-            .getMessage());
-    }
+  @Override
+  public Set<String> keySet() {
+    return event.getMessage().getInboundAttachmentNames();
+  }
+
+  @Override
+  public void clear() {
+    throw new UnsupportedOperationException(CoreMessages.inboundMessageAttachmentsImmutable().getMessage());
+  }
 }

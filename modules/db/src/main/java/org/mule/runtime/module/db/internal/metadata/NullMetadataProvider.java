@@ -13,18 +13,15 @@ import org.mule.common.metadata.MetaData;
 /**
  * Null implementation of {@link QueryMetadataProvider}
  */
-public class NullMetadataProvider implements QueryMetadataProvider
-{
+public class NullMetadataProvider implements QueryMetadataProvider {
 
-    @Override
-    public Result<MetaData> getInputMetaData()
-    {
-        return null;
-    }
+  @Override
+  public Result<MetaData> getInputMetaData() {
+    return null;
+  }
 
-    @Override
-    public Result<MetaData> getOutputMetaData(MetaData metaData)
-    {
-        return null;
-    }
+  @Override
+  public Result<MetaData> getOutputMetaData(MetaData metaData) {
+    return null;
+  }
 }

@@ -49,85 +49,87 @@ import org.hamcrest.Matcher;
 import org.junit.Test;
 
 @SmallTest
-public class DynamicBulkUpdateMessageProcessorTestCase extends AbstractMuleTestCase
-{
+public class DynamicBulkUpdateMessageProcessorTestCase extends AbstractMuleTestCase {
 
-    public static final QueryTemplate QUERY_TEMPLATE1 = new QueryTemplate("update PLANET set NAME='Mercury' where NAME='EARTH'", UPDATE, Collections.<QueryParam>emptyList());
-    public static final QueryTemplate QUERY_TEMPLATE2 = new QueryTemplate("update PLANET set NAME='Mercury' where NAME='MARS'", UPDATE, Collections.<QueryParam>emptyList());
-    public static final String QUERY1 = DbDebugInfoUtils.QUERY_DEBUG_FIELD + 1;
-    public static final String QUERY2 = DbDebugInfoUtils.QUERY_DEBUG_FIELD + 2;
+  public static final QueryTemplate QUERY_TEMPLATE1 =
+      new QueryTemplate("update PLANET set NAME='Mercury' where NAME='EARTH'", UPDATE, Collections.<QueryParam>emptyList());
+  public static final QueryTemplate QUERY_TEMPLATE2 =
+      new QueryTemplate("update PLANET set NAME='Mercury' where NAME='MARS'", UPDATE, Collections.<QueryParam>emptyList());
+  public static final String QUERY1 = DbDebugInfoUtils.QUERY_DEBUG_FIELD + 1;
+  public static final String QUERY2 = DbDebugInfoUtils.QUERY_DEBUG_FIELD + 2;
 
-    private final MuleEvent event = mock(MuleEvent.class);
-    private final MuleMessage message= mock(MuleMessage.class);
-    private final DbConnection connection = mock(DbConnection.class);
-    private final DbConnectionFactory dbConnectionFactory = mock(DbConnectionFactory.class);
-    private final DbConfigResolver dbConfigResolver = mock(DbConfigResolver.class);
-    private final DbConfig dbConfig = mock(DbConfig.class);
-    private final QueryResolver queryResolver = mock(QueryResolver.class);
-    private final MuleContext muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
+  private final MuleEvent event = mock(MuleEvent.class);
+  private final MuleMessage message = mock(MuleMessage.class);
+  private final DbConnection connection = mock(DbConnection.class);
+  private final DbConnectionFactory dbConnectionFactory = mock(DbConnectionFactory.class);
+  private final DbConfigResolver dbConfigResolver = mock(DbConfigResolver.class);
+  private final DbConfig dbConfig = mock(DbConfig.class);
+  private final QueryResolver queryResolver = mock(QueryResolver.class);
+  private final MuleContext muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
 
-    @Test
-    public void returnsDebugInfo() throws Exception
-    {
-        when(message.getPayload()).thenReturn(getPlanetNames());
-        when(event.getMessage()).thenReturn(message);
+  @Test
+  public void returnsDebugInfo() throws Exception {
+    when(message.getPayload()).thenReturn(getPlanetNames());
+    when(event.getMessage()).thenReturn(message);
 
-        when(dbConnectionFactory.createConnection(TransactionalAction.NOT_SUPPORTED)).thenReturn(connection);
+    when(dbConnectionFactory.createConnection(TransactionalAction.NOT_SUPPORTED)).thenReturn(connection);
 
-        when(dbConfigResolver.resolve(event)).thenReturn(dbConfig);
-        when(dbConfig.getConnectionFactory()).thenReturn(dbConnectionFactory);
+    when(dbConfigResolver.resolve(event)).thenReturn(dbConfig);
+    when(dbConfig.getConnectionFactory()).thenReturn(dbConnectionFactory);
 
-        when(queryResolver.resolve(any(DbConnection.class), any(MuleEvent.class))).thenReturn(new Query(QUERY_TEMPLATE1)).thenReturn(new Query(QUERY_TEMPLATE2));
+    when(queryResolver.resolve(any(DbConnection.class), any(MuleEvent.class))).thenReturn(new Query(QUERY_TEMPLATE1))
+        .thenReturn(new Query(QUERY_TEMPLATE2));
 
-        final DynamicBulkUpdateMessageProcessor dynamicBulkUpdateMessageProcessor = new DynamicBulkUpdateMessageProcessor(dbConfigResolver, queryResolver, null, NOT_SUPPORTED, Collections.singletonList(QueryType.UPDATE));
-        dynamicBulkUpdateMessageProcessor.setMuleContext(muleContext);
+    final DynamicBulkUpdateMessageProcessor dynamicBulkUpdateMessageProcessor =
+        new DynamicBulkUpdateMessageProcessor(dbConfigResolver, queryResolver, null, NOT_SUPPORTED,
+                                              Collections.singletonList(QueryType.UPDATE));
+    dynamicBulkUpdateMessageProcessor.setMuleContext(muleContext);
 
-        final List<FieldDebugInfo<?>> debugInfo = dynamicBulkUpdateMessageProcessor.getDebugInfo(event);
+    final List<FieldDebugInfo<?>> debugInfo = dynamicBulkUpdateMessageProcessor.getDebugInfo(event);
 
-        assertThat(debugInfo, is(not(nullValue())));
-        assertThat(debugInfo.size(), equalTo(1));
+    assertThat(debugInfo, is(not(nullValue())));
+    assertThat(debugInfo.size(), equalTo(1));
 
-        assertThat(debugInfo, hasItem(objectLike(QUERIES_DEBUG_FIELD, List.class, createExpectedQueryMatchers())));
-    }
+    assertThat(debugInfo, hasItem(objectLike(QUERIES_DEBUG_FIELD, List.class, createExpectedQueryMatchers())));
+  }
 
-    @Test
-    public void returnsErrorDebugInfoWhenCannotResolveQueries() throws Exception
-    {
-        when(message.getPayload()).thenReturn(getPlanetNames());
-        when(event.getMessage()).thenReturn(message);
+  @Test
+  public void returnsErrorDebugInfoWhenCannotResolveQueries() throws Exception {
+    when(message.getPayload()).thenReturn(getPlanetNames());
+    when(event.getMessage()).thenReturn(message);
 
-        when(dbConnectionFactory.createConnection(TransactionalAction.NOT_SUPPORTED)).thenReturn(connection);
+    when(dbConnectionFactory.createConnection(TransactionalAction.NOT_SUPPORTED)).thenReturn(connection);
 
-        when(dbConfigResolver.resolve(event)).thenReturn(dbConfig);
-        when(dbConfig.getConnectionFactory()).thenReturn(dbConnectionFactory);
+    when(dbConfigResolver.resolve(event)).thenReturn(dbConfig);
+    when(dbConfig.getConnectionFactory()).thenReturn(dbConnectionFactory);
 
-        final QueryResolutionException queryResolutionException = new QueryResolutionException("Error");
-        when(queryResolver.resolve(any(DbConnection.class), any(MuleEvent.class))).thenThrow(queryResolutionException);
+    final QueryResolutionException queryResolutionException = new QueryResolutionException("Error");
+    when(queryResolver.resolve(any(DbConnection.class), any(MuleEvent.class))).thenThrow(queryResolutionException);
 
-        final DynamicBulkUpdateMessageProcessor dynamicBulkUpdateMessageProcessor = new DynamicBulkUpdateMessageProcessor(dbConfigResolver, queryResolver, null, NOT_SUPPORTED, Collections.singletonList(QueryType.UPDATE));
-        dynamicBulkUpdateMessageProcessor.setMuleContext(muleContext);
+    final DynamicBulkUpdateMessageProcessor dynamicBulkUpdateMessageProcessor =
+        new DynamicBulkUpdateMessageProcessor(dbConfigResolver, queryResolver, null, NOT_SUPPORTED,
+                                              Collections.singletonList(QueryType.UPDATE));
+    dynamicBulkUpdateMessageProcessor.setMuleContext(muleContext);
 
-        final List<FieldDebugInfo<?>> debugInfo = dynamicBulkUpdateMessageProcessor.getDebugInfo(event);
+    final List<FieldDebugInfo<?>> debugInfo = dynamicBulkUpdateMessageProcessor.getDebugInfo(event);
 
-        assertThat(debugInfo.size(), equalTo(1));
-        assertThat(debugInfo, hasItem(fieldLike(QUERIES_DEBUG_FIELD, List.class, queryResolutionException)));
-    }
+    assertThat(debugInfo.size(), equalTo(1));
+    assertThat(debugInfo, hasItem(fieldLike(QUERIES_DEBUG_FIELD, List.class, queryResolutionException)));
+  }
 
-    private List<Matcher<FieldDebugInfo<?>>> createExpectedQueryMatchers()
-    {
-        final List<Matcher<FieldDebugInfo<?>>> queryMatchers = new ArrayList<>();
-        queryMatchers.add(createQueryFieldDebugInfoMatcher(QUERY1, QUERY_TEMPLATE1));
-        queryMatchers.add(createQueryFieldDebugInfoMatcher(QUERY2, QUERY_TEMPLATE2));
+  private List<Matcher<FieldDebugInfo<?>>> createExpectedQueryMatchers() {
+    final List<Matcher<FieldDebugInfo<?>>> queryMatchers = new ArrayList<>();
+    queryMatchers.add(createQueryFieldDebugInfoMatcher(QUERY1, QUERY_TEMPLATE1));
+    queryMatchers.add(createQueryFieldDebugInfoMatcher(QUERY2, QUERY_TEMPLATE2));
 
-        return queryMatchers;
-    }
+    return queryMatchers;
+  }
 
-    private static List<String> getPlanetNames()
-    {
-        List<String> planetNames = new ArrayList<>();
-        planetNames.add("EARTH");
-        planetNames.add("MARS");
+  private static List<String> getPlanetNames() {
+    List<String> planetNames = new ArrayList<>();
+    planetNames.add("EARTH");
+    planetNames.add("MARS");
 
-        return planetNames;
-    }
+    return planetNames;
+  }
 }

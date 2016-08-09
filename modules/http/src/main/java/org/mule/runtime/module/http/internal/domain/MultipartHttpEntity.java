@@ -10,19 +10,16 @@ import org.mule.runtime.module.http.internal.multipart.HttpPart;
 
 import java.util.Collection;
 
-public class MultipartHttpEntity implements HttpEntity
-{
+public class MultipartHttpEntity implements HttpEntity {
 
-    private final Collection<HttpPart> parts;
+  private final Collection<HttpPart> parts;
 
-    public MultipartHttpEntity(final Collection<HttpPart> parts)
-    {
-        this.parts = parts;
-    }
+  public MultipartHttpEntity(final Collection<HttpPart> parts) {
+    this.parts = parts;
+  }
 
-    public Collection<HttpPart> getParts()
-    {
-        return this.parts;
-    }
+  public Collection<HttpPart> getParts() {
+    return this.parts;
+  }
 
 }

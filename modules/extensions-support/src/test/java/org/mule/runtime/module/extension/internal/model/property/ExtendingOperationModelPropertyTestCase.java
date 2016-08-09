@@ -16,31 +16,27 @@ import org.mule.tck.size.SmallTest;
 import org.junit.Test;
 
 @SmallTest
-public class ExtendingOperationModelPropertyTestCase extends AbstractMuleTestCase
-{
+public class ExtendingOperationModelPropertyTestCase extends AbstractMuleTestCase {
 
-    @Test
-    public void extensible()
-    {
-        ExtendingOperationModelProperty<TestExtensibleType> modelProperty = new ExtendingOperationModelProperty(TestExtensibleType.class);
-        assertThat(modelProperty.getType(), is(sameInstance(TestExtensibleType.class)));
-    }
+  @Test
+  public void extensible() {
+    ExtendingOperationModelProperty<TestExtensibleType> modelProperty =
+        new ExtendingOperationModelProperty(TestExtensibleType.class);
+    assertThat(modelProperty.getType(), is(sameInstance(TestExtensibleType.class)));
+  }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void notExtensible()
-    {
-        new ExtendingOperationModelProperty(Object.class);
-    }
+  @Test(expected = IllegalArgumentException.class)
+  public void notExtensible() {
+    new ExtendingOperationModelProperty(Object.class);
+  }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void nullImplementation()
-    {
-        new ExtendingOperationModelProperty(null);
-    }
+  @Test(expected = IllegalArgumentException.class)
+  public void nullImplementation() {
+    new ExtendingOperationModelProperty(null);
+  }
 
-    @Extensible
-    private class TestExtensibleType
-    {
+  @Extensible
+  private class TestExtensibleType {
 
-    }
+  }
 }

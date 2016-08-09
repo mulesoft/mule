@@ -15,40 +15,35 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 
-public class JmsInfiniteRedeliveryTestCase extends AbstractJmsRedeliveryTestCase
-{
+public class JmsInfiniteRedeliveryTestCase extends AbstractJmsRedeliveryTestCase {
 
-    public static final int DEFAULT_REDELIVERY = 6;
+  public static final int DEFAULT_REDELIVERY = 6;
 
-    @Override
-    protected int getMaxRedelivery()
-    {
-        return JmsConnector.REDELIVERY_IGNORE;
-    }
+  @Override
+  protected int getMaxRedelivery() {
+    return JmsConnector.REDELIVERY_IGNORE;
+  }
 
-    @Override
-    protected int getMaxRedeliveryAttempts()
-    {
-        return Integer.MAX_VALUE;
-    }
+  @Override
+  protected int getMaxRedeliveryAttempts() {
+    return Integer.MAX_VALUE;
+  }
 
-    @Test
-    public void testInfiniteRedelivery() throws Exception
-    {
-        client.dispatch(JMS_INPUT_QUEUE, TEST_MESSAGE, null);
+  @Test
+  public void testInfiniteRedelivery() throws Exception {
+    client.dispatch(JMS_INPUT_QUEUE, TEST_MESSAGE, null);
 
-        assertFalse(messageRedeliveryExceptionFired.await(timeout, TimeUnit.MILLISECONDS));
-        assertTrue(callback.getCallbackCount() > DEFAULT_REDELIVERY + 1);
-        assertNoMessageInDlq(JMS_DEAD_LETTER);
-    }
+    assertFalse(messageRedeliveryExceptionFired.await(timeout, TimeUnit.MILLISECONDS));
+    assertTrue(callback.getCallbackCount() > DEFAULT_REDELIVERY + 1);
+    assertNoMessageInDlq(JMS_DEAD_LETTER);
+  }
 
-    @Test
-    public void testRedeliveryWithRollbackExceptionStrategy() throws Exception
-    {
-        client.dispatch(JMS_INPUT_QUEUE2, TEST_MESSAGE, null);
+  @Test
+  public void testRedeliveryWithRollbackExceptionStrategy() throws Exception {
+    client.dispatch(JMS_INPUT_QUEUE2, TEST_MESSAGE, null);
 
-        assertFalse(messageRedeliveryExceptionFired.await(timeout, TimeUnit.MILLISECONDS));
-        assertTrue(callback.getCallbackCount() > DEFAULT_REDELIVERY + 1);
-        assertNoMessageInDlq(JMS_DEAD_LETTER);
-    }
+    assertFalse(messageRedeliveryExceptionFired.await(timeout, TimeUnit.MILLISECONDS));
+    assertTrue(callback.getCallbackCount() > DEFAULT_REDELIVERY + 1);
+    assertNoMessageInDlq(JMS_DEAD_LETTER);
+  }
 }

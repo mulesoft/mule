@@ -31,45 +31,42 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class GroupValueSetterTestCase extends AbstractMuleTestCase
-{
+public class GroupValueSetterTestCase extends AbstractMuleTestCase {
 
-    private static final String NAME = "name";
-    private static final Integer AGE = 50;
-    private static final Date DATE = new Date();
+  private static final String NAME = "name";
+  private static final Integer AGE = 50;
+  private static final Date DATE = new Date();
 
 
-    private ValueSetter valueSetter;
+  private ValueSetter valueSetter;
 
-    @Mock
-    private ResolverSetResult result;
+  @Mock
+  private ResolverSetResult result;
 
-    @Before
-    public void before() throws Exception
-    {
-        ParameterGroup group = new ParameterGroup(ExtendedPersonalInfo.class, getField(HeisenbergExtension.class, "personalInfo"));
-        group.addParameter(getField(ExtendedPersonalInfo.class, "name"));
-        group.addParameter(getField(ExtendedPersonalInfo.class, "age"));
+  @Before
+  public void before() throws Exception {
+    ParameterGroup group = new ParameterGroup(ExtendedPersonalInfo.class, getField(HeisenbergExtension.class, "personalInfo"));
+    group.addParameter(getField(ExtendedPersonalInfo.class, "name"));
+    group.addParameter(getField(ExtendedPersonalInfo.class, "age"));
 
-        ParameterGroup child = new ParameterGroup(LifetimeInfo.class, getField(ExtendedPersonalInfo.class, "lifetimeInfo"));
-        child.addParameter(getField(LifetimeInfo.class, "dateOfBirth"));
-        group.addModelProperty(new ParameterGroupModelProperty(asList(child)));
+    ParameterGroup child = new ParameterGroup(LifetimeInfo.class, getField(ExtendedPersonalInfo.class, "lifetimeInfo"));
+    child.addParameter(getField(LifetimeInfo.class, "dateOfBirth"));
+    group.addModelProperty(new ParameterGroupModelProperty(asList(child)));
 
-        when(result.get("name")).thenReturn(NAME);
-        when(result.get("age")).thenReturn(AGE);
-        when(result.get("dateOfBirth")).thenReturn(DATE);
+    when(result.get("name")).thenReturn(NAME);
+    when(result.get("age")).thenReturn(AGE);
+    when(result.get("dateOfBirth")).thenReturn(DATE);
 
-        valueSetter = new GroupValueSetter(group);
-    }
+    valueSetter = new GroupValueSetter(group);
+  }
 
-    @Test
-    public void set() throws Exception
-    {
-        HeisenbergExtension extension = new HeisenbergExtension();
-        valueSetter.set(extension, result);
+  @Test
+  public void set() throws Exception {
+    HeisenbergExtension extension = new HeisenbergExtension();
+    valueSetter.set(extension, result);
 
-        assertThat(extension.getPersonalInfo().getName(), is(NAME));
-        assertThat(extension.getPersonalInfo().getAge(), is(AGE));
-        assertThat(extension.getPersonalInfo().getLifetimeInfo().getDateOfBirth(), is(sameInstance(DATE)));
-    }
+    assertThat(extension.getPersonalInfo().getName(), is(NAME));
+    assertThat(extension.getPersonalInfo().getAge(), is(AGE));
+    assertThat(extension.getPersonalInfo().getLifetimeInfo().getDateOfBirth(), is(sameInstance(DATE)));
+  }
 }

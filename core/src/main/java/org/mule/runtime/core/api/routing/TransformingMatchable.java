@@ -6,9 +6,8 @@
  */
 package org.mule.runtime.core.api.routing;
 
-public interface TransformingMatchable extends Matchable
-{
+public interface TransformingMatchable extends Matchable {
 
-    boolean isTransformBeforeMatch();
+  boolean isTransformBeforeMatch();
 
 }

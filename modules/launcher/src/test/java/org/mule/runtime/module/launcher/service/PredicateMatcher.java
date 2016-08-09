@@ -12,36 +12,30 @@ import java.util.function.Predicate;
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;
 
-public class PredicateMatcher<T> extends TypeSafeMatcher<T>
-{
+public class PredicateMatcher<T> extends TypeSafeMatcher<T> {
 
-    Predicate<T> predicate;
+  Predicate<T> predicate;
 
-    public PredicateMatcher(Predicate<T> predicate)
-    {
-        this.predicate = predicate;
-    }
+  public PredicateMatcher(Predicate<T> predicate) {
+    this.predicate = predicate;
+  }
 
-    public static <T> PredicateMatcher<T> matchesPredicate(Predicate<T> predicate)
-    {
-        return new PredicateMatcher<T>(predicate);
-    }
+  public static <T> PredicateMatcher<T> matchesPredicate(Predicate<T> predicate) {
+    return new PredicateMatcher<T>(predicate);
+  }
 
-    @Override
-    protected boolean matchesSafely(T item)
-    {
-        return predicate.test(item);
-    }
+  @Override
+  protected boolean matchesSafely(T item) {
+    return predicate.test(item);
+  }
 
-    @Override
-    public void describeTo(Description description)
-    {
-        description.appendText("successfully evaluated predicate");
-    }
+  @Override
+  public void describeTo(Description description) {
+    description.appendText("successfully evaluated predicate");
+  }
 
-    @Override
-    protected void describeMismatchSafely(T item, Description description)
-    {
-        description.appendText("predicate evaluated to false on " + item);
-    }
+  @Override
+  protected void describeMismatchSafely(T item, Description description) {
+    description.appendText("predicate evaluated to false on " + item);
+  }
 }

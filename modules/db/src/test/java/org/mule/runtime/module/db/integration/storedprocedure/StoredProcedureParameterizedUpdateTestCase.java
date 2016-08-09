@@ -16,31 +16,26 @@ import java.util.List;
 
 import org.junit.runners.Parameterized;
 
-public class StoredProcedureParameterizedUpdateTestCase extends AbstractStoredProcedureParameterizedUpdateTestCase
-{
+public class StoredProcedureParameterizedUpdateTestCase extends AbstractStoredProcedureParameterizedUpdateTestCase {
 
-    public StoredProcedureParameterizedUpdateTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public StoredProcedureParameterizedUpdateTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Override
-    public void setupStoredProcedure() throws Exception
-    {
-        assumeThat(getDefaultDataSource(), new SupportsReturningStoredProcedureResultsWithoutParameters());
-        super.setupStoredProcedure();
-    }
+  @Override
+  public void setupStoredProcedure() throws Exception {
+    assumeThat(getDefaultDataSource(), new SupportsReturningStoredProcedureResultsWithoutParameters());
+    super.setupStoredProcedure();
+  }
 
-    @Parameterized.Parameters
-    public static List<Object[]> parameters()
-    {
-        return TestDbConfig.getResources();
-    }
+  @Parameterized.Parameters
+  public static List<Object[]> parameters() {
+    return TestDbConfig.getResources();
+  }
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/storedprocedure/stored-procedure-parameterized-update-config.xml"};
-    }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/storedprocedure/stored-procedure-parameterized-update-config.xml"};
+  }
 
 }

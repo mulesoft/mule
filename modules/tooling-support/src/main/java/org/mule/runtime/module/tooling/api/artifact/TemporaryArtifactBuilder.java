@@ -16,37 +16,37 @@ import java.io.File;
  *
  * @since 4.0
  */
-public interface TemporaryArtifactBuilder
-{
+public interface TemporaryArtifactBuilder {
 
-    /**
-     * Allows to configure a {@code ConnectivityTestingStrategy} that can be used for connectivity testing.
-     *
-     * @param connectionTestingServiceType class that creates instance of {@code ConnectivityTestingStrategy}
-     * @return the builder
-     */
-    TemporaryArtifactBuilder addConnectivityTestingStrategyType(Class<? extends ConnectivityTestingStrategy> connectionTestingServiceType);
+  /**
+   * Allows to configure a {@code ConnectivityTestingStrategy} that can be used for connectivity testing.
+   *
+   * @param connectionTestingServiceType class that creates instance of {@code ConnectivityTestingStrategy}
+   * @return the builder
+   */
+  TemporaryArtifactBuilder addConnectivityTestingStrategyType(Class<? extends ConnectivityTestingStrategy> connectionTestingServiceType);
 
-    /**
-     * Allows to add an extensions to be used in the tooling artifact. The file type must be zip and be an extension.
-     *
-     * @param artifactPluginFile a file pointer to an extension file
-     * @return the builder
-     */
-    TemporaryArtifactBuilder addArtifactPluginFile(File artifactPluginFile);
+  /**
+   * Allows to add an extensions to be used in the tooling artifact. The file type must be zip and be an extension.
+   *
+   * @param artifactPluginFile a file pointer to an extension file
+   * @return the builder
+   */
+  TemporaryArtifactBuilder addArtifactPluginFile(File artifactPluginFile);
 
-    /**
-     * Allows to configure the set of mule components to be used by the artifact.
-     *
-     * @param artifactConfiguration the mule configuration used by the artifact
-     * @return the builder
-     */
-    TemporaryArtifactBuilder setArtifactConfiguration(ArtifactConfiguration artifactConfiguration);
+  /**
+   * Allows to configure the set of mule components to be used by the artifact.
+   *
+   * @param artifactConfiguration the mule configuration used by the artifact
+   * @return the builder
+   */
+  TemporaryArtifactBuilder setArtifactConfiguration(ArtifactConfiguration artifactConfiguration);
 
-    /**
-     * Builds a {@code ToolingArtifact} with the provided configuration.
-     * @return a {@code ToolingArtifact}
-     */
-    TemporaryArtifact build();
+  /**
+   * Builds a {@code ToolingArtifact} with the provided configuration.
+   * 
+   * @return a {@code ToolingArtifact}
+   */
+  TemporaryArtifact build();
 
 }

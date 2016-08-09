@@ -14,39 +14,33 @@ import org.mule.runtime.module.extension.file.api.FileMetadataResolverTestCommon
 import org.junit.Before;
 import org.junit.Test;
 
-public class FtpMetadataResolverTestCase extends FtpConnectorTestCase
-{
+public class FtpMetadataResolverTestCase extends FtpConnectorTestCase {
 
-    private MetadataManager manager;
-    private FileMetadataResolverTestCommon testCommon;
+  private MetadataManager manager;
+  private FileMetadataResolverTestCommon testCommon;
 
-    public FtpMetadataResolverTestCase(String name, FtpTestHarness testHarness)
-    {
-        super(name, testHarness);
-    }
+  public FtpMetadataResolverTestCase(String name, FtpTestHarness testHarness) {
+    super(name, testHarness);
+  }
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "ftp-metadata-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "ftp-metadata-config.xml";
+  }
 
-    @Before
-    public void setupManager() throws RegistrationException
-    {
-        manager = muleContext.getRegistry().lookupObject(MetadataManager.class);
-        testCommon = new FileMetadataResolverTestCommon();
-    }
+  @Before
+  public void setupManager() throws RegistrationException {
+    manager = muleContext.getRegistry().lookupObject(MetadataManager.class);
+    testCommon = new FileMetadataResolverTestCommon();
+  }
 
-    @Test
-    public void getReadAttributesMetadata()
-    {
-        testCommon.testReadAttributesMetadata(manager, testHarness.getAttributesType());
-    }
+  @Test
+  public void getReadAttributesMetadata() {
+    testCommon.testReadAttributesMetadata(manager, testHarness.getAttributesType());
+  }
 
-    @Test
-    public void getListOperationOutputMetadata()
-    {
-        testCommon.testTreeNodeType(manager, testHarness.getAttributesType());
-    }
+  @Test
+  public void getListOperationOutputMetadata() {
+    testCommon.testTreeNodeType(manager, testHarness.getAttributesType());
+  }
 }

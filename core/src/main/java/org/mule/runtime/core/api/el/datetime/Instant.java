@@ -11,29 +11,28 @@ import java.util.Calendar;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-public interface Instant
-{
+public interface Instant {
 
-    boolean isBefore(Instant date);
+  boolean isBefore(Instant date);
 
-    boolean isAfter(Instant date);
+  boolean isAfter(Instant date);
 
-    String format();
+  String format();
 
-    String format(String pattern);
+  String format(String pattern);
 
-    String getTimeZone();
+  String getTimeZone();
 
-    Instant withTimeZone(String newTimezone);
+  Instant withTimeZone(String newTimezone);
 
-    Instant changeTimeZone(String newTimezone);
+  Instant changeTimeZone(String newTimezone);
 
-    Instant withLocale(String locale);
+  Instant withLocale(String locale);
 
-    Calendar toCalendar();
+  Calendar toCalendar();
 
-    java.util.Date toDate();
+  java.util.Date toDate();
 
-    XMLGregorianCalendar toXMLCalendar() throws DatatypeConfigurationException;
+  XMLGregorianCalendar toXMLCalendar() throws DatatypeConfigurationException;
 
 }

@@ -12,44 +12,35 @@ import java.io.File;
 import org.junit.rules.TemporaryFolder;
 
 /**
- * Sets up a temporary folder that is also set as a system property before a test
- * and guaranties to tear it down afterward.
+ * Sets up a temporary folder that is also set as a system property before a test and guaranties to tear it down afterward.
  */
-public class SystemPropertyTemporaryFolder extends TemporaryFolder
-{
+public class SystemPropertyTemporaryFolder extends TemporaryFolder {
 
-    private final String propertyName;
-    private String originalPropertyValue;
+  private final String propertyName;
+  private String originalPropertyValue;
 
-    public SystemPropertyTemporaryFolder(String propertyName)
-    {
-        this.propertyName = propertyName;
+  public SystemPropertyTemporaryFolder(String propertyName) {
+    this.propertyName = propertyName;
+  }
+
+  public SystemPropertyTemporaryFolder(File parentFolder, String propertyName) {
+    super(parentFolder);
+    this.propertyName = propertyName;
+  }
+
+  @Override
+  protected void before() throws Throwable {
+    super.before();
+    originalPropertyValue = System.setProperty(propertyName, getRoot().getCanonicalPath());
+  }
+
+  @Override
+  protected void after() {
+    if (originalPropertyValue == null) {
+      System.clearProperty(propertyName);
+    } else {
+      System.setProperty(propertyName, originalPropertyValue);
     }
-
-    public SystemPropertyTemporaryFolder(File parentFolder, String propertyName)
-    {
-        super(parentFolder);
-        this.propertyName = propertyName;
-    }
-
-    @Override
-    protected void before() throws Throwable
-    {
-        super.before();
-        originalPropertyValue = System.setProperty(propertyName, getRoot().getCanonicalPath());
-    }
-
-    @Override
-    protected void after()
-    {
-        if (originalPropertyValue == null)
-        {
-            System.clearProperty(propertyName);
-        }
-        else
-        {
-            System.setProperty(propertyName, originalPropertyValue);
-        }
-        super.after();
-    }
+    super.after();
+  }
 }

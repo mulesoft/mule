@@ -29,86 +29,79 @@ import org.mule.tck.size.SmallTest;
 @RunWith(MockitoJUnitRunner.class)
 public class AbstractMuleObjectOwnerTest {
 
-    @Mock
-    private TestClass mockObject1;
-    @Mock
-    private TestClass mockObject2;
-    @Mock
-    private MuleContext mockMuleContext;
-    @Mock
-    private FlowConstruct mockFlowConstruct;
-    private AbstractMuleObjectOwner<TestClass> abstractMuleObjectOwner;
+  @Mock
+  private TestClass mockObject1;
+  @Mock
+  private TestClass mockObject2;
+  @Mock
+  private MuleContext mockMuleContext;
+  @Mock
+  private FlowConstruct mockFlowConstruct;
+  private AbstractMuleObjectOwner<TestClass> abstractMuleObjectOwner;
 
-    @Before
-    public void before()
-    {
-        abstractMuleObjectOwner = new AbstractMuleObjectOwner<TestClass>()
-        {
-            @Override
-            protected List<TestClass> getOwnedObjects() {
-                return Arrays.asList(mockObject1,mockObject2);
-            }
-        };
-        abstractMuleObjectOwner.setFlowConstruct(mockFlowConstruct);
-        abstractMuleObjectOwner.setMuleContext(mockMuleContext);
-    }
+  @Before
+  public void before() {
+    abstractMuleObjectOwner = new AbstractMuleObjectOwner<TestClass>() {
 
-    @Test
-    public void testInitialise() throws Exception {
-        abstractMuleObjectOwner.initialise();
-        verify(mockObject1).initialise();
-        verify(mockObject2).initialise();
-        verify(mockObject1).setMuleContext(mockMuleContext);
-        verify(mockObject2).setMuleContext(mockMuleContext);
-        verify(mockObject1).setFlowConstruct(mockFlowConstruct);
-        verify(mockObject2).setFlowConstruct(mockFlowConstruct);
-    }
+      @Override
+      protected List<TestClass> getOwnedObjects() {
+        return Arrays.asList(mockObject1, mockObject2);
+      }
+    };
+    abstractMuleObjectOwner.setFlowConstruct(mockFlowConstruct);
+    abstractMuleObjectOwner.setMuleContext(mockMuleContext);
+  }
 
-    @Test
-    public void testDispose() throws Exception {
-        abstractMuleObjectOwner.dispose();
-        verify(mockObject1).dispose();
-        verify(mockObject2).dispose();
-    }
+  @Test
+  public void testInitialise() throws Exception {
+    abstractMuleObjectOwner.initialise();
+    verify(mockObject1).initialise();
+    verify(mockObject2).initialise();
+    verify(mockObject1).setMuleContext(mockMuleContext);
+    verify(mockObject2).setMuleContext(mockMuleContext);
+    verify(mockObject1).setFlowConstruct(mockFlowConstruct);
+    verify(mockObject2).setFlowConstruct(mockFlowConstruct);
+  }
 
-    @Test
-    public void testStart() throws Exception {
-        abstractMuleObjectOwner.start();
-        verify(mockObject1).start();
-        verify(mockObject2).start();
-    }
+  @Test
+  public void testDispose() throws Exception {
+    abstractMuleObjectOwner.dispose();
+    verify(mockObject1).dispose();
+    verify(mockObject2).dispose();
+  }
 
-    @Test
-    public void testStop() throws Exception {
-        abstractMuleObjectOwner.stop();
-        verify(mockObject1).stop();
-        verify(mockObject2).stop();
-    }
+  @Test
+  public void testStart() throws Exception {
+    abstractMuleObjectOwner.start();
+    verify(mockObject1).start();
+    verify(mockObject2).start();
+  }
 
-    public class TestClass implements Lifecycle, MuleContextAware, FlowConstructAware
-    {
-        @Override
-        public void dispose() {
-        }
+  @Test
+  public void testStop() throws Exception {
+    abstractMuleObjectOwner.stop();
+    verify(mockObject1).stop();
+    verify(mockObject2).stop();
+  }
 
-        @Override
-        public void setFlowConstruct(FlowConstruct flowConstruct) {
-        }
+  public class TestClass implements Lifecycle, MuleContextAware, FlowConstructAware {
 
-        @Override
-        public void initialise() throws InitialisationException {
-        }
+    @Override
+    public void dispose() {}
 
-        @Override
-        public void setMuleContext(MuleContext context) {
-        }
+    @Override
+    public void setFlowConstruct(FlowConstruct flowConstruct) {}
 
-        @Override
-        public void start() throws MuleException {
-        }
+    @Override
+    public void initialise() throws InitialisationException {}
 
-        @Override
-        public void stop() throws MuleException {
-        }
-    }
+    @Override
+    public void setMuleContext(MuleContext context) {}
+
+    @Override
+    public void start() throws MuleException {}
+
+    @Override
+    public void stop() throws MuleException {}
+  }
 }

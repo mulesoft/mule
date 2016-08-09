@@ -30,106 +30,96 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-public class PetStoreRetryPolicyConnectionTestCase extends ExtensionFunctionalTestCase
-{
+public class PetStoreRetryPolicyConnectionTestCase extends ExtensionFunctionalTestCase {
 
-    public static final String CONNECTION_FAIL = "Connection fail";
-    public static final String CONNECTION_FAIL_DOT = "Connection fail.";
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
+  public static final String CONNECTION_FAIL = "Connection fail";
+  public static final String CONNECTION_FAIL_DOT = "Connection fail.";
+  @Rule
+  public ExpectedException exception = ExpectedException.none();
 
-    public PetStoreRetryPolicyConnectionTestCase(){}
+  public PetStoreRetryPolicyConnectionTestCase() {}
+
+  @Override
+  protected String getConfigFile() {
+    return "petstore-retry-policy.xml";
+  }
+
+  @Override
+  protected Class<?>[] getAnnotatedExtensionClasses() {
+    return new Class<?>[] {PetStoreConnectorWithConnectionFailure.class};
+  }
+
+  @Test
+  public void retryPolicyExhaustedDueToInvalidConnectionExecutingOperation() throws Exception {
+    exception.expect(MessagingException.class);
+    exception.expectCause(is(instanceOf(RetryPolicyExhaustedException.class)));
+    exception.expectMessage(is(CONNECTION_FAIL_DOT));
+    runFlow("fail-operation-with-connection-exception");
+  }
+
+  @Test
+  public void retryPolicyExhaustedDueToInvalidConnectionAtValidateTime() throws Exception {
+    exception.expect(MessagingException.class);
+    exception.expectCause(is(instanceOf(RetryPolicyExhaustedException.class)));
+    exception.expectMessage(is(CONNECTION_FAIL_DOT));
+    runFlow("fail-connection-validation");
+  }
+
+  @Test
+  public void retryPolicyNotExecutedDueToNotConnectionExceptionWithException() throws Exception {
+    exception.expect(MessagingException.class);
+    exception.expectCause(is(instanceOf(Throwable.class)));
+    exception.expectMessage(is(CONNECTION_FAIL_DOT));
+    runFlow("fail-operation-with-not-handled-exception");
+  }
+
+  @Test
+  public void retryPolicyNotExecutedDueToNotConnectionExceptionWithThrowable() throws Throwable {
+    exception.expect(MessagingException.class);
+    exception.expectCause(is(instanceOf(Throwable.class)));
+    runFlow("fail-operation-with-not-handled-throwable");
+
+  }
+
+  @Extension(name = "petstore", description = "PetStore Test connector")
+  @Operations(PetStoreOperationsWithFailures.class)
+  @Providers({PooledPetStoreConnectionProviderWithFailureInvalidConnection.class,
+      PooledPetStoreConnectionProviderWithValidConnection.class})
+  @Xml(namespaceLocation = "http://www.mulesoft.org/schema/mule/petstore", namespace = "petstore")
+  public static class PetStoreConnectorWithConnectionFailure extends PetStoreConnector {
+  }
+
+  @Alias("valid")
+  public static class PooledPetStoreConnectionProviderWithValidConnection extends PetStoreConnectionProvider<PetStoreClient>
+      implements PoolingConnectionProvider<PetStoreClient> {
+
+  }
+
+  @Alias("invalid")
+  public static class PooledPetStoreConnectionProviderWithFailureInvalidConnection
+      extends PetStoreConnectionProvider<PetStoreClient> implements PoolingConnectionProvider<PetStoreClient> {
 
     @Override
-    protected String getConfigFile()
-    {
-        return "petstore-retry-policy.xml";
+    public ConnectionValidationResult validate(PetStoreClient connection) {
+      return ConnectionValidationResult.failure(CONNECTION_FAIL, ConnectionExceptionCode.INCORRECT_CREDENTIALS,
+                                                new Exception("Invalid credentials"));
+    }
+  }
+
+  public static class PetStoreOperationsWithFailures extends PetStoreOperations {
+
+    public Integer failConnection(@Connection PetStoreClient client) throws ConnectionException {
+      throw new ConnectionException(CONNECTION_FAIL);
     }
 
-    @Override
-    protected Class<?>[] getAnnotatedExtensionClasses()
-    {
-        return new Class<?>[] {PetStoreConnectorWithConnectionFailure.class};
+    public Integer failOperationWithException(@Connection PetStoreClient client) throws Exception {
+      throw new Exception(CONNECTION_FAIL);
     }
 
-    @Test
-    public void retryPolicyExhaustedDueToInvalidConnectionExecutingOperation() throws Exception
-    {
-        exception.expect(MessagingException.class);
-        exception.expectCause(is(instanceOf(RetryPolicyExhaustedException.class)));
-        exception.expectMessage(is(CONNECTION_FAIL_DOT));
-        runFlow("fail-operation-with-connection-exception");
+    public Integer failOperationWithThrowable(@Connection PetStoreClient client) throws Throwable {
+      throw new Throwable(CONNECTION_FAIL);
     }
-
-    @Test
-    public void retryPolicyExhaustedDueToInvalidConnectionAtValidateTime() throws Exception
-    {
-        exception.expect(MessagingException.class);
-        exception.expectCause(is(instanceOf(RetryPolicyExhaustedException.class)));
-        exception.expectMessage(is(CONNECTION_FAIL_DOT));
-        runFlow("fail-connection-validation");
-    }
-
-    @Test
-    public void retryPolicyNotExecutedDueToNotConnectionExceptionWithException() throws Exception
-    {
-        exception.expect(MessagingException.class);
-        exception.expectCause(is(instanceOf(Throwable.class)));
-        exception.expectMessage(is(CONNECTION_FAIL_DOT));
-        runFlow("fail-operation-with-not-handled-exception");
-    }
-
-    @Test
-    public void retryPolicyNotExecutedDueToNotConnectionExceptionWithThrowable() throws Throwable
-    {
-        exception.expect(MessagingException.class);
-        exception.expectCause(is(instanceOf(Throwable.class)));
-        runFlow("fail-operation-with-not-handled-throwable");
-
-    }
-
-    @Extension(name = "petstore", description = "PetStore Test connector")
-    @Operations(PetStoreOperationsWithFailures.class)
-    @Providers({PooledPetStoreConnectionProviderWithFailureInvalidConnection.class, PooledPetStoreConnectionProviderWithValidConnection.class})
-    @Xml(namespaceLocation = "http://www.mulesoft.org/schema/mule/petstore", namespace = "petstore")
-    public static class PetStoreConnectorWithConnectionFailure extends PetStoreConnector
-    {
-    }
-
-    @Alias("valid")
-    public static class PooledPetStoreConnectionProviderWithValidConnection extends PetStoreConnectionProvider<PetStoreClient> implements PoolingConnectionProvider<PetStoreClient>
-    {
-
-    }
-
-    @Alias("invalid")
-    public static class PooledPetStoreConnectionProviderWithFailureInvalidConnection extends PetStoreConnectionProvider<PetStoreClient>
-            implements PoolingConnectionProvider<PetStoreClient>
-    {
-        @Override
-        public ConnectionValidationResult validate(PetStoreClient connection)
-        {
-             return ConnectionValidationResult.failure(CONNECTION_FAIL, ConnectionExceptionCode.INCORRECT_CREDENTIALS, new Exception("Invalid credentials"));
-        }
-    }
-
-    public static class PetStoreOperationsWithFailures extends PetStoreOperations
-    {
-        public Integer failConnection(@Connection PetStoreClient client) throws ConnectionException
-        {
-            throw new ConnectionException(CONNECTION_FAIL);
-        }
-
-        public Integer failOperationWithException(@Connection PetStoreClient client) throws Exception
-        {
-            throw new Exception(CONNECTION_FAIL);
-        }
-
-        public Integer failOperationWithThrowable(@Connection PetStoreClient client) throws Throwable
-        {
-            throw new Throwable(CONNECTION_FAIL);
-        }
-    }
+  }
 
 
 }

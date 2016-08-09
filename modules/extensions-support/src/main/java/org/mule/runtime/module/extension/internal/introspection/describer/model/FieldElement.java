@@ -13,21 +13,19 @@ import java.lang.reflect.Field;
  *
  * @since 4.0
  */
-public interface FieldElement extends ExtensionParameter
-{
+public interface FieldElement extends ExtensionParameter {
 
-    /**
-     * @return The represented {@link Field}
-     */
-    //TODO MULE-10137 - Adapt logic to AST
-    Field getField();
+  /**
+   * @return The represented {@link Field}
+   */
+  // TODO MULE-10137 - Adapt logic to AST
+  Field getField();
 
-    /**
-     * {@inheritDoc}
-     */
-    default boolean isFieldBased()
-    {
-        return true;
-    }
+  /**
+   * {@inheritDoc}
+   */
+  default boolean isFieldBased() {
+    return true;
+  }
 
 }

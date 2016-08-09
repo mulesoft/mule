@@ -20,23 +20,29 @@ import org.mule.runtime.config.spring.handlers.AbstractMuleNamespaceHandler;
  * Registers a Bean Definition Parser for handling <code><parsers-test:...></code> elements.
  *
  */
-public class EndpointParsersTestNamespaceHandler extends AbstractMuleNamespaceHandler
-{
+public class EndpointParsersTestNamespaceHandler extends AbstractMuleNamespaceHandler {
 
-    @Override
-    public void init()
-    {
-        registerMuleBeanDefinitionParser("address", new ChildAddressDefinitionParser("test")).addAlias("address", "host");
-        registerBeanDefinitionParser("orphan-endpoint", new OrphanEndpointDefinitionParser(EndpointURIEndpointBuilder.class));
-        registerBeanDefinitionParser("child-endpoint", new ChildEndpointDefinitionParser(InboundEndpointFactoryBean.class));
-        registerBeanDefinitionParser("unaddressed-orphan-endpoint", new OrphanEndpointDefinitionParser(EndpointURIEndpointBuilder.class));
-        registerBeanDefinitionParser("addressed-orphan-endpoint", new AddressedEndpointDefinitionParser("test", AddressedEndpointDefinitionParser.PROTOCOL, new OrphanEndpointDefinitionParser(EndpointURIEndpointBuilder.class), new String[]{"path"}, new String[]{}));
-        registerBeanDefinitionParser("addressed-child-endpoint", new TransportEndpointDefinitionParser("test", InboundEndpointFactoryBean.class, new String[]{}));
+  @Override
+  public void init() {
+    registerMuleBeanDefinitionParser("address", new ChildAddressDefinitionParser("test")).addAlias("address", "host");
+    registerBeanDefinitionParser("orphan-endpoint", new OrphanEndpointDefinitionParser(EndpointURIEndpointBuilder.class));
+    registerBeanDefinitionParser("child-endpoint", new ChildEndpointDefinitionParser(InboundEndpointFactoryBean.class));
+    registerBeanDefinitionParser("unaddressed-orphan-endpoint",
+                                 new OrphanEndpointDefinitionParser(EndpointURIEndpointBuilder.class));
+    registerBeanDefinitionParser("addressed-orphan-endpoint",
+                                 new AddressedEndpointDefinitionParser("test", AddressedEndpointDefinitionParser.PROTOCOL,
+                                                                       new OrphanEndpointDefinitionParser(EndpointURIEndpointBuilder.class),
+                                                                       new String[] {"path"}, new String[] {}));
+    registerBeanDefinitionParser("addressed-child-endpoint",
+                                 new TransportEndpointDefinitionParser("test", InboundEndpointFactoryBean.class,
+                                                                       new String[] {}));
 
-        registerMuleBeanDefinitionParser("complex-endpoint",
-                new TransportGlobalEndpointDefinitionParser(
-                        "test", TransportGlobalEndpointDefinitionParser.PROTOCOL,
-                        new String[]{"path"}, new String[]{"string", "bar"})).addAlias("bar", "foo");
-    }
+    registerMuleBeanDefinitionParser("complex-endpoint",
+                                     new TransportGlobalEndpointDefinitionParser("test",
+                                                                                 TransportGlobalEndpointDefinitionParser.PROTOCOL,
+                                                                                 new String[] {"path"},
+                                                                                 new String[] {"string", "bar"})).addAlias("bar",
+                                                                                                                           "foo");
+  }
 
 }

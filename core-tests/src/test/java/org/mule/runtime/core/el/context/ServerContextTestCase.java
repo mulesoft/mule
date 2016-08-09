@@ -20,218 +20,183 @@ import java.util.Locale;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class ServerContextTestCase extends AbstractELTestCase
-{
-    public ServerContextTestCase(Variant variant, String mvelOptimizer)
-    {
-        super(variant, mvelOptimizer);
-    }
+public class ServerContextTestCase extends AbstractELTestCase {
 
-    @Test
-    public void host() throws UnknownHostException
-    {
-        Assert.assertEquals(NetworkUtils.getLocalHost().getCanonicalHostName(), evaluate("server.host"));
-    }
+  public ServerContextTestCase(Variant variant, String mvelOptimizer) {
+    super(variant, mvelOptimizer);
+  }
 
-    @Test
-    public void assignValueToHost()
-    {
-        assertFinalProperty("server.host='1'");
-    }
+  @Test
+  public void host() throws UnknownHostException {
+    Assert.assertEquals(NetworkUtils.getLocalHost().getCanonicalHostName(), evaluate("server.host"));
+  }
 
-    @Test
-    public void ip() throws UnknownHostException
-    {
-        Assert.assertEquals(NetworkUtils.getLocalHost().getHostAddress(), evaluate("server.ip"));
-    }
+  @Test
+  public void assignValueToHost() {
+    assertFinalProperty("server.host='1'");
+  }
 
-    @Test
-    public void assignValueToIp()
-    {
-        assertFinalProperty("server.ip='1'");
-    }
+  @Test
+  public void ip() throws UnknownHostException {
+    Assert.assertEquals(NetworkUtils.getLocalHost().getHostAddress(), evaluate("server.ip"));
+  }
 
-    @Test
-    public void javaSystemProperties()
-    {
-        Assert.assertEquals(System.getProperties(), evaluate("server.systemProperties"));
-    }
+  @Test
+  public void assignValueToIp() {
+    assertFinalProperty("server.ip='1'");
+  }
 
-    @Test
-    public void assignValueToJavaSystemProperties()
-    {
-        assertFinalProperty("server.systemProperties='1'");
-    }
+  @Test
+  public void javaSystemProperties() {
+    Assert.assertEquals(System.getProperties(), evaluate("server.systemProperties"));
+  }
 
-    @Test
-    public void tmpDir()
-    {
-        Assert.assertEquals(System.getProperty("java.io.tmpdir"), evaluate("server.tmpDir"));
-    }
+  @Test
+  public void assignValueToJavaSystemProperties() {
+    assertFinalProperty("server.systemProperties='1'");
+  }
 
-    @Test
-    public void assignValueToTmpdir()
-    {
-        assertFinalProperty("server.tmpDir='1'");
-    }
+  @Test
+  public void tmpDir() {
+    Assert.assertEquals(System.getProperty("java.io.tmpdir"), evaluate("server.tmpDir"));
+  }
 
-    @Test
-    public void fileSeperator()
-    {
-        Assert.assertEquals(System.getProperty("file.separator"), evaluate("server.fileSeparator"));
-    }
+  @Test
+  public void assignValueToTmpdir() {
+    assertFinalProperty("server.tmpDir='1'");
+  }
 
-    @Test
-    public void assignValueToFileseperator()
-    {
-        assertFinalProperty("server.fileSeparator='1'");
-    }
+  @Test
+  public void fileSeperator() {
+    Assert.assertEquals(System.getProperty("file.separator"), evaluate("server.fileSeparator"));
+  }
 
-    @Test
-    public void osName()
-    {
-        Assert.assertEquals(System.getProperty("os.name"), evaluate("server.osName"));
-    }
+  @Test
+  public void assignValueToFileseperator() {
+    assertFinalProperty("server.fileSeparator='1'");
+  }
 
-    @Test
-    public void assignValueToOsName()
-    {
-        assertFinalProperty("server.osName='1'");
-    }
+  @Test
+  public void osName() {
+    Assert.assertEquals(System.getProperty("os.name"), evaluate("server.osName"));
+  }
 
-    @Test
-    public void osArch()
-    {
-        Assert.assertEquals(System.getProperty("os.arch"), evaluate("server.osArch"));
-    }
+  @Test
+  public void assignValueToOsName() {
+    assertFinalProperty("server.osName='1'");
+  }
 
-    @Test
-    public void assignValueToOsArch()
-    {
-        assertFinalProperty("server.osArch='1'");
-    }
+  @Test
+  public void osArch() {
+    Assert.assertEquals(System.getProperty("os.arch"), evaluate("server.osArch"));
+  }
 
-    @Test
-    public void osVersion()
-    {
-        Assert.assertEquals(System.getProperty("os.version"), evaluate("server.osVersion"));
-    }
+  @Test
+  public void assignValueToOsArch() {
+    assertFinalProperty("server.osArch='1'");
+  }
 
-    @Test
-    public void assignValueToOsVersion()
-    {
-        assertFinalProperty("server.os.version='1'");
-    }
+  @Test
+  public void osVersion() {
+    Assert.assertEquals(System.getProperty("os.version"), evaluate("server.osVersion"));
+  }
 
-    @Test
-    public void javaVersion()
-    {
-        Assert.assertEquals(System.getProperty("java.version"), evaluate("server.javaVersion"));
-    }
+  @Test
+  public void assignValueToOsVersion() {
+    assertFinalProperty("server.os.version='1'");
+  }
 
-    @Test
-    public void assignValueToJavaVersion()
-    {
-        assertFinalProperty("server.javaVersion='1'");
-    }
+  @Test
+  public void javaVersion() {
+    Assert.assertEquals(System.getProperty("java.version"), evaluate("server.javaVersion"));
+  }
 
-    @Test
-    public void javaVendor()
-    {
-        Assert.assertEquals(System.getProperty("java.vendor"), evaluate("server.javaVendor"));
-    }
+  @Test
+  public void assignValueToJavaVersion() {
+    assertFinalProperty("server.javaVersion='1'");
+  }
 
-    @Test
-    public void assignValueToJavaVendor()
-    {
-        assertFinalProperty("server.javaVendor='1'");
-    }
+  @Test
+  public void javaVendor() {
+    Assert.assertEquals(System.getProperty("java.vendor"), evaluate("server.javaVendor"));
+  }
 
-    @Test
-    public void env()
-    {
-        Assert.assertEquals(System.getenv(), evaluate("server.env"));
-    }
+  @Test
+  public void assignValueToJavaVendor() {
+    assertFinalProperty("server.javaVendor='1'");
+  }
 
-    @Test
-    public void assignValueToEnv()
-    {
-        assertFinalProperty("server.env='1'");
-    }
+  @Test
+  public void env() {
+    Assert.assertEquals(System.getenv(), evaluate("server.env"));
+  }
 
-    @Test
-    public void timeZone()
-    {
-        Assert.assertEquals(Calendar.getInstance().getTimeZone(), evaluate("server.timeZone"));
-    }
+  @Test
+  public void assignValueToEnv() {
+    assertFinalProperty("server.env='1'");
+  }
 
-    @Test
-    public void assignValueToTimeZone()
-    {
-        assertFinalProperty("server.timeZone='1'");
-    }
+  @Test
+  public void timeZone() {
+    Assert.assertEquals(Calendar.getInstance().getTimeZone(), evaluate("server.timeZone"));
+  }
 
-    @Test
-    public void locale()
-    {
-        Assert.assertEquals(Locale.getDefault(), evaluate("server.locale"));
-    }
+  @Test
+  public void assignValueToTimeZone() {
+    assertFinalProperty("server.timeZone='1'");
+  }
 
-    @Test
-    public void assignValueToLocal()
-    {
-        assertFinalProperty("server.locale='1'");
-    }
+  @Test
+  public void locale() {
+    Assert.assertEquals(Locale.getDefault(), evaluate("server.locale"));
+  }
 
-    @Test
-    public void userName()
-    {
-        Assert.assertEquals(System.getProperty("user.name"), evaluate("server.userName"));
-    }
+  @Test
+  public void assignValueToLocal() {
+    assertFinalProperty("server.locale='1'");
+  }
 
-    @Test
-    public void assignValueToUserName()
-    {
-        assertFinalProperty("server.userName='1'");
-    }
+  @Test
+  public void userName() {
+    Assert.assertEquals(System.getProperty("user.name"), evaluate("server.userName"));
+  }
 
-    @Test
-    public void userHome()
-    {
-        Assert.assertEquals(System.getProperty("user.home"), evaluate("server.userHome"));
-    }
+  @Test
+  public void assignValueToUserName() {
+    assertFinalProperty("server.userName='1'");
+  }
 
-    @Test
-    public void assignValueToUserHome()
-    {
-        assertFinalProperty("server.userHome='1'");
-    }
+  @Test
+  public void userHome() {
+    Assert.assertEquals(System.getProperty("user.home"), evaluate("server.userHome"));
+  }
 
-    @Test
-    public void userDir()
-    {
-        Assert.assertEquals(System.getProperty("user.dir"), evaluate("server.userDir"));
-    }
+  @Test
+  public void assignValueToUserHome() {
+    assertFinalProperty("server.userHome='1'");
+  }
 
-    @Test
-    public void assignValueToUserDir()
-    {
-        assertFinalProperty("server.userDir='1'");
-    }
+  @Test
+  public void userDir() {
+    Assert.assertEquals(System.getProperty("user.dir"), evaluate("server.userDir"));
+  }
 
-    @Test
-    public void dateTime()
-    {
-        DateTime serverTime = (DateTime) evaluate("server.dateTime");
-        long diff = new Date().getTime() - serverTime.toDate().getTime();
-        assertThat("server.dateTime is not returning the current time", diff, lessThan(DEFAULT_TEST_TIMEOUT_SECS * 1000L));
-        assertThat(evaluate("server.dateTime"), instanceOf(DateTime.class));
-    }
+  @Test
+  public void assignValueToUserDir() {
+    assertFinalProperty("server.userDir='1'");
+  }
 
-    @Test
-    public void assignValueToDateTime()
-    {
-        assertFinalProperty("server.dateTime='1'");
-    }
+  @Test
+  public void dateTime() {
+    DateTime serverTime = (DateTime) evaluate("server.dateTime");
+    long diff = new Date().getTime() - serverTime.toDate().getTime();
+    assertThat("server.dateTime is not returning the current time", diff, lessThan(DEFAULT_TEST_TIMEOUT_SECS * 1000L));
+    assertThat(evaluate("server.dateTime"), instanceOf(DateTime.class));
+  }
+
+  @Test
+  public void assignValueToDateTime() {
+    assertFinalProperty("server.dateTime='1'");
+  }
 
 }

@@ -30,50 +30,45 @@ import javax.transaction.TransactionManager;
 
 import org.junit.Test;
 
-public class ExtensionsConnectionAdapterTestCase extends AbstractMuleContextTestCase
-{
+public class ExtensionsConnectionAdapterTestCase extends AbstractMuleContextTestCase {
 
-    private ExtensionsConnectionAdapter adapter;
+  private ExtensionsConnectionAdapter adapter;
 
-    @Override
-    protected void doSetUp() throws Exception
-    {
-        adapter = muleContext.getRegistry().lookupObject(ExtensionsConnectionAdapter.class);
+  @Override
+  protected void doSetUp() throws Exception {
+    adapter = muleContext.getRegistry().lookupObject(ExtensionsConnectionAdapter.class);
+  }
+
+  @Override
+  protected void doTearDownAfterMuleContextDispose() throws Exception {
+    Transaction transaction = TransactionCoordination.getInstance().getTransaction();
+    if (transaction != null) {
+      TransactionCoordination.getInstance().unbindTransaction(transaction);
     }
+  }
 
-    @Override
-    protected void doTearDownAfterMuleContextDispose() throws Exception
-    {
-        Transaction transaction = TransactionCoordination.getInstance().getTransaction();
-        if (transaction != null)
-        {
-            TransactionCoordination.getInstance().unbindTransaction(transaction);
-        }
-    }
+  @Test
+  public void xaTransaction() throws Exception {
+    muleContext.setTransactionManager(mock(TransactionManager.class, RETURNS_DEEP_STUBS));
+    XaTransaction transaction = spy(new XaTransaction(muleContext));
+    XATransactionalConnection connection = mock(XATransactionalConnection.class, RETURNS_DEEP_STUBS);
+    Object config = new Object();
 
-    @Test
-    public void xaTransaction() throws Exception
-    {
-        muleContext.setTransactionManager(mock(TransactionManager.class, RETURNS_DEEP_STUBS));
-        XaTransaction transaction = spy(new XaTransaction(muleContext));
-        XATransactionalConnection connection = mock(XATransactionalConnection.class, RETURNS_DEEP_STUBS);
-        Object config = new Object();
+    OperationContextAdapter operationContext = mock(OperationContextAdapter.class, RETURNS_DEEP_STUBS);
+    ConnectionProvider connectionProvider = mock(ConnectionProvider.class);
+    when(operationContext.getConfiguration().getConnectionProvider()).thenReturn(Optional.of(connectionProvider));
+    when(operationContext.getConfiguration().getValue()).thenReturn(config);
+    when(connectionProvider.connect()).thenReturn(connection);
 
-        OperationContextAdapter operationContext = mock(OperationContextAdapter.class, RETURNS_DEEP_STUBS);
-        ConnectionProvider connectionProvider = mock(ConnectionProvider.class);
-        when(operationContext.getConfiguration().getConnectionProvider()).thenReturn(Optional.of(connectionProvider));
-        when(operationContext.getConfiguration().getValue()).thenReturn(config);
-        when(connectionProvider.connect()).thenReturn(connection);
+    TransactionConfig transactionConfig = mock(TransactionConfig.class);
+    when(transactionConfig.getAction()).thenReturn(ACTION_ALWAYS_JOIN);
+    when(operationContext.getTransactionConfig()).thenReturn(Optional.of(transactionConfig));
 
-        TransactionConfig transactionConfig = mock(TransactionConfig.class);
-        when(transactionConfig.getAction()).thenReturn(ACTION_ALWAYS_JOIN);
-        when(operationContext.getTransactionConfig()).thenReturn(Optional.of(transactionConfig));
+    muleContext.getRegistry().lookupObject(ConnectionManager.class).bind(config, connectionProvider);
 
-        muleContext.getRegistry().lookupObject(ConnectionManager.class).bind(config, connectionProvider);
+    TransactionCoordination.getInstance().bindTransaction(transaction);
 
-        TransactionCoordination.getInstance().bindTransaction(transaction);
-
-        adapter.getConnection(operationContext);
-        verify(transaction).bindResource(any(), any(XAExtensionTransactionalResource.class));
-    }
+    adapter.getConnection(operationContext);
+    verify(transaction).bindResource(any(), any(XAExtensionTransactionalResource.class));
+  }
 }

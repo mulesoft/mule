@@ -20,47 +20,37 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 
 /**
- * This interceptor is responsible for decompressing a message
- * received with Content-Encoding that includes gzip or x-zip.
- * It won't delete the Content-Encoding property since we are proxying
- * and we might still require it.
+ * This interceptor is responsible for decompressing a message received with Content-Encoding that includes gzip or x-zip. It
+ * won't delete the Content-Encoding property since we are proxying and we might still require it.
  */
-public class ProxyGZIPInInterceptor extends AbstractProxyGZIPInterceptor
-{
-    public ProxyGZIPInInterceptor()
-    {
-        super(Phase.RECEIVE);
-        addBefore(AttachmentInInterceptor.class.getName());
+public class ProxyGZIPInInterceptor extends AbstractProxyGZIPInterceptor {
+
+  public ProxyGZIPInInterceptor() {
+    super(Phase.RECEIVE);
+    addBefore(AttachmentInInterceptor.class.getName());
+  }
+
+
+  @Override
+  public void handleMessage(Message message) throws Fault {
+    MuleEvent event = (MuleEvent) message.getExchange().get(CxfConstants.MULE_EVENT);
+
+    if (event == null || event.getMessage() == null) {
+      return;
     }
 
+    if (isEncoded(event.getMessage())) {
+      InputStream is = message.getContent(InputStream.class);
+      if (is == null) {
+        return;
+      }
 
-    @Override
-    public void handleMessage(Message message) throws Fault
-    {
-        MuleEvent event = (MuleEvent) message.getExchange().get(CxfConstants.MULE_EVENT);
-
-        if (event == null || event.getMessage() == null)
-        {
-            return;
-        }
-
-        if(isEncoded(event.getMessage()))
-        {
-            InputStream is = message.getContent(InputStream.class);
-            if (is == null)
-            {
-                return;
-            }
-
-            try
-            {
-                GZIPInputStream zipInput = new GZIPInputStream(is);
-                message.setContent(InputStream.class, zipInput);
-            }
-            catch(IOException io)
-            {
-                throw new Fault(io);
-            }
-        }
+      try {
+        GZIPInputStream zipInput = new GZIPInputStream(is);
+        message.setContent(InputStream.class, zipInput);
+      } catch (IOException io) {
+        throw new Fault(io);
+      }
     }
+  }
 }

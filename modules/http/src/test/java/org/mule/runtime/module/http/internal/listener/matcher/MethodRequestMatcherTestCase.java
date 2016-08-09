@@ -16,30 +16,26 @@ import org.mule.tck.size.SmallTest;
 import org.junit.Test;
 
 @SmallTest
-public class MethodRequestMatcherTestCase extends AbstractMuleTestCase
-{
+public class MethodRequestMatcherTestCase extends AbstractMuleTestCase {
 
-    @Test(expected =  IllegalArgumentException.class)
-    public void doNotAcceptsNull()
-    {
-        new MethodRequestMatcher(null);
-    }
+  @Test(expected = IllegalArgumentException.class)
+  public void doNotAcceptsNull() {
+    new MethodRequestMatcher(null);
+  }
 
-    @Test
-    public void onlyAcceptsOneMethod()
-    {
-        final MethodRequestMatcher matcher = new MethodRequestMatcher("GET");
-        assertThat(matcher.matches(new HttpRequestBuilder().setMethod("GET").build()), is(true));
-        assertThat(matcher.matches(new HttpRequestBuilder().setMethod("POST").build()), is(false));
-    }
+  @Test
+  public void onlyAcceptsOneMethod() {
+    final MethodRequestMatcher matcher = new MethodRequestMatcher("GET");
+    assertThat(matcher.matches(new HttpRequestBuilder().setMethod("GET").build()), is(true));
+    assertThat(matcher.matches(new HttpRequestBuilder().setMethod("POST").build()), is(false));
+  }
 
-    @Test
-    public void acceptSeveralMethods()
-    {
-        final MethodRequestMatcher matcher = new MethodRequestMatcher("GET", "POST", "PATCH");
-        assertThat(matcher.matches(new HttpRequestBuilder().setMethod("GET").build()), is(true));
-        assertThat(matcher.matches(new HttpRequestBuilder().setMethod("POST").build()), is(true));
-        assertThat(matcher.matches(new HttpRequestBuilder().setMethod("PATCH").build()), is(true));
-        assertThat(matcher.matches(new HttpRequestBuilder().setMethod("OPTIONS").build()), is(false));
-    }
+  @Test
+  public void acceptSeveralMethods() {
+    final MethodRequestMatcher matcher = new MethodRequestMatcher("GET", "POST", "PATCH");
+    assertThat(matcher.matches(new HttpRequestBuilder().setMethod("GET").build()), is(true));
+    assertThat(matcher.matches(new HttpRequestBuilder().setMethod("POST").build()), is(true));
+    assertThat(matcher.matches(new HttpRequestBuilder().setMethod("PATCH").build()), is(true));
+    assertThat(matcher.matches(new HttpRequestBuilder().setMethod("OPTIONS").build()), is(false));
+  }
 }

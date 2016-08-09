@@ -10,18 +10,15 @@ package org.mule.test.subtypes.extension;
 import org.mule.runtime.extension.api.annotation.Alias;
 
 @Alias("triangleAlias")
-public class Triangle extends ParentShape
-{
+public class Triangle extends ParentShape {
 
-    private Integer height;
+  private Integer height;
 
-    public Integer getHeight()
-    {
-        return height;
-    }
+  public Integer getHeight() {
+    return height;
+  }
 
-    public void setHeight(Integer height)
-    {
-        this.height = height;
-    }
+  public void setHeight(Integer height) {
+    this.height = height;
+  }
 }

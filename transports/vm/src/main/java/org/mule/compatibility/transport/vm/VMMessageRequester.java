@@ -16,114 +16,84 @@ import org.mule.runtime.core.util.queue.QueueSession;
 import java.io.Serializable;
 
 /**
- * <code>VMMessageDispatcher</code> is used for providing in memory interaction
- * between components.
+ * <code>VMMessageDispatcher</code> is used for providing in memory interaction between components.
  */
-public class VMMessageRequester extends AbstractMessageRequester
-{
+public class VMMessageRequester extends AbstractMessageRequester {
 
-    private final VMConnector connector;
+  private final VMConnector connector;
 
-    public VMMessageRequester(InboundEndpoint endpoint)
-    {
-        super(endpoint);
-        this.connector = (VMConnector) endpoint.getConnector();
-    }
+  public VMMessageRequester(InboundEndpoint endpoint) {
+    super(endpoint);
+    this.connector = (VMConnector) endpoint.getConnector();
+  }
 
-    /**
-     * Make a specific request to the underlying transport
-     *
-     * @param timeout the maximum time the operation should block before returning.
-     *                The call should return immediately if there is data available. If
-     *                no data becomes available before the timeout elapses, null will be
-     *                returned
-     * @return the result of the request wrapped in a MuleMessage object. Null will be
-     *         returned if no data was available
-     * @throws Exception if the call to the underlying protocol causes an exception
-     */
-    @Override
-    protected MuleMessage doRequest(long timeout) throws Exception
-    {
-        try
-        {
-            QueueSession queueSession = connector.getTransactionalResource(endpoint);
-            Queue queue = queueSession.getQueue(endpoint.getEndpointURI().getAddress());
+  /**
+   * Make a specific request to the underlying transport
+   *
+   * @param timeout the maximum time the operation should block before returning. The call should return immediately if there is
+   *        data available. If no data becomes available before the timeout elapses, null will be returned
+   * @return the result of the request wrapped in a MuleMessage object. Null will be returned if no data was available
+   * @throws Exception if the call to the underlying protocol causes an exception
+   */
+  @Override
+  protected MuleMessage doRequest(long timeout) throws Exception {
+    try {
+      QueueSession queueSession = connector.getTransactionalResource(endpoint);
+      Queue queue = queueSession.getQueue(endpoint.getEndpointURI().getAddress());
 
-            if (queue == null)
-            {
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("No queue with name " + endpoint.getEndpointURI().getAddress());
-                }
-                return null;
-            }
-            else
-            {
-                MuleMessage message = null;
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("Waiting for a message on " + endpoint.getEndpointURI().getAddress());
-                }
-                try
-                {
-                    Serializable polledItem = queue.poll(timeout);
-
-                    if (polledItem instanceof MuleEvent)
-                    {
-                        message = ((MuleEvent) polledItem).getMessage();
-                    }
-                    else
-                    {
-                        message = (MuleMessage) polledItem;
-                    }
-                }
-                catch (InterruptedException e)
-                {
-                    logger.error("Failed to receive message from queue: " + endpoint.getEndpointURI());
-                }
-                if (message != null)
-                {
-                    if (logger.isDebugEnabled())
-                    {
-                        logger.debug("Message received: " + message);
-                    }
-                    return message;
-                }
-                else
-                {
-                    if (logger.isDebugEnabled())
-                    {
-                        logger.debug("No event received after " + timeout + " ms");
-                    }
-                    return null;
-                }
-            }
+      if (queue == null) {
+        if (logger.isDebugEnabled()) {
+          logger.debug("No queue with name " + endpoint.getEndpointURI().getAddress());
         }
-        catch (Exception e)
-        {
-            throw e;
+        return null;
+      } else {
+        MuleMessage message = null;
+        if (logger.isDebugEnabled()) {
+          logger.debug("Waiting for a message on " + endpoint.getEndpointURI().getAddress());
         }
-    }
+        try {
+          Serializable polledItem = queue.poll(timeout);
 
-    @Override
-    protected void doDispose()
-    {
-        // template method
+          if (polledItem instanceof MuleEvent) {
+            message = ((MuleEvent) polledItem).getMessage();
+          } else {
+            message = (MuleMessage) polledItem;
+          }
+        } catch (InterruptedException e) {
+          logger.error("Failed to receive message from queue: " + endpoint.getEndpointURI());
+        }
+        if (message != null) {
+          if (logger.isDebugEnabled()) {
+            logger.debug("Message received: " + message);
+          }
+          return message;
+        } else {
+          if (logger.isDebugEnabled()) {
+            logger.debug("No event received after " + timeout + " ms");
+          }
+          return null;
+        }
+      }
+    } catch (Exception e) {
+      throw e;
     }
+  }
 
-    @Override
-    protected void doConnect() throws Exception
-    {
-        // use the default queue profile to configure this queue.
-        connector.getQueueProfile().configureQueue(
-            getEndpoint().getMuleContext(), endpoint.getEndpointURI().getAddress(),
-            connector.getQueueManager());
-    }
+  @Override
+  protected void doDispose() {
+    // template method
+  }
 
-    @Override
-    protected void doDisconnect() throws Exception
-    {
-        // template method
-    }
+  @Override
+  protected void doConnect() throws Exception {
+    // use the default queue profile to configure this queue.
+    connector.getQueueProfile().configureQueue(getEndpoint().getMuleContext(), endpoint.getEndpointURI().getAddress(),
+                                               connector.getQueueManager());
+  }
+
+  @Override
+  protected void doDisconnect() throws Exception {
+    // template method
+  }
 
 }

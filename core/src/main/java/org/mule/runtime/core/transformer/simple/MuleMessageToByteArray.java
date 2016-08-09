@@ -13,17 +13,15 @@ import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 import java.nio.charset.Charset;
 
 /** TODO */
-public class MuleMessageToByteArray extends AbstractMessageTransformer
-{
-    public MuleMessageToByteArray()
-    {
-        registerSourceType(DataType.MULE_MESSAGE);
-        setReturnDataType(DataType.BYTE_ARRAY);
-    }
+public class MuleMessageToByteArray extends AbstractMessageTransformer {
 
-    @Override
-    public Object transformMessage(MuleEvent event, Charset outputEncoding)
-    {
-        return muleContext.getObjectSerializer().serialize(event.getMessage());
-    }
+  public MuleMessageToByteArray() {
+    registerSourceType(DataType.MULE_MESSAGE);
+    setReturnDataType(DataType.BYTE_ARRAY);
+  }
+
+  @Override
+  public Object transformMessage(MuleEvent event, Charset outputEncoding) {
+    return muleContext.getObjectSerializer().serialize(event.getMessage());
+  }
 }

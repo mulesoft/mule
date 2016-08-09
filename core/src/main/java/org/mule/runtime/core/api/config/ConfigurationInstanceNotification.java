@@ -14,36 +14,32 @@ import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
  *
  * @since 4.0
  */
-public class ConfigurationInstanceNotification extends CustomNotification
-{
+public class ConfigurationInstanceNotification extends CustomNotification {
 
-    private static final int CONFIGURATION_INSTANCE_ACTION_BASE = (CUSTOM_EVENT_ACTION_START_RANGE + 4) * 5;
-    private static int ACTION_INDEX = 0;
+  private static final int CONFIGURATION_INSTANCE_ACTION_BASE = (CUSTOM_EVENT_ACTION_START_RANGE + 4) * 5;
+  private static int ACTION_INDEX = 0;
 
-    public static final int CONFIGURATION_STOPPED = ++ACTION_INDEX + CONFIGURATION_INSTANCE_ACTION_BASE;
+  public static final int CONFIGURATION_STOPPED = ++ACTION_INDEX + CONFIGURATION_INSTANCE_ACTION_BASE;
 
-    static
-    {
-        registerAction("Configuration instance is stopped", CONFIGURATION_STOPPED);
-    }
+  static {
+    registerAction("Configuration instance is stopped", CONFIGURATION_STOPPED);
+  }
 
-    private final ConfigurationInstance configurationInstance;
+  private final ConfigurationInstance configurationInstance;
 
-    public ConfigurationInstanceNotification(ConfigurationInstance configurationInstance, int action)
-    {
-        super(null, action);
-        this.configurationInstance = configurationInstance;
-        this.action = action;
-    }
+  public ConfigurationInstanceNotification(ConfigurationInstance configurationInstance, int action) {
+    super(null, action);
+    this.configurationInstance = configurationInstance;
+    this.action = action;
+  }
 
-    @Override
-    public String toString()
-    {
-        return String.format("%s {action=%s, resourceId=%s, timestamp=%s}", EVENT_NAME, getActionName(action), resourceIdentifier, timestamp);
-    }
+  @Override
+  public String toString() {
+    return String.format("%s {action=%s, resourceId=%s, timestamp=%s}", EVENT_NAME, getActionName(action), resourceIdentifier,
+                         timestamp);
+  }
 
-    public ConfigurationInstance getConfigurationInstance()
-    {
-        return configurationInstance;
-    }
+  public ConfigurationInstance getConfigurationInstance() {
+    return configurationInstance;
+  }
 }

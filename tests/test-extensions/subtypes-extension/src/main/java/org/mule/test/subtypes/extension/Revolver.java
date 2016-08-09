@@ -10,21 +10,18 @@ import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.test.heisenberg.extension.model.Weapon;
 
-public final class Revolver implements Weapon
-{
+public final class Revolver implements Weapon {
 
-    @Parameter
-    @Optional(defaultValue = "6")
-    private int bullets;
+  @Parameter
+  @Optional(defaultValue = "6")
+  private int bullets;
 
-    public int getBullets()
-    {
-        return bullets;
-    }
+  public int getBullets() {
+    return bullets;
+  }
 
-    @Override
-    public String kill()
-    {
-        return bullets > 0 ? "BANG" : "LUCKY";
-    }
+  @Override
+  public String kill() {
+    return bullets > 0 ? "BANG" : "LUCKY";
+  }
 }

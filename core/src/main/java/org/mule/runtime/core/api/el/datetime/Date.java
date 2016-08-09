@@ -6,38 +6,37 @@
  */
 package org.mule.runtime.core.api.el.datetime;
 
-public interface Date extends Instant
-{
+public interface Date extends Instant {
 
-    int getDayOfWeek();
+  int getDayOfWeek();
 
-    int getDayOfMonth();
+  int getDayOfMonth();
 
-    int getDayOfYear();
+  int getDayOfYear();
 
-    int getWeekOfMonth();
+  int getWeekOfMonth();
 
-    int getWeekOfYear();
+  int getWeekOfYear();
 
-    int getMonth();
+  int getMonth();
 
-    int getYear();
+  int getYear();
 
-    Date plusDays(int add);
+  Date plusDays(int add);
 
-    Date plusWeeks(int add);
+  Date plusWeeks(int add);
 
-    Date plusMonths(int add);
+  Date plusMonths(int add);
 
-    Date plusYears(int add);
+  Date plusYears(int add);
 
-    @Override
-    Date withTimeZone(String newTimezone);
+  @Override
+  Date withTimeZone(String newTimezone);
 
-    @Override
-    Date changeTimeZone(String newTimezone);
+  @Override
+  Date changeTimeZone(String newTimezone);
 
-    @Override
-    Date withLocale(String locale);
+  @Override
+  Date withLocale(String locale);
 
 }

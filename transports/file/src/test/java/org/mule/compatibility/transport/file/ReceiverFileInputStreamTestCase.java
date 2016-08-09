@@ -40,124 +40,115 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 @SmallTest
-public class ReceiverFileInputStreamTestCase extends AbstractMuleTestCase
-{
-    @Rule
-    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+public class ReceiverFileInputStreamTestCase extends AbstractMuleTestCase {
 
-    @Mock
-    InputStreamCloseListener listener;
+  @Rule
+  public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
-    File inputFileSpy;
+  @Mock
+  InputStreamCloseListener listener;
 
-    File outputFileSpy;
+  File inputFileSpy;
 
-    @Before
-    public void prepare() throws IOException
-    {
-        inputFileSpy = Mockito.spy(createTestFile());
-        outputFileSpy = Mockito.spy(createTestFile());
-    }
+  File outputFileSpy;
 
-    @Test
-    public void testStreamingError() throws IOException
-    {
-        ReceiverFileInputStream receiver = createReceiver(inputFileSpy, outputFileSpy, true, listener, true);
+  @Before
+  public void prepare() throws IOException {
+    inputFileSpy = Mockito.spy(createTestFile());
+    outputFileSpy = Mockito.spy(createTestFile());
+  }
+
+  @Test
+  public void testStreamingError() throws IOException {
+    ReceiverFileInputStream receiver = createReceiver(inputFileSpy, outputFileSpy, true, listener, true);
+    receiver.close();
+
+    assertThat(inputFileSpy.exists(), is(true));
+    verify(listener).fileClose(inputFileSpy);
+    verify(inputFileSpy, never()).renameTo(any(File.class));
+    verify(inputFileSpy, never()).delete();
+  }
+
+  @Test
+  public void testNonStreamingErrorWithDelete() throws IOException {
+    ReceiverFileInputStream receiver = createReceiver(inputFileSpy, null, true, listener, false);
+    receiver.close();
+
+    assertThat(inputFileSpy.exists(), is(false));
+    verify(listener).fileClose(inputFileSpy);
+    verify(inputFileSpy, never()).renameTo(any(File.class));
+    verify(inputFileSpy).delete();
+  }
+
+  @Test
+  public void testNonStreamingErrorWithoutDelete() throws IOException {
+    ReceiverFileInputStream receiver = createReceiver(inputFileSpy, outputFileSpy, false, listener, false);
+    receiver.close();
+
+    assertThat(inputFileSpy.exists(), is(false));
+    verify(listener).fileClose(inputFileSpy);
+    verify(inputFileSpy).renameTo(any(File.class));
+    verify(inputFileSpy, never()).delete();
+  }
+
+  @Test
+  public void testMultipleThreadedStreamingError() throws IOException, InterruptedException, ExecutionException {
+    ReceiverFileInputStream receiver = createReceiver(inputFileSpy, outputFileSpy, true, listener, true);
+    receiverCloseThreaded(receiver, 2);
+    receiver.close();
+
+    assertThat(inputFileSpy.exists(), is(true));
+    verify(listener).fileClose(any(File.class));
+  }
+
+  @Test
+  public void testMultipleThreadedNonStreamingError() throws IOException, InterruptedException, ExecutionException {
+    ReceiverFileInputStream receiver = createReceiver(inputFileSpy, outputFileSpy, true, listener, false);
+    receiverCloseThreaded(receiver, 2);
+
+    assertThat(inputFileSpy.exists(), is(false));
+    verify(listener).fileClose(inputFileSpy);
+  }
+
+  private File createTestFile() throws IOException {
+    return temporaryFolder.newFile(UUID.getUUID());
+  }
+
+  private ReceiverFileInputStream createReceiver(File input, File output, boolean deleteOnClose,
+                                                 InputStreamCloseListener listener, boolean streamingError)
+      throws IOException {
+    ReceiverFileInputStream receiverStream = new ReceiverFileInputStream(input, true, output, listener);
+    receiverStream.setStreamProcessingError(streamingError);
+    return receiverStream;
+  }
+
+  private void receiverCloseThreaded(final ReceiverFileInputStream receiver, int numberThreads)
+      throws IOException, ExecutionException, InterruptedException {
+    final CountDownLatch latch = new CountDownLatch(numberThreads);
+    ExecutorService pool = Executors.newFixedThreadPool(numberThreads);
+
+    Callable<Void> receiverCloseRunnable = new Callable<Void>() {
+
+      @Override
+      public Void call() throws Exception {
+        latch.countDown();
+        latch.await();
         receiver.close();
+        return null;
+      }
+    };
 
-        assertThat(inputFileSpy.exists(), is(true));
-        verify(listener).fileClose(inputFileSpy);
-        verify(inputFileSpy, never()).renameTo(any(File.class));
-        verify(inputFileSpy, never()).delete();
+    try {
+      List<Future> futures = new ArrayList<Future>(numberThreads);
+      for (int i = 0; i < numberThreads; i++) {
+        futures.add(pool.submit(receiverCloseRunnable));
+      }
+      for (Future future : futures) {
+        future.get();
+      }
+    } finally {
+      pool.shutdown();
     }
-
-    @Test
-    public void testNonStreamingErrorWithDelete() throws IOException
-    {
-        ReceiverFileInputStream receiver = createReceiver(inputFileSpy, null, true, listener, false);
-        receiver.close();
-
-        assertThat(inputFileSpy.exists(), is(false));
-        verify(listener).fileClose(inputFileSpy);
-        verify(inputFileSpy, never()).renameTo(any(File.class));
-        verify(inputFileSpy).delete();
-    }
-
-    @Test
-    public void testNonStreamingErrorWithoutDelete() throws IOException
-    {
-        ReceiverFileInputStream receiver = createReceiver(inputFileSpy, outputFileSpy, false, listener, false);
-        receiver.close();
-
-        assertThat(inputFileSpy.exists(), is(false));
-        verify(listener).fileClose(inputFileSpy);
-        verify(inputFileSpy).renameTo(any(File.class));
-        verify(inputFileSpy, never()).delete();
-    }
-
-    @Test
-    public void testMultipleThreadedStreamingError() throws IOException, InterruptedException, ExecutionException {
-        ReceiverFileInputStream receiver = createReceiver(inputFileSpy, outputFileSpy, true, listener, true);
-        receiverCloseThreaded(receiver, 2);
-        receiver.close();
-
-        assertThat(inputFileSpy.exists(), is(true));
-        verify(listener).fileClose(any(File.class));
-    }
-
-    @Test
-    public void testMultipleThreadedNonStreamingError() throws IOException, InterruptedException, ExecutionException {
-        ReceiverFileInputStream receiver = createReceiver(inputFileSpy, outputFileSpy, true, listener, false);
-        receiverCloseThreaded(receiver, 2);
-
-        assertThat(inputFileSpy.exists(), is(false));
-        verify(listener).fileClose(inputFileSpy);
-    }
-
-    private File createTestFile() throws IOException
-    {
-        return temporaryFolder.newFile(UUID.getUUID());
-    }
-
-    private ReceiverFileInputStream createReceiver(File input, File output, boolean deleteOnClose, InputStreamCloseListener listener, boolean streamingError) throws IOException
-    {
-        ReceiverFileInputStream receiverStream = new ReceiverFileInputStream(input, true, output, listener);
-        receiverStream.setStreamProcessingError(streamingError);
-        return receiverStream;
-    }
-
-    private void receiverCloseThreaded(final ReceiverFileInputStream receiver, int numberThreads) throws IOException, ExecutionException, InterruptedException {
-        final CountDownLatch latch = new CountDownLatch(numberThreads);
-        ExecutorService pool = Executors.newFixedThreadPool(numberThreads);
-
-        Callable<Void> receiverCloseRunnable = new Callable<Void>()
-        {
-            @Override
-            public Void call() throws Exception
-            {
-                latch.countDown();
-                latch.await();
-                receiver.close();
-                return null;
-            }
-        };
-
-        try
-        {
-            List<Future> futures = new ArrayList<Future>(numberThreads);
-            for(int i=0; i<numberThreads; i++)
-            {
-                futures.add(pool.submit(receiverCloseRunnable));
-            }
-            for(Future future: futures)
-            {
-                future.get();
-            }
-        }
-        finally
-        {
-            pool.shutdown();
-        }
-    }
+  }
 
 }

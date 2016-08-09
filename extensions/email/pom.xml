@@ -19,6 +19,7 @@
         <icegreenVersion>1.5.0</icegreenVersion>
         <guavaVersion>18.0</guavaVersion>
         <powermockVersion>1.6.5</powermockVersion>
+        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
 
     <dependencies>

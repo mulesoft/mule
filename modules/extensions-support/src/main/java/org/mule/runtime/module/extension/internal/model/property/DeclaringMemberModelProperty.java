@@ -17,55 +17,49 @@ import java.lang.reflect.Field;
 /**
  * A custom model property to link a {@link ParameterModel} to the actual member it represents.
  * <p>
- * The most common use case for this is to support the {@link Alias} annotation.
- * For example, consider a {@link ConfigurationModel} parameter which is obtained through
- * inspecting fields in a class. This property allows for the introspection model to list
- * the parameter by a given alias, while this parameter still provides the real name of the field
+ * The most common use case for this is to support the {@link Alias} annotation. For example, consider a
+ * {@link ConfigurationModel} parameter which is obtained through inspecting fields in a class. This property allows for the
+ * introspection model to list the parameter by a given alias, while this parameter still provides the real name of the field
  * which is going to be needed for further operations
  * <p>
  * Another common use case is to get the field {@link Annotation}s in order to enrich the model with other properties.
  *
  * @since 4.0
  */
-public final class DeclaringMemberModelProperty implements ModelProperty
-{
+public final class DeclaringMemberModelProperty implements ModelProperty {
 
-    private final Field declaringField;
+  private final Field declaringField;
 
-    public DeclaringMemberModelProperty(Field declaringField)
-    {
-        this.declaringField = declaringField;
-    }
+  public DeclaringMemberModelProperty(Field declaringField) {
+    this.declaringField = declaringField;
+  }
 
-    /**
-     * The field associated to the {@link ParameterModel}
-     *
-     * @return a {@link Field}
-     */
-    public Field getDeclaringField()
-    {
-        return declaringField;
-    }
+  /**
+   * The field associated to the {@link ParameterModel}
+   *
+   * @return a {@link Field}
+   */
+  public Field getDeclaringField() {
+    return declaringField;
+  }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @return {@code declaringMember}
-     */
-    @Override
-    public String getName()
-    {
-        return "declaringMember";
-    }
+  /**
+   * {@inheritDoc}
+   *
+   * @return {@code declaringMember}
+   */
+  @Override
+  public String getName() {
+    return "declaringMember";
+  }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @return {@code false}
-     */
-    @Override
-    public boolean isExternalizable()
-    {
-        return false;
-    }
+  /**
+   * {@inheritDoc}
+   *
+   * @return {@code false}
+   */
+  @Override
+  public boolean isExternalizable() {
+    return false;
+  }
 }

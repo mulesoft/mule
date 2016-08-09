@@ -9,11 +9,11 @@ package org.mule.runtime.core.service;
 import org.mule.runtime.core.api.MuleException;
 
 /**
- * Adds a resume lifecycle method to an object.  This should only be used with {@link org.mule.runtime.core.service.Pausable}
+ * Adds a resume lifecycle method to an object. This should only be used with {@link org.mule.runtime.core.service.Pausable}
  */
-public interface Resumable
-{
-    public static final String PHASE_NAME = "resume";
+public interface Resumable {
 
-    void resume() throws MuleException;
+  public static final String PHASE_NAME = "resume";
+
+  void resume() throws MuleException;
 }

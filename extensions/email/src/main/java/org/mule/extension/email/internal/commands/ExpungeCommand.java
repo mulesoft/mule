@@ -16,18 +16,16 @@ import org.mule.extension.email.internal.retriever.RetrieverConnection;
  *
  * @since 4.0
  */
-public final class ExpungeCommand
-{
+public final class ExpungeCommand {
 
-    /**
-     * Removes from the mailbox all deleted messages if the flag is set true.
-     *
-     * @param connection the associated {@link RetrieverConnection}.
-     * @param folderName the name of the folder that is going to erase the deleted emails.
-     */
-    public void expunge(RetrieverConnection connection, String folderName)
-    {
-        connection.getFolder(folderName, READ_WRITE);
-        connection.closeFolder(true);
-    }
+  /**
+   * Removes from the mailbox all deleted messages if the flag is set true.
+   *
+   * @param connection the associated {@link RetrieverConnection}.
+   * @param folderName the name of the folder that is going to erase the deleted emails.
+   */
+  public void expunge(RetrieverConnection connection, String folderName) {
+    connection.getFolder(folderName, READ_WRITE);
+    connection.closeFolder(true);
+  }
 }

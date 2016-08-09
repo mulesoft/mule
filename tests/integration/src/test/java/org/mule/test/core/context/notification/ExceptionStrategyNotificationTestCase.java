@@ -16,46 +16,36 @@ import org.mule.runtime.core.context.notification.ExceptionStrategyNotification;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
 
-public class ExceptionStrategyNotificationTestCase extends AbstractNotificationTestCase
-{
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
+public class ExceptionStrategyNotificationTestCase extends AbstractNotificationTestCase {
+
+  @Rule
+  public ExpectedException expectedException = ExpectedException.none();
 
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/integration/notifications/exception-strategy-notification-test-flow.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/integration/notifications/exception-strategy-notification-test-flow.xml";
+  }
 
-    @Override
-    public void doTest() throws Exception
-    {
-        assertNotNull(flowRunner("catch-es").withPayload(TEST_PAYLOAD).run());
-        assertNotNull(flowRunner("choice-es").withPayload(TEST_PAYLOAD).run());
-        expectedException.expect(ComponentException.class);
-        assertNotNull(flowRunner("rollback-es").withPayload(TEST_PAYLOAD).run());
-        assertNotNull(flowRunner("default-es").withPayload(TEST_PAYLOAD).run());
-    }
+  @Override
+  public void doTest() throws Exception {
+    assertNotNull(flowRunner("catch-es").withPayload(TEST_PAYLOAD).run());
+    assertNotNull(flowRunner("choice-es").withPayload(TEST_PAYLOAD).run());
+    expectedException.expect(ComponentException.class);
+    assertNotNull(flowRunner("rollback-es").withPayload(TEST_PAYLOAD).run());
+    assertNotNull(flowRunner("default-es").withPayload(TEST_PAYLOAD).run());
+  }
 
-    @Override
-    public RestrictedNode getSpecification()
-    {
-        return new Node()
-                .serial(node(PROCESS_START).serial(node(PROCESS_END)))
-                .serial(node(PROCESS_START).serial(node(PROCESS_END)))
-                .serial(node(PROCESS_START).serial(node(PROCESS_END)))
-                .serial(node(PROCESS_START).serial(node(PROCESS_END)))
-                ;
-    }
+  @Override
+  public RestrictedNode getSpecification() {
+    return new Node().serial(node(PROCESS_START).serial(node(PROCESS_END))).serial(node(PROCESS_START).serial(node(PROCESS_END)))
+        .serial(node(PROCESS_START).serial(node(PROCESS_END))).serial(node(PROCESS_START).serial(node(PROCESS_END)));
+  }
 
-    private RestrictedNode node(int action)
-    {
-        return new Node(ExceptionStrategyNotification.class, action);
-    }
+  private RestrictedNode node(int action) {
+    return new Node(ExceptionStrategyNotification.class, action);
+  }
 
-    @Override
-    public void validateSpecification(RestrictedNode spec) throws Exception
-    {
-    }
+  @Override
+  public void validateSpecification(RestrictedNode spec) throws Exception {}
 }

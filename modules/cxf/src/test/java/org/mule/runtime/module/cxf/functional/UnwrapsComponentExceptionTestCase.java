@@ -19,47 +19,38 @@ import javax.jws.WebService;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class UnwrapsComponentExceptionTestCase extends FunctionalTestCase
-{
-    public static final String ERROR_MESSAGE = "Changos!!!";
+public class UnwrapsComponentExceptionTestCase extends FunctionalTestCase {
 
-    private static final String requestPayload =
-            "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"\n" +
-            "           xmlns:hi=\"http://example.cxf.module.runtime.mule.org/\">\n" +
-            "<soap:Body>\n" +
-            "<hi:sayHi>\n" +
-            "    <arg0>Hello</arg0>\n" +
-            "</hi:sayHi>\n" +
-            "</soap:Body>\n" +
-            "</soap:Envelope>";
+  public static final String ERROR_MESSAGE = "Changos!!!";
 
-    @Rule
-    public DynamicPort dynamicPort = new DynamicPort("port1");
+  private static final String requestPayload = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"\n"
+      + "           xmlns:hi=\"http://example.cxf.module.runtime.mule.org/\">\n" + "<soap:Body>\n" + "<hi:sayHi>\n"
+      + "    <arg0>Hello</arg0>\n" + "</hi:sayHi>\n" + "</soap:Body>\n" + "</soap:Envelope>";
+
+  @Rule
+  public DynamicPort dynamicPort = new DynamicPort("port1");
+
+  @Override
+  protected String getConfigFile() {
+    return "unwraps-component-exception-config-httpn.xml";
+  }
+
+  @Test
+  public void testReceivesComponentExceptionMessage() throws Exception {
+    MuleMessage request = MuleMessage.builder().payload(requestPayload).build();
+
+    MuleMessage received = muleContext.getClient().send("http://localhost:" + dynamicPort.getNumber() + "/hello", request,
+                                                        newOptions().method(POST.name()).disableStatusCodeValidation().build());
+
+    assertTrue("Component exception was not managed", getPayloadAsString(received).contains(ERROR_MESSAGE));
+  }
+
+  @WebService(endpointInterface = "org.mule.runtime.module.cxf.example.HelloWorld", serviceName = "HelloWorld")
+  public static class HelloWorldImpl implements HelloWorld {
 
     @Override
-    protected String getConfigFile()
-    {
-        return "unwraps-component-exception-config-httpn.xml";
+    public String sayHi(String text) {
+      throw new RuntimeException(ERROR_MESSAGE);
     }
-
-    @Test
-    public void testReceivesComponentExceptionMessage() throws Exception
-    {
-        MuleMessage request = MuleMessage.builder().payload(requestPayload).build();
-
-        MuleMessage received = muleContext.getClient().send("http://localhost:" + dynamicPort.getNumber() + "/hello", request, newOptions().method(POST.name()).disableStatusCodeValidation().build());
-
-        assertTrue("Component exception was not managed", getPayloadAsString(received).contains(ERROR_MESSAGE));
-    }
-
-    @WebService(endpointInterface = "org.mule.runtime.module.cxf.example.HelloWorld", serviceName = "HelloWorld")
-    public static class HelloWorldImpl implements HelloWorld
-    {
-
-        @Override
-        public String sayHi(String text)
-        {
-            throw new RuntimeException(ERROR_MESSAGE);
-        }
-    }
+  }
 }

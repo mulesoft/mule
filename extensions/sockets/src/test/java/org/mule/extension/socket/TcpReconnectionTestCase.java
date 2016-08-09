@@ -43,98 +43,96 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class TcpReconnectionTestCase extends AbstractMuleTestCase
-{
+public class TcpReconnectionTestCase extends AbstractMuleTestCase {
 
-    @Rule
-    public DynamicPort dynamicPort = new DynamicPort("port");
+  @Rule
+  public DynamicPort dynamicPort = new DynamicPort("port");
 
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
+  @Rule
+  public ExpectedException expectedException = ExpectedException.none();
 
-    @Inject
-    private MuleContext muleContext;
+  @Inject
+  private MuleContext muleContext;
 
-    @Mock
-    private ConnectionSettings connectionSettings;
+  @Mock
+  private ConnectionSettings connectionSettings;
 
-    @Mock
-    private MessageHandler handler;
+  @Mock
+  private MessageHandler handler;
 
-    private TcpServerSocketProperties serverSocketProperties;
-    private TcpClientSocketProperties clientSocketProperties;
+  private TcpServerSocketProperties serverSocketProperties;
+  private TcpClientSocketProperties clientSocketProperties;
 
-    private TcpListenerConnection listenerConnection;
-    private TcpRequesterConnection requesterConnection;
+  private TcpListenerConnection listenerConnection;
+  private TcpRequesterConnection requesterConnection;
 
-    private String host;
-    private int port;
+  private String host;
+  private int port;
 
-    @Before
-    public void before() throws ConnectionException
+  @Before
+  public void before() throws ConnectionException
 
-    {
-        port = dynamicPort.getNumber();
-        host = "localhost";
-        when(connectionSettings.getPort()).thenReturn(port);
-        when(connectionSettings.getHost()).thenReturn(host);
-        when(connectionSettings.getInetSocketAddress()).thenReturn(new InetSocketAddress(host, port));
+  {
+    port = dynamicPort.getNumber();
+    host = "localhost";
+    when(connectionSettings.getPort()).thenReturn(port);
+    when(connectionSettings.getHost()).thenReturn(host);
+    when(connectionSettings.getInetSocketAddress()).thenReturn(new InetSocketAddress(host, port));
 
-        // Mockito returns 0 in mocked boxed types, that leads to invalid socket configurations
-        serverSocketProperties = new TcpServerSocketProperties();
-        clientSocketProperties = new TcpClientSocketProperties();
+    // Mockito returns 0 in mocked boxed types, that leads to invalid socket configurations
+    serverSocketProperties = new TcpServerSocketProperties();
+    clientSocketProperties = new TcpClientSocketProperties();
 
-        listenerConnection = new TcpListenerConnection(connectionSettings, new SafeProtocol(), serverSocketProperties, new TcpServerSocketFactory());
-        requesterConnection = new TcpRequesterConnection(connectionSettings, new ConnectionSettings(), new SafeProtocol(), clientSocketProperties, new TcpSocketFactory());
-    }
+    listenerConnection =
+        new TcpListenerConnection(connectionSettings, new SafeProtocol(), serverSocketProperties, new TcpServerSocketFactory());
+    requesterConnection = new TcpRequesterConnection(connectionSettings, new ConnectionSettings(), new SafeProtocol(),
+                                                     clientSocketProperties, new TcpSocketFactory());
+  }
 
-    @Test
-    public void failOnInvalidPort() throws Exception
-    {
-        int invalidPort = -1;
-        connectionSettings = new ConnectionSettings(invalidPort, host);
-        listenerConnection = new TcpListenerConnection(connectionSettings, new SafeProtocol(), serverSocketProperties, new TcpServerSocketFactory());
-        expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage(format("port out of range:%d", invalidPort));
-        listenerConnection.connect();
-    }
+  @Test
+  public void failOnInvalidPort() throws Exception {
+    int invalidPort = -1;
+    connectionSettings = new ConnectionSettings(invalidPort, host);
+    listenerConnection =
+        new TcpListenerConnection(connectionSettings, new SafeProtocol(), serverSocketProperties, new TcpServerSocketFactory());
+    expectedException.expect(IllegalArgumentException.class);
+    expectedException.expectMessage(format("port out of range:%d", invalidPort));
+    listenerConnection.connect();
+  }
 
-    @Test
-    public void failToBindListenerInAnOccupiedPort() throws Exception
-    {
-        expectedException.expect(ConnectionException.class);
-        expectedException.expectMessage(format("Could not bind socket to host '%s' and port '%d'", host, port));
-        listenerConnection.connect();
+  @Test
+  public void failToBindListenerInAnOccupiedPort() throws Exception {
+    expectedException.expect(ConnectionException.class);
+    expectedException.expectMessage(format("Could not bind socket to host '%s' and port '%d'", host, port));
+    listenerConnection.connect();
 
-        TcpListenerConnection secondListener = new TcpListenerConnection(connectionSettings, new SafeProtocol(), serverSocketProperties, new TcpServerSocketFactory());
-        secondListener.connect();
-    }
+    TcpListenerConnection secondListener =
+        new TcpListenerConnection(connectionSettings, new SafeProtocol(), serverSocketProperties, new TcpServerSocketFactory());
+    secondListener.connect();
+  }
 
-    @Test
-    public void requesterFailsToConnect() throws Exception
-    {
-        expectedException.expect(ConnectionException.class);
-        expectedException.expectMessage(format("Could not connect TCP requester socket to host '%s' on port '%d'", host, port));
-        requesterConnection.connect();
-    }
+  @Test
+  public void requesterFailsToConnect() throws Exception {
+    expectedException.expect(ConnectionException.class);
+    expectedException.expectMessage(format("Could not connect TCP requester socket to host '%s' on port '%d'", host, port));
+    requesterConnection.connect();
+  }
 
-    @Test
-    public void closeListener() throws Exception
-    {
-        expectedException.expect(SocketException.class);
-        expectedException.expectMessage("Socket is closed");
-        listenerConnection.connect();
+  @Test
+  public void closeListener() throws Exception {
+    expectedException.expect(SocketException.class);
+    expectedException.expectMessage("Socket is closed");
+    listenerConnection.connect();
 
-        PollingProber prober = new PollingProber(TIMEOUT_MILLIS, POLL_DELAY_MILLIS);
-        prober.check(new JUnitLambdaProbe(() -> {
-            if (listenerConnection.validate().isValid())
-            {
-                listenerConnection.disconnect();
-                return true;
-            }
-            return false;
-        }));
+    PollingProber prober = new PollingProber(TIMEOUT_MILLIS, POLL_DELAY_MILLIS);
+    prober.check(new JUnitLambdaProbe(() -> {
+      if (listenerConnection.validate().isValid()) {
+        listenerConnection.disconnect();
+        return true;
+      }
+      return false;
+    }));
 
-        SocketWorker worker = listenerConnection.listen(handler);
-    }
+    SocketWorker worker = listenerConnection.listen(handler);
+  }
 }

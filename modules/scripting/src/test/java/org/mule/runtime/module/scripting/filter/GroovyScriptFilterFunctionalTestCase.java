@@ -15,34 +15,30 @@ import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 
-public class GroovyScriptFilterFunctionalTestCase extends FunctionalTestCase
-{
+public class GroovyScriptFilterFunctionalTestCase extends FunctionalTestCase {
 
-    public GroovyScriptFilterFunctionalTestCase()
-    {
-        // Groovy really hammers the startup time since it needs to create the
-        // interpreter on every start
-        setDisposeContextPerClass(true);
+  public GroovyScriptFilterFunctionalTestCase() {
+    // Groovy really hammers the startup time since it needs to create the
+    // interpreter on every start
+    setDisposeContextPerClass(true);
 
-    }
+  }
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "groovy-filter-config-flow.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "groovy-filter-config-flow.xml";
+  }
 
-    @Test
-    public void testFilterScript() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        flowRunner("filterService").withPayload("hello").asynchronously().run();
-        MuleMessage response = client.request("test://filterServiceTestOut", RECEIVE_TIMEOUT);
-        assertNotNull(response);
-        assertEquals("hello", response.getPayload());
+  @Test
+  public void testFilterScript() throws Exception {
+    MuleClient client = muleContext.getClient();
+    flowRunner("filterService").withPayload("hello").asynchronously().run();
+    MuleMessage response = client.request("test://filterServiceTestOut", RECEIVE_TIMEOUT);
+    assertNotNull(response);
+    assertEquals("hello", response.getPayload());
 
-        flowRunner("filterService").withPayload("1").asynchronously().run();
-        response = client.request("test://filterServiceTestOut", RECEIVE_TIMEOUT);
-        assertNull(response);
-    }
+    flowRunner("filterService").withPayload("1").asynchronously().run();
+    response = client.request("test://filterServiceTestOut", RECEIVE_TIMEOUT);
+    assertNull(response);
+  }
 }

@@ -11,12 +11,10 @@ import javax.mail.internet.MimeMultipart;
 /**
  *
  */
-public class HttpMimeMultipart extends MimeMultipart
-{
+public class HttpMimeMultipart extends MimeMultipart {
 
-    public HttpMimeMultipart(String contentType, String subtype)
-    {
-        super(subtype);
-        this.contentType = contentType;
-    }
+  public HttpMimeMultipart(String contentType, String subtype) {
+    super(subtype);
+    this.contentType = contentType;
+  }
 }

@@ -10,12 +10,10 @@ package org.mule.runtime.module.db.internal.domain.logger;
 /**
  * Base class for query loggers that logs nothing
  */
-public abstract class AbstractNullQueryLogger implements QueryLogger
-{
+public abstract class AbstractNullQueryLogger implements QueryLogger {
 
-    @Override
-    public void logQuery()
-    {
-        // Do nothing
-    }
+  @Override
+  public void logQuery() {
+    // Do nothing
+  }
 }

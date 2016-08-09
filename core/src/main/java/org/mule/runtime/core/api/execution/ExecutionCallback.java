@@ -12,7 +12,7 @@ package org.mule.runtime.core.api.execution;
  *
  * @param <T> type of the return value of the processing execution
  */
-public interface ExecutionCallback<T>
-{
-    T process() throws Exception;
+public interface ExecutionCallback<T> {
+
+  T process() throws Exception;
 }

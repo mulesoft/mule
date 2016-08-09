@@ -20,54 +20,47 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-public abstract class AbstractSplashScreenTestCase<S extends SplashScreen> extends AbstractMuleTestCase
-{
-    @ClassRule
-    public static TemporaryFolder workingDirectory = new TemporaryFolder();
-    @Rule
-    public SystemProperty muleHome = new SystemProperty(MULE_HOME_DIRECTORY_PROPERTY, workingDirectory.getRoot().getAbsolutePath());
+public abstract class AbstractSplashScreenTestCase<S extends SplashScreen> extends AbstractMuleTestCase {
 
-    protected S splashScreen;
+  @ClassRule
+  public static TemporaryFolder workingDirectory = new TemporaryFolder();
+  @Rule
+  public SystemProperty muleHome = new SystemProperty(MULE_HOME_DIRECTORY_PROPERTY, workingDirectory.getRoot().getAbsolutePath());
 
-    protected abstract void setUpSplashScreen();
-    protected abstract Matcher<String> getSimpleLogMatcher();
-    protected abstract Matcher<String> getComplexLogMatcher();
+  protected S splashScreen;
 
-    @Test
-    public void simpleLogWhenVerbosityOff()
-    {
-        try
-        {
-            System.setProperty(RUNTIME_VERBOSE, "false");
-            setUpSplashScreen();
-            assertThat(splashScreen.toString(), getSimpleLogMatcher());
-        }
-        finally
-        {
-            System.clearProperty(RUNTIME_VERBOSE);
-        }
+  protected abstract void setUpSplashScreen();
+
+  protected abstract Matcher<String> getSimpleLogMatcher();
+
+  protected abstract Matcher<String> getComplexLogMatcher();
+
+  @Test
+  public void simpleLogWhenVerbosityOff() {
+    try {
+      System.setProperty(RUNTIME_VERBOSE, "false");
+      setUpSplashScreen();
+      assertThat(splashScreen.toString(), getSimpleLogMatcher());
+    } finally {
+      System.clearProperty(RUNTIME_VERBOSE);
     }
+  }
 
-    @Test
-    public void complexLogWhenVerbosityOn()
-    {
-        try
-        {
-            System.setProperty(RUNTIME_VERBOSE, "true");
-            setUpSplashScreen();
-            assertThat(splashScreen.toString(), getComplexLogMatcher());
-        }
-        finally
-        {
-            System.clearProperty(RUNTIME_VERBOSE);
-        }
+  @Test
+  public void complexLogWhenVerbosityOn() {
+    try {
+      System.setProperty(RUNTIME_VERBOSE, "true");
+      setUpSplashScreen();
+      assertThat(splashScreen.toString(), getComplexLogMatcher());
+    } finally {
+      System.clearProperty(RUNTIME_VERBOSE);
     }
+  }
 
-    @Test
-    public void complexLogWhenNoVerbositySpecified()
-    {
-        checkArgument(System.getProperty(RUNTIME_VERBOSE) == null, "Runtime verbosity should not be specified.");
-        setUpSplashScreen();
-        assertThat(splashScreen.toString(), getComplexLogMatcher());
-    }
+  @Test
+  public void complexLogWhenNoVerbositySpecified() {
+    checkArgument(System.getProperty(RUNTIME_VERBOSE) == null, "Runtime verbosity should not be specified.");
+    setUpSplashScreen();
+    assertThat(splashScreen.toString(), getComplexLogMatcher());
+  }
 }

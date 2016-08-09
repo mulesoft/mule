@@ -18,64 +18,57 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
  * @since 4.0
  */
 @Alias("part")
-public class HttpPart
-{
-    /**
-     * Name to identify this part.
-     */
-    @Parameter
-    private String id;
+public class HttpPart {
 
-    /**
-     * Actual value the part holds.
-     */
-    @Parameter
-    @XmlHints(allowReferences = false)
-    private Object data;
+  /**
+   * Name to identify this part.
+   */
+  @Parameter
+  private String id;
 
-    /**
-     * Content type from the data.
-     */
-    @Parameter
-    @Optional
-    private MediaType contentType;
+  /**
+   * Actual value the part holds.
+   */
+  @Parameter
+  @XmlHints(allowReferences = false)
+  private Object data;
 
-    /**
-     * File name of this part, if required.
-     */
-    @Parameter
-    @Optional
-    private String filename;
+  /**
+   * Content type from the data.
+   */
+  @Parameter
+  @Optional
+  private MediaType contentType;
 
-    public HttpPart()
-    {
-    }
+  /**
+   * File name of this part, if required.
+   */
+  @Parameter
+  @Optional
+  private String filename;
 
-    public HttpPart(String id, Object data, MediaType contentType, String filename)
-    {
-        this.id = id;
-        this.data = data;
-        this.contentType = contentType;
-        this.filename = filename;
-    }
+  public HttpPart() {}
 
-    public Object getData()
-    {
-        return data;
-    }
+  public HttpPart(String id, Object data, MediaType contentType, String filename) {
+    this.id = id;
+    this.data = data;
+    this.contentType = contentType;
+    this.filename = filename;
+  }
 
-    public MediaType getContentType()
-    {
-        return contentType;
-    }
+  public Object getData() {
+    return data;
+  }
 
-    public String getId()
-    {
-        return id;
-    }
+  public MediaType getContentType() {
+    return contentType;
+  }
 
-    public String getFilename()
-    {
-        return filename;
-    }
+  public String getId() {
+    return id;
+  }
+
+  public String getFilename() {
+    return filename;
+  }
 }

@@ -17,72 +17,70 @@ import org.mule.runtime.api.tls.TlsContextFactory;
 /**
  * Configuration object for an {@code HttpRequester}.
  *
- * Some of the configuration attributes can be dynamic meaning that the
- * configuration value to use will change based on the message at the moment
- * of the request execution.
+ * Some of the configuration attributes can be dynamic meaning that the configuration value to use will change based on the
+ * message at the moment of the request execution.
  *
  * This object represents the XML request-config elements in the configuration.
  *
  * If a new HttpRequesterConfig needs to be created programmatically then use
  * {@link org.mule.runtime.module.http.api.requester.HttpRequesterConfigBuilder}
  */
-public interface HttpRequesterConfig extends NamedObject, AnnotatedObject, Startable, Stoppable
-{
+public interface HttpRequesterConfig extends NamedObject, AnnotatedObject, Startable, Stoppable {
 
-    /**
-     * @return the base path
-     */
-    String getBasePath();
+  /**
+   * @return the base path
+   */
+  String getBasePath();
 
-    /**
-     * @return the host to be called
-     */
-    String getHost();
+  /**
+   * @return the host to be called
+   */
+  String getHost();
 
-    /**
-     * @return the port to connect to
-     */
-    String getPort();
+  /**
+   * @return the port to connect to
+   */
+  String getPort();
 
-    /**
-     * @return configuration for enabling or disabling follow redirects. It may be dynamic.
-     */
-    String getFollowRedirects();
+  /**
+   * @return configuration for enabling or disabling follow redirects. It may be dynamic.
+   */
+  String getFollowRedirects();
 
-    /**
-     * @return the streaming mode for making the request.
-     * Defines if the request will be sent using Transfer-Encoding: chunked. It may be dynamic
-     */
-    String getRequestStreamingMode();
+  /**
+   * @return the streaming mode for making the request. Defines if the request will be sent using Transfer-Encoding: chunked. It
+   *         may be dynamic
+   */
+  String getRequestStreamingMode();
 
-    /**
-     * @return if the request will contain or not a body. It may be dynamic.
-     */
-    String getSendBodyMode();
+  /**
+   * @return if the request will contain or not a body. It may be dynamic.
+   */
+  String getSendBodyMode();
 
-    /**
-     * @return mode for parsing a response. It may contain an expression if it's dynamic.
-     */
-    String getParseResponse();
+  /**
+   * @return mode for parsing a response. It may contain an expression if it's dynamic.
+   */
+  String getParseResponse();
 
-    /**
-     * @return maximum time to wait for a response
-     */
-    String getResponseTimeout();
+  /**
+   * @return maximum time to wait for a response
+   */
+  String getResponseTimeout();
 
-    /**
-     * @return authentication mechanism when making request
-     */
-    HttpAuthentication getAuthentication();
+  /**
+   * @return authentication mechanism when making request
+   */
+  HttpAuthentication getAuthentication();
 
-    /**
-     * @return the tls configuration when using HTTPS
-     */
-    TlsContextFactory getTlsContext();
+  /**
+   * @return the tls configuration when using HTTPS
+   */
+  TlsContextFactory getTlsContext();
 
-    /**
-     * @return http proxy configuration to be used
-     */
-    ProxyConfig getProxyConfig();
+  /**
+   * @return http proxy configuration to be used
+   */
+  ProxyConfig getProxyConfig();
 
 }

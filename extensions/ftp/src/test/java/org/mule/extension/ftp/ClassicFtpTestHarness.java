@@ -32,189 +32,166 @@ import org.junit.rules.TestRule;
  *
  * @since 4.0
  */
-public class ClassicFtpTestHarness extends AbstractFtpTestHarness
-{
+public class ClassicFtpTestHarness extends AbstractFtpTestHarness {
 
-    private static final String FTP_USER = "anonymous";
-    private static final String FTP_PASSWORD = "password";
+  private static final String FTP_USER = "anonymous";
+  private static final String FTP_PASSWORD = "password";
 
-    private FtpServer ftpServer = new FtpServer("ftpPort", new File(FTP_SERVER_BASE_DIR, WORKING_DIR));
-    private SystemProperty workingDirSystemProperty = new SystemProperty(WORKING_DIR_SYSTEM_PROPERTY, WORKING_DIR);
-    private FTPTestClient ftpClient;
+  private FtpServer ftpServer = new FtpServer("ftpPort", new File(FTP_SERVER_BASE_DIR, WORKING_DIR));
+  private SystemProperty workingDirSystemProperty = new SystemProperty(WORKING_DIR_SYSTEM_PROPERTY, WORKING_DIR);
+  private FTPTestClient ftpClient;
 
 
-    /**
-     * Creates a new instance activating the {@code ftp} spring profile
-     */
-    public ClassicFtpTestHarness()
-    {
-        super("ftp");
+  /**
+   * Creates a new instance activating the {@code ftp} spring profile
+   */
+  public ClassicFtpTestHarness() {
+    super("ftp");
+  }
+
+  /**
+   * Starts a FTP server and connects a client to it
+   */
+  @Override
+  protected void doBefore() throws Exception {
+    ftpServer.start();
+    ftpClient = new FTPTestClient(DEFAULT_FTP_HOST, ftpServer.getPort(), FTP_USER, FTP_PASSWORD);
+
+    if (!ftpClient.testConnection()) {
+      throw new IOException("could not connect to ftp server");
+    }
+    ftpClient.changeWorkingDirectory(WORKING_DIR);
+  }
+
+  /**
+   * Disconnects the client and shuts the server down
+   */
+  @Override
+  protected void doAfter() throws Exception {
+    try {
+      if (ftpClient.isConnected()) {
+        ftpClient.disconnect();
+      }
+    } finally {
+      ftpServer.stop();
     }
 
-    /**
-     * Starts a FTP server and connects a client to it
-     */
-    @Override
-    protected void doBefore() throws Exception
-    {
-        ftpServer.start();
-        ftpClient = new FTPTestClient(DEFAULT_FTP_HOST, ftpServer.getPort(), FTP_USER, FTP_PASSWORD);
+  }
 
-        if (!ftpClient.testConnection())
-        {
-            throw new IOException("could not connect to ftp server");
-        }
-        ftpClient.changeWorkingDirectory(WORKING_DIR);
-    }
+  /**
+   * @return {@link #workingDirSystemProperty , and {@link #ftpServer}}
+   */
+  @Override
+  protected TestRule[] getChildRules() {
+    return new TestRule[] {workingDirSystemProperty, ftpServer};
+  }
 
-    /**
-     * Disconnects the client and shuts the server down
-     */
-    @Override
-    protected void doAfter() throws Exception
-    {
-        try
-        {
-            if (ftpClient.isConnected())
-            {
-                ftpClient.disconnect();
-            }
-        }
-        finally
-        {
-            ftpServer.stop();
-        }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void createHelloWorldFile() throws Exception {
+    ftpClient.makeDir("files");
+    ftpClient.putFile("files/" + HELLO_FILE_NAME, HELLO_WORLD);
+  }
 
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void createBinaryFile() throws Exception {
+    ftpClient.putFile(BINARY_FILE_NAME, HELLO_WORLD.getBytes());
+  }
 
-    /**
-     * @return {@link #workingDirSystemProperty , and {@link #ftpServer}}
-     */
-    @Override
-    protected TestRule[] getChildRules()
-    {
-        return new TestRule[] {workingDirSystemProperty, ftpServer};
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void makeDir(String directoryPath) throws Exception {
+    ftpClient.makeDir(directoryPath);
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void createHelloWorldFile() throws Exception
-    {
-        ftpClient.makeDir("files");
-        ftpClient.putFile("files/" + HELLO_FILE_NAME, HELLO_WORLD);
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String getWorkingDirectory() throws Exception {
+    return ftpClient.getWorkingDirectory();
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void createBinaryFile() throws Exception
-    {
-        ftpClient.putFile(BINARY_FILE_NAME, HELLO_WORLD.getBytes());
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void write(String path, String content) throws Exception {
+    ftpClient.putFile(path, content);
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void makeDir(String directoryPath) throws Exception
-    {
-        ftpClient.makeDir(directoryPath);
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean dirExists(String path) throws Exception {
+    return ftpClient.dirExists(path);
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getWorkingDirectory() throws Exception
-    {
-        return ftpClient.getWorkingDirectory();
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean fileExists(String path) throws Exception {
+    return ftpClient.fileExists(path);
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void write(String path, String content) throws Exception
-    {
-        ftpClient.putFile(path, content);
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean changeWorkingDirectory(String path) throws Exception {
+    return ftpClient.changeWorkingDirectory(path);
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean dirExists(String path) throws Exception
-    {
-        return ftpClient.dirExists(path);
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String[] getFileList(String path) throws Exception {
+    return ftpClient.getFileList(path);
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean fileExists(String path) throws Exception
-    {
-        return ftpClient.fileExists(path);
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void assertAttributes(String path, FtpFileAttributes fileAttributes) throws Exception {
+    FTPFile file = ftpClient.get(path);
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean changeWorkingDirectory(String path) throws Exception
-    {
-        return ftpClient.changeWorkingDirectory(path);
-    }
+    assertThat(fileAttributes.getName(), equalTo(file.getName()));
+    assertThat(fileAttributes.getPath(), equalTo(Paths.get("/", WORKING_DIR, HELLO_PATH).toString()));
+    assertThat(fileAttributes.getSize(), is(file.getSize()));
+    assertTime(fileAttributes.getTimestamp(), file.getTimestamp());
+    assertThat(fileAttributes.isDirectory(), is(false));
+    assertThat(fileAttributes.isSymbolicLink(), is(false));
+    assertThat(fileAttributes.isRegularFile(), is(true));
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String[] getFileList(String path) throws Exception
-    {
-        return ftpClient.getFileList(path);
-    }
+  private void assertTime(LocalDateTime dateTime, Calendar calendar) {
+    assertThat(dateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli(), is(calendar.toInstant().toEpochMilli()));
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void assertAttributes(String path, FtpFileAttributes fileAttributes) throws Exception
-    {
-        FTPFile file = ftpClient.get(path);
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void assertDeleted(String path) throws Exception {
+    assertThat(fileExists(path), is(false));
+  }
 
-        assertThat(fileAttributes.getName(), equalTo(file.getName()));
-        assertThat(fileAttributes.getPath(), equalTo(Paths.get("/", WORKING_DIR, HELLO_PATH).toString()));
-        assertThat(fileAttributes.getSize(), is(file.getSize()));
-        assertTime(fileAttributes.getTimestamp(), file.getTimestamp());
-        assertThat(fileAttributes.isDirectory(), is(false));
-        assertThat(fileAttributes.isSymbolicLink(), is(false));
-        assertThat(fileAttributes.isRegularFile(), is(true));
-    }
-
-    private void assertTime(LocalDateTime dateTime, Calendar calendar)
-    {
-        assertThat(dateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli(), is(calendar.toInstant().toEpochMilli()));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void assertDeleted(String path) throws Exception
-    {
-        assertThat(fileExists(path), is(false));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Class getAttributesType()
-    {
-        return ClassicFtpFileAttributes.class;
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Class getAttributesType() {
+    return ClassicFtpFileAttributes.class;
+  }
 }

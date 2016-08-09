@@ -26,100 +26,80 @@ import org.apache.commons.collections.Predicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class XaTransactionRecoverer
-{
+public class XaTransactionRecoverer {
 
-    protected transient Logger logger = LoggerFactory.getLogger(getClass());
+  protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final XaTxQueueTransactionJournal xaTxQueueTransactionJournal;
-    private final QueueProvider queueProvider;
+  private final XaTxQueueTransactionJournal xaTxQueueTransactionJournal;
+  private final QueueProvider queueProvider;
 
-    public XaTransactionRecoverer(XaTxQueueTransactionJournal xaTxQueueTransactionJournal, QueueProvider queueProvider)
-    {
-        this.xaTxQueueTransactionJournal = xaTxQueueTransactionJournal;
-        this.queueProvider = queueProvider;
+  public XaTransactionRecoverer(XaTxQueueTransactionJournal xaTxQueueTransactionJournal, QueueProvider queueProvider) {
+    this.xaTxQueueTransactionJournal = xaTxQueueTransactionJournal;
+    this.queueProvider = queueProvider;
+  }
+
+  public XaTxQueueTransactionJournal getXaTxQueueTransactionJournal() {
+    return xaTxQueueTransactionJournal;
+  }
+
+  public synchronized Xid[] recover(int flag) throws XAException {
+    // No need to do anything for XAResource.TMENDRSCAN
+    if (flag == XAResource.TMENDRSCAN) {
+      return new Xid[0];
     }
-
-    public XaTxQueueTransactionJournal getXaTxQueueTransactionJournal()
-    {
-        return xaTxQueueTransactionJournal;
+    // For XAResource.TMSTARTRSCAN and XAResource.TMNOFLAGS (only possible values despite XAResource.TMENDRSCAN we returns
+    // the set of Xid to recover (no commit, no rollback) and bitronix will commit, rollback for Xid that are
+    // dangling transactions and will do nothing for those that are currently being executed.
+    Multimap<Xid, XaQueueTxJournalEntry> xidXaJournalEntryMultimap = xaTxQueueTransactionJournal.getAllLogEntries();
+    if (logger.isDebugEnabled()) {
+      logger.debug("Executing XA recover");
+      logger.debug("Found " + xidXaJournalEntryMultimap.size() + " in the tx log");
     }
+    List<Xid> txsToRecover = new ArrayList<Xid>();
+    for (Xid xid : xidXaJournalEntryMultimap.keySet()) {
+      Collection<XaQueueTxJournalEntry> entries = xidXaJournalEntryMultimap.get(xid);
+      Object commitOrRollback = CollectionUtils.find(entries, new Predicate() {
 
-    public synchronized Xid[] recover(int flag) throws XAException
-    {
-        //No need to do anything for XAResource.TMENDRSCAN
-        if (flag == XAResource.TMENDRSCAN)
-        {
-            return new Xid[0];
+        @Override
+        public boolean evaluate(Object object) {
+          XaQueueTxJournalEntry logEntry = (XaQueueTxJournalEntry) object;
+          return logEntry.isCommit() || logEntry.isRollback();
         }
-        //For XAResource.TMSTARTRSCAN and XAResource.TMNOFLAGS (only possible values despite XAResource.TMENDRSCAN we returns
-        //the set of Xid to recover (no commit, no rollback) and bitronix will commit, rollback for Xid that are
-        //dangling transactions and will do nothing for those that are currently being executed.
-        Multimap<Xid,XaQueueTxJournalEntry> xidXaJournalEntryMultimap = xaTxQueueTransactionJournal.getAllLogEntries();
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Executing XA recover");
-            logger.debug("Found " + xidXaJournalEntryMultimap.size() + " in the tx log");
-        }
-        List<Xid> txsToRecover = new ArrayList<Xid>();
-        for (Xid xid : xidXaJournalEntryMultimap.keySet())
-        {
-            Collection<XaQueueTxJournalEntry> entries = xidXaJournalEntryMultimap.get(xid);
-            Object commitOrRollback = CollectionUtils.find(entries, new Predicate()
-            {
-                @Override
-                public boolean evaluate(Object object)
-                {
-                    XaQueueTxJournalEntry logEntry = (XaQueueTxJournalEntry) object;
-                    return logEntry.isCommit() || logEntry.isRollback();
-                }
-            });
-            if (commitOrRollback != null)
-            {
-                continue;
-            }
-            txsToRecover.add(xid);
-        }
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("found " + txsToRecover.size() + " txs to recover");
-        }
-        return txsToRecover.toArray(new Xid[txsToRecover.size()]);
+      });
+      if (commitOrRollback != null) {
+        continue;
+      }
+      txsToRecover.add(xid);
     }
+    if (logger.isDebugEnabled()) {
+      logger.debug("found " + txsToRecover.size() + " txs to recover");
+    }
+    return txsToRecover.toArray(new Xid[txsToRecover.size()]);
+  }
 
-    public void rollbackDandlingTransaction(Xid xid) throws XAException
-    {
-        try
-        {
-            logger.info("Rollbacking dangling tx with id " + xid);
-            new PersistentXaTransactionContext(xaTxQueueTransactionJournal, queueProvider, xid).doRollback();
-        }
-        catch (ResourceManagerException e)
-        {
-            logger.warn(e.getMessage());
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Error rollbacking dangling transaction", e);
-            }
-            throw new XAException(XAException.XAER_NOTA);
-        }
+  public void rollbackDandlingTransaction(Xid xid) throws XAException {
+    try {
+      logger.info("Rollbacking dangling tx with id " + xid);
+      new PersistentXaTransactionContext(xaTxQueueTransactionJournal, queueProvider, xid).doRollback();
+    } catch (ResourceManagerException e) {
+      logger.warn(e.getMessage());
+      if (logger.isDebugEnabled()) {
+        logger.debug("Error rollbacking dangling transaction", e);
+      }
+      throw new XAException(XAException.XAER_NOTA);
     }
+  }
 
-    public void commitDandlingTransaction(Xid xid, boolean onePhase) throws XAException
-    {
-        try
-        {
-            logger.info("Commiting dangling tx with id " + xid);
-            new PersistentXaTransactionContext(xaTxQueueTransactionJournal, queueProvider, xid).doCommit();
-        }
-        catch (ResourceManagerException e)
-        {
-            logger.warn(e.getMessage());
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Error committing dangling transaction", e);
-            }
-            throw new XAException(XAException.XAER_NOTA);
-        }
+  public void commitDandlingTransaction(Xid xid, boolean onePhase) throws XAException {
+    try {
+      logger.info("Commiting dangling tx with id " + xid);
+      new PersistentXaTransactionContext(xaTxQueueTransactionJournal, queueProvider, xid).doCommit();
+    } catch (ResourceManagerException e) {
+      logger.warn(e.getMessage());
+      if (logger.isDebugEnabled()) {
+        logger.debug("Error committing dangling transaction", e);
+      }
+      throw new XAException(XAException.XAER_NOTA);
     }
+  }
 }

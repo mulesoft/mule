@@ -18,131 +18,105 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 /**
- * <code>FutureMessageResult</code> is an MuleMessage result of a remote invocation
- * on a Mule Server. This object makes the result available to the client code once
- * the request has been processed. This execution happens asynchronously.
+ * <code>FutureMessageResult</code> is an MuleMessage result of a remote invocation on a Mule Server. This object makes the result
+ * available to the client code once the request has been processed. This execution happens asynchronously.
  */
 // @ThreadSafe
-public class FutureMessageResult extends FutureTask
-{
-    /**
-     * This is a simple default Executor for FutureMessageResults. Instead of
-     * spawning a Thread for each invocation it uses a single daemon Thread with an
-     * unbounded queue, so "truly" concurrent operation of multiple Futures or
-     * otherwise customized execution behaviour requires calling the
-     * {@link #setExecutor(Executor)} method and passing in a custom {@link Executor}.
-     * This is strongly recommended in order to provide better control over
-     * concurrency, resource consumption and possible overruns.
-     * <p>
-     * Reasons for these defaults:
-     * <ul>
-     * <li> a daemon thread does not block the VM on shutdown; lifecycle control
-     * should be done elsewhere (e.g. the provider of the custom ExecutorService),
-     * otherwise this class would become too overloaded
-     * <li> a single thread provides for conservative & predictable yet async
-     * behaviour from a client's point of view
-     * <li> the unbounded queue is not optimal but probably harmless since e.g. a
-     * MuleClient would have to create a LOT of Futures for an OOM. Cancelled/timed
-     * out invocations are GC'ed so the problem is rather unlikely to occur.
-     * </ul>
-     */
-    private static final Executor DefaultExecutor = Executors.newSingleThreadExecutor(
-        new DaemonThreadFactory("MuleDefaultFutureMessageExecutor"));
+public class FutureMessageResult extends FutureTask {
 
-    // @GuardedBy(this)
-    private Executor executor;
+  /**
+   * This is a simple default Executor for FutureMessageResults. Instead of spawning a Thread for each invocation it uses a single
+   * daemon Thread with an unbounded queue, so "truly" concurrent operation of multiple Futures or otherwise customized execution
+   * behaviour requires calling the {@link #setExecutor(Executor)} method and passing in a custom {@link Executor}. This is
+   * strongly recommended in order to provide better control over concurrency, resource consumption and possible overruns.
+   * <p>
+   * Reasons for these defaults:
+   * <ul>
+   * <li>a daemon thread does not block the VM on shutdown; lifecycle control should be done elsewhere (e.g. the provider of the
+   * custom ExecutorService), otherwise this class would become too overloaded
+   * <li>a single thread provides for conservative & predictable yet async behaviour from a client's point of view
+   * <li>the unbounded queue is not optimal but probably harmless since e.g. a MuleClient would have to create a LOT of Futures
+   * for an OOM. Cancelled/timed out invocations are GC'ed so the problem is rather unlikely to occur.
+   * </ul>
+   */
+  private static final Executor DefaultExecutor =
+      Executors.newSingleThreadExecutor(new DaemonThreadFactory("MuleDefaultFutureMessageExecutor"));
 
-    // @GuardedBy(this)
-    private List transformers;
+  // @GuardedBy(this)
+  private Executor executor;
 
-    protected MuleContext muleContext;
+  // @GuardedBy(this)
+  private List transformers;
 
-    public FutureMessageResult(Callable callable, MuleContext muleContext)
-    {
-        super(callable);
-        this.executor = DefaultExecutor;
-        this.muleContext = muleContext;
+  protected MuleContext muleContext;
+
+  public FutureMessageResult(Callable callable, MuleContext muleContext) {
+    super(callable);
+    this.executor = DefaultExecutor;
+    this.muleContext = muleContext;
+  }
+
+  /**
+   * Set an ExecutorService to run this invocation.
+   * 
+   * @param e the executor to be used.
+   * @throws IllegalArgumentException when the executor is null or shutdown.
+   */
+  public void setExecutor(Executor e) {
+    if (e == null) {
+      throw new IllegalArgumentException("Executor must not be null.");
     }
 
-    /**
-     * Set an ExecutorService to run this invocation.
-     * 
-     * @param e the executor to be used.
-     * @throws IllegalArgumentException when the executor is null or shutdown.
-     */
-    public void setExecutor(Executor e)
-    {
-        if (e == null)
-        {
-            throw new IllegalArgumentException("Executor must not be null.");
+    synchronized (this) {
+      this.executor = e;
+    }
+  }
+
+  /**
+   * Set a post-invocation transformer.
+   * 
+   * @param t Transformers to be applied to the result of this invocation. May be null.
+   */
+  public void setTransformers(List t) {
+    synchronized (this) {
+      this.transformers = t;
+    }
+  }
+
+  public MuleMessage getMessage() throws InterruptedException, ExecutionException, MuleException {
+    return this.getMessage(this.get());
+  }
+
+  public MuleMessage getMessage(long timeout) throws InterruptedException, ExecutionException, TimeoutException, MuleException {
+    return this.getMessage(this.get(timeout, TimeUnit.MILLISECONDS));
+  }
+
+  private MuleMessage getMessage(Object obj) throws MuleException {
+    MuleMessage result = null;
+    if (obj != null) {
+      if (obj instanceof MuleMessage) {
+        result = (MuleMessage) obj;
+      } else {
+        result = MuleMessage.builder().payload(obj).build();
+      }
+
+      synchronized (this) {
+        if (transformers != null) {
+          result = muleContext.getTransformationService().applyTransformers(result, null, transformers);
         }
+      }
 
-        synchronized (this)
-        {
-            this.executor = e;
-        }
     }
+    return result;
+  }
 
-    /**
-     * Set a post-invocation transformer.
-     * 
-     * @param t Transformers to be applied to the result of this invocation. May be
-     *            null.
-     */
-    public void setTransformers(List t)
-    {
-        synchronized (this)
-        {
-            this.transformers = t;
-        }
+  /**
+   * Start asynchronous execution of this task
+   */
+  public void execute() {
+    synchronized (this) {
+      executor.execute(this);
     }
-
-    public MuleMessage getMessage() throws InterruptedException, ExecutionException, MuleException
-    {
-        return this.getMessage(this.get());
-    }
-
-    public MuleMessage getMessage(long timeout)
-        throws InterruptedException, ExecutionException, TimeoutException, MuleException
-    {
-        return this.getMessage(this.get(timeout, TimeUnit.MILLISECONDS));
-    }
-
-    private MuleMessage getMessage(Object obj) throws MuleException
-    {
-        MuleMessage result = null;
-        if (obj != null)
-        {
-            if (obj instanceof MuleMessage)
-            {
-                result = (MuleMessage)obj;
-            }
-            else
-            {
-                result = MuleMessage.builder().payload(obj).build();
-            }
-
-            synchronized (this)
-            {
-                if (transformers != null)
-                {
-                    result = muleContext.getTransformationService().applyTransformers(result, null, transformers);
-                }
-            }
-
-        }
-        return result;
-    }
-
-    /**
-     * Start asynchronous execution of this task
-     */
-    public void execute()
-    {
-        synchronized (this)
-        {
-            executor.execute(this);
-        }
-    }
+  }
 
 }

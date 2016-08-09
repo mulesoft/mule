@@ -25,69 +25,66 @@ import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Test;
 
-public class JsonNamespaceHandlerTestCase extends FunctionalTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "json-namespace-config.xml";
+public class JsonNamespaceHandlerTestCase extends FunctionalTestCase {
+
+  @Override
+  protected String getConfigFile() {
+    return "json-namespace-config.xml";
+  }
+
+  @Test
+  public void testJsonConfig() throws Exception {
+    JsonToXml jToX = muleContext.getRegistry().lookupObject("jToX");
+    assertNotNull(jToX);
+
+    XmlToJson xToJ = muleContext.getRegistry().lookupObject("xToJ");
+    assertNotNull(xToJ);
+
+    JsonXsltTransformer jToJ = muleContext.getRegistry().lookupObject("jToJ");
+    assertNotNull(jToJ);
+    assertNotNull(jToJ.getXslt());
+
+    JsonSchemaValidationFilter jvf = muleContext.getRegistry().lookupObject("jvf");
+    assertNotNull(jvf);
+    assertNotNull(jvf.getSchemaLocations());
+
+    // This test fails under Java 1.6 on Windows, because the Java fields are serialized in a different order.
+    String javaVersion = System.getProperty("java.specification.version", "<None>");
+    String osName = System.getProperty("os.name", "<None>");
+    if (javaVersion.equals("1.6") && osName.startsWith("Windows")) {
+      return;
     }
 
-    @Test
-    public void testJsonConfig() throws Exception
-    {
-        JsonToXml jToX = muleContext.getRegistry().lookupObject("jToX");
-        assertNotNull(jToX);
+    IsJsonFilter filter = (IsJsonFilter) muleContext.getRegistry().lookupObject("jsonFilter");
+    assertNotNull(filter);
+    assertTrue(filter.isValidateParsing());
 
-        XmlToJson xToJ = muleContext.getRegistry().lookupObject("xToJ");
-        assertNotNull(xToJ);
+    ObjectToJson serializer = (ObjectToJson) muleContext.getRegistry().lookupObject("fruitCollectionToJson");
+    serializer.initialise();
+    assertNotNull(serializer);
+    assertEquals(String.class, serializer.getReturnDataType().getType());
+    assertEquals(FruitCollection.class, serializer.getSourceClass());
+    assertEquals(3, serializer.getSerializationMixins().size());
 
-        JsonXsltTransformer jToJ = muleContext.getRegistry().lookupObject("jToJ");
-        assertNotNull(jToJ);
-        assertNotNull(jToJ.getXslt());
+    JsonToObject deserializer = (JsonToObject) muleContext.getRegistry().lookupObject("jsonToFruitCollection");
+    assertNotNull(deserializer);
+    assertEquals(FruitCollection.class, deserializer.getReturnDataType().getType());
+    assertEquals(1, deserializer.getDeserializationMixins().size());
 
-        JsonSchemaValidationFilter jvf = muleContext.getRegistry().lookupObject("jvf");
-        assertNotNull(jvf);
-        assertNotNull(jvf.getSchemaLocations());
+    // Test roundTrip
+    FruitCollection fc = JsonBeanRoundTripTestCase.JSON_OBJECT;
 
-        // This test fails under Java 1.6 on Windows, because the Java fields are serialized in a different order.
-        String javaVersion = System.getProperty("java.specification.version", "<None>");
-        String osName = System.getProperty("os.name", "<None>");
-        if (javaVersion.equals("1.6") && osName.startsWith("Windows"))
-        {
-            return;
-        }
+    String result = (String) serializer.transform(fc);
+    assertNotNull(result);
+    // compare the structure and values but not the attributes' order
+    ObjectMapper mapper = new ObjectMapper();
+    JsonNode actualJsonNode = mapper.readTree(result);
+    JsonNode expectedJsonNode = mapper.readTree(JsonBeanRoundTripTestCase.JSON_STRING);
+    assertEquals(actualJsonNode, expectedJsonNode);
 
-        IsJsonFilter filter = (IsJsonFilter) muleContext.getRegistry().lookupObject("jsonFilter");
-        assertNotNull(filter);
-        assertTrue(filter.isValidateParsing());
-
-        ObjectToJson serializer = (ObjectToJson) muleContext.getRegistry().lookupObject("fruitCollectionToJson");
-        serializer.initialise();
-        assertNotNull(serializer);
-        assertEquals(String.class, serializer.getReturnDataType().getType());
-        assertEquals(FruitCollection.class, serializer.getSourceClass());
-        assertEquals(3, serializer.getSerializationMixins().size());
-
-        JsonToObject deserializer = (JsonToObject) muleContext.getRegistry().lookupObject("jsonToFruitCollection");
-        assertNotNull(deserializer);
-        assertEquals(FruitCollection.class, deserializer.getReturnDataType().getType());
-        assertEquals(1, deserializer.getDeserializationMixins().size());
-
-       //Test roundTrip
-        FruitCollection fc = JsonBeanRoundTripTestCase.JSON_OBJECT;
-
-        String result = (String)serializer.transform(fc);
-        assertNotNull(result);
-        // compare the structure and values but not the attributes' order
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode actualJsonNode = mapper.readTree(result);
-        JsonNode expectedJsonNode = mapper.readTree(JsonBeanRoundTripTestCase.JSON_STRING);
-        assertEquals(actualJsonNode, expectedJsonNode);
-
-        FruitCollection result2 = (FruitCollection)deserializer.transform(result);
-        assertNotNull(result2);
-        assertEquals(fc, result2);
-    }
+    FruitCollection result2 = (FruitCollection) deserializer.transform(result);
+    assertNotNull(result2);
+    assertEquals(fc, result2);
+  }
 
 }

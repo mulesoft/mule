@@ -16,4 +16,7 @@
     <name>Mule Transactional Test Extension</name>
     <description>A Mule extension for testing TX support</description>
 
+    <properties>
+        <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
+    </properties>
 </project>

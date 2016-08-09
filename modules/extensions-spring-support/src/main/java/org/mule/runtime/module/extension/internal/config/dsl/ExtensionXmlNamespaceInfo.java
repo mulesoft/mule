@@ -13,26 +13,23 @@ import org.mule.runtime.config.spring.dsl.api.xml.XmlNamespaceInfo;
  *
  * @since 4.0
  */
-public class ExtensionXmlNamespaceInfo implements XmlNamespaceInfo
-{
+public class ExtensionXmlNamespaceInfo implements XmlNamespaceInfo {
 
-    public static final String EXTENSION_NAMESPACE = "extension";
+  public static final String EXTENSION_NAMESPACE = "extension";
 
-    /**
-     * @return {@code http//://www.mulesoft.org/schema/mule/extension}
-     */
-    @Override
-    public String getNamespaceUriPrefix()
-    {
-        return "http//://www.mulesoft.org/schema/mule/extension";
-    }
+  /**
+   * @return {@code http//://www.mulesoft.org/schema/mule/extension}
+   */
+  @Override
+  public String getNamespaceUriPrefix() {
+    return "http//://www.mulesoft.org/schema/mule/extension";
+  }
 
-    /**
-     * @return {@link #EXTENSION_NAMESPACE}
-     */
-    @Override
-    public String getNamespace()
-    {
-        return EXTENSION_NAMESPACE;
-    }
+  /**
+   * @return {@link #EXTENSION_NAMESPACE}
+   */
+  @Override
+  public String getNamespace() {
+    return EXTENSION_NAMESPACE;
+  }
 }

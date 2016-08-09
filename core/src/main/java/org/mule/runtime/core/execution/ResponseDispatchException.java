@@ -13,22 +13,18 @@ import org.mule.runtime.core.config.i18n.Message;
 /**
  * Exception thrown when there's a failure writing the response using the transport infrastructure.
  */
-public class ResponseDispatchException extends MessagingException
-{
+public class ResponseDispatchException extends MessagingException {
 
-    public ResponseDispatchException(Message message, MuleEvent event)
-    {
-        super(message, event);
-    }
+  public ResponseDispatchException(Message message, MuleEvent event) {
+    super(message, event);
+  }
 
-    public ResponseDispatchException(Message message, MuleEvent event, Throwable cause)
-    {
-        super(message, event, cause);
-    }
+  public ResponseDispatchException(Message message, MuleEvent event, Throwable cause) {
+    super(message, event, cause);
+  }
 
-    public ResponseDispatchException(MuleEvent event, Throwable cause)
-    {
-        super(event, cause);
-    }
+  public ResponseDispatchException(MuleEvent event, Throwable cause) {
+    super(event, cause);
+  }
 
 }

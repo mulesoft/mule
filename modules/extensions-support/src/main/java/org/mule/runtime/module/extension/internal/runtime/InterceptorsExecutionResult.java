@@ -15,39 +15,34 @@ import java.util.List;
  *
  * @since 4.0
  */
-final class InterceptorsExecutionResult
-{
+final class InterceptorsExecutionResult {
 
-    private final Throwable throwable;
-    private final List<Interceptor> executedInterceptors;
+  private final Throwable throwable;
+  private final List<Interceptor> executedInterceptors;
 
-    public InterceptorsExecutionResult(Throwable throwable, List<Interceptor> executedInterceptors)
-    {
-        this.throwable = throwable;
-        this.executedInterceptors = executedInterceptors;
-    }
+  public InterceptorsExecutionResult(Throwable throwable, List<Interceptor> executedInterceptors) {
+    this.throwable = throwable;
+    this.executedInterceptors = executedInterceptors;
+  }
 
-    /**
-     * @return the {@link Throwable} that caused the execution failure
-     */
-    public Throwable getThrowable()
-    {
-        return throwable;
-    }
+  /**
+   * @return the {@link Throwable} that caused the execution failure
+   */
+  public Throwable getThrowable() {
+    return throwable;
+  }
 
-    /**
-     * @return a list of {@link Interceptor} that has been executed
-     */
-    public List<Interceptor> getExecutedInterceptors()
-    {
-        return executedInterceptors;
-    }
+  /**
+   * @return a list of {@link Interceptor} that has been executed
+   */
+  public List<Interceptor> getExecutedInterceptors() {
+    return executedInterceptors;
+  }
 
-    /**
-     * @return boolean that represents if the execution finished correctly
-     */
-    public boolean isOk()
-    {
-        return throwable == null;
-    }
+  /**
+   * @return boolean that represents if the execution finished correctly
+   */
+  public boolean isOk() {
+    return throwable == null;
+  }
 }

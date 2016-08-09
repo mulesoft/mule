@@ -28,73 +28,68 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class DispatchingLoggerTestCase extends AbstractMuleTestCase
-{
+public class DispatchingLoggerTestCase extends AbstractMuleTestCase {
 
-    private static final String LOGGER_NAME = DispatchingLoggerTestCase.class.getName();
-    private static final String MESSAGE = "Hello Log!";
+  private static final String LOGGER_NAME = DispatchingLoggerTestCase.class.getName();
+  private static final String MESSAGE = "Hello Log!";
 
-    private ClassLoader currentClassLoader;
+  private ClassLoader currentClassLoader;
 
-    @Mock
-    private ClassLoader additionalClassLoader;
+  @Mock
+  private ClassLoader additionalClassLoader;
 
-    @Mock(extraInterfaces = {ArtifactClassLoader.class})
-    private ClassLoader artifactClassLoader;
+  @Mock(extraInterfaces = {ArtifactClassLoader.class})
+  private ClassLoader artifactClassLoader;
 
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private Logger originalLogger;
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  private Logger originalLogger;
 
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private LoggerContext loggerContext;
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  private LoggerContext loggerContext;
 
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private ContextSelector contextSelector;
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  private ContextSelector contextSelector;
 
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private MessageFactory messageFactory;
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  private MessageFactory messageFactory;
 
-    private Logger logger;
+  private Logger logger;
 
-    @Before
-    public void before()
-    {
-        currentClassLoader = Thread.currentThread().getContextClassLoader();
-        when(loggerContext.getConfiguration().getLoggerConfig(anyString()).getLevel()).thenReturn(Level.INFO);
+  @Before
+  public void before() {
+    currentClassLoader = Thread.currentThread().getContextClassLoader();
+    when(loggerContext.getConfiguration().getLoggerConfig(anyString()).getLevel()).thenReturn(Level.INFO);
 
-        logger = new DispatchingLogger(originalLogger, currentClassLoader.hashCode(), loggerContext, contextSelector, messageFactory)
-        {
-            @Override
-            public String getName()
-            {
-                return LOGGER_NAME;
-            }
+    logger =
+        new DispatchingLogger(originalLogger, currentClassLoader.hashCode(), loggerContext, contextSelector, messageFactory) {
+
+          @Override
+          public String getName() {
+            return LOGGER_NAME;
+          }
         };
-    }
+  }
 
-    @Test
-    public void currentClassLoader()
-    {
-        logger.info(MESSAGE);
-        verify(originalLogger).info(MESSAGE);
-    }
+  @Test
+  public void currentClassLoader() {
+    logger.info(MESSAGE);
+    verify(originalLogger).info(MESSAGE);
+  }
 
-    @Test
-    public void anotherClassLoader()
-    {
-        withContextClassLoader(additionalClassLoader, () -> {
-            logger.info(MESSAGE);
-            verify(originalLogger).info(MESSAGE);
-        });
-    }
+  @Test
+  public void anotherClassLoader() {
+    withContextClassLoader(additionalClassLoader, () -> {
+      logger.info(MESSAGE);
+      verify(originalLogger).info(MESSAGE);
+    });
+  }
 
-    @Test
-    public void artifactClassLoader()
-    {
-        withContextClassLoader(artifactClassLoader, () -> {
-            logger.info(MESSAGE);
-            verify(contextSelector).getContext(LOGGER_NAME, artifactClassLoader, true);
-        });
-    }
+  @Test
+  public void artifactClassLoader() {
+    withContextClassLoader(artifactClassLoader, () -> {
+      logger.info(MESSAGE);
+      verify(contextSelector).getContext(LOGGER_NAME, artifactClassLoader, true);
+    });
+  }
 
 }

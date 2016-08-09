@@ -8,12 +8,11 @@ package org.mule.compatibility.core;
 
 import org.mule.runtime.core.MessageExchangePattern;
 
-public class NonBlockingFullySupportedOneWayReplyToEndpointFunctionalTestCase extends NonBlockingFullySupportedEndpointFunctionalTestCase
-{
+public class NonBlockingFullySupportedOneWayReplyToEndpointFunctionalTestCase
+    extends NonBlockingFullySupportedEndpointFunctionalTestCase {
 
-    @Override
-    protected MessageExchangePattern getMessageExchnagePattern()
-    {
-        return MessageExchangePattern.ONE_WAY;
-    }
+  @Override
+  protected MessageExchangePattern getMessageExchnagePattern() {
+    return MessageExchangePattern.ONE_WAY;
+  }
 }

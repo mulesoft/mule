@@ -19,33 +19,29 @@ import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.hamcrest.core.Is;
 
-public class ParamMapMatcher
-{
+public class ParamMapMatcher {
 
-    public static Matcher<ParameterMap> isEqual(final Map<String, ? extends List<String>> parameters)
-    {
-        return new BaseMatcher<ParameterMap>()
-        {
-            @Override
-            public boolean matches(Object o)
-            {
-                ParameterMap parameterMap = (ParameterMap) o;
-                assertThat(parameterMap.size(), Is.is(parameters.size()));
-                for (String key : parameters.keySet())
-                {
-                    assertThat(parameterMap.keySet(), Matchers.containsInAnyOrder(parameters.keySet().toArray(new String[parameterMap.size()])));
-                    final List<String> parameterKeyValues = parameters.get(key);
-                    final List<String> parameterMapValues = parameterMap.getAll(key);
-                    assertThat(parameterMapValues, Matchers.containsInAnyOrder(parameterKeyValues.toArray(new String[parameterKeyValues.size()])));
-                }
-                return true;
-            }
+  public static Matcher<ParameterMap> isEqual(final Map<String, ? extends List<String>> parameters) {
+    return new BaseMatcher<ParameterMap>() {
 
-            @Override
-            public void describeTo(Description description)
-            {
-            }
-        };
-    }
+      @Override
+      public boolean matches(Object o) {
+        ParameterMap parameterMap = (ParameterMap) o;
+        assertThat(parameterMap.size(), Is.is(parameters.size()));
+        for (String key : parameters.keySet()) {
+          assertThat(parameterMap.keySet(),
+                     Matchers.containsInAnyOrder(parameters.keySet().toArray(new String[parameterMap.size()])));
+          final List<String> parameterKeyValues = parameters.get(key);
+          final List<String> parameterMapValues = parameterMap.getAll(key);
+          assertThat(parameterMapValues,
+                     Matchers.containsInAnyOrder(parameterKeyValues.toArray(new String[parameterKeyValues.size()])));
+        }
+        return true;
+      }
+
+      @Override
+      public void describeTo(Description description) {}
+    };
+  }
 
 }

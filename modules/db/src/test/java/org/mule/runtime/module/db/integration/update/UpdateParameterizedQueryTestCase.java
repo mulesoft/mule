@@ -21,42 +21,36 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class UpdateParameterizedQueryTestCase extends AbstractDbIntegrationTestCase
-{
+public class UpdateParameterizedQueryTestCase extends AbstractDbIntegrationTestCase {
 
-    public static final String PLUTO = "Pluto";
+  public static final String PLUTO = "Pluto";
 
-    public UpdateParameterizedQueryTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public UpdateParameterizedQueryTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Parameterized.Parameters
-    public static List<Object[]> parameters()
-    {
-        return TestDbConfig.getResources();
-    }
+  @Parameterized.Parameters
+  public static List<Object[]> parameters() {
+    return TestDbConfig.getResources();
+  }
 
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/update/update-parameterized-query-config.xml"};
-    }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/update/update-parameterized-query-config.xml"};
+  }
 
-    @Test
-    public void usesParameterizedQuery() throws Exception
-    {
-        final MuleEvent responseEvent = flowRunner("jdbcUpdate").withPayload(PLUTO).run();
+  @Test
+  public void usesParameterizedQuery() throws Exception {
+    final MuleEvent responseEvent = flowRunner("jdbcUpdate").withPayload(PLUTO).run();
 
-        final MuleMessage response = responseEvent.getMessage();
-        assertUpdate(response);
-    }
+    final MuleMessage response = responseEvent.getMessage();
+    assertUpdate(response);
+  }
 
-    private void assertUpdate(MuleMessage response) throws SQLException
-    {
-        assertThat(response.getPayload(), equalTo(1));
+  private void assertUpdate(MuleMessage response) throws SQLException {
+    assertThat(response.getPayload(), equalTo(1));
 
-        assertPlanetRecordsFromQuery(PLUTO);
-    }
+    assertPlanetRecordsFromQuery(PLUTO);
+  }
 }

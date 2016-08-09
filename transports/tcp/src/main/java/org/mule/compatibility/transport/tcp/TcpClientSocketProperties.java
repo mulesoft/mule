@@ -7,24 +7,23 @@
 package org.mule.compatibility.transport.tcp;
 
 /**
- * Interface for objects that provide TCP configuration for client sockets.
- * Null values can be returned by any of the methods, meaning that there is no value defined for the property.
+ * Interface for objects that provide TCP configuration for client sockets. Null values can be returned by any of the methods,
+ * meaning that there is no value defined for the property.
  */
-public interface TcpClientSocketProperties
-{
+public interface TcpClientSocketProperties {
 
-    public Integer getSendBufferSize();
+  public Integer getSendBufferSize();
 
-    public Integer getReceiveBufferSize();
+  public Integer getReceiveBufferSize();
 
-    public Boolean getSendTcpNoDelay();
+  public Boolean getSendTcpNoDelay();
 
-    public Integer getConnectionTimeout();
+  public Integer getConnectionTimeout();
 
-    public Integer getTimeout();
+  public Integer getTimeout();
 
-    public Integer getLinger();
+  public Integer getLinger();
 
-    public Boolean getKeepAlive();
+  public Boolean getKeepAlive();
 
 }

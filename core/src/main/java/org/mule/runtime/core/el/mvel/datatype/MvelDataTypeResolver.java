@@ -18,69 +18,59 @@ import java.util.List;
 /**
  * Resolves expression's data type using {@link ExpressionDataTypeResolver}
  */
-public class MvelDataTypeResolver
-{
+public class MvelDataTypeResolver {
 
 
-    private final List<ExpressionDataTypeResolver> resolvers;
+  private final List<ExpressionDataTypeResolver> resolvers;
 
-    public MvelDataTypeResolver()
-    {
-        this(getDefaultDataTypeResolvers());
-    }
+  public MvelDataTypeResolver() {
+    this(getDefaultDataTypeResolvers());
+  }
 
-    public MvelDataTypeResolver(List<ExpressionDataTypeResolver> resolvers)
-    {
-        this.resolvers = new LinkedList<>(resolvers);
-    }
+  public MvelDataTypeResolver(List<ExpressionDataTypeResolver> resolvers) {
+    this.resolvers = new LinkedList<>(resolvers);
+  }
 
-    private static List<ExpressionDataTypeResolver> getDefaultDataTypeResolvers()
-    {
-        List<ExpressionDataTypeResolver> resolvers;
-        resolvers = new LinkedList<>();
-        resolvers.add(new PayloadExpressionDataTypeResolver());
-        resolvers.add(new PropertyExpressionDataTypeResolver());
-        resolvers.add(new FlowVarExpressionDataTypeResolver());
-        resolvers.add(new SessionVarExpressionDataTypeResolver());
+  private static List<ExpressionDataTypeResolver> getDefaultDataTypeResolvers() {
+    List<ExpressionDataTypeResolver> resolvers;
+    resolvers = new LinkedList<>();
+    resolvers.add(new PayloadExpressionDataTypeResolver());
+    resolvers.add(new PropertyExpressionDataTypeResolver());
+    resolvers.add(new FlowVarExpressionDataTypeResolver());
+    resolvers.add(new SessionVarExpressionDataTypeResolver());
 
-        return resolvers;
-    }
+    return resolvers;
+  }
 
-    /**
-     * Resolves expression data type
-     *
-     * @param value result of evaluating the expression on the given message
-     * @param event event under evaluation
-     * @param serializedExpression expression
-     * @return the data type corresponding to the given expression if there is an expression
-     *         resolver able to resolved it. A default data type for the value if the expression
-     *         was not resolved.
-     */
-    public DataType resolve(Object value, MuleEvent event, Serializable serializedExpression)
-    {
-        DataType result = null;
+  /**
+   * Resolves expression data type
+   *
+   * @param value result of evaluating the expression on the given message
+   * @param event event under evaluation
+   * @param serializedExpression expression
+   * @return the data type corresponding to the given expression if there is an expression resolver able to resolved it. A default
+   *         data type for the value if the expression was not resolved.
+   */
+  public DataType resolve(Object value, MuleEvent event, Serializable serializedExpression) {
+    DataType result = null;
 
-        if (serializedExpression instanceof CompiledExpression)
-        {
-            CompiledExpression compiledExpression = (CompiledExpression) serializedExpression;
+    if (serializedExpression instanceof CompiledExpression) {
+      CompiledExpression compiledExpression = (CompiledExpression) serializedExpression;
 
-            for (ExpressionDataTypeResolver resolver : resolvers)
-            {
-                result = resolver.resolve(event, compiledExpression);
+      for (ExpressionDataTypeResolver resolver : resolvers) {
+        result = resolver.resolve(event, compiledExpression);
 
-                if (result != null)
-                {
-                    break;
-                }
-            }
+        if (result != null) {
+          break;
         }
-
-        if (result == null)
-        {
-            Class<?> type = value == null ? Object.class : value.getClass();
-            result = DataType.fromType(type);
-        }
-
-        return result;
+      }
     }
+
+    if (result == null) {
+      Class<?> type = value == null ? Object.class : value.getClass();
+      result = DataType.fromType(type);
+    }
+
+    return result;
+  }
 }

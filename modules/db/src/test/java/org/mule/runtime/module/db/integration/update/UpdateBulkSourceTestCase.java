@@ -17,32 +17,27 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class UpdateBulkSourceTestCase extends AbstractUpdateBulkTestCase
-{
+public class UpdateBulkSourceTestCase extends AbstractUpdateBulkTestCase {
 
-    public UpdateBulkSourceTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public UpdateBulkSourceTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Parameterized.Parameters
-    public static List<Object[]> parameters()
-    {
-        return TestDbConfig.getResources();
-    }
+  @Parameterized.Parameters
+  public static List<Object[]> parameters() {
+    return TestDbConfig.getResources();
+  }
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/update/update-bulk-source-config.xml"};
-    }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/update/update-bulk-source-config.xml"};
+  }
 
-    @Test
-    public void usesCustomSource() throws Exception
-    {
-        final MuleEvent responseEvent = flowRunner("updateBulkCustomSource").withPayload(TEST_MESSAGE).run();
+  @Test
+  public void usesCustomSource() throws Exception {
+    final MuleEvent responseEvent = flowRunner("updateBulkCustomSource").withPayload(TEST_MESSAGE).run();
 
-        final MuleMessage response = responseEvent.getMessage();
-        assertBulkModeResult(response.getPayload());
-    }
+    final MuleMessage response = responseEvent.getMessage();
+    assertBulkModeResult(response.getPayload());
+  }
 }

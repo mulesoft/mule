@@ -20,29 +20,26 @@ import java.util.List;
 
 import org.junit.Test;
 
-public class MulticastSyncTestCase extends AbstractIntegrationTestCase
-{
+public class MulticastSyncTestCase extends AbstractIntegrationTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/integration/routing/outbound/multicaster-sync-test-flow.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/integration/routing/outbound/multicaster-sync-test-flow.xml";
+  }
 
-    @Test
-    public void testSyncMulticast() throws Exception
-    {
-        Apple apple = new Apple();
-        MuleMessage result = flowRunner("Distributor").withPayload(apple).run().getMessage();
+  @Test
+  public void testSyncMulticast() throws Exception {
+    Apple apple = new Apple();
+    MuleMessage result = flowRunner("Distributor").withPayload(apple).run().getMessage();
 
-        assertNotNull(result);
-        assertTrue(result.getPayload() instanceof List);
-        List<Fruit> results = ((List<MuleMessage>) result.getPayload()).stream().map(msg -> (Fruit) msg.getPayload
-                ()).collect(toList());
-        assertEquals(3, results.size());
+    assertNotNull(result);
+    assertTrue(result.getPayload() instanceof List);
+    List<Fruit> results =
+        ((List<MuleMessage>) result.getPayload()).stream().map(msg -> (Fruit) msg.getPayload()).collect(toList());
+    assertEquals(3, results.size());
 
-        assertTrue(results.contains(apple));
+    assertTrue(results.contains(apple));
 
-        FlowAssert.verify();
-    }
+    FlowAssert.verify();
+  }
 }

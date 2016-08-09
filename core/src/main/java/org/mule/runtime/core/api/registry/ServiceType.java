@@ -9,30 +9,27 @@ package org.mule.runtime.core.api.registry;
 /**
  * TODO
  */
-public interface ServiceType
-{
-    public static final ServiceType EXCEPTION = new ServiceType()
-    {
-        @Override
-        public String toString()
-        {
-            return getPath() + ": " + getName();
-        }
+public interface ServiceType {
 
-        public String getPath()
-        {
-            return "org/mule/runtime/core/config";
-        }
+  public static final ServiceType EXCEPTION = new ServiceType() {
 
-        public String getName()
-        {
-            return "exception";
-        }
-    };
+    @Override
+    public String toString() {
+      return getPath() + ": " + getName();
+    }
 
-    String getPath();
+    public String getPath() {
+      return "org/mule/runtime/core/config";
+    }
 
-    String getName();
+    public String getName() {
+      return "exception";
+    }
+  };
+
+  String getPath();
+
+  String getName();
 }
 
 

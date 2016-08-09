@@ -16,35 +16,32 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
-public class MuleApplicationClassLoader extends MuleDeployableArtifactClassLoader implements ApplicationClassLoader
-{
-    static
-    {
-        registerAsParallelCapable();
-    }
+public class MuleApplicationClassLoader extends MuleDeployableArtifactClassLoader implements ApplicationClassLoader {
 
-    private NativeLibraryFinder nativeLibraryFinder;
+  static {
+    registerAsParallelCapable();
+  }
 
-    public MuleApplicationClassLoader(String appName, ClassLoader parentCl, NativeLibraryFinder nativeLibraryFinder, List<URL> urls, ClassLoaderLookupPolicy lookupPolicy, List<ArtifactClassLoader> artifactPluginClassLoaders)
-    {
-        super(appName, urls.toArray(new URL[0]), parentCl, lookupPolicy, artifactPluginClassLoaders);
+  private NativeLibraryFinder nativeLibraryFinder;
 
-        this.nativeLibraryFinder = nativeLibraryFinder;
-    }
+  public MuleApplicationClassLoader(String appName, ClassLoader parentCl, NativeLibraryFinder nativeLibraryFinder, List<URL> urls,
+                                    ClassLoaderLookupPolicy lookupPolicy, List<ArtifactClassLoader> artifactPluginClassLoaders) {
+    super(appName, urls.toArray(new URL[0]), parentCl, lookupPolicy, artifactPluginClassLoaders);
 
-    @Override
-    protected String findLibrary(String name)
-    {
-        String libraryPath = super.findLibrary(name);
+    this.nativeLibraryFinder = nativeLibraryFinder;
+  }
 
-        libraryPath = nativeLibraryFinder.findLibrary(name, libraryPath);
+  @Override
+  protected String findLibrary(String name) {
+    String libraryPath = super.findLibrary(name);
 
-        return libraryPath;
-    }
+    libraryPath = nativeLibraryFinder.findLibrary(name, libraryPath);
 
-    @Override
-    protected String[] getLocalResourceLocations()
-    {
-        return new String[] {MuleFoldersUtil.getAppClassesFolder(getArtifactName()).getAbsolutePath()};
-    }
+    return libraryPath;
+  }
+
+  @Override
+  protected String[] getLocalResourceLocations() {
+    return new String[] {MuleFoldersUtil.getAppClassesFolder(getArtifactName()).getAbsolutePath()};
+  }
 }

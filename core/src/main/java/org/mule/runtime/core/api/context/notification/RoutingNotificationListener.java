@@ -10,10 +10,10 @@ import org.mule.runtime.core.context.notification.RoutingNotification;
 
 
 /**
- * <code>RoutingNotificationListener</code> is an observer interface that objects
- * can use to receive notifications about routing events such as async-reply misses.
+ * <code>RoutingNotificationListener</code> is an observer interface that objects can use to receive notifications about routing
+ * events such as async-reply misses.
  */
-public interface RoutingNotificationListener<T extends RoutingNotification> extends ServerNotificationListener<RoutingNotification>
-{
-    // no methods
+public interface RoutingNotificationListener<T extends RoutingNotification>
+    extends ServerNotificationListener<RoutingNotification> {
+  // no methods
 }

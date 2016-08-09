@@ -13,23 +13,16 @@ import org.mule.runtime.core.api.MuleMessage;
 
 import java.io.Serializable;
 
-public class AddPropertyTransformer extends AbstractAddVariablePropertyTransformer<Serializable>
-{
+public class AddPropertyTransformer extends AbstractAddVariablePropertyTransformer<Serializable> {
 
-    @Override
-    protected void addProperty(MuleEvent event, String propertyName, Serializable value, DataType dataType)
-    {
-        event.setMessage(MuleMessage.builder(event.getMessage())
-                                    .addOutboundProperty(propertyName, value, dataType)
-                                    .build());
-    }
+  @Override
+  protected void addProperty(MuleEvent event, String propertyName, Serializable value, DataType dataType) {
+    event.setMessage(MuleMessage.builder(event.getMessage()).addOutboundProperty(propertyName, value, dataType).build());
+  }
 
-    @Override
-    protected void removeProperty(MuleEvent event, String propertyName)
-    {
-        event.setMessage(MuleMessage.builder(event.getMessage())
-                                    .removeOutboundProperty(propertyName)
-                                    .build());
-    }
+  @Override
+  protected void removeProperty(MuleEvent event, String propertyName) {
+    event.setMessage(MuleMessage.builder(event.getMessage()).removeOutboundProperty(propertyName).build());
+  }
 
 }

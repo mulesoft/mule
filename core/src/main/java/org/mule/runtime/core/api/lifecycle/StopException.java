@@ -10,36 +10,33 @@ import org.mule.runtime.core.config.i18n.Message;
 
 /** <code>DisposeException</code> TODO (document class) */
 
-public class StopException extends LifecycleException
-{
-    /** Serial version */
-    private static final long serialVersionUID = 1714192220605243678L;
+public class StopException extends LifecycleException {
 
-    /**
-     * @param message   the exception message
-     * @param component the object that failed during a lifecycle method call
-     */
-    public StopException(Message message, Stoppable component)
-    {
-        super(message, component);
-    }
+  /** Serial version */
+  private static final long serialVersionUID = 1714192220605243678L;
 
-    /**
-     * @param message   the exception message
-     * @param cause     the exception that cause this exception to be thrown
-     * @param component the object that failed during a lifecycle method call
-     */
-    public StopException(Message message, Throwable cause, Stoppable component)
-    {
-        super(message, cause, component);
-    }
+  /**
+   * @param message the exception message
+   * @param component the object that failed during a lifecycle method call
+   */
+  public StopException(Message message, Stoppable component) {
+    super(message, component);
+  }
 
-    /**
-     * @param cause     the exception that cause this exception to be thrown
-     * @param component the object that failed during a lifecycle method call
-     */
-    public StopException(Throwable cause, Stoppable component)
-    {
-        super(cause, component);
-    }
+  /**
+   * @param message the exception message
+   * @param cause the exception that cause this exception to be thrown
+   * @param component the object that failed during a lifecycle method call
+   */
+  public StopException(Message message, Throwable cause, Stoppable component) {
+    super(message, cause, component);
+  }
+
+  /**
+   * @param cause the exception that cause this exception to be thrown
+   * @param component the object that failed during a lifecycle method call
+   */
+  public StopException(Throwable cause, Stoppable component) {
+    super(cause, component);
+  }
 }

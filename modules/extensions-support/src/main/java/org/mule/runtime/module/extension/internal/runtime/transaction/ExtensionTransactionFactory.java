@@ -16,27 +16,24 @@ import org.mule.runtime.core.api.transaction.TransactionFactory;
  *
  * @since 4.0
  */
-public class ExtensionTransactionFactory implements TransactionFactory
-{
+public class ExtensionTransactionFactory implements TransactionFactory {
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Transaction beginTransaction(MuleContext muleContext) throws TransactionException
-    {
-        Transaction transaction = new ExtensionTransaction(muleContext);
-        transaction.begin();
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Transaction beginTransaction(MuleContext muleContext) throws TransactionException {
+    Transaction transaction = new ExtensionTransaction(muleContext);
+    transaction.begin();
 
-        return transaction;
-    }
+    return transaction;
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean isTransacted()
-    {
-        return true;
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean isTransacted() {
+    return true;
+  }
 }

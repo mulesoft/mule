@@ -26,56 +26,49 @@ import javax.management.remote.JMXServiceURL;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class JmxAgentAuthenticationTestCase extends FunctionalTestCase
-{
-    @Rule
-    public DynamicPort dynamicPort = new DynamicPort("port1");
+public class JmxAgentAuthenticationTestCase extends FunctionalTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "jmx-authentication-config.xml";
-    }
+  @Rule
+  public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    @Test(expected = SecurityException.class)
-    public void testAccessJmxServerWithoutCredentials() throws Exception
-    {
-        JMXServiceURL serviceUrl = createServiceUrl();
-        JMXConnectorFactory.connect(serviceUrl);
-    }
+  @Override
+  protected String getConfigFile() {
+    return "jmx-authentication-config.xml";
+  }
 
-    @Test
-    public void testAccessJmxServerWithValidCredentials() throws Exception
-    {
-        JMXConnector connector = connectToJmx("jsmith", "foo");
+  @Test(expected = SecurityException.class)
+  public void testAccessJmxServerWithoutCredentials() throws Exception {
+    JMXServiceURL serviceUrl = createServiceUrl();
+    JMXConnectorFactory.connect(serviceUrl);
+  }
 
-        // to test the connection, access an MBean that is present by default
-        MBeanServerConnection connection = connector.getMBeanServerConnection();
-        ObjectName name = new ObjectName("java.lang:type=Runtime");
-        ObjectInstance instance = connection.getObjectInstance(name);
-        assertNotNull(instance);
-    }
+  @Test
+  public void testAccessJmxServerWithValidCredentials() throws Exception {
+    JMXConnector connector = connectToJmx("jsmith", "foo");
 
-    @Test(expected = SecurityException.class)
-    public void testAccessJmxServerWithInvalidCredentials() throws Exception
-    {
-        connectToJmx("invalid", "user");
-    }
+    // to test the connection, access an MBean that is present by default
+    MBeanServerConnection connection = connector.getMBeanServerConnection();
+    ObjectName name = new ObjectName("java.lang:type=Runtime");
+    ObjectInstance instance = connection.getObjectInstance(name);
+    assertNotNull(instance);
+  }
 
-    private JMXConnector connectToJmx(String user, String password) throws IOException
-    {
-        JMXServiceURL serviceUrl = createServiceUrl();
+  @Test(expected = SecurityException.class)
+  public void testAccessJmxServerWithInvalidCredentials() throws Exception {
+    connectToJmx("invalid", "user");
+  }
 
-        String[] authToken = new String[] {user, password};
-        Map<String, ?> environment = Collections.singletonMap(JMXConnector.CREDENTIALS, authToken);
+  private JMXConnector connectToJmx(String user, String password) throws IOException {
+    JMXServiceURL serviceUrl = createServiceUrl();
 
-        return JMXConnectorFactory.connect(serviceUrl, environment);
-    }
+    String[] authToken = new String[] {user, password};
+    Map<String, ?> environment = Collections.singletonMap(JMXConnector.CREDENTIALS, authToken);
 
-    private JMXServiceURL createServiceUrl() throws MalformedURLException
-    {
-        String url = String.format("service:jmx:rmi:///jndi/rmi://localhost:%d/server",
-                                   dynamicPort.getNumber());
-        return new JMXServiceURL(url);
-    }
+    return JMXConnectorFactory.connect(serviceUrl, environment);
+  }
+
+  private JMXServiceURL createServiceUrl() throws MalformedURLException {
+    String url = String.format("service:jmx:rmi:///jndi/rmi://localhost:%d/server", dynamicPort.getNumber());
+    return new JMXServiceURL(url);
+  }
 }

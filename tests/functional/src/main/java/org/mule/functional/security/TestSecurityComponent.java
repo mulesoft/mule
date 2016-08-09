@@ -15,22 +15,21 @@ import org.mule.runtime.core.api.security.SecurityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class TestSecurityComponent implements Callable
-{
-    protected static final Logger logger = LoggerFactory.getLogger(TestSecurityComponent.class);
-    
-    public Object onCall(MuleEventContext eventContext) throws Exception
-    {
-        SecurityContext securityContext = eventContext.getSession().getSecurityContext();
-        Authentication authentication = securityContext.getAuthentication();
+public class TestSecurityComponent implements Callable {
 
-        int numberLogins = (Integer) authentication.getProperties().get(TestSingleUserSecurityProvider.PROPERTY_NUMBER_LOGINS);
-        String favoriteColor = (String) authentication.getProperties().get(TestSingleUserSecurityProvider.PROPERTY_FAVORITE_COLOR);
+  protected static final Logger logger = LoggerFactory.getLogger(TestSecurityComponent.class);
 
-        String msg = "user = " + authentication.getPrincipal() + ", logins = " + numberLogins + ", color = " + favoriteColor;
-        logger.debug(msg);
-        return msg;
-    }
+  public Object onCall(MuleEventContext eventContext) throws Exception {
+    SecurityContext securityContext = eventContext.getSession().getSecurityContext();
+    Authentication authentication = securityContext.getAuthentication();
+
+    int numberLogins = (Integer) authentication.getProperties().get(TestSingleUserSecurityProvider.PROPERTY_NUMBER_LOGINS);
+    String favoriteColor = (String) authentication.getProperties().get(TestSingleUserSecurityProvider.PROPERTY_FAVORITE_COLOR);
+
+    String msg = "user = " + authentication.getPrincipal() + ", logins = " + numberLogins + ", color = " + favoriteColor;
+    logger.debug(msg);
+    return msg;
+  }
 }
 
 

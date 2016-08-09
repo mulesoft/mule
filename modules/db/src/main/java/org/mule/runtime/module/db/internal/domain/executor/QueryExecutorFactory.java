@@ -10,12 +10,11 @@ package org.mule.runtime.module.db.internal.domain.executor;
 /**
  * Creates query executor instances
  */
-public interface QueryExecutorFactory
-{
+public interface QueryExecutorFactory {
 
-    /**
-     * @return a non null query executor
-     */
-    QueryExecutor create();
+  /**
+   * @return a non null query executor
+   */
+  QueryExecutor create();
 
 }

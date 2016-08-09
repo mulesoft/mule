@@ -13,57 +13,49 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Session variables wrapper {@link Map} for exposing Session variables via an {@link org.mule.runtime.core.api.el.ExpressionLanguage}
+ * Session variables wrapper {@link Map} for exposing Session variables via an
+ * {@link org.mule.runtime.core.api.el.ExpressionLanguage}
  */
-public class SessionVariableMapContext extends AbstractMapContext<Object>
-{
+public class SessionVariableMapContext extends AbstractMapContext<Object> {
 
-    private MuleSession session;
+  private MuleSession session;
 
-    public SessionVariableMapContext(MuleSession session)
-    {
-        this.session = session;
+  public SessionVariableMapContext(MuleSession session) {
+    this.session = session;
+  }
+
+  @Override
+  public Object doGet(String key) {
+    return session.getProperty(key);
+  }
+
+  @Override
+  public void doPut(String key, Object value) {
+    session.setProperty(key, value);
+  }
+
+  @Override
+  public void doRemove(String key) {
+    session.removeProperty(key);
+  }
+
+  @Override
+  public Set<String> keySet() {
+    return session.getPropertyNamesAsSet();
+  }
+
+  @Override
+  public void clear() {
+    session.clearProperties();
+  }
+
+  @Override
+  public String toString() {
+    Map<String, Object> map = new HashMap<String, Object>();
+    for (String key : session.getPropertyNamesAsSet()) {
+      Object value = session.getProperty(key);
+      map.put(key, value);
     }
-
-    @Override
-    public Object doGet(String key)
-    {
-        return session.getProperty(key);
-    }
-
-    @Override
-    public void doPut(String key, Object value)
-    {
-        session.setProperty(key, value);
-    }
-
-    @Override
-    public void doRemove(String key)
-    {
-        session.removeProperty(key);
-    }
-
-    @Override
-    public Set<String> keySet()
-    {
-        return session.getPropertyNamesAsSet();
-    }
-
-    @Override
-    public void clear()
-    {
-        session.clearProperties();
-    }
-
-    @Override
-    public String toString()
-    {
-        Map<String, Object> map = new HashMap<String, Object>();
-        for (String key : session.getPropertyNamesAsSet())
-        {
-            Object value = session.getProperty(key);
-            map.put(key, value);
-        }
-        return map.toString();
-    }
+    return map.toString();
+  }
 }

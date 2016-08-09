@@ -24,139 +24,110 @@ import java.io.Serializable;
 /**
  * Abstract class with common logic for until successful processing strategies.
  */
-public abstract class AbstractUntilSuccessfulProcessingStrategy implements UntilSuccessfulProcessingStrategy, MuleContextAware
-{
+public abstract class AbstractUntilSuccessfulProcessingStrategy implements UntilSuccessfulProcessingStrategy, MuleContextAware {
 
-    private UntilSuccessfulConfiguration untilSuccessfulConfiguration;
-    private MuleContext muleContext;
+  private UntilSuccessfulConfiguration untilSuccessfulConfiguration;
+  private MuleContext muleContext;
 
-    @Override
-    public void setUntilSuccessfulConfiguration(final UntilSuccessfulConfiguration untilSuccessfulConfiguration)
-    {
-        this.untilSuccessfulConfiguration = untilSuccessfulConfiguration;
+  @Override
+  public void setUntilSuccessfulConfiguration(final UntilSuccessfulConfiguration untilSuccessfulConfiguration) {
+    this.untilSuccessfulConfiguration = untilSuccessfulConfiguration;
+  }
+
+  /**
+   * Process the event through the configured route in the until-successful configuration.
+   *
+   * @param event the event to process through the until successful inner route.
+   * @return the response from the route if there's no ack expression. If there's ack expression then a message with the response
+   *         event but with a payload defined by the ack expression.
+   */
+  protected MuleEvent processEvent(final MuleEvent event) {
+    MuleEvent returnEvent;
+    try {
+      returnEvent = untilSuccessfulConfiguration.getRoute().process(event);
+    } catch (final MuleException me) {
+      throw new MuleRuntimeException(me);
     }
 
-    /**
-     * Process the event through the configured route in the until-successful configuration.
-     *
-     * @param event the event to process through the until successful inner route.
-     * @return the response from the route if there's no ack expression. If there's ack expression
-     * then a message with the response event but with a payload defined by the ack expression.
-     */
-    protected MuleEvent processEvent(final MuleEvent event)
-    {
-        MuleEvent returnEvent;
-        try
-        {
-            returnEvent = untilSuccessfulConfiguration.getRoute().process(event);
-        }
-        catch (final MuleException me)
-        {
-            throw new MuleRuntimeException(me);
-        }
-
-        if (returnEvent == null || VoidMuleEvent.getInstance().equals(returnEvent))
-        {
-            return returnEvent;
-        }
-
-        final MuleMessage msg = returnEvent.getMessage();
-        if (msg == null)
-        {
-            throw new MuleRuntimeException(
-                    MessageFactory.createStaticMessage("No message found in response to processing, which is therefore considered failed for event: "
-                                                       + event));
-        }
-
-        final boolean errorDetected = untilSuccessfulConfiguration.getFailureExpressionFilter().accept(returnEvent);
-        if (errorDetected)
-        {
-            throw new MuleRuntimeException(
-                    MessageFactory.createStaticMessage("Failure expression positive when processing event: "
-                                                       + event));
-        }
-        return returnEvent;
+    if (returnEvent == null || VoidMuleEvent.getInstance().equals(returnEvent)) {
+      return returnEvent;
     }
 
-    /**
-     * @param event the response event from the until-successful route.
-     * @return the response message to be sent to the until successful caller.
-     */
-    protected MuleEvent processResponseThroughAckResponseExpression(MuleEvent event)
-    {
-        if (event == null || VoidMuleEvent.getInstance().equals(event))
-        {
-            return VoidMuleEvent.getInstance();
+    final MuleMessage msg = returnEvent.getMessage();
+    if (msg == null) {
+      throw new MuleRuntimeException(MessageFactory
+          .createStaticMessage("No message found in response to processing, which is therefore considered failed for event: "
+              + event));
+    }
+
+    final boolean errorDetected = untilSuccessfulConfiguration.getFailureExpressionFilter().accept(returnEvent);
+    if (errorDetected) {
+      throw new MuleRuntimeException(MessageFactory
+          .createStaticMessage("Failure expression positive when processing event: " + event));
+    }
+    return returnEvent;
+  }
+
+  /**
+   * @param event the response event from the until-successful route.
+   * @return the response message to be sent to the until successful caller.
+   */
+  protected MuleEvent processResponseThroughAckResponseExpression(MuleEvent event) {
+    if (event == null || VoidMuleEvent.getInstance().equals(event)) {
+      return VoidMuleEvent.getInstance();
+    }
+    final String ackExpression = getUntilSuccessfulConfiguration().getAckExpression();
+    if (ackExpression == null) {
+      return event;
+    }
+
+    event.setMessage(MuleMessage.builder(event.getMessage())
+        .payload(getUntilSuccessfulConfiguration().getMuleContext().getExpressionManager().evaluate(ackExpression, event))
+        .build());
+    return event;
+  }
+
+  /**
+   * @return configuration of the until-successful router.
+   */
+  protected UntilSuccessfulConfiguration getUntilSuccessfulConfiguration() {
+    return untilSuccessfulConfiguration;
+  }
+
+  @Override
+  public MuleEvent route(MuleEvent event) throws MessagingException {
+    prepareAndValidateEvent(event);
+    return doRoute(event);
+  }
+
+  protected abstract MuleEvent doRoute(final MuleEvent event) throws MessagingException;
+
+  private void prepareAndValidateEvent(final MuleEvent event) throws MessagingException {
+    try {
+      final MuleMessage message = event.getMessage();
+      if (message instanceof MuleMessage) {
+        if (isConsumable(message.getDataType().getType())) {
+          event.getMessageAsBytes();
+        } else {
+          ensureSerializable(message);
         }
-        final String ackExpression = getUntilSuccessfulConfiguration().getAckExpression();
-        if (ackExpression == null)
-        {
-            return event;
-        }
-
-        event.setMessage(MuleMessage.builder(event.getMessage())
-                                    .payload(getUntilSuccessfulConfiguration().getMuleContext()
-                                                                              .getExpressionManager()
-                                                                              .evaluate(ackExpression, event))
-                .build());
-        return event;
+      } else {
+        event.getMessageAsBytes();
+      }
+    } catch (final Exception e) {
+      throw new MessagingException(MessageFactory.createStaticMessage("Failed to prepare message for processing"), event, e,
+                                   getUntilSuccessfulConfiguration().getRouter());
     }
+  }
 
-    /**
-     * @return configuration of the until-successful router.
-     */
-    protected UntilSuccessfulConfiguration getUntilSuccessfulConfiguration()
-    {
-        return untilSuccessfulConfiguration;
+  protected void ensureSerializable(MuleMessage message) throws NotSerializableException {
+    if (!(message.getPayload() instanceof Serializable)) {
+      throw new NotSerializableException(message.getDataType().getType().getCanonicalName());
     }
+  }
 
-    @Override
-    public MuleEvent route(MuleEvent event) throws MessagingException
-    {
-        prepareAndValidateEvent(event);
-        return doRoute(event);
-    }
-
-    protected abstract MuleEvent doRoute(final MuleEvent event) throws MessagingException;
-
-    private void prepareAndValidateEvent(final MuleEvent event) throws MessagingException
-    {
-        try
-        {
-            final MuleMessage message = event.getMessage();
-            if (message instanceof MuleMessage)
-            {
-                if (isConsumable(message.getDataType().getType()))
-                {
-                    event.getMessageAsBytes();
-                }
-                else
-                {
-                    ensureSerializable(message);
-                }
-            }
-            else
-            {
-                event.getMessageAsBytes();
-            }
-        }
-        catch (final Exception e)
-        {
-            throw new MessagingException(MessageFactory.createStaticMessage("Failed to prepare message for processing"), event, e, getUntilSuccessfulConfiguration().getRouter());
-        }
-    }
-
-    protected void ensureSerializable(MuleMessage message) throws NotSerializableException
-    {
-        if (!(message.getPayload() instanceof Serializable))
-        {
-            throw new NotSerializableException(message.getDataType().getType().getCanonicalName());
-        }
-    }
-
-    @Override
-    public void setMuleContext(MuleContext muleContext)
-    {
-        this.muleContext = muleContext;
-    }
+  @Override
+  public void setMuleContext(MuleContext muleContext) {
+    this.muleContext = muleContext;
+  }
 }

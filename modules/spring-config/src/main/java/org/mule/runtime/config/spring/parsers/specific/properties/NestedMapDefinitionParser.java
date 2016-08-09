@@ -13,27 +13,19 @@ import org.mule.runtime.config.spring.parsers.delegate.AbstractSingleParentFamil
 import org.mule.runtime.config.spring.parsers.processors.AddAttribute;
 
 /**
- * This extends a map that is itself a property (with key mapKey).  It does not have any
- * container element.
+ * This extends a map that is itself a property (with key mapKey). It does not have any container element.
  */
-public class NestedMapDefinitionParser extends AbstractSingleParentFamilyDefinitionParser
-{
+public class NestedMapDefinitionParser extends AbstractSingleParentFamilyDefinitionParser {
 
-    // we use this so that "key" can be used as the attribute name!
-    public static final String HIDDEN_KEY = "hiddenKey";
+  // we use this so that "key" can be used as the attribute name!
+  public static final String HIDDEN_KEY = "hiddenKey";
 
-    public NestedMapDefinitionParser(String mapSetter, String mapKey)
-    {
-        addDelegate(new ChildSingletonMapDefinitionParser(mapSetter))
-                .registerPreProcessor(new AddAttribute(HIDDEN_KEY, mapKey))
-                .addCollection(mapSetter)
-                .setIgnoredDefault(true)
-                .addAlias(HIDDEN_KEY, MapEntryCombiner.KEY)
-                .removeIgnored(HIDDEN_KEY)
-                .addIgnored(AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME);
-        addChildDelegate(new SimplePropertyDefinitionParser())
-                .addIgnored(HIDDEN_KEY)
-                .addIgnored(AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME);
-    }
+  public NestedMapDefinitionParser(String mapSetter, String mapKey) {
+    addDelegate(new ChildSingletonMapDefinitionParser(mapSetter)).registerPreProcessor(new AddAttribute(HIDDEN_KEY, mapKey))
+        .addCollection(mapSetter).setIgnoredDefault(true).addAlias(HIDDEN_KEY, MapEntryCombiner.KEY).removeIgnored(HIDDEN_KEY)
+        .addIgnored(AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME);
+    addChildDelegate(new SimplePropertyDefinitionParser()).addIgnored(HIDDEN_KEY)
+        .addIgnored(AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME);
+  }
 
 }

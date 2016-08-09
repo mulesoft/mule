@@ -14,24 +14,22 @@ import org.mule.runtime.core.api.client.MuleClient;
 
 import org.junit.Test;
 
-public class InterceptorFlowTestCase extends AbstractIntegrationTestCase
-{
-    @Test
-    public void testDefaultJavaComponentShortcut() throws Exception
-    {
-        flowRunner("interceptorFlow").withPayload(getTestMuleMessage(TEST_PAYLOAD)).asynchronously().run();
-        MuleClient client = muleContext.getClient();
-        MuleMessage message = client.request("test://out", 3000);
-        assertNotNull(message);
-        String payload = (String)message.getPayload();
-        assertNotNull(payload);
-        //note that there is an exclamation mark on the end that was added by the interceptor
-        assertEquals(TEST_PAYLOAD + "!", payload);
-    }
+public class InterceptorFlowTestCase extends AbstractIntegrationTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/integration/interceptor-flow.xml";
-    }
+  @Test
+  public void testDefaultJavaComponentShortcut() throws Exception {
+    flowRunner("interceptorFlow").withPayload(getTestMuleMessage(TEST_PAYLOAD)).asynchronously().run();
+    MuleClient client = muleContext.getClient();
+    MuleMessage message = client.request("test://out", 3000);
+    assertNotNull(message);
+    String payload = (String) message.getPayload();
+    assertNotNull(payload);
+    // note that there is an exclamation mark on the end that was added by the interceptor
+    assertEquals(TEST_PAYLOAD + "!", payload);
+  }
+
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/integration/interceptor-flow.xml";
+  }
 }

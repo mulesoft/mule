@@ -48,161 +48,140 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class ArtifactAwareContextSelectorTestCase extends AbstractMuleTestCase
-{
+public class ArtifactAwareContextSelectorTestCase extends AbstractMuleTestCase {
 
-    private static final File CONFIG_LOCATION = new File("my/local/log4j2.xml");
-    private static final int PROBER_TIMEOUT = 5000;
-    private static final int PROBER_FREQ = 500;
+  private static final File CONFIG_LOCATION = new File("my/local/log4j2.xml");
+  private static final int PROBER_TIMEOUT = 5000;
+  private static final int PROBER_FREQ = 500;
 
-    @Rule
-    public SystemProperty disposeDelay = new SystemProperty(MULE_LOG_CONTEXT_DISPOSE_DELAY_MILLIS, "200");
+  @Rule
+  public SystemProperty disposeDelay = new SystemProperty(MULE_LOG_CONTEXT_DISPOSE_DELAY_MILLIS, "200");
 
-    private ArtifactAwareContextSelector selector;
+  private ArtifactAwareContextSelector selector;
 
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private CompositeApplicationClassLoader classLoader;
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  private CompositeApplicationClassLoader classLoader;
 
-    @Before
-    public void before() throws Exception
-    {
-        selector = new ArtifactAwareContextSelector();
-        when(classLoader.getArtifactName()).thenReturn(getClass().getName());
-        when(classLoader.findLocalResource("log4j2.xml")).thenReturn(CONFIG_LOCATION.toURI().toURL());
-    }
+  @Before
+  public void before() throws Exception {
+    selector = new ArtifactAwareContextSelector();
+    when(classLoader.getArtifactName()).thenReturn(getClass().getName());
+    when(classLoader.findLocalResource("log4j2.xml")).thenReturn(CONFIG_LOCATION.toURI().toURL());
+  }
 
-    @Test
-    public void classLoaderToContext()
-    {
-        MuleLoggerContext context = (MuleLoggerContext) selector.getContext(EMPTY, classLoader, true);
-        assertThat(context, is(sameInstance(selector.getContext(EMPTY, classLoader, true))));
+  @Test
+  public void classLoaderToContext() {
+    MuleLoggerContext context = (MuleLoggerContext) selector.getContext(EMPTY, classLoader, true);
+    assertThat(context, is(sameInstance(selector.getContext(EMPTY, classLoader, true))));
 
-        classLoader = mock(CompositeApplicationClassLoader.class, RETURNS_DEEP_STUBS);
-        when(classLoader.getArtifactName()).thenReturn(getClass().getName());
-        assertThat(context, not(sameInstance(selector.getContext(EMPTY, classLoader, true))));
-    }
+    classLoader = mock(CompositeApplicationClassLoader.class, RETURNS_DEEP_STUBS);
+    when(classLoader.getArtifactName()).thenReturn(getClass().getName());
+    assertThat(context, not(sameInstance(selector.getContext(EMPTY, classLoader, true))));
+  }
 
-    @Test
-    public void shutdownListener()
-    {
-        MuleLoggerContext context = getContext();
+  @Test
+  public void shutdownListener() {
+    MuleLoggerContext context = getContext();
 
-        ArgumentCaptor<ShutdownListener> captor = ArgumentCaptor.forClass(ShutdownListener.class);
-        verify(classLoader).addShutdownListener(captor.capture());
-        ShutdownListener listener = captor.getValue();
-        assertThat(listener, notNullValue());
+    ArgumentCaptor<ShutdownListener> captor = ArgumentCaptor.forClass(ShutdownListener.class);
+    verify(classLoader).addShutdownListener(captor.capture());
+    ShutdownListener listener = captor.getValue();
+    assertThat(listener, notNullValue());
 
-        assertThat(context, is(selector.getContext(EMPTY, classLoader, true)));
-        listener.execute();
+    assertThat(context, is(selector.getContext(EMPTY, classLoader, true)));
+    listener.execute();
 
-        assertStopped(context);
-    }
+    assertStopped(context);
+  }
 
-    @Test
-    public void dispose() throws Exception
-    {
-        MuleLoggerContext context = getContext();
+  @Test
+  public void dispose() throws Exception {
+    MuleLoggerContext context = getContext();
 
-        selector.dispose();
-        assertStopped(context);
-    }
+    selector.dispose();
+    assertStopped(context);
+  }
 
-    @Test
-    public void returnsMuleLoggerContext()
-    {
-        LoggerContext ctx = selector.getContext("", classLoader, true);
-        assertThat(ctx, instanceOf(MuleLoggerContext.class));
-        assertConfigurationLocation(ctx);
-    }
+  @Test
+  public void returnsMuleLoggerContext() {
+    LoggerContext ctx = selector.getContext("", classLoader, true);
+    assertThat(ctx, instanceOf(MuleLoggerContext.class));
+    assertConfigurationLocation(ctx);
+  }
 
-    @Test
-    public void defaultToConfWhenNoConfigFound()
-    {
-        when(classLoader.findLocalResource(anyString())).thenReturn(null);
-        File expected = new File(MuleContainerBootstrapUtils.getMuleHome(), "conf");
-        expected = new File(expected, "log4j2.xml");
-        LoggerContext ctx = selector.getContext("", classLoader, true);
-        assertThat(ctx.getConfigLocation(), equalTo(expected.toURI()));
-    }
+  @Test
+  public void defaultToConfWhenNoConfigFound() {
+    when(classLoader.findLocalResource(anyString())).thenReturn(null);
+    File expected = new File(MuleContainerBootstrapUtils.getMuleHome(), "conf");
+    expected = new File(expected, "log4j2.xml");
+    LoggerContext ctx = selector.getContext("", classLoader, true);
+    assertThat(ctx.getConfigLocation(), equalTo(expected.toURI()));
+  }
 
-    @Test
-    public void usesLoggerContextReaperThread()
-    {
-        assertReaperThreadNotRunning();
+  @Test
+  public void usesLoggerContextReaperThread() {
+    assertReaperThreadNotRunning();
 
-        MuleLoggerContext context = getContext();
-        selector.removeContext(context);
+    MuleLoggerContext context = getContext();
+    selector.removeContext(context);
 
-        Thread thread = getReaperThread();
-        assertThat(thread, is(notNullValue()));
-    }
+    Thread thread = getReaperThread();
+    assertThat(thread, is(notNullValue()));
+  }
 
-    private void assertReaperThreadNotRunning()
-    {
-        PollingProber prober = new PollingProber(PROBER_TIMEOUT, PROBER_FREQ);
-        prober.check(new Probe()
-        {
-            @Override
-            public boolean isSatisfied()
-            {
-                return getReaperThread() == null;
-            }
+  private void assertReaperThreadNotRunning() {
+    PollingProber prober = new PollingProber(PROBER_TIMEOUT, PROBER_FREQ);
+    prober.check(new Probe() {
 
-            @Override
-            public String describeFailure()
-            {
-                return "Reaper thread exists from previous test and did not died";
-            }
-        });
-    }
+      @Override
+      public boolean isSatisfied() {
+        return getReaperThread() == null;
+      }
 
-    private Thread getReaperThread()
-    {
-        return getRunningThreadByName(THREAD_NAME);
-    }
+      @Override
+      public String describeFailure() {
+        return "Reaper thread exists from previous test and did not died";
+      }
+    });
+  }
 
-    private MuleLoggerContext getContext()
-    {
-        return (MuleLoggerContext) selector.getContext("", classLoader, true);
-    }
+  private Thread getReaperThread() {
+    return getRunningThreadByName(THREAD_NAME);
+  }
 
-    private void assertConfigurationLocation(LoggerContext ctx)
-    {
-        assertThat(ctx.getConfigLocation(), equalTo(CONFIG_LOCATION.toURI()));
-    }
+  private MuleLoggerContext getContext() {
+    return (MuleLoggerContext) selector.getContext("", classLoader, true);
+  }
 
-    private void assertStopped(final MuleLoggerContext context)
-    {
-        final ValueHolder<Boolean> contextWasAccessibleDuringShutdown = new ValueHolder<>(true);
-        PollingProber pollingProber = new PollingProber(1000, 10);
-        pollingProber.check(new JUnitProbe()
-        {
-            @Override
-            protected boolean test() throws Exception
-            {
-                if (context.getState().equals(LifeCycle.State.STOPPED))
-                {
-                    return true;
-                }
-                else
-                {
-                    LoggerContext currentContext = getContext();
-                    if (currentContext != null && currentContext != context)
-                    {
-                        contextWasAccessibleDuringShutdown.set(false);
-                    }
-                    return false;
-                }
-            }
+  private void assertConfigurationLocation(LoggerContext ctx) {
+    assertThat(ctx.getConfigLocation(), equalTo(CONFIG_LOCATION.toURI()));
+  }
 
-            @Override
-            public String describeFailure()
-            {
-                return "context was not stopped";
-            }
-        });
+  private void assertStopped(final MuleLoggerContext context) {
+    final ValueHolder<Boolean> contextWasAccessibleDuringShutdown = new ValueHolder<>(true);
+    PollingProber pollingProber = new PollingProber(1000, 10);
+    pollingProber.check(new JUnitProbe() {
 
-        assertThat(context, not(getContext()));
-        assertThat(contextWasAccessibleDuringShutdown.get(), is(true));
-    }
+      @Override
+      protected boolean test() throws Exception {
+        if (context.getState().equals(LifeCycle.State.STOPPED)) {
+          return true;
+        } else {
+          LoggerContext currentContext = getContext();
+          if (currentContext != null && currentContext != context) {
+            contextWasAccessibleDuringShutdown.set(false);
+          }
+          return false;
+        }
+      }
+
+      @Override
+      public String describeFailure() {
+        return "context was not stopped";
+      }
+    });
+
+    assertThat(context, not(getContext()));
+    assertThat(contextWasAccessibleDuringShutdown.get(), is(true));
+  }
 }

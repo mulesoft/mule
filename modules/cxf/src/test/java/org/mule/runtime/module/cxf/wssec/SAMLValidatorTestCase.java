@@ -23,43 +23,39 @@ import org.apache.ws.security.WSPasswordCallback;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class SAMLValidatorTestCase extends FunctionalTestCase
-{
-    @Rule
-    public DynamicPort dynamicPort = new DynamicPort("port1");
+public class SAMLValidatorTestCase extends FunctionalTestCase {
+
+  @Rule
+  public DynamicPort dynamicPort = new DynamicPort("port1");
+
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/runtime/module/cxf/wssec/saml-validator-conf-httpn.xml";
+  }
+
+  @Test
+  public void testSAMLUnsignedAssertion() throws Exception {
+    MuleMessage received = flowRunner("cxfClient").withPayload("me").run().getMessage();
+
+    assertNotNull(received);
+    assertEquals("Hello me", getPayloadAsString(received));
+  }
+
+  @Test
+  public void testSAMLSignedAssertion() throws Exception {
+    MuleMessage received = flowRunner("cxfClientSigned").withPayload("me").run().getMessage();
+
+    assertNotNull(received);
+    assertEquals("Hello me", getPayloadAsString(received));
+  }
+
+  public static class PasswordCallbackHandler implements CallbackHandler {
 
     @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/runtime/module/cxf/wssec/saml-validator-conf-httpn.xml";
+    public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
+      WSPasswordCallback pc = (WSPasswordCallback) callbacks[0];
+
+      pc.setPassword("secret");
     }
-
-    @Test
-    public void testSAMLUnsignedAssertion() throws Exception
-    {
-        MuleMessage received = flowRunner("cxfClient").withPayload("me").run().getMessage();
-
-        assertNotNull(received);
-        assertEquals("Hello me", getPayloadAsString(received));
-    }
-
-    @Test
-    public void testSAMLSignedAssertion() throws Exception
-    {
-        MuleMessage received = flowRunner("cxfClientSigned").withPayload("me").run().getMessage();
-
-        assertNotNull(received);
-        assertEquals("Hello me", getPayloadAsString(received));
-    }
-
-    public static class PasswordCallbackHandler implements CallbackHandler
-    {
-        @Override
-        public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException
-        {
-            WSPasswordCallback pc = (WSPasswordCallback) callbacks[0];
-
-            pc.setPassword("secret");
-        }
-    }
+  }
 }

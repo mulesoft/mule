@@ -12,83 +12,75 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 /**
- * Stores the metadata annotations from the XML parser so they are available when building the actual objects of the
- * application.
+ * Stores the metadata annotations from the XML parser so they are available when building the actual objects of the application.
  */
-public class DefaultXmlMetadataAnnotations implements XmlMetadataAnnotations
-{
-    public static final String METADATA_ANNOTATIONS_KEY = "metadataAnnotations";
-    
-    private StringBuilder xmlContent = new StringBuilder();
-    private int lineNumber;
+public class DefaultXmlMetadataAnnotations implements XmlMetadataAnnotations {
 
-    /**
-     * Builds the opening tag of the xml element.
-     * 
-     * @param qName the qualified name of the element
-     * @param atts the attributes of the element, with the qualified name as key
-     */
-    @Override
-    public void appendElementStart(String qName, Map<String, String> atts)
-    {
-        xmlContent.append("<" + qName);
-        for (Entry<String, String> entry : atts.entrySet())
-        {
-            xmlContent.append(" " + entry.getKey() + "=\"" + entry.getValue() + "\"");
-        }
-        xmlContent.append(">");
-    }
+  public static final String METADATA_ANNOTATIONS_KEY = "metadataAnnotations";
 
-    /**
-     * Adds the body of the xml tag.
-     * 
-     * @param elementBody the body content to be added
-     */
-    @Override
-    public void appendElementBody(String elementBody)
-    {
-        xmlContent.append(elementBody);
-    }
+  private StringBuilder xmlContent = new StringBuilder();
+  private int lineNumber;
 
-    /**
-     * Builds the closing tag of the xml element.
-     * 
-     * @param qName the qualified name of the element
-     */
-    @Override
-    public void appendElementEnd(String qName)
-    {
-        xmlContent.append("</" + qName + ">");
+  /**
+   * Builds the opening tag of the xml element.
+   * 
+   * @param qName the qualified name of the element
+   * @param atts the attributes of the element, with the qualified name as key
+   */
+  @Override
+  public void appendElementStart(String qName, Map<String, String> atts) {
+    xmlContent.append("<" + qName);
+    for (Entry<String, String> entry : atts.entrySet()) {
+      xmlContent.append(" " + entry.getKey() + "=\"" + entry.getValue() + "\"");
     }
+    xmlContent.append(">");
+  }
 
-    /**
-     * @return the reconstruction of the declaration of the element in its source xml file.
-     *         <p/>
-     *         Note that the order of the elements may be different, and any implicit attributes with default values
-     *         will be included.
-     */
-    @Override
-    public String getElementString()
-    {
-        return xmlContent.toString()
-                         .replaceAll(">\\s+<+", ">" + SystemUtils.LINE_SEPARATOR + "<") /* compact whitespaces and line breaks */
-                         .trim();
-    }
+  /**
+   * Adds the body of the xml tag.
+   * 
+   * @param elementBody the body content to be added
+   */
+  @Override
+  public void appendElementBody(String elementBody) {
+    xmlContent.append(elementBody);
+  }
 
-    /**
-     * @param lineNumber the line where the declaration of the element starts in its source xml file.
-     */
-    public void setLineNumber(int lineNumber)
-    {
-        this.lineNumber = lineNumber;
-    }
+  /**
+   * Builds the closing tag of the xml element.
+   * 
+   * @param qName the qualified name of the element
+   */
+  @Override
+  public void appendElementEnd(String qName) {
+    xmlContent.append("</" + qName + ">");
+  }
 
-    /**
-     * @return the line where the declaration of the element starts in its source xml file.
-     */
-    @Override
-    public int getLineNumber()
-    {
-        return lineNumber;
-    }
+  /**
+   * @return the reconstruction of the declaration of the element in its source xml file.
+   *         <p/>
+   *         Note that the order of the elements may be different, and any implicit attributes with default values will be
+   *         included.
+   */
+  @Override
+  public String getElementString() {
+    return xmlContent.toString()
+        .replaceAll(">\\s+<+", ">" + SystemUtils.LINE_SEPARATOR + "<") /* compact whitespaces and line breaks */
+        .trim();
+  }
+
+  /**
+   * @param lineNumber the line where the declaration of the element starts in its source xml file.
+   */
+  public void setLineNumber(int lineNumber) {
+    this.lineNumber = lineNumber;
+  }
+
+  /**
+   * @return the line where the declaration of the element starts in its source xml file.
+   */
+  @Override
+  public int getLineNumber() {
+    return lineNumber;
+  }
 }

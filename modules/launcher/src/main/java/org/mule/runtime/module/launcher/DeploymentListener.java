@@ -11,74 +11,73 @@ import org.mule.runtime.core.api.MuleContext;
 /**
  * Defines a listener for deployment events for Mule applications.
  */
-public interface DeploymentListener
-{
+public interface DeploymentListener {
 
-    /**
-     * Notifies that a deploy for a given application has started.
-     *
-     * @param artifactName the name of the application being deployed
-     */
-    void onDeploymentStart(String artifactName);
+  /**
+   * Notifies that a deploy for a given application has started.
+   *
+   * @param artifactName the name of the application being deployed
+   */
+  void onDeploymentStart(String artifactName);
 
-    /**
-     * Notifies that a deploy for a given application has successfully finished.
-     *
-     * @param artifactName the name of the application being deployed
-     */
-    void onDeploymentSuccess(String artifactName);
+  /**
+   * Notifies that a deploy for a given application has successfully finished.
+   *
+   * @param artifactName the name of the application being deployed
+   */
+  void onDeploymentSuccess(String artifactName);
 
-    /**
-     * Notifies that a deploy for a given application has finished with a failure.
-     *
-     * @param artifactName the name of the application being deployed
-     * @param cause       the cause of the failure
-     */
-    void onDeploymentFailure(String artifactName, Throwable cause);
+  /**
+   * Notifies that a deploy for a given application has finished with a failure.
+   *
+   * @param artifactName the name of the application being deployed
+   * @param cause the cause of the failure
+   */
+  void onDeploymentFailure(String artifactName, Throwable cause);
 
-    /**
-     * Notifies that an un-deployment for a given application has started.
-     *
-     * @param artifactName the name of the application being un-deployed
-     */
-    void onUndeploymentStart(String artifactName);
+  /**
+   * Notifies that an un-deployment for a given application has started.
+   *
+   * @param artifactName the name of the application being un-deployed
+   */
+  void onUndeploymentStart(String artifactName);
 
-    /**
-     * Notifies that an un-deployment for a given application has successfully finished.
-     *
-     * @param artifactName the name of the application being un-deployed
-     */
-    void onUndeploymentSuccess(String artifactName);
+  /**
+   * Notifies that an un-deployment for a given application has successfully finished.
+   *
+   * @param artifactName the name of the application being un-deployed
+   */
+  void onUndeploymentSuccess(String artifactName);
 
-    /**
-     * Notifies that an un-deployment for a given application has finished with a failure.
-     *
-     * @param artifactName the name of the application being un-deployed
-     * @param cause       the cause of the failure
-     */
-    void onUndeploymentFailure(String artifactName, Throwable cause);
+  /**
+   * Notifies that an un-deployment for a given application has finished with a failure.
+   *
+   * @param artifactName the name of the application being un-deployed
+   * @param cause the cause of the failure
+   */
+  void onUndeploymentFailure(String artifactName, Throwable cause);
 
-    /**
-     * Notifies the creation of the {@link MuleContext} for a given app.
-     *
-     * @param artifactName name of the application that owns the mule context
-     * @param context mule context for the application being deployed
-     */
-    void onMuleContextCreated(String artifactName, MuleContext context);
+  /**
+   * Notifies the creation of the {@link MuleContext} for a given app.
+   *
+   * @param artifactName name of the application that owns the mule context
+   * @param context mule context for the application being deployed
+   */
+  void onMuleContextCreated(String artifactName, MuleContext context);
 
-    /**
-     * Notifies the initialization of the {@link MuleContext} for a given app.
-     *
-     * @param artifactName name of the application that owns the mule context
-     * @param context mule context for the application being deployed
-     */
-    void onMuleContextInitialised(String artifactName, MuleContext context);
+  /**
+   * Notifies the initialization of the {@link MuleContext} for a given app.
+   *
+   * @param artifactName name of the application that owns the mule context
+   * @param context mule context for the application being deployed
+   */
+  void onMuleContextInitialised(String artifactName, MuleContext context);
 
-    /**
-     * Notifies the configuration of the {@link MuleContext} for a given app.
-     *
-     * @param artifactName name of the application that owns the mule context
-     * @param context mule context for the application being deployed
-     */
-    void onMuleContextConfigured(String artifactName, MuleContext context);
+  /**
+   * Notifies the configuration of the {@link MuleContext} for a given app.
+   *
+   * @param artifactName name of the application that owns the mule context
+   * @param context mule context for the application being deployed
+   */
+  void onMuleContextConfigured(String artifactName, MuleContext context);
 }

@@ -12,9 +12,8 @@ import org.mule.runtime.core.api.processor.MessageProcessorContainer;
 /**
  * Marker interface for MessageProcessors that actually represent a subflow.
  */
-public interface SubFlowMessageProcessor extends MessageProcessor, MessageProcessorContainer
-{
+public interface SubFlowMessageProcessor extends MessageProcessor, MessageProcessorContainer {
 
-    String getSubFlowName();
+  String getSubFlowName();
 
 }

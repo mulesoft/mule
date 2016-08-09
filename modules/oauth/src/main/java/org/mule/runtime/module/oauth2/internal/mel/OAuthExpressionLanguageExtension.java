@@ -17,40 +17,32 @@ import org.mule.runtime.core.api.lifecycle.Startable;
 /**
  * MEL extension for adding OAuth related functions.
  */
-public class OAuthExpressionLanguageExtension implements ExpressionLanguageExtension, MuleContextAware, Startable, Initialisable
-{
+public class OAuthExpressionLanguageExtension implements ExpressionLanguageExtension, MuleContextAware, Startable, Initialisable {
 
-    private OAuthContextExpressionLanguageFunction oauthContextFunction;
-    private MuleContext muleContext;
+  private OAuthContextExpressionLanguageFunction oauthContextFunction;
+  private MuleContext muleContext;
 
-    @Override
-    public void start()
-    {
-        oauthContextFunction.setRegistry(muleContext.getRegistry());
+  @Override
+  public void start() {
+    oauthContextFunction.setRegistry(muleContext.getRegistry());
+  }
+
+  @Override
+  public void configureContext(final ExpressionLanguageContext context) {
+    context.declareFunction("oauthContext", oauthContextFunction);
+  }
+
+  @Override
+  public void setMuleContext(final MuleContext context) {
+    this.muleContext = context;
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    try {
+      oauthContextFunction = new OAuthContextExpressionLanguageFunction();
+    } catch (Exception e) {
+      throw new InitialisationException(e, this);
     }
-
-    @Override
-    public void configureContext(final ExpressionLanguageContext context)
-    {
-        context.declareFunction("oauthContext", oauthContextFunction);
-    }
-
-    @Override
-    public void setMuleContext(final MuleContext context)
-    {
-        this.muleContext = context;
-    }
-
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        try
-        {
-            oauthContextFunction = new OAuthContextExpressionLanguageFunction();
-        }
-        catch (Exception e)
-        {
-            throw new InitialisationException(e, this);
-        }
-    }
+  }
 }

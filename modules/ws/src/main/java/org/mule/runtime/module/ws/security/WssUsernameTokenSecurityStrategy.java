@@ -23,104 +23,84 @@ import java.util.Map;
 
 import org.apache.ws.security.WSPasswordCallback;
 
-public class WssUsernameTokenSecurityStrategy extends AbstractSecurityStrategy implements SecurityStrategy
-{
+public class WssUsernameTokenSecurityStrategy extends AbstractSecurityStrategy implements SecurityStrategy {
 
-    private String username;
-    private String password;
-    private PasswordType passwordType;
-    private boolean addNonce;
-    private boolean addCreated;
+  private String username;
+  private String password;
+  private PasswordType passwordType;
+  private boolean addNonce;
+  private boolean addCreated;
 
-    @Override
-    public void apply(Map<String, Object> outConfigProperties, Map<String, Object> inConfigProperties)
-    {
-        appendAction(outConfigProperties, USERNAME_TOKEN);
-        outConfigProperties.put(USER, username);
+  @Override
+  public void apply(Map<String, Object> outConfigProperties, Map<String, Object> inConfigProperties) {
+    appendAction(outConfigProperties, USERNAME_TOKEN);
+    outConfigProperties.put(USER, username);
 
-        if (passwordType == TEXT)
-        {
-            outConfigProperties.put(PASSWORD_TYPE, "PasswordText");
+    if (passwordType == TEXT) {
+      outConfigProperties.put(PASSWORD_TYPE, "PasswordText");
+    } else if (passwordType == DIGEST) {
+      outConfigProperties.put(PASSWORD_TYPE, "PasswordDigest");
+    }
+
+    List<String> additionalElements = new ArrayList<String>(2);
+    if (addNonce) {
+      additionalElements.add(NONCE_LN);
+    }
+    if (addCreated) {
+      additionalElements.add(CREATED_LN);
+    }
+    if (!additionalElements.isEmpty()) {
+      outConfigProperties.put(ADD_UT_ELEMENTS, StringUtils.join(additionalElements, " "));
+    }
+
+    addPasswordCallbackHandler(outConfigProperties, new WSPasswordCallbackHandler(WSPasswordCallback.USERNAME_TOKEN) {
+
+      @Override
+      public void handle(WSPasswordCallback passwordCallback) {
+        if (passwordCallback.getIdentifier().equals(username)) {
+          passwordCallback.setPassword(password);
         }
-        else if (passwordType == DIGEST)
-        {
-            outConfigProperties.put(PASSWORD_TYPE, "PasswordDigest");
-        }
+      }
+    });
+  }
 
-        List<String> additionalElements = new ArrayList<String>(2);
-        if (addNonce)
-        {
-            additionalElements.add(NONCE_LN);
-        }
-        if (addCreated)
-        {
-            additionalElements.add(CREATED_LN);
-        }
-        if (!additionalElements.isEmpty())
-        {
-            outConfigProperties.put(ADD_UT_ELEMENTS, StringUtils.join(additionalElements, " "));
-        }
+  public void setUsername(String username) {
+    this.username = username;
+  }
 
-        addPasswordCallbackHandler(outConfigProperties, new WSPasswordCallbackHandler(WSPasswordCallback.USERNAME_TOKEN)
-        {
-            @Override
-            public void handle(WSPasswordCallback passwordCallback)
-            {
-                if (passwordCallback.getIdentifier().equals(username))
-                {
-                    passwordCallback.setPassword(password);
-                }
-            }
-        });
-    }
+  public String getUsername() {
+    return username;
+  }
 
-    public void setUsername(String username)
-    {
-        this.username = username;
-    }
+  public String getPassword() {
+    return password;
+  }
 
-    public String getUsername()
-    {
-        return username;
-    }
+  public void setPassword(String password) {
+    this.password = password;
+  }
 
-    public String getPassword()
-    {
-        return password;
-    }
+  public PasswordType getPasswordType() {
+    return passwordType;
+  }
 
-    public void setPassword(String password)
-    {
-        this.password = password;
-    }
+  public void setPasswordType(PasswordType passwordType) {
+    this.passwordType = passwordType;
+  }
 
-    public PasswordType getPasswordType()
-    {
-        return passwordType;
-    }
+  public boolean isAddNonce() {
+    return addNonce;
+  }
 
-    public void setPasswordType(PasswordType passwordType)
-    {
-        this.passwordType = passwordType;
-    }
+  public void setAddNonce(boolean addNonce) {
+    this.addNonce = addNonce;
+  }
 
-    public boolean isAddNonce()
-    {
-        return addNonce;
-    }
+  public boolean isAddCreated() {
+    return addCreated;
+  }
 
-    public void setAddNonce(boolean addNonce)
-    {
-        this.addNonce = addNonce;
-    }
-
-    public boolean isAddCreated()
-    {
-        return addCreated;
-    }
-
-    public void setAddCreated(boolean addCreated)
-    {
-        this.addCreated = addCreated;
-    }
+  public void setAddCreated(boolean addCreated) {
+    this.addCreated = addCreated;
+  }
 }

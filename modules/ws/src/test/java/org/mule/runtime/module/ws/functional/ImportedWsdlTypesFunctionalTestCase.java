@@ -9,21 +9,18 @@ package org.mule.runtime.module.ws.functional;
 
 import org.junit.Test;
 
-public class ImportedWsdlTypesFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase
-{
+public class ImportedWsdlTypesFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "imported-wsdl-types-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "imported-wsdl-types-config.xml";
+  }
 
-    // This test verifies that types defined in an imported WSDL are processed correctly. The type of the input
-    // message is imported from another WSDL. If this import isn't processed correctly, WS consumer assumes that the WS
-    // has no parameters and ignores the payload (which generates an invalid response).
-    @Test
-    public void resolvesTypesFromImportedWsdl() throws Exception
-    {
-        assertValidResponse("client");
-    }
+  // This test verifies that types defined in an imported WSDL are processed correctly. The type of the input
+  // message is imported from another WSDL. If this import isn't processed correctly, WS consumer assumes that the WS
+  // has no parameters and ignores the payload (which generates an invalid response).
+  @Test
+  public void resolvesTypesFromImportedWsdl() throws Exception {
+    assertValidResponse("client");
+  }
 }

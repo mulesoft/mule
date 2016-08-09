@@ -12,11 +12,10 @@ import org.mule.runtime.core.api.transaction.Transaction;
 /**
  * Manages transactions for the connector
  */
-public interface DbTransactionManager
-{
+public interface DbTransactionManager {
 
-    /**
-     * @return the active transaction if available
-     */
-    Transaction getTransaction();
+  /**
+   * @return the active transaction if available
+   */
+  Transaction getTransaction();
 }

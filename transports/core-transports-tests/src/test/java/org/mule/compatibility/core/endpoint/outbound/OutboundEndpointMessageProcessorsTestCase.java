@@ -25,50 +25,42 @@ import org.junit.Test;
 /**
  * Unit test for configuring message processors on an outbound endpoint.
  */
-public class OutboundEndpointMessageProcessorsTestCase extends AbstractMessageProcessorTestCase
-{
-    private MuleEvent testOutboundEvent;
-    private OutboundEndpoint endpoint;
-    private MuleEvent result;
+public class OutboundEndpointMessageProcessorsTestCase extends AbstractMessageProcessorTestCase {
 
-    @Override
-    protected void doSetUp() throws Exception
-    {
-        super.doSetUp();
-        endpoint = createOutboundEndpoint(null, null, null, null, 
-            MessageExchangePattern.REQUEST_RESPONSE, null);
-        testOutboundEvent = createTestOutboundEvent();
-    }
+  private MuleEvent testOutboundEvent;
+  private OutboundEndpoint endpoint;
+  private MuleEvent result;
 
-    @Test
-    public void testProcessors() throws Exception
-    {
-        DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
-        builder.chain(new TestMessageProcessor("1"), new TestMessageProcessor("2"), new TestMessageProcessor("3"));
-        MessageProcessor mpChain = builder.build();
-        
-        result = mpChain.process(testOutboundEvent);
-        assertEquals(TEST_MESSAGE + ":1:2:3", result.getMessage().getPayload());
-    }
+  @Override
+  protected void doSetUp() throws Exception {
+    super.doSetUp();
+    endpoint = createOutboundEndpoint(null, null, null, null, MessageExchangePattern.REQUEST_RESPONSE, null);
+    testOutboundEvent = createTestOutboundEvent();
+  }
 
-    @Test
-    public void testNoProcessors() throws Exception
-    {
-        DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
-        MessageProcessor mpChain = builder.build();
-        
-        result = mpChain.process(testOutboundEvent);
-        assertEquals(TEST_MESSAGE, result.getMessage().getPayload());
-    }
+  @Test
+  public void testProcessors() throws Exception {
+    DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
+    builder.chain(new TestMessageProcessor("1"), new TestMessageProcessor("2"), new TestMessageProcessor("3"));
+    MessageProcessor mpChain = builder.build();
 
-    protected OutboundEndpoint createOutboundEndpoint(Filter filter,
-                                                      EndpointSecurityFilter securityFilter,
-                                                      Transformer in,
-                                                      Transformer response,
-                                                      MessageExchangePattern exchangePattern,
-                                                      TransactionConfig txConfig) throws Exception
-    {
-        return createTestOutboundEndpoint(filter, securityFilter, in, response, exchangePattern, 
-            txConfig);
-    }
+    result = mpChain.process(testOutboundEvent);
+    assertEquals(TEST_MESSAGE + ":1:2:3", result.getMessage().getPayload());
+  }
+
+  @Test
+  public void testNoProcessors() throws Exception {
+    DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
+    MessageProcessor mpChain = builder.build();
+
+    result = mpChain.process(testOutboundEvent);
+    assertEquals(TEST_MESSAGE, result.getMessage().getPayload());
+  }
+
+  protected OutboundEndpoint createOutboundEndpoint(Filter filter, EndpointSecurityFilter securityFilter, Transformer in,
+                                                    Transformer response, MessageExchangePattern exchangePattern,
+                                                    TransactionConfig txConfig)
+      throws Exception {
+    return createTestOutboundEndpoint(filter, securityFilter, in, response, exchangePattern, txConfig);
+  }
 }

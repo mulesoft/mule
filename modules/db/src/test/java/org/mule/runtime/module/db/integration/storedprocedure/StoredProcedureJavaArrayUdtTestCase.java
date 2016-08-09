@@ -28,55 +28,48 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class StoredProcedureJavaArrayUdtTestCase extends AbstractDbIntegrationTestCase
-{
-    public StoredProcedureJavaArrayUdtTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
+public class StoredProcedureJavaArrayUdtTestCase extends AbstractDbIntegrationTestCase {
+
+  public StoredProcedureJavaArrayUdtTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
+
+  @Parameterized.Parameters
+  public static List<Object[]> parameters() {
+    List<Object[]> params = new LinkedList<>();
+
+    if (!getOracleResource().isEmpty()) {
+      params.add(new Object[] {"integration/config/oracle-mapped-udt-db-config.xml", new OracleTestDatabase()});
     }
 
-    @Parameterized.Parameters
-    public static List<Object[]> parameters()
-    {
-        List<Object[]> params = new LinkedList<>();
+    return params;
+  }
 
-        if (!getOracleResource().isEmpty())
-        {
-            params.add(new Object[] {"integration/config/oracle-mapped-udt-db-config.xml", new OracleTestDatabase()});
-        }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/storedprocedure/stored-procedure-udt-array-config.xml"};
+  }
 
-        return params;
-    }
+  @Before
+  public void setupStoredProcedure() throws Exception {
+    final DataSource dataSource = getDefaultDataSource();
+    testDatabase.createStoredProcedureGetZipCodes(dataSource);
+    testDatabase.createStoredProcedureGetContactDetails(dataSource);
+  }
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/storedprocedure/stored-procedure-udt-array-config.xml"};
-    }
+  @Test
+  public void returnsDefaultArray() throws Exception {
+    final MuleEvent responseEvent = flowRunner("returnsDefaultArrayValue").withPayload(TEST_MESSAGE).run();
+    final MuleMessage response = responseEvent.getMessage();
 
-    @Before
-    public void setupStoredProcedure() throws Exception
-    {
-        final DataSource dataSource = getDefaultDataSource();
-        testDatabase.createStoredProcedureGetZipCodes(dataSource);
-        testDatabase.createStoredProcedureGetContactDetails(dataSource);
-    }
+    assertThat(response.getPayload(), Matchers.<Object>equalTo(SOUTHWEST.getZips()));
+  }
 
-    @Test
-    public void returnsDefaultArray() throws Exception
-    {
-        final MuleEvent responseEvent = flowRunner("returnsDefaultArrayValue").withPayload(TEST_MESSAGE).run();
-        final MuleMessage response = responseEvent.getMessage();
+  @Test
+  public void returnsCustomArray() throws Exception {
+    final MuleEvent responseEvent = flowRunner("returnsCustomArrayValue").withPayload(TEST_MESSAGE).run();
+    final MuleMessage response = responseEvent.getMessage();
 
-        assertThat(response.getPayload(), Matchers.<Object>equalTo(SOUTHWEST.getZips()));
-    }
-
-    @Test
-    public void returnsCustomArray() throws Exception
-    {
-        final MuleEvent responseEvent = flowRunner("returnsCustomArrayValue").withPayload(TEST_MESSAGE).run();
-        final MuleMessage response = responseEvent.getMessage();
-
-        assertThat(response.getPayload(), Matchers.<Object>equalTo(CONTACT1.getDetails()));
-    }
+    assertThat(response.getPayload(), Matchers.<Object>equalTo(CONTACT1.getDetails()));
+  }
 }

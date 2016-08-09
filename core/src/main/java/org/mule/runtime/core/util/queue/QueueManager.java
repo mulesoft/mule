@@ -11,33 +11,31 @@ import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
 
 /**
- * A Queue manager is responsible for managing one or more Queue resources and
- * providing common support for transactions and persistence.
+ * A Queue manager is responsible for managing one or more Queue resources and providing common support for transactions and
+ * persistence.
  */
-public interface QueueManager extends Startable, Stoppable
-{
-    /**
-     * Returns a new instance of {@link QueueSession} bounded to this
-     * {@link QueueManager}
-     * 
-     * @return session for retrieving queues and handle transactions
-     */
-    QueueSession getQueueSession();
+public interface QueueManager extends Startable, Stoppable {
 
-    /**
-     * Sets the default {@link org.mule.runtime.core.util.queue.QueueConfiguration} for any created {@link Queue} for
-     * which a custom configuration hasn't been specified
-     * 
-     * @param config an instance of {@link org.mule.runtime.core.util.queue.QueueConfiguration}
-     */
-    void setDefaultQueueConfiguration(QueueConfiguration config);
+  /**
+   * Returns a new instance of {@link QueueSession} bounded to this {@link QueueManager}
+   * 
+   * @return session for retrieving queues and handle transactions
+   */
+  QueueSession getQueueSession();
 
-    /**
-     * Specifies a {@link org.mule.runtime.core.util.queue.QueueConfiguration} for the queue which name matches
-     * queueName
-     * 
-     * @param queueName the name of a {@link Queue}
-     * @param config an instance of {@link org.mule.runtime.core.util.queue.QueueConfiguration}
-     */
-    void setQueueConfiguration(String queueName, QueueConfiguration config);
+  /**
+   * Sets the default {@link org.mule.runtime.core.util.queue.QueueConfiguration} for any created {@link Queue} for which a custom
+   * configuration hasn't been specified
+   * 
+   * @param config an instance of {@link org.mule.runtime.core.util.queue.QueueConfiguration}
+   */
+  void setDefaultQueueConfiguration(QueueConfiguration config);
+
+  /**
+   * Specifies a {@link org.mule.runtime.core.util.queue.QueueConfiguration} for the queue which name matches queueName
+   * 
+   * @param queueName the name of a {@link Queue}
+   * @param config an instance of {@link org.mule.runtime.core.util.queue.QueueConfiguration}
+   */
+  void setQueueConfiguration(String queueName, QueueConfiguration config);
 }

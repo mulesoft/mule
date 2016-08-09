@@ -33,217 +33,167 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Only one worker will be created per each new TCP connection accepted by the {@link TcpListenerConnection#listen(MuleContext, MessageHandler)},
- * This class is responsible for reading from that connection is closed by the sender,
- * or {@link Source} is stopped.
+ * Only one worker will be created per each new TCP connection accepted by the
+ * {@link TcpListenerConnection#listen(MuleContext, MessageHandler)}, This class is responsible for reading from that connection
+ * is closed by the sender, or {@link Source} is stopped.
  *
  * @since 4.0
  */
-public final class TcpWorker extends SocketWorker
-{
+public final class TcpWorker extends SocketWorker {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TcpWorker.class);
-    private final Socket socket;
-    private final TcpInputStream dataIn;
-    private final OutputStream dataOut;
-    private final InputStream underlyingIn;
-    private final TcpProtocol protocol;
-    private Object notify = new Object();
-    private boolean dataInWorkFinished = false;
-    private AtomicBoolean moreMessages = new AtomicBoolean(true); // can be set on completion's callback
+  private static final Logger LOGGER = LoggerFactory.getLogger(TcpWorker.class);
+  private final Socket socket;
+  private final TcpInputStream dataIn;
+  private final OutputStream dataOut;
+  private final InputStream underlyingIn;
+  private final TcpProtocol protocol;
+  private Object notify = new Object();
+  private boolean dataInWorkFinished = false;
+  private AtomicBoolean moreMessages = new AtomicBoolean(true); // can be set on completion's callback
 
-    public TcpWorker(Socket socket, TcpProtocol protocol,
-                     MessageHandler<InputStream, SocketAttributes> messageHandler) throws IOException
-    {
-        super(messageHandler);
-        this.socket = socket;
-        this.protocol = protocol;
+  public TcpWorker(Socket socket, TcpProtocol protocol, MessageHandler<InputStream, SocketAttributes> messageHandler)
+      throws IOException {
+    super(messageHandler);
+    this.socket = socket;
+    this.protocol = protocol;
 
-        underlyingIn = new BufferedInputStream(socket.getInputStream());
-        dataOut = new BufferedOutputStream(socket.getOutputStream());
-        dataIn = new TcpInputStream(underlyingIn)
-        {
-            @Override
-            public void close() throws IOException
-            {
-                // Don't actually close the stream, we just want to know if the
-                // we want to stop receiving messages on this sockete.
-                // The Protocol is responsible for closing this.
-                dataInWorkFinished = true;
-                moreMessages.set(false);
+    underlyingIn = new BufferedInputStream(socket.getInputStream());
+    dataOut = new BufferedOutputStream(socket.getOutputStream());
+    dataIn = new TcpInputStream(underlyingIn) {
 
-                synchronized (notify)
-                {
-                    notify.notifyAll();
-                }
-            }
-        };
-    }
+      @Override
+      public void close() throws IOException {
+        // Don't actually close the stream, we just want to know if the
+        // we want to stop receiving messages on this sockete.
+        // The Protocol is responsible for closing this.
+        dataInWorkFinished = true;
+        moreMessages.set(false);
 
-    private void waitForStreams()
-    {
-        // The Message with the InputStream as a payload can be dispatched
-        // into a different thread, in which case we need to wait for it to
-        // finish streaming
-        if (!dataInWorkFinished)
-        {
-            synchronized (notify)
-            {
-                if (!dataInWorkFinished)
-                {
-                    try
-                    {
-                        notify.wait();
-                    }
-                    catch (InterruptedException e)
-                    {
-                    }
-                }
-            }
+        synchronized (notify) {
+          notify.notifyAll();
         }
-    }
+      }
+    };
+  }
 
-    private InputStream getNextMessage() throws IOException
-    {
-        InputStream readMsg = null;
-        try
-        {
-            readMsg = protocol.read(dataIn);
-            if (dataIn.isStreaming())
-            {
-                moreMessages.set(false);
-            }
-
-            return readMsg;
+  private void waitForStreams() {
+    // The Message with the InputStream as a payload can be dispatched
+    // into a different thread, in which case we need to wait for it to
+    // finish streaming
+    if (!dataInWorkFinished) {
+      synchronized (notify) {
+        if (!dataInWorkFinished) {
+          try {
+            notify.wait();
+          } catch (InterruptedException e) {
+          }
         }
-        finally
-        {
-            if (readMsg == null)
-            {
-                dataIn.close();
-            }
+      }
+    }
+  }
+
+  private InputStream getNextMessage() throws IOException {
+    InputStream readMsg = null;
+    try {
+      readMsg = protocol.read(dataIn);
+      if (dataIn.isStreaming()) {
+        moreMessages.set(false);
+      }
+
+      return readMsg;
+    } finally {
+      if (readMsg == null) {
+        dataIn.close();
+      }
+    }
+  }
+
+  protected void shutdownSocket() throws IOException {
+    try {
+      socket.shutdownOutput();
+    } catch (UnsupportedOperationException e) {
+      // Ignore, not supported by ssl sockets
+    }
+  }
+
+  private boolean hasMoreMessages() {
+    return !socket.isClosed() && !dataInWorkFinished && moreMessages.get();
+  }
+
+  @Override
+  public void run() {
+    while (hasMoreMessages()) {
+      InputStream content;
+      try {
+        content = getNextMessage();
+      } catch (IOException e) {
+        if (LOGGER.isDebugEnabled()) {
+          LOGGER.debug("An error occurred while reading from the TCP Worker connection", e);
         }
-    }
 
-    protected void shutdownSocket() throws IOException
-    {
-        try
-        {
-            socket.shutdownOutput();
+        moreMessages.set(false);
+        break;
+      }
+
+      if (content == null) {
+        moreMessages.set(false);
+        break;
+      }
+
+      SocketAttributes attributes = new ImmutableSocketAttributes(socket);
+      messageHandler.handle(createMuleMessage(content, attributes), new CompletionHandler<MuleEvent, Exception, MuleEvent>() {
+
+        @Override
+        public void onCompletion(MuleEvent muleEvent, ExceptionCallback<MuleEvent, Exception> exceptionCallback) {
+          try {
+            protocol.write(dataOut, muleEvent.getMessage().getPayload(), encoding);
+            dataOut.flush();
+          } catch (IOException e) {
+            exceptionCallback.onException(new IOException(format("An error occurred while sending TCP response to address '%s'",
+                                                                 socket.getRemoteSocketAddress().toString(), e)));
+          }
         }
-        catch (UnsupportedOperationException e)
-        {
-            //Ignore, not supported by ssl sockets
+
+        @Override
+        public void onFailure(Exception e) {
+          LOGGER.error("TCP worker will not answer back due an exception was received", e);
+
+          // end worker's execution
+          moreMessages.set(false);
         }
+      });
+
     }
+  }
 
-    private boolean hasMoreMessages()
-    {
-        return !socket.isClosed() && !dataInWorkFinished && moreMessages.get();
-    }
+  @Override
+  public void dispose() {
+    releaseSocket();
+  }
 
-    @Override
-    public void run()
-    {
-        while (hasMoreMessages())
-        {
-            InputStream content;
-            try
-            {
-                content = getNextMessage();
-            }
-            catch (IOException e)
-            {
-                if (LOGGER.isDebugEnabled())
-                {
-                    LOGGER.debug("An error occurred while reading from the TCP Worker connection", e);
-                }
-
-                moreMessages.set(false);
-                break;
-            }
-
-            if (content == null)
-            {
-                moreMessages.set(false);
-                break;
-            }
-
-            SocketAttributes attributes = new ImmutableSocketAttributes(socket);
-            messageHandler.handle(createMuleMessage(content, attributes), new CompletionHandler<MuleEvent, Exception, MuleEvent>()
-            {
-                @Override
-                public void onCompletion(MuleEvent muleEvent, ExceptionCallback<MuleEvent, Exception> exceptionCallback)
-                {
-                    try
-                    {
-                        protocol.write(dataOut, muleEvent.getMessage().getPayload(), encoding);
-                        dataOut.flush();
-                    }
-                    catch (IOException e)
-                    {
-                        exceptionCallback.onException(new IOException(
-                                format("An error occurred while sending TCP response to address '%s'",
-                                       socket.getRemoteSocketAddress().toString(), e))
-                        );
-                    }
-                }
-
-                @Override
-                public void onFailure(Exception e)
-                {
-                    LOGGER.error("TCP worker will not answer back due an exception was received", e);
-
-                    // end worker's execution
-                    moreMessages.set(false);
-                }
-            });
-
+  private void releaseSocket() {
+    if (socket != null && !socket.isClosed()) {
+      try {
+        shutdownSocket();
+      } catch (IOException e) {
+        if (LOGGER.isWarnEnabled()) {
+          LOGGER.warn("TCP Worker shutting down output stream failed", e);
         }
-    }
-
-    @Override
-    public void dispose()
-    {
-        releaseSocket();
-    }
-
-    private void releaseSocket()
-    {
-        if (socket != null && !socket.isClosed())
-        {
-            try
-            {
-                shutdownSocket();
-            }
-            catch (IOException e)
-            {
-                if (LOGGER.isWarnEnabled())
-                {
-                    LOGGER.warn("TCP Worker shutting down output stream failed", e);
-                }
-            }
-            finally
-            {
-                try
-                {
-                    socket.close();
-                }
-                catch (IOException e)
-                {
-                    if (LOGGER.isWarnEnabled())
-                    {
-                        LOGGER.warn("TCP Worker socket close failed", e);
-                    }
-                }
-            }
+      } finally {
+        try {
+          socket.close();
+        } catch (IOException e) {
+          if (LOGGER.isWarnEnabled()) {
+            LOGGER.warn("TCP Worker socket close failed", e);
+          }
         }
+      }
     }
+  }
 
-    @Override
-    public void release()
-    {
-        waitForStreams();
-        releaseSocket();
-    }
+  @Override
+  public void release() {
+    waitForStreams();
+    releaseSocket();
+  }
 }

@@ -13,18 +13,16 @@ import org.mule.tck.size.SmallTest;
 import org.junit.Test;
 
 @SmallTest
-public class SimplePropertyConfigurationTestCase extends AbstractBasePropertyConfigurationTestCase
-{
+public class SimplePropertyConfigurationTestCase extends AbstractBasePropertyConfigurationTestCase {
 
-    public static final String SIMPLE = "simple";
+  public static final String SIMPLE = "simple";
 
-    @Test
-    public void testSimple()
-    {
-        PropertyConfiguration config = new SimplePropertyConfiguration();
-        setTestValues(SIMPLE, config);
-        verifyTestValues(SIMPLE, config);
-        verifyIgnored(SIMPLE, config);
-    }
+  @Test
+  public void testSimple() {
+    PropertyConfiguration config = new SimplePropertyConfiguration();
+    setTestValues(SIMPLE, config);
+    verifyTestValues(SIMPLE, config);
+    verifyIgnored(SIMPLE, config);
+  }
 
 }

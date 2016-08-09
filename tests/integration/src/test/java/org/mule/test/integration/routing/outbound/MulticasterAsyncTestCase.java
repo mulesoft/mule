@@ -20,38 +20,35 @@ import java.util.List;
 
 import org.junit.Test;
 
-public class MulticasterAsyncTestCase extends AbstractIntegrationTestCase
-{
+public class MulticasterAsyncTestCase extends AbstractIntegrationTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/integration/routing/outbound/multicaster-async-test-flow.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/integration/routing/outbound/multicaster-async-test-flow.xml";
+  }
 
-    @Test
-    public void testSplitter() throws Exception
-    {
-        Apple apple = new Apple();
-        flowRunner("Distributor").withPayload(apple).asynchronously().run();
+  @Test
+  public void testSplitter() throws Exception {
+    Apple apple = new Apple();
+    flowRunner("Distributor").withPayload(apple).asynchronously().run();
 
-        List<Apple> results = new ArrayList<>(3);
+    List<Apple> results = new ArrayList<>(3);
 
-        MuleClient client = muleContext.getClient();
-        MuleMessage result = client.request("test://collector.queue", RECEIVE_TIMEOUT);
-        assertNotNull(result);
-        results.add((Apple) result.getPayload());
+    MuleClient client = muleContext.getClient();
+    MuleMessage result = client.request("test://collector.queue", RECEIVE_TIMEOUT);
+    assertNotNull(result);
+    results.add((Apple) result.getPayload());
 
-        result = client.request("test://collector.queue", RECEIVE_TIMEOUT);
-        assertNotNull(result);
-        results.add((Apple) result.getPayload());
+    result = client.request("test://collector.queue", RECEIVE_TIMEOUT);
+    assertNotNull(result);
+    results.add((Apple) result.getPayload());
 
-        result = client.request("test://collector.queue", RECEIVE_TIMEOUT);
-        assertNotNull(result);
-        results.add((Apple) result.getPayload());
+    result = client.request("test://collector.queue", RECEIVE_TIMEOUT);
+    assertNotNull(result);
+    results.add((Apple) result.getPayload());
 
-        assertThat(results.size(), equalTo(3));
+    assertThat(results.size(), equalTo(3));
 
-        FlowAssert.verify();
-    }
+    FlowAssert.verify();
+  }
 }

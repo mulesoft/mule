@@ -24,83 +24,76 @@ import java.util.Collections;
 import org.junit.Test;
 
 @SmallTest
-public class MuleClassLoaderLookupPolicyTestCase extends AbstractMuleTestCase
-{
+public class MuleClassLoaderLookupPolicyTestCase extends AbstractMuleTestCase {
 
-    @Test(expected = IllegalArgumentException.class)
-    public void extendingCustomLookupStrategyForSystemPackage() throws Exception
-    {
-        new MuleClassLoaderLookupPolicy(Collections.emptyMap(), singleton("java")).extend(Collections.singletonMap(Object.class.getName(), CHILD_FIRST));
-    }
+  @Test(expected = IllegalArgumentException.class)
+  public void extendingCustomLookupStrategyForSystemPackage() throws Exception {
+    new MuleClassLoaderLookupPolicy(Collections.emptyMap(), singleton("java"))
+        .extend(Collections.singletonMap(Object.class.getName(), CHILD_FIRST));
+  }
 
-    @Test
-    public void returnsConfiguredLookupStrategy() throws Exception
-    {
-        MuleClassLoaderLookupPolicy lookupPolicy = new MuleClassLoaderLookupPolicy(Collections.singletonMap("java.lang", CHILD_FIRST), emptySet());
+  @Test
+  public void returnsConfiguredLookupStrategy() throws Exception {
+    MuleClassLoaderLookupPolicy lookupPolicy =
+        new MuleClassLoaderLookupPolicy(Collections.singletonMap("java.lang", CHILD_FIRST), emptySet());
 
-        ClassLoaderLookupStrategy lookupStrategy = lookupPolicy.getLookupStrategy(Object.class.getName());
-        assertThat(lookupStrategy, is(CHILD_FIRST));
+    ClassLoaderLookupStrategy lookupStrategy = lookupPolicy.getLookupStrategy(Object.class.getName());
+    assertThat(lookupStrategy, is(CHILD_FIRST));
 
-        lookupPolicy = new MuleClassLoaderLookupPolicy(Collections.singletonMap("java.lang.", CHILD_FIRST), emptySet());
+    lookupPolicy = new MuleClassLoaderLookupPolicy(Collections.singletonMap("java.lang.", CHILD_FIRST), emptySet());
 
-        lookupStrategy = lookupPolicy.getLookupStrategy(Object.class.getName());
-        assertThat(lookupStrategy, is(CHILD_FIRST));
-    }
+    lookupStrategy = lookupPolicy.getLookupStrategy(Object.class.getName());
+    assertThat(lookupStrategy, is(CHILD_FIRST));
+  }
 
-    @Test
-    public void usesParentOnlyForSystemPackage() throws Exception
-    {
-        ClassLoaderLookupPolicy lookupPolicy = new MuleClassLoaderLookupPolicy(emptyMap(), singleton("java"));
+  @Test
+  public void usesParentOnlyForSystemPackage() throws Exception {
+    ClassLoaderLookupPolicy lookupPolicy = new MuleClassLoaderLookupPolicy(emptyMap(), singleton("java"));
 
-        assertThat(lookupPolicy.getLookupStrategy(Object.class.getName()), is(PARENT_ONLY));
+    assertThat(lookupPolicy.getLookupStrategy(Object.class.getName()), is(PARENT_ONLY));
 
-        lookupPolicy = new MuleClassLoaderLookupPolicy(emptyMap(), singleton("java.lang"));
-        assertThat(lookupPolicy.getLookupStrategy(Object.class.getName()), is(PARENT_ONLY));
-    }
+    lookupPolicy = new MuleClassLoaderLookupPolicy(emptyMap(), singleton("java.lang"));
+    assertThat(lookupPolicy.getLookupStrategy(Object.class.getName()), is(PARENT_ONLY));
+  }
 
-    @Test
-    public void usesChildFirstForNoConfiguredPackage() throws Exception
-    {
-        ClassLoaderLookupPolicy lookupPolicy = new MuleClassLoaderLookupPolicy(emptyMap(), emptySet());
+  @Test
+  public void usesChildFirstForNoConfiguredPackage() throws Exception {
+    ClassLoaderLookupPolicy lookupPolicy = new MuleClassLoaderLookupPolicy(emptyMap(), emptySet());
 
-        assertThat(lookupPolicy.getLookupStrategy("org.foo.Object"), is(CHILD_FIRST));
-    }
+    assertThat(lookupPolicy.getLookupStrategy("org.foo.Object"), is(CHILD_FIRST));
+  }
 
-    @Test
-    public void extendsPolicy() throws Exception
-    {
-        ClassLoaderLookupPolicy lookupPolicy = new MuleClassLoaderLookupPolicy(emptyMap(), emptySet());
+  @Test
+  public void extendsPolicy() throws Exception {
+    ClassLoaderLookupPolicy lookupPolicy = new MuleClassLoaderLookupPolicy(emptyMap(), emptySet());
 
-        final ClassLoaderLookupPolicy extendedPolicy = lookupPolicy.extend(singletonMap("org.foo", PARENT_FIRST));
+    final ClassLoaderLookupPolicy extendedPolicy = lookupPolicy.extend(singletonMap("org.foo", PARENT_FIRST));
 
-        assertThat(extendedPolicy.getLookupStrategy("org.foo.Object"), is(PARENT_FIRST));
-    }
+    assertThat(extendedPolicy.getLookupStrategy("org.foo.Object"), is(PARENT_FIRST));
+  }
 
-    @Test
-    public void maintainsOriginalLookupStrategy() throws Exception
-    {
-        ClassLoaderLookupPolicy lookupPolicy = new MuleClassLoaderLookupPolicy(singletonMap("org.foo", PARENT_ONLY), emptySet());
+  @Test
+  public void maintainsOriginalLookupStrategy() throws Exception {
+    ClassLoaderLookupPolicy lookupPolicy = new MuleClassLoaderLookupPolicy(singletonMap("org.foo", PARENT_ONLY), emptySet());
 
-        final ClassLoaderLookupPolicy extendedPolicy = lookupPolicy.extend(singletonMap("org.foo", PARENT_FIRST));
+    final ClassLoaderLookupPolicy extendedPolicy = lookupPolicy.extend(singletonMap("org.foo", PARENT_FIRST));
 
-        assertThat(extendedPolicy.getLookupStrategy("org.foo.Object"), is(PARENT_ONLY));
-    }
+    assertThat(extendedPolicy.getLookupStrategy("org.foo.Object"), is(PARENT_ONLY));
+  }
 
-    @Test
-    public void normalizesLookupStrategies() throws Exception
-    {
-        ClassLoaderLookupPolicy lookupPolicy = new MuleClassLoaderLookupPolicy(singletonMap("org.foo", PARENT_ONLY), emptySet());
+  @Test
+  public void normalizesLookupStrategies() throws Exception {
+    ClassLoaderLookupPolicy lookupPolicy = new MuleClassLoaderLookupPolicy(singletonMap("org.foo", PARENT_ONLY), emptySet());
 
-        final ClassLoaderLookupPolicy extendedPolicy = lookupPolicy.extend(singletonMap("org.foo.", PARENT_FIRST));
+    final ClassLoaderLookupPolicy extendedPolicy = lookupPolicy.extend(singletonMap("org.foo.", PARENT_FIRST));
 
-        assertThat(extendedPolicy.getLookupStrategy("org.foo.Object"), is(PARENT_ONLY));
-    }
+    assertThat(extendedPolicy.getLookupStrategy("org.foo.Object"), is(PARENT_ONLY));
+  }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void cannotExtendPolicyWithSystemPackage() throws Exception
-    {
-        ClassLoaderLookupPolicy lookupPolicy = new MuleClassLoaderLookupPolicy(emptyMap(), singleton("java"));
+  @Test(expected = IllegalArgumentException.class)
+  public void cannotExtendPolicyWithSystemPackage() throws Exception {
+    ClassLoaderLookupPolicy lookupPolicy = new MuleClassLoaderLookupPolicy(emptyMap(), singleton("java"));
 
-        lookupPolicy.extend(singletonMap(Object.class.getName(), PARENT_FIRST));
-    }
+    lookupPolicy.extend(singletonMap(Object.class.getName(), PARENT_FIRST));
+  }
 }

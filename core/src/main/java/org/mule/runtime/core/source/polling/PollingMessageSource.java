@@ -43,331 +43,287 @@ import org.slf4j.LoggerFactory;
  * Polling {@link org.mule.runtime.core.api.source.MessageSource}.
  * </p>
  * <p>
- * The {@link PollingMessageSource} is responsible of creating a {@link org.mule.runtime.core.api.schedule.Scheduler}
- * at the initialization phase. This {@link org.mule.runtime.core.api.schedule.Scheduler} can be stopped/started and executed by using the {@link org.mule.runtime.core.api.registry.MuleRegistry}
- * interface, this way users can manipulate poll from outside mule server.
+ * The {@link PollingMessageSource} is responsible of creating a {@link org.mule.runtime.core.api.schedule.Scheduler} at the
+ * initialization phase. This {@link org.mule.runtime.core.api.schedule.Scheduler} can be stopped/started and executed by using
+ * the {@link org.mule.runtime.core.api.registry.MuleRegistry} interface, this way users can manipulate poll from outside mule
+ * server.
  * </p>
  */
-public class PollingMessageSource implements MessageSource, FlowConstructAware, Startable, Stoppable, MuleContextAware, Initialisable, Disposable
-{
+public class PollingMessageSource
+    implements MessageSource, FlowConstructAware, Startable, Stoppable, MuleContextAware, Initialisable, Disposable {
 
-    private static Logger logger = LoggerFactory.getLogger(PollingMessageSource.class);
-    /**
-     * The Polling name identifier. Used to create the scheduler name
-     */
-    public static final String POLLING_SCHEME = "polling";
-    /**
-     * Format string for all the Polling Schedulers name.
-     */
-    private static final String POLLING_SCHEDULER_NAME_FORMAT = POLLING_SCHEME + "://%s/%s";
-    private final SchedulerFactory<Runnable> schedulerFactory;
+  private static Logger logger = LoggerFactory.getLogger(PollingMessageSource.class);
+  /**
+   * The Polling name identifier. Used to create the scheduler name
+   */
+  public static final String POLLING_SCHEME = "polling";
+  /**
+   * Format string for all the Polling Schedulers name.
+   */
+  private static final String POLLING_SCHEDULER_NAME_FORMAT = POLLING_SCHEME + "://%s/%s";
+  private final SchedulerFactory<Runnable> schedulerFactory;
 
-    /**
-     * The {@link org.mule.runtime.core.api.schedule.Scheduler} instance used to execute the scheduled jobs
-     */
-    private Scheduler scheduler;
-    private MessageProcessor listener;
-    private FlowConstruct flowConstruct;
-    private MuleContext muleContext;
-    private boolean started;
-    /**
-     * <p>
-     * The poll message source, configured inside the poll element in the xml configuration. i.e.:
-     * <pre>
-     * {@code
-     * <poll>
-     *       <sfdc:query query=""/>
-     * </poll>
-     * </pre>
-     * </p>
-     */
-    protected MessageProcessor sourceMessageProcessor;
+  /**
+   * The {@link org.mule.runtime.core.api.schedule.Scheduler} instance used to execute the scheduled jobs
+   */
+  private Scheduler scheduler;
+  private MessageProcessor listener;
+  private FlowConstruct flowConstruct;
+  private MuleContext muleContext;
+  private boolean started;
+  /**
+   * <p>
+   * The poll message source, configured inside the poll element in the xml configuration. i.e.:
+   * 
+   * <pre>
+   * {@code
+   * <poll>
+   *       <sfdc:query query=""/>
+   * </poll>
+   * 
+  </pre>
+  
+   * 
+  </p>
+   */
+  protected MessageProcessor sourceMessageProcessor;
 
-    /**
-     * <p>
-     * The {@link MessageProcessorPollingOverride} that affects the routing of the {@link MuleEvent}
-     * </p>
-     */
-    protected MessageProcessorPollingOverride override;
+  /**
+   * <p>
+   * The {@link MessageProcessorPollingOverride} that affects the routing of the {@link MuleEvent}
+   * </p>
+   */
+  protected MessageProcessorPollingOverride override;
 
-    /**
-     * @param muleContext application's context
-     * @param sourceMessageProcessor message processor that should be triggered
-     * @param override interceptor for each triggered operation
-     * @param schedulerFactory factory for the scheduler
-     */
-    public PollingMessageSource(MuleContext muleContext, MessageProcessor sourceMessageProcessor, MessageProcessorPollingOverride override, SchedulerFactory<Runnable> schedulerFactory)
-    {
-        this.muleContext = muleContext;
-        this.sourceMessageProcessor = sourceMessageProcessor;
-        this.override = override;
-        this.schedulerFactory = schedulerFactory;
+  /**
+   * @param muleContext application's context
+   * @param sourceMessageProcessor message processor that should be triggered
+   * @param override interceptor for each triggered operation
+   * @param schedulerFactory factory for the scheduler
+   */
+  public PollingMessageSource(MuleContext muleContext, MessageProcessor sourceMessageProcessor,
+                              MessageProcessorPollingOverride override, SchedulerFactory<Runnable> schedulerFactory) {
+    this.muleContext = muleContext;
+    this.sourceMessageProcessor = sourceMessageProcessor;
+    this.override = override;
+    this.schedulerFactory = schedulerFactory;
+  }
+
+  @Override
+  public void start() throws MuleException {
+    try {
+      // The initialization phase if handled by the scheduler
+      if (override instanceof Startable) {
+        ((Startable) override).start();
+      }
+      if (sourceMessageProcessor instanceof Startable) {
+        ((Startable) sourceMessageProcessor).start();
+      }
+      started = true;
+    } catch (Exception ex) {
+      this.stop();
+      throw new CreateException(CoreMessages.failedToScheduleWork(), ex, this);
+    }
+  }
+
+  public String getPollingUniqueName() {
+    return flowConstruct.getName() + "-polling-" + this.hashCode();
+  }
+
+  @Override
+  public void stop() throws MuleException {
+    this.started = false;
+    if (override instanceof Stoppable) {
+      ((Stoppable) override).stop();
     }
 
-    @Override
-    public void start() throws MuleException
-    {
-        try
-        {
-            // The initialization phase if handled by the scheduler
-            if (override instanceof Startable)
-            {
-                ((Startable) override).start();
-            }
-            if (sourceMessageProcessor instanceof Startable)
-            {
-                ((Startable) sourceMessageProcessor).start();
-            }
-            started = true;
+    // Stop the scheduler to address the case when the flow is stop but not the application
+    if (scheduler != null) {
+      scheduler.stop();
+    }
+  }
+
+  protected PollingWorker createWork() {
+    return new PollingWorker(new PollingTask() {
+
+      @Override
+      public boolean isStarted() {
+        return PollingMessageSource.this.started;
+      }
+
+      @Override
+      public void run() throws Exception {
+        PollingMessageSource.this.performPoll();
+      }
+
+      @Override
+      public void stop() throws MuleException {
+        PollingMessageSource.this.stop();
+      }
+    }, muleContext.getExceptionListener());
+  }
+
+  /**
+   * Checks whether polling should take place on this instance.
+   */
+  protected final void performPoll() throws Exception {
+    if (!pollOnPrimaryInstanceOnly() || flowConstruct.getMuleContext().isPrimaryPollingInstance()) {
+      poll();
+    }
+  }
+
+  private boolean pollOnPrimaryInstanceOnly() {
+    return true;
+  }
+
+  /**
+   * <p>
+   * Helper method to create {@link org.mule.runtime.core.api.schedule.Scheduler} names
+   * </p>
+   */
+  private String schedulerNameOf(FlowConstruct flowConstruct) {
+    return String.format(POLLING_SCHEDULER_NAME_FORMAT, flowConstruct.getName(), this.hashCode());
+  }
+
+  /**
+   * Triggers the forced execution of the polling message processor ignoring the configured scheduler.
+   *
+   * @throws Exception
+   */
+  public void poll() throws Exception {
+    MuleMessage request = MuleMessage.builder().payload(StringUtils.EMPTY).build();
+    pollWith(request);
+  }
+
+  private void pollWith(final MuleMessage request) throws Exception {
+    ExecutionTemplate<MuleEvent> executionTemplate = TransactionalErrorHandlingExecutionTemplate
+        .createMainExecutionTemplate(muleContext, flowConstruct.getExceptionListener());
+    try {
+      final MessageProcessorPollingInterceptor interceptor = override.interceptor();
+      MuleEvent muleEvent = executionTemplate.execute(new ExecutionCallback<MuleEvent>() {
+
+        @Override
+        public MuleEvent process() throws Exception {
+          MuleEvent event = new DefaultMuleEvent(request, MessageExchangePattern.ONE_WAY, flowConstruct);
+          event = interceptor.prepareSourceEvent(event);
+
+          OptimizedRequestContext.criticalSetEvent(event);
+
+          MuleEvent sourceEvent = sourceMessageProcessor.process(event);
+          if (isNewMessage(sourceEvent)) {
+            muleContext.getNotificationManager()
+                .fireNotification(new ConnectorMessageNotification(this, sourceEvent.getMessage(), getPollingUniqueName(),
+                                                                   flowConstruct, ConnectorMessageNotification.MESSAGE_RECEIVED));
+            event = interceptor.prepareRouting(sourceEvent, new DefaultMuleEvent(sourceEvent.getMessage(), sourceEvent));
+            listener.process(event);
+            interceptor.postProcessRouting(event);
+          } else {
+            logger.info(CoreMessages.pollSourceReturnedNull(flowConstruct.getName()).getMessage());
+          }
+          return null;
         }
-        catch (Exception ex)
-        {
-            this.stop();
-            throw new CreateException(CoreMessages.failedToScheduleWork(), ex, this);
-        }
+      });
+      if (muleEvent != null) {
+        interceptor.postProcessRouting(muleEvent);
+      }
+    } catch (MessagingException e) {
+      // Already handled by TransactionTemplate
+    } catch (Exception e) {
+      muleContext.getExceptionListener().handleException(e);
+    }
+  }
+
+  /**
+   * <p>
+   * On the Initialization phase it.
+   * <ul>
+   * <li>Calls the {@link SchedulerFactory} to create the scheduler</li>
+   * <li>Gets the Poll the message source</li>
+   * <li>Gets the Poll override</li>
+   * </ul>
+   * </p>
+   */
+  @Override
+  public void initialise() throws InitialisationException {
+    if (sourceMessageProcessor instanceof MuleContextAware) {
+      ((MuleContextAware) sourceMessageProcessor).setMuleContext(muleContext);
+    }
+    if (sourceMessageProcessor instanceof FlowConstructAware) {
+      ((FlowConstructAware) sourceMessageProcessor).setFlowConstruct(flowConstruct);
+    }
+    if (sourceMessageProcessor instanceof Initialisable) {
+      ((Initialisable) sourceMessageProcessor).initialise();
+    }
+    if (override instanceof MuleContextAware) {
+      ((MuleContextAware) override).setMuleContext(muleContext);
+    }
+    if (override instanceof FlowConstructAware) {
+      ((FlowConstructAware) override).setFlowConstruct(flowConstruct);
+    }
+    if (override instanceof Initialisable) {
+      ((Initialisable) override).initialise();
+    }
+    createScheduler();
+  }
+
+  @Override
+  public void dispose() {
+    if (override instanceof Disposable) {
+      try {
+        ((Disposable) override).dispose();
+      } catch (Exception e) {
+        logger.warn(String.format("Could not dispose polling override of class %s. Message receiver will continue to dispose",
+                                  override.getClass().getCanonicalName()),
+                    e);
+      }
     }
 
-    public String getPollingUniqueName()
-    {
-        return flowConstruct.getName() + "-polling-" + this.hashCode();
+    disposeScheduler();
+  }
+
+  private void createScheduler() {
+    scheduler = schedulerFactory.create(schedulerNameOf(flowConstruct), createWork());
+  }
+
+  private void disposeScheduler() {
+    if (scheduler != null) {
+      try {
+        muleContext.getRegistry().unregisterScheduler(scheduler);
+      } catch (MuleException e) {
+        logger.warn(String.format("Could not unregister scheduler %s from registry.", scheduler.getName()), e);
+      }
+      scheduler = null;
     }
+  }
 
-    @Override
-    public void stop() throws MuleException
-    {
-        this.started = false;
-        if (override instanceof Stoppable)
-        {
-            ((Stoppable) override).stop();
-        }
-
-        // Stop the scheduler to address the case when the flow is stop but not the application
-        if (scheduler != null)
-        {
-            scheduler.stop();
-        }
+  /**
+   * Only consider response for source message processor a new message if it is not null and payload is not NullPayload
+   *
+   * @param event result of the polled message processor
+   * @return true if the polled message processor return new content, false otherwise
+   */
+  protected boolean isNewMessage(MuleEvent event) {
+    if (event != null && !VoidMuleEvent.getInstance().equals(event) && event.getMessage() != null) {
+      MuleMessage message = event.getMessage();
+      return message.getPayload() != null;
     }
+    return false;
+  }
 
-    protected PollingWorker createWork()
-    {
-        return new PollingWorker(new PollingTask()
-        {
-            @Override
-            public boolean isStarted()
-            {
-                return PollingMessageSource.this.started;
-            }
+  @Override
+  public void setFlowConstruct(FlowConstruct flowConstruct) {
+    this.flowConstruct = flowConstruct;
+  }
 
-            @Override
-            public void run() throws Exception
-            {
-                PollingMessageSource.this.performPoll();
-            }
-
-            @Override
-            public void stop() throws MuleException
-            {
-                PollingMessageSource.this.stop();
-            }
-        }, muleContext.getExceptionListener());
-    }
-
-    /**
-     * Checks whether polling should take place on this instance.
-     */
-    protected final void performPoll() throws Exception
-    {
-        if (!pollOnPrimaryInstanceOnly() || flowConstruct.getMuleContext().isPrimaryPollingInstance())
-        {
-            poll();
-        }
-    }
-
-    private boolean pollOnPrimaryInstanceOnly()
-    {
-        return true;
-    }
-
-    /**
-     * <p>
-     * Helper method to create {@link org.mule.runtime.core.api.schedule.Scheduler} names
-     * </p>
-     */
-    private String schedulerNameOf(FlowConstruct flowConstruct)
-    {
-        return String.format(POLLING_SCHEDULER_NAME_FORMAT, flowConstruct.getName(), this.hashCode());
-    }
-
-    /**
-     * Triggers the forced execution of the polling message processor ignoring the configured scheduler.
-     *
-     * @throws Exception
-     */
-    public void poll() throws Exception
-    {
-        MuleMessage request = MuleMessage.builder().payload(StringUtils.EMPTY).build();
-        pollWith(request);
-    }
-
-    private void pollWith(final MuleMessage request) throws Exception
-    {
-        ExecutionTemplate<MuleEvent> executionTemplate = TransactionalErrorHandlingExecutionTemplate.createMainExecutionTemplate(muleContext, flowConstruct.getExceptionListener());
-        try
-        {
-            final MessageProcessorPollingInterceptor interceptor = override.interceptor();
-            MuleEvent muleEvent = executionTemplate.execute(new ExecutionCallback<MuleEvent>()
-            {
-                @Override
-                public MuleEvent process() throws Exception
-                {
-                    MuleEvent event = new DefaultMuleEvent(request, MessageExchangePattern.ONE_WAY, flowConstruct);
-                    event = interceptor.prepareSourceEvent(event);
-
-                    OptimizedRequestContext.criticalSetEvent(event);
-
-                    MuleEvent sourceEvent = sourceMessageProcessor.process(event);
-                    if (isNewMessage(sourceEvent))
-                    {
-                        muleContext.getNotificationManager().fireNotification(new ConnectorMessageNotification(this, sourceEvent.getMessage(), getPollingUniqueName(), flowConstruct, ConnectorMessageNotification.MESSAGE_RECEIVED));
-                        event = interceptor.prepareRouting(sourceEvent, new DefaultMuleEvent(sourceEvent.getMessage(), sourceEvent));
-                        listener.process(event);
-                        interceptor.postProcessRouting(event);
-                    }
-                    else
-                    {
-                        logger.info(CoreMessages.pollSourceReturnedNull(flowConstruct.getName()).getMessage());
-                    }
-                    return null;
-                }
-            });
-            if (muleEvent != null)
-            {
-                interceptor.postProcessRouting(muleEvent);
-            }
-        }
-        catch (MessagingException e)
-        {
-            //Already handled by TransactionTemplate
-        }
-        catch (Exception e)
-        {
-            muleContext.getExceptionListener().handleException(e);
-        }
-    }
-
-    /**
-     * <p>
-     * On the Initialization phase it.
-     * <ul>
-     * <li>Calls the {@link SchedulerFactory} to create the scheduler</li>
-     * <li>Gets the Poll the message source</li>
-     * <li>Gets the Poll override</li>
-     * </ul>
-     * </p>
-     */
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        if (sourceMessageProcessor instanceof MuleContextAware)
-        {
-            ((MuleContextAware) sourceMessageProcessor).setMuleContext(muleContext);
-        }
-        if (sourceMessageProcessor instanceof FlowConstructAware)
-        {
-            ((FlowConstructAware) sourceMessageProcessor).setFlowConstruct(flowConstruct);
-        }
-        if (sourceMessageProcessor instanceof Initialisable)
-        {
-            ((Initialisable) sourceMessageProcessor).initialise();
-        }
-        if (override instanceof MuleContextAware)
-        {
-            ((MuleContextAware) override).setMuleContext(muleContext);
-        }
-        if (override instanceof FlowConstructAware)
-        {
-            ((FlowConstructAware) override).setFlowConstruct(flowConstruct);
-        }
-        if (override instanceof Initialisable)
-        {
-            ((Initialisable) override).initialise();
-        }
-        createScheduler();
-    }
-
-    @Override
-    public void dispose()
-    {
-        if (override instanceof Disposable)
-        {
-            try
-            {
-                ((Disposable) override).dispose();
-            }
-            catch (Exception e)
-            {
-                logger.warn(String.format("Could not dispose polling override of class %s. Message receiver will continue to dispose", override.getClass().getCanonicalName()), e);
-            }
-        }
-
-        disposeScheduler();
-    }
-
-    private void createScheduler()
-    {
-        scheduler = schedulerFactory.create(schedulerNameOf(flowConstruct), createWork());
-    }
-
-    private void disposeScheduler()
-    {
-        if (scheduler != null)
-        {
-            try
-            {
-                muleContext.getRegistry().unregisterScheduler(scheduler);
-            }
-            catch (MuleException e)
-            {
-                logger.warn(String.format("Could not unregister scheduler %s from registry.", scheduler.getName()), e);
-            }
-            scheduler = null;
-        }
-    }
-
-    /**
-     * Only consider response for source message processor a new message if it is not
-     * null and payload is not NullPayload
-     *
-     * @param event result of the polled message processor
-     * @return true if the polled message processor return new content, false otherwise
-     */
-    protected boolean isNewMessage(MuleEvent event)
-    {
-        if (event != null && !VoidMuleEvent.getInstance().equals(event) && event.getMessage() != null)
-        {
-            MuleMessage message = event.getMessage();
-            return message.getPayload() != null;
-        }
-        return false;
-    }
-
-    @Override
-    public void setFlowConstruct(FlowConstruct flowConstruct)
-    {
-        this.flowConstruct = flowConstruct;
-    }
-
-    @Override
-    public void setMuleContext(MuleContext context)
-    {
-        this.muleContext = context;
-    }
+  @Override
+  public void setMuleContext(MuleContext context) {
+    this.muleContext = context;
+  }
 
 
-    @Override
-    public void setListener(MessageProcessor listener)
-    {
-        this.listener = listener;
-    }
+  @Override
+  public void setListener(MessageProcessor listener) {
+    this.listener = listener;
+  }
 
 }

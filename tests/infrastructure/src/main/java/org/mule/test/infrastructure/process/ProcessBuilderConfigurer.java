@@ -6,9 +6,8 @@
  */
 package org.mule.test.infrastructure.process;
 
-public interface ProcessBuilderConfigurer
-{
+public interface ProcessBuilderConfigurer {
 
-    void configure(String instanceId, ConfigurableProcessBuilder configurableProcessBuilder);
+  void configure(String instanceId, ConfigurableProcessBuilder configurableProcessBuilder);
 
 }

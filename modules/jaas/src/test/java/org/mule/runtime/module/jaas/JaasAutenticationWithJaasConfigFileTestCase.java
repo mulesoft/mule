@@ -13,55 +13,51 @@ import org.mule.runtime.core.api.MuleMessage;
 
 import org.junit.Test;
 
-public class JaasAutenticationWithJaasConfigFileTestCase extends AbstractJaasFunctionalTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "mule-conf-for-jaas-conf-file-flow.xml";
-    }
+public class JaasAutenticationWithJaasConfigFileTestCase extends AbstractJaasFunctionalTestCase {
 
-    @Test
-    public void goodAuthentication() throws Exception
-    {
-        SecurityHeader securityHeader = createSecurityHeader("Marie.Rizzo", "dragon");
-        MuleMessage message = flowRunner(TEST_FLOW_NAME).withInboundProperty(securityHeader.getKey(), securityHeader.getValue()).withPayload("Test").run().getMessage();
+  @Override
+  protected String getConfigFile() {
+    return "mule-conf-for-jaas-conf-file-flow.xml";
+  }
 
-        assertNotNull(message);
-        assertTrue(message.getPayload() instanceof String);
-        assertEquals("Test Received", getPayloadAsString(message));
-    }
+  @Test
+  public void goodAuthentication() throws Exception {
+    SecurityHeader securityHeader = createSecurityHeader("Marie.Rizzo", "dragon");
+    MuleMessage message = flowRunner(TEST_FLOW_NAME).withInboundProperty(securityHeader.getKey(), securityHeader.getValue())
+        .withPayload("Test").run().getMessage();
 
-    @Test
-    public void anotherGoodAuthentication() throws Exception
-    {
-        SecurityHeader securityHeader = createSecurityHeader("anon", "anon");
-        MuleMessage message = flowRunner(TEST_FLOW_NAME).withInboundProperty(securityHeader.getKey(), securityHeader.getValue()).withPayload("Test").run().getMessage();
+    assertNotNull(message);
+    assertTrue(message.getPayload() instanceof String);
+    assertEquals("Test Received", getPayloadAsString(message));
+  }
 
-        assertNotNull(message);
-        assertTrue(message.getPayload() instanceof String);
-        assertEquals("Test Received", getPayloadAsString(message));
-    }
+  @Test
+  public void anotherGoodAuthentication() throws Exception {
+    SecurityHeader securityHeader = createSecurityHeader("anon", "anon");
+    MuleMessage message = flowRunner(TEST_FLOW_NAME).withInboundProperty(securityHeader.getKey(), securityHeader.getValue())
+        .withPayload("Test").run().getMessage();
 
-    @Test
-    public void wrongCombinationOfCorrectUsernameAndPassword() throws Exception
-    {
-        SecurityHeader securityHeader = createSecurityHeader("Marie.Rizzo", "anon");
-        runFlowAndExpectUnauthorizedException(securityHeader);
-    }
+    assertNotNull(message);
+    assertTrue(message.getPayload() instanceof String);
+    assertEquals("Test Received", getPayloadAsString(message));
+  }
 
-    @Test
-    public void badUserName() throws Exception
-    {
-        SecurityHeader securityHeader = createSecurityHeader("Evil", "dragon");
-        runFlowAndExpectUnauthorizedException(securityHeader);
-    }
+  @Test
+  public void wrongCombinationOfCorrectUsernameAndPassword() throws Exception {
+    SecurityHeader securityHeader = createSecurityHeader("Marie.Rizzo", "anon");
+    runFlowAndExpectUnauthorizedException(securityHeader);
+  }
 
-    @Test
-    public void badPassword() throws Exception
-    {
-        SecurityHeader securityHeader = createSecurityHeader("Marie.Rizzo", "evil");
-        runFlowAndExpectUnauthorizedException(securityHeader);
-    }
+  @Test
+  public void badUserName() throws Exception {
+    SecurityHeader securityHeader = createSecurityHeader("Evil", "dragon");
+    runFlowAndExpectUnauthorizedException(securityHeader);
+  }
+
+  @Test
+  public void badPassword() throws Exception {
+    SecurityHeader securityHeader = createSecurityHeader("Marie.Rizzo", "evil");
+    runFlowAndExpectUnauthorizedException(securityHeader);
+  }
 
 }

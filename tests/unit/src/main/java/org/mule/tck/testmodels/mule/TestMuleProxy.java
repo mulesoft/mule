@@ -13,17 +13,14 @@ import org.mule.runtime.core.component.DefaultJavaComponent;
 /**
  * Makes the underlying POJO service object available for unit testing.
  */
-public class TestMuleProxy extends DefaultJavaComponent
-{
+public class TestMuleProxy extends DefaultJavaComponent {
 
-    public TestMuleProxy(ObjectFactory objectFactory) throws MuleException
-    {
-        super(objectFactory);
-    }
+  public TestMuleProxy(ObjectFactory objectFactory) throws MuleException {
+    super(objectFactory);
+  }
 
-    /** Returns the underlying POJO service object for unit testing. */
-    public Object getPojoService() throws Exception
-    {
-        return objectFactory.getInstance(muleContext);
-    }
+  /** Returns the underlying POJO service object for unit testing. */
+  public Object getPojoService() throws Exception {
+    return objectFactory.getInstance(muleContext);
+  }
 }

@@ -19,28 +19,25 @@ import java.nio.charset.Charset;
  *
  * @since 4.0
  */
-public class CharsetValueResolverParsingDelegate implements ValueResolverParsingDelegate
-{
+public class CharsetValueResolverParsingDelegate implements ValueResolverParsingDelegate {
 
-    /**
-     * @param metadataType a {@link MetadataType}
-     * @return {@code true} if {@code metadataType} represents a {@link Charset}
-     */
-    @Override
-    public boolean accepts(MetadataType metadataType)
-    {
-        return Charset.class.equals(getType(metadataType));
-    }
+  /**
+   * @param metadataType a {@link MetadataType}
+   * @return {@code true} if {@code metadataType} represents a {@link Charset}
+   */
+  @Override
+  public boolean accepts(MetadataType metadataType) {
+    return Charset.class.equals(getType(metadataType));
+  }
 
-    /**
-     * @param key          the parsed entity key
-     * @param metadataType a {@link MetadataType}
-     * @param elementDsl the {@link DslElementSyntax} of the parsed element
-     * @return A {@link ValueResolver} which resolves to the {@link Charset} corresponding with the given {@code key}
-     */
-    @Override
-    public ValueResolver<Object> parse(String key, MetadataType metadataType, DslElementSyntax elementDsl)
-    {
-        return new StaticValueResolver<>(Charset.forName(key));
-    }
+  /**
+   * @param key the parsed entity key
+   * @param metadataType a {@link MetadataType}
+   * @param elementDsl the {@link DslElementSyntax} of the parsed element
+   * @return A {@link ValueResolver} which resolves to the {@link Charset} corresponding with the given {@code key}
+   */
+  @Override
+  public ValueResolver<Object> parse(String key, MetadataType metadataType, DslElementSyntax elementDsl) {
+    return new StaticValueResolver<>(Charset.forName(key));
+  }
 }

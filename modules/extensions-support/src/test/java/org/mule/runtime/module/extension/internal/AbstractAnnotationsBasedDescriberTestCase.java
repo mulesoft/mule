@@ -21,43 +21,37 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.List;
 
-public abstract class AbstractAnnotationsBasedDescriberTestCase extends AbstractMuleTestCase
-{
+public abstract class AbstractAnnotationsBasedDescriberTestCase extends AbstractMuleTestCase {
 
-    private Describer describer;
+  private Describer describer;
 
-    protected Describer getDescriber()
-    {
-        return describer;
-    }
+  protected Describer getDescriber() {
+    return describer;
+  }
 
-    protected void setDescriber(Describer describer)
-    {
-        this.describer = describer;
-    }
+  protected void setDescriber(Describer describer) {
+    this.describer = describer;
+  }
 
-    protected Describer describerFor(final Class<?> type)
-    {
-        return new AnnotationsBasedDescriber(type, new StaticVersionResolver(getProductVersion()));
-    }
+  protected Describer describerFor(final Class<?> type) {
+    return new AnnotationsBasedDescriber(type, new StaticVersionResolver(getProductVersion()));
+  }
 
-    protected ExtensionDeclarer describeExtension()
-    {
-        return getDescriber().describe(new DefaultDescribingContext(getClass().getClassLoader()));
-    }
+  protected ExtensionDeclarer describeExtension() {
+    return getDescriber().describe(new DefaultDescribingContext(getClass().getClassLoader()));
+  }
 
-    protected ConfigurationDeclaration getConfiguration(ExtensionDeclaration extensionDeclaration, final String configurationName)
-    {
-        return (ConfigurationDeclaration) find(extensionDeclaration.getConfigurations(), object -> ((ConfigurationDeclaration) object).getName().equals(configurationName));
-    }
+  protected ConfigurationDeclaration getConfiguration(ExtensionDeclaration extensionDeclaration, final String configurationName) {
+    return (ConfigurationDeclaration) find(extensionDeclaration.getConfigurations(),
+                                           object -> ((ConfigurationDeclaration) object).getName().equals(configurationName));
+  }
 
-    protected OperationDeclaration getOperation(WithOperationsDeclaration declaration, final String operationName)
-    {
-        return (OperationDeclaration) find(declaration.getOperations(), object -> ((OperationDeclaration) object).getName().equals(operationName));
-    }
+  protected OperationDeclaration getOperation(WithOperationsDeclaration declaration, final String operationName) {
+    return (OperationDeclaration) find(declaration.getOperations(),
+                                       object -> ((OperationDeclaration) object).getName().equals(operationName));
+  }
 
-    protected ParameterDeclaration findParameter(List<ParameterDeclaration> parameters, final String name)
-    {
-        return (ParameterDeclaration) find(parameters, object -> name.equals(((ParameterDeclaration) object).getName()));
-    }
+  protected ParameterDeclaration findParameter(List<ParameterDeclaration> parameters, final String name) {
+    return (ParameterDeclaration) find(parameters, object -> name.equals(((ParameterDeclaration) object).getName()));
+  }
 }

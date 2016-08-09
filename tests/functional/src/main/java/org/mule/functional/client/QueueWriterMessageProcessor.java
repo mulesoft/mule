@@ -18,34 +18,29 @@ import org.mule.runtime.core.api.processor.MessageProcessor;
 /**
  * Writes {@link MuleEvent} to a test connector's queue.
  */
-public class QueueWriterMessageProcessor implements MessageProcessor, MuleContextAware
-{
+public class QueueWriterMessageProcessor implements MessageProcessor, MuleContextAware {
 
-    private MuleContext muleContext;
-    private String name;
+  private MuleContext muleContext;
+  private String name;
 
-    @Override
-    public MuleEvent process(MuleEvent event) throws MuleException
-    {
-        TestConnectorConfig connectorConfig = muleContext.getRegistry().lookupObject(DEFAULT_CONFIG_ID);
-        connectorConfig.write(name, DefaultMuleEvent.copy(event));
+  @Override
+  public MuleEvent process(MuleEvent event) throws MuleException {
+    TestConnectorConfig connectorConfig = muleContext.getRegistry().lookupObject(DEFAULT_CONFIG_ID);
+    connectorConfig.write(name, DefaultMuleEvent.copy(event));
 
-        return event;
-    }
+    return event;
+  }
 
-    @Override
-    public void setMuleContext(MuleContext context)
-    {
-        muleContext = context;
-    }
+  @Override
+  public void setMuleContext(MuleContext context) {
+    muleContext = context;
+  }
 
-    public String getName()
-    {
-        return name;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public void setName(String name)
-    {
-        this.name = name;
-    }
+  public void setName(String name) {
+    this.name = name;
+  }
 }

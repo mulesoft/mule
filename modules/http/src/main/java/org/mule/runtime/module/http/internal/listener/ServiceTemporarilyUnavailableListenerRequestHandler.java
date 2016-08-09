@@ -11,18 +11,18 @@ import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.SERVICE_
 /**
  * Request handle for request calls to paths with no listener configured.
  */
-public class ServiceTemporarilyUnavailableListenerRequestHandler extends ErrorRequestHandler
-{
-    private static ServiceTemporarilyUnavailableListenerRequestHandler instance = new ServiceTemporarilyUnavailableListenerRequestHandler();
+public class ServiceTemporarilyUnavailableListenerRequestHandler extends ErrorRequestHandler {
 
-    private ServiceTemporarilyUnavailableListenerRequestHandler()
-    {
-        super(SERVICE_UNAVAILABLE.getStatusCode(), SERVICE_UNAVAILABLE.getReasonPhrase(), "Service not available for request uri: %s");
-    }
+  private static ServiceTemporarilyUnavailableListenerRequestHandler instance =
+      new ServiceTemporarilyUnavailableListenerRequestHandler();
 
-    public static ServiceTemporarilyUnavailableListenerRequestHandler getInstance()
-    {
-        return instance;
-    }
+  private ServiceTemporarilyUnavailableListenerRequestHandler() {
+    super(SERVICE_UNAVAILABLE.getStatusCode(), SERVICE_UNAVAILABLE.getReasonPhrase(),
+          "Service not available for request uri: %s");
+  }
+
+  public static ServiceTemporarilyUnavailableListenerRequestHandler getInstance() {
+    return instance;
+  }
 
 }

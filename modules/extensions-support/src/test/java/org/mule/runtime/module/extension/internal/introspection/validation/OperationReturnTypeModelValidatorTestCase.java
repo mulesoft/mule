@@ -28,42 +28,40 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class OperationReturnTypeModelValidatorTestCase extends AbstractMuleTestCase
-{
+public class OperationReturnTypeModelValidatorTestCase extends AbstractMuleTestCase {
 
-    @Mock(answer = RETURNS_DEEP_STUBS)
-    private ExtensionModel extensionModel;
+  @Mock(answer = RETURNS_DEEP_STUBS)
+  private ExtensionModel extensionModel;
 
-    @Mock
-    private OperationModel operationModel;
+  @Mock
+  private OperationModel operationModel;
 
-    private OperationReturnTypeModelValidator validator = new OperationReturnTypeModelValidator();
+  private OperationReturnTypeModelValidator validator = new OperationReturnTypeModelValidator();
 
-    @Before
-    public void before()
-    {
-        when(extensionModel.getOperationModels()).thenReturn(asList(operationModel));
-        when(operationModel.getOutput()).thenReturn(new ImmutableOutputModel("MuleMessage.Payload", toMetadataType(String.class), false, emptySet()));
-        when(operationModel.getName()).thenReturn("operation");
-    }
+  @Before
+  public void before() {
+    when(extensionModel.getOperationModels()).thenReturn(asList(operationModel));
+    when(operationModel.getOutput())
+        .thenReturn(new ImmutableOutputModel("MuleMessage.Payload", toMetadataType(String.class), false, emptySet()));
+    when(operationModel.getName()).thenReturn("operation");
+  }
 
-    @Test
-    public void valid()
-    {
-        validator.validate(extensionModel);
-    }
+  @Test
+  public void valid() {
+    validator.validate(extensionModel);
+  }
 
-    @Test(expected = IllegalOperationModelDefinitionException.class)
-    public void muleEventReturnType()
-    {
-        when(operationModel.getOutput()).thenReturn(new ImmutableOutputModel("MuleMessage.Payload", toMetadataType(MuleEvent.class), false, emptySet()));
-        validator.validate(extensionModel);
-    }
+  @Test(expected = IllegalOperationModelDefinitionException.class)
+  public void muleEventReturnType() {
+    when(operationModel.getOutput())
+        .thenReturn(new ImmutableOutputModel("MuleMessage.Payload", toMetadataType(MuleEvent.class), false, emptySet()));
+    validator.validate(extensionModel);
+  }
 
-    @Test(expected = IllegalOperationModelDefinitionException.class)
-    public void muleMessageReturnType()
-    {
-        when(operationModel.getOutput()).thenReturn(new ImmutableOutputModel("MuleMessage.Payload", toMetadataType(MuleMessage.class), false, emptySet()));
-        validator.validate(extensionModel);
-    }
+  @Test(expected = IllegalOperationModelDefinitionException.class)
+  public void muleMessageReturnType() {
+    when(operationModel.getOutput())
+        .thenReturn(new ImmutableOutputModel("MuleMessage.Payload", toMetadataType(MuleMessage.class), false, emptySet()));
+    validator.validate(extensionModel);
+  }
 }

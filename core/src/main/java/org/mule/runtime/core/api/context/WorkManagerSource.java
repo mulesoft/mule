@@ -8,7 +8,7 @@ package org.mule.runtime.core.api.context;
 
 import org.mule.runtime.core.api.MuleException;
 
-public interface WorkManagerSource
-{
-    WorkManager getWorkManager() throws MuleException;
+public interface WorkManagerSource {
+
+  WorkManager getWorkManager() throws MuleException;
 }

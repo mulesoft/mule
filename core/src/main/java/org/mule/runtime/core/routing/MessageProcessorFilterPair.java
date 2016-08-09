@@ -26,107 +26,85 @@ import org.mule.runtime.core.api.routing.filter.Filter;
 /**
  * A holder for a pair of MessageProcessor and Filter.
  */
-public class MessageProcessorFilterPair implements FlowConstructAware, MuleContextAware, Lifecycle
-{
-    private final MessageProcessor messageProcessor;
-    private final Filter filter;
+public class MessageProcessorFilterPair implements FlowConstructAware, MuleContextAware, Lifecycle {
 
-    public MessageProcessorFilterPair(MessageProcessor messageProcessor, Filter filter)
-    {
-        Validate.notNull(messageProcessor, "messageProcessor can't be null");
-        Validate.notNull(filter, "filter can't be null");
-        this.messageProcessor = messageProcessor;
-        this.filter = filter;
+  private final MessageProcessor messageProcessor;
+  private final Filter filter;
+
+  public MessageProcessorFilterPair(MessageProcessor messageProcessor, Filter filter) {
+    Validate.notNull(messageProcessor, "messageProcessor can't be null");
+    Validate.notNull(filter, "filter can't be null");
+    this.messageProcessor = messageProcessor;
+    this.filter = filter;
+  }
+
+  public MessageProcessor getMessageProcessor() {
+    return messageProcessor;
+  }
+
+  public Filter getFilter() {
+    return filter;
+  }
+
+  @Override
+  public String toString() {
+    return ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE);
+  }
+
+  // This class being just a logic-less tuple, it directly delegates lifecyle
+  // events to its members, without any control.
+
+  public void setFlowConstruct(FlowConstruct flowConstruct) {
+    if (messageProcessor instanceof FlowConstructAware) {
+      ((FlowConstructAware) messageProcessor).setFlowConstruct(flowConstruct);
     }
-
-    public MessageProcessor getMessageProcessor()
-    {
-        return messageProcessor;
+    if (filter instanceof FlowConstructAware) {
+      ((FlowConstructAware) filter).setFlowConstruct(flowConstruct);
     }
+  }
 
-    public Filter getFilter()
-    {
-        return filter;
+  public void setMuleContext(MuleContext context) {
+    if (messageProcessor instanceof MuleContextAware) {
+      ((MuleContextAware) messageProcessor).setMuleContext(context);
     }
-
-    @Override
-    public String toString()
-    {
-        return ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE);
+    if (filter instanceof MuleContextAware) {
+      ((MuleContextAware) filter).setMuleContext(context);
     }
+  }
 
-    // This class being just a logic-less tuple, it directly delegates lifecyle
-    // events to its members, without any control.
-
-    public void setFlowConstruct(FlowConstruct flowConstruct)
-    {
-        if (messageProcessor instanceof FlowConstructAware)
-        {
-            ((FlowConstructAware) messageProcessor).setFlowConstruct(flowConstruct);
-        }
-        if (filter instanceof FlowConstructAware)
-        {
-            ((FlowConstructAware) filter).setFlowConstruct(flowConstruct);
-        }
+  public void initialise() throws InitialisationException {
+    if (messageProcessor instanceof Initialisable) {
+      ((Initialisable) messageProcessor).initialise();
     }
-
-    public void setMuleContext(MuleContext context)
-    {
-         if (messageProcessor instanceof MuleContextAware)
-        {
-            ((MuleContextAware) messageProcessor).setMuleContext(context);
-        }
-        if (filter instanceof MuleContextAware)
-        {
-            ((MuleContextAware) filter).setMuleContext(context);
-        }
+    if (filter instanceof Initialisable) {
+      ((Initialisable) filter).initialise();
     }
+  }
 
-    public void initialise() throws InitialisationException
-    {
-        if (messageProcessor instanceof Initialisable)
-        {
-            ((Initialisable) messageProcessor).initialise();
-        }
-        if (filter instanceof Initialisable)
-        {
-            ((Initialisable) filter).initialise();
-        }
+  public void start() throws MuleException {
+    if (messageProcessor instanceof Startable) {
+      ((Startable) messageProcessor).start();
     }
+    if (filter instanceof Startable) {
+      ((Startable) filter).start();
+    }
+  }
 
-    public void start() throws MuleException
-    {
-        if (messageProcessor instanceof Startable)
-        {
-            ((Startable) messageProcessor).start();
-        }
-        if (filter instanceof Startable)
-        {
-            ((Startable) filter).start();
-        }
+  public void stop() throws MuleException {
+    if (messageProcessor instanceof Stoppable) {
+      ((Stoppable) messageProcessor).stop();
     }
+    if (filter instanceof Stoppable) {
+      ((Stoppable) filter).stop();
+    }
+  }
 
-    public void stop() throws MuleException
-    {
-        if (messageProcessor instanceof Stoppable)
-        {
-            ((Stoppable) messageProcessor).stop();
-        }
-        if (filter instanceof Stoppable)
-        {
-            ((Stoppable) filter).stop();
-        }
+  public void dispose() {
+    if (messageProcessor instanceof Disposable) {
+      ((Disposable) messageProcessor).dispose();
     }
-
-    public void dispose()
-    {
-        if (messageProcessor instanceof Disposable)
-        {
-            ((Disposable) messageProcessor).dispose();
-        }
-        if (filter instanceof Disposable)
-        {
-            ((Disposable) filter).dispose();
-        }
+    if (filter instanceof Disposable) {
+      ((Disposable) filter).dispose();
     }
+  }
 }

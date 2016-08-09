@@ -14,37 +14,36 @@ import org.mule.runtime.core.api.lifecycle.Startable;
 /**
  * Artifact meant to be used for tooling purposes.
  *
- * Artifacts must be construct without being started since the start may fail due to
- * lifecycle issues to testing component in the configuration. Some tooling services will
- * required to do an start as part of some services to be aware of context creation problems
- * that may be, for instance, connectivity testing problems.
+ * Artifacts must be construct without being started since the start may fail due to lifecycle issues to testing component in the
+ * configuration. Some tooling services will required to do an start as part of some services to be aware of context creation
+ * problems that may be, for instance, connectivity testing problems.
  *
  * @since 4.0
  */
-public interface TemporaryArtifact extends Startable, Disposable
-{
+public interface TemporaryArtifact extends Startable, Disposable {
 
-    /**
-     * Initialises and starts the tooling context.
-     *
-     * @throws MuleException which can be an {@link org.mule.runtime.core.api.lifecycle.InitialisationException} or {@link org.mule.runtime.core.api.config.ConfigurationException} that
-     * represents a failure in the configuration of components.
-     */
-    void start() throws MuleException;
+  /**
+   * Initialises and starts the tooling context.
+   *
+   * @throws MuleException which can be an {@link org.mule.runtime.core.api.lifecycle.InitialisationException} or
+   *         {@link org.mule.runtime.core.api.config.ConfigurationException} that represents a failure in the configuration of
+   *         components.
+   */
+  void start() throws MuleException;
 
-    /**
-     * @return true if the artifact has already been created, false otherwise.
-     */
-    boolean isStarted();
+  /**
+   * @return true if the artifact has already been created, false otherwise.
+   */
+  boolean isStarted();
 
-    /**
-     * @return the {@code MuleContext} created by the artifact.
-     */
-    MuleContext getMuleContext();
+  /**
+   * @return the {@code MuleContext} created by the artifact.
+   */
+  MuleContext getMuleContext();
 
-    /**
-     * Destroys all the resource allocated for the artifact.
-     */
-    void dispose();
+  /**
+   * Destroys all the resource allocated for the artifact.
+   */
+  void dispose();
 
 }

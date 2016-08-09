@@ -15,110 +15,91 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class FruitBowl
-{
-    /**
-     * logger used by this class
-     */
-    private static final Logger logger = LoggerFactory.getLogger(FruitBowl.class);
+public class FruitBowl {
 
-    private final Map<Class<?>, Fruit> bowl = Collections.synchronizedMap(new HashMap<Class<?>, Fruit>());
+  /**
+   * logger used by this class
+   */
+  private static final Logger logger = LoggerFactory.getLogger(FruitBowl.class);
 
-    public FruitBowl()
-    {
-        super();
+  private final Map<Class<?>, Fruit> bowl = Collections.synchronizedMap(new HashMap<Class<?>, Fruit>());
+
+  public FruitBowl() {
+    super();
+  }
+
+  public FruitBowl(Fruit fruit[]) {
+    for (int i = 0; i < fruit.length; i++) {
+      bowl.put(fruit[i].getClass(), fruit[i]);
     }
+  }
 
-    public FruitBowl(Fruit fruit[])
-    {
-        for (int i = 0; i < fruit.length; i++)
-        {
-            bowl.put(fruit[i].getClass(), fruit[i]);
-        }
+  public FruitBowl(Apple apple, Banana banana) {
+    bowl.put(Apple.class, apple);
+    bowl.put(Banana.class, banana);
+  }
+
+  public boolean hasApple() {
+    return bowl.get(Apple.class) != null;
+  }
+
+  public boolean hasBanana() {
+    return bowl.get(Banana.class) != null;
+  }
+
+  public void addFruit(Fruit fruit) {
+    bowl.put(fruit.getClass(), fruit);
+  }
+
+  public Fruit[] addAppleAndBanana(Apple apple, Banana banana) {
+    bowl.put(Apple.class, apple);
+    bowl.put(Banana.class, banana);
+    return new Fruit[] {apple, banana};
+  }
+
+  public Fruit[] addBananaAndApple(Banana banana, Apple apple) {
+    bowl.put(Apple.class, apple);
+    bowl.put(Banana.class, banana);
+    return new Fruit[] {banana, apple};
+
+  }
+
+  public List<Fruit> getFruit() {
+    return new ArrayList<Fruit>(bowl.values());
+  }
+
+  public Object consumeFruit(FruitLover fruitlover) {
+    logger.debug("Got a fruit lover who says: " + fruitlover.speak());
+    for (Fruit fruit : bowl.values()) {
+      fruit.bite();
     }
+    return fruitlover;
+  }
 
-    public FruitBowl(Apple apple, Banana banana)
-    {
-        bowl.put(Apple.class, apple);
-        bowl.put(Banana.class, banana);
+  public void setFruit(Fruit[] fruit) {
+    for (int i = 0; i < fruit.length; i++) {
+      bowl.put(fruit[i].getClass(), fruit[i]);
     }
+  }
 
-    public boolean hasApple()
-    {
-        return bowl.get(Apple.class) != null;
-    }
+  public void setFruit(List<Fruit> fruit) {
+    this.setFruit(fruit.toArray(new Fruit[fruit.size()]));
+  }
 
-    public boolean hasBanana()
-    {
-        return bowl.get(Banana.class) != null;
-    }
+  public Apple getApple() {
+    return (Apple) bowl.get(Apple.class);
+  }
 
-    public void addFruit(Fruit fruit)
-    {
-        bowl.put(fruit.getClass(), fruit);
-    }
+  public void setApple(Apple apple) {
+    bowl.put(Apple.class, apple);
+  }
 
-    public Fruit[] addAppleAndBanana(Apple apple, Banana banana)
-    {
-        bowl.put(Apple.class, apple);
-        bowl.put(Banana.class, banana);
-        return new Fruit[]{apple, banana};
-    }
+  public Banana getBanana() {
+    return (Banana) bowl.get(Banana.class);
+  }
 
-    public Fruit[] addBananaAndApple(Banana banana, Apple apple)
-    {
-        bowl.put(Apple.class, apple);
-        bowl.put(Banana.class, banana);
-        return new Fruit[]{banana, apple};
-
-    }
-
-    public List<Fruit> getFruit()
-    {
-        return new ArrayList<Fruit>(bowl.values());
-    }
-
-    public Object consumeFruit(FruitLover fruitlover)
-    {
-        logger.debug("Got a fruit lover who says: " + fruitlover.speak());
-        for (Fruit fruit : bowl.values())
-        {
-            fruit.bite();
-        }
-        return fruitlover;
-    }
-
-    public void setFruit(Fruit[] fruit)
-    {
-        for (int i = 0; i < fruit.length; i++)
-        {
-            bowl.put(fruit[i].getClass(), fruit[i]);
-        }
-    }
-
-    public void setFruit(List<Fruit> fruit)
-    {
-        this.setFruit(fruit.toArray(new Fruit[fruit.size()]));
-    }
-
-    public Apple getApple()
-    {
-        return (Apple) bowl.get(Apple.class);
-    }
-
-    public void setApple(Apple apple)
-    {
-        bowl.put(Apple.class, apple);
-    }
-
-    public Banana getBanana()
-    {
-        return (Banana) bowl.get(Banana.class);
-    }
-
-    public void setBanana(Banana banana)
-    {
-        bowl.put(Banana.class, banana);
-    }
+  public void setBanana(Banana banana) {
+    bowl.put(Banana.class, banana);
+  }
 
 }

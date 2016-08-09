@@ -7,45 +7,40 @@
 package org.mule.extension.email.api.exception;
 
 /**
- * This {@link EmailRetrieverException} is the base {@link RuntimeException} type for operations that
- * retrieves emails any other exceptions thrown by operations that retrieves emails will be wrapped into
- * one of this.
+ * This {@link EmailRetrieverException} is the base {@link RuntimeException} type for operations that retrieves emails any other
+ * exceptions thrown by operations that retrieves emails will be wrapped into one of this.
  *
  * @since 4.0
  */
-public class EmailRetrieverException extends EmailException
-{
+public class EmailRetrieverException extends EmailException {
 
-    public static final String ERROR = "Error while retrieving emails: ";
+  public static final String ERROR = "Error while retrieving emails: ";
 
-    /**
-     * Creates a new instance with the specified detail {@code message}.
-     *
-     * @param message the detail message
-     */
-    public EmailRetrieverException(String message)
-    {
-        super(ERROR + message);
-    }
+  /**
+   * Creates a new instance with the specified detail {@code message}.
+   *
+   * @param message the detail message
+   */
+  public EmailRetrieverException(String message) {
+    super(ERROR + message);
+  }
 
-    /**
-     * Creates a new instance with the {@code cause}.
-     *
-     * @param cause the exception's cause
-     */
-    public EmailRetrieverException(Throwable cause)
-    {
-        super(ERROR + cause.getMessage(), cause);
-    }
+  /**
+   * Creates a new instance with the {@code cause}.
+   *
+   * @param cause the exception's cause
+   */
+  public EmailRetrieverException(Throwable cause) {
+    super(ERROR + cause.getMessage(), cause);
+  }
 
-    /**
-     * Creates a new instance with the specified detail {@code message} and {@code cause}
-     *
-     * @param message the detail message
-     * @param cause   the exception's cause
-     */
-    public EmailRetrieverException(String message, Throwable cause)
-    {
-        super(ERROR + message, cause);
-    }
+  /**
+   * Creates a new instance with the specified detail {@code message} and {@code cause}
+   *
+   * @param message the detail message
+   * @param cause the exception's cause
+   */
+  public EmailRetrieverException(String message, Throwable cause) {
+    super(ERROR + message, cause);
+  }
 }

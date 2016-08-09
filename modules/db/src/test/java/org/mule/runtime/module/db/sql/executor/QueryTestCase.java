@@ -31,31 +31,29 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 @SmallTest
-public class QueryTestCase extends AbstractMuleTestCase
-{
+public class QueryTestCase extends AbstractMuleTestCase {
 
-    @Test
-    public void testQueryReturnsTheExpectedResult() throws Exception
-    {
-        ResultSet resultSet = mock(ResultSet.class);
-        Statement statement = mock(Statement.class);
-        String sqlText = "SELECT * FROM dummy";
-        when(statement.executeQuery(sqlText)).thenReturn(resultSet);
-        StatementFactory statementFactory = mock(StatementFactory.class);
+  @Test
+  public void testQueryReturnsTheExpectedResult() throws Exception {
+    ResultSet resultSet = mock(ResultSet.class);
+    Statement statement = mock(Statement.class);
+    String sqlText = "SELECT * FROM dummy";
+    when(statement.executeQuery(sqlText)).thenReturn(resultSet);
+    StatementFactory statementFactory = mock(StatementFactory.class);
 
-        DbConnection connection = mock(DbConnection.class);
+    DbConnection connection = mock(DbConnection.class);
 
-        ResultSetHandler resultHandler = mock(ResultSetHandler.class);
-        List<Object> processedResult = new ArrayList<Object>();
-        when(resultHandler.processResultSet(connection, resultSet)).thenReturn(processedResult);
-        SelectExecutor selectExecutor = new SelectExecutor(statementFactory, resultHandler);
+    ResultSetHandler resultHandler = mock(ResultSetHandler.class);
+    List<Object> processedResult = new ArrayList<Object>();
+    when(resultHandler.processResultSet(connection, resultSet)).thenReturn(processedResult);
+    SelectExecutor selectExecutor = new SelectExecutor(statementFactory, resultHandler);
 
-        QueryTemplate queryTemplate = new QueryTemplate(sqlText, QueryType.SELECT, Collections.<QueryParam>emptyList());
-        Mockito.when(statementFactory.create(connection, queryTemplate)).thenReturn(statement);
+    QueryTemplate queryTemplate = new QueryTemplate(sqlText, QueryType.SELECT, Collections.<QueryParam>emptyList());
+    Mockito.when(statementFactory.create(connection, queryTemplate)).thenReturn(statement);
 
-        Query query = new Query(queryTemplate, null);
-        Object result = selectExecutor.execute(connection, query);
+    Query query = new Query(queryTemplate, null);
+    Object result = selectExecutor.execute(connection, query);
 
-        assertEquals(processedResult, result);
-    }
+    assertEquals(processedResult, result);
+  }
 }

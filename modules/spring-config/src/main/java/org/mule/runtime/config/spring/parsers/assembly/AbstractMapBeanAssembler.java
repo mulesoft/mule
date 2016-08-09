@@ -19,30 +19,25 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.support.ManagedMap;
 
-public abstract class AbstractMapBeanAssembler extends DefaultBeanAssembler
-{
+public abstract class AbstractMapBeanAssembler extends DefaultBeanAssembler {
 
-    public AbstractMapBeanAssembler(PropertyConfiguration beanConfig, BeanDefinitionBuilder bean,
-                                    PropertyConfiguration targetConfig, BeanDefinition target)
-    {
-        super(beanConfig, bean, targetConfig, target);
-    }
+  public AbstractMapBeanAssembler(PropertyConfiguration beanConfig, BeanDefinitionBuilder bean,
+                                  PropertyConfiguration targetConfig, BeanDefinition target) {
+    super(beanConfig, bean, targetConfig, target);
+  }
 
-    protected void insertDefinitionAsMap(String oldName)
-    {
-        BeanDefinitionBuilder builder = BeanDefinitionBuilder.rootBeanDefinition(MapCombiner.class);
-        Map map = new ManagedMap();
-        for (Iterator pvs = getBean().getBeanDefinition().getPropertyValues().getPropertyValueList().iterator();
-             pvs.hasNext();)
-        {
-            PropertyValue pv = (PropertyValue) pvs.next();
-            map.put(pv.getName(), pv.getValue());
-        }
-        List list = new ManagedList();
-        list.add(map);
-        builder.addPropertyValue(MapCombiner.LIST, list);
-        setBean(builder);
-        super.insertBeanInTarget(oldName);
+  protected void insertDefinitionAsMap(String oldName) {
+    BeanDefinitionBuilder builder = BeanDefinitionBuilder.rootBeanDefinition(MapCombiner.class);
+    Map map = new ManagedMap();
+    for (Iterator pvs = getBean().getBeanDefinition().getPropertyValues().getPropertyValueList().iterator(); pvs.hasNext();) {
+      PropertyValue pv = (PropertyValue) pvs.next();
+      map.put(pv.getName(), pv.getValue());
     }
+    List list = new ManagedList();
+    list.add(map);
+    builder.addPropertyValue(MapCombiner.LIST, list);
+    setBean(builder);
+    super.insertBeanInTarget(oldName);
+  }
 
 }

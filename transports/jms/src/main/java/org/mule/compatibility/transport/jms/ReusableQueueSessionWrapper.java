@@ -32,212 +32,179 @@ import javax.jms.TopicSubscriber;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ReusableQueueSessionWrapper implements QueueSession
-{
-    protected transient Logger logger = LoggerFactory.getLogger(getClass());
+public class ReusableQueueSessionWrapper implements QueueSession {
 
-    private QueueSession delegateSession;
+  protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
-    ReusableQueueSessionWrapper(QueueSession delegateSession)
-    {
-        this.delegateSession = delegateSession;
-    }
+  private QueueSession delegateSession;
 
-    @Override
-    public Queue createQueue(String queueName) throws JMSException
-    {
-        return delegateSession.createQueue(queueName);
-    }
+  ReusableQueueSessionWrapper(QueueSession delegateSession) {
+    this.delegateSession = delegateSession;
+  }
 
-    @Override
-    public QueueReceiver createReceiver(Queue queue) throws JMSException
-    {
-        return delegateSession.createReceiver(queue);
-    }
+  @Override
+  public Queue createQueue(String queueName) throws JMSException {
+    return delegateSession.createQueue(queueName);
+  }
 
-    @Override
-    public QueueReceiver createReceiver(Queue queue, String messageSelector) throws JMSException
-    {
-        return delegateSession.createReceiver(queue, messageSelector);
-    }
+  @Override
+  public QueueReceiver createReceiver(Queue queue) throws JMSException {
+    return delegateSession.createReceiver(queue);
+  }
 
-    @Override
-    public QueueSender createSender(Queue queue) throws JMSException
-    {
-        return delegateSession.createSender(queue);
-    }
+  @Override
+  public QueueReceiver createReceiver(Queue queue, String messageSelector) throws JMSException {
+    return delegateSession.createReceiver(queue, messageSelector);
+  }
 
-    @Override
-    public QueueBrowser createBrowser(Queue queue) throws JMSException
-    {
-        return delegateSession.createBrowser(queue);
-    }
+  @Override
+  public QueueSender createSender(Queue queue) throws JMSException {
+    return delegateSession.createSender(queue);
+  }
 
-    @Override
-    public QueueBrowser createBrowser(Queue queue, String messageSelector) throws JMSException
-    {
-        return delegateSession.createBrowser(queue, messageSelector);
-    }
+  @Override
+  public QueueBrowser createBrowser(Queue queue) throws JMSException {
+    return delegateSession.createBrowser(queue);
+  }
 
-    @Override
-    public TemporaryQueue createTemporaryQueue() throws JMSException
-    {
-        return delegateSession.createTemporaryQueue();
-    }
+  @Override
+  public QueueBrowser createBrowser(Queue queue, String messageSelector) throws JMSException {
+    return delegateSession.createBrowser(queue, messageSelector);
+  }
 
-    @Override
-    public BytesMessage createBytesMessage() throws JMSException
-    {
-        return delegateSession.createBytesMessage();
-    }
+  @Override
+  public TemporaryQueue createTemporaryQueue() throws JMSException {
+    return delegateSession.createTemporaryQueue();
+  }
 
-    @Override
-    public MapMessage createMapMessage() throws JMSException
-    {
-        return delegateSession.createMapMessage();
-    }
+  @Override
+  public BytesMessage createBytesMessage() throws JMSException {
+    return delegateSession.createBytesMessage();
+  }
 
-    @Override
-    public Message createMessage() throws JMSException
-    {
-        return delegateSession.createMessage();
-    }
+  @Override
+  public MapMessage createMapMessage() throws JMSException {
+    return delegateSession.createMapMessage();
+  }
 
-    @Override
-    public ObjectMessage createObjectMessage() throws JMSException
-    {
-        return delegateSession.createObjectMessage();
-    }
+  @Override
+  public Message createMessage() throws JMSException {
+    return delegateSession.createMessage();
+  }
 
-    @Override
-    public ObjectMessage createObjectMessage(Serializable object) throws JMSException
-    {
-        return delegateSession.createObjectMessage(object);
-    }
+  @Override
+  public ObjectMessage createObjectMessage() throws JMSException {
+    return delegateSession.createObjectMessage();
+  }
 
-    @Override
-    public StreamMessage createStreamMessage() throws JMSException
-    {
-        return delegateSession.createStreamMessage();
-    }
+  @Override
+  public ObjectMessage createObjectMessage(Serializable object) throws JMSException {
+    return delegateSession.createObjectMessage(object);
+  }
 
-    @Override
-    public TextMessage createTextMessage() throws JMSException
-    {
-        return delegateSession.createTextMessage();
-    }
+  @Override
+  public StreamMessage createStreamMessage() throws JMSException {
+    return delegateSession.createStreamMessage();
+  }
 
-    @Override
-    public TextMessage createTextMessage(String text) throws JMSException
-    {
-        return delegateSession.createTextMessage(text);
-    }
+  @Override
+  public TextMessage createTextMessage() throws JMSException {
+    return delegateSession.createTextMessage();
+  }
 
-    @Override
-    public boolean getTransacted() throws JMSException
-    {
-        return delegateSession.getTransacted();
-    }
+  @Override
+  public TextMessage createTextMessage(String text) throws JMSException {
+    return delegateSession.createTextMessage(text);
+  }
 
-    @Override
-    public int getAcknowledgeMode() throws JMSException
-    {
-        return delegateSession.getAcknowledgeMode();
-    }
+  @Override
+  public boolean getTransacted() throws JMSException {
+    return delegateSession.getTransacted();
+  }
 
-    @Override
-    public void commit() throws JMSException
-    {
-        delegateSession.commit();
-    }
+  @Override
+  public int getAcknowledgeMode() throws JMSException {
+    return delegateSession.getAcknowledgeMode();
+  }
 
-    @Override
-    public void rollback() throws JMSException
-    {
-        delegateSession.rollback();
-    }
+  @Override
+  public void commit() throws JMSException {
+    delegateSession.commit();
+  }
 
-    @Override
-    public void close() throws JMSException
-    {
-        //Do nothing, reuse it
-    }
+  @Override
+  public void rollback() throws JMSException {
+    delegateSession.rollback();
+  }
 
-    @Override
-    public void recover() throws JMSException
-    {
-        delegateSession.recover();
-    }
+  @Override
+  public void close() throws JMSException {
+    // Do nothing, reuse it
+  }
 
-    @Override
-    public MessageListener getMessageListener() throws JMSException
-    {
-        return delegateSession.getMessageListener();
-    }
+  @Override
+  public void recover() throws JMSException {
+    delegateSession.recover();
+  }
 
-    @Override
-    public void setMessageListener(MessageListener listener) throws JMSException
-    {
-        delegateSession.setMessageListener(listener);
-    }
+  @Override
+  public MessageListener getMessageListener() throws JMSException {
+    return delegateSession.getMessageListener();
+  }
 
-    @Override
-    public void run()
-    {
-        delegateSession.run();
-    }
+  @Override
+  public void setMessageListener(MessageListener listener) throws JMSException {
+    delegateSession.setMessageListener(listener);
+  }
 
-    @Override
-    public MessageProducer createProducer(Destination destination) throws JMSException
-    {
-        return delegateSession.createProducer(destination);
-    }
+  @Override
+  public void run() {
+    delegateSession.run();
+  }
 
-    @Override
-    public MessageConsumer createConsumer(Destination destination) throws JMSException
-    {
-        return delegateSession.createConsumer(destination);
-    }
+  @Override
+  public MessageProducer createProducer(Destination destination) throws JMSException {
+    return delegateSession.createProducer(destination);
+  }
 
-    @Override
-    public MessageConsumer createConsumer(Destination destination, String messageSelector) throws JMSException
-    {
-        return delegateSession.createConsumer(destination, messageSelector);
-    }
+  @Override
+  public MessageConsumer createConsumer(Destination destination) throws JMSException {
+    return delegateSession.createConsumer(destination);
+  }
 
-    @Override
-    public MessageConsumer createConsumer(Destination destination, String messageSelector, boolean NoLocal) throws JMSException
-    {
-        return delegateSession.createConsumer(destination, messageSelector, NoLocal);
-    }
+  @Override
+  public MessageConsumer createConsumer(Destination destination, String messageSelector) throws JMSException {
+    return delegateSession.createConsumer(destination, messageSelector);
+  }
 
-    @Override
-    public Topic createTopic(String topicName) throws JMSException
-    {
-        return delegateSession.createTopic(topicName);
-    }
+  @Override
+  public MessageConsumer createConsumer(Destination destination, String messageSelector, boolean NoLocal) throws JMSException {
+    return delegateSession.createConsumer(destination, messageSelector, NoLocal);
+  }
 
-    @Override
-    public TopicSubscriber createDurableSubscriber(Topic topic, String name) throws JMSException
-    {
-        return delegateSession.createDurableSubscriber(topic, name);
-    }
+  @Override
+  public Topic createTopic(String topicName) throws JMSException {
+    return delegateSession.createTopic(topicName);
+  }
 
-    @Override
-    public TopicSubscriber createDurableSubscriber(Topic topic, String name, String messageSelector, boolean noLocal) throws JMSException
-    {
-        return delegateSession.createDurableSubscriber(topic, name, messageSelector, noLocal);
-    }
+  @Override
+  public TopicSubscriber createDurableSubscriber(Topic topic, String name) throws JMSException {
+    return delegateSession.createDurableSubscriber(topic, name);
+  }
 
-    @Override
-    public TemporaryTopic createTemporaryTopic() throws JMSException
-    {
-        return delegateSession.createTemporaryTopic();
-    }
+  @Override
+  public TopicSubscriber createDurableSubscriber(Topic topic, String name, String messageSelector, boolean noLocal)
+      throws JMSException {
+    return delegateSession.createDurableSubscriber(topic, name, messageSelector, noLocal);
+  }
 
-    @Override
-    public void unsubscribe(String name) throws JMSException
-    {
-        delegateSession.unsubscribe(name);
-    }
+  @Override
+  public TemporaryTopic createTemporaryTopic() throws JMSException {
+    return delegateSession.createTemporaryTopic();
+  }
+
+  @Override
+  public void unsubscribe(String name) throws JMSException {
+    delegateSession.unsubscribe(name);
+  }
 }

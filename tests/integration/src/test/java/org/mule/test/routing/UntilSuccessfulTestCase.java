@@ -40,239 +40,210 @@ import org.junit.Test;
 import org.junit.runners.Parameterized;
 
 @RunnerDelegateTo(Parameterized.class)
-public class UntilSuccessfulTestCase extends AbstractIntegrationTestCase
-{
-    private final String configFile;
+public class UntilSuccessfulTestCase extends AbstractIntegrationTestCase {
 
-    private FunctionalTestComponent targetMessageProcessor;
+  private final String configFile;
 
-    @Parameterized.Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][] {
-                {"until-successful-test.xml"},
-                {"until-successful-seconds-test.xml"}
-        });
+  private FunctionalTestComponent targetMessageProcessor;
+
+  @Parameterized.Parameters
+  public static Collection<Object[]> parameters() {
+    return Arrays.asList(new Object[][] {{"until-successful-test.xml"}, {"until-successful-seconds-test.xml"}});
+  }
+
+  public UntilSuccessfulTestCase(String configFile) {
+    this.configFile = configFile;
+  }
+
+  @Override
+  protected String getConfigFile() {
+    return configFile;
+  }
+
+  @Override
+  protected void doSetUp() throws Exception {
+    super.doSetUp();
+
+    targetMessageProcessor = getFunctionalTestComponent("target-mp");
+
+    final AbstractPartitionedObjectStore<Serializable> objectStore = muleContext.getRegistry().lookupObject("objectStore");
+    objectStore.disposePartition("DEFAULT_PARTITION");
+  }
+
+  @Test
+  public void testDefaultConfiguration() throws Exception {
+    final String payload = RandomStringUtils.randomAlphanumeric(20);
+    flowRunner("minimal-config").withPayload(payload).asynchronously().run();
+
+    final List<Object> receivedPayloads = ponderUntilMessageCountReceivedByTargetMessageProcessor(1);
+    assertThat(receivedPayloads, hasSize(1));
+    assertThat(receivedPayloads.get(0), is(payload));
+  }
+
+  @Test
+  public void testFullConfigurationMP() throws Exception {
+    final String payload = RandomStringUtils.randomAlphanumeric(20);
+    final MuleMessage response = flowRunner("full-config-with-mp").withPayload(payload).run().getMessage();
+    assertThat(getPayloadAsString(response), is("ACK"));
+
+    final List<Object> receivedPayloads = ponderUntilMessageCountReceivedByTargetMessageProcessor(3);
+    assertThat(receivedPayloads, hasSize(3));
+    for (int i = 0; i <= 2; i++) {
+      assertThat(receivedPayloads.get(i), is(payload));
     }
 
-    public UntilSuccessfulTestCase(String configFile)
-    {
-        this.configFile = configFile;
+    ponderUntilMessageCountReceivedByCustomMP(1);
+
+    ExceptionPayload dlqExceptionPayload = CustomMP.getProcessedMessages().get(0).getExceptionPayload();
+    assertThat(dlqExceptionPayload, is(notNullValue()));
+    assertThat(dlqExceptionPayload.getException(), instanceOf(RetryPolicyExhaustedException.class));
+    assertThat(dlqExceptionPayload.getException().getMessage(),
+               containsString("until-successful retries exhausted. Last exception message was: Failure expression positive when processing event"));
+
+    assertThat(dlqExceptionPayload.getException().getCause(), instanceOf(MuleRuntimeException.class));
+    assertThat(dlqExceptionPayload.getException().getMessage(),
+               containsString("Failure expression positive when processing event"));
+  }
+
+  @Test
+  public void testRetryOnEndpoint() throws Exception {
+    final String payload = RandomStringUtils.randomAlphanumeric(20);
+    flowRunner("retry-endpoint-config").withPayload(payload).asynchronously().run();
+
+    final List<Object> receivedPayloads = ponderUntilMessageCountReceivedByTargetMessageProcessor(3);
+    assertThat(receivedPayloads, hasSize(3));
+    for (int i = 0; i <= 2; i++) {
+      assertThat(receivedPayloads.get(i), is(payload));
+    }
+  }
+
+  @Test(expected = RoutingException.class)
+  public void executeSynchronously() throws Exception {
+    final String payload = RandomStringUtils.randomAlphanumeric(20);
+    throw flowRunner("synchronous").withPayload(payload).runExpectingException();
+  }
+
+  @Test
+  public void executeSynchronouslyDoingRetries() throws Exception {
+    final String payload = RandomStringUtils.randomAlphanumeric(20);
+    flowRunner("synchronous-with-retry").withPayload(payload).runExpectingException();
+    assertThat(getNumberOfInvocationsFor("untilSuccessful"), is(4));
+    assertThat(getNumberOfInvocationsFor("exceptionStrategy"), is(1));
+  }
+
+  /**
+   * Verifies that the synchronous wait time is consistent with that requested
+   */
+  @Test
+  public void measureSynchronousWait() throws Exception {
+    final String payload = RandomStringUtils.randomAlphanumeric(20);
+    flowRunner("measureSynchronousWait").withPayload(payload).runExpectingException();
+    assertThat(WaitMeasure.totalWait >= 1000, is(true));
+  }
+
+  @Test
+  public void executeAsynchronouslyDoingRetries() throws Exception {
+    final String payload = RandomStringUtils.randomAlphanumeric(20);
+    final int expectedCounterExecutions = 4;
+    final int expectedCounterInExceptionStrategyExecutions = 1;
+    flowRunner("asynchronous-using-threading-profile").withPayload(payload).run();
+    new PollingProber(10000, 100).check(new Probe() {
+
+      private int executionOfCountInUntilSuccessful;
+      private int executionOfCountInExceptionStrategy;
+
+      @Override
+      public boolean isSatisfied() {
+        executionOfCountInUntilSuccessful = getNumberOfInvocationsFor("untilSuccessful2");
+        executionOfCountInExceptionStrategy = getNumberOfInvocationsFor("exceptionStrategy2");
+        return executionOfCountInUntilSuccessful == expectedCounterExecutions
+            && executionOfCountInExceptionStrategy == expectedCounterInExceptionStrategyExecutions;
+      }
+
+      @Override
+      public String describeFailure() {
+        return String.format(
+                             "Expecting %d executions of counter in until-successful and got %d \n "
+                                 + "Expecting %d execution of counter in exception strategy and got %d",
+                             expectedCounterExecutions, executionOfCountInUntilSuccessful,
+                             expectedCounterInExceptionStrategyExecutions, executionOfCountInExceptionStrategy);
+      }
+    });
+  }
+
+  @Test
+  public void executeAsynchronouslyDoingRetriesAfterRestart() throws Exception {
+    Flow flow = (Flow) getFlowConstruct("asynchronous-using-threading-profile");
+    flow.stop();
+    flow.start();
+    executeAsynchronouslyDoingRetries();
+
+  }
+
+  private List<Object> ponderUntilMessageCountReceivedByTargetMessageProcessor(final int expectedCount)
+      throws InterruptedException {
+    return ponderUntilMessageCountReceived(expectedCount, targetMessageProcessor);
+  }
+
+  private List<Object> ponderUntilMessageCountReceived(final int expectedCount, final FunctionalTestComponent ftc)
+      throws InterruptedException {
+    final List<Object> results = new ArrayList<Object>();
+
+    while (ftc.getReceivedMessagesCount() < expectedCount) {
+      Thread.yield();
+      Thread.sleep(100L);
+    }
+
+    for (int i = 0; i < ftc.getReceivedMessagesCount(); i++) {
+      results.add(ftc.getReceivedMessage(1 + i));
+    }
+    return results;
+  }
+
+  private void ponderUntilMessageCountReceivedByCustomMP(final int expectedCount) throws InterruptedException {
+    while (CustomMP.getCount() < expectedCount) {
+      Thread.yield();
+      Thread.sleep(100L);
+    }
+  }
+
+  static class CustomMP implements MessageProcessor {
+
+    private static List<MuleMessage> processedMessages = new ArrayList<>();
+
+    public static void clearCount() {
+      processedMessages.clear();
+    }
+
+    public static int getCount() {
+      return processedMessages.size();
+    }
+
+    public static List<MuleMessage> getProcessedMessages() {
+      return processedMessages;
     }
 
     @Override
-    protected String getConfigFile()
-    {
-        return configFile;
+    public MuleEvent process(final MuleEvent event) throws MuleException {
+      processedMessages.add(event.getMessage());
+      return null;
     }
+  }
+
+  static class WaitMeasure implements MessageProcessor {
+
+    public static long totalWait;
+    private long firstAttemptTime = 0;
 
     @Override
-    protected void doSetUp() throws Exception
-    {
-        super.doSetUp();
+    public MuleEvent process(MuleEvent event) throws MuleException {
+      if (firstAttemptTime == 0) {
+        firstAttemptTime = System.currentTimeMillis();
+      } else {
+        totalWait = System.currentTimeMillis() - firstAttemptTime;
+      }
 
-        targetMessageProcessor = getFunctionalTestComponent("target-mp");
-
-        final AbstractPartitionedObjectStore<Serializable> objectStore = muleContext.getRegistry()
-            .lookupObject("objectStore");
-        objectStore.disposePartition("DEFAULT_PARTITION");
+      return event;
     }
-
-    @Test
-    public void testDefaultConfiguration() throws Exception
-    {
-        final String payload = RandomStringUtils.randomAlphanumeric(20);
-        flowRunner("minimal-config").withPayload(payload).asynchronously().run();
-
-        final List<Object> receivedPayloads = ponderUntilMessageCountReceivedByTargetMessageProcessor(1);
-        assertThat(receivedPayloads, hasSize(1));
-        assertThat(receivedPayloads.get(0), is(payload));
-    }
-
-    @Test
-    public void testFullConfigurationMP() throws Exception
-    {
-        final String payload = RandomStringUtils.randomAlphanumeric(20);
-        final MuleMessage response = flowRunner("full-config-with-mp").withPayload(payload).run().getMessage();
-        assertThat(getPayloadAsString(response), is("ACK"));
-
-        final List<Object> receivedPayloads = ponderUntilMessageCountReceivedByTargetMessageProcessor(3);
-        assertThat(receivedPayloads, hasSize(3));
-        for (int i = 0; i <= 2; i++)
-        {
-            assertThat(receivedPayloads.get(i), is(payload));
-        }
-
-        ponderUntilMessageCountReceivedByCustomMP(1);
-
-        ExceptionPayload dlqExceptionPayload = CustomMP.getProcessedMessages().get(0).getExceptionPayload();
-        assertThat(dlqExceptionPayload, is(notNullValue()));
-        assertThat(dlqExceptionPayload.getException(), instanceOf(RetryPolicyExhaustedException.class));
-        assertThat(dlqExceptionPayload.getException().getMessage(),
-                containsString("until-successful retries exhausted. Last exception message was: Failure expression positive when processing event"));
-
-        assertThat(dlqExceptionPayload.getException().getCause(), instanceOf(MuleRuntimeException.class));
-        assertThat(dlqExceptionPayload.getException().getMessage(),
-                containsString("Failure expression positive when processing event"));
-    }
-
-    @Test
-    public void testRetryOnEndpoint() throws Exception
-    {
-        final String payload = RandomStringUtils.randomAlphanumeric(20);
-        flowRunner("retry-endpoint-config").withPayload(payload).asynchronously().run();
-
-        final List<Object> receivedPayloads = ponderUntilMessageCountReceivedByTargetMessageProcessor(3);
-        assertThat(receivedPayloads, hasSize(3));
-        for (int i = 0; i <= 2; i++)
-        {
-            assertThat(receivedPayloads.get(i), is(payload));
-        }
-    }
-
-    @Test(expected = RoutingException.class)
-    public void executeSynchronously() throws Exception
-    {
-        final String payload = RandomStringUtils.randomAlphanumeric(20);
-        throw flowRunner("synchronous").withPayload(payload).runExpectingException();
-    }
-
-    @Test
-    public void executeSynchronouslyDoingRetries() throws Exception
-    {
-        final String payload = RandomStringUtils.randomAlphanumeric(20);
-        flowRunner("synchronous-with-retry").withPayload(payload).runExpectingException();
-        assertThat(getNumberOfInvocationsFor("untilSuccessful"), is(4));
-        assertThat(getNumberOfInvocationsFor("exceptionStrategy"), is(1));
-    }
-
-    /**
-     * Verifies that the synchronous wait time is consistent with that requested
-     */
-    @Test
-    public void measureSynchronousWait() throws Exception {
-        final String payload = RandomStringUtils.randomAlphanumeric(20);
-        flowRunner("measureSynchronousWait").withPayload(payload).runExpectingException();
-        assertThat(WaitMeasure.totalWait >= 1000, is(true));
-    }
-
-    @Test
-    public void executeAsynchronouslyDoingRetries() throws Exception
-    {
-        final String payload = RandomStringUtils.randomAlphanumeric(20);
-        final int expectedCounterExecutions = 4;
-        final int expectedCounterInExceptionStrategyExecutions = 1;
-        flowRunner("asynchronous-using-threading-profile").withPayload(payload).run();
-        new PollingProber(10000, 100).check(new Probe()
-        {
-            private int executionOfCountInUntilSuccessful;
-            private int executionOfCountInExceptionStrategy;
-
-            @Override
-            public boolean isSatisfied()
-            {
-                executionOfCountInUntilSuccessful = getNumberOfInvocationsFor("untilSuccessful2");
-                executionOfCountInExceptionStrategy = getNumberOfInvocationsFor("exceptionStrategy2");
-                return executionOfCountInUntilSuccessful == expectedCounterExecutions && executionOfCountInExceptionStrategy == expectedCounterInExceptionStrategyExecutions;
-            }
-
-            @Override
-            public String describeFailure()
-            {
-                return String.format("Expecting %d executions of counter in until-successful and got %d \n " +
-                                     "Expecting %d execution of counter in exception strategy and got %d",
-                                     expectedCounterExecutions, executionOfCountInUntilSuccessful, expectedCounterInExceptionStrategyExecutions, executionOfCountInExceptionStrategy);
-            }
-        });
-    }
-
-    @Test
-    public void executeAsynchronouslyDoingRetriesAfterRestart() throws Exception
-    {
-        Flow flow = (Flow) getFlowConstruct("asynchronous-using-threading-profile");
-        flow.stop();
-        flow.start();
-        executeAsynchronouslyDoingRetries();
-
-    }
-
-    private List<Object> ponderUntilMessageCountReceivedByTargetMessageProcessor(final int expectedCount)
-        throws InterruptedException
-    {
-        return ponderUntilMessageCountReceived(expectedCount, targetMessageProcessor);
-    }
-
-    private List<Object> ponderUntilMessageCountReceived(final int expectedCount,
-                                                         final FunctionalTestComponent ftc)
-        throws InterruptedException
-    {
-        final List<Object> results = new ArrayList<Object>();
-
-        while (ftc.getReceivedMessagesCount() < expectedCount)
-        {
-            Thread.yield();
-            Thread.sleep(100L);
-        }
-
-        for (int i = 0; i < ftc.getReceivedMessagesCount(); i++)
-        {
-            results.add(ftc.getReceivedMessage(1 + i));
-        }
-        return results;
-    }
-
-    private void ponderUntilMessageCountReceivedByCustomMP(final int expectedCount)
-        throws InterruptedException
-    {
-        while (CustomMP.getCount() < expectedCount)
-        {
-            Thread.yield();
-            Thread.sleep(100L);
-        }
-    }
-
-    static class CustomMP implements MessageProcessor
-    {
-        private static List<MuleMessage> processedMessages = new ArrayList<>();
-
-        public static void clearCount()
-        {
-            processedMessages.clear();
-        }
-
-        public static int getCount()
-        {
-            return processedMessages.size();
-        }
-
-        public static List<MuleMessage> getProcessedMessages()
-        {
-            return processedMessages;
-        }
-
-        @Override
-        public MuleEvent process(final MuleEvent event) throws MuleException
-        {
-            processedMessages.add(event.getMessage());
-            return null;
-        }
-    }
-
-    static class WaitMeasure implements MessageProcessor {
-
-        public static long totalWait;
-        private long firstAttemptTime = 0;
-
-        @Override
-        public MuleEvent process(MuleEvent event) throws MuleException
-        {
-            if (firstAttemptTime == 0) {
-                firstAttemptTime = System.currentTimeMillis();
-            } else {
-                totalWait = System.currentTimeMillis() - firstAttemptTime;
-            }
-
-            return event;
-        }
-    }
+  }
 }

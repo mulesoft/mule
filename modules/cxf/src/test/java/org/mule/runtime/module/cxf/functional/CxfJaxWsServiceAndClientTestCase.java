@@ -19,50 +19,34 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class CxfJaxWsServiceAndClientTestCase extends FunctionalTestCase
-{
-    @Rule
-    public DynamicPort port = new DynamicPort("port");
+public class CxfJaxWsServiceAndClientTestCase extends FunctionalTestCase {
 
-    private static final HttpRequestOptions HTTP_REQUEST_OPTIONS = newOptions().method(HttpConstants.Methods.POST.name()).build();
+  @Rule
+  public DynamicPort port = new DynamicPort("port");
 
-    private static final String REQUEST_PAYLOAD =
-            "<soap:Envelope \n" +
-            "           xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"\n" +
-            "           xmlns:svc=\"http://example.cxf.module.runtime.mule.org/\">\n" +
-            "<soap:Body>\n" +
-            "<svc:sayHi>\n" +
-            "    <arg0>Test Message</arg0>\n" +
-            "</svc:sayHi>\n" +
-            "</soap:Body>\n" +
-            "</soap:Envelope>";
+  private static final HttpRequestOptions HTTP_REQUEST_OPTIONS = newOptions().method(HttpConstants.Methods.POST.name()).build();
 
-    private static final String RESPONSE_PAYLOAD =
-            "<soap:Envelope " +
-                "xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">" +
-                "<soap:Body>" +
-                    "<ns2:sayHiResponse xmlns:ns2=\"http://example.cxf.module.runtime.mule.org/\">" +
-                        "<return>" +
-                            "Hello\u2297 Test Message" +
-                        "</return>" +
-                    "</ns2:sayHiResponse>" +
-                "</soap:Body>" +
-            "</soap:Envelope>";
+  private static final String REQUEST_PAYLOAD =
+      "<soap:Envelope \n" + "           xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"\n"
+          + "           xmlns:svc=\"http://example.cxf.module.runtime.mule.org/\">\n" + "<soap:Body>\n" + "<svc:sayHi>\n"
+          + "    <arg0>Test Message</arg0>\n" + "</svc:sayHi>\n" + "</soap:Body>\n" + "</soap:Envelope>";
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "cxf-jaxws-service-and-client-config-httpn.xml";
-    }
+  private static final String RESPONSE_PAYLOAD = "<soap:Envelope " + "xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
+      + "<soap:Body>" + "<ns2:sayHiResponse xmlns:ns2=\"http://example.cxf.module.runtime.mule.org/\">" + "<return>"
+      + "Hello\u2297 Test Message" + "</return>" + "</ns2:sayHiResponse>" + "</soap:Body>" + "</soap:Envelope>";
 
-    @Test
-    public void jaxWsClientReadsMuleMethodPropertySetByJaxWsService() throws Exception
-    {
-        String url = "http://localhost:" + port.getNumber() + "/hello";
-        MuleClient client = muleContext.getClient();
+  @Override
+  protected String getConfigFile() {
+    return "cxf-jaxws-service-and-client-config-httpn.xml";
+  }
 
-        MuleMessage result = client.send(url, getTestMuleMessage(REQUEST_PAYLOAD), HTTP_REQUEST_OPTIONS);
+  @Test
+  public void jaxWsClientReadsMuleMethodPropertySetByJaxWsService() throws Exception {
+    String url = "http://localhost:" + port.getNumber() + "/hello";
+    MuleClient client = muleContext.getClient();
 
-        assertEquals(RESPONSE_PAYLOAD, getPayloadAsString(result));
-    }
+    MuleMessage result = client.send(url, getTestMuleMessage(REQUEST_PAYLOAD), HTTP_REQUEST_OPTIONS);
+
+    assertEquals(RESPONSE_PAYLOAD, getPayloadAsString(result));
+  }
 }

@@ -31,49 +31,39 @@ import org.mule.runtime.core.context.notification.ServerNotificationManager;
 /**
  * Builder for domain MuleContext instance.
  */
-public class DomainMuleContextBuilder extends DefaultMuleContextBuilder
-{
+public class DomainMuleContextBuilder extends DefaultMuleContextBuilder {
 
-    private final String domainId;
+  private final String domainId;
 
-    public DomainMuleContextBuilder(String domainId)
-    {
-        this.domainId = domainId;
-    }
+  public DomainMuleContextBuilder(String domainId) {
+    this.domainId = domainId;
+  }
 
-    @Override
-    protected DefaultMuleContext createDefaultMuleContext()
-    {
-        DefaultMuleContext muleContext = super.createDefaultMuleContext();
-        muleContext.setArtifactType(DOMAIN);
-        return muleContext;
-    }
+  @Override
+  protected DefaultMuleContext createDefaultMuleContext() {
+    DefaultMuleContext muleContext = super.createDefaultMuleContext();
+    muleContext.setArtifactType(DOMAIN);
+    return muleContext;
+  }
 
-    @Override
-    protected MuleConfiguration getMuleConfiguration()
-    {
-        DefaultMuleConfiguration defaultMuleConfiguration = new DefaultMuleConfiguration(true);
-        defaultMuleConfiguration.setDomainId(domainId);
-        defaultMuleConfiguration.setId(domainId);
-        return defaultMuleConfiguration;
-    }
+  @Override
+  protected MuleConfiguration getMuleConfiguration() {
+    DefaultMuleConfiguration defaultMuleConfiguration = new DefaultMuleConfiguration(true);
+    defaultMuleConfiguration.setDomainId(domainId);
+    defaultMuleConfiguration.setId(domainId);
+    return defaultMuleConfiguration;
+  }
 
-    @Override
-    protected ServerNotificationManager createNotificationManager()
-    {
-        ServerNotificationManager manager = new ServerNotificationManager();
-        manager.addInterfaceToType(MuleContextNotificationListener.class,
-                                   MuleContextNotification.class);
-        manager.addInterfaceToType(SecurityNotificationListener.class,
-                                   SecurityNotification.class);
-        manager.addInterfaceToType(ManagementNotificationListener.class,
-                                   ManagementNotification.class);
-        manager.addInterfaceToType(CustomNotificationListener.class, CustomNotification.class);
-        manager.addInterfaceToType(ConnectionNotificationListener.class,
-                                   ConnectionNotification.class);
-        manager.addInterfaceToType(ExceptionNotificationListener.class,
-                                   ExceptionNotification.class);
-        manager.addInterfaceToType(ClusterNodeNotificationListener.class, ClusterNodeNotification.class);
-        return manager;
-    }
+  @Override
+  protected ServerNotificationManager createNotificationManager() {
+    ServerNotificationManager manager = new ServerNotificationManager();
+    manager.addInterfaceToType(MuleContextNotificationListener.class, MuleContextNotification.class);
+    manager.addInterfaceToType(SecurityNotificationListener.class, SecurityNotification.class);
+    manager.addInterfaceToType(ManagementNotificationListener.class, ManagementNotification.class);
+    manager.addInterfaceToType(CustomNotificationListener.class, CustomNotification.class);
+    manager.addInterfaceToType(ConnectionNotificationListener.class, ConnectionNotification.class);
+    manager.addInterfaceToType(ExceptionNotificationListener.class, ExceptionNotification.class);
+    manager.addInterfaceToType(ClusterNodeNotificationListener.class, ClusterNodeNotification.class);
+    return manager;
+  }
 }

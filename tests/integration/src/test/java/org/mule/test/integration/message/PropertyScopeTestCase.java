@@ -13,52 +13,38 @@ import org.mule.runtime.core.api.client.MuleClient;
 
 import org.junit.Test;
 
-public class PropertyScopeTestCase extends AbstractPropertyScopeTestCase
-{
+public class PropertyScopeTestCase extends AbstractPropertyScopeTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/message/property-scope-flow.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/message/property-scope-flow.xml";
+  }
 
-    @Test
-    public void testRequestResponseChain() throws Exception
-    {
-        MuleMessage result = flowRunner("s1").withPayload(TEST_PAYLOAD)
-                                             .withInboundProperty("foo", "fooValue")
-                                             .run()
-                                             .getMessage();
+  @Test
+  public void testRequestResponseChain() throws Exception {
+    MuleMessage result = flowRunner("s1").withPayload(TEST_PAYLOAD).withInboundProperty("foo", "fooValue").run().getMessage();
 
-        assertThat(result.getPayload(), is("test bar"));
-        assertThat(result.getOutboundProperty("foo4"), is("fooValue"));
-    }
+    assertThat(result.getPayload(), is("test bar"));
+    assertThat(result.getOutboundProperty("foo4"), is("fooValue"));
+  }
 
-    @Test
-    public void testOneWay() throws Exception
-    {
-        flowRunner("oneWay").withPayload(TEST_PAYLOAD)
-                            .withInboundProperty("foo", "fooValue")
-                            .asynchronously()
-                            .run();
+  @Test
+  public void testOneWay() throws Exception {
+    flowRunner("oneWay").withPayload(TEST_PAYLOAD).withInboundProperty("foo", "fooValue").asynchronously().run();
 
-        MuleClient client = muleContext.getClient();
-        MuleMessage result = client.request("test://queueOut", RECEIVE_TIMEOUT);
-        assertThat(result.getPayload(), is("test bar"));
-        assertThat(result.getOutboundProperty("foo2"), is("fooValue"));
-    }
+    MuleClient client = muleContext.getClient();
+    MuleMessage result = client.request("test://queueOut", RECEIVE_TIMEOUT);
+    assertThat(result.getPayload(), is("test bar"));
+    assertThat(result.getOutboundProperty("foo2"), is("fooValue"));
+  }
 
-    @Test
-    public void testRRToOneWay() throws Exception
-    {
-        flowRunner("rrToOneWay").withPayload(TEST_PAYLOAD)
-                                .withInboundProperty("foo", "rrfooValue")
-                                .asynchronously()
-                                .run();
+  @Test
+  public void testRRToOneWay() throws Exception {
+    flowRunner("rrToOneWay").withPayload(TEST_PAYLOAD).withInboundProperty("foo", "rrfooValue").asynchronously().run();
 
-        MuleClient client = muleContext.getClient();
-        MuleMessage result = client.request("test://rrQueueOut", RECEIVE_TIMEOUT);
-        assertThat(result.getPayload(), is("test baz"));
-        assertThat(result.getOutboundProperty("foo2"), is("rrfooValue"));
-    }
+    MuleClient client = muleContext.getClient();
+    MuleMessage result = client.request("test://rrQueueOut", RECEIVE_TIMEOUT);
+    assertThat(result.getPayload(), is("test baz"));
+    assertThat(result.getOutboundProperty("foo2"), is("rrfooValue"));
+  }
 }

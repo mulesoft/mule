@@ -28,44 +28,41 @@ import org.apache.ws.security.WSPasswordCallback;
 import org.junit.Test;
 
 @SmallTest
-public class WssUsernameTokenSecurityStrategyTestCase extends AbstractMuleTestCase
-{
+public class WssUsernameTokenSecurityStrategyTestCase extends AbstractMuleTestCase {
 
-    private WssUsernameTokenSecurityStrategy strategy = new WssUsernameTokenSecurityStrategy();
+  private WssUsernameTokenSecurityStrategy strategy = new WssUsernameTokenSecurityStrategy();
 
-    @Test
-    public void usernameTokenPropertiesAreSetInTheMap() throws Exception
-    {
-        Map<String, Object> properties = new HashMap<String, Object>();
+  @Test
+  public void usernameTokenPropertiesAreSetInTheMap() throws Exception {
+    Map<String, Object> properties = new HashMap<String, Object>();
 
-        String username = "testUsername";
-        String password = "testPassword";
+    String username = "testUsername";
+    String password = "testPassword";
 
-        strategy.setUsername(username);
-        strategy.setPassword(password);
-        strategy.setPasswordType(TEXT);
-        strategy.apply(properties, null);
+    strategy.setUsername(username);
+    strategy.setPassword(password);
+    strategy.setPasswordType(TEXT);
+    strategy.apply(properties, null);
 
-        assertEquals(username, properties.get(USER));
-        assertEquals("PasswordText", properties.get(PASSWORD_TYPE));
+    assertEquals(username, properties.get(USER));
+    assertEquals("PasswordText", properties.get(PASSWORD_TYPE));
 
-        CallbackHandler handler = (CallbackHandler) properties.get(PW_CALLBACK_REF);
-        WSPasswordCallback passwordCallback = new WSPasswordCallback(username, USERNAME_TOKEN);
-        handler.handle(new Callback[] { passwordCallback });
+    CallbackHandler handler = (CallbackHandler) properties.get(PW_CALLBACK_REF);
+    WSPasswordCallback passwordCallback = new WSPasswordCallback(username, USERNAME_TOKEN);
+    handler.handle(new Callback[] {passwordCallback});
 
-        assertEquals(password, passwordCallback.getPassword());
-    }
+    assertEquals(password, passwordCallback.getPassword());
+  }
 
-    @Test
-    public void nonceAndCreatedAreSetInTheMap()
-    {
-        Map<String, Object> properties = new HashMap<String, Object>();
+  @Test
+  public void nonceAndCreatedAreSetInTheMap() {
+    Map<String, Object> properties = new HashMap<String, Object>();
 
-        strategy.setAddNonce(true);
-        strategy.setAddCreated(true);
-        strategy.apply(properties, null);
+    strategy.setAddNonce(true);
+    strategy.setAddCreated(true);
+    strategy.apply(properties, null);
 
-        assertEquals(NONCE_LN + " " + CREATED_LN, properties.get(ADD_UT_ELEMENTS));
-    }
+    assertEquals(NONCE_LN + " " + CREATED_LN, properties.get(ADD_UT_ELEMENTS));
+  }
 
 }

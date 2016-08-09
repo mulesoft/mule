@@ -19,35 +19,31 @@ import org.slf4j.LoggerFactory;
 /**
  * Decorates a {@link DataSource} using a {@link DataSourceWrapper} if required
  */
-public class DefaultDataSourceDecorator implements DataSourceDecorator
-{
+public class DefaultDataSourceDecorator implements DataSourceDecorator {
 
-    private static final Logger logger = LoggerFactory.getLogger(DefaultDataSourceDecorator.class);
+  private static final Logger logger = LoggerFactory.getLogger(DefaultDataSourceDecorator.class);
 
-    @Override
-    public DataSource decorate(DataSource dataSource, String dataSourceName, DbPoolingProfile dbPoolingProfile, MuleContext muleContext)
-    {
-        Preconditions.checkState(appliesTo(dataSource, muleContext), "DefaultDataSourceDecorator cannot be applied to data source " + dataSource);
-        if (dbPoolingProfile != null)
-        {
-            logger.warn("Pooling profile configuration cannot be used with current transaction manager and XADataSource");
-        }
-        return new DataSourceWrapper((XADataSource) dataSource);
+  @Override
+  public DataSource decorate(DataSource dataSource, String dataSourceName, DbPoolingProfile dbPoolingProfile,
+                             MuleContext muleContext) {
+    Preconditions.checkState(appliesTo(dataSource, muleContext),
+                             "DefaultDataSourceDecorator cannot be applied to data source " + dataSource);
+    if (dbPoolingProfile != null) {
+      logger.warn("Pooling profile configuration cannot be used with current transaction manager and XADataSource");
     }
+    return new DataSourceWrapper((XADataSource) dataSource);
+  }
 
-    @Override
-    public boolean appliesTo(DataSource dataSource, MuleContext muleContext)
-    {
-        return !isDataSourceWrapper(dataSource) && isXaDataSource(dataSource);
-    }
+  @Override
+  public boolean appliesTo(DataSource dataSource, MuleContext muleContext) {
+    return !isDataSourceWrapper(dataSource) && isXaDataSource(dataSource);
+  }
 
-    private boolean isDataSourceWrapper(DataSource dataSource)
-    {
-        return (dataSource instanceof DataSourceWrapper);
-    }
+  private boolean isDataSourceWrapper(DataSource dataSource) {
+    return (dataSource instanceof DataSourceWrapper);
+  }
 
-    private boolean isXaDataSource(DataSource dataSource)
-    {
-        return (dataSource instanceof XADataSource);
-    }
+  private boolean isXaDataSource(DataSource dataSource) {
+    return (dataSource instanceof XADataSource);
+  }
 }

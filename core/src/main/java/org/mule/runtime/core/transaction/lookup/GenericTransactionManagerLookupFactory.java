@@ -24,109 +24,90 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A factory performing a JNDI lookup for TransactionManager. <p/> NOTE: Java EE 1.4
- * specification does not mandate application server vendors to expose a
- * TransactionManager for direct use, nor does it name the standard way to locate it.
- * For some servers the TransactionManager is not even available in the global JNDI
- * namespace, so your only bet is to run Mule in the same JVM as the application
- * server.
+ * A factory performing a JNDI lookup for TransactionManager.
+ * <p/>
+ * NOTE: Java EE 1.4 specification does not mandate application server vendors to expose a TransactionManager for direct use, nor
+ * does it name the standard way to locate it. For some servers the TransactionManager is not even available in the global JNDI
+ * namespace, so your only bet is to run Mule in the same JVM as the application server.
  */
-public class GenericTransactionManagerLookupFactory implements TransactionManagerFactory, Initialisable
-{
-    protected final Logger logger = LoggerFactory.getLogger(getClass());
+public class GenericTransactionManagerLookupFactory implements TransactionManagerFactory, Initialisable {
 
-    protected Context context;
+  protected final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private Map environment;
+  protected Context context;
 
-    private TransactionManager txManager;
+  private Map environment;
 
-    private String jndiName;
+  private TransactionManager txManager;
 
-    public String getJndiName()
-    {
-        return jndiName;
+  private String jndiName;
+
+  public String getJndiName() {
+    return jndiName;
+  }
+
+  public void setJndiName(final String jndiName) {
+    this.jndiName = jndiName;
+  }
+
+  public TransactionManager getTxManager() {
+    return txManager;
+  }
+
+  public void setTxManager(final TransactionManager txManager) {
+    this.txManager = txManager;
+  }
+
+  public Map getEnvironment() {
+    return environment;
+  }
+
+  public void setEnvironment(final Map environment) {
+    this.environment = environment;
+  }
+
+  public Context getContext() {
+    return context;
+  }
+
+  public void setContext(final Context context) {
+    this.context = context;
+  }
+
+  /**
+   * @see org.mule.runtime.core.api.transaction.TransactionManagerFactory#create(MuleConfiguration)
+   * @param config
+   */
+  public TransactionManager create(MuleConfiguration config) throws Exception {
+    // implementing the Initilisable interface does not call it??
+    initialise();
+    if (txManager == null) {
+      txManager = (TransactionManager) context.lookup(jndiName);
     }
 
-    public void setJndiName(final String jndiName)
-    {
-        this.jndiName = jndiName;
+    return txManager;
+  }
+
+  /**
+   * Method used to perform any initialisation work. If a fatal error occurs during initialisation an
+   * <code>InitialisationException</code> should be thrown, causing the Mule instance to shutdown. If the error is recoverable,
+   * say by retrying to connect, a <code>RecoverableException</code> should be thrown. There is no guarantee that by throwing a
+   * Recoverable exception that the Mule instance will not shut down.
+   *
+   * @throws org.mule.runtime.core.api.lifecycle.InitialisationException if a fatal error occurs causing the Mule instance to
+   *         shutdown
+   */
+  public void initialise() throws InitialisationException {
+    if (txManager == null && StringUtils.isEmpty(StringUtils.trim(jndiName))) {
+      throw new InitialisationException(CoreMessages.propertiesNotSet("jndiName"), this);
     }
 
-    public TransactionManager getTxManager()
-    {
-        return txManager;
+    try {
+      if (context == null) {
+        context = JndiContextHelper.initialise(getEnvironment());
+      }
+    } catch (NamingException e) {
+      throw new InitialisationException(CoreMessages.failedToCreate("Jndi context"), e, this);
     }
-
-    public void setTxManager(final TransactionManager txManager)
-    {
-        this.txManager = txManager;
-    }
-
-    public Map getEnvironment()
-    {
-        return environment;
-    }
-
-    public void setEnvironment(final Map environment)
-    {
-        this.environment = environment;
-    }
-
-    public Context getContext()
-    {
-        return context;
-    }
-
-    public void setContext(final Context context)
-    {
-        this.context = context;
-    }
-
-    /** @see org.mule.runtime.core.api.transaction.TransactionManagerFactory#create(MuleConfiguration)
-     * @param config */
-    public TransactionManager create(MuleConfiguration config) throws Exception
-    {
-        // implementing the Initilisable interface does not call it??
-        initialise();
-        if (txManager == null)
-        {
-            txManager = (TransactionManager) context.lookup(jndiName);
-        }
-
-        return txManager;
-    }
-
-    /**
-     * Method used to perform any initialisation work. If a fatal error occurs during
-     * initialisation an <code>InitialisationException</code> should be thrown,
-     * causing the Mule instance to shutdown. If the error is recoverable, say by
-     * retrying to connect, a <code>RecoverableException</code> should be thrown.
-     * There is no guarantee that by throwing a Recoverable exception that the Mule
-     * instance will not shut down.
-     *
-     * @throws org.mule.runtime.core.api.lifecycle.InitialisationException
-     *          if a fatal error occurs
-     *          causing the Mule instance to shutdown
-     */
-    public void initialise() throws InitialisationException
-    {
-        if (txManager == null && StringUtils.isEmpty(StringUtils.trim(jndiName)))
-        {
-            throw new InitialisationException(CoreMessages.propertiesNotSet("jndiName"), this);
-        }
-
-        try
-        {
-            if (context == null)
-            {
-                context = JndiContextHelper.initialise(getEnvironment());
-            }
-        }
-        catch (NamingException e)
-        {
-            throw new InitialisationException(CoreMessages.failedToCreate("Jndi context"),
-                    e, this);
-        }
-    }
+  }
 }

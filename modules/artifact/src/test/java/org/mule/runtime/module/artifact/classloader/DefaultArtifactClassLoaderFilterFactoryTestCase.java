@@ -17,31 +17,29 @@ import java.lang.reflect.AnnotatedElement;
 
 import org.junit.Test;
 
-public class DefaultArtifactClassLoaderFilterFactoryTestCase extends AbstractMuleTestCase
-{
+public class DefaultArtifactClassLoaderFilterFactoryTestCase extends AbstractMuleTestCase {
 
-    private final DefaultArtifactClassLoaderFilterFactory factory = new DefaultArtifactClassLoaderFilterFactory();
+  private final DefaultArtifactClassLoaderFilterFactory factory = new DefaultArtifactClassLoaderFilterFactory();
 
-    @Test
-    public void createsNullFilter() throws Exception
-    {
-        assertThat(factory.create(null, null), is(NULL_CLASSLOADER_FILTER));
-        assertThat(factory.create("", null), is(NULL_CLASSLOADER_FILTER));
-        assertThat(factory.create(null, ""), is(NULL_CLASSLOADER_FILTER));
-    }
+  @Test
+  public void createsNullFilter() throws Exception {
+    assertThat(factory.create(null, null), is(NULL_CLASSLOADER_FILTER));
+    assertThat(factory.create("", null), is(NULL_CLASSLOADER_FILTER));
+    assertThat(factory.create(null, ""), is(NULL_CLASSLOADER_FILTER));
+  }
 
-    @Test
-    public void createsFilter() throws Exception
-    {
-        final ClassLoaderFilter filter = factory.create("java.lang, java.lang.annotation", "META-INF/MANIFEST.MF, META-INF/xml/schema.xsd");
+  @Test
+  public void createsFilter() throws Exception {
+    final ClassLoaderFilter filter =
+        factory.create("java.lang, java.lang.annotation", "META-INF/MANIFEST.MF, META-INF/xml/schema.xsd");
 
-        assertThat(filter.exportsClass(Object.class.getName()), is(true));
-        assertThat(filter.exportsClass(Annotation.class.getName()), is(true));
-        assertThat(filter.exportsClass(AnnotatedElement.class.getName()), is(false));
+    assertThat(filter.exportsClass(Object.class.getName()), is(true));
+    assertThat(filter.exportsClass(Annotation.class.getName()), is(true));
+    assertThat(filter.exportsClass(AnnotatedElement.class.getName()), is(false));
 
-        assertThat(filter.exportsResource("META-INF/MANIFEST.MF"), is(true));
-        assertThat(filter.exportsResource("META-INF/readme.txt"), is(false));
-        assertThat(filter.exportsResource("META-INF/xml/schema.xsd"), is(true));
-        assertThat(filter.exportsResource("META-INF/xml/readme.txt"), is(false));
-    }
+    assertThat(filter.exportsResource("META-INF/MANIFEST.MF"), is(true));
+    assertThat(filter.exportsResource("META-INF/readme.txt"), is(false));
+    assertThat(filter.exportsResource("META-INF/xml/schema.xsd"), is(true));
+    assertThat(filter.exportsResource("META-INF/xml/readme.txt"), is(false));
+  }
 }

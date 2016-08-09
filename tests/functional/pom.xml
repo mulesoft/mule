@@ -11,6 +11,10 @@
     <name>Mule Functional Test Framework (TCK)</name>
     <description>Mule functional test framework (TCK)</description>
 
+    <properties>
+        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
+    </properties>
+
     <build>
         <plugins>
             <plugin>

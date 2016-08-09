@@ -27,31 +27,22 @@ import org.mule.runtime.extension.api.annotation.param.display.Placement;
  */
 @Alias("imap")
 @DisplayName("IMAP Connection")
-public class IMAPProvider extends AbstractRetrieverProvider<RetrieverConnection>
-{
+public class IMAPProvider extends AbstractRetrieverProvider<RetrieverConnection> {
 
-    /**
-     * The port number of the mail server. '143' by default
-     */
-    @Parameter
-    @Optional(defaultValue = IMAP_PORT)
-    @Placement(group = CONNECTION, order = 2)
-    private String port;
+  /**
+   * The port number of the mail server. '143' by default
+   */
+  @Parameter
+  @Optional(defaultValue = IMAP_PORT)
+  @Placement(group = CONNECTION, order = 2)
+  private String port;
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public RetrieverConnection connect() throws ConnectionException
-    {
-        return new RetrieverConnection(IMAP,
-                                       settings.getUser(),
-                                       settings.getPassword(),
-                                       settings.getHost(),
-                                       port,
-                                       getConnectionTimeout(),
-                                       getReadTimeout(),
-                                       getWriteTimeout(),
-                                       getProperties());
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public RetrieverConnection connect() throws ConnectionException {
+    return new RetrieverConnection(IMAP, settings.getUser(), settings.getPassword(), settings.getHost(), port,
+                                   getConnectionTimeout(), getReadTimeout(), getWriteTimeout(), getProperties());
+  }
 }

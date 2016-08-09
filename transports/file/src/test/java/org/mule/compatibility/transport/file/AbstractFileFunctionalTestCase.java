@@ -26,94 +26,82 @@ import java.io.Writer;
 import java.net.MalformedURLException;
 
 /**
- * We are careful here to access the file system in a generic way. This means setting
- * directories dynamically.
+ * We are careful here to access the file system in a generic way. This means setting directories dynamically.
  */
-public abstract class AbstractFileFunctionalTestCase extends FunctionalTestCase
-{
-    public static final String TEST_MESSAGE = "Test file contents";
-    public static final String TARGET_FILE = "TARGET_FILE";
+public abstract class AbstractFileFunctionalTestCase extends FunctionalTestCase {
 
-    protected File tmpDir;
+  public static final String TEST_MESSAGE = "Test file contents";
+  public static final String TARGET_FILE = "TARGET_FILE";
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "file-functional-test-flow.xml";
+  protected File tmpDir;
+
+  @Override
+  protected String getConfigFile() {
+    return "file-functional-test-flow.xml";
+  }
+
+  protected String fileToUrl(File file) throws MalformedURLException {
+    return file.getAbsoluteFile().toURI().toURL().toString();
+  }
+
+  // annoying but necessary wait apparently due to OS caching?
+  protected void waitForFileSystem() throws Exception {
+    synchronized (this) {
+      wait(1000);
     }
+  }
 
-    protected String fileToUrl(File file) throws MalformedURLException
-    {
-        return file.getAbsoluteFile().toURI().toURL().toString();
-    }
+  protected File initForRequest() throws Exception {
+    createTempDirectory();
+    File target = createAndPopulateTempFile("mule-file-test-", ".txt");
 
-    // annoying but necessary wait apparently due to OS caching?
-    protected void waitForFileSystem() throws Exception
-    {
-        synchronized (this)
-        {
-            wait(1000);
-        }
-    }
+    // define the readFromDirectory on the connector
+    FileConnector connector = (FileConnector) muleContext.getRegistry().lookupObject("receiveConnector");
+    connector.setReadFromDirectory(tmpDir.getAbsolutePath());
+    logger.debug("Directory is " + connector.getReadFromDirectory());
 
-    protected File initForRequest() throws Exception
-    {
-        createTempDirectory();
-        File target = createAndPopulateTempFile("mule-file-test-", ".txt");
+    waitForFileSystem();
+    return target;
+  }
 
-        // define the readFromDirectory on the connector
-        FileConnector connector = (FileConnector) muleContext.getRegistry().lookupObject(
-            "receiveConnector");
-        connector.setReadFromDirectory(tmpDir.getAbsolutePath());
-        logger.debug("Directory is " + connector.getReadFromDirectory());
+  private void createTempDirectory() throws Exception {
+    tmpDir = File.createTempFile("mule-file-test-", "-dir");
+    tmpDir.delete();
+    tmpDir.mkdir();
+  }
 
-        waitForFileSystem();
-        return target;
-    }
+  protected File createAndPopulateTempFile(String prefix, String suffix) throws Exception {
+    File target = File.createTempFile(prefix, suffix, tmpDir);
+    logger.info("Created temporary file: " + target.getAbsolutePath());
 
-    private void createTempDirectory() throws Exception
-    {
-        tmpDir = File.createTempFile("mule-file-test-", "-dir");
-        tmpDir.delete();
-        tmpDir.mkdir();
-    }
+    Writer out = new FileWriter(target);
+    out.write(TEST_MESSAGE);
+    out.close();
 
-    protected File createAndPopulateTempFile(String prefix, String suffix) throws Exception
-    {
-        File target = File.createTempFile(prefix, suffix, tmpDir);
-        logger.info("Created temporary file: " + target.getAbsolutePath());
+    target.deleteOnExit();
+    return target;
+  }
 
-        Writer out = new FileWriter(target);
-        out.write(TEST_MESSAGE);
-        out.close();
+  protected void checkReceivedMessage(MuleMessage message) throws Exception {
+    assertNotNull(message);
+    assertNotNull(message.getPayload());
+    assertTrue(message.getPayload() instanceof InputStream);
 
-        target.deleteOnExit();
-        return target;
-    }
+    InputStream fis = (InputStream) message.getPayload();
+    ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+    IOUtils.copy(fis, byteOut);
+    fis.close();
+    String result = new String(byteOut.toByteArray());
+    assertEquals(TEST_MESSAGE, result);
+  }
 
-    protected void checkReceivedMessage(MuleMessage message) throws Exception
-    {
-        assertNotNull(message);
-        assertNotNull(message.getPayload());
-        assertTrue(message.getPayload() instanceof InputStream);
+  @Override
+  protected void doTearDown() throws Exception {
+    super.doTearDown();
+    FileUtils.deleteTree(tmpDir);
+  }
 
-        InputStream fis = (InputStream) message.getPayload();
-        ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-        IOUtils.copy(fis, byteOut);
-        fis.close();
-        String result = new String(byteOut.toByteArray());
-        assertEquals(TEST_MESSAGE, result);
-    }
-
-    @Override
-    protected void doTearDown() throws Exception
-    {
-        super.doTearDown();
-        FileUtils.deleteTree(tmpDir);
-    }
-
-    public EndpointFactory getEndpointFactory()
-    {
-        return (EndpointFactory) muleContext.getRegistry().lookupObject(MuleEndpointProperties.OBJECT_MULE_ENDPOINT_FACTORY);
-    }
+  public EndpointFactory getEndpointFactory() {
+    return (EndpointFactory) muleContext.getRegistry().lookupObject(MuleEndpointProperties.OBJECT_MULE_ENDPOINT_FACTORY);
+  }
 }

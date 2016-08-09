@@ -32,87 +32,78 @@ import org.slf4j.LoggerFactory;
  * @param <Connection> the generic type of the connections that the {@link #delegate} produces
  * @since 4.0
  */
-public abstract class ConnectionProviderWrapper<Connection> implements ConnectionProvider<Connection>, HasPoolingProfile, Lifecycle
-{
+public abstract class ConnectionProviderWrapper<Connection>
+    implements ConnectionProvider<Connection>, HasPoolingProfile, Lifecycle {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ConnectionProviderWrapper.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ConnectionProviderWrapper.class);
 
-    @Inject
-    protected MuleContext muleContext;
+  @Inject
+  protected MuleContext muleContext;
 
-    private final ConnectionProvider<Connection> delegate;
+  private final ConnectionProvider<Connection> delegate;
 
-    /**
-     * Creates a new instance which wraps the {@code delegate}
-     *
-     * @param delegate the {@link ConnectionProvider} to be wrapped
-     */
-    ConnectionProviderWrapper(ConnectionProvider<Connection> delegate)
-    {
-        this.delegate = delegate;
-    }
+  /**
+   * Creates a new instance which wraps the {@code delegate}
+   *
+   * @param delegate the {@link ConnectionProvider} to be wrapped
+   */
+  ConnectionProviderWrapper(ConnectionProvider<Connection> delegate) {
+    this.delegate = delegate;
+  }
 
-    @Override
-    public Connection connect() throws ConnectionException
-    {
-        return delegate.connect();
-    }
+  @Override
+  public Connection connect() throws ConnectionException {
+    return delegate.connect();
+  }
 
-    /**
-     * Delegates the connection validation to the delegated {@link ConnectionProvider}
-     *
-     * @param connection a non {@code null} {@link Connection}.
-     * @return the {@link ConnectionValidationResult} returned by the delegated {@link ConnectionProvider}
-     */
-    @Override
-    public ConnectionValidationResult validate(Connection connection)
-    {
-        return delegate.validate(connection);
-    }
+  /**
+   * Delegates the connection validation to the delegated {@link ConnectionProvider}
+   *
+   * @param connection a non {@code null} {@link Connection}.
+   * @return the {@link ConnectionValidationResult} returned by the delegated {@link ConnectionProvider}
+   */
+  @Override
+  public ConnectionValidationResult validate(Connection connection) {
+    return delegate.validate(connection);
+  }
 
-    @Override
-    public void disconnect(Connection connection)
-    {
-        delegate.disconnect(connection);
-    }
+  @Override
+  public void disconnect(Connection connection) {
+    delegate.disconnect(connection);
+  }
 
-    public ConnectionProvider<Connection> getDelegate()
-    {
-        return delegate;
-    }
+  public ConnectionProvider<Connection> getDelegate() {
+    return delegate;
+  }
 
-    /**
-     * @return a {@link RetryPolicyTemplate}
-     */
-    public abstract RetryPolicyTemplate getRetryPolicyTemplate();
+  /**
+   * @return a {@link RetryPolicyTemplate}
+   */
+  public abstract RetryPolicyTemplate getRetryPolicyTemplate();
 
 
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        initialiseIfNeeded(delegate, true, muleContext);
-        initialiseIfNeeded(getRetryPolicyTemplate(), true, muleContext);
-    }
+  @Override
+  public void initialise() throws InitialisationException {
+    initialiseIfNeeded(delegate, true, muleContext);
+    initialiseIfNeeded(getRetryPolicyTemplate(), true, muleContext);
+  }
 
-    @Override
-    public void start() throws MuleException
-    {
-        startIfNeeded(delegate);
-        startIfNeeded(getRetryPolicyTemplate());
-    }
+  @Override
+  public void start() throws MuleException {
+    startIfNeeded(delegate);
+    startIfNeeded(getRetryPolicyTemplate());
+  }
 
-    @Override
-    public void stop() throws MuleException
-    {
-        stopIfNeeded(delegate);
-        stopIfNeeded(getRetryPolicyTemplate());
-    }
+  @Override
+  public void stop() throws MuleException {
+    stopIfNeeded(delegate);
+    stopIfNeeded(getRetryPolicyTemplate());
+  }
 
-    @Override
-    public void dispose()
-    {
-        disposeIfNeeded(delegate, LOGGER);
-        disposeIfNeeded(getRetryPolicyTemplate(), LOGGER);
-    }
+  @Override
+  public void dispose() {
+    disposeIfNeeded(delegate, LOGGER);
+    disposeIfNeeded(getRetryPolicyTemplate(), LOGGER);
+  }
 
 }

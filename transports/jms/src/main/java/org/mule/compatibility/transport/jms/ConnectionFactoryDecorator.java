@@ -13,13 +13,11 @@ import javax.jms.ConnectionFactory;
 /**
  * Decorator for the jms ConnectionFactory.
  *
- * Used as mechanism to hook to connection creations or session creations
- * in order to customize behavior.
+ * Used as mechanism to hook to connection creations or session creations in order to customize behavior.
  */
-public interface ConnectionFactoryDecorator
-{
+public interface ConnectionFactoryDecorator {
 
-    ConnectionFactory decorate(ConnectionFactory connectionFactory, JmsConnector jmsConnector, MuleContext mulecontext);
+  ConnectionFactory decorate(ConnectionFactory connectionFactory, JmsConnector jmsConnector, MuleContext mulecontext);
 
-    boolean appliesTo(ConnectionFactory connectionFactory, MuleContext muleContext);
+  boolean appliesTo(ConnectionFactory connectionFactory, MuleContext muleContext);
 }

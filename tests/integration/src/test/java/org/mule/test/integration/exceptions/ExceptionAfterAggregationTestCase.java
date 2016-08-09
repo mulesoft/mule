@@ -19,38 +19,31 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 @RunnerDelegateTo(Parameterized.class)
-public class ExceptionAfterAggregationTestCase extends AbstractIntegrationTestCase
-{
+public class ExceptionAfterAggregationTestCase extends AbstractIntegrationTestCase {
 
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
+  @Rule
+  public ExpectedException expectedException = ExpectedException.none();
 
-    private final String configResources;
+  private final String configResources;
 
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][] {
-                {"exception-after-aggregation-test-config-simple.xml"},
-        });
-    }
+  @Parameters
+  public static Collection<Object[]> parameters() {
+    return Arrays.asList(new Object[][] {{"exception-after-aggregation-test-config-simple.xml"},});
+  }
 
-    public ExceptionAfterAggregationTestCase(String configResources)
-    {
-        super();
-        this.configResources = configResources;
-    }
+  public ExceptionAfterAggregationTestCase(String configResources) {
+    super();
+    this.configResources = configResources;
+  }
 
-    @Override
-    protected String getConfigResources()
-    {
-        return configResources;
-    }
+  @Override
+  protected String getConfigResources() {
+    return configResources;
+  }
 
-    @Test
-    public void testReceiveCorrectExceptionAfterAggregation() throws Exception
-    {
-        expectedException.expectMessage("Ad hoc message exception");
-        flowRunner("main").withPayload(getTestMuleMessage("some data")).run();
-    }
+  @Test
+  public void testReceiveCorrectExceptionAfterAggregation() throws Exception {
+    expectedException.expectMessage("Ad hoc message exception");
+    flowRunner("main").withPayload(getTestMuleMessage("some data")).run();
+  }
 }

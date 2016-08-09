@@ -20,28 +20,24 @@ import org.apache.cxf.phase.Phase;
 /**
  * CXF interceptor that wraps the XML Stream with a decorator that is able to restore namespace declarations for fragments
  */
-public class NamespaceSaverStaxInterceptor extends AbstractPhaseInterceptor<Message>
-{
-    public NamespaceSaverStaxInterceptor()
-    {
-        super(Phase.POST_STREAM);
-        getAfter().add(StreamClosingInterceptor.class.getName());
-        getAfter().add(StaxInInterceptor.class.getName());
+public class NamespaceSaverStaxInterceptor extends AbstractPhaseInterceptor<Message> {
+
+  public NamespaceSaverStaxInterceptor() {
+    super(Phase.POST_STREAM);
+    getAfter().add(StreamClosingInterceptor.class.getName());
+    getAfter().add(StaxInInterceptor.class.getName());
+  }
+
+  public void handleMessage(Message message) throws Fault {
+    XMLStreamReader reader = message.getContent(XMLStreamReader.class);
+
+    if (reader != null) {
+      NamespaceRestorerXMLStreamReader replacement = new NamespaceRestorerXMLStreamReader(reader)
+          .blackList(SOAPConstants.URI_NS_SOAP_1_1_ENVELOPE).blackList(SOAPConstants.URI_NS_SOAP_1_2_ENVELOPE);
+
+      message.setContent(XMLStreamReader.class, replacement);
+      message.setContent(NamespaceRestorerXMLStreamReader.class, replacement);
     }
-
-    public void handleMessage(Message message) throws Fault
-    {
-        XMLStreamReader reader = message.getContent(XMLStreamReader.class);
-
-        if (reader != null)
-        {
-            NamespaceRestorerXMLStreamReader replacement = new NamespaceRestorerXMLStreamReader(reader)
-                    .blackList(SOAPConstants.URI_NS_SOAP_1_1_ENVELOPE)
-                    .blackList(SOAPConstants.URI_NS_SOAP_1_2_ENVELOPE);
-
-            message.setContent(XMLStreamReader.class, replacement);
-            message.setContent(NamespaceRestorerXMLStreamReader.class, replacement);
-        }
-    }
+  }
 
 }

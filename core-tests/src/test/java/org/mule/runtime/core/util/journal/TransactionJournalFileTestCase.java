@@ -24,42 +24,39 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-public class TransactionJournalFileTestCase extends AbstractMuleContextTestCase
-{
+public class TransactionJournalFileTestCase extends AbstractMuleContextTestCase {
 
-    private static final long KB_500 = 500 * 1024l;
+  private static final long KB_500 = 500 * 1024l;
 
-    @Rule
-    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+  @Rule
+  public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
-    @Test
-    public void largeQueueName() throws Exception
-    {
-        final String queueName = RandomStringUtils.randomAlphanumeric(129);
-        final Serializable payload = "Hello World!";
-        final int txId = 1;
+  @Test
+  public void largeQueueName() throws Exception {
+    final String queueName = RandomStringUtils.randomAlphanumeric(129);
+    final Serializable payload = "Hello World!";
+    final int txId = 1;
 
-        TransactionJournalFile<Integer, LocalQueueTxJournalEntry> journal = openJournal();
-        journal.logOperation(new LocalQueueTxJournalEntry(txId, (byte) 6, queueName, payload));
-        journal.close();
+    TransactionJournalFile<Integer, LocalQueueTxJournalEntry> journal = openJournal();
+    journal.logOperation(new LocalQueueTxJournalEntry(txId, (byte) 6, queueName, payload));
+    journal.close();
 
-        journal = openJournal();
+    journal = openJournal();
 
-        Collection<LocalQueueTxJournalEntry> entries = journal.getLogEntries(txId);
-        assertThat(entries, is(notNullValue()));
-        assertThat(entries.size(), equalTo(1));
+    Collection<LocalQueueTxJournalEntry> entries = journal.getLogEntries(txId);
+    assertThat(entries, is(notNullValue()));
+    assertThat(entries.size(), equalTo(1));
 
-        LocalQueueTxJournalEntry entry = entries.iterator().next();
-        assertThat(entry.getQueueName(), equalTo(queueName));
-        assertThat(entry.getValue(), equalTo(payload));
-    }
+    LocalQueueTxJournalEntry entry = entries.iterator().next();
+    assertThat(entry.getQueueName(), equalTo(queueName));
+    assertThat(entry.getValue(), equalTo(payload));
+  }
 
-    private TransactionJournalFile<Integer, LocalQueueTxJournalEntry> openJournal()
-    {
-        File journalFile = new File(temporaryFolder.getRoot(), "journal");
-        JournalEntrySerializer serializer = LocalTxQueueTransactionJournal.createLocalTxQueueJournalEntrySerializer(muleContext);
+  private TransactionJournalFile<Integer, LocalQueueTxJournalEntry> openJournal() {
+    File journalFile = new File(temporaryFolder.getRoot(), "journal");
+    JournalEntrySerializer serializer = LocalTxQueueTransactionJournal.createLocalTxQueueJournalEntrySerializer(muleContext);
 
-        return new TransactionJournalFile(journalFile, serializer, journalEntry -> false, KB_500);
-    }
+    return new TransactionJournalFile(journalFile, serializer, journalEntry -> false, KB_500);
+  }
 
 }

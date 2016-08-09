@@ -10,14 +10,12 @@ package org.mule.extension.validation.api;
 import org.mule.runtime.extension.api.annotation.Alias;
 
 /**
- * A {@link ObjectSource} for instance of {@link ExceptionFactory}.
- * The reason why this is a top level class instead of just an instance
- * is to hint the extensions api with an {@link Alias} annotation
+ * A {@link ObjectSource} for instance of {@link ExceptionFactory}. The reason why this is a top level class instead of just an
+ * instance is to hint the extensions api with an {@link Alias} annotation
  *
  * @since 3.7.0
  */
 @Alias("exceptionFactory")
-public class ExceptionFactorySource extends ObjectSource<ExceptionFactory>
-{
+public class ExceptionFactorySource extends ObjectSource<ExceptionFactory> {
 
 }

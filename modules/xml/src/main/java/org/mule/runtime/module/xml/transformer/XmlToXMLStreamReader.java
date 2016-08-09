@@ -22,71 +22,57 @@ import javax.xml.transform.Source;
 
 import org.w3c.dom.Document;
 
-public class XmlToXMLStreamReader extends AbstractXmlTransformer implements DiscoverableTransformer
-{
+public class XmlToXMLStreamReader extends AbstractXmlTransformer implements DiscoverableTransformer {
 
-    private int priorityWeighting = DiscoverableTransformer.DEFAULT_PRIORITY_WEIGHTING;
-    private boolean reversible;
-    
-    public XmlToXMLStreamReader()
-    {
-        super();
-        registerSourceType(DataType.fromType(Source.class));
-        registerSourceType(DataType.INPUT_STREAM);
-        registerSourceType(DataType.fromType(Document.class));
-        registerSourceType(DataType.BYTE_ARRAY);
-        registerSourceType(DataType.STRING);
+  private int priorityWeighting = DiscoverableTransformer.DEFAULT_PRIORITY_WEIGHTING;
+  private boolean reversible;
 
-        setReturnDataType(DataType.fromType(XMLStreamReader.class));
+  public XmlToXMLStreamReader() {
+    super();
+    registerSourceType(DataType.fromType(Source.class));
+    registerSourceType(DataType.INPUT_STREAM);
+    registerSourceType(DataType.fromType(Document.class));
+    registerSourceType(DataType.BYTE_ARRAY);
+    registerSourceType(DataType.STRING);
+
+    setReturnDataType(DataType.fromType(XMLStreamReader.class));
+  }
+
+  @Override
+  public Object transformMessage(MuleEvent event, Charset encoding) throws TransformerException {
+    Object src = event.getMessage().getPayload();
+    try {
+      XMLStreamReader xsr = XMLUtils.toXMLStreamReader(getXMLInputFactory(), src);
+      if (xsr == null) {
+        throw new TransformerException(MessageFactory
+            .createStaticMessage("Unable to convert " + src.getClass() + " to XMLStreamReader."), this);
+      }
+
+      if (reversible && !(xsr instanceof ReversibleXMLStreamReader)) {
+        return new ReversibleXMLStreamReader(xsr);
+      } else {
+        return xsr;
+      }
+    } catch (XMLStreamException e) {
+      throw new TransformerException(this, e);
     }
+  }
 
-    @Override
-    public Object transformMessage(MuleEvent event, Charset encoding) throws TransformerException
-    {
-        Object src = event.getMessage().getPayload();
-        try
-        {
-            XMLStreamReader xsr = XMLUtils.toXMLStreamReader(getXMLInputFactory(), src);
-            if (xsr == null)
-            {
-                throw new TransformerException(MessageFactory
-                    .createStaticMessage("Unable to convert " + src.getClass() + " to XMLStreamReader."), this);
-            }
-        
-            if (reversible && !(xsr instanceof ReversibleXMLStreamReader))
-            {
-                return new ReversibleXMLStreamReader(xsr);
-            }
-            else
-            {
-                return xsr;
-            }
-        }
-        catch (XMLStreamException e)
-        {
-            throw new TransformerException(this, e);
-        }
-    }
+  public boolean isReversible() {
+    return reversible;
+  }
 
-    public boolean isReversible()
-    {
-        return reversible;
-    }
+  public void setReversible(boolean reversible) {
+    this.reversible = reversible;
+  }
 
-    public void setReversible(boolean reversible)
-    {
-        this.reversible = reversible;
-    }
+  @Override
+  public int getPriorityWeighting() {
+    return priorityWeighting;
+  }
 
-    @Override
-    public int getPriorityWeighting()
-    {
-        return priorityWeighting;
-    }
-
-    @Override
-    public void setPriorityWeighting(int priorityWeighting)
-    {
-        this.priorityWeighting = priorityWeighting;
-    }
+  @Override
+  public void setPriorityWeighting(int priorityWeighting) {
+    this.priorityWeighting = priorityWeighting;
+  }
 }

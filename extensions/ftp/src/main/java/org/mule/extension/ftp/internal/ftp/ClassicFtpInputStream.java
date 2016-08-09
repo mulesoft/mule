@@ -25,38 +25,37 @@ import java.util.function.Supplier;
  *
  * @since 4.0
  */
-public class ClassicFtpInputStream extends FtpInputStream
-{
+public class ClassicFtpInputStream extends FtpInputStream {
 
-    /**
-     * Establishes the underlying connection and returns a new instance of this class.
-     * <p>
-     * Instances returned by this method <b>MUST</b> be closed or fully consumed.
-     *
-     * @param config     the {@link FtpConnector} which is configuring the connection
-     * @param attributes a {@link FileAttributes} referencing the file which contents are to be fetched
-     * @param lock       the {@link PathLock} to be used
-     * @return a new {@link FtpInputStream}
-     * @throws ConnectionException if a connection could not be established
-     */
-    public static FtpInputStream newInstance(FtpConnector config, FtpFileAttributes attributes, PathLock lock) throws ConnectionException
-    {
-        ConnectionHandler<FtpFileSystem> connectionHandler = getConnectionHandler(config);
-        return new ClassicFtpInputStream(getStreamSupplier(attributes, connectionHandler), connectionHandler, lock);
-    }
+  /**
+   * Establishes the underlying connection and returns a new instance of this class.
+   * <p>
+   * Instances returned by this method <b>MUST</b> be closed or fully consumed.
+   *
+   * @param config the {@link FtpConnector} which is configuring the connection
+   * @param attributes a {@link FileAttributes} referencing the file which contents are to be fetched
+   * @param lock the {@link PathLock} to be used
+   * @return a new {@link FtpInputStream}
+   * @throws ConnectionException if a connection could not be established
+   */
+  public static FtpInputStream newInstance(FtpConnector config, FtpFileAttributes attributes, PathLock lock)
+      throws ConnectionException {
+    ConnectionHandler<FtpFileSystem> connectionHandler = getConnectionHandler(config);
+    return new ClassicFtpInputStream(getStreamSupplier(attributes, connectionHandler), connectionHandler, lock);
+  }
 
-    private ClassicFtpInputStream(Supplier<InputStream> streamSupplier, ConnectionHandler<FtpFileSystem> connectionHandler, PathLock lock) throws ConnectionException
-    {
-        super(streamSupplier, connectionHandler, lock);
-    }
+  private ClassicFtpInputStream(Supplier<InputStream> streamSupplier, ConnectionHandler<FtpFileSystem> connectionHandler,
+                                PathLock lock)
+      throws ConnectionException {
+    super(streamSupplier, connectionHandler, lock);
+  }
 
-    /**
-     * Invokes {@link ClassicFtpFileSystem#awaitCommandCompletion()} to make sure that the operation is completed
-     * before closing the stream
-     */
-    @Override
-    protected void beforeClose() throws IOException
-    {
-        ((ClassicFtpFileSystem) getFtpFileSystem()).awaitCommandCompletion();
-    }
+  /**
+   * Invokes {@link ClassicFtpFileSystem#awaitCommandCompletion()} to make sure that the operation is completed before closing the
+   * stream
+   */
+  @Override
+  protected void beforeClose() throws IOException {
+    ((ClassicFtpFileSystem) getFtpFileSystem()).awaitCommandCompletion();
+  }
 }

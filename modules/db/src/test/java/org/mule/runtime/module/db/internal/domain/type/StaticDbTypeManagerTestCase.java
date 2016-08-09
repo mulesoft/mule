@@ -19,29 +19,25 @@ import java.util.Arrays;
 import org.junit.Test;
 
 @SmallTest
-public class StaticDbTypeManagerTestCase extends AbstractMuleTestCase
-{
+public class StaticDbTypeManagerTestCase extends AbstractMuleTestCase {
 
-    private final DbConnection connection = mock(DbConnection.class);
-    private final StaticDbTypeManager typeManager = new StaticDbTypeManager(Arrays.asList(JdbcTypes.VARCHAR_DB_TYPE));
+  private final DbConnection connection = mock(DbConnection.class);
+  private final StaticDbTypeManager typeManager = new StaticDbTypeManager(Arrays.asList(JdbcTypes.VARCHAR_DB_TYPE));
 
-    @Test
-    public void resolvesByName() throws Exception
-    {
-        DbType lookup = typeManager.lookup(connection, JdbcTypes.VARCHAR_DB_TYPE.getName());
+  @Test
+  public void resolvesByName() throws Exception {
+    DbType lookup = typeManager.lookup(connection, JdbcTypes.VARCHAR_DB_TYPE.getName());
 
-        assertThat(lookup, sameInstance(JdbcTypes.VARCHAR_DB_TYPE));
-    }
+    assertThat(lookup, sameInstance(JdbcTypes.VARCHAR_DB_TYPE));
+  }
 
-    @Test(expected = UnknownDbTypeException.class)
-    public void failsWhenNoTypeDefined() throws Exception
-    {
-        typeManager.lookup(connection, "NonRegisteredType");
-    }
+  @Test(expected = UnknownDbTypeException.class)
+  public void failsWhenNoTypeDefined() throws Exception {
+    typeManager.lookup(connection, "NonRegisteredType");
+  }
 
-    @Test(expected = UnknownDbTypeException.class)
-    public void doesNotResolveByNameAndId() throws Exception
-    {
-        typeManager.lookup(connection, 0, JdbcTypes.VARCHAR_DB_TYPE.getName());
-    }
+  @Test(expected = UnknownDbTypeException.class)
+  public void doesNotResolveByNameAndId() throws Exception {
+    typeManager.lookup(connection, 0, JdbcTypes.VARCHAR_DB_TYPE.getName());
+  }
 }

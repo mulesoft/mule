@@ -8,12 +8,12 @@ package org.mule.runtime.core.api.schedule;
 
 /**
  * <p>
- * All the classes that implement this interface and are registered in the mule registry are going to be called
- * after the creation of a {@link Scheduler} by the {@link SchedulerFactory}
+ * All the classes that implement this interface and are registered in the mule registry are going to be called after the creation
+ * of a {@link Scheduler} by the {@link SchedulerFactory}
  * </p>
  * <p>
- * The SchedulerFactoryPostProcessor can alter the instance of the scheduler, create notifications, etc. It is a way
- * of hooking the creation of each {@link Scheduler}
+ * The SchedulerFactoryPostProcessor can alter the instance of the scheduler, create notifications, etc. It is a way of hooking
+ * the creation of each {@link Scheduler}
  * </p>
  * <p>
  * The SchedulerFactoryPostProcessor can be:
@@ -28,17 +28,16 @@ package org.mule.runtime.core.api.schedule;
  *
  * @since 3.5.0
  */
-public interface SchedulerFactoryPostProcessor
-{
+public interface SchedulerFactoryPostProcessor {
 
-    /**
-     * <p>
-     * Process based on a {@link Scheduler} instance after the {@link SchedulerFactory} creates it.
-     * </p>
-     *
-     * @param scheduler The {@link Scheduler} that was created by the {@SchedulerFactory}. It will never be Null.
-     * @param job, The job that the {@link Scheduler} is going to execute
-     * @return A Post processed instance of a {@link Scheduler}
-     */
-    Scheduler process(Object job, Scheduler scheduler);
+  /**
+   * <p>
+   * Process based on a {@link Scheduler} instance after the {@link SchedulerFactory} creates it.
+   * </p>
+   *
+   * @param scheduler The {@link Scheduler} that was created by the {@SchedulerFactory}. It will never be Null.
+   * @param job, The job that the {@link Scheduler} is going to execute
+   * @return A Post processed instance of a {@link Scheduler}
+   */
+  Scheduler process(Object job, Scheduler scheduler);
 }

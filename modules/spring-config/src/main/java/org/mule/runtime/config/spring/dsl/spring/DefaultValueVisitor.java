@@ -17,20 +17,17 @@ import java.util.Optional;
  *
  * @since 4.0
  */
-public class DefaultValueVisitor extends AbstractAttributeDefinitionVisitor
-{
+public class DefaultValueVisitor extends AbstractAttributeDefinitionVisitor {
 
-    private Optional<Object> defaultValue = empty();
+  private Optional<Object> defaultValue = empty();
 
-    @Override
-    public void onConfigurationParameter(String parameterName, Object defaultValue, Optional<TypeConverter> typeConverter)
-    {
-        this.defaultValue = Optional.ofNullable(defaultValue);
-    }
+  @Override
+  public void onConfigurationParameter(String parameterName, Object defaultValue, Optional<TypeConverter> typeConverter) {
+    this.defaultValue = Optional.ofNullable(defaultValue);
+  }
 
-    public Optional<Object> getDefaultValue()
-    {
-        return defaultValue;
-    }
+  public Optional<Object> getDefaultValue() {
+    return defaultValue;
+  }
 
 }

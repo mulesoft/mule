@@ -21,25 +21,23 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 @Ignore("This test causes HttpsSharePortTestCase to fail")
-public class InOutOutInTestCase extends FunctionalTestCase
-{
-    public static final long TIMEOUT = 3000;
+public class InOutOutInTestCase extends FunctionalTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/integration/messaging/meps/pattern_In-Out_Out-In.xml";
-    }
+  public static final long TIMEOUT = 3000;
 
-    @Test
-    public void testExchange() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/integration/messaging/meps/pattern_In-Out_Out-In.xml";
+  }
 
-        Map<String, Serializable> props = new HashMap<>();
-        props.put("foo", "bar");
-        MuleMessage result = client.send("inboundEndpoint", "some data", props);
-        assertNotNull(result);
-        assertEquals("bar header received", result.getPayload());
-    }
+  @Test
+  public void testExchange() throws Exception {
+    MuleClient client = muleContext.getClient();
+
+    Map<String, Serializable> props = new HashMap<>();
+    props.put("foo", "bar");
+    MuleMessage result = client.send("inboundEndpoint", "some data", props);
+    assertNotNull(result);
+    assertEquals("bar header received", result.getPayload());
+  }
 }

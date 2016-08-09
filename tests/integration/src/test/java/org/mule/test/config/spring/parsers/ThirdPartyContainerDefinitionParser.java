@@ -15,18 +15,14 @@ import org.mule.test.config.spring.parsers.beans.ThirdPartyContainer;
 import org.mule.runtime.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.runtime.config.spring.parsers.processors.NamedSetterChildElementIterator;
 
-public class ThirdPartyContainerDefinitionParser extends OrphanDefinitionParser
-{
+public class ThirdPartyContainerDefinitionParser extends OrphanDefinitionParser {
 
-    public ThirdPartyContainerDefinitionParser()
-    {
-        super(ThirdPartyContainer.class, true);
-        addIgnored(AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME);
-        addBeanFlag(MuleHierarchicalBeanDefinitionParserDelegate.MULE_NO_RECURSE);
-        PropertyConfiguration configuration = new SimplePropertyConfiguration();
-        registerPostProcessor(
-                new NamedSetterChildElementIterator(
-                        "thing", new DefaultBeanAssemblerFactory(), configuration));
-    }
+  public ThirdPartyContainerDefinitionParser() {
+    super(ThirdPartyContainer.class, true);
+    addIgnored(AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME);
+    addBeanFlag(MuleHierarchicalBeanDefinitionParserDelegate.MULE_NO_RECURSE);
+    PropertyConfiguration configuration = new SimplePropertyConfiguration();
+    registerPostProcessor(new NamedSetterChildElementIterator("thing", new DefaultBeanAssemblerFactory(), configuration));
+  }
 
 }

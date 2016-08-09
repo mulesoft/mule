@@ -9,10 +9,10 @@ package org.mule.runtime.core.api.registry;
 /**
  * Fired after the inject phase but before the initialise lifecycle phase
  *
- * @deprecated as of 3.7.0 since these are only used by {@link org.mule.runtime.core.registry.TransientRegistry} which is also deprecated. Use post processors
- * for currently supported registries instead (i.e: {@link org.mule.runtime.core.config.spring.SpringRegistry})
+ * @deprecated as of 3.7.0 since these are only used by {@link org.mule.runtime.core.registry.TransientRegistry} which is also
+ *             deprecated. Use post processors for currently supported registries instead (i.e:
+ *             {@link org.mule.runtime.core.config.spring.SpringRegistry})
  */
 @Deprecated
-public interface PreInitProcessor extends ObjectProcessor
-{
+public interface PreInitProcessor extends ObjectProcessor {
 }

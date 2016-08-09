@@ -48,204 +48,182 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class MuleSessionHandlerTestCase extends AbstractMuleTestCase
-{
+public class MuleSessionHandlerTestCase extends AbstractMuleTestCase {
 
-    private static String originalEncoding;
+  private static String originalEncoding;
 
-    private MuleContext muleContext;
+  private MuleContext muleContext;
 
-    @Before
-    public void setUp() throws Exception
-    {
-        muleContext = mock(MuleContext.class);
-        MuleConfiguration configuration = mock(MuleConfiguration.class);
-        when(configuration.getDefaultEncoding()).thenReturn(Charsets.UTF_8.name());
-        when(muleContext.getConfiguration()).thenReturn(configuration);
-        when(muleContext.getExecutionClassLoader()).thenReturn(Thread.currentThread().getContextClassLoader());
-        when(muleContext.getRegistry()).thenReturn(mock(MuleRegistry.class));
-        addJavaSerializerToMockMuleContext(muleContext);
+  @Before
+  public void setUp() throws Exception {
+    muleContext = mock(MuleContext.class);
+    MuleConfiguration configuration = mock(MuleConfiguration.class);
+    when(configuration.getDefaultEncoding()).thenReturn(Charsets.UTF_8.name());
+    when(muleContext.getConfiguration()).thenReturn(configuration);
+    when(muleContext.getExecutionClassLoader()).thenReturn(Thread.currentThread().getContextClassLoader());
+    when(muleContext.getRegistry()).thenReturn(mock(MuleRegistry.class));
+    addJavaSerializerToMockMuleContext(muleContext);
+  }
+
+  @BeforeClass
+  public static void setUpEncoding() {
+    originalEncoding = System.getProperty(MULE_ENCODING_SYSTEM_PROPERTY);
+    System.setProperty(MULE_ENCODING_SYSTEM_PROPERTY, "UTF-8");
+  }
+
+  @AfterClass
+  public static void restoreEncoding() {
+    if (originalEncoding == null) {
+      System.clearProperty(MULE_ENCODING_SYSTEM_PROPERTY);
+    } else {
+      System.setProperty(MULE_ENCODING_SYSTEM_PROPERTY, originalEncoding);
+    }
+  }
+
+  /**
+   * see EE-1705/MULE-4567
+   */
+  @Test
+  public void testSessionProperties() throws Exception {
+    MuleMessage message = MuleMessage.builder().payload("Test Message").build();
+    MuleEvent event = new DefaultMuleEvent(message, MuleTestUtils.getTestFlow(muleContext));
+    SessionHandler handler = new SerializeAndEncodeSessionHandler();
+
+    String string = "bar";
+    event.getSession().setProperty("fooString", string);
+
+    Date date = new Date(0);
+    event.getSession().setProperty("fooDate", date);
+
+    List<String> list = createList();
+    event.getSession().setProperty("fooList", list);
+
+    message = handler.storeSessionInfoToMessage(event.getSession(), event.getMessage(), muleContext);
+    event.setMessage(message);
+    // store save session to outbound, move it to the inbound
+    // for retrieve to deserialize
+    Serializable s = removeProperty(event);
+    message = MuleMessage.builder(event.getMessage()).addInboundProperty(MULE_SESSION_PROPERTY, s).build();
+    MuleSession session = handler.retrieveSessionInfoFromMessage(message, muleContext);
+
+    Object obj = session.getProperty("fooString");
+    assertTrue(obj instanceof String);
+    assertEquals(string, obj);
+
+    obj = session.getProperty("fooDate");
+    assertTrue("Object should be a Date but is " + obj.getClass().getName(), obj instanceof Date);
+    assertEquals(date, obj);
+
+    obj = session.getProperty("fooList");
+    assertTrue("Object should be a List but is " + obj.getClass().getName(), obj instanceof List);
+    assertEquals(list, obj);
+  }
+
+  /**
+   * see EE-1774
+   */
+  @Test
+  public void testNonSerializableSessionProperties() throws Exception {
+    MuleMessage message = MuleMessage.builder().payload("Test Message").build();
+    MuleEvent event = new DefaultMuleEvent(message, MuleTestUtils.getTestFlow(muleContext));
+    SessionHandler handler = new SerializeAndEncodeSessionHandler();
+
+    NotSerializableClass clazz = new NotSerializableClass();
+    event.getSession().setProperty("foo", clazz);
+    message = handler.storeSessionInfoToMessage(event.getSession(), event.getMessage(), muleContext);
+    event.setMessage(message);
+    // store save session to outbound, move it to the inbound
+    // for retrieve to deserialize
+    Serializable s = removeProperty(event);
+    message = MuleMessage.builder(event.getMessage()).addInboundProperty(MULE_SESSION_PROPERTY, s).build();
+    MuleSession session = handler.retrieveSessionInfoFromMessage(message, muleContext);
+    // Property was removed because it could not be serialized
+    assertNull(session.getProperty("foo"));
+  }
+
+  /**
+   * see MULE-4720
+   */
+  @Test
+  public void testSecurityContext() throws Exception {
+    MuleMessage message = MuleMessage.builder().payload("Test Message").build();
+    MuleEvent event = new DefaultMuleEvent(message, MuleTestUtils.getTestFlow(muleContext));
+    SessionHandler handler = new SerializeAndEncodeSessionHandler();
+
+    Credentials credentials = new MuleCredentials("joe", "secret".toCharArray());
+    SecurityContext sc = new DefaultSecurityContextFactory().create(new DefaultMuleAuthentication(credentials));
+    event.getSession().setSecurityContext(sc);
+
+    message = handler.storeSessionInfoToMessage(event.getSession(), event.getMessage(), muleContext);
+    event.setMessage(message);
+    // store save session to outbound, move it to the inbound
+    // for retrieve to deserialize
+    Serializable s = removeProperty(event);
+    message = MuleMessage.builder(event.getMessage()).addInboundProperty(MULE_SESSION_PROPERTY, s).build();
+    MuleSession session = handler.retrieveSessionInfoFromMessage(message, muleContext);
+
+    sc = session.getSecurityContext();
+    assertEquals("joe", sc.getAuthentication().getPrincipal());
+  }
+
+  private Serializable removeProperty(MuleEvent event) {
+    final AtomicReference<Serializable> outbound = new AtomicReference<>();
+    outbound.set(event.getMessage().getOutboundProperty(MULE_SESSION_PROPERTY));
+    event.setMessage(MuleMessage.builder(event.getMessage()).removeOutboundProperty(MULE_SESSION_PROPERTY).build());
+
+    final Object invocation = event.getFlowVariable(MULE_SESSION_PROPERTY);
+    event.removeFlowVariable(MULE_SESSION_PROPERTY);
+    return outbound.get() != null ? outbound.get() : (Serializable) invocation;
+  }
+
+  /**
+   * see EE-1774
+   */
+  @Test
+  public void testNotSerializableSecurityContext() throws Exception {
+    MuleMessage message = MuleMessage.builder().payload("Test Message").build();
+    SessionHandler handler = new SerializeAndEncodeSessionHandler();
+    MuleSession session = new DefaultMuleSession();
+
+    session.setSecurityContext(new NotSerializableSecurityContext());
+
+    try {
+      handler.storeSessionInfoToMessage(session, message, muleContext);
+      fail("Should throw a SerializationException");
+    } catch (SerializationException e) {
+      // expected
+    }
+  }
+
+  private List<String> createList() {
+    List<String> list = new ArrayList<>();
+    list.add("bar1");
+    list.add("bar2");
+    return list;
+  }
+
+  private class NotSerializableClass {
+
+    public NotSerializableClass() {
+      super();
+    }
+  }
+
+  private class NotSerializableSecurityContext implements SecurityContext {
+
+    public NotSerializableSecurityContext() {
+      super();
     }
 
-    @BeforeClass
-    public static void setUpEncoding()
-    {
-        originalEncoding = System.getProperty(MULE_ENCODING_SYSTEM_PROPERTY);
-        System.setProperty(MULE_ENCODING_SYSTEM_PROPERTY, "UTF-8");
+    @Override
+    public void setAuthentication(Authentication authentication) {
+      // nothing to do
     }
 
-    @AfterClass
-    public static void restoreEncoding()
-    {
-        if (originalEncoding == null)
-        {
-            System.clearProperty(MULE_ENCODING_SYSTEM_PROPERTY);
-        }
-        else
-        {
-            System.setProperty(MULE_ENCODING_SYSTEM_PROPERTY, originalEncoding);
-        }
+    @Override
+    public Authentication getAuthentication() {
+      return null;
     }
-
-    /**
-     * see EE-1705/MULE-4567
-     */
-    @Test
-    public void testSessionProperties() throws Exception
-    {
-        MuleMessage message = MuleMessage.builder().payload("Test Message").build();
-        MuleEvent event = new DefaultMuleEvent(message, MuleTestUtils.getTestFlow(muleContext));
-        SessionHandler handler = new SerializeAndEncodeSessionHandler();
-
-        String string = "bar";
-        event.getSession().setProperty("fooString", string);
-
-        Date date = new Date(0);
-        event.getSession().setProperty("fooDate", date);
-
-        List<String> list = createList();
-        event.getSession().setProperty("fooList", list);
-
-        message = handler.storeSessionInfoToMessage(event.getSession(), event.getMessage(), muleContext);
-        event.setMessage(message);
-        // store save session to outbound, move it to the inbound
-        // for retrieve to deserialize
-        Serializable s = removeProperty(event);
-        message = MuleMessage.builder(event.getMessage()).addInboundProperty(MULE_SESSION_PROPERTY, s).build();
-        MuleSession session = handler.retrieveSessionInfoFromMessage(message, muleContext);
-
-        Object obj = session.getProperty("fooString");
-        assertTrue(obj instanceof String);
-        assertEquals(string, obj);
-
-        obj = session.getProperty("fooDate");
-        assertTrue("Object should be a Date but is " + obj.getClass().getName(), obj instanceof Date);
-        assertEquals(date, obj);
-
-        obj = session.getProperty("fooList");
-        assertTrue("Object should be a List but is " + obj.getClass().getName(), obj instanceof List);
-        assertEquals(list, obj);
-    }
-
-    /**
-     * see EE-1774
-     */
-    @Test
-    public void testNonSerializableSessionProperties() throws Exception
-    {
-        MuleMessage message = MuleMessage.builder().payload("Test Message").build();
-        MuleEvent event = new DefaultMuleEvent(message, MuleTestUtils.getTestFlow(muleContext));
-        SessionHandler handler = new SerializeAndEncodeSessionHandler();
-
-        NotSerializableClass clazz = new NotSerializableClass();
-        event.getSession().setProperty("foo", clazz);
-        message = handler.storeSessionInfoToMessage(event.getSession(), event.getMessage(), muleContext);
-        event.setMessage(message);
-        // store save session to outbound, move it to the inbound
-        // for retrieve to deserialize
-        Serializable s = removeProperty(event);
-        message = MuleMessage.builder(event.getMessage()).addInboundProperty(MULE_SESSION_PROPERTY, s).build();
-        MuleSession session = handler.retrieveSessionInfoFromMessage(message, muleContext);
-        // Property was removed because it could not be serialized
-        assertNull(session.getProperty("foo"));
-    }
-
-    /**
-     * see MULE-4720
-     */
-    @Test
-    public void testSecurityContext() throws Exception
-    {
-        MuleMessage message = MuleMessage.builder().payload("Test Message").build();
-        MuleEvent event = new DefaultMuleEvent(message, MuleTestUtils.getTestFlow(muleContext));
-        SessionHandler handler = new SerializeAndEncodeSessionHandler();
-
-        Credentials credentials = new MuleCredentials("joe", "secret".toCharArray());
-        SecurityContext sc = new DefaultSecurityContextFactory().create(new DefaultMuleAuthentication(credentials));
-        event.getSession().setSecurityContext(sc);
-
-        message = handler.storeSessionInfoToMessage(event.getSession(), event.getMessage(), muleContext);
-        event.setMessage(message);
-        // store save session to outbound, move it to the inbound
-        // for retrieve to deserialize
-        Serializable s = removeProperty(event);
-        message = MuleMessage.builder(event.getMessage()).addInboundProperty(MULE_SESSION_PROPERTY, s).build();
-        MuleSession session = handler.retrieveSessionInfoFromMessage(message, muleContext);
-
-        sc = session.getSecurityContext();
-        assertEquals("joe", sc.getAuthentication().getPrincipal());
-    }
-
-    private Serializable removeProperty(MuleEvent event)
-    {
-        final AtomicReference<Serializable> outbound = new AtomicReference<>();
-        outbound.set(event.getMessage().getOutboundProperty(MULE_SESSION_PROPERTY));
-        event.setMessage(MuleMessage.builder(event.getMessage()).removeOutboundProperty(MULE_SESSION_PROPERTY).build());
-
-        final Object invocation = event.getFlowVariable(MULE_SESSION_PROPERTY);
-        event.removeFlowVariable(MULE_SESSION_PROPERTY);
-        return outbound.get() != null ? outbound.get() : (Serializable) invocation;
-    }
-
-    /**
-     * see EE-1774
-     */
-    @Test
-    public void testNotSerializableSecurityContext() throws Exception
-    {
-        MuleMessage message = MuleMessage.builder().payload("Test Message").build();
-        SessionHandler handler = new SerializeAndEncodeSessionHandler();
-        MuleSession session = new DefaultMuleSession();
-
-        session.setSecurityContext(new NotSerializableSecurityContext());
-
-        try
-        {
-            handler.storeSessionInfoToMessage(session, message, muleContext);
-            fail("Should throw a SerializationException");
-        }
-        catch (SerializationException e)
-        {
-            // expected
-        }
-    }
-
-    private List<String> createList()
-    {
-        List<String> list = new ArrayList<>();
-        list.add("bar1");
-        list.add("bar2");
-        return list;
-    }
-
-    private class NotSerializableClass
-    {
-
-        public NotSerializableClass()
-        {
-            super();
-        }
-    }
-
-    private class NotSerializableSecurityContext implements SecurityContext
-    {
-
-        public NotSerializableSecurityContext()
-        {
-            super();
-        }
-
-        @Override
-        public void setAuthentication(Authentication authentication)
-        {
-            // nothing to do
-        }
-
-        @Override
-        public Authentication getAuthentication()
-        {
-            return null;
-        }
-    }
+  }
 
 }

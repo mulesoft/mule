@@ -18,16 +18,13 @@ import java.util.LinkedList;
  *
  * @since 4.0
  */
-public class CaseInsensitiveParameterMap extends ParameterMap
-{
+public class CaseInsensitiveParameterMap extends ParameterMap {
 
-    public CaseInsensitiveParameterMap(ParameterMap paramsMap)
-    {
-        this.paramsMap = new CaseInsensitiveMapWrapper<>(LinkedHashMap.class);
-        for (String key : paramsMap.keySet())
-        {
-            this.paramsMap.put(key, paramsMap.getAll(key).stream().collect(toCollection(LinkedList::new)));
-        }
+  public CaseInsensitiveParameterMap(ParameterMap paramsMap) {
+    this.paramsMap = new CaseInsensitiveMapWrapper<>(LinkedHashMap.class);
+    for (String key : paramsMap.keySet()) {
+      this.paramsMap.put(key, paramsMap.getAll(key).stream().collect(toCollection(LinkedList::new)));
     }
+  }
 
 }

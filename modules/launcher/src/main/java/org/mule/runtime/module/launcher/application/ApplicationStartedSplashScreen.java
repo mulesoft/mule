@@ -16,35 +16,28 @@ import java.util.Set;
 /**
  * Splash screen specific for {@link Application} startup based on it's {@link ApplicationDescriptor}.
  */
-public class ApplicationStartedSplashScreen extends ArtifactStartedSplashScreen<ApplicationDescriptor>
-{
+public class ApplicationStartedSplashScreen extends ArtifactStartedSplashScreen<ApplicationDescriptor> {
 
-    @Override
-    protected void createMessage(ApplicationDescriptor descriptor)
-    {
-        doBody(String.format("Started app '%s'", descriptor.getName()));
-        if (RUNTIME_VERBOSE_PROPERTY.isEnabled())
-        {
-            listPlugins(descriptor);
-            listLibraries(descriptor);
-        }
+  @Override
+  protected void createMessage(ApplicationDescriptor descriptor) {
+    doBody(String.format("Started app '%s'", descriptor.getName()));
+    if (RUNTIME_VERBOSE_PROPERTY.isEnabled()) {
+      listPlugins(descriptor);
+      listLibraries(descriptor);
     }
+  }
 
-    private void listPlugins(ApplicationDescriptor descriptor)
-    {
-        Set<ArtifactPluginDescriptor> plugins = descriptor.getPlugins();
-        if (!plugins.isEmpty())
-        {
-            doBody("Application plugins:");
-            for (ArtifactPluginDescriptor plugin : plugins)
-            {
-                doBody(String.format(VALUE_FORMAT, plugin.getName()));
-            }
-        }
+  private void listPlugins(ApplicationDescriptor descriptor) {
+    Set<ArtifactPluginDescriptor> plugins = descriptor.getPlugins();
+    if (!plugins.isEmpty()) {
+      doBody("Application plugins:");
+      for (ArtifactPluginDescriptor plugin : plugins) {
+        doBody(String.format(VALUE_FORMAT, plugin.getName()));
+      }
     }
+  }
 
-    protected void listLibraries(ApplicationDescriptor descriptor)
-    {
-        listItems(getLibraries(getAppLibFolder(descriptor.getName())), "Application libraries:");
-    }
+  protected void listLibraries(ApplicationDescriptor descriptor) {
+    listItems(getLibraries(getAppLibFolder(descriptor.getName())), "Application libraries:");
+  }
 }

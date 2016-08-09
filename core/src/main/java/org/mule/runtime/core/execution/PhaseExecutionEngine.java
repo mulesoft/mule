@@ -12,110 +12,96 @@ import org.mule.runtime.core.api.exception.SystemExceptionHandler;
 import java.util.List;
 
 /**
- * This class process a message through a set of {@link org.mule.runtime.core.execution.MessageProcessPhase} using
- * the message content and message processing context provided by {@link org.mule.runtime.core.execution.MessageProcessTemplate} and {@link org.mule.runtime.core.execution.MessageProcessContext}.
+ * This class process a message through a set of {@link org.mule.runtime.core.execution.MessageProcessPhase} using the message
+ * content and message processing context provided by {@link org.mule.runtime.core.execution.MessageProcessTemplate} and
+ * {@link org.mule.runtime.core.execution.MessageProcessContext}.
  * <p>
- * This class will handle any message processing failure by calling the {@link org.mule.runtime.core.api.exception.SystemExceptionHandler} defined by the application.
+ * This class will handle any message processing failure by calling the
+ * {@link org.mule.runtime.core.api.exception.SystemExceptionHandler} defined by the application.
  * <p>
  * Each {@link org.mule.runtime.core.execution.MessageProcessPhase} can be executed with a different threading mechanism.
- * {@link org.mule.runtime.core.execution.MessageProcessPhase} implementation must guarantee that upon phase completion the method {@link PhaseResultNotifier#phaseSuccessfully()}  is executed,
- * if there was a failure processing the message then the method {@link PhaseResultNotifier#phaseFailure(Exception)} must be executed and if the phase consumed the message the method
+ * {@link org.mule.runtime.core.execution.MessageProcessPhase} implementation must guarantee that upon phase completion the method
+ * {@link PhaseResultNotifier#phaseSuccessfully()} is executed, if there was a failure processing the message then the method
+ * {@link PhaseResultNotifier#phaseFailure(Exception)} must be executed and if the phase consumed the message the method
  * {@link org.mule.runtime.core.execution.PhaseResultNotifier#phaseConsumedMessage()} must be executed.
  */
-public class PhaseExecutionEngine
-{
+public class PhaseExecutionEngine {
 
-    private final List<MessageProcessPhase> phaseList;
-    private final SystemExceptionHandler exceptionHandler;
-    private final EndProcessPhase endProcessPhase;
+  private final List<MessageProcessPhase> phaseList;
+  private final SystemExceptionHandler exceptionHandler;
+  private final EndProcessPhase endProcessPhase;
 
-    public PhaseExecutionEngine(List<MessageProcessPhase> messageProcessPhaseList, SystemExceptionHandler exceptionHandler, EndProcessPhase endProcessPhase)
-    {
-        this.phaseList = messageProcessPhaseList;
-        this.exceptionHandler = exceptionHandler;
-        this.endProcessPhase = endProcessPhase;
+  public PhaseExecutionEngine(List<MessageProcessPhase> messageProcessPhaseList, SystemExceptionHandler exceptionHandler,
+                              EndProcessPhase endProcessPhase) {
+    this.phaseList = messageProcessPhaseList;
+    this.exceptionHandler = exceptionHandler;
+    this.endProcessPhase = endProcessPhase;
+  }
+
+  public void process(MessageProcessTemplate messageProcessTemplate, MessageProcessContext messageProcessContext) {
+    InternalPhaseExecutionEngine internalPhaseExecutionEngine =
+        new InternalPhaseExecutionEngine(messageProcessTemplate, messageProcessContext);
+    internalPhaseExecutionEngine.process();
+  }
+
+  public class InternalPhaseExecutionEngine implements PhaseResultNotifier {
+
+    private int currentPhase = 0;
+    private final MessageProcessContext messageProcessContext;
+    private final MessageProcessTemplate messageProcessTemplate;
+    private boolean endPhaseProcessed;
+
+    public InternalPhaseExecutionEngine(MessageProcessTemplate messageProcessTemplate,
+                                        MessageProcessContext messageProcessContext) {
+      this.messageProcessTemplate = messageProcessTemplate;
+      this.messageProcessContext = messageProcessContext;
     }
 
-    public void process(MessageProcessTemplate messageProcessTemplate, MessageProcessContext messageProcessContext)
-    {
-        InternalPhaseExecutionEngine internalPhaseExecutionEngine = new InternalPhaseExecutionEngine(messageProcessTemplate, messageProcessContext);
-        internalPhaseExecutionEngine.process();
+    @Override
+    public void phaseSuccessfully() {
+      currentPhase++;
+      if (currentPhase < phaseList.size()) {
+        if (phaseList.get(currentPhase).supportsTemplate(messageProcessTemplate)) {
+          phaseList.get(currentPhase).runPhase(messageProcessTemplate, messageProcessContext, this);
+        } else {
+          phaseSuccessfully();
+        }
+      } else {
+        processEndPhase();
+      }
     }
 
-    public class InternalPhaseExecutionEngine implements PhaseResultNotifier
-    {
-
-        private int currentPhase = 0;
-        private final MessageProcessContext messageProcessContext;
-        private final MessageProcessTemplate messageProcessTemplate;
-        private boolean endPhaseProcessed;
-
-        public InternalPhaseExecutionEngine(MessageProcessTemplate messageProcessTemplate, MessageProcessContext messageProcessContext)
-        {
-            this.messageProcessTemplate = messageProcessTemplate;
-            this.messageProcessContext = messageProcessContext;
-        }
-
-        @Override
-        public void phaseSuccessfully()
-        {
-            currentPhase++;
-            if (currentPhase < phaseList.size())
-            {
-                if (phaseList.get(currentPhase).supportsTemplate(messageProcessTemplate))
-                {
-                    phaseList.get(currentPhase).runPhase(messageProcessTemplate, messageProcessContext, this);
-                }
-                else
-                {
-                    phaseSuccessfully();
-                }
-            }
-            else
-            {
-                processEndPhase();
-            }
-        }
-
-        @Override
-        public void phaseConsumedMessage()
-        {
-            processEndPhase();
-        }
-
-        @Override
-        public void phaseFailure(Exception reason)
-        {
-            exceptionHandler.handleException(reason);
-            processEndPhase();
-        }
-
-        private void processEndPhase()
-        {
-            if (!endPhaseProcessed)
-            {
-                endPhaseProcessed = true;
-                if (endProcessPhase.supportsTemplate(messageProcessTemplate))
-                {
-                    endProcessPhase.runPhase((EndPhaseTemplate) messageProcessTemplate, messageProcessContext, this);
-                }
-            }
-        }
-
-        public void process()
-        {
-            withContextClassLoader(messageProcessContext.getExecutionClassLoader(), () -> {
-                for (MessageProcessPhase phase : phaseList)
-                {
-                    if (phase.supportsTemplate(messageProcessTemplate))
-                    {
-                        phase.runPhase(messageProcessTemplate, messageProcessContext, this);
-                        return;
-                    }
-                    currentPhase++;
-                }
-            });
-        }
-
+    @Override
+    public void phaseConsumedMessage() {
+      processEndPhase();
     }
+
+    @Override
+    public void phaseFailure(Exception reason) {
+      exceptionHandler.handleException(reason);
+      processEndPhase();
+    }
+
+    private void processEndPhase() {
+      if (!endPhaseProcessed) {
+        endPhaseProcessed = true;
+        if (endProcessPhase.supportsTemplate(messageProcessTemplate)) {
+          endProcessPhase.runPhase((EndPhaseTemplate) messageProcessTemplate, messageProcessContext, this);
+        }
+      }
+    }
+
+    public void process() {
+      withContextClassLoader(messageProcessContext.getExecutionClassLoader(), () -> {
+        for (MessageProcessPhase phase : phaseList) {
+          if (phase.supportsTemplate(messageProcessTemplate)) {
+            phase.runPhase(messageProcessTemplate, messageProcessContext, this);
+            return;
+          }
+          currentPhase++;
+        }
+      });
+    }
+
+  }
 }

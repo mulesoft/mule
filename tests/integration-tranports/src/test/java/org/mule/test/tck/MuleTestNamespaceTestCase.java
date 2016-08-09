@@ -19,48 +19,42 @@ import org.mule.tck.testmodels.mule.TestConnector;
 
 import org.junit.Test;
 
-public class MuleTestNamespaceTestCase extends FunctionalTestCase
-{
+public class MuleTestNamespaceTestCase extends FunctionalTestCase {
+
+  @Override
+  protected String getConfigFile() {
+    return "test-namespace-config-flow.xml";
+  }
+
+  @Test
+  public void testConnectorUsingDefaultDispatcherPoolFactory() {
+    Connector connector = muleContext.getRegistry().lookupObject("testConnectorWithDefaultFactory");
+
+    assertTrue(connector instanceof TestConnector);
+    TestConnector testConnector = (TestConnector) connector;
+    assertEquals(DefaultConfigurableKeyedObjectPoolFactory.class, testConnector.getDispatcherPoolFactory().getClass());
+    assertEquals(DefaultConfigurableKeyedObjectPool.class, testConnector.getDispatchers().getClass());
+  }
+
+  @Test
+  public void testConnectorUsingOverriddenDispatcherPoolFactory() {
+    Connector connector = muleContext.getRegistry().lookupObject("testConnectorWithOverriddenFactory");
+
+    assertTrue(connector instanceof TestConnector);
+    TestConnector testConnector = (TestConnector) connector;
+    assertEquals(StubDispatcherPoolFactory.class, testConnector.getDispatcherPoolFactory().getClass());
+    assertEquals(StubConfigurableKeyedObjectPool.class, testConnector.getDispatchers().getClass());
+  }
+
+  public static class StubConfigurableKeyedObjectPool extends DefaultConfigurableKeyedObjectPool {
+    // no custom methods
+  }
+
+  public static class StubDispatcherPoolFactory implements ConfigurableKeyedObjectPoolFactory {
 
     @Override
-    protected String getConfigFile()
-    {
-        return "test-namespace-config-flow.xml";
+    public ConfigurableKeyedObjectPool createObjectPool() {
+      return new StubConfigurableKeyedObjectPool();
     }
-
-    @Test
-    public void testConnectorUsingDefaultDispatcherPoolFactory()
-    {
-        Connector connector = muleContext.getRegistry().lookupObject("testConnectorWithDefaultFactory");
-
-        assertTrue(connector instanceof TestConnector);
-        TestConnector testConnector = (TestConnector) connector;
-        assertEquals(DefaultConfigurableKeyedObjectPoolFactory.class, testConnector.getDispatcherPoolFactory().getClass());
-        assertEquals(DefaultConfigurableKeyedObjectPool.class, testConnector.getDispatchers().getClass());
-    }
-
-    @Test
-    public void testConnectorUsingOverriddenDispatcherPoolFactory()
-    {
-        Connector connector = muleContext.getRegistry().lookupObject("testConnectorWithOverriddenFactory");
-
-        assertTrue(connector instanceof TestConnector);
-        TestConnector testConnector = (TestConnector) connector;
-        assertEquals(StubDispatcherPoolFactory.class, testConnector.getDispatcherPoolFactory().getClass());
-        assertEquals(StubConfigurableKeyedObjectPool.class, testConnector.getDispatchers().getClass());
-    }
-
-    public static class StubConfigurableKeyedObjectPool extends DefaultConfigurableKeyedObjectPool
-    {
-        // no custom methods
-    }
-
-    public static class StubDispatcherPoolFactory implements ConfigurableKeyedObjectPoolFactory
-    {
-        @Override
-        public ConfigurableKeyedObjectPool createObjectPool()
-        {
-            return new StubConfigurableKeyedObjectPool();
-        }
-    }
+  }
 }

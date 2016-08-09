@@ -12,23 +12,19 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-public class MockTcpProtocol extends AbstractByteProtocol
-{
+public class MockTcpProtocol extends AbstractByteProtocol {
 
-    public MockTcpProtocol()
-    {
-        super(false);
-    }
+  public MockTcpProtocol() {
+    super(false);
+  }
 
-    @Override
-    public InputStream read(InputStream is) throws IOException
-    {
-        throw new UnsupportedOperationException("read");
-    }
+  @Override
+  public InputStream read(InputStream is) throws IOException {
+    throw new UnsupportedOperationException("read");
+  }
 
-    @Override
-    public void write(OutputStream os, Object data, String encoding) throws IOException
-    {
-        throw new UnsupportedOperationException("write");
-    }
+  @Override
+  public void write(OutputStream os, Object data, String encoding) throws IOException {
+    throw new UnsupportedOperationException("write");
+  }
 }

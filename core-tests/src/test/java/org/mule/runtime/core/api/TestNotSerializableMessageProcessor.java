@@ -11,17 +11,14 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 
-public class TestNotSerializableMessageProcessor implements MessageProcessor
-{
+public class TestNotSerializableMessageProcessor implements MessageProcessor {
 
-    public TestNotSerializableMessageProcessor()
-    {
-        super();
-    }
+  public TestNotSerializableMessageProcessor() {
+    super();
+  }
 
-    @Override
-    public MuleEvent process(MuleEvent event) throws MuleException
-    {
-        return event;
-    }
+  @Override
+  public MuleEvent process(MuleEvent event) throws MuleException {
+    return event;
+  }
 }

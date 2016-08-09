@@ -21,51 +21,47 @@ import org.mule.runtime.module.ws.consumer.SoapFaultException;
 
 import org.junit.Test;
 
-public class CatchExceptionStrategyFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase
-{
+public class CatchExceptionStrategyFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase {
 
-    private static final String FAIL_REQUEST = "<tns:fail xmlns:tns=\"http://consumer.ws.module.runtime.mule.org/\">" +
-                                               "<text>Hello</text></tns:fail>";
+  private static final String FAIL_REQUEST =
+      "<tns:fail xmlns:tns=\"http://consumer.ws.module.runtime.mule.org/\">" + "<text>Hello</text></tns:fail>";
 
-    private static final String EXPECTED_SOAP_FAULT_DETAIL = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><detail>" +
-                                                             "<ns2:EchoException xmlns:ns2=\"http://consumer.ws.module.runtime.mule.org/\">" +
-                                                             "<text>Hello</text></ns2:EchoException></detail>";
+  private static final String EXPECTED_SOAP_FAULT_DETAIL = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><detail>"
+      + "<ns2:EchoException xmlns:ns2=\"http://consumer.ws.module.runtime.mule.org/\">"
+      + "<text>Hello</text></ns2:EchoException></detail>";
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "catch-exception-strategy-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "catch-exception-strategy-config.xml";
+  }
 
-    @Test
-    public void soapFaultThrowsException() throws Exception
-    {
-        MessagingException e = flowRunner("soapFaultWithoutCatchExceptionStrategy").withPayload(FAIL_REQUEST).runExpectingException();
-        MuleMessage response = e.getEvent().getMessage();
+  @Test
+  public void soapFaultThrowsException() throws Exception {
+    MessagingException e = flowRunner("soapFaultWithoutCatchExceptionStrategy").withPayload(FAIL_REQUEST).runExpectingException();
+    MuleMessage response = e.getEvent().getMessage();
 
-        assertNotNull(response.getExceptionPayload());
+    assertNotNull(response.getExceptionPayload());
 
-        SoapFaultException soapFault = (SoapFaultException) response.getExceptionPayload().getException();
-        assertThat(soapFault.getMessage(), startsWith("Hello"));
-        assertThat(soapFault.getFaultCode().getLocalPart(), is("Server"));
-    }
+    SoapFaultException soapFault = (SoapFaultException) response.getExceptionPayload().getException();
+    assertThat(soapFault.getMessage(), startsWith("Hello"));
+    assertThat(soapFault.getFaultCode().getLocalPart(), is("Server"));
+  }
 
-    @Test
-    public void catchExceptionStrategyHandlesSoapFault() throws Exception
-    {
-        ExceptionListener listener = new ExceptionListener(muleContext);
-        MuleMessage response = flowRunner("soapFaultWithCatchExceptionStrategy").withPayload(FAIL_REQUEST).run().getMessage();
+  @Test
+  public void catchExceptionStrategyHandlesSoapFault() throws Exception {
+    ExceptionListener listener = new ExceptionListener(muleContext);
+    MuleMessage response = flowRunner("soapFaultWithCatchExceptionStrategy").withPayload(FAIL_REQUEST).run().getMessage();
 
-        // Assert that the exception was thrown
-        listener.waitUntilAllNotificationsAreReceived();
+    // Assert that the exception was thrown
+    listener.waitUntilAllNotificationsAreReceived();
 
-        assertXMLEqual(EXPECTED_SOAP_FAULT_DETAIL, getPayloadAsString(response));
+    assertXMLEqual(EXPECTED_SOAP_FAULT_DETAIL, getPayloadAsString(response));
 
-        assertNull(response.getExceptionPayload());
+    assertNull(response.getExceptionPayload());
 
-        SoapFaultException soapFault = response.getOutboundProperty("soapFaultException");
-        assertThat(soapFault.getMessage(), startsWith("Hello"));
-        assertThat(soapFault.getFaultCode().getLocalPart(), is("Server"));
-    }
+    SoapFaultException soapFault = response.getOutboundProperty("soapFaultException");
+    assertThat(soapFault.getMessage(), startsWith("Hello"));
+    assertThat(soapFault.getFaultCode().getLocalPart(), is("Server"));
+  }
 
 }

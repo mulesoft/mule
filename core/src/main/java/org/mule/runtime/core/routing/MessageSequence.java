@@ -14,46 +14,42 @@ import java.util.Iterator;
  * @author flbulgarelli
  * @param <T> the message payload type
  */
-public interface MessageSequence<T> extends Iterator<T>
-{
-    Integer UNKNOWN_SIZE = null;
+public interface MessageSequence<T> extends Iterator<T> {
 
-    /**
-     * If the sequence is empty
-     * 
-     * @return !hasNext()
-     */
-    boolean isEmpty();
+  Integer UNKNOWN_SIZE = null;
 
-    /**
-     * The number of members of the sequence.  If this is unknown, return UNKNOWN_ELEMENTS_COUNT.
-     * 
-     * @return The estimated size of the sequence, or {@link #UNKNOWN_SIZE},
-     *         if it is unknown
-     */
-    Integer size();
+  /**
+   * If the sequence is empty
+   * 
+   * @return !hasNext()
+   */
+  boolean isEmpty();
 
-    /**
-     * Whether this sequence has more elements.
-     * 
-     * @see Iterator#hasNext()
-     */
-    @Override
-    public boolean hasNext();
+  /**
+   * The number of members of the sequence. If this is unknown, return UNKNOWN_ELEMENTS_COUNT.
+   * 
+   * @return The estimated size of the sequence, or {@link #UNKNOWN_SIZE}, if it is unknown
+   */
+  Integer size();
 
-    /**
-     * The next element of the sequence. At any moment, if
-     * {@link #size()} is not equal to
-     * {@link #UNKNOWN_SIZE}, this means that this method may be invoked
-     * approximately up to {@link #size()} times.
-     */
-    @Override
-    public T next();
-    
-    /**
-     * Unsupported operation. 
-     * {@link MessageSequence} do not allow removal of elements.
-     */
-    @Override
-    public void remove();
+  /**
+   * Whether this sequence has more elements.
+   * 
+   * @see Iterator#hasNext()
+   */
+  @Override
+  public boolean hasNext();
+
+  /**
+   * The next element of the sequence. At any moment, if {@link #size()} is not equal to {@link #UNKNOWN_SIZE}, this means that
+   * this method may be invoked approximately up to {@link #size()} times.
+   */
+  @Override
+  public T next();
+
+  /**
+   * Unsupported operation. {@link MessageSequence} do not allow removal of elements.
+   */
+  @Override
+  public void remove();
 }

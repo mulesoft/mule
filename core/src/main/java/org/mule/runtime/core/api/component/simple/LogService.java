@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.api.component.simple;
 
-public interface LogService
-{
-    void log(String message);
+public interface LogService {
+
+  void log(String message);
 }

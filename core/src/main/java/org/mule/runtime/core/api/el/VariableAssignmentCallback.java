@@ -13,7 +13,7 @@ package org.mule.runtime.core.api.el;
 /**
  * @since 3.3
  */
-public interface VariableAssignmentCallback<T>
-{
-    public void assignValue(String name, T value, T newValue);
+public interface VariableAssignmentCallback<T> {
+
+  public void assignValue(String name, T value, T newValue);
 }

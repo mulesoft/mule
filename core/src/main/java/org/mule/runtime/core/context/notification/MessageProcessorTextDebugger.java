@@ -11,24 +11,20 @@ import org.mule.runtime.core.api.context.notification.MessageProcessorNotificati
 /**
  * Listener for MessageProcessorNotification that delegates notifications to NotificationTextDebugger
  */
-public class MessageProcessorTextDebugger implements MessageProcessorNotificationListener<MessageProcessorNotification>
-{
+public class MessageProcessorTextDebugger implements MessageProcessorNotificationListener<MessageProcessorNotification> {
 
-    private final MessageProcessingFlowTraceManager messageProcessingFlowTraceManager;
+  private final MessageProcessingFlowTraceManager messageProcessingFlowTraceManager;
 
-    public MessageProcessorTextDebugger(MessageProcessingFlowTraceManager messageProcessingFlowTraceManager)
-    {
-        this.messageProcessingFlowTraceManager = messageProcessingFlowTraceManager;
+  public MessageProcessorTextDebugger(MessageProcessingFlowTraceManager messageProcessingFlowTraceManager) {
+    this.messageProcessingFlowTraceManager = messageProcessingFlowTraceManager;
+  }
+
+
+  @Override
+  public void onNotification(MessageProcessorNotification notification) {
+    if (notification.getAction() == MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE) {
+      messageProcessingFlowTraceManager.onMessageProcessorNotificationPreInvoke(notification);
     }
-
-
-    @Override
-    public void onNotification(MessageProcessorNotification notification)
-    {
-        if (notification.getAction() == MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE)
-        {
-            messageProcessingFlowTraceManager.onMessageProcessorNotificationPreInvoke(notification);
-        }
-    }
+  }
 
 }

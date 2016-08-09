@@ -9,15 +9,15 @@ package org.mule.functional.functional;
 /**
  * Interface only to be used by the {@link FunctionalTestComponent}.
  */
-public interface Receiveable
-{
-    /**
-     * This method is used by some WebServices tests where you don' want to be introducing the {@link org.mule.runtime.core.api.MuleEventContext} as
-     * a complex type.
-     *
-     * @param data the event data received
-     * @return the processed message
-     * @throws Exception
-     */
-    public Object onReceive(Object data) throws Exception;
+public interface Receiveable {
+
+  /**
+   * This method is used by some WebServices tests where you don' want to be introducing the
+   * {@link org.mule.runtime.core.api.MuleEventContext} as a complex type.
+   *
+   * @param data the event data received
+   * @return the processed message
+   * @throws Exception
+   */
+  public Object onReceive(Object data) throws Exception;
 }

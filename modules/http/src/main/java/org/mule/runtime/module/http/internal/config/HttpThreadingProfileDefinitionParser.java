@@ -17,23 +17,20 @@ import org.w3c.dom.Element;
 /**
  * Threading profile definition parser for HTTP, that sets a custom default value for the maxThreadsActive property.
  */
-public class HttpThreadingProfileDefinitionParser extends ThreadingProfileDefinitionParser
-{
+public class HttpThreadingProfileDefinitionParser extends ThreadingProfileDefinitionParser {
 
-    public HttpThreadingProfileDefinitionParser(String propertyName, String defaults)
-    {
-        super(propertyName, defaults);
-    }
+  public HttpThreadingProfileDefinitionParser(String propertyName, String defaults) {
+    super(propertyName, defaults);
+  }
 
-    public HttpThreadingProfileDefinitionParser(String propertyName, String defaults, Class<? extends ThreadingProfile> threadingProfileClass)
-    {
-        super(propertyName, defaults, threadingProfileClass);
-    }
+  public HttpThreadingProfileDefinitionParser(String propertyName, String defaults,
+                                              Class<? extends ThreadingProfile> threadingProfileClass) {
+    super(propertyName, defaults, threadingProfileClass);
+  }
 
-    @Override
-    protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
-    {
-        builder.addPropertyValue("maxThreadsActive", DEFAULT_MAX_THREADS);
-        super.parseChild(element, parserContext, builder);
-    }
+  @Override
+  protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
+    builder.addPropertyValue("maxThreadsActive", DEFAULT_MAX_THREADS);
+    super.parseChild(element, parserContext, builder);
+  }
 }

@@ -10,36 +10,33 @@ import org.mule.runtime.core.config.i18n.Message;
 
 /** <code>DisposeException</code> TODO (document class) */
 
-public class StartException extends LifecycleException
-{
-    /** Serial version */
-    private static final long serialVersionUID = 1714192220605243678L;
+public class StartException extends LifecycleException {
 
-    /**
-     * @param message   the exception message
-     * @param component the object that failed during a lifecycle method call
-     */
-    public StartException(Message message, Startable component)
-    {
-        super(message, component);
-    }
+  /** Serial version */
+  private static final long serialVersionUID = 1714192220605243678L;
 
-    /**
-     * @param message   the exception message
-     * @param cause     the exception that cause this exception to be thrown
-     * @param component the object that failed during a lifecycle method call
-     */
-    public StartException(Message message, Throwable cause, Startable component)
-    {
-        super(message, cause, component);
-    }
+  /**
+   * @param message the exception message
+   * @param component the object that failed during a lifecycle method call
+   */
+  public StartException(Message message, Startable component) {
+    super(message, component);
+  }
 
-    /**
-     * @param cause     the exception that cause this exception to be thrown
-     * @param component the object that failed during a lifecycle method call
-     */
-    public StartException(Throwable cause, Startable component)
-    {
-        super(cause, component);
-    }
+  /**
+   * @param message the exception message
+   * @param cause the exception that cause this exception to be thrown
+   * @param component the object that failed during a lifecycle method call
+   */
+  public StartException(Message message, Throwable cause, Startable component) {
+    super(message, cause, component);
+  }
+
+  /**
+   * @param cause the exception that cause this exception to be thrown
+   * @param component the object that failed during a lifecycle method call
+   */
+  public StartException(Throwable cause, Startable component) {
+    super(cause, component);
+  }
 }

@@ -26,82 +26,66 @@ import java.util.Set;
 import org.apache.commons.lang.ClassUtils;
 
 /**
- * Visitor that retrieves the {@code ComponentModel} object {@code Class} based
- * on the component configuration.
+ * Visitor that retrieves the {@code ComponentModel} object {@code Class} based on the component configuration.
  *
  * @since 4.0
  */
-public class ObjectTypeVisitor implements TypeDefinitionVisitor
-{
+public class ObjectTypeVisitor implements TypeDefinitionVisitor {
 
-    public static final Class<ArrayList> DEFAULT_COLLECTION_TYPE = ArrayList.class;
-    private static final Class<HashMap> DEFAULT_MAP_TYPE = HashMap.class;
-    private static final Class<HashSet> DEFAULT_SET_CLASS = HashSet.class;
+  public static final Class<ArrayList> DEFAULT_COLLECTION_TYPE = ArrayList.class;
+  private static final Class<HashMap> DEFAULT_MAP_TYPE = HashMap.class;
+  private static final Class<HashSet> DEFAULT_SET_CLASS = HashSet.class;
 
-    private final ComponentModel componentModel;
-    private Class<?> type;
-    private Optional<TypeDefinition.MapEntryType> mapEntryType = empty();
+  private final ComponentModel componentModel;
+  private Class<?> type;
+  private Optional<TypeDefinition.MapEntryType> mapEntryType = empty();
 
-    public ObjectTypeVisitor(ComponentModel componentModel)
-    {
-        this.componentModel = componentModel;
+  public ObjectTypeVisitor(ComponentModel componentModel) {
+    this.componentModel = componentModel;
+  }
+
+  @Override
+  public void onType(Class<?> type) {
+    this.type = resolveType(type);
+  }
+
+  private Class<?> resolveType(Class<?> type) {
+    if (Collection.class.equals(type) || List.class.equals(type)) {
+      return DEFAULT_COLLECTION_TYPE;
+    } else if (Set.class.equals(type)) {
+      return DEFAULT_SET_CLASS;
+    } else if (Map.class.equals(type)) {
+      return DEFAULT_MAP_TYPE;
+    } else {
+      return type;
     }
+  }
 
-    @Override
-    public void onType(Class<?> type)
-    {
-        this.type = resolveType(type);
+  @Override
+  public void onConfigurationAttribute(String attributeName) {
+    try {
+      type =
+          ClassUtils.getClass(Thread.currentThread().getContextClassLoader(), componentModel.getParameters().get(attributeName));
+    } catch (ClassNotFoundException e) {
+      throw new MuleRuntimeException(createStaticMessage("Error while trying to locate Class definition for type %s on element %s",
+                                                         componentModel.getParameters().get(attributeName),
+                                                         componentModel.getIdentifier()),
+                                     e);
     }
+  }
 
-    private Class<?> resolveType(Class<?> type)
-    {
-        if (Collection.class.equals(type) || List.class.equals(type))
-        {
-            return DEFAULT_COLLECTION_TYPE;
-        }
-        else if (Set.class.equals(type))
-        {
-            return DEFAULT_SET_CLASS;
-        }
-        else if (Map.class.equals(type))
-        {
-            return DEFAULT_MAP_TYPE;
-        }
-        else
-        {
-            return type;
-        }
-    }
+  @Override
+  public void onMapType(TypeDefinition.MapEntryType mapEntryType) {
+    this.type = mapEntryType.getClass();
+    this.mapEntryType =
+        of(new TypeDefinition.MapEntryType(resolveType(mapEntryType.getKeyType()), resolveType(mapEntryType.getValueType())));
+  }
 
-    @Override
-    public void onConfigurationAttribute(String attributeName)
-    {
-        try
-        {
-            type = ClassUtils.getClass(Thread.currentThread().getContextClassLoader(), componentModel.getParameters().get(attributeName));
-        }
-        catch (ClassNotFoundException e)
-        {
-            throw new MuleRuntimeException(createStaticMessage("Error while trying to locate Class definition for type %s on element %s",
-                                                               componentModel.getParameters().get(attributeName),
-                                                               componentModel.getIdentifier()), e);
-        }
-    }
+  public Class<?> getType() {
+    return type;
+  }
 
-    @Override
-    public void onMapType(TypeDefinition.MapEntryType mapEntryType)
-    {
-        this.type = mapEntryType.getClass();
-        this.mapEntryType = of(new TypeDefinition.MapEntryType(resolveType(mapEntryType.getKeyType()), resolveType(mapEntryType.getValueType())));
-    }
-
-    public Class<?> getType()
-    {
-        return type;
-    }
-
-    public Optional<TypeDefinition.MapEntryType> getMapEntryType()
-    {
-        return mapEntryType;
-    }
+  public Optional<TypeDefinition.MapEntryType> getMapEntryType() {
+    return mapEntryType;
+  }
 }

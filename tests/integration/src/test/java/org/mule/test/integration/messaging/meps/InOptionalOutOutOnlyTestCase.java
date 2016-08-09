@@ -16,29 +16,25 @@ import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Test;
 
-public class InOptionalOutOutOnlyTestCase extends AbstractIntegrationTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/integration/messaging/meps/pattern_In-Optional-Out_Out-Only-flow.xml";
-    }
+public class InOptionalOutOutOnlyTestCase extends AbstractIntegrationTestCase {
 
-    @Test
-    public void testExchange() throws Exception
-    {
-        FlowRunner baseRunner = flowRunner("In-Optional-Out_Out-Only-Service").withPayload("some data");
-        MuleMessage result = baseRunner.run().getMessage();
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/integration/messaging/meps/pattern_In-Optional-Out_Out-Only-flow.xml";
+  }
 
-        assertNotNull(result);
-        assertThat(result.getPayload(), is(nullValue()));
+  @Test
+  public void testExchange() throws Exception {
+    FlowRunner baseRunner = flowRunner("In-Optional-Out_Out-Only-Service").withPayload("some data");
+    MuleMessage result = baseRunner.run().getMessage();
 
-        baseRunner.reset();
-        result = baseRunner.withInboundProperty("foo", "bar")
-                           .run()
-                           .getMessage();
+    assertNotNull(result);
+    assertThat(result.getPayload(), is(nullValue()));
 
-        assertNotNull(result);
-        assertThat(result.getPayload(), is("foo header received"));
-    }
+    baseRunner.reset();
+    result = baseRunner.withInboundProperty("foo", "bar").run().getMessage();
+
+    assertNotNull(result);
+    assertThat(result.getPayload(), is("foo header received"));
+  }
 }

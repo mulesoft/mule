@@ -82,610 +82,498 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
 /**
- * The CxfInboundMessageProcessor performs inbound CXF processing, sending an event
- * through the CXF service, then on to the next MessageProcessor. This processor gets
- * built by a MessageProcessorBuilder which is responsible for configuring it and the
+ * The CxfInboundMessageProcessor performs inbound CXF processing, sending an event through the CXF service, then on to the next
+ * MessageProcessor. This processor gets built by a MessageProcessorBuilder which is responsible for configuring it and the
  * {@link Server} that it dispatches to.
  */
-public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProcessor implements Lifecycle, NonBlockingSupported
-{
+public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProcessor implements Lifecycle, NonBlockingSupported {
 
-    private static final String HTTP_REQUEST_PROPERTY_MANAGER_KEY = "_cxfHttpRequestPropertyManager";
+  private static final String HTTP_REQUEST_PROPERTY_MANAGER_KEY = "_cxfHttpRequestPropertyManager";
 
-    public static final String JMS_TRANSPORT = "jms";
+  public static final String JMS_TRANSPORT = "jms";
 
-    /**
-     * logger used by this class
-     */
-    protected transient Logger logger = LoggerFactory.getLogger(getClass());
+  /**
+   * logger used by this class
+   */
+  protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
-    protected Bus bus;
+  protected Bus bus;
 
-    // manager to the component
-    protected String transportClass;
+  // manager to the component
+  protected String transportClass;
 
-    protected Server server;
+  protected Server server;
 
-    private boolean proxy;
+  private boolean proxy;
 
-    private QueryHandler wsdlQueryHandler;
+  private QueryHandler wsdlQueryHandler;
 
-    private MediaType mimeType;
+  private MediaType mimeType;
 
-    private HttpRequestPropertyManager requestPropertyManager;
+  private HttpRequestPropertyManager requestPropertyManager;
 
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        if (bus == null)
-        {
-            throw new InitialisationException(
-                MessageFactory.createStaticMessage("No CXF bus instance, this component has not been initialized properly."),
-                this);
-        }
-
-        final HttpRequestPropertyManager httpRequestPropertyManager = muleContext.getRegistry().get(HTTP_REQUEST_PROPERTY_MANAGER_KEY);
-        requestPropertyManager = httpRequestPropertyManager != null ? httpRequestPropertyManager : new HttpRequestPropertyManager();
+  @Override
+  public void initialise() throws InitialisationException {
+    if (bus == null) {
+      throw new InitialisationException(MessageFactory
+          .createStaticMessage("No CXF bus instance, this component has not been initialized properly."), this);
     }
 
-    @Override
-    public void stop() throws MuleException
-    {
-        if (server != null)
-        {
-            server.stop();
-        }
+    final HttpRequestPropertyManager httpRequestPropertyManager =
+        muleContext.getRegistry().get(HTTP_REQUEST_PROPERTY_MANAGER_KEY);
+    requestPropertyManager = httpRequestPropertyManager != null ? httpRequestPropertyManager : new HttpRequestPropertyManager();
+  }
+
+  @Override
+  public void stop() throws MuleException {
+    if (server != null) {
+      server.stop();
+    }
+  }
+
+  @Override
+  public void start() throws MuleException {
+    // Start the CXF Server
+    if (server != null) {
+      server.start();
+    }
+  }
+
+  @Override
+  public void dispose() {
+    // nothing to do
+  }
+
+  @Override
+  public MuleEvent process(MuleEvent event) throws MuleException {
+    // if http request
+    String requestPath = parseHttpRequestProperty(requestPropertyManager.getRequestPath(event.getMessage()));
+    try {
+      if (requestPath.indexOf('?') > -1) {
+        return generateWSDLOrXSD(event, requestPath);
+      } else {
+        return sendToDestination(event);
+      }
+    } catch (IOException e) {
+      throw new DefaultMuleException(e);
+    }
+  }
+
+  private String parseHttpRequestProperty(String request) {
+    String uriBase = "";
+
+    if (!(request.contains("?wsdl")) && (!(request.contains("?xsd")))) {
+      int qIdx = request.indexOf('?');
+      if (qIdx > -1) {
+        uriBase = request.substring(0, qIdx);
+      }
+    } else {
+      uriBase = request;
     }
 
-    @Override
-    public void start() throws MuleException
-    {
-        // Start the CXF Server
-        if (server != null)
-        {
-            server.start();
-        }
+    return uriBase;
+  }
+
+  protected MuleEvent generateWSDLOrXSD(MuleEvent event, String req) throws IOException {
+    // TODO: Is there a way to make this not so ugly?
+    String ctxUri = requestPropertyManager.getBasePath(event.getMessage());
+    String wsdlUri = getUri(event);
+    String serviceUri = wsdlUri.substring(0, wsdlUri.indexOf('?'));
+
+    EndpointInfo ei = getServer().getEndpoint().getEndpointInfo();
+
+    if (serviceUri != null) {
+      ei.setAddress(serviceUri);
+
+      if (ei.getExtensor(AddressType.class) != null) {
+        ei.getExtensor(AddressType.class).setLocation(serviceUri);
+      }
     }
 
-    @Override
-    public void dispose()
-    {
-        // nothing to do
+    ByteArrayOutputStream out = new ByteArrayOutputStream();
+    MediaType ct = null;
+
+    if (wsdlQueryHandler.isRecognizedQuery(wsdlUri, ctxUri, ei)) {
+      ct = parse(wsdlQueryHandler.getResponseContentType(wsdlUri, ctxUri));
+      wsdlQueryHandler.writeResponse(wsdlUri, ctxUri, ei, out);
+      out.flush();
     }
 
-    @Override
-    public MuleEvent process(MuleEvent event) throws MuleException
-    {
-        // if http request
-        String requestPath = parseHttpRequestProperty(requestPropertyManager.getRequestPath(event.getMessage()));
-        try
-        {
-            if (requestPath.indexOf('?') > -1)
-            {
-                return generateWSDLOrXSD(event, requestPath);
+    String message;
+    if (ct == null) {
+      ct = TEXT;
+      message = "No query handler found for URL.";
+    } else {
+      message = out.toString();
+    }
+    MuleMessage resultMessage = MuleMessage.builder(event.getMessage()).payload(message).mediaType(ct).build();
+    event.setMessage(resultMessage);
+
+    return event;
+  }
+
+  private String getUri(MuleEvent event) {
+    String scheme = requestPropertyManager.getScheme(event);
+    String host = event.getMessage().getInboundProperty("Host");
+    String ctx = requestPropertyManager.getRequestPath(event.getMessage());
+
+    return scheme + "://" + host + ctx;
+  }
+
+  protected MuleEvent sendToDestination(MuleEvent event) throws MuleException, IOException {
+    try {
+      final Exchange exchange = new ExchangeImpl();
+
+      final MuleEvent originalEvent = event;
+      if (event.isAllowNonBlocking()) {
+        final ReplyToHandler originalReplyToHandler = event.getReplyToHandler();
+
+        event = new DefaultMuleEvent(event, new NonBlockingReplyToHandler() {
+
+          @Override
+          public void processReplyTo(MuleEvent responseEvent, MuleMessage returnMessage, Object replyTo) throws MuleException {
+            try {
+              // CXF execution chain was suspended, so we need to resume it.
+              // The MuleInvoker component will be recalled, by using the CxfConstants.NON_BLOCKING_RESPONSE flag we force using
+              // the received response event instead of re-invoke the flow
+              exchange.put(CxfConstants.MULE_EVENT, responseEvent);
+              exchange.put(CxfConstants.NON_BLOCKING_RESPONSE, true);
+              exchange.getInMessage().getInterceptorChain().resume();
+
+              // Process the response
+              responseEvent = (MuleEvent) exchange.get(CxfConstants.MULE_EVENT);
+              responseEvent = processResponse(originalEvent, exchange, responseEvent);
+
+              // Continue the non blocking execution
+              originalReplyToHandler.processReplyTo(responseEvent, responseEvent.getMessage(), replyTo);
+            } catch (Exception e) {
+              ExceptionPayload exceptionPayload = new DefaultExceptionPayload(e);
+              responseEvent.setMessage(MuleMessage.builder(responseEvent.getMessage()).exceptionPayload(exceptionPayload)
+                  .addOutboundProperty(HTTP_STATUS_PROPERTY, 500).build());
+              processExceptionReplyTo(new MessagingException(responseEvent, e, CxfInboundMessageProcessor.this), replyTo);
             }
-            else
-            {
-                return sendToDestination(event);
-            }
-        }
-        catch (IOException e)
-        {
-            throw new DefaultMuleException(e);
-        }
+          }
+
+          @Override
+          public void processExceptionReplyTo(MessagingException exception, Object replyTo) {
+            originalReplyToHandler.processExceptionReplyTo(exception, replyTo);
+          }
+        });
+        // Update RequestContext ThreadLocal for backwards compatibility
+        OptimizedRequestContext.unsafeSetEvent(event);
+      }
+
+      MuleEvent responseEvent = sendThroughCxf(event, exchange);
+
+      if (responseEvent == null || !responseEvent.equals(NonBlockingVoidMuleEvent.getInstance())) {
+        return processResponse(event, exchange, responseEvent);
+      }
+
+      return responseEvent;
+    } catch (MuleException e) {
+      logger.warn("Could not dispatch message to CXF!", e);
+      throw e;
+    }
+  }
+
+  private MuleEvent sendThroughCxf(MuleEvent event, Exchange exchange) throws TransformerException, IOException {
+    final MessageImpl m = new MessageImpl();
+    m.setExchange(exchange);
+    final MuleMessage muleReqMsg = event.getMessage();
+    String method = muleReqMsg.getInboundProperty(HTTP_METHOD_PROPERTY);
+
+    MediaType ct = muleReqMsg.getDataType().getMediaType();
+    if (!ct.matches(ANY)) {
+      m.put(Message.CONTENT_TYPE, ct.toRfcString());
     }
 
-    private String parseHttpRequestProperty(String request)
-    {
-        String uriBase = "";
-
-        if (!(request.contains("?wsdl")) && (!(request.contains("?xsd"))))
-        {
-            int qIdx = request.indexOf('?');
-            if (qIdx > -1)
-            {
-                uriBase = request.substring(0, qIdx);
-            }
-        }
-        else
-        {
-            uriBase = request;
-        }
-
-        return uriBase;
+    String path = requestPropertyManager.getRequestPath(event.getMessage());
+    if (path == null) {
+      path = "";
     }
 
-    protected MuleEvent generateWSDLOrXSD(MuleEvent event, String req)
-        throws IOException
-    {
-        // TODO: Is there a way to make this not so ugly?
-        String ctxUri = requestPropertyManager.getBasePath(event.getMessage());
-        String wsdlUri = getUri(event);
-        String serviceUri = wsdlUri.substring(0, wsdlUri.indexOf('?'));
+    if (method != null) {
+      m.put(Message.HTTP_REQUEST_METHOD, method);
+      m.put(Message.PATH_INFO, path);
+      String basePath = requestPropertyManager.getBasePath(muleReqMsg);
+      m.put(Message.BASE_PATH, basePath);
 
-        EndpointInfo ei = getServer().getEndpoint().getEndpointInfo();
-
-        if (serviceUri != null)
-        {
-            ei.setAddress(serviceUri);
-
-            if (ei.getExtensor(AddressType.class) != null)
-            {
-                ei.getExtensor(AddressType.class).setLocation(serviceUri);
-            }
-        }
-
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        MediaType ct = null;
-
-        if (wsdlQueryHandler.isRecognizedQuery(wsdlUri, ctxUri, ei))
-        {
-            ct = parse(wsdlQueryHandler.getResponseContentType(wsdlUri, ctxUri));
-            wsdlQueryHandler.writeResponse(wsdlUri, ctxUri, ei, out);
-            out.flush();
-        }
-
-        String message;
-        if (ct == null)
-        {
-            ct = TEXT;
-            message = "No query handler found for URL.";
-        }
-        else
-        {
-            message = out.toString();
-        }
-        MuleMessage resultMessage = MuleMessage.builder(event.getMessage()).payload(message).mediaType(ct).build();
-        event.setMessage(resultMessage);
-
-        return event;
+      method = method.toUpperCase();
     }
 
-    private String getUri(MuleEvent event)
-    {
-        String scheme = requestPropertyManager.getScheme(event);
-        String host = event.getMessage().getInboundProperty("Host");
-        String ctx = requestPropertyManager.getRequestPath(event.getMessage());
+    if (!"GET".equals(method)) {
+      Object payload = event.getMessage().getPayload();
 
-        return scheme + "://" + host + ctx;
+      setPayload(event, m, payload);
     }
 
-    protected MuleEvent sendToDestination(MuleEvent event) throws MuleException, IOException
-    {
-        try
-        {
-            final Exchange exchange = new ExchangeImpl();
+    // TODO: Not sure if this is 100% correct - DBD
+    String soapAction = getSoapAction(event.getMessage());
+    m.put(SoapConstants.SOAP_ACTION_PROPERTY_CAPS, soapAction);
 
-            final MuleEvent originalEvent = event;
-            if (event.isAllowNonBlocking())
-            {
-                final ReplyToHandler originalReplyToHandler = event.getReplyToHandler();
+    org.apache.cxf.transport.Destination d;
 
-                event = new DefaultMuleEvent(event, new NonBlockingReplyToHandler()
-                {
-                    @Override
-                    public void processReplyTo(MuleEvent responseEvent, MuleMessage returnMessage, Object replyTo) throws MuleException
-                    {
-                        try
-                        {
-                            // CXF execution chain was suspended, so we need to resume it.
-                            // The MuleInvoker component will be recalled, by using the CxfConstants.NON_BLOCKING_RESPONSE flag we force using the received response event instead of re-invoke the flow
-                            exchange.put(CxfConstants.MULE_EVENT, responseEvent);
-                            exchange.put(CxfConstants.NON_BLOCKING_RESPONSE, true);
-                            exchange.getInMessage().getInterceptorChain().resume();
+    if (server != null) {
+      d = server.getDestination();
+    } else {
+      String serviceUri = getUri(event);
 
-                            // Process the response
-                            responseEvent = (MuleEvent) exchange.get(CxfConstants.MULE_EVENT);
-                            responseEvent = processResponse(originalEvent, exchange, responseEvent);
+      DestinationFactoryManager dfm = bus.getExtension(DestinationFactoryManager.class);
+      DestinationFactory df = dfm.getDestinationFactoryForUri(serviceUri);
 
-                            // Continue the non blocking execution
-                            originalReplyToHandler.processReplyTo(responseEvent, responseEvent.getMessage(), replyTo);
-                        }
-                        catch (Exception e)
-                        {
-                            ExceptionPayload exceptionPayload = new DefaultExceptionPayload(e);
-                            responseEvent.setMessage(MuleMessage.builder(responseEvent.getMessage()).exceptionPayload
-                                    (exceptionPayload).addOutboundProperty(HTTP_STATUS_PROPERTY, 500).build());
-                            processExceptionReplyTo(new MessagingException(responseEvent, e, CxfInboundMessageProcessor.this), replyTo);
-                        }
-                    }
-
-                    @Override
-                    public void processExceptionReplyTo(MessagingException exception, Object replyTo)
-                    {
-                        originalReplyToHandler.processExceptionReplyTo(exception, replyTo);
-                    }
-                });
-                // Update RequestContext ThreadLocal for backwards compatibility
-                OptimizedRequestContext.unsafeSetEvent(event);
-            }
-
-            MuleEvent responseEvent = sendThroughCxf(event, exchange);
-
-            if (responseEvent == null || !responseEvent.equals(NonBlockingVoidMuleEvent.getInstance()))
-            {
-                return processResponse(event, exchange, responseEvent);
-            }
-
-            return responseEvent;
-        }
-        catch (MuleException e)
-        {
-            logger.warn("Could not dispatch message to CXF!", e);
-            throw e;
-        }
+      EndpointInfo ei = new EndpointInfo();
+      ei.setAddress(serviceUri);
+      d = df.getDestination(ei);
     }
 
-    private MuleEvent sendThroughCxf(MuleEvent event, Exchange exchange) throws TransformerException, IOException
-    {
-        final MessageImpl m = new MessageImpl();
-        m.setExchange(exchange);
-        final MuleMessage muleReqMsg = event.getMessage();
-        String method = muleReqMsg.getInboundProperty(HTTP_METHOD_PROPERTY);
+    // For MULE-6829
+    if (shouldSoapActionHeader()) {
+      // Add protocol headers with the soap action so that the SoapActionInInterceptor can find them if it is soap v1.1
+      Map<String, List<String>> protocolHeaders = new HashMap<>();
+      if (soapAction != null && !soapAction.isEmpty()) {
+        List<String> soapActions = new ArrayList<>();
+        // An HTTP client MUST use [SOAPAction] header field when issuing a SOAP HTTP Request.
+        // The header field value of empty string ("") means that the intent of the SOAP message is provided by the HTTP
+        // Request-URI.
+        // No value means that there is no indication of the intent of the message.
+        soapActions.add(soapAction);
+        protocolHeaders.put(SoapBindingConstants.SOAP_ACTION, soapActions);
+      }
 
-        MediaType ct = muleReqMsg.getDataType().getMediaType();
-        if (!ct.matches(ANY))
-        {
-            m.put(Message.CONTENT_TYPE, ct.toRfcString());
+      String eventRequestUri = event.getMessageSourceURI().toString();
+      if (eventRequestUri.startsWith(JMS_TRANSPORT)
+          || SoapJMSConstants.SOAP_JMS_NAMESPACE.equals(((MuleUniversalDestination) d).getEndpointInfo().getTransportId())) {
+        String contentType = muleReqMsg.getInboundProperty(SoapJMSConstants.CONTENTTYPE_FIELD);
+        if (contentType == null) {
+          contentType = "text/xml";
         }
+        protocolHeaders.put(SoapJMSConstants.CONTENTTYPE_FIELD, Collections.singletonList(contentType));
 
-        String path = requestPropertyManager.getRequestPath(event.getMessage());
-        if (path == null)
-        {
-            path = "";
+        String requestUri = muleReqMsg.getInboundProperty(SoapJMSConstants.REQUESTURI_FIELD);
+        if (requestUri == null) {
+          requestUri = eventRequestUri;
         }
+        protocolHeaders.put(SoapJMSConstants.REQUESTURI_FIELD, Collections.singletonList(requestUri));
+      }
 
-        if (method != null)
-        {
-            m.put(Message.HTTP_REQUEST_METHOD, method);
-            m.put(Message.PATH_INFO, path);
-            String basePath = requestPropertyManager.getBasePath(muleReqMsg);
-            m.put(Message.BASE_PATH, basePath);
-
-            method = method.toUpperCase();
-        }
-
-        if (!"GET".equals(method))
-        {
-            Object payload = event.getMessage().getPayload();
-
-            setPayload(event, m, payload);
-        }
-
-        // TODO: Not sure if this is 100% correct - DBD
-        String soapAction = getSoapAction(event.getMessage());
-        m.put(SoapConstants.SOAP_ACTION_PROPERTY_CAPS, soapAction);
-
-        org.apache.cxf.transport.Destination d;
-
-        if (server != null)
-        {
-            d = server.getDestination();
-        }
-        else
-        {
-            String serviceUri = getUri(event);
-
-            DestinationFactoryManager dfm = bus.getExtension(DestinationFactoryManager.class);
-            DestinationFactory df = dfm.getDestinationFactoryForUri(serviceUri);
-
-            EndpointInfo ei = new EndpointInfo();
-            ei.setAddress(serviceUri);
-            d = df.getDestination(ei);
-        }
-
-        // For MULE-6829
-        if (shouldSoapActionHeader())
-        {
-            // Add protocol headers with the soap action so that the SoapActionInInterceptor can find them if it is soap v1.1
-            Map<String, List<String>> protocolHeaders = new HashMap<>();
-            if (soapAction != null && !soapAction.isEmpty())
-            {
-                List<String> soapActions = new ArrayList<>();
-                // An HTTP client MUST use [SOAPAction] header field when issuing a SOAP HTTP Request.
-                // The header field value of empty string ("") means that the intent of the SOAP message is provided by the HTTP Request-URI.
-                // No value means that there is no indication of the intent of the message.
-                soapActions.add(soapAction);
-                protocolHeaders.put(SoapBindingConstants.SOAP_ACTION, soapActions);
-            }
-
-            String eventRequestUri = event.getMessageSourceURI().toString();
-            if (eventRequestUri.startsWith(JMS_TRANSPORT) || SoapJMSConstants.SOAP_JMS_NAMESPACE.equals(((MuleUniversalDestination) d).getEndpointInfo().getTransportId()))
-            {
-                String contentType = muleReqMsg.getInboundProperty(SoapJMSConstants.CONTENTTYPE_FIELD);
-                if (contentType == null)
-                {
-                    contentType = "text/xml";
-                }
-                protocolHeaders.put(SoapJMSConstants.CONTENTTYPE_FIELD, Collections.singletonList(contentType));
-
-                String requestUri = muleReqMsg.getInboundProperty(SoapJMSConstants.REQUESTURI_FIELD);
-                if (requestUri == null)
-                {
-                    requestUri = eventRequestUri;
-                }
-                protocolHeaders.put(SoapJMSConstants.REQUESTURI_FIELD, Collections.singletonList(requestUri));
-            }
-
-            m.put(Message.PROTOCOL_HEADERS, protocolHeaders);
-        }
-
-        // Set up a listener for the response
-        m.put(LocalConduit.DIRECT_DISPATCH, Boolean.TRUE);
-        m.setDestination(d);
-
-        // mule will close the stream so don't let cxf, otherwise cxf will close it too early
-        exchange.put(StaxInEndingInterceptor.STAX_IN_NOCLOSE, Boolean.TRUE);
-        exchange.setInMessage(m);
-
-        // if there is a fault, then we need an event in here because we won't
-        // have a responseEvent from the MuleInvoker
-        exchange.put(CxfConstants.MULE_EVENT, event);
-
-        // invoke the actual web service up until right before we serialize the
-        // response
-        try
-        {
-            d.getMessageObserver().onMessage(m);
-        }
-        catch (SuspendedInvocationException e)
-        {
-            MuleEvent responseEvent = (MuleEvent) exchange.get(CxfConstants.MULE_EVENT);
-
-            if (responseEvent == null || !responseEvent.equals(NonBlockingVoidMuleEvent.getInstance()))
-            {
-                throw e;
-            }
-        }
-
-        // get the response event
-        return (MuleEvent) exchange.get(CxfConstants.MULE_EVENT);
+      m.put(Message.PROTOCOL_HEADERS, protocolHeaders);
     }
 
-    private MuleEvent processResponse(MuleEvent event, Exchange exchange, MuleEvent responseEvent)
-    {
-        // If there isn't one, there was probably a fault, so use the original event
-        if (responseEvent == null || VoidMuleEvent.getInstance().equals(responseEvent) || !event.getExchangePattern().hasResponse())
-        {
-            return null;
+    // Set up a listener for the response
+    m.put(LocalConduit.DIRECT_DISPATCH, Boolean.TRUE);
+    m.setDestination(d);
+
+    // mule will close the stream so don't let cxf, otherwise cxf will close it too early
+    exchange.put(StaxInEndingInterceptor.STAX_IN_NOCLOSE, Boolean.TRUE);
+    exchange.setInMessage(m);
+
+    // if there is a fault, then we need an event in here because we won't
+    // have a responseEvent from the MuleInvoker
+    exchange.put(CxfConstants.MULE_EVENT, event);
+
+    // invoke the actual web service up until right before we serialize the
+    // response
+    try {
+      d.getMessageObserver().onMessage(m);
+    } catch (SuspendedInvocationException e) {
+      MuleEvent responseEvent = (MuleEvent) exchange.get(CxfConstants.MULE_EVENT);
+
+      if (responseEvent == null || !responseEvent.equals(NonBlockingVoidMuleEvent.getInstance())) {
+        throw e;
+      }
+    }
+
+    // get the response event
+    return (MuleEvent) exchange.get(CxfConstants.MULE_EVENT);
+  }
+
+  private MuleEvent processResponse(MuleEvent event, Exchange exchange, MuleEvent responseEvent) {
+    // If there isn't one, there was probably a fault, so use the original event
+    if (responseEvent == null || VoidMuleEvent.getInstance().equals(responseEvent) || !event.getExchangePattern().hasResponse()) {
+      return null;
+    }
+
+    final MuleMessage message = responseEvent.getMessage();
+    MuleMessage.Builder builder = MuleMessage.builder(message);
+
+    BindingOperationInfo binding = exchange.get(BindingOperationInfo.class);
+    if (null != binding && null != binding.getOperationInfo() && binding.getOperationInfo().isOneWay()) {
+      // For one-way operations, no envelope should be returned
+      // (http://www.w3.org/TR/soap12-part2/#http-reqbindwaitstate)
+      builder.addOutboundProperty(HTTP_STATUS_PROPERTY, ACCEPTED.getStatusCode());
+      builder.nullPayload();
+    } else {
+      final Optional<Charset> charset = message.getDataType().getMediaType().getCharset();
+      if (charset.isPresent()) {
+        builder.payload(getResponseOutputHandler(exchange)).mediaType(XML.withCharset(charset.get()));
+      } else {
+        builder.payload(getResponseOutputHandler(exchange)).mediaType(XML);
+      }
+    }
+
+    // Handle a fault if there is one.
+    Message faultMsg = exchange.getOutFaultMessage();
+    if (faultMsg != null) {
+      if (null != binding && null != binding.getOperationInfo() && binding.getOperationInfo().isOneWay()) {
+        final Optional<Charset> charset = message.getDataType().getMediaType().getCharset();
+        if (charset.isPresent()) {
+          builder.payload(getResponseOutputHandler(exchange)).mediaType(XML.withCharset(charset.get()));
+        } else {
+          builder.payload(getResponseOutputHandler(exchange)).mediaType(XML);
         }
+      }
+      Exception ex = faultMsg.getContent(Exception.class);
+      if (ex != null) {
+        builder.exceptionPayload(new DefaultExceptionPayload(ex));
+        builder.addOutboundProperty(HTTP_STATUS_PROPERTY, 500);
+      }
+    }
+    responseEvent.setMessage(builder.build());
+    return responseEvent;
+  }
 
-        final MuleMessage message = responseEvent.getMessage();
-        MuleMessage.Builder builder = MuleMessage.builder(message);
+  protected boolean shouldSoapActionHeader() {
+    // Only add soap headers if we can validate the bindings. if not, cxf will throw a fault in SoapActionInInterceptor
+    // we cannot validate the bindings if we're using mule's pass-through invoke proxy service
+    boolean isGenericProxy =
+        "http://support.cxf.module.runtime.mule.org/".equals(getServer().getEndpoint().getService().getName().getNamespaceURI())
+            && "ProxyService".equals(getServer().getEndpoint().getService().getName().getLocalPart());
+    return !isGenericProxy;
+  }
 
-        BindingOperationInfo binding = exchange.get(BindingOperationInfo.class);
-        if (null != binding && null != binding.getOperationInfo() && binding.getOperationInfo().isOneWay())
-        {
-            // For one-way operations, no envelope should be returned
-            // (http://www.w3.org/TR/soap12-part2/#http-reqbindwaitstate)
-            builder.addOutboundProperty(HTTP_STATUS_PROPERTY, ACCEPTED.getStatusCode());
-            builder.nullPayload();
-        }
-        else
-        {
-            final Optional<Charset> charset = message.getDataType().getMediaType().getCharset();
-            if (charset.isPresent())
-            {
-                builder.payload(getResponseOutputHandler(exchange)).mediaType(XML.withCharset(charset.get()));
-            }
-            else
-            {
-                builder.payload(getResponseOutputHandler(exchange)).mediaType(XML);
-            }
-        }
+  @Override
+  public MuleEvent processNext(MuleEvent event) throws MuleException {
+    return super.processNext(event);
+  }
 
-        // Handle a fault if there is one.
-        Message faultMsg = exchange.getOutFaultMessage();
-        if (faultMsg != null)
-        {
-            if (null != binding && null != binding.getOperationInfo() && binding.getOperationInfo().isOneWay())
-            {
-                final Optional<Charset> charset = message.getDataType().getMediaType().getCharset();
-                if (charset.isPresent())
-                {
-                    builder.payload(getResponseOutputHandler(exchange)).mediaType(XML.withCharset(charset.get()));
-                }
-                else
-                {
-                    builder.payload(getResponseOutputHandler(exchange)).mediaType(XML);
-                }
-            }
-            Exception ex = faultMsg.getContent(Exception.class);
-            if (ex != null)
-            {
-                builder.exceptionPayload(new DefaultExceptionPayload(ex));
-                builder.addOutboundProperty(HTTP_STATUS_PROPERTY, 500);
-            }
-        }
-        responseEvent.setMessage(builder.build());
-        return responseEvent;
+  @Deprecated
+  protected OutputHandler getRessponseOutputHandler(final MessageImpl m) {
+    return getResponseOutputHandler(m);
+  }
+
+  protected OutputHandler getResponseOutputHandler(final MessageImpl m) {
+    return getResponseOutputHandler(m.getExchange());
+  }
+
+  protected OutputHandler getResponseOutputHandler(final Exchange exchange) {
+    OutputHandler outputHandler = (event, out) -> {
+      Message outFaultMessage = exchange.getOutFaultMessage();
+      Message outMessage = exchange.getOutMessage();
+
+      Message contentMsg = null;
+      if (outFaultMessage != null && outFaultMessage.getContent(OutputStream.class) != null) {
+        contentMsg = outFaultMessage;
+      } else if (outMessage != null) {
+        contentMsg = outMessage;
+      }
+
+      if (contentMsg == null) {
+        return;
+      }
+
+      DelegatingOutputStream delegate = contentMsg.getContent(DelegatingOutputStream.class);
+      if (delegate.getOutputStream() instanceof ByteArrayOutputStream) {
+        out.write(((ByteArrayOutputStream) delegate.getOutputStream()).toByteArray());
+      }
+      delegate.setOutputStream(out);
+
+      out.flush();
+
+      contentMsg.getInterceptorChain().resume();
+    };
+    return outputHandler;
+  }
+
+  private void setPayload(MuleEvent ctx, final MessageImpl m, Object payload) throws TransformerException {
+    if (payload instanceof Reader) {
+      m.setContent(XMLStreamReader.class, StaxUtils.createXMLStreamReader((Reader) payload));
+    } else if (payload instanceof byte[]) {
+      m.setContent(InputStream.class, new ByteArrayInputStream((byte[]) payload));
+    } else if (payload instanceof StaxSource) {
+      m.setContent(XMLStreamReader.class, ((StaxSource) payload).getXMLStreamReader());
+    } else if (payload instanceof Source) {
+      m.setContent(XMLStreamReader.class, StaxUtils.createXMLStreamReader((Source) payload));
+    } else if (payload instanceof XMLStreamReader) {
+      m.setContent(XMLStreamReader.class, payload);
+    } else if (payload instanceof Document) {
+      DOMSource source = new DOMSource((Node) payload);
+      m.setContent(XMLStreamReader.class, StaxUtils.createXMLStreamReader(source));
+    } else {
+      ctx.getMessage().getDataType().getMediaType().getCharset().ifPresent(encoding -> {
+        m.put(Message.ENCODING, encoding.name());
+      });
+
+      if (payload instanceof InputStream) {
+        m.setContent(InputStream.class, payload);
+      } else {
+        InputStream is = (InputStream) ctx.transformMessage(DataType.INPUT_STREAM);
+        m.setContent(InputStream.class, is);
+      }
+    }
+  }
+
+  /**
+   * Gets the stream representation of the current message.
+   * 
+   * @param context the event context
+   * @return The inputstream for the current message
+   * @throws MuleException
+   */
+  protected InputStream getMessageStream(MuleEvent context) throws MuleException {
+    InputStream is;
+    Object eventMsgPayload = context.getMessage().getPayload();
+
+    if (eventMsgPayload instanceof InputStream) {
+      is = (InputStream) eventMsgPayload;
+    } else {
+      is = (InputStream) context.transformMessage(DataType.INPUT_STREAM);
+    }
+    return is;
+  }
+
+  protected String getSoapAction(MuleMessage message) {
+    String action = message.getInboundProperty(SoapConstants.SOAP_ACTION_PROPERTY);
+
+    if (action != null && action.startsWith("\"") && action.endsWith("\"") && action.length() >= 2) {
+      action = action.substring(1, action.length() - 1);
     }
 
-    protected boolean shouldSoapActionHeader()
-    {
-        // Only add soap headers if we can validate the bindings. if not, cxf will throw a fault in SoapActionInInterceptor
-        // we cannot validate the bindings if we're using mule's pass-through invoke proxy service 
-        boolean isGenericProxy = "http://support.cxf.module.runtime.mule.org/"
-                .equals(getServer().getEndpoint().getService().getName().getNamespaceURI()) && 
-                "ProxyService".equals(getServer().getEndpoint().getService().getName().getLocalPart());
-        return !isGenericProxy;
-    }
+    return action;
+  }
 
-    @Override
-    public MuleEvent processNext(MuleEvent event) throws MuleException
-    {
-        return super.processNext(event);
-    }
+  public Bus getBus() {
+    return bus;
+  }
 
-    @Deprecated
-    protected OutputHandler getRessponseOutputHandler(final MessageImpl m)
-    {
-        return getResponseOutputHandler(m);
-    }
-    protected OutputHandler getResponseOutputHandler(final MessageImpl m)
-    {
-        return getResponseOutputHandler(m.getExchange());
-    }
+  public void setBus(Bus bus) {
+    this.bus = bus;
+  }
 
-    protected OutputHandler getResponseOutputHandler(final Exchange exchange)
-    {
-        OutputHandler outputHandler = (event, out) ->
-        {
-            Message outFaultMessage = exchange.getOutFaultMessage();
-            Message outMessage = exchange.getOutMessage();
+  public Server getServer() {
+    return server;
+  }
 
-            Message contentMsg = null;
-            if (outFaultMessage != null && outFaultMessage.getContent(OutputStream.class) != null)
-            {
-                contentMsg = outFaultMessage;
-            }
-            else if (outMessage != null)
-            {
-                contentMsg = outMessage;
-            }
+  public void setServer(Server server) {
+    this.server = server;
+  }
 
-            if (contentMsg == null)
-            {
-                return;
-            }
+  public void setProxy(boolean proxy) {
+    this.proxy = proxy;
+  }
 
-            DelegatingOutputStream delegate = contentMsg.getContent(DelegatingOutputStream.class);
-            if (delegate.getOutputStream() instanceof ByteArrayOutputStream)
-            {
-                out.write(((ByteArrayOutputStream) delegate.getOutputStream()).toByteArray());
-            }
-            delegate.setOutputStream(out);
+  public boolean isProxy() {
+    return proxy;
+  }
 
-            out.flush();
+  public void setWSDLQueryHandler(QueryHandler wsdlQueryHandler) {
+    this.wsdlQueryHandler = wsdlQueryHandler;
+  }
 
-            contentMsg.getInterceptorChain().resume();
-        };
-        return outputHandler;
-    }
+  public MediaType getMimeType() {
+    return mimeType;
+  }
 
-    private void setPayload(MuleEvent ctx, final MessageImpl m, Object payload) throws TransformerException
-    {
-        if (payload instanceof Reader)
-        {
-            m.setContent(XMLStreamReader.class, StaxUtils.createXMLStreamReader((Reader) payload));
-        }
-        else if (payload instanceof byte[])
-        {
-            m.setContent(InputStream.class, new ByteArrayInputStream((byte[]) payload));
-        }
-        else if (payload instanceof StaxSource)
-        {
-            m.setContent(XMLStreamReader.class, ((StaxSource) payload).getXMLStreamReader());
-        }
-        else if (payload instanceof Source)
-        {
-            m.setContent(XMLStreamReader.class, StaxUtils.createXMLStreamReader((Source) payload));
-        }
-        else if (payload instanceof XMLStreamReader)
-        {
-            m.setContent(XMLStreamReader.class, payload);
-        }
-        else if (payload instanceof Document)
-        {
-            DOMSource source = new DOMSource((Node) payload);
-            m.setContent(XMLStreamReader.class, StaxUtils.createXMLStreamReader(source));
-        }
-        else
-        {
-            ctx.getMessage().getDataType().getMediaType().getCharset().ifPresent(encoding ->
-            {
-                m.put(Message.ENCODING, encoding.name());
-            });
-
-            if (payload instanceof InputStream)
-            {
-                m.setContent(InputStream.class, payload);
-            }
-            else
-            {
-                InputStream is = (InputStream) ctx.transformMessage(DataType.INPUT_STREAM);
-                m.setContent(InputStream.class, is);
-            }
-        }
-    }
-
-    /**
-     * Gets the stream representation of the current message.
-     * 
-     * @param context the event context
-     * @return The inputstream for the current message
-     * @throws MuleException
-     */
-    protected InputStream getMessageStream(MuleEvent context) throws MuleException
-    {
-        InputStream is;
-        Object eventMsgPayload = context.getMessage().getPayload();
-
-        if (eventMsgPayload instanceof InputStream)
-        {
-            is = (InputStream) eventMsgPayload;
-        }
-        else
-        {
-            is = (InputStream) context.transformMessage(DataType.INPUT_STREAM);
-        }
-        return is;
-    }
-
-    protected String getSoapAction(MuleMessage message)
-    {
-        String action = message.getInboundProperty(SoapConstants.SOAP_ACTION_PROPERTY);
-
-        if (action != null && action.startsWith("\"") && action.endsWith("\"") && action.length() >= 2)
-        {
-            action = action.substring(1, action.length() - 1);
-        }
-
-        return action;
-    }
-
-    public Bus getBus()
-    {
-        return bus;
-    }
-
-    public void setBus(Bus bus)
-    {
-        this.bus = bus;
-    }
-
-    public Server getServer()
-    {
-        return server;
-    }
-
-    public void setServer(Server server)
-    {
-        this.server = server;
-    }
-
-    public void setProxy(boolean proxy)
-    {
-        this.proxy = proxy;
-    }
-
-    public boolean isProxy()
-    {
-        return proxy;
-    }
-
-    public void setWSDLQueryHandler(QueryHandler wsdlQueryHandler)
-    {
-        this.wsdlQueryHandler = wsdlQueryHandler;
-    }
-
-    public MediaType getMimeType()
-    {
-        return mimeType;
-    }
-
-    public void setMimeType(MediaType mimeType)
-    {
-        this.mimeType = mimeType;
-    }
+  public void setMimeType(MediaType mimeType) {
+    this.mimeType = mimeType;
+  }
 }

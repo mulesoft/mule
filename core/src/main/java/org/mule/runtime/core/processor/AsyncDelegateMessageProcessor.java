@@ -40,140 +40,114 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Processes {@link MuleEvent}'s asynchronously using a {@link MuleWorkManager} to schedule asynchronous
- * processing of MessageProcessor delegate configured the next {@link MessageProcessor}. The next
- * {@link MessageProcessor} is therefore be executed in a different thread regardless of the exchange-pattern
- * configured on the inbound endpoint. If a transaction is present then an exception is thrown.
+ * Processes {@link MuleEvent}'s asynchronously using a {@link MuleWorkManager} to schedule asynchronous processing of
+ * MessageProcessor delegate configured the next {@link MessageProcessor}. The next {@link MessageProcessor} is therefore be
+ * executed in a different thread regardless of the exchange-pattern configured on the inbound endpoint. If a transaction is
+ * present then an exception is thrown.
  */
 public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
-        implements MessageProcessor, Initialisable, Startable, Stoppable, NonBlockingSupported
-{
+    implements MessageProcessor, Initialisable, Startable, Stoppable, NonBlockingSupported {
 
-    protected Logger logger = LoggerFactory.getLogger(getClass());
-    private AtomicBoolean consumablePayloadWarned = new AtomicBoolean(false);
+  protected Logger logger = LoggerFactory.getLogger(getClass());
+  private AtomicBoolean consumablePayloadWarned = new AtomicBoolean(false);
 
-    protected MessageProcessor delegate;
+  protected MessageProcessor delegate;
 
-    protected List<MessageProcessor> processors;
-    protected ProcessingStrategy processingStrategy;
-    protected String name;
+  protected List<MessageProcessor> processors;
+  protected ProcessingStrategy processingStrategy;
+  protected String name;
 
-    private MessageProcessor target;
+  private MessageProcessor target;
 
-    public AsyncDelegateMessageProcessor(MessageProcessor delegate,
-                                         ProcessingStrategy processingStrategy,
-                                         String name)
-    {
-        this.delegate = delegate;
-        this.processingStrategy = processingStrategy;
-        this.name = name;
+  public AsyncDelegateMessageProcessor(MessageProcessor delegate, ProcessingStrategy processingStrategy, String name) {
+    this.delegate = delegate;
+    this.processingStrategy = processingStrategy;
+    this.name = name;
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    if (delegate == null) {
+      throw new InitialisationException(CoreMessages.objectIsNull("delegate message processor"), this);
+    }
+    if (processingStrategy == null) {
+      throw new InitialisationException(CoreMessages.objectIsNull("processingStrategy"), this);
     }
 
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        if (delegate == null)
-        {
-            throw new InitialisationException(CoreMessages.objectIsNull("delegate message processor"), this);
-        }
-        if (processingStrategy == null)
-        {
-            throw new InitialisationException(CoreMessages.objectIsNull("processingStrategy"), this);
-        }
+    validateFlowConstruct();
 
-        validateFlowConstruct();
+    StageNameSource nameSource = null;
 
-        StageNameSource nameSource = null;
-
-        if (name != null)
-        {
-            nameSource = ((StageNameSourceProvider) flowConstruct).getAsyncStageNameSource(name);
-        }
-        else
-        {
-            nameSource = ((StageNameSourceProvider) flowConstruct).getAsyncStageNameSource();
-        }
-
-        MessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder(flowConstruct);
-        processingStrategy.configureProcessors(Collections.singletonList(delegate), nameSource, builder,
-                                               muleContext);
-        try
-        {
-            target = builder.build();
-        }
-        catch (MuleException e)
-        {
-            throw new InitialisationException(e, this);
-        }
-        super.initialise();
+    if (name != null) {
+      nameSource = ((StageNameSourceProvider) flowConstruct).getAsyncStageNameSource(name);
+    } else {
+      nameSource = ((StageNameSourceProvider) flowConstruct).getAsyncStageNameSource();
     }
 
-    private void validateFlowConstruct()
-    {
-        if (flowConstruct == null) {
-            throw new IllegalArgumentException("FlowConstruct cannot be null");
-        }
-        else if (!(flowConstruct instanceof StageNameSourceProvider))
-        {
-            throw new IllegalArgumentException(String.format("FlowConstuct must implement the %s interface. However, the type %s does not implement it",
-                                                             StageNameSourceProvider.class.getCanonicalName(), flowConstruct.getClass().getCanonicalName()));
-        }
+    MessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder(flowConstruct);
+    processingStrategy.configureProcessors(Collections.singletonList(delegate), nameSource, builder, muleContext);
+    try {
+      target = builder.build();
+    } catch (MuleException e) {
+      throw new InitialisationException(e, this);
+    }
+    super.initialise();
+  }
+
+  private void validateFlowConstruct() {
+    if (flowConstruct == null) {
+      throw new IllegalArgumentException("FlowConstruct cannot be null");
+    } else if (!(flowConstruct instanceof StageNameSourceProvider)) {
+      throw new IllegalArgumentException(String
+          .format("FlowConstuct must implement the %s interface. However, the type %s does not implement it",
+                  StageNameSourceProvider.class.getCanonicalName(), flowConstruct.getClass().getCanonicalName()));
+    }
+  }
+
+  @Override
+  public MuleEvent process(MuleEvent event) throws MuleException {
+    if (event.isTransacted()) {
+      throw new MessagingException(CoreMessages.asyncDoesNotSupportTransactions(), event, this);
     }
 
-    @Override
-    public MuleEvent process(MuleEvent event) throws MuleException
-    {
-        if (event.isTransacted())
-        {
-            throw new MessagingException(CoreMessages.asyncDoesNotSupportTransactions(), event, this);
-        }
-
-        final MuleMessage message = event.getMessage();
-        if (consumablePayloadWarned.compareAndSet(false, true) && isConsumable(message.getDataType().getType()))
-        {
-            logger.warn(String.format("Using 'async' router with consumable payload (%s) may lead to unexpected results." +
-                                      " Please ensure that only one of the branches actually consumes the payload, or transform it by using an <object-to-byte-array-transformer>.",
-                    message.getPayload().getClass().getName()));
-        }
-
-        if (target != null)
-        {
-            // Clone event, make it async and remove ReplyToHandler
-            MuleEvent newEvent = new DefaultMuleEvent(message, event, false, false, MessageExchangePattern.ONE_WAY, null);
-            // Update RequestContext ThreadLocal for backwards compatibility
-            OptimizedRequestContext.unsafeSetEvent(newEvent);
-            target.process(newEvent);
-        }
-        return VoidMuleEvent.getInstance();
+    final MuleMessage message = event.getMessage();
+    if (consumablePayloadWarned.compareAndSet(false, true) && isConsumable(message.getDataType().getType())) {
+      logger.warn(String.format(
+                                "Using 'async' router with consumable payload (%s) may lead to unexpected results."
+                                    + " Please ensure that only one of the branches actually consumes the payload, or transform it by using an <object-to-byte-array-transformer>.",
+                                message.getPayload().getClass().getName()));
     }
 
-    public void setDelegate(MessageProcessor delegate)
-    {
-        this.delegate = delegate;
+    if (target != null) {
+      // Clone event, make it async and remove ReplyToHandler
+      MuleEvent newEvent = new DefaultMuleEvent(message, event, false, false, MessageExchangePattern.ONE_WAY, null);
+      // Update RequestContext ThreadLocal for backwards compatibility
+      OptimizedRequestContext.unsafeSetEvent(newEvent);
+      target.process(newEvent);
     }
+    return VoidMuleEvent.getInstance();
+  }
 
-    @Override
-    protected List<MessageProcessor> getOwnedMessageProcessors()
-    {
-        return Collections.singletonList(target);
-    }
+  public void setDelegate(MessageProcessor delegate) {
+    this.delegate = delegate;
+  }
 
-    public ProcessingStrategy getProcessingStrategy()
-    {
-        return processingStrategy;
-    }
+  @Override
+  protected List<MessageProcessor> getOwnedMessageProcessors() {
+    return Collections.singletonList(target);
+  }
 
-    @Override
-    public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement)
-    {
-        if (delegate instanceof MessageProcessorContainer)
-        {
-            ((MessageProcessorContainer) delegate).addMessageProcessorPathElements(pathElement);
-        }
-        else
-        {
-            NotificationUtils.addMessageProcessorPathElements(Collections.singletonList(delegate), pathElement);
-        }
+  public ProcessingStrategy getProcessingStrategy() {
+    return processingStrategy;
+  }
+
+  @Override
+  public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement) {
+    if (delegate instanceof MessageProcessorContainer) {
+      ((MessageProcessorContainer) delegate).addMessageProcessorPathElements(pathElement);
+    } else {
+      NotificationUtils.addMessageProcessorPathElements(Collections.singletonList(delegate), pathElement);
     }
+  }
 
 }

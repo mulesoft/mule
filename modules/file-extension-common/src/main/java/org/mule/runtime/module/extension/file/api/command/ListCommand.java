@@ -19,19 +19,19 @@ import java.util.function.Predicate;
  *
  * @since 4.0
  */
-public interface ListCommand
-{
+public interface ListCommand {
 
-    /**
-     * Lists files under the considerations of {@link FileSystem#list(FileConnectorConfig, String, boolean, MuleMessage, Predicate)}
-     *
-     * @param config        the config that is parameterizing this operation
-     * @param directoryPath the path to the directory to be listed
-     * @param recursive     whether to include the contents of sub-directories
-     * @param message       the {@link MuleMessage} on which this operation was triggered
-     * @param matcher       a {@link Predicate} of {@link FileAttributes} used to filter the output list
-     * @return a {@link TreeNode} object representing the listed directory
-     * @throws IllegalArgumentException if {@code directoryPath} points to a file which doesn't exists or is not a directory
-     */
-    TreeNode list(FileConnectorConfig config, String directoryPath, boolean recursive, MuleMessage message, Predicate<FileAttributes> matcher);
+  /**
+   * Lists files under the considerations of {@link FileSystem#list(FileConnectorConfig, String, boolean, MuleMessage, Predicate)}
+   *
+   * @param config the config that is parameterizing this operation
+   * @param directoryPath the path to the directory to be listed
+   * @param recursive whether to include the contents of sub-directories
+   * @param message the {@link MuleMessage} on which this operation was triggered
+   * @param matcher a {@link Predicate} of {@link FileAttributes} used to filter the output list
+   * @return a {@link TreeNode} object representing the listed directory
+   * @throws IllegalArgumentException if {@code directoryPath} points to a file which doesn't exists or is not a directory
+   */
+  TreeNode list(FileConnectorConfig config, String directoryPath, boolean recursive, MuleMessage message,
+                Predicate<FileAttributes> matcher);
 }

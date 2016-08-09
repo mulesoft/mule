@@ -7,21 +7,19 @@
 package org.mule.runtime.module.http.internal;
 
 /**
- * Object that holds a reference to an {@code HttpMessageBuilder}, it represents the {@code <http:builder ref="..." />}
- * element for composing request/response builders.
+ * Object that holds a reference to an {@code HttpMessageBuilder}, it represents the {@code <http:builder ref="..." />} element
+ * for composing request/response builders.
  */
-public class HttpMessageBuilderRef
-{
-    private HttpMessageBuilder ref;
+public class HttpMessageBuilderRef {
+
+  private HttpMessageBuilder ref;
 
 
-    public HttpMessageBuilder getRef()
-    {
-        return ref;
-    }
+  public HttpMessageBuilder getRef() {
+    return ref;
+  }
 
-    public void setRef(HttpMessageBuilder ref)
-    {
-        this.ref = ref;
-    }
+  public void setRef(HttpMessageBuilder ref) {
+    this.ref = ref;
+  }
 }

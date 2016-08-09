@@ -16,22 +16,20 @@ import org.mule.runtime.module.http.internal.domain.request.HttpRequestAuthentic
  *
  * @since 4.0
  */
-public class BasicAuthentication extends UsernamePasswordAuthentication
-{
+public class BasicAuthentication extends UsernamePasswordAuthentication {
 
-    /**
-     * Configures if authentication should be preemptive or not. Preemptive authentication will send
-     * the authentication header in the first request, instead of waiting for a 401 response code to send it.
-     */
-    @Parameter
-    @Optional(defaultValue = "true")
-    private boolean preemptive;
+  /**
+   * Configures if authentication should be preemptive or not. Preemptive authentication will send the authentication header in
+   * the first request, instead of waiting for a 401 response code to send it.
+   */
+  @Parameter
+  @Optional(defaultValue = "true")
+  private boolean preemptive;
 
-    @Override
-    public HttpRequestAuthentication buildRequestAuthentication()
-    {
-        HttpRequestAuthentication requestAuthentication = getBaseRequestAuthentication(BASIC);
-        requestAuthentication.setPreemptive(preemptive);
-        return requestAuthentication;
-    }
+  @Override
+  public HttpRequestAuthentication buildRequestAuthentication() {
+    HttpRequestAuthentication requestAuthentication = getBaseRequestAuthentication(BASIC);
+    requestAuthentication.setPreemptive(preemptive);
+    return requestAuthentication;
+  }
 }

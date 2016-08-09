@@ -27,110 +27,97 @@ import java.io.InputStream;
 
 import org.junit.Test;
 
-public class FtpReadTestCase extends FtpConnectorTestCase
-{
+public class FtpReadTestCase extends FtpConnectorTestCase {
 
-    public FtpReadTestCase(String name, FtpTestHarness testHarness)
-    {
-        super(name, testHarness);
-    }
+  public FtpReadTestCase(String name, FtpTestHarness testHarness) {
+    super(name, testHarness);
+  }
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "ftp-read-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "ftp-read-config.xml";
+  }
 
-    @Override
-    protected void doSetUp() throws Exception
-    {
-        super.doSetUp();
-        testHarness.createHelloWorldFile();
-    }
+  @Override
+  protected void doSetUp() throws Exception {
+    super.doSetUp();
+    testHarness.createHelloWorldFile();
+  }
 
-    @Test
-    public void read() throws Exception
-    {
-        MuleMessage message = readHelloWorld().getMessage();
+  @Test
+  public void read() throws Exception {
+    MuleMessage message = readHelloWorld().getMessage();
 
-        assertThat(message.getDataType().getMediaType().getPrimaryType(), is(JSON.getPrimaryType()));
-        assertThat(message.getDataType().getMediaType().getSubType(), is(JSON.getSubType()));
+    assertThat(message.getDataType().getMediaType().getPrimaryType(), is(JSON.getPrimaryType()));
+    assertThat(message.getDataType().getMediaType().getSubType(), is(JSON.getSubType()));
 
-        AbstractFileInputStream payload = message.getPayload();
-        assertThat(payload.isLocked(), is(false));
-        assertThat(getPayloadAsString(message), is(HELLO_WORLD));
-    }
+    AbstractFileInputStream payload = message.getPayload();
+    assertThat(payload.isLocked(), is(false));
+    assertThat(getPayloadAsString(message), is(HELLO_WORLD));
+  }
 
-    @Test
-    public void readBinary() throws Exception
-    {
-        testHarness.createBinaryFile();
+  @Test
+  public void readBinary() throws Exception {
+    testHarness.createBinaryFile();
 
-        MuleMessage response = readPath(BINARY_FILE_NAME);
+    MuleMessage response = readPath(BINARY_FILE_NAME);
 
-        assertThat(response.getDataType().getMediaType().getPrimaryType(), is(MediaType.BINARY.getPrimaryType()));
-        assertThat(response.getDataType().getMediaType().getSubType(), is(MediaType.BINARY.getSubType()));
+    assertThat(response.getDataType().getMediaType().getPrimaryType(), is(MediaType.BINARY.getPrimaryType()));
+    assertThat(response.getDataType().getMediaType().getSubType(), is(MediaType.BINARY.getSubType()));
 
-        AbstractFileInputStream payload = response.getPayload();
-        assertThat(payload.isLocked(), is(false));
+    AbstractFileInputStream payload = response.getPayload();
+    assertThat(payload.isLocked(), is(false));
 
-        byte[] readContent = new byte[new Long(HELLO_WORLD.length()).intValue()];
-        IOUtils.read(payload, readContent);
-        assertThat(new String(readContent), is(HELLO_WORLD));
-    }
+    byte[] readContent = new byte[new Long(HELLO_WORLD.length()).intValue()];
+    IOUtils.read(payload, readContent);
+    assertThat(new String(readContent), is(HELLO_WORLD));
+  }
 
-    @Test
-    public void readWithForcedMimeType() throws Exception
-    {
-        MuleEvent event = flowRunner("readWithForcedMimeType").withFlowVariable("path", HELLO_PATH).run();
-        assertThat(event.getMessage().getDataType().getMediaType().getPrimaryType(), equalTo("test"));
-        assertThat(event.getMessage().getDataType().getMediaType().getSubType(), equalTo("test"));
-    }
+  @Test
+  public void readWithForcedMimeType() throws Exception {
+    MuleEvent event = flowRunner("readWithForcedMimeType").withFlowVariable("path", HELLO_PATH).run();
+    assertThat(event.getMessage().getDataType().getMediaType().getPrimaryType(), equalTo("test"));
+    assertThat(event.getMessage().getDataType().getMediaType().getSubType(), equalTo("test"));
+  }
 
-    @Test
-    public void readUnexisting() throws Exception
-    {
-        testHarness.expectedException().expectCause(instanceOf(IllegalArgumentException.class));
-        readPath("files/not-there.txt");
-    }
+  @Test
+  public void readUnexisting() throws Exception {
+    testHarness.expectedException().expectCause(instanceOf(IllegalArgumentException.class));
+    readPath("files/not-there.txt");
+  }
 
-    @Test
-    public void readDirectory() throws Exception
-    {
-        testHarness.expectedException().expectCause(instanceOf(IllegalArgumentException.class));
-        readPath("files");
-    }
+  @Test
+  public void readDirectory() throws Exception {
+    testHarness.expectedException().expectCause(instanceOf(IllegalArgumentException.class));
+    readPath("files");
+  }
 
-    @Test
-    public void readLockReleasedOnContentConsumed() throws Exception
-    {
-        MuleMessage message = readWithLock();
-        getPayloadAsString(message);
+  @Test
+  public void readLockReleasedOnContentConsumed() throws Exception {
+    MuleMessage message = readWithLock();
+    getPayloadAsString(message);
 
-        assertThat(isLocked(message), is(false));
-    }
+    assertThat(isLocked(message), is(false));
+  }
 
-    @Test
-    public void readLockReleasedOnEarlyClose() throws Exception
-    {
-        MuleMessage message = readWithLock();
-        ((InputStream) message.getPayload()).close();
+  @Test
+  public void readLockReleasedOnEarlyClose() throws Exception {
+    MuleMessage message = readWithLock();
+    ((InputStream) message.getPayload()).close();
 
-        assertThat(isLocked(message), is(false));
-    }
+    assertThat(isLocked(message), is(false));
+  }
 
-    @Test
-    public void getProperties() throws Exception
-    {
-        FtpFileAttributes fileAttributes = (FtpFileAttributes) readHelloWorld().getMessage().getAttributes();
-        testHarness.assertAttributes(HELLO_PATH, fileAttributes);
-    }
+  @Test
+  public void getProperties() throws Exception {
+    FtpFileAttributes fileAttributes = (FtpFileAttributes) readHelloWorld().getMessage().getAttributes();
+    testHarness.assertAttributes(HELLO_PATH, fileAttributes);
+  }
 
-    private MuleMessage readWithLock() throws Exception
-    {
-        MuleMessage message = flowRunner("readWithLock").run().getMessage();
+  private MuleMessage readWithLock() throws Exception {
+    MuleMessage message = flowRunner("readWithLock").run().getMessage();
 
-        assertThat(isLocked(message), is(true));
-        return message;
-    }
+    assertThat(isLocked(message), is(true));
+    return message;
+  }
 }

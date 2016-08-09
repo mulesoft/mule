@@ -27,48 +27,44 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class NestedProcessorValueResolverTestCase extends AbstractMuleContextTestCase
-{
+public class NestedProcessorValueResolverTestCase extends AbstractMuleContextTestCase {
 
-    private static final String RESPONSE = "Hello world!";
+  private static final String RESPONSE = "Hello world!";
 
-    @Mock
-    private MuleContext muleContext;
+  @Mock
+  private MuleContext muleContext;
 
-    @Mock
-    private MessageProcessor messageProcessor;
+  @Mock
+  private MessageProcessor messageProcessor;
 
-    @Before
-    public void before() throws Exception
-    {
-        when(messageProcessor.process(any(MuleEvent.class))).thenReturn(getTestEvent(RESPONSE));
-    }
+  @Before
+  public void before() throws Exception {
+    when(messageProcessor.process(any(MuleEvent.class))).thenReturn(getTestEvent(RESPONSE));
+  }
 
-    @Test
-    public void yieldsNestedProcessor() throws Exception
-    {
-        MuleEvent muleEvent = getTestEvent("");
-        NestedProcessorValueResolver resolver = new NestedProcessorValueResolver(messageProcessor);
-        NestedProcessor nestedProcessor = resolver.resolve(muleEvent);
-        Object response = nestedProcessor.process();
-        assertThat((String) response, is(sameInstance(RESPONSE)));
+  @Test
+  public void yieldsNestedProcessor() throws Exception {
+    MuleEvent muleEvent = getTestEvent("");
+    NestedProcessorValueResolver resolver = new NestedProcessorValueResolver(messageProcessor);
+    NestedProcessor nestedProcessor = resolver.resolve(muleEvent);
+    Object response = nestedProcessor.process();
+    assertThat((String) response, is(sameInstance(RESPONSE)));
 
-        ArgumentCaptor<MuleEvent> captor = ArgumentCaptor.forClass(MuleEvent.class);
-        verify(messageProcessor).process(captor.capture());
+    ArgumentCaptor<MuleEvent> captor = ArgumentCaptor.forClass(MuleEvent.class);
+    verify(messageProcessor).process(captor.capture());
 
-        MuleEvent capturedEvent = captor.getValue();
-        assertThat(capturedEvent.getId(), is(muleEvent.getId()));
-    }
+    MuleEvent capturedEvent = captor.getValue();
+    assertThat(capturedEvent.getId(), is(muleEvent.getId()));
+  }
 
-    @Test
-    public void alwaysGivesDifferentInstances() throws Exception
-    {
-        MuleEvent muleEvent = getTestEvent("");
-        NestedProcessorValueResolver resolver = new NestedProcessorValueResolver(messageProcessor);
-        NestedProcessor resolved1 = resolver.resolve(muleEvent);
-        NestedProcessor resolved2 = resolver.resolve(muleEvent);
+  @Test
+  public void alwaysGivesDifferentInstances() throws Exception {
+    MuleEvent muleEvent = getTestEvent("");
+    NestedProcessorValueResolver resolver = new NestedProcessorValueResolver(messageProcessor);
+    NestedProcessor resolved1 = resolver.resolve(muleEvent);
+    NestedProcessor resolved2 = resolver.resolve(muleEvent);
 
-        assertThat(resolved1, is(not(sameInstance(resolved2))));
-    }
+    assertThat(resolved1, is(not(sameInstance(resolved2))));
+  }
 
 }

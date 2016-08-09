@@ -15,23 +15,21 @@ import java.util.List;
 
 import org.junit.runners.Parameterized;
 
-public class OracleStoredProcedureStreamingReturningResultsetTestCase extends AbstractStoredProcedureStreamingReturningResultsetTestCase
-{
+public class OracleStoredProcedureStreamingReturningResultsetTestCase
+    extends AbstractStoredProcedureStreamingReturningResultsetTestCase {
 
-    public OracleStoredProcedureStreamingReturningResultsetTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public OracleStoredProcedureStreamingReturningResultsetTestCase(String dataSourceConfigResource,
+                                                                  AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Parameterized.Parameters
-    public static List<Object[]> parameters()
-    {
-        return TestDbConfig.getOracleResource();
-    }
+  @Parameterized.Parameters
+  public static List<Object[]> parameters() {
+    return TestDbConfig.getOracleResource();
+  }
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/vendor/oracle/oracle-stored-procedure-streaming-returning-resultset-config.xml"};
-    }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/vendor/oracle/oracle-stored-procedure-streaming-returning-resultset-config.xml"};
+  }
 }

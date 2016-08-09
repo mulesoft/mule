@@ -26,47 +26,38 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class LoadJsonSchemaForValidationTestCase extends AbstractMuleTestCase
-{
+public class LoadJsonSchemaForValidationTestCase extends AbstractMuleTestCase {
 
-    @Mock
-    private ClassLoader mockClassLoader;
+  @Mock
+  private ClassLoader mockClassLoader;
 
-    private URL schemaUrl;
+  private URL schemaUrl;
 
-    @Before
-    public void before() throws Exception
-    {
-        schemaUrl = getClass().getResource(SCHEMA_FSTAB_JSON);
-        assertThat("could not load schema", schemaUrl, is(notNullValue()));
+  @Before
+  public void before() throws Exception {
+    schemaUrl = getClass().getResource(SCHEMA_FSTAB_JSON);
+    assertThat("could not load schema", schemaUrl, is(notNullValue()));
 
-        when(mockClassLoader.getResource(SCHEMA_FSTAB_JSON)).thenReturn(schemaUrl);
-        when(mockClassLoader.getResource("resource:" + SCHEMA_FSTAB_JSON)).thenReturn(schemaUrl);
-    }
+    when(mockClassLoader.getResource(SCHEMA_FSTAB_JSON)).thenReturn(schemaUrl);
+    when(mockClassLoader.getResource("resource:" + SCHEMA_FSTAB_JSON)).thenReturn(schemaUrl);
+  }
 
-    @Test
-    public void usesThreadClassloader() throws Exception
-    {
-        doWithMockClassLoader(() -> JsonSchemaValidator.builder()
-                .setSchemaLocation(SCHEMA_FSTAB_JSON)
-                .build());
+  @Test
+  public void usesThreadClassloader() throws Exception {
+    doWithMockClassLoader(() -> JsonSchemaValidator.builder().setSchemaLocation(SCHEMA_FSTAB_JSON).build());
 
-        verify(mockClassLoader).getResource(SCHEMA_FSTAB_JSON);
-    }
+    verify(mockClassLoader).getResource(SCHEMA_FSTAB_JSON);
+  }
 
-    @Test
-    public void usesThreadClassloaderWithRedirect() throws Exception
-    {
-        doWithMockClassLoader(() -> JsonSchemaValidator.builder()
-                .setSchemaLocation("http://mule.org/schemas/fstab.json")
-                .addSchemaRedirect("http://mule.org/schemas/fstab.json", SCHEMA_FSTAB_JSON)
-                .build());
+  @Test
+  public void usesThreadClassloaderWithRedirect() throws Exception {
+    doWithMockClassLoader(() -> JsonSchemaValidator.builder().setSchemaLocation("http://mule.org/schemas/fstab.json")
+        .addSchemaRedirect("http://mule.org/schemas/fstab.json", SCHEMA_FSTAB_JSON).build());
 
-        verify(mockClassLoader).getResource(SCHEMA_FSTAB_JSON);
-    }
+    verify(mockClassLoader).getResource(SCHEMA_FSTAB_JSON);
+  }
 
-    private void doWithMockClassLoader(Runnable closure)
-    {
-        withContextClassLoader(mockClassLoader, closure);
-    }
+  private void doWithMockClassLoader(Runnable closure) {
+    withContextClassLoader(mockClassLoader, closure);
+  }
 }

@@ -9,13 +9,12 @@ package org.mule.runtime.core.util.queue;
 /**
  * Queue configuration attributes
  */
-public interface QueueConfiguration
-{
+public interface QueueConfiguration {
 
-    int MAXIMUM_CAPACITY = 0;
+  int MAXIMUM_CAPACITY = 0;
 
-    public boolean isPersistent();
+  public boolean isPersistent();
 
-    public int getCapacity();
+  public int getCapacity();
 
 }

@@ -11,28 +11,26 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.registry.InjectProcessor;
 
 /**
- * Injects the MuleContext object for objects stored in the {@link TransientRegistry} where the object registered
- * implements {@link org.mule.runtime.core.api.context.MuleContextAware}.
+ * Injects the MuleContext object for objects stored in the {@link TransientRegistry} where the object registered implements
+ * {@link org.mule.runtime.core.api.context.MuleContextAware}.
  *
- * @deprecated as of 3.7.0 since these are only used by {@link org.mule.runtime.core.registry.TransientRegistry} which is also deprecated. Use post processors
- * for currently supported registries instead (i.e: {@link org.mule.runtime.core.config.spring.SpringRegistry})
+ * @deprecated as of 3.7.0 since these are only used by {@link org.mule.runtime.core.registry.TransientRegistry} which is also
+ *             deprecated. Use post processors for currently supported registries instead (i.e:
+ *             {@link org.mule.runtime.core.config.spring.SpringRegistry})
  */
 @Deprecated
-public class MuleContextProcessor implements InjectProcessor
-{
-    private MuleContext context;
+public class MuleContextProcessor implements InjectProcessor {
 
-    public MuleContextProcessor(MuleContext context)
-    {
-        this.context = context;
-    }
+  private MuleContext context;
 
-    public Object process(Object object)
-    {
-        if (object instanceof MuleContextAware)
-        {
-            ((MuleContextAware)object).setMuleContext(context);
-        }
-        return object;
+  public MuleContextProcessor(MuleContext context) {
+    this.context = context;
+  }
+
+  public Object process(Object object) {
+    if (object instanceof MuleContextAware) {
+      ((MuleContextAware) object).setMuleContext(context);
     }
+    return object;
+  }
 }

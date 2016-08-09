@@ -21,41 +21,35 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class SelectMaxRowsTestCase extends AbstractDbIntegrationTestCase
-{
+public class SelectMaxRowsTestCase extends AbstractDbIntegrationTestCase {
 
-    public SelectMaxRowsTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public SelectMaxRowsTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Parameterized.Parameters
-    public static List<Object[]> parameters()
-    {
-        return TestDbConfig.getResources();
-    }
+  @Parameterized.Parameters
+  public static List<Object[]> parameters() {
+    return TestDbConfig.getResources();
+  }
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/select/select-max-rows-config.xml"};
-    }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/select/select-max-rows-config.xml"};
+  }
 
-    @Test
-    public void limitsRows() throws Exception
-    {
-        final MuleEvent responseEvent = flowRunner("selectMaxRows").withPayload(TEST_MESSAGE).run();
+  @Test
+  public void limitsRows() throws Exception {
+    final MuleEvent responseEvent = flowRunner("selectMaxRows").withPayload(TEST_MESSAGE).run();
 
-        final MuleMessage response = responseEvent.getMessage();
-        assertMessageContains(response, getVenusRecord(), getEarthRecord());
-    }
+    final MuleMessage response = responseEvent.getMessage();
+    assertMessageContains(response, getVenusRecord(), getEarthRecord());
+  }
 
-    @Test
-    public void limitsStreamedRows() throws Exception
-    {
-        final MuleEvent responseEvent = flowRunner("selectMaxStreamedRows").withPayload(TEST_MESSAGE).run();
+  @Test
+  public void limitsStreamedRows() throws Exception {
+    final MuleEvent responseEvent = flowRunner("selectMaxStreamedRows").withPayload(TEST_MESSAGE).run();
 
-        final MuleMessage response = responseEvent.getMessage();
-        assertMessageContains(response, getVenusRecord(), getEarthRecord());
-    }
+    final MuleMessage response = responseEvent.getMessage();
+    assertMessageContains(response, getVenusRecord(), getEarthRecord());
+  }
 }

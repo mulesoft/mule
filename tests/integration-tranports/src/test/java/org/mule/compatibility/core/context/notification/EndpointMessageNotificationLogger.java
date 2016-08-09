@@ -10,7 +10,6 @@ import org.mule.compatibility.core.api.context.notification.EndpointMessageNotif
 import org.mule.test.core.context.notification.AbstractNotificationLogger;
 
 public class EndpointMessageNotificationLogger extends AbstractNotificationLogger<EndpointMessageNotification>
-    implements EndpointMessageNotificationListener<EndpointMessageNotification>
-{
-    // nothing to do here
+    implements EndpointMessageNotificationListener<EndpointMessageNotification> {
+  // nothing to do here
 }

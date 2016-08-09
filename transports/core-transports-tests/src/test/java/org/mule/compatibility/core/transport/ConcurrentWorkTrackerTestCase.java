@@ -18,40 +18,36 @@ import org.mule.tck.size.SmallTest;
 import org.junit.Test;
 
 @SmallTest
-public class ConcurrentWorkTrackerTestCase extends AbstractMuleTestCase
-{
+public class ConcurrentWorkTrackerTestCase extends AbstractMuleTestCase {
 
-    private ConcurrentWorkTracker workTracker = new ConcurrentWorkTracker();
+  private ConcurrentWorkTracker workTracker = new ConcurrentWorkTracker();
 
-    @Test
-    public void addsWork()
-    {
-        Runnable work = mock(Runnable.class);
+  @Test
+  public void addsWork() {
+    Runnable work = mock(Runnable.class);
 
-        workTracker.addWork(work);
+    workTracker.addWork(work);
 
-        assertThat(workTracker.pendingWorks(), hasItem(work));
-    }
+    assertThat(workTracker.pendingWorks(), hasItem(work));
+  }
 
-    @Test
-    public void removesWork()
-    {
-        Runnable work = mock(Runnable.class);
+  @Test
+  public void removesWork() {
+    Runnable work = mock(Runnable.class);
 
-        workTracker.addWork(work);
-        workTracker.removeWork(work);
+    workTracker.addWork(work);
+    workTracker.removeWork(work);
 
-        assertThat(workTracker.pendingWorks(), not(hasItem(work)));
-    }
+    assertThat(workTracker.pendingWorks(), not(hasItem(work)));
+  }
 
-    @Test
-    public void cleansUpPendingWorksOnDispose() throws Exception
-    {
-        Runnable work = mock(Runnable.class);
-        workTracker.addWork(work);
+  @Test
+  public void cleansUpPendingWorksOnDispose() throws Exception {
+    Runnable work = mock(Runnable.class);
+    workTracker.addWork(work);
 
-        workTracker.dispose();
+    workTracker.dispose();
 
-        assertThat(workTracker.pendingWorks(), not(hasItem(work)));
-    }
+    assertThat(workTracker.pendingWorks(), not(hasItem(work)));
+  }
 }

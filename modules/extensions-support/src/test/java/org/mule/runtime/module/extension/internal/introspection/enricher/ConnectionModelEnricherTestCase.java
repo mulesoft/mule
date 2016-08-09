@@ -55,191 +55,183 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class ConnectionModelEnricherTestCase extends AbstractMuleTestCase
-{
+public class ConnectionModelEnricherTestCase extends AbstractMuleTestCase {
 
-    private static final String CONNECTED_OPERATION = "connectedOperation";
-    private static final String NOT_CONNECTED_OPERATION = "notConnectedOperation";
-    private static final String CONNECTED_SOURCE = "connectedSource";
-    private static final String NOT_CONNECTED_SOURCE = "notConnectedSource";
+  private static final String CONNECTED_OPERATION = "connectedOperation";
+  private static final String NOT_CONNECTED_OPERATION = "notConnectedOperation";
+  private static final String CONNECTED_SOURCE = "connectedSource";
+  private static final String NOT_CONNECTED_SOURCE = "notConnectedSource";
 
-    @Mock(answer = RETURNS_DEEP_STUBS)
-    private DescribingContext describingContext;
+  @Mock(answer = RETURNS_DEEP_STUBS)
+  private DescribingContext describingContext;
 
-    @Mock(answer = RETURNS_DEEP_STUBS)
-    private ExtensionDeclarer extensionDeclarer;
+  @Mock(answer = RETURNS_DEEP_STUBS)
+  private ExtensionDeclarer extensionDeclarer;
 
-    @Mock(answer = RETURNS_DEEP_STUBS)
-    private ExtensionDeclaration extensionDeclaration;
+  @Mock(answer = RETURNS_DEEP_STUBS)
+  private ExtensionDeclaration extensionDeclaration;
 
-    @Mock(answer = RETURNS_DEEP_STUBS)
-    private OperationDeclaration connectedOperation;
+  @Mock(answer = RETURNS_DEEP_STUBS)
+  private OperationDeclaration connectedOperation;
 
-    @Mock(answer = RETURNS_DEEP_STUBS)
-    private OperationDeclaration notConnectedOperation;
+  @Mock(answer = RETURNS_DEEP_STUBS)
+  private OperationDeclaration notConnectedOperation;
 
-    @Mock(answer = RETURNS_DEEP_STUBS)
-    private SourceDeclaration connectedSource;
+  @Mock(answer = RETURNS_DEEP_STUBS)
+  private SourceDeclaration connectedSource;
 
-    @Mock(answer = RETURNS_DEEP_STUBS)
-    private SourceDeclaration notConnectedSource;
+  @Mock(answer = RETURNS_DEEP_STUBS)
+  private SourceDeclaration notConnectedSource;
 
-    private ImplementingTypeModelProperty implementingTypeModelProperty = new ImplementingTypeModelProperty(Object.class);
-    private ImplementingTypeModelProperty connectedSourceImplementingTypeModelProperty = new ImplementingTypeModelProperty(ConnectedSource.class);
-    private ImplementingTypeModelProperty notConnectedSourceImplementingTypeModelProperty = new ImplementingTypeModelProperty(NotConnectedSource.class);
-    private ImplementingMethodModelProperty connectedImplementingModelProperty = new ImplementingMethodModelProperty(Operations.class.getMethod(CONNECTED_OPERATION, TransactionalConnection.class));
-    private ImplementingMethodModelProperty notConnectedImplementingModelProperty = new ImplementingMethodModelProperty(Operations.class.getMethod(NOT_CONNECTED_OPERATION));
-    private ModelEnricher enricher = new ConnectionModelEnricher();
-    private ClassTypeLoader typeLoader;
+  private ImplementingTypeModelProperty implementingTypeModelProperty = new ImplementingTypeModelProperty(Object.class);
+  private ImplementingTypeModelProperty connectedSourceImplementingTypeModelProperty =
+      new ImplementingTypeModelProperty(ConnectedSource.class);
+  private ImplementingTypeModelProperty notConnectedSourceImplementingTypeModelProperty =
+      new ImplementingTypeModelProperty(NotConnectedSource.class);
+  private ImplementingMethodModelProperty connectedImplementingModelProperty =
+      new ImplementingMethodModelProperty(Operations.class.getMethod(CONNECTED_OPERATION, TransactionalConnection.class));
+  private ImplementingMethodModelProperty notConnectedImplementingModelProperty =
+      new ImplementingMethodModelProperty(Operations.class.getMethod(NOT_CONNECTED_OPERATION));
+  private ModelEnricher enricher = new ConnectionModelEnricher();
+  private ClassTypeLoader typeLoader;
 
-    public ConnectionModelEnricherTestCase() throws Exception
-    {
+  public ConnectionModelEnricherTestCase() throws Exception {}
+
+  @Before
+  public void before() throws Exception {
+    typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(Thread.currentThread().getContextClassLoader());
+    when(describingContext.getExtensionDeclarer()).thenReturn(extensionDeclarer);
+    when(extensionDeclarer.getDeclaration()).thenReturn(extensionDeclaration);
+    when(extensionDeclaration.getOperations()).thenReturn(asList(connectedOperation, notConnectedOperation));
+    when(extensionDeclaration.getMessageSources()).thenReturn(asList(connectedSource, notConnectedSource));
+    when(extensionDeclaration.getModelProperty(ImplementingTypeModelProperty.class))
+        .thenReturn(Optional.of(implementingTypeModelProperty));
+
+    when(connectedOperation.getModelProperty(ImplementingMethodModelProperty.class))
+        .thenReturn(Optional.of(connectedImplementingModelProperty));
+    when(connectedOperation.getParameters()).thenReturn(emptyList());
+    when(connectedOperation.getName()).thenReturn(CONNECTED_OPERATION);
+    when(notConnectedOperation.getModelProperty(ImplementingMethodModelProperty.class))
+        .thenReturn(Optional.of(notConnectedImplementingModelProperty));
+    when(notConnectedOperation.getName()).thenReturn(NOT_CONNECTED_OPERATION);
+
+    when(connectedSource.getModelProperty(ImplementingTypeModelProperty.class))
+        .thenReturn(Optional.of(connectedSourceImplementingTypeModelProperty));
+    when(connectedSource.getParameters()).thenReturn(emptyList());
+    when(connectedSource.getName()).thenReturn(CONNECTED_SOURCE);
+    when(notConnectedSource.getModelProperty(ImplementingTypeModelProperty.class))
+        .thenReturn(Optional.of(notConnectedSourceImplementingTypeModelProperty));
+    when(notConnectedSource.getParameters()).thenReturn(emptyList());
+    when(notConnectedSource.getName()).thenReturn(NOT_CONNECTED_SOURCE);
+  }
+
+  @Test
+  public void enrichConnectedOperation() throws Exception {
+    enricher.enrich(describingContext);
+    ArgumentCaptor<InterceptorFactory> captor = ArgumentCaptor.forClass(InterceptorFactory.class);
+    verify(connectedOperation).addInterceptorFactory(captor.capture());
+
+    InterceptorFactory factory = captor.getValue();
+    assertThat(factory, is(notNullValue()));
+    assertThat(factory.createInterceptor(), is(instanceOf(ConnectionInterceptor.class)));
+  }
+
+  @Test
+  public void enrichOnlyOnceWhenFlyweight() throws Exception {
+    when(extensionDeclaration.getOperations()).thenReturn(asList(connectedOperation, connectedOperation, notConnectedOperation));
+    enricher.enrich(describingContext);
+    verify(connectedOperation, times(1)).addInterceptorFactory(any());
+  }
+
+  @Test
+  public void skipNotConnectedOperation() throws Exception {
+    enricher.enrich(describingContext);
+    verify(notConnectedOperation, never()).addInterceptorFactory(any(InterceptorFactory.class));
+  }
+
+
+  @Test(expected = IllegalOperationModelDefinitionException.class)
+  public void transactionalActionParameter() {
+    ParameterDeclaration offending = mock(ParameterDeclaration.class);
+    when(offending.getName()).thenReturn(TRANSACTIONAL_ACTION_PARAMETER_NAME);
+    when(connectedOperation.getParameters()).thenReturn(singletonList(offending));
+
+    enricher.enrich(describingContext);
+  }
+
+  @Test
+  public void verifyConnectivityModelPropertyOnConnectedOperation() {
+    enricher.enrich(describingContext);
+    OperationDeclaration operationDeclaration =
+        getDeclaration(describingContext.getExtensionDeclarer().getDeclaration().getOperations(), CONNECTED_OPERATION);
+    ArgumentCaptor<ConnectivityModelProperty> captor = ArgumentCaptor.forClass(ConnectivityModelProperty.class);
+    verify(operationDeclaration, times(1)).addModelProperty(captor.capture());
+    assertThat(captor.getValue().getConnectionType(), is(typeLoader.load(TransactionalConnection.class)));
+  }
+
+  @Test
+  public void verifyConnectivityModelPropertyOnNotConnectedOperation() {
+    enricher.enrich(describingContext);
+    OperationDeclaration operationDeclaration =
+        getDeclaration(describingContext.getExtensionDeclarer().getDeclaration().getOperations(), NOT_CONNECTED_OPERATION);
+    verify(operationDeclaration, never()).addModelProperty(any(ConnectivityModelProperty.class));
+  }
+
+  @Test
+  public void verifyConnectivityModelPropertyOnConnectedSource() {
+    enricher.enrich(describingContext);
+    SourceDeclaration sourceDeclaration =
+        getDeclaration(describingContext.getExtensionDeclarer().getDeclaration().getMessageSources(), CONNECTED_SOURCE);
+    ArgumentCaptor<ConnectivityModelProperty> captor = ArgumentCaptor.forClass(ConnectivityModelProperty.class);
+    verify(sourceDeclaration, times(1)).addModelProperty(captor.capture());
+    assertThat(captor.getValue().getConnectionType(), is(typeLoader.load(TransactionalConnection.class)));
+  }
+
+  @Test
+  public void verifyConnectivityModelPropertyOnNotConnectedSource() {
+    enricher.enrich(describingContext);
+    SourceDeclaration sourceDeclaration =
+        getDeclaration(describingContext.getExtensionDeclarer().getDeclaration().getMessageSources(), NOT_CONNECTED_SOURCE);
+    verify(sourceDeclaration, never()).addModelProperty(any(ConnectivityModelProperty.class));
+  }
+
+  private static class Operations {
+
+    public void connectedOperation(@Connection TransactionalConnection conn) {
+
     }
 
-    @Before
-    public void before() throws Exception
-    {
-        typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(Thread.currentThread().getContextClassLoader());
-        when(describingContext.getExtensionDeclarer()).thenReturn(extensionDeclarer);
-        when(extensionDeclarer.getDeclaration()).thenReturn(extensionDeclaration);
-        when(extensionDeclaration.getOperations()).thenReturn(asList(connectedOperation, notConnectedOperation));
-        when(extensionDeclaration.getMessageSources()).thenReturn(asList(connectedSource, notConnectedSource));
-        when(extensionDeclaration.getModelProperty(ImplementingTypeModelProperty.class)).thenReturn(Optional.of(implementingTypeModelProperty));
+    public void notConnectedOperation() {
 
-        when(connectedOperation.getModelProperty(ImplementingMethodModelProperty.class)).thenReturn(Optional.of(connectedImplementingModelProperty));
-        when(connectedOperation.getParameters()).thenReturn(emptyList());
-        when(connectedOperation.getName()).thenReturn(CONNECTED_OPERATION);
-        when(notConnectedOperation.getModelProperty(ImplementingMethodModelProperty.class)).thenReturn(Optional.of(notConnectedImplementingModelProperty));
-        when(notConnectedOperation.getName()).thenReturn(NOT_CONNECTED_OPERATION);
+    }
+  }
 
-        when(connectedSource.getModelProperty(ImplementingTypeModelProperty.class)).thenReturn(Optional.of(connectedSourceImplementingTypeModelProperty));
-        when(connectedSource.getParameters()).thenReturn(emptyList());
-        when(connectedSource.getName()).thenReturn(CONNECTED_SOURCE);
-        when(notConnectedSource.getModelProperty(ImplementingTypeModelProperty.class)).thenReturn(Optional.of(notConnectedSourceImplementingTypeModelProperty));
-        when(notConnectedSource.getParameters()).thenReturn(emptyList());
-        when(notConnectedSource.getName()).thenReturn(NOT_CONNECTED_SOURCE);
+  public static class ConnectedSource extends Source {
+
+    @Connection
+    public TransactionalConnection conn;
+
+    @Override
+    public void start() throws Exception {
+
     }
 
-    @Test
-    public void enrichConnectedOperation() throws Exception
-    {
-        enricher.enrich(describingContext);
-        ArgumentCaptor<InterceptorFactory> captor = ArgumentCaptor.forClass(InterceptorFactory.class);
-        verify(connectedOperation).addInterceptorFactory(captor.capture());
+    @Override
+    public void stop() throws Exception {
 
-        InterceptorFactory factory = captor.getValue();
-        assertThat(factory, is(notNullValue()));
-        assertThat(factory.createInterceptor(), is(instanceOf(ConnectionInterceptor.class)));
+    }
+  }
+
+  public static class NotConnectedSource extends Source {
+
+    @Override
+    public void start() throws Exception {
+
     }
 
-    @Test
-    public void enrichOnlyOnceWhenFlyweight() throws Exception
-    {
-        when(extensionDeclaration.getOperations()).thenReturn(asList(connectedOperation, connectedOperation, notConnectedOperation));
-        enricher.enrich(describingContext);
-        verify(connectedOperation, times(1)).addInterceptorFactory(any());
+    @Override
+    public void stop() throws Exception {
+
     }
-
-    @Test
-    public void skipNotConnectedOperation() throws Exception
-    {
-        enricher.enrich(describingContext);
-        verify(notConnectedOperation, never()).addInterceptorFactory(any(InterceptorFactory.class));
-    }
-
-
-    @Test(expected = IllegalOperationModelDefinitionException.class)
-    public void transactionalActionParameter()
-    {
-        ParameterDeclaration offending = mock(ParameterDeclaration.class);
-        when(offending.getName()).thenReturn(TRANSACTIONAL_ACTION_PARAMETER_NAME);
-        when(connectedOperation.getParameters()).thenReturn(singletonList(offending));
-
-        enricher.enrich(describingContext);
-    }
-
-    @Test
-    public void verifyConnectivityModelPropertyOnConnectedOperation()
-    {
-        enricher.enrich(describingContext);
-        OperationDeclaration operationDeclaration = getDeclaration(describingContext.getExtensionDeclarer().getDeclaration().getOperations(), CONNECTED_OPERATION);
-        ArgumentCaptor<ConnectivityModelProperty> captor = ArgumentCaptor.forClass(ConnectivityModelProperty.class);
-        verify(operationDeclaration, times(1)).addModelProperty(captor.capture());
-        assertThat(captor.getValue().getConnectionType(), is(typeLoader.load(TransactionalConnection.class)));
-    }
-
-    @Test
-    public void verifyConnectivityModelPropertyOnNotConnectedOperation()
-    {
-        enricher.enrich(describingContext);
-        OperationDeclaration operationDeclaration = getDeclaration(describingContext.getExtensionDeclarer().getDeclaration().getOperations(), NOT_CONNECTED_OPERATION);
-        verify(operationDeclaration, never()).addModelProperty(any(ConnectivityModelProperty.class));
-    }
-
-    @Test
-    public void verifyConnectivityModelPropertyOnConnectedSource()
-    {
-        enricher.enrich(describingContext);
-        SourceDeclaration sourceDeclaration = getDeclaration(describingContext.getExtensionDeclarer().getDeclaration().getMessageSources(), CONNECTED_SOURCE);
-        ArgumentCaptor<ConnectivityModelProperty> captor = ArgumentCaptor.forClass(ConnectivityModelProperty.class);
-        verify(sourceDeclaration, times(1)).addModelProperty(captor.capture());
-        assertThat(captor.getValue().getConnectionType(), is(typeLoader.load(TransactionalConnection.class)));
-    }
-
-    @Test
-    public void verifyConnectivityModelPropertyOnNotConnectedSource()
-    {
-        enricher.enrich(describingContext);
-        SourceDeclaration sourceDeclaration = getDeclaration(describingContext.getExtensionDeclarer().getDeclaration().getMessageSources(), NOT_CONNECTED_SOURCE);
-        verify(sourceDeclaration, never()).addModelProperty(any(ConnectivityModelProperty.class));
-    }
-
-    private static class Operations
-    {
-
-        public void connectedOperation(@Connection TransactionalConnection conn)
-        {
-
-        }
-
-        public void notConnectedOperation()
-        {
-
-        }
-    }
-
-    public static class ConnectedSource extends Source
-    {
-
-        @Connection
-        public TransactionalConnection conn;
-
-        @Override
-        public void start() throws Exception
-        {
-
-        }
-
-        @Override
-        public void stop() throws Exception
-        {
-
-        }
-    }
-
-    public static class NotConnectedSource extends Source
-    {
-
-        @Override
-        public void start() throws Exception
-        {
-
-        }
-
-        @Override
-        public void stop() throws Exception
-        {
-
-        }
-    }
+  }
 }

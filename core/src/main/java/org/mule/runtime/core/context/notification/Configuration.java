@@ -7,6 +7,7 @@
 package org.mule.runtime.core.context.notification;
 
 import static org.mule.runtime.core.context.notification.ServerNotificationManager.toClass;
+
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.api.context.notification.ServerNotificationListener;
 import org.mule.runtime.core.config.i18n.CoreMessages;
@@ -25,153 +26,128 @@ import org.slf4j.LoggerFactory;
 /**
  * This acts as a synchronized collection. No call blocks and all are synchronized.
  */
-class Configuration
-{
+class Configuration {
 
-    protected static Logger logger = LoggerFactory.getLogger(Configuration.class);
-    private Map<Class<? extends ServerNotificationListener>, Set<Class<? extends ServerNotification>>> interfaceToTypes =
-            new HashMap<Class<? extends ServerNotificationListener>, Set<Class<? extends ServerNotification>>>(); // map from interface to collection of events
-    private Set<ListenerSubscriptionPair> listenerSubscriptionPairs = new HashSet<ListenerSubscriptionPair>();
-    private Set<Class<? extends ServerNotificationListener>> disabledInterfaces = new HashSet<Class<? extends ServerNotificationListener>>();
-    private Set<Class<? extends ServerNotification>> disabledNotificationTypes = new HashSet<Class<? extends ServerNotification>>();
-    private volatile boolean dirty = true;
-    private Policy policy;
+  protected static Logger logger = LoggerFactory.getLogger(Configuration.class);
+  // map from interface to collection of events
+  private Map<Class<? extends ServerNotificationListener>, Set<Class<? extends ServerNotification>>> interfaceToTypes =
+      new HashMap<>();
+  private Set<ListenerSubscriptionPair> listenerSubscriptionPairs = new HashSet<>();
+  private Set<Class<? extends ServerNotificationListener>> disabledInterfaces =
+      new HashSet<>();
+  private Set<Class<? extends ServerNotification>> disabledNotificationTypes = new HashSet<>();
+  private volatile boolean dirty = true;
+  private Policy policy;
 
-    synchronized void addInterfaceToType(Class<? extends ServerNotificationListener> iface, Class<? extends ServerNotification> type)
-    {
-        dirty = true;
-        if (!ServerNotification.class.isAssignableFrom(type))
-        {
-            throw new IllegalArgumentException(
-                    CoreMessages.propertyIsNotSupportedType("type",
-                            ServerNotification.class, type).getMessage());
+  synchronized void addInterfaceToType(Class<? extends ServerNotificationListener> iface,
+                                       Class<? extends ServerNotification> type) {
+    dirty = true;
+    if (!ServerNotification.class.isAssignableFrom(type)) {
+      throw new IllegalArgumentException(CoreMessages.propertyIsNotSupportedType("type", ServerNotification.class, type)
+          .getMessage());
+    }
+    if (!interfaceToTypes.containsKey(iface)) {
+      interfaceToTypes.put(iface, new HashSet<Class<? extends ServerNotification>>());
+    }
+    Set<Class<? extends ServerNotification>> events = interfaceToTypes.get(iface);
+    events.add(type);
+    if (logger.isDebugEnabled()) {
+      logger.debug("Registered event type: " + type);
+      logger.debug("Binding listener type '" + iface + "' to event type '" + type + "'");
+    }
+  }
+
+  /**
+   * @param interfaceToTypes map from interace to a particular event
+   * @throws ClassNotFoundException if the interface is a key, but the corresponding class cannot be loaded
+   */
+  synchronized void addAllInterfaceToTypes(Map<Class<? extends ServerNotificationListener>, Set<Class<? extends ServerNotification>>> interfaceToTypes)
+      throws ClassNotFoundException {
+    dirty = true;
+
+    for (Object iface : interfaceToTypes.keySet()) {
+      addInterfaceToType(toClass(iface), toClass(interfaceToTypes.get(iface)));
+    }
+  }
+
+  synchronized void addListenerSubscriptionPair(ListenerSubscriptionPair pair) {
+    dirty = true;
+    if (!listenerSubscriptionPairs.add(pair)) {
+      logger.warn(CoreMessages.notificationListenerSubscriptionAlreadyRegistered(pair).toString());
+    }
+  }
+
+  synchronized void addAllListenerSubscriptionPairs(Collection pairs) {
+    dirty = true;
+    for (Iterator listener = pairs.iterator(); listener.hasNext();) {
+      addListenerSubscriptionPair((ListenerSubscriptionPair) listener.next());
+    }
+  }
+
+  synchronized void removeListener(ServerNotificationListener listener) {
+    dirty = true;
+    Set<ListenerSubscriptionPair> toRemove = new HashSet<>();
+    for (Object element : listenerSubscriptionPairs) {
+      ListenerSubscriptionPair pair = (ListenerSubscriptionPair) element;
+      if (pair.getListener().equals(listener)) {
+        toRemove.add(pair);
+      }
+    }
+    listenerSubscriptionPairs.removeAll(toRemove);
+  }
+
+  synchronized void removeAllListeners(Collection listeners) {
+    dirty = true;
+    for (Iterator listener = listeners.iterator(); listener.hasNext();) {
+      removeListener((ServerNotificationListener) listener.next());
+    }
+  }
+
+  synchronized void disableInterface(Class<? extends ServerNotificationListener> iface) {
+    dirty = true;
+    disabledInterfaces.add(iface);
+  }
+
+  synchronized void disabledAllInterfaces(Collection<Class<? extends ServerNotificationListener>> interfaces)
+      throws ClassNotFoundException {
+    dirty = true;
+    for (Object element : interfaces) {
+      disableInterface(toClass(element));
+    }
+  }
+
+  synchronized void disableType(Class<? extends ServerNotification> type) {
+    dirty = true;
+    disabledNotificationTypes.add(type);
+  }
+
+  synchronized void disableAllTypes(Collection types) throws ClassNotFoundException {
+    dirty = true;
+    for (Iterator event = types.iterator(); event.hasNext();) {
+      disableType(toClass(event.next()));
+    }
+  }
+
+  protected Policy getPolicy() {
+    if (dirty) {
+      synchronized (this) {
+        if (dirty) {
+          policy = new Policy(interfaceToTypes, listenerSubscriptionPairs, disabledInterfaces, disabledNotificationTypes);
+          dirty = false;
         }
-        if (!interfaceToTypes.containsKey(iface))
-        {
-            interfaceToTypes.put(iface, new HashSet<Class<? extends ServerNotification>>());
-        }
-        Set<Class<? extends ServerNotification>> events = interfaceToTypes.get(iface);
-        events.add(type);
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Registered event type: " + type);
-            logger.debug("Binding listener type '" + iface + "' to event type '" + type + "'");
-        }
+      }
     }
+    return policy;
+  }
 
-    /**
-     * @param interfaceToTypes map from interace to a particular event
-     * @throws ClassNotFoundException if the interface is a key, but the corresponding class cannot be loaded
-     */
-    synchronized void addAllInterfaceToTypes(Map<Class<? extends ServerNotificationListener>, Set<Class<? extends ServerNotification>>> interfaceToTypes) throws ClassNotFoundException
-    {
-        dirty = true;
+  // for tests -------------------------------
 
-        for (Iterator ifaces = interfaceToTypes.keySet().iterator(); ifaces.hasNext();)
-        {
-            Object iface = ifaces.next();
-            addInterfaceToType(toClass(iface), toClass(interfaceToTypes.get(iface)));
-        }
-    }
+  Map<Class<? extends ServerNotificationListener>, Set<Class<? extends ServerNotification>>> getInterfaceToTypes() {
+    return Collections.unmodifiableMap(interfaceToTypes);
+  }
 
-    synchronized void addListenerSubscriptionPair(ListenerSubscriptionPair pair)
-    {
-        dirty = true;
-        if (!listenerSubscriptionPairs.add(pair))
-        {
-            logger.warn(CoreMessages.notificationListenerSubscriptionAlreadyRegistered(pair).toString());
-        }
-    }
-
-    synchronized void addAllListenerSubscriptionPairs(Collection pairs)
-    {
-        dirty = true;
-        for (Iterator listener = pairs.iterator(); listener.hasNext();)
-        {
-            addListenerSubscriptionPair((ListenerSubscriptionPair) listener.next());
-        }
-    }
-
-    synchronized void removeListener(ServerNotificationListener listener)
-    {
-        dirty = true;
-        Set<ListenerSubscriptionPair> toRemove = new HashSet<ListenerSubscriptionPair>();
-        for (Iterator listeners = listenerSubscriptionPairs.iterator(); listeners.hasNext();)
-        {
-            ListenerSubscriptionPair pair = (ListenerSubscriptionPair) listeners.next();
-            if (pair.getListener().equals(listener))
-            {
-                toRemove.add(pair);
-            }
-        }
-        listenerSubscriptionPairs.removeAll(toRemove);
-    }
-
-    synchronized void removeAllListeners(Collection listeners)
-    {
-        dirty = true;
-        for (Iterator listener = listeners.iterator(); listener.hasNext();)
-        {
-            removeListener((ServerNotificationListener) listener.next());
-        }
-    }
-
-    synchronized void disableInterface(Class<? extends ServerNotificationListener> iface)
-    {
-        dirty = true;
-        disabledInterfaces.add(iface);
-    }
-
-    synchronized void disabledAllInterfaces(Collection<Class<? extends ServerNotificationListener>> interfaces) throws ClassNotFoundException
-    {
-        dirty = true;
-        for (Iterator iface = interfaces.iterator(); iface.hasNext();)
-        {
-            disableInterface(toClass(iface.next()));
-        }
-    }
-
-    synchronized void disableType(Class<? extends ServerNotification> type)
-    {
-        dirty = true;
-        disabledNotificationTypes.add(type);
-    }
-
-    synchronized void disableAllTypes(Collection types) throws ClassNotFoundException
-    {
-        dirty = true;
-        for (Iterator event = types.iterator(); event.hasNext();)
-        {
-            disableType(toClass(event.next()));
-        }
-    }
-
-    protected Policy getPolicy()
-    {
-        if (dirty)
-        {
-            synchronized (this)
-            {
-                if (dirty)
-                {
-                    policy = new Policy(interfaceToTypes, listenerSubscriptionPairs, disabledInterfaces, disabledNotificationTypes);
-                    dirty = false;
-                }
-            }
-        }
-        return policy;
-    }
-
-    // for tests -------------------------------
-
-    Map<Class<? extends ServerNotificationListener>, Set<Class<? extends ServerNotification>>> getInterfaceToTypes()
-    {
-        return Collections.unmodifiableMap(interfaceToTypes);
-    }
-
-    Set<ListenerSubscriptionPair> getListeners()
-    {
-        return Collections.unmodifiableSet(listenerSubscriptionPairs);
-    }
+  Set<ListenerSubscriptionPair> getListeners() {
+    return Collections.unmodifiableSet(listenerSubscriptionPairs);
+  }
 
 }

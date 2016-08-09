@@ -10,30 +10,25 @@ import static org.mule.runtime.module.json.validation.JsonSchemaTestUtils.getGoo
 
 import org.junit.Test;
 
-public class ValidateSchemaWithDifferentLocationStylesFunctionalTestCase extends AbstractValidateSchemaFunctionalTestCase
-{
+public class ValidateSchemaWithDifferentLocationStylesFunctionalTestCase extends AbstractValidateSchemaFunctionalTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "validate-schema-location-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "validate-schema-location-config.xml";
+  }
 
-    @Test
-    public void withRelativePath() throws Exception
-    {
-        flowRunner("withRelativePath").withPayload(getGoodFstab()).run();
-    }
+  @Test
+  public void withRelativePath() throws Exception {
+    flowRunner("withRelativePath").withPayload(getGoodFstab()).run();
+  }
 
-    @Test
-    public void withRelativePathStartingWithSlash() throws Exception
-    {
-        flowRunner("withRelativePathStartingWithSlash").withPayload(getGoodFstab()).run();
-    }
+  @Test
+  public void withRelativePathStartingWithSlash() throws Exception {
+    flowRunner("withRelativePathStartingWithSlash").withPayload(getGoodFstab()).run();
+  }
 
-    @Test
-    public void withUri() throws Exception
-    {
-        flowRunner("withUri").withPayload(getGoodFstab()).run();
-    }
+  @Test
+  public void withUri() throws Exception {
+    flowRunner("withUri").withPayload(getGoodFstab()).run();
+  }
 }

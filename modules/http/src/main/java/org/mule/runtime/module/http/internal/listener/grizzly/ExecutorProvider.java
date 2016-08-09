@@ -10,15 +10,14 @@ import org.mule.runtime.module.http.internal.listener.ServerAddress;
 
 import java.util.concurrent.Executor;
 
-public interface ExecutorProvider
-{
+public interface ExecutorProvider {
 
-    /**
-     * Provides an {@link java.util.concurrent.Executor} for a {@link org.mule.runtime.module.http.internal.listener.ServerAddress}
-     *
-     * @param serverAddress an HTTP server address
-     * @return the executor to use for process HTTP request for the server address
-     */
-    Executor getExecutor(ServerAddress serverAddress);
+  /**
+   * Provides an {@link java.util.concurrent.Executor} for a {@link org.mule.runtime.module.http.internal.listener.ServerAddress}
+   *
+   * @param serverAddress an HTTP server address
+   * @return the executor to use for process HTTP request for the server address
+   */
+  Executor getExecutor(ServerAddress serverAddress);
 
 }

@@ -18,27 +18,21 @@ import java.util.Collection;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class JmsXaSharedConnectorTestCase extends JmsSharedConnectorTestCase
-{
+public class JmsXaSharedConnectorTestCase extends JmsSharedConnectorTestCase {
 
-    public JmsXaSharedConnectorTestCase(String domainConfig)
-    {
-        super(domainConfig);
-    }
+  public JmsXaSharedConnectorTestCase(String domainConfig) {
+    super(domainConfig);
+  }
 
-    @Parameterized.Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][] {
-                {"domain/jms/jms-activemq-xa-embedded-shared-connector.xml"}
-        });
-    }
+  @Parameterized.Parameters
+  public static Collection<Object[]> parameters() {
+    return Arrays.asList(new Object[][] {{"domain/jms/jms-activemq-xa-embedded-shared-connector.xml"}});
+  }
 
-    @Test
-    public void connectionFactoryWrapperIsUsed()
-    {
-        JmsConnector jmsConnector = (JmsConnector) getMuleContextForApp(CLIENT_APP).getRegistry().lookupObject("sharedJmsConnector");
-        assertThat(jmsConnector.getConnectionFactory(), instanceOf(DefaultXAConnectionFactoryWrapper.class));
-    }
+  @Test
+  public void connectionFactoryWrapperIsUsed() {
+    JmsConnector jmsConnector = (JmsConnector) getMuleContextForApp(CLIENT_APP).getRegistry().lookupObject("sharedJmsConnector");
+    assertThat(jmsConnector.getConnectionFactory(), instanceOf(DefaultXAConnectionFactoryWrapper.class));
+  }
 
 }

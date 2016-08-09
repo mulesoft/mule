@@ -11,24 +11,21 @@ import static org.apache.ws.security.handler.WSHandlerConstants.TTL_TIMESTAMP;
 
 import java.util.Map;
 
-public class WssTimestampSecurityStrategy extends AbstractSecurityStrategy implements SecurityStrategy
-{
-    private long expires;
+public class WssTimestampSecurityStrategy extends AbstractSecurityStrategy implements SecurityStrategy {
 
-    @Override
-    public void apply(Map<String, Object> outConfigProperties, Map<String, Object> inConfigProperties)
-    {
-        appendAction(outConfigProperties, TIMESTAMP);
-        outConfigProperties.put(TTL_TIMESTAMP, String.valueOf(expires));
-    }
+  private long expires;
 
-    public long getExpires()
-    {
-        return expires;
-    }
+  @Override
+  public void apply(Map<String, Object> outConfigProperties, Map<String, Object> inConfigProperties) {
+    appendAction(outConfigProperties, TIMESTAMP);
+    outConfigProperties.put(TTL_TIMESTAMP, String.valueOf(expires));
+  }
 
-    public void setExpires(long expires)
-    {
-        this.expires = expires;
-    }
+  public long getExpires() {
+    return expires;
+  }
+
+  public void setExpires(long expires) {
+    this.expires = expires;
+  }
 }

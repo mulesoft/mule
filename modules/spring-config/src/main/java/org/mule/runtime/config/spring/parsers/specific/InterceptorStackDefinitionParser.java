@@ -14,31 +14,26 @@ import org.mule.runtime.config.spring.parsers.generic.ParentDefinitionParser;
 import org.mule.runtime.core.interceptor.InterceptorStack;
 
 /**
- * This allows a interceptor-stack to be defined globally, or configured on a
- * service.
+ * This allows a interceptor-stack to be defined globally, or configured on a service.
  */
-public class InterceptorStackDefinitionParser extends ParentContextDefinitionParser
-{
-    public static final String INTERCEPTOR_STACK = "interceptor";
-    public static final String ATTRIBUTE_NAME = AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME;
+public class InterceptorStackDefinitionParser extends ParentContextDefinitionParser {
 
-    /**
-     * For custom transformers
-     */
-    public InterceptorStackDefinitionParser()
-    {
-        // Interceptor stacks get next message processor etc. set in their chains and thus
-        // cannot be singletons
-        super(MuleOrphanDefinitionParser.ROOT_ELEMENT, 
-            new MuleOrphanDefinitionParser(InterceptorStack.class, false));
-        otherwise(addAlias(new ParentDefinitionParser(), AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF,
-            INTERCEPTOR_STACK));
-        super.addIgnored(ATTRIBUTE_NAME);
-    }
+  public static final String INTERCEPTOR_STACK = "interceptor";
+  public static final String ATTRIBUTE_NAME = AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME;
 
-    private static MuleDefinitionParser addAlias(MuleDefinitionParser parser, String alias, String name)
-    {
-        parser.addAlias(alias, name);
-        return parser;
-    }
+  /**
+   * For custom transformers
+   */
+  public InterceptorStackDefinitionParser() {
+    // Interceptor stacks get next message processor etc. set in their chains and thus
+    // cannot be singletons
+    super(MuleOrphanDefinitionParser.ROOT_ELEMENT, new MuleOrphanDefinitionParser(InterceptorStack.class, false));
+    otherwise(addAlias(new ParentDefinitionParser(), AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF, INTERCEPTOR_STACK));
+    super.addIgnored(ATTRIBUTE_NAME);
+  }
+
+  private static MuleDefinitionParser addAlias(MuleDefinitionParser parser, String alias, String name) {
+    parser.addAlias(alias, name);
+    return parser;
+  }
 }

@@ -13,30 +13,25 @@ import org.mule.runtime.core.transformer.AbstractTransformer;
 import java.nio.charset.Charset;
 
 /**
- * <code>NoActionTransformer</code> doesn't do any transformation on the source
- * object and returns the source as the result. This can be used to overload the
- * default transform for an endpoint.
+ * <code>NoActionTransformer</code> doesn't do any transformation on the source object and returns the source as the result. This
+ * can be used to overload the default transform for an endpoint.
  */
 @Deprecated
-public final class NoActionTransformer extends AbstractTransformer
-{
+public final class NoActionTransformer extends AbstractTransformer {
 
-    public NoActionTransformer()
-    {
-        registerSourceType(DataType.OBJECT);
-        setReturnDataType(DataType.OBJECT);
-    }
+  public NoActionTransformer() {
+    registerSourceType(DataType.OBJECT);
+    setReturnDataType(DataType.OBJECT);
+  }
 
-    @Override
-    public Object doTransform(Object src, Charset encoding) throws TransformerException
-    {
-        return src;
-    }
+  @Override
+  public Object doTransform(Object src, Charset encoding) throws TransformerException {
+    return src;
+  }
 
-    @Override
-    public boolean isAcceptNull()
-    {
-        return true;
-    }
+  @Override
+  public boolean isAcceptNull() {
+    return true;
+  }
 
 }

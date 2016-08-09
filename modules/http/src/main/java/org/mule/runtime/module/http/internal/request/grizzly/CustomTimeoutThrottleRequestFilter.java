@@ -23,113 +23,88 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A {@link com.ning.http.client.filter.RequestFilter} that throttles requests and blocks when the number of permits
- * is reached, waiting for the response to arrive before executing the next request.
+ * A {@link com.ning.http.client.filter.RequestFilter} that throttles requests and blocks when the number of permits is reached,
+ * waiting for the response to arrive before executing the next request.
  *
- * This is based on {@code com.ning.http.client.extra.ThrottleRequestFilter} from Async Http Client, but uses the
- * request timeout from each request.
+ * This is based on {@code com.ning.http.client.extra.ThrottleRequestFilter} from Async Http Client, but uses the request timeout
+ * from each request.
  */
-public class CustomTimeoutThrottleRequestFilter implements RequestFilter
-{
+public class CustomTimeoutThrottleRequestFilter implements RequestFilter {
 
-    private final static Logger logger = LoggerFactory.getLogger(CustomTimeoutThrottleRequestFilter.class);
-    private final Semaphore available;
+  private final static Logger logger = LoggerFactory.getLogger(CustomTimeoutThrottleRequestFilter.class);
+  private final Semaphore available;
 
-    public CustomTimeoutThrottleRequestFilter(int maxConnections)
-    {
-        available = new Semaphore(maxConnections, true);
+  public CustomTimeoutThrottleRequestFilter(int maxConnections) {
+    available = new Semaphore(maxConnections, true);
+  }
+
+  @Override
+  public FilterContext filter(FilterContext ctx) throws FilterException {
+    try {
+      if (logger.isDebugEnabled()) {
+        logger.debug("Current Throttling Status {}", available.availablePermits());
+      }
+      if (!available.tryAcquire(ctx.getRequest().getRequestTimeout(), MILLISECONDS)) {
+        throw new FilterException(String.format("No slot available for processing Request %s with AsyncHandler %s",
+                                                ctx.getRequest(), ctx.getAsyncHandler()));
+      }
+    } catch (InterruptedException e) {
+      throw new FilterException(String.format("Interrupted Request %s with AsyncHandler %s", ctx.getRequest(),
+                                              ctx.getAsyncHandler()));
+    }
+
+    return new FilterContext.FilterContextBuilder(ctx).asyncHandler(new AsyncHandlerWrapper(ctx.getAsyncHandler())).build();
+  }
+
+  private class AsyncHandlerWrapper<T> implements AsyncHandler<T> {
+
+    private final AsyncHandler<T> asyncHandler;
+    private final AtomicBoolean complete = new AtomicBoolean(false);
+
+    public AsyncHandlerWrapper(AsyncHandler<T> asyncHandler) {
+      this.asyncHandler = asyncHandler;
+    }
+
+    private void complete() {
+      if (complete.compareAndSet(false, true)) {
+        available.release();
+      }
+      if (logger.isDebugEnabled()) {
+        logger.debug("Current Throttling Status after onThrowable {}", available.availablePermits());
+      }
     }
 
     @Override
-    public FilterContext filter(FilterContext ctx) throws FilterException
-    {
-        try
-        {
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Current Throttling Status {}", available.availablePermits());
-            }
-            if (!available.tryAcquire(ctx.getRequest().getRequestTimeout(), MILLISECONDS))
-            {
-                throw new FilterException(
-                        String.format("No slot available for processing Request %s with AsyncHandler %s",
-                                      ctx.getRequest(), ctx.getAsyncHandler()));
-            }
-        }
-        catch (InterruptedException e)
-        {
-            throw new FilterException(
-                    String.format("Interrupted Request %s with AsyncHandler %s", ctx.getRequest(), ctx.getAsyncHandler()));
-        }
-
-        return new FilterContext.FilterContextBuilder(ctx).asyncHandler(new AsyncHandlerWrapper(ctx.getAsyncHandler())).build();
+    public void onThrowable(Throwable t) {
+      try {
+        asyncHandler.onThrowable(t);
+      } finally {
+        complete();
+      }
     }
 
-    private class AsyncHandlerWrapper<T> implements AsyncHandler<T>
-    {
-
-        private final AsyncHandler<T> asyncHandler;
-        private final AtomicBoolean complete = new AtomicBoolean(false);
-
-        public AsyncHandlerWrapper(AsyncHandler<T> asyncHandler)
-        {
-            this.asyncHandler = asyncHandler;
-        }
-
-        private void complete()
-        {
-            if (complete.compareAndSet(false, true))
-            {
-                available.release();
-            }
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Current Throttling Status after onThrowable {}", available.availablePermits());
-            }
-        }
-
-        @Override
-        public void onThrowable(Throwable t)
-        {
-            try
-            {
-                asyncHandler.onThrowable(t);
-            }
-            finally
-            {
-                complete();
-            }
-        }
-
-        @Override
-        public STATE onBodyPartReceived(HttpResponseBodyPart bodyPart) throws Exception
-        {
-            return asyncHandler.onBodyPartReceived(bodyPart);
-        }
-
-        @Override
-        public STATE onStatusReceived(HttpResponseStatus responseStatus) throws Exception
-        {
-            return asyncHandler.onStatusReceived(responseStatus);
-        }
-
-        @Override
-        public STATE onHeadersReceived(HttpResponseHeaders headers) throws Exception
-        {
-            return asyncHandler.onHeadersReceived(headers);
-        }
-
-        @Override
-        public T onCompleted() throws Exception
-        {
-            try
-            {
-                return asyncHandler.onCompleted();
-            }
-            finally
-            {
-                complete();
-            }
-        }
+    @Override
+    public STATE onBodyPartReceived(HttpResponseBodyPart bodyPart) throws Exception {
+      return asyncHandler.onBodyPartReceived(bodyPart);
     }
+
+    @Override
+    public STATE onStatusReceived(HttpResponseStatus responseStatus) throws Exception {
+      return asyncHandler.onStatusReceived(responseStatus);
+    }
+
+    @Override
+    public STATE onHeadersReceived(HttpResponseHeaders headers) throws Exception {
+      return asyncHandler.onHeadersReceived(headers);
+    }
+
+    @Override
+    public T onCompleted() throws Exception {
+      try {
+        return asyncHandler.onCompleted();
+      } finally {
+        complete();
+      }
+    }
+  }
 }

@@ -18,17 +18,16 @@ import java.util.Map;
 /**
  * Resolves {@link QueryTemplate} actual parameter types for a given {@link DbConnection}
  */
-public interface ParamTypeResolver
-{
+public interface ParamTypeResolver {
 
-    /**
-     * Resolves actual parameter types
-     *
-     * @param connection database connection to resolve against to
-     * @param queryTemplate query template containing UNKNOWN parameter types
-     * @return a map containing the actual type for each parameter index
-     * @throws SQLException if this method is invoked on a closed connection
-     * @throws UnknownDbTypeException when an invalid data type is used
-     */
-    Map<Integer, DbType> getParameterTypes(DbConnection connection, QueryTemplate queryTemplate) throws SQLException;
+  /**
+   * Resolves actual parameter types
+   *
+   * @param connection database connection to resolve against to
+   * @param queryTemplate query template containing UNKNOWN parameter types
+   * @return a map containing the actual type for each parameter index
+   * @throws SQLException if this method is invoked on a closed connection
+   * @throws UnknownDbTypeException when an invalid data type is used
+   */
+  Map<Integer, DbType> getParameterTypes(DbConnection connection, QueryTemplate queryTemplate) throws SQLException;
 }

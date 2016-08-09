@@ -22,48 +22,44 @@ import java.io.Serializable;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ExpressionKeyGeneratorTestCase extends AbstractMuleTestCase
-{
+public class ExpressionKeyGeneratorTestCase extends AbstractMuleTestCase {
 
-    private static final String KEY = "KEY";
-    private static final String EXPRESSION = "muleExpression";
+  private static final String KEY = "KEY";
+  private static final String EXPRESSION = "muleExpression";
 
-    private ExpressionMuleEventKeyGenerator keyGenerator;
-    private MuleMessage message;
-    private MuleEvent event;
+  private ExpressionMuleEventKeyGenerator keyGenerator;
+  private MuleMessage message;
+  private MuleEvent event;
 
-    @Before
-    public void setUp() throws Exception
-    {
-        expressionManager = mock(ExpressionManager.class);
-        MuleContext context = mock(MuleContext.class);
-        when(context.getExpressionManager()).thenReturn(expressionManager);
+  @Before
+  public void setUp() throws Exception {
+    expressionManager = mock(ExpressionManager.class);
+    MuleContext context = mock(MuleContext.class);
+    when(context.getExpressionManager()).thenReturn(expressionManager);
 
-        message = mock(MuleMessage.class);
+    message = mock(MuleMessage.class);
 
-        event = mock(MuleEvent.class);
-        when(event.getMessage()).thenReturn(message);
-        when(event.getMuleContext()).thenReturn(context);
+    event = mock(MuleEvent.class);
+    when(event.getMessage()).thenReturn(message);
+    when(event.getMuleContext()).thenReturn(context);
 
-        keyGenerator = new ExpressionMuleEventKeyGenerator();
-        keyGenerator.setExpression(EXPRESSION);
-    }
+    keyGenerator = new ExpressionMuleEventKeyGenerator();
+    keyGenerator.setExpression(EXPRESSION);
+  }
 
-    private ExpressionManager expressionManager;
+  private ExpressionManager expressionManager;
 
-    @Test
-    public void testGeneratesSerializableKey() throws Exception
-    {
-        when(expressionManager.evaluate(EXPRESSION, event)).thenReturn(KEY);
-        Serializable key = keyGenerator.generateKey(event);
+  @Test
+  public void testGeneratesSerializableKey() throws Exception {
+    when(expressionManager.evaluate(EXPRESSION, event)).thenReturn(KEY);
+    Serializable key = keyGenerator.generateKey(event);
 
-        assertEquals(KEY, key);
-    }
+    assertEquals(KEY, key);
+  }
 
-    @Test(expected = NotSerializableException.class)
-    public void testThrowsExceptionOnNonSerializableKey() throws Exception
-    {
-        when(expressionManager.evaluate(EXPRESSION, event)).thenReturn(null);
-        keyGenerator.generateKey(event);
-    }
+  @Test(expected = NotSerializableException.class)
+  public void testThrowsExceptionOnNonSerializableKey() throws Exception {
+    when(expressionManager.evaluate(EXPRESSION, event)).thenReturn(null);
+    keyGenerator.generateKey(event);
+  }
 }

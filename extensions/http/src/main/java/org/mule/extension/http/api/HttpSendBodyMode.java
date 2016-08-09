@@ -11,18 +11,17 @@ package org.mule.extension.http.api;
  *
  * @since 4.0
  */
-public enum HttpSendBodyMode
-{
-    /**
-     * Will send a body, regardless of the HTTP method selected.
-     */
-    ALWAYS,
-    /**
-     * Will send a body depending on the HTTP method selected (GET, HEAD and OPTIONS will not send a body).
-     */
-    AUTO,
-    /**
-     * Will not send a body, regardless of the HTTP method selected.
-     */
-    NEVER
+public enum HttpSendBodyMode {
+  /**
+   * Will send a body, regardless of the HTTP method selected.
+   */
+  ALWAYS,
+  /**
+   * Will send a body depending on the HTTP method selected (GET, HEAD and OPTIONS will not send a body).
+   */
+  AUTO,
+  /**
+   * Will not send a body, regardless of the HTTP method selected.
+   */
+  NEVER
 }

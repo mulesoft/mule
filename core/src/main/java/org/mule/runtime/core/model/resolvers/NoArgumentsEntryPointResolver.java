@@ -11,26 +11,24 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.util.ClassUtils;
 
 /**
- * Allows for arguments with no parameters to be called. Regardless of the payload of the current
- * event, this resolver will always only look for No-Arg servic methods.
+ * Allows for arguments with no parameters to be called. Regardless of the payload of the current event, this resolver will always
+ * only look for No-Arg servic methods.
  * <p/>
- * Note that the {@link org.mule.runtime.core.model.resolvers.ReflectionEntryPointResolver} supports the resolution
- * of no-arg service methods if the event payload received is of type {@link org.mule.runtime.api.message.NullPayload}.
+ * Note that the {@link org.mule.runtime.core.model.resolvers.ReflectionEntryPointResolver} supports the resolution of no-arg
+ * service methods if the event payload received is of type {@link org.mule.runtime.api.message.NullPayload}.
  *
  * @see org.mule.runtime.core.model.resolvers.ReflectionEntryPointResolver
  * @see org.mule.runtime.api.message.NullPayload
  */
-public class NoArgumentsEntryPointResolver extends AbstractArgumentEntryPointResolver
-{
-    @Override
-    protected Class<?>[] getMethodArgumentTypes(Object[] payload)
-    {
-        return ClassUtils.NO_ARGS_TYPE;
-    }
+public class NoArgumentsEntryPointResolver extends AbstractArgumentEntryPointResolver {
 
-    @Override
-    protected Object[] getPayloadFromMessage(MuleEventContext context) throws TransformerException
-    {
-        return ClassUtils.NO_ARGS;
-    }
+  @Override
+  protected Class<?>[] getMethodArgumentTypes(Object[] payload) {
+    return ClassUtils.NO_ARGS_TYPE;
+  }
+
+  @Override
+  protected Object[] getPayloadFromMessage(MuleEventContext context) throws TransformerException {
+    return ClassUtils.NO_ARGS;
+  }
 }

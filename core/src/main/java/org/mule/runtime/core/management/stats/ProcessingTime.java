@@ -16,82 +16,71 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * Accumulates the processing time for all branches of a flow
  */
-public class ProcessingTime implements Serializable
-{
+public class ProcessingTime implements Serializable {
 
-    /**
-     * Serial version
-     */
-    private static final long serialVersionUID = 1L;
+  /**
+   * Serial version
+   */
+  private static final long serialVersionUID = 1L;
 
-    private AtomicLong accumulator = new AtomicLong();
-    private FlowConstructStatistics statistics;
+  private AtomicLong accumulator = new AtomicLong();
+  private FlowConstructStatistics statistics;
 
-    /**
-     * Create a ProcessingTime for the specified MuleSession.
-     *
-     * @return ProcessingTime if the session has an enabled FlowConstructStatistics or null otherwise
-     */
-    public static ProcessingTime newInstance(MuleEvent event)
-    {
-        if (event != null)
-        {
-            FlowConstruct fc = event.getFlowConstruct();
-            if (fc != null)
-            {
-                FlowConstructStatistics stats = fc.getStatistics();
-                if (stats != null && fc.getStatistics().isEnabled())
-                {
-                    return new ProcessingTime(stats, event.getMuleContext());
-                }
-            }
+  /**
+   * Create a ProcessingTime for the specified MuleSession.
+   *
+   * @return ProcessingTime if the session has an enabled FlowConstructStatistics or null otherwise
+   */
+  public static ProcessingTime newInstance(MuleEvent event) {
+    if (event != null) {
+      FlowConstruct fc = event.getFlowConstruct();
+      if (fc != null) {
+        FlowConstructStatistics stats = fc.getStatistics();
+        if (stats != null && fc.getStatistics().isEnabled()) {
+          return new ProcessingTime(stats, event.getMuleContext());
         }
-        return null;
+      }
     }
+    return null;
+  }
 
-    /**
-     * Create a Processing Time
-     *
-     * @param stats       never null
-     * @param muleContext
-     */
-    private ProcessingTime(FlowConstructStatistics stats, MuleContext muleContext)
-    {
-        this.statistics = stats;
-        ProcessingTimeWatcher processorTimeWatcher = muleContext.getProcessorTimeWatcher();
-        processorTimeWatcher.addProcessingTime(this);
-    }
+  /**
+   * Create a Processing Time
+   *
+   * @param stats never null
+   * @param muleContext
+   */
+  private ProcessingTime(FlowConstructStatistics stats, MuleContext muleContext) {
+    this.statistics = stats;
+    ProcessingTimeWatcher processorTimeWatcher = muleContext.getProcessorTimeWatcher();
+    processorTimeWatcher.addProcessingTime(this);
+  }
 
-    /**
-     * Add the execution time for this branch to the flow construct's statistics
-     *
-     * @param startTime time this branch started
-     */
-    public void addFlowExecutionBranchTime(long startTime)
-    {
-        if (statistics.isEnabled())
-        {
-            long elapsedTime = getEffectiveTime(System.currentTimeMillis() - startTime);
-            statistics.addFlowExecutionBranchTime(elapsedTime, accumulator.addAndGet(elapsedTime));
-        }
+  /**
+   * Add the execution time for this branch to the flow construct's statistics
+   *
+   * @param startTime time this branch started
+   */
+  public void addFlowExecutionBranchTime(long startTime) {
+    if (statistics.isEnabled()) {
+      long elapsedTime = getEffectiveTime(System.currentTimeMillis() - startTime);
+      statistics.addFlowExecutionBranchTime(elapsedTime, accumulator.addAndGet(elapsedTime));
     }
+  }
 
-    /**
-     * Convert processing time to effective processing time.  If processing took less than a tick, we consider
-     * it to have been one millisecond
-     */
-    public static long getEffectiveTime(long time)
-    {
-        return (time <= 0) ? 1L : time;
-    }
+  /**
+   * Convert processing time to effective processing time. If processing took less than a tick, we consider it to have been one
+   * millisecond
+   */
+  public static long getEffectiveTime(long time) {
+    return (time <= 0) ? 1L : time;
+  }
 
-    public FlowConstructStatistics getStatistics()
-    {
-        return statistics;
-    }
+  public FlowConstructStatistics getStatistics() {
+    return statistics;
+  }
 
-    public AtomicLong getAccumulator()
-    {
-        return accumulator;
-    }
+  public AtomicLong getAccumulator() {
+    return accumulator;
+  }
 }

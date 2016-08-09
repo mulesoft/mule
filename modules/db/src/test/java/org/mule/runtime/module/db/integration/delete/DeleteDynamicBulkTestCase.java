@@ -9,18 +9,15 @@ package org.mule.runtime.module.db.integration.delete;
 
 import org.mule.runtime.module.db.integration.model.AbstractTestDatabase;
 
-public class DeleteDynamicBulkTestCase extends DeleteBulkTestCase
-{
+public class DeleteDynamicBulkTestCase extends DeleteBulkTestCase {
 
-    public DeleteDynamicBulkTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public DeleteDynamicBulkTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/delete/delete-dynamic-bulk-config.xml"};
-    }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/delete/delete-dynamic-bulk-config.xml"};
+  }
 
 }

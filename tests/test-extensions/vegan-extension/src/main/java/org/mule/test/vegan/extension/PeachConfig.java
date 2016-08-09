@@ -15,7 +15,6 @@ import org.mule.runtime.extension.api.annotation.connector.Providers;
 // No operations defined on purpose
 @Providers(VeganPeachConnectionProvider.class)
 @Sources({HarvestPeachesSource.class})
-public class PeachConfig
-{
+public class PeachConfig {
 
 }

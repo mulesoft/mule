@@ -12,12 +12,10 @@ import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 
 import java.nio.charset.Charset;
 
-public class DummyTransformer extends AbstractMessageTransformer
-{
+public class DummyTransformer extends AbstractMessageTransformer {
 
-    @Override
-    public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException
-    {
-        return event.getMessage();
-    }
+  @Override
+  public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException {
+    return event.getMessage();
+  }
 }

@@ -18,30 +18,25 @@ import org.junit.Test;
 /**
  * Simple synch test used to study message flow.
  */
-public class VMSynchTestCase extends FunctionalTestCase
-{
+public class VMSynchTestCase extends FunctionalTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "vm/vm-synch-test-flow.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "vm/vm-synch-test-flow.xml";
+  }
 
-    @Test
-    public void testSingleMessage() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        MuleMessage response =  client.send("vm://bridge", "Message", null);
-        assertNotNull("Response is null", response);
-        assertEquals("Message Received", response.getPayload());
-    }
+  @Test
+  public void testSingleMessage() throws Exception {
+    MuleClient client = muleContext.getClient();
+    MuleMessage response = client.send("vm://bridge", "Message", null);
+    assertNotNull("Response is null", response);
+    assertEquals("Message Received", response.getPayload());
+  }
 
-    @Test
-    public void testManyMessage() throws Exception
-    {
-        for (int i = 0; i < 1000; i++)
-        {
-            testSingleMessage();
-        }
+  @Test
+  public void testManyMessage() throws Exception {
+    for (int i = 0; i < 1000; i++) {
+      testSingleMessage();
     }
+  }
 }

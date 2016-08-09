@@ -17,38 +17,34 @@ import java.util.List;
 import org.junit.Test;
 
 @SmallTest
-public class StaticParamValueResolverTestCase extends AbstractQueryParamResolverTestCase
-{
+public class StaticParamValueResolverTestCase extends AbstractQueryParamResolverTestCase {
 
-    private final StaticParamValueResolver paramResolver = new StaticParamValueResolver();
+  private final StaticParamValueResolver paramResolver = new StaticParamValueResolver();
 
-    @Test
-    public void resolvesStaticParam() throws Exception
-    {
-        List<QueryParamValue> templateParams = getQueryParamValues(777);
+  @Test
+  public void resolvesStaticParam() throws Exception {
+    List<QueryParamValue> templateParams = getQueryParamValues(777);
 
-        List<QueryParamValue> resolvedParams = paramResolver.resolveParams(muleEvent, templateParams);
+    List<QueryParamValue> resolvedParams = paramResolver.resolveParams(muleEvent, templateParams);
 
-        assertThat(resolvedParams, equalTo(templateParams));
-    }
+    assertThat(resolvedParams, equalTo(templateParams));
+  }
 
-    @Test
-    public void returnsOriginalExpressionParam() throws Exception
-    {
-        List<QueryParamValue> templateParams = getQueryParamValues("#[payload]");
+  @Test
+  public void returnsOriginalExpressionParam() throws Exception {
+    List<QueryParamValue> templateParams = getQueryParamValues("#[payload]");
 
-        List<QueryParamValue> resolvedParams = paramResolver.resolveParams(muleEvent, templateParams);
+    List<QueryParamValue> resolvedParams = paramResolver.resolveParams(muleEvent, templateParams);
 
-        assertThat(resolvedParams, equalTo(templateParams));
-    }
+    assertThat(resolvedParams, equalTo(templateParams));
+  }
 
-    @Test
-    public void resolveMultipleParams() throws Exception
-    {
-        List<QueryParamValue> templateParams = getQueryParamValues("#[payload]", 777);
+  @Test
+  public void resolveMultipleParams() throws Exception {
+    List<QueryParamValue> templateParams = getQueryParamValues("#[payload]", 777);
 
-        List<QueryParamValue> resolvedParams = paramResolver.resolveParams(muleEvent, templateParams);
+    List<QueryParamValue> resolvedParams = paramResolver.resolveParams(muleEvent, templateParams);
 
-        assertThat(resolvedParams, equalTo(templateParams));
-    }
+    assertThat(resolvedParams, equalTo(templateParams));
+  }
 }

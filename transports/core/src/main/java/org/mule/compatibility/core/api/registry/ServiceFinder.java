@@ -13,17 +13,17 @@ import org.mule.runtime.core.api.registry.ServiceException;
 
 
 /**
- * <code>ServiceFinder</code> can be used as a hook into the service lookup process to return the correct Service
- * Descriptor for a given service name. By default a service is looked up directly, however a generic service name might
- * be used where the real service implementation will depend on other modules/resources being available. For example, in
- * the case of a SOAP connector the finder could check the classpath for Axis or CXF and return the correct descriptor.
+ * <code>ServiceFinder</code> can be used as a hook into the service lookup process to return the correct Service Descriptor for a
+ * given service name. By default a service is looked up directly, however a generic service name might be used where the real
+ * service implementation will depend on other modules/resources being available. For example, in the case of a SOAP connector the
+ * finder could check the classpath for Axis or CXF and return the correct descriptor.
  * 
  * @deprecated Transport infrastructure is deprecated.
  */
 @Deprecated
-public interface ServiceFinder
-{
-    String findService(String service, ServiceDescriptor descriptor, Properties props) throws ServiceException;
+public interface ServiceFinder {
+
+  String findService(String service, ServiceDescriptor descriptor, Properties props) throws ServiceException;
 }
 
 

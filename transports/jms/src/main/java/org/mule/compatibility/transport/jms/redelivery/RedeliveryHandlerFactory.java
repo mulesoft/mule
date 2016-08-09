@@ -7,18 +7,16 @@
 package org.mule.compatibility.transport.jms.redelivery;
 
 /**
- * Implementors of this interface are responsible to create {@link RedeliveryHandler}
- * instances upon request.
+ * Implementors of this interface are responsible to create {@link RedeliveryHandler} instances upon request.
  * <p>
- * Note that due to the stateful nature of a {@link RedeliveryHandler} this factory
- * should always return new {@link RedeliveryHandler} instances.
+ * Note that due to the stateful nature of a {@link RedeliveryHandler} this factory should always return new
+ * {@link RedeliveryHandler} instances.
  */
-public interface RedeliveryHandlerFactory
-{
-    
-    /**
-     * @return {@link RedeliveryHandler} new redelivery handler instance.
-     */
-    RedeliveryHandler create();
-    
+public interface RedeliveryHandlerFactory {
+
+  /**
+   * @return {@link RedeliveryHandler} new redelivery handler instance.
+   */
+  RedeliveryHandler create();
+
 }

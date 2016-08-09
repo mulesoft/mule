@@ -31,48 +31,43 @@ import javax.inject.Inject;
 @Providers({SMTPProvider.class, SMTPSProvider.class})
 @Configuration(name = "smtp")
 @DisplayName("SMTP")
-public class SMTPConfiguration implements Initialisable
-{
+public class SMTPConfiguration implements Initialisable {
 
-    @Inject
-    private MuleContext muleContext;
+  @Inject
+  private MuleContext muleContext;
 
-    /**
-     * The "From" sender address. The person that is going to send the messages.
-     */
-    @Parameter
-    @Optional
-    @Placement(group = GENERAL)
-    private String from;
+  /**
+   * The "From" sender address. The person that is going to send the messages.
+   */
+  @Parameter
+  @Optional
+  @Placement(group = GENERAL)
+  private String from;
 
-    /**
-     * Default character encoding to be used in all the messages. If not specified, the default charset in the mule
-     * configuration will be used
-     */
-    @Parameter
-    @Optional
-    @Placement(group = ADVANCED)
-    private String defaultCharset;
+  /**
+   * Default character encoding to be used in all the messages. If not specified, the default charset in the mule configuration
+   * will be used
+   */
+  @Parameter
+  @Optional
+  @Placement(group = ADVANCED)
+  private String defaultCharset;
 
-    /**
-     * @return the address of the person that is going to send the messages.
-     */
-    public String getFrom()
-    {
-        return from;
+  /**
+   * @return the address of the person that is going to send the messages.
+   */
+  public String getFrom() {
+    return from;
+  }
+
+  public String getDefaultCharset() {
+    return defaultCharset;
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    if (defaultCharset == null) {
+      defaultCharset = muleContext.getConfiguration().getDefaultEncoding();
     }
-
-    public String getDefaultCharset()
-    {
-        return defaultCharset;
-    }
-
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        if (defaultCharset == null)
-        {
-            defaultCharset = muleContext.getConfiguration().getDefaultEncoding();
-        }
-    }
+  }
 }

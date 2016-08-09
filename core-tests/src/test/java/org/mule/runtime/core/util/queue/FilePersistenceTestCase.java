@@ -14,30 +14,27 @@ import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
 import org.mockito.Mockito;
 
-public class FilePersistenceTestCase extends AbstractTransactionQueueManagerTestCase
-{
+public class FilePersistenceTestCase extends AbstractTransactionQueueManagerTestCase {
 
-    @Rule
-    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+  @Rule
+  public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
-    @Override
-    protected TransactionalQueueManager createQueueManager() throws Exception
-    {
-        TransactionalQueueManager mgr = new TransactionalQueueManager();
-        MuleConfiguration mockConfiguration = Mockito.mock(MuleConfiguration.class);
-        when(mockConfiguration.getWorkingDirectory()).thenReturn(temporaryFolder.getRoot().getAbsolutePath());
-        when(mockConfiguration.getMaxQueueTransactionFilesSizeInMegabytes()).thenReturn(100);
-        ((DefaultMuleContext)muleContext).setMuleConfiguration(mockConfiguration);
+  @Override
+  protected TransactionalQueueManager createQueueManager() throws Exception {
+    TransactionalQueueManager mgr = new TransactionalQueueManager();
+    MuleConfiguration mockConfiguration = Mockito.mock(MuleConfiguration.class);
+    when(mockConfiguration.getWorkingDirectory()).thenReturn(temporaryFolder.getRoot().getAbsolutePath());
+    when(mockConfiguration.getMaxQueueTransactionFilesSizeInMegabytes()).thenReturn(100);
+    ((DefaultMuleContext) muleContext).setMuleConfiguration(mockConfiguration);
 
-        mgr.setMuleContext(muleContext);
-        mgr.initialise();
-        mgr.setDefaultQueueConfiguration(new DefaultQueueConfiguration(0, true));
-        return mgr;
-    }
+    mgr.setMuleContext(muleContext);
+    mgr.initialise();
+    mgr.setDefaultQueueConfiguration(new DefaultQueueConfiguration(0, true));
+    return mgr;
+  }
 
-    @Override
-    protected boolean isPersistent()
-    {
-        return true;
-    }
+  @Override
+  protected boolean isPersistent() {
+    return true;
+  }
 }

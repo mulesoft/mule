@@ -19,29 +19,27 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class TcpEchoDirectProtocolTestCase extends FunctionalTestCase
-{
+public class TcpEchoDirectProtocolTestCase extends FunctionalTestCase {
 
-    protected static String TEST_MESSAGE = "Test TCP Request";
+  protected static String TEST_MESSAGE = "Test TCP Request";
 
-    @Rule
-    public DynamicPort dynamicPort = new DynamicPort("port1");
+  @Rule
+  public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "tcp-echo-test-flow.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "tcp-echo-test-flow.xml";
+  }
 
-    @Test
-    public void testSend() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
+  @Test
+  public void testSend() throws Exception {
+    MuleClient client = muleContext.getClient();
 
-        MuleMessage response = client.send(((InboundEndpoint) ((Flow) muleContext.getRegistry().lookupObject("BounceTcpMMP")).getMessageSource()).getAddress(),
-            TEST_MESSAGE, null);
+    MuleMessage response = client
+        .send(((InboundEndpoint) ((Flow) muleContext.getRegistry().lookupObject("BounceTcpMMP")).getMessageSource()).getAddress(),
+              TEST_MESSAGE, null);
 
-        assertNotNull(response);
-        assertEquals(TEST_MESSAGE, response.getPayload());
-    }
+    assertNotNull(response);
+    assertEquals(TEST_MESSAGE, response.getPayload());
+  }
 }

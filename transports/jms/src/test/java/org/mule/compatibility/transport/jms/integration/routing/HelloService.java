@@ -6,17 +6,15 @@
  */
 package org.mule.compatibility.transport.jms.integration.routing;
 
-public class HelloService implements HelloInterface
-{
-    @Override
-    public String hello(String s, Integer v)
-    {
-        return "Hello " + s + " " + v;
-    }
+public class HelloService implements HelloInterface {
 
-    @Override
-    public Object returnNull()
-    {
-        return null;
-    }
+  @Override
+  public String hello(String s, Integer v) {
+    return "Hello " + s + " " + v;
+  }
+
+  @Override
+  public Object returnNull() {
+    return null;
+  }
 }

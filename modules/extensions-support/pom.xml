@@ -15,6 +15,10 @@
         Default implementation of the Mule Extension API.
     </description>
 
+    <properties>
+        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
+    </properties>
+
     <dependencies>
         <!-- Mule Dependencies -->
         <dependency>

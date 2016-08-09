@@ -9,11 +9,10 @@ package org.mule.runtime.core.api.model;
 import org.mule.runtime.core.api.MuleEventContext;
 
 /**
- * <code>EntryPoint</code> defines the current entry method on a service. If
- * the invoked method does not have a return value, a {@link org.mule.runtime.core.VoidResult}
- * is returned.
+ * <code>EntryPoint</code> defines the current entry method on a service. If the invoked method does not have a return value, a
+ * {@link org.mule.runtime.core.VoidResult} is returned.
  */
-public interface EntryPoint
-{
-    Object invoke(Object component, MuleEventContext context) throws Exception;
+public interface EntryPoint {
+
+  Object invoke(Object component, MuleEventContext context) throws Exception;
 }

@@ -20,64 +20,53 @@ import java.nio.file.Path;
  *
  * @since 4.0
  */
-public final class LocalMoveCommand extends AbstractLocalCopyCommand implements MoveCommand
-{
+public final class LocalMoveCommand extends AbstractLocalCopyCommand implements MoveCommand {
 
-    /**
-     * {@inheritDoc}
-     */
-    public LocalMoveCommand(LocalFileSystem fileSystem)
-    {
-        super(fileSystem);
-    }
+  /**
+   * {@inheritDoc}
+   */
+  public LocalMoveCommand(LocalFileSystem fileSystem) {
+    super(fileSystem);
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void move(FileConnectorConfig config, String sourcePath, String targetDirectory, boolean overwrite, boolean createParentDirectories)
-    {
-        execute(config, sourcePath, targetDirectory, overwrite, createParentDirectories);
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void move(FileConnectorConfig config, String sourcePath, String targetDirectory, boolean overwrite,
+                   boolean createParentDirectories) {
+    execute(config, sourcePath, targetDirectory, overwrite, createParentDirectories);
+  }
 
-    /**
-     * Implements recursive moving
-     *
-     * @param source     the path to be copied
-     * @param targetPath the path to the target destination
-     * @param overwrite  whether to overwrite existing target paths
-     * @param options    an array of {@link CopyOption} which configure the copying operation
-     */
-    @Override
-    protected void doExecute(Path source, Path targetPath, boolean overwrite, CopyOption[] options) throws Exception
-    {
-        if (Files.isDirectory(source))
-        {
-            if (Files.exists(targetPath))
-            {
-                if (overwrite)
-                {
-                    FileUtils.deleteTree(targetPath.toFile());
-                }
-                else
-                {
-                    alreadyExistsException(targetPath);
-                }
-            }
-            FileUtils.moveDirectory(source.toFile(), targetPath.toFile());
+  /**
+   * Implements recursive moving
+   *
+   * @param source the path to be copied
+   * @param targetPath the path to the target destination
+   * @param overwrite whether to overwrite existing target paths
+   * @param options an array of {@link CopyOption} which configure the copying operation
+   */
+  @Override
+  protected void doExecute(Path source, Path targetPath, boolean overwrite, CopyOption[] options) throws Exception {
+    if (Files.isDirectory(source)) {
+      if (Files.exists(targetPath)) {
+        if (overwrite) {
+          FileUtils.deleteTree(targetPath.toFile());
+        } else {
+          alreadyExistsException(targetPath);
         }
-        else
-        {
-            Files.move(source, targetPath, options);
-        }
+      }
+      FileUtils.moveDirectory(source.toFile(), targetPath.toFile());
+    } else {
+      Files.move(source, targetPath, options);
     }
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected String getAction()
-    {
-        return "moving";
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected String getAction() {
+    return "moving";
+  }
 }

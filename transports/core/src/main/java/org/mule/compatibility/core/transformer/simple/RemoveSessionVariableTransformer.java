@@ -12,25 +12,21 @@ import org.mule.runtime.core.transformer.simple.AbstractRemoveVariablePropertyTr
 
 import java.util.Set;
 
-public class RemoveSessionVariableTransformer extends AbstractRemoveVariablePropertyTransformer
-{
+public class RemoveSessionVariableTransformer extends AbstractRemoveVariablePropertyTransformer {
 
-    @Override
-    protected void removeProperty(MuleEvent event, String propertyName)
-    {
-        event.getSession().removeProperty(propertyName);
-    }
+  @Override
+  protected void removeProperty(MuleEvent event, String propertyName) {
+    event.getSession().removeProperty(propertyName);
+  }
 
-    @Override
-    protected Set<String> getPropertyNames(MuleEvent event)
-    {
-        return event.getSession().getPropertyNamesAsSet();
-    }
+  @Override
+  protected Set<String> getPropertyNames(MuleEvent event) {
+    return event.getSession().getPropertyNamesAsSet();
+  }
 
-    @Override
-    protected String getScopeName()
-    {
-        return PropertyScope.SESSION_VAR_NAME;
-    }
+  @Override
+  protected String getScopeName() {
+    return PropertyScope.SESSION_VAR_NAME;
+  }
 
 }

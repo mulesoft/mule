@@ -9,11 +9,11 @@ package org.mule.runtime.module.pgp;
 import org.bouncycastle.openpgp.PGPPublicKey;
 import org.bouncycastle.openpgp.PGPSecretKey;
 
-public interface PGPKeyRing
-{
-    public abstract String getSecretPassphrase();
+public interface PGPKeyRing {
 
-    public abstract PGPSecretKey getSecretKey();
+  public abstract String getSecretPassphrase();
 
-    public abstract PGPPublicKey getPublicKey(String principalId);
+  public abstract PGPSecretKey getSecretKey();
+
+  public abstract PGPPublicKey getPublicKey(String principalId);
 }

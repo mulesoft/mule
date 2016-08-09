@@ -21,41 +21,31 @@ import org.apache.ws.security.WSPasswordCallback;
 import org.junit.Test;
 
 
-public class CombinedSecurityFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase
-{
+public class CombinedSecurityFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "combined-security-config.xml";
+  @Override
+  protected String getConfigFile() {
+    return "combined-security-config.xml";
+  }
+
+  @Test
+  public void validRequestReturnsExpectedResult() throws Exception {
+    assertValidResponse("request");
+  }
+
+
+  public static class ServerPasswordCallback implements CallbackHandler {
+
+    public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
+      WSPasswordCallback pc = (WSPasswordCallback) callbacks[0];
+
+      if (pc.getUsage() == USERNAME_TOKEN) {
+        pc.setPassword("textPassword");
+      } else if (pc.getUsage() == SIGNATURE) {
+        pc.setPassword("mulepassword");
+      } else if (pc.getUsage() == DECRYPT) {
+        pc.setPassword("changeit");
+      }
     }
-
-    @Test
-    public void validRequestReturnsExpectedResult() throws Exception
-    {
-        assertValidResponse("request");
-    }
-
-
-    public static class ServerPasswordCallback implements CallbackHandler
-    {
-
-        public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException
-        {
-            WSPasswordCallback pc = (WSPasswordCallback) callbacks[0];
-
-            if (pc.getUsage() == USERNAME_TOKEN)
-            {
-                pc.setPassword("textPassword");
-            }
-            else if (pc.getUsage() == SIGNATURE)
-            {
-                pc.setPassword("mulepassword");
-            }
-            else if (pc.getUsage() == DECRYPT)
-            {
-                pc.setPassword("changeit");
-            }
-        }
-    }
+  }
 }

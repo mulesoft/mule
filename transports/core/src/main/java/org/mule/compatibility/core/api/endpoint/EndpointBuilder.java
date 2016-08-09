@@ -22,73 +22,73 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Constructs endpoints. Transport specific endpoints can easily resolve the Endpoint implementation to be uses, for
- * generic endpoints we can either resolve the transport from uri string or use a default implementation.
+ * Constructs endpoints. Transport specific endpoints can easily resolve the Endpoint implementation to be uses, for generic
+ * endpoints we can either resolve the transport from uri string or use a default implementation.
  * 
  * @deprecated Transport infrastructure is deprecated.
  */
 @Deprecated
-public interface EndpointBuilder extends MuleContextAware, Cloneable
-{
-    /**
-     * Constructs inbound endpoints
-     *
-     * @throws EndpointException
-     * @throws InitialisationException
-     */
-    InboundEndpoint buildInboundEndpoint() throws EndpointException, InitialisationException;
+public interface EndpointBuilder extends MuleContextAware, Cloneable {
 
-    /**
-     * Constructs outbound endpoints
-     *
-     * @throws EndpointException
-     * @throws InitialisationException
-     */
-    OutboundEndpoint buildOutboundEndpoint() throws EndpointException, InitialisationException;
+  /**
+   * Constructs inbound endpoints
+   *
+   * @throws EndpointException
+   * @throws InitialisationException
+   */
+  InboundEndpoint buildInboundEndpoint() throws EndpointException, InitialisationException;
 
-    void setConnector(Connector connector);
+  /**
+   * Constructs outbound endpoints
+   *
+   * @throws EndpointException
+   * @throws InitialisationException
+   */
+  OutboundEndpoint buildOutboundEndpoint() throws EndpointException, InitialisationException;
 
-    /** @deprecated Use setMessageProcessors() */
-    @Deprecated
-    void setTransformers(List<Transformer> transformers);
+  void setConnector(Connector connector);
 
-    /** @deprecated Use setResponseMessageProcessors() */
-    @Deprecated
-    void setResponseTransformers(List<Transformer> responseTransformer);
+  /** @deprecated Use setMessageProcessors() */
+  @Deprecated
+  void setTransformers(List<Transformer> transformers);
 
-    void setName(String name);
+  /** @deprecated Use setResponseMessageProcessors() */
+  @Deprecated
+  void setResponseTransformers(List<Transformer> responseTransformer);
 
-    void setProperty(String key, Serializable value);
+  void setName(String name);
 
-    void setProperties(Map<String, Serializable> properties);
+  void setProperty(String key, Serializable value);
 
-    void setTransactionConfig(TransactionConfig transactionConfig);
+  void setProperties(Map<String, Serializable> properties);
 
-    void setDeleteUnacceptedMessages(boolean deleteUnacceptedMessages);
+  void setTransactionConfig(TransactionConfig transactionConfig);
 
-    void setExchangePattern(MessageExchangePattern mep);
+  void setDeleteUnacceptedMessages(boolean deleteUnacceptedMessages);
 
-    void setResponseTimeout(int responseTimeout);
+  void setExchangePattern(MessageExchangePattern mep);
 
-    void setInitialState(String initialState);
+  void setResponseTimeout(int responseTimeout);
 
-    void setEncoding(Charset encoding);
+  void setInitialState(String initialState);
 
-    void setRegistryId(String registryId);
+  void setEncoding(Charset encoding);
 
-    void setRetryPolicyTemplate(RetryPolicyTemplate retryPolicyTemplate);
+  void setRegistryId(String registryId);
 
-    void setMessageProcessors(List <MessageProcessor> messageProcessors);
+  void setRetryPolicyTemplate(RetryPolicyTemplate retryPolicyTemplate);
 
-    void addMessageProcessor(MessageProcessor messageProcessor);
+  void setMessageProcessors(List<MessageProcessor> messageProcessors);
 
-    void setResponseMessageProcessors(List <MessageProcessor> responseMessageProcessors);
+  void addMessageProcessor(MessageProcessor messageProcessor);
 
-    void addResponseMessageProcessor(MessageProcessor responseMessageProcessor);
+  void setResponseMessageProcessors(List<MessageProcessor> responseMessageProcessors);
 
-    void setDisableTransportTransformer(boolean disableTransportTransformer);
+  void addResponseMessageProcessor(MessageProcessor responseMessageProcessor);
 
-    void setURIBuilder(URIBuilder URIBuilder);
+  void setDisableTransportTransformer(boolean disableTransportTransformer);
 
-    Object clone() throws CloneNotSupportedException;
+  void setURIBuilder(URIBuilder URIBuilder);
+
+  Object clone() throws CloneNotSupportedException;
 }

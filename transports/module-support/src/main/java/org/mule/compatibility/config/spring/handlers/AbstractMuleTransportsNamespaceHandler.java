@@ -15,48 +15,47 @@ import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
 import org.mule.runtime.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.runtime.config.spring.parsers.MuleDefinitionParserConfiguration;
 
-public abstract class AbstractMuleTransportsNamespaceHandler extends AbstractMuleNamespaceHandler
-{
+public abstract class AbstractMuleTransportsNamespaceHandler extends AbstractMuleNamespaceHandler {
 
-    @Override
-    protected MuleDefinitionParserConfiguration registerStandardTransportEndpoints(String protocol, String[] requiredAttributes)
-    {
-        return new TransportRegisteredMdps(protocol, AddressedEndpointDefinitionParser.PROTOCOL, requiredAttributes);
-    }
+  @Override
+  protected MuleDefinitionParserConfiguration registerStandardTransportEndpoints(String protocol, String[] requiredAttributes) {
+    return new TransportRegisteredMdps(protocol, AddressedEndpointDefinitionParser.PROTOCOL, requiredAttributes);
+  }
 
-    @Override
-    protected MuleDefinitionParserConfiguration registerMetaTransportEndpoints(String protocol)
-    {
-        return new TransportRegisteredMdps(protocol, AddressedEndpointDefinitionParser.META, new String[] {});
-    }
+  @Override
+  protected MuleDefinitionParserConfiguration registerMetaTransportEndpoints(String protocol) {
+    return new TransportRegisteredMdps(protocol, AddressedEndpointDefinitionParser.META, new String[] {});
+  }
 
-    protected Class getInboundEndpointFactoryBeanClass()
-    {
-        return InboundEndpointFactoryBean.class;
-    }
+  protected Class getInboundEndpointFactoryBeanClass() {
+    return InboundEndpointFactoryBean.class;
+  }
 
-    protected Class getOutboundEndpointFactoryBeanClass()
-    {
-        return OutboundEndpointFactoryBean.class;
-    }
+  protected Class getOutboundEndpointFactoryBeanClass() {
+    return OutboundEndpointFactoryBean.class;
+  }
 
-    protected Class getGlobalEndpointBuilderBeanClass()
-    {
-        return EndpointURIEndpointBuilder.class;
-    }
+  protected Class getGlobalEndpointBuilderBeanClass() {
+    return EndpointURIEndpointBuilder.class;
+  }
 
-    protected class TransportRegisteredMdps extends RegisteredMdps
-    {
-        public TransportRegisteredMdps(String protocol, boolean isMeta, String[] requiredAttributes)
-        {
-            registerBeanDefinitionParser("endpoint",
-                    add(new TransportGlobalEndpointDefinitionParser(protocol, isMeta, getGlobalEndpointBuilderBeanClass(), requiredAttributes, new String[] {})));
-            registerBeanDefinitionParser("inbound-endpoint",
-                    add(new TransportEndpointDefinitionParser(protocol, isMeta, getInboundEndpointFactoryBeanClass(), requiredAttributes, new String[] {})));
-            registerBeanDefinitionParser("outbound-endpoint",
-                    add(new TransportEndpointDefinitionParser(protocol, isMeta, getOutboundEndpointFactoryBeanClass(), requiredAttributes, new String[] {})));
-        }
+  protected class TransportRegisteredMdps extends RegisteredMdps {
+
+    public TransportRegisteredMdps(String protocol, boolean isMeta, String[] requiredAttributes) {
+      registerBeanDefinitionParser("endpoint",
+                                   add(new TransportGlobalEndpointDefinitionParser(protocol, isMeta,
+                                                                                   getGlobalEndpointBuilderBeanClass(),
+                                                                                   requiredAttributes, new String[] {})));
+      registerBeanDefinitionParser("inbound-endpoint",
+                                   add(new TransportEndpointDefinitionParser(protocol, isMeta,
+                                                                             getInboundEndpointFactoryBeanClass(),
+                                                                             requiredAttributes, new String[] {})));
+      registerBeanDefinitionParser("outbound-endpoint",
+                                   add(new TransportEndpointDefinitionParser(protocol, isMeta,
+                                                                             getOutboundEndpointFactoryBeanClass(),
+                                                                             requiredAttributes, new String[] {})));
     }
+  }
 
 
 }

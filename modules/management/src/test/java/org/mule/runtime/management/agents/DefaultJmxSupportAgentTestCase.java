@@ -22,30 +22,25 @@ import javax.management.remote.rmi.RMIConnectorServer;
 
 import org.junit.Test;
 
-public class DefaultJmxSupportAgentTestCase extends AbstractMuleContextTestCase
-{
-    @Test
-    public void testHostPropertyEnablesClientSocketFactory () throws Exception
-    {
-        doTestHostPropertyEnablesClientSocketFactory(muleContext);
-    }
+public class DefaultJmxSupportAgentTestCase extends AbstractMuleContextTestCase {
 
-    public static void doTestHostPropertyEnablesClientSocketFactory(MuleContext muleContext)
-    {
-        DefaultJmxSupportAgent agent = new DefaultJmxSupportAgent();
-        agent.setMuleContext(muleContext);
-        agent.setHost("127.0.0.1");
-        AbstractJmxAgent jmxAgent = agent.createJmxAgent();
-        Map props = jmxAgent.getConnectorServerProperties();
-        assertNotNull(props);
-        assertEquals("JMX ConnectorServer properties should've been merged",
-                     2, props.size());
-        assertTrue("Property shouldn't have been removed",
-                   props.containsKey(RMIConnectorServer.JNDI_REBIND_ATTRIBUTE));
-        assertTrue("Property should've been added",
-                   props.containsKey(RMIConnectorServer.RMI_CLIENT_SOCKET_FACTORY_ATTRIBUTE));
-        Object ref = props.get(RMIConnectorServer.RMI_CLIENT_SOCKET_FACTORY_ATTRIBUTE);
-        assertNotNull(ref);
-        assertTrue(ref instanceof FixedHostRmiClientSocketFactory);
-    }
+  @Test
+  public void testHostPropertyEnablesClientSocketFactory() throws Exception {
+    doTestHostPropertyEnablesClientSocketFactory(muleContext);
+  }
+
+  public static void doTestHostPropertyEnablesClientSocketFactory(MuleContext muleContext) {
+    DefaultJmxSupportAgent agent = new DefaultJmxSupportAgent();
+    agent.setMuleContext(muleContext);
+    agent.setHost("127.0.0.1");
+    AbstractJmxAgent jmxAgent = agent.createJmxAgent();
+    Map props = jmxAgent.getConnectorServerProperties();
+    assertNotNull(props);
+    assertEquals("JMX ConnectorServer properties should've been merged", 2, props.size());
+    assertTrue("Property shouldn't have been removed", props.containsKey(RMIConnectorServer.JNDI_REBIND_ATTRIBUTE));
+    assertTrue("Property should've been added", props.containsKey(RMIConnectorServer.RMI_CLIENT_SOCKET_FACTORY_ATTRIBUTE));
+    Object ref = props.get(RMIConnectorServer.RMI_CLIENT_SOCKET_FACTORY_ATTRIBUTE);
+    assertNotNull(ref);
+    assertTrue(ref instanceof FixedHostRmiClientSocketFactory);
+  }
 }

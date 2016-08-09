@@ -16,60 +16,51 @@ import java.util.Vector;
 
 import org.apache.commons.collections.keyvalue.DefaultMapEntry;
 
-public class OrderedProperties extends Properties
-{
+public class OrderedProperties extends Properties {
 
-    private static final long serialVersionUID = -3611415251568805458L;
+  private static final long serialVersionUID = -3611415251568805458L;
 
-    private final Vector<Object> keys = new Vector<Object>();
+  private final Vector<Object> keys = new Vector<Object>();
 
-    public OrderedProperties()
-    {
-        super();
+  public OrderedProperties() {
+    super();
+  }
+
+  public OrderedProperties(Properties defaults) {
+    super(defaults);
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public Set<Map.Entry<Object, Object>> entrySet() {
+    Set<Map.Entry<Object, Object>> entries = new LinkedHashSet<Map.Entry<Object, Object>>();
+    Enumeration<?> keys = this.propertyNames();
+
+    while (keys.hasMoreElements()) {
+      Object key = keys.nextElement();
+      entries.add(new DefaultMapEntry(key, this.getProperty((String) key)));
     }
 
-    public OrderedProperties(Properties defaults)
-    {
-        super(defaults);
+    return entries;
+  }
+
+  @Override
+  public Enumeration<?> propertyNames() {
+    return this.keys.elements();
+  }
+
+  public Object put(Object key, Object value) {
+    if (this.keys.contains(key)) {
+      this.keys.remove(key);
     }
 
-    @Override
-    @SuppressWarnings("unchecked")
-    public Set<Map.Entry<Object, Object>> entrySet()
-    {
-        Set<Map.Entry<Object, Object>> entries = new LinkedHashSet<Map.Entry<Object, Object>>();
-        Enumeration<?> keys = this.propertyNames();
+    this.keys.add(key);
 
-        while (keys.hasMoreElements())
-        {
-            Object key = keys.nextElement();
-            entries.add(new DefaultMapEntry(key, this.getProperty((String) key)));
-        }
+    return super.put(key, value);
+  }
 
-        return entries;
-    }
-
-    @Override
-    public Enumeration<?> propertyNames()
-    {
-        return this.keys.elements();
-    }
-
-    public Object put(Object key, Object value)
-    {
-        if (this.keys.contains(key))
-        {
-            this.keys.remove(key);
-        }
-
-        this.keys.add(key);
-
-        return super.put(key, value);
-    }
-
-    public Object remove(Object key)
-    {
-        this.keys.remove(key);
-        return super.remove(key);
-    }
+  public Object remove(Object key) {
+    this.keys.remove(key);
+    return super.remove(key);
+  }
 }

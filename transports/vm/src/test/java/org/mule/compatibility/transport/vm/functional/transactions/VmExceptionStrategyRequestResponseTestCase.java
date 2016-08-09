@@ -31,148 +31,139 @@ import org.hamcrest.core.IsNull;
 import org.junit.Before;
 import org.junit.Test;
 
-public class VmExceptionStrategyRequestResponseTestCase extends FunctionalTestCase
-{
-    public static final int TIMEOUT = 3000;
-    public static final int TINY_TIMEOUT = 300;
-    public static final String ORIGINAL_MESSAGE = "some message";
-    private static Latch outboundComponentLatch;
-    private static Latch deadLetterQueueLatch;
-    private static boolean outboundComponentReached;
+public class VmExceptionStrategyRequestResponseTestCase extends FunctionalTestCase {
+
+  public static final int TIMEOUT = 3000;
+  public static final int TINY_TIMEOUT = 300;
+  public static final String ORIGINAL_MESSAGE = "some message";
+  private static Latch outboundComponentLatch;
+  private static Latch deadLetterQueueLatch;
+  private static boolean outboundComponentReached;
+
+  @Override
+  protected String getConfigFile() {
+    return "vm/vm-exception-strategy-config-request-response.xml";
+  }
+
+  @Before
+  public void setUp() throws Exception {
+    outboundComponentLatch = new Latch();
+    deadLetterQueueLatch = new Latch();
+    outboundComponentReached = false;
+  }
+
+  @Test
+  public void testDeadLetterQueueWithInboundEndpointException() throws Exception {
+    MuleClient muleClient = muleContext.getClient();
+    MuleMessage response = muleClient.send("vm://in1", ORIGINAL_MESSAGE, null);
+    if (!deadLetterQueueLatch.await(TIMEOUT, TimeUnit.MILLISECONDS)) {
+      fail("dead letter queue must be reached");
+    }
+    assertThat(outboundComponentReached, is(false));
+    assertThat(response, IsNull.<Object>notNullValue());
+    assertThat(response.getPayload(), is(nullValue()));
+    assertThat(response.getExceptionPayload(), IsNull.<Object>notNullValue());
+    assertThat(response.getExceptionPayload(), IsInstanceOf.instanceOf(DefaultExceptionPayload.class));
+    assertThat(muleClient.request("vm://out1", TINY_TIMEOUT), IsNull.<Object>nullValue());
+  }
+
+  @Test
+  public void testDeadLetterQueueWithInboundEndpointResponseException() throws Exception {
+    MuleClient muleClient = muleContext.getClient();
+    MuleMessage response = muleClient.send("vm://in2", ORIGINAL_MESSAGE, null);
+    // TODO PLG - ES - fix this, dlq is failing because transaction was already commited by next flow despite is called using
+    // one-way with vm
+    /*
+     * if (!deadLetterQueueLatch.await(TIMEOUT, MILLISECONDS)) { fail("dead letter queue must be reached"); }
+     */
+    assertThat(response, IsNull.<Object>notNullValue());
+    assertThat(response.getPayload(), is(nullValue()));
+    assertThat(response.getExceptionPayload(), IsNull.<Object>notNullValue());
+    assertThat(response.getExceptionPayload(), IsInstanceOf.instanceOf(DefaultExceptionPayload.class));
+    assertThat(muleClient.request("vm://out2", TINY_TIMEOUT), IsNull.<Object>nullValue());
+    if (!outboundComponentLatch.await(TINY_TIMEOUT, TimeUnit.MILLISECONDS)) {
+      fail("outbound component not reached");
+    }
+  }
+
+  @Test
+  public void testDeadLetterQueueWithComponentException() throws Exception {
+    MuleClient muleClient = muleContext.getClient();
+    MuleMessage response = muleClient.send("vm://in3", ORIGINAL_MESSAGE, null);
+    if (!deadLetterQueueLatch.await(TIMEOUT, TimeUnit.MILLISECONDS)) {
+      fail("dead letter queue must be reached");
+    }
+    assertThat(outboundComponentReached, Is.is(false));
+    assertThat(response, IsNull.<Object>notNullValue());
+    assertThat(response.getPayload(), is(nullValue()));
+    assertThat(response.getExceptionPayload(), IsNull.<Object>notNullValue());
+    assertThat(response.getExceptionPayload(), IsInstanceOf.instanceOf(DefaultExceptionPayload.class));
+    assertThat(muleClient.request("vm://out3", TINY_TIMEOUT), IsNull.<Object>nullValue());
+  }
+
+  @Test
+  public void testDeadLetterQueueWithOutboundEndpointException() throws Exception {
+    MuleClient muleClient = muleContext.getClient();
+    MuleMessage response = muleClient.send("vm://in4", ORIGINAL_MESSAGE, null);
+    if (!deadLetterQueueLatch.await(TIMEOUT, TimeUnit.MILLISECONDS)) {
+      fail("dead letter queue must be reached");
+    }
+    assertThat(outboundComponentReached, Is.is(false));
+    assertThat(response, IsNull.<Object>notNullValue());
+    assertThat(response.getPayload(), is(nullValue()));
+    assertThat(response.getExceptionPayload(), IsNull.<Object>notNullValue());
+    assertThat(response.getExceptionPayload(), IsInstanceOf.instanceOf(DefaultExceptionPayload.class));
+    assertThat(muleClient.request("vm://out4", TINY_TIMEOUT), IsNull.<Object>nullValue());
+  }
+
+  @Test
+  public void testDeadLetterQueueWithOutboundEndpointResponseException() throws Exception {
+    MuleClient muleClient = muleContext.getClient();
+    MuleMessage response = muleClient.send("vm://in5", ORIGINAL_MESSAGE, null);
+    // TODO PLG - ES - fix this issue, the response must have an exception since there was a failire in the flow. It seems that
+    // response chain was not executed
+    /*
+     * assertThat(response, IsNull.<Object>notNullValue()); assertThat(response.getPayload(), is(nullValue()));
+     * assertThat(response.getExceptionPayload(), IsNull.<Object>notNullValue()); assertThat(response.getExceptionPayload(),
+     * IsInstanceOf.instanceOf(DefaultExceptionPayload.class));
+     */
+    assertThat(muleClient.request("vm://out5", TINY_TIMEOUT), IsNull.<Object>nullValue());
+    if (!outboundComponentLatch.await(TINY_TIMEOUT, TimeUnit.MILLISECONDS)) {
+      fail("outbound component not reached");
+    }
+    // TODO PLG - ES - fix this issue. dead letter queue component is not reached
+    /*
+     * if (!deadLetterQueueLatch.await(TIMEOUT, MILLISECONDS)) { fail("dead letter queue must be reached"); }
+     */
+  }
+
+  public static class FailingTransformer extends AbstractTransformer {
 
     @Override
-    protected String getConfigFile()
-    {
-        return "vm/vm-exception-strategy-config-request-response.xml";
+    protected Object doTransform(Object src, Charset enc) throws TransformerException {
+      throw new TransformerException(CoreMessages.failedToBuildMessage(), this);
     }
+  }
 
-    @Before
-    public void setUp() throws Exception
-    {
-        outboundComponentLatch = new Latch();
-        deadLetterQueueLatch = new Latch();
-        outboundComponentReached = false;
-    }
+  public static class DeadLetterQueueComponent implements Callable {
 
-    @Test
-    public void testDeadLetterQueueWithInboundEndpointException() throws Exception
-    {
-        MuleClient muleClient = muleContext.getClient();
-        MuleMessage response = muleClient.send("vm://in1", ORIGINAL_MESSAGE, null);
-        if (!deadLetterQueueLatch.await(TIMEOUT, TimeUnit.MILLISECONDS)) {
-            fail("dead letter queue must be reached");
-        }
-        assertThat(outboundComponentReached, is(false));
-        assertThat(response, IsNull.<Object>notNullValue());
-        assertThat(response.getPayload(), is(nullValue()));
-        assertThat(response.getExceptionPayload(), IsNull.<Object>notNullValue());
-        assertThat(response.getExceptionPayload(), IsInstanceOf.instanceOf(DefaultExceptionPayload.class));
-        assertThat(muleClient.request("vm://out1", TINY_TIMEOUT), IsNull.<Object>nullValue());
+    @Override
+    public Object onCall(MuleEventContext eventContext) throws Exception {
+      deadLetterQueueLatch.release();
+      MuleMessage message = eventContext.getMessage();
+      assertThat(message, IsNull.<Object>notNullValue());
+      assertThat(message.getExceptionPayload(), IsNull.<Object>nullValue());
+      assertThat(message.getPayload(), IsInstanceOf.instanceOf(ExceptionMessage.class));
+      return eventContext.getMessage();
     }
+  }
 
-    @Test
-    public void testDeadLetterQueueWithInboundEndpointResponseException() throws Exception
-    {
-        MuleClient muleClient = muleContext.getClient();
-        MuleMessage response = muleClient.send("vm://in2", ORIGINAL_MESSAGE, null);
-        //TODO PLG - ES - fix this, dlq is failing because transaction was already commited by next flow despite is called using one-way with vm
-        /*if (!deadLetterQueueLatch.await(TIMEOUT, MILLISECONDS)) {
-            fail("dead letter queue must be reached");
-        }*/
-        assertThat(response, IsNull.<Object>notNullValue());
-        assertThat(response.getPayload(), is(nullValue()));
-        assertThat(response.getExceptionPayload(), IsNull.<Object>notNullValue());
-        assertThat(response.getExceptionPayload(), IsInstanceOf.instanceOf(DefaultExceptionPayload.class));
-        assertThat(muleClient.request("vm://out2", TINY_TIMEOUT), IsNull.<Object>nullValue());
-        if (!outboundComponentLatch.await(TINY_TIMEOUT, TimeUnit.MILLISECONDS))
-        {
-            fail("outbound component not reached");
-        }
-    }
+  public static class OutboundComponent implements Callable {
 
-    @Test
-    public void testDeadLetterQueueWithComponentException() throws Exception
-    {
-        MuleClient muleClient = muleContext.getClient();
-        MuleMessage response = muleClient.send("vm://in3", ORIGINAL_MESSAGE, null);
-        if (!deadLetterQueueLatch.await(TIMEOUT, TimeUnit.MILLISECONDS)) {
-            fail("dead letter queue must be reached");
-        }
-        assertThat(outboundComponentReached, Is.is(false));
-        assertThat(response, IsNull.<Object>notNullValue());
-        assertThat(response.getPayload(), is(nullValue()));
-        assertThat(response.getExceptionPayload(), IsNull.<Object>notNullValue());
-        assertThat(response.getExceptionPayload(), IsInstanceOf.instanceOf(DefaultExceptionPayload.class));
-        assertThat(muleClient.request("vm://out3", TINY_TIMEOUT), IsNull.<Object>nullValue());
+    @Override
+    public Object onCall(MuleEventContext eventContext) throws Exception {
+      outboundComponentLatch.release();
+      return eventContext.getMessage();
     }
-
-    @Test
-    public void testDeadLetterQueueWithOutboundEndpointException() throws Exception
-    {
-        MuleClient muleClient = muleContext.getClient();
-        MuleMessage response = muleClient.send("vm://in4", ORIGINAL_MESSAGE, null);
-        if (!deadLetterQueueLatch.await(TIMEOUT, TimeUnit.MILLISECONDS)) {
-            fail("dead letter queue must be reached");
-        }
-        assertThat(outboundComponentReached, Is.is(false));
-        assertThat(response, IsNull.<Object>notNullValue());
-        assertThat(response.getPayload(), is(nullValue()));
-        assertThat(response.getExceptionPayload(), IsNull.<Object>notNullValue());
-        assertThat(response.getExceptionPayload(), IsInstanceOf.instanceOf(DefaultExceptionPayload.class));
-        assertThat(muleClient.request("vm://out4", TINY_TIMEOUT), IsNull.<Object>nullValue());
-    }
-
-    @Test
-    public void testDeadLetterQueueWithOutboundEndpointResponseException() throws Exception
-    {
-        MuleClient muleClient = muleContext.getClient();
-        MuleMessage response = muleClient.send("vm://in5", ORIGINAL_MESSAGE, null);
-        //TODO PLG - ES - fix this issue, the response must have an exception since there was a failire in the flow. It seems that response chain was not executed
-        /*assertThat(response, IsNull.<Object>notNullValue());
-        assertThat(response.getPayload(), is(nullValue()));
-        assertThat(response.getExceptionPayload(), IsNull.<Object>notNullValue());
-        assertThat(response.getExceptionPayload(), IsInstanceOf.instanceOf(DefaultExceptionPayload.class));*/
-        assertThat(muleClient.request("vm://out5", TINY_TIMEOUT), IsNull.<Object>nullValue());
-        if (!outboundComponentLatch.await(TINY_TIMEOUT, TimeUnit.MILLISECONDS))
-        {
-            fail("outbound component not reached");
-        }
-        //TODO PLG - ES - fix this issue. dead letter queue component is not reached
-        /*if (!deadLetterQueueLatch.await(TIMEOUT, MILLISECONDS)) {
-            fail("dead letter queue must be reached");
-        }*/
-    }
-
-    public static class FailingTransformer extends AbstractTransformer
-    {
-        @Override
-        protected Object doTransform(Object src, Charset enc) throws TransformerException
-        {
-            throw new TransformerException(CoreMessages.failedToBuildMessage(), this);
-        }
-    }
-
-    public static class DeadLetterQueueComponent implements Callable
-    {
-        @Override
-        public Object onCall(MuleEventContext eventContext) throws Exception
-        {
-            deadLetterQueueLatch.release();
-            MuleMessage message = eventContext.getMessage();
-            assertThat(message, IsNull.<Object>notNullValue());
-            assertThat(message.getExceptionPayload(), IsNull.<Object>nullValue());
-            assertThat(message.getPayload(), IsInstanceOf.instanceOf(ExceptionMessage.class));
-            return eventContext.getMessage();
-        }
-    }
-
-    public static class OutboundComponent implements Callable
-    {
-        @Override
-        public Object onCall(MuleEventContext eventContext) throws Exception
-        {
-            outboundComponentLatch.release();
-            return eventContext.getMessage();
-        }
-    }
+  }
 }

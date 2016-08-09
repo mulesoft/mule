@@ -18,38 +18,31 @@ import java.util.Map;
 /**
  * Maps a row using returning a case insensitive map
  */
-public class InsensitiveMapRowHandler implements RowHandler
-{
+public class InsensitiveMapRowHandler implements RowHandler {
 
-    @Override
-    public Map<String, Object> process(ResultSet resultSet) throws SQLException
-    {
-        CaseInsensitiveHashMap result = new CaseInsensitiveHashMap();
-        ResultSetMetaData metaData = resultSet.getMetaData();
-        int cols = metaData.getColumnCount();
+  @Override
+  public Map<String, Object> process(ResultSet resultSet) throws SQLException {
+    CaseInsensitiveHashMap result = new CaseInsensitiveHashMap();
+    ResultSetMetaData metaData = resultSet.getMetaData();
+    int cols = metaData.getColumnCount();
 
-        for (int i = 1; i <= cols; i++)
-        {
-            String column = metaData.getColumnLabel(i);
-            Object value = resultSet.getObject(i);
+    for (int i = 1; i <= cols; i++) {
+      String column = metaData.getColumnLabel(i);
+      Object value = resultSet.getObject(i);
 
-            if (value instanceof SQLXML)
-            {
-                SQLXML sqlxml = (SQLXML) value;
+      if (value instanceof SQLXML) {
+        SQLXML sqlxml = (SQLXML) value;
 
-                result.put(column, sqlxml.getString());
-            }
-            else
-            {
-                result.put(column, value);
-            }
-        }
-
-        if (cols != result.size())
-        {
-            throw new IllegalArgumentException("Record cannot be mapped as it contains multiple columns with the same label. Define column aliases to solve this problem");
-        }
-
-        return result;
+        result.put(column, sqlxml.getString());
+      } else {
+        result.put(column, value);
+      }
     }
+
+    if (cols != result.size()) {
+      throw new IllegalArgumentException("Record cannot be mapped as it contains multiple columns with the same label. Define column aliases to solve this problem");
+    }
+
+    return result;
+  }
 }

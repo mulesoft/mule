@@ -27,126 +27,91 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * A transformer that will convert a JSON encoded object graph to a java object. The
- * object type is determined by the 'returnType' attribute. Note that this
- * transformers supports Arrays and Lists. For example, to convert a JSON string to
- * an array of org.foo.Person, set the the returnClass=[Lorg.foo.Person;.
+ * A transformer that will convert a JSON encoded object graph to a java object. The object type is determined by the 'returnType'
+ * attribute. Note that this transformers supports Arrays and Lists. For example, to convert a JSON string to an array of
+ * org.foo.Person, set the the returnClass=[Lorg.foo.Person;.
  */
-public class JsonToObject extends AbstractJsonTransformer
-{
-    private static final DataType JSON_TYPE = DataType.builder().type(JsonData.class).mediaType(MediaType.APPLICATION_JSON).build();
+public class JsonToObject extends AbstractJsonTransformer {
 
-    private Map<Class<?>, Class<?>> deserializationMixins = new HashMap<>();
+  private static final DataType JSON_TYPE = DataType.builder().type(JsonData.class).mediaType(MediaType.APPLICATION_JSON).build();
 
-    public JsonToObject()
-    {
-        this.registerSourceType(DataType.fromType(Reader.class));
-        this.registerSourceType(DataType.fromType(URL.class));
-        this.registerSourceType(DataType.fromType(File.class));
-        this.registerSourceType(DataType.STRING);
-        this.registerSourceType(DataType.INPUT_STREAM);
-        this.registerSourceType(DataType.BYTE_ARRAY);
-        setReturnDataType(JSON_TYPE);
+  private Map<Class<?>, Class<?>> deserializationMixins = new HashMap<>();
+
+  public JsonToObject() {
+    this.registerSourceType(DataType.fromType(Reader.class));
+    this.registerSourceType(DataType.fromType(URL.class));
+    this.registerSourceType(DataType.fromType(File.class));
+    this.registerSourceType(DataType.STRING);
+    this.registerSourceType(DataType.INPUT_STREAM);
+    this.registerSourceType(DataType.BYTE_ARRAY);
+    setReturnDataType(JSON_TYPE);
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    super.initialise();
+    // Add shared mixins first
+    for (Map.Entry<Class<?>, Class<?>> entry : getMixins().entrySet()) {
+      getMapper().getDeserializationConfig().addMixInAnnotations(entry.getKey(), entry.getValue());
     }
 
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        super.initialise();
-        //Add shared mixins first
-        for (Map.Entry<Class<?>, Class<?>> entry : getMixins().entrySet())
-        {
-            getMapper().getDeserializationConfig().addMixInAnnotations(entry.getKey(), entry.getValue());
-        }
-
-        for (Map.Entry<Class<?>, Class<?>> entry : deserializationMixins.entrySet())
-        {
-            getMapper().getDeserializationConfig().addMixInAnnotations(entry.getKey(), entry.getValue());
-        }
+    for (Map.Entry<Class<?>, Class<?>> entry : deserializationMixins.entrySet()) {
+      getMapper().getDeserializationConfig().addMixInAnnotations(entry.getKey(), entry.getValue());
     }
+  }
 
-    @Override
-    public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException
-    {
-        Object src = event.getMessage().getPayload();
-        Object returnValue;
-        InputStream is = null;
-        Reader reader = null;
+  @Override
+  public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException {
+    Object src = event.getMessage().getPayload();
+    Object returnValue;
+    InputStream is = null;
+    Reader reader = null;
 
-        try
-        {
-            if (src instanceof InputStream)
-            {
-                is = (InputStream) src;
-            }
-            else if (src instanceof File)
-            {
-                is = new FileInputStream((File) src);
-            }
-            else if (src instanceof URL)
-            {
-                is = ((URL) src).openStream();
-            }
-            else if (src instanceof byte[])
-            {
-                is = new ByteArrayInputStream((byte[]) src);
-            }
+    try {
+      if (src instanceof InputStream) {
+        is = (InputStream) src;
+      } else if (src instanceof File) {
+        is = new FileInputStream((File) src);
+      } else if (src instanceof URL) {
+        is = ((URL) src).openStream();
+      } else if (src instanceof byte[]) {
+        is = new ByteArrayInputStream((byte[]) src);
+      }
 
-            if (src instanceof Reader)
-            {
-                if (JSON_TYPE.isCompatibleWith(getReturnDataType()))
-                {
-                    returnValue = new JsonData((Reader) src);
-                }
-                else
-                {
-                    returnValue = getMapper().readValue((Reader) src, getReturnDataType().getType());
-                }
-            }
-            else if (src instanceof String)
-            {
-                if (JSON_TYPE.isCompatibleWith(getReturnDataType()))
-                {
-                    returnValue = new JsonData((String) src);
-                }
-                else
-                {
-                    returnValue = getMapper().readValue((String) src, getReturnDataType().getType());
-                }
-            }
-            else
-            {
-                reader = new InputStreamReader(is, outputEncoding);
-                if (JSON_TYPE.isCompatibleWith(getReturnDataType()))
-                {
-                    returnValue = new JsonData(reader);
-                }
-                else
-                {
-                    returnValue = getMapper().readValue(reader, getReturnDataType().getType());
-                }
-            }
-            return returnValue;
+      if (src instanceof Reader) {
+        if (JSON_TYPE.isCompatibleWith(getReturnDataType())) {
+          returnValue = new JsonData((Reader) src);
+        } else {
+          returnValue = getMapper().readValue((Reader) src, getReturnDataType().getType());
         }
-        catch (Exception e)
-        {
-            throw new TransformerException(CoreMessages.transformFailed("json",
-                getReturnDataType().getType().getName()), this, e);
+      } else if (src instanceof String) {
+        if (JSON_TYPE.isCompatibleWith(getReturnDataType())) {
+          returnValue = new JsonData((String) src);
+        } else {
+          returnValue = getMapper().readValue((String) src, getReturnDataType().getType());
         }
-        finally
-        {
-            IOUtils.closeQuietly(reader);
-            IOUtils.closeQuietly(is);
+      } else {
+        reader = new InputStreamReader(is, outputEncoding);
+        if (JSON_TYPE.isCompatibleWith(getReturnDataType())) {
+          returnValue = new JsonData(reader);
+        } else {
+          returnValue = getMapper().readValue(reader, getReturnDataType().getType());
         }
+      }
+      return returnValue;
+    } catch (Exception e) {
+      throw new TransformerException(CoreMessages.transformFailed("json", getReturnDataType().getType().getName()), this, e);
+    } finally {
+      IOUtils.closeQuietly(reader);
+      IOUtils.closeQuietly(is);
     }
+  }
 
-    public Map<Class<?>, Class<?>> getDeserializationMixins()
-    {
-        return deserializationMixins;
-    }
+  public Map<Class<?>, Class<?>> getDeserializationMixins() {
+    return deserializationMixins;
+  }
 
-    public void setDeserializationMixins(Map<Class<?>, Class<?>> deserializationMixins)
-    {
-        this.deserializationMixins = deserializationMixins;
-    }
+  public void setDeserializationMixins(Map<Class<?>, Class<?>> deserializationMixins) {
+    this.deserializationMixins = deserializationMixins;
+  }
 }

@@ -11,6 +11,10 @@
     <name>Mule Core Unit Tests</name>
     <description>Mule Core Unit Tests</description>
 
+    <properties>
+        <formatterConfigPath>../formatter.xml</formatterConfigPath>
+    </properties>
+    
     <build>
         <plugins>
             <plugin>

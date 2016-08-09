@@ -16,54 +16,50 @@ import org.mule.runtime.core.api.processor.MessageProcessor;
  * @deprecated Transport infrastructure is deprecated.
  */
 @Deprecated
-public interface InterfaceBinding extends MessageProcessor
-{
-    /**
-     * This method is responsible for routing the Message via the MuleSession. The
-     * logic for this method will change for each type of router depending on
-     * expected behaviour. For example, a MulticastingRouter might just iterate
-     * through the list of assoaciated endpoints sending the message. Another type of
-     * router such as the ExceptionBasedRouter will hit the first endpoint, if it
-     * fails try the second, and so on. Most router implementations will extends the
-     * FilteringOutboundRouter which implements all the common logic need for a
-     * router.
-     *
-     * @return a result message if any from the invocation. If the endpoint bound has
-     *         a one-way exchange pattern configured a null result will always be
-     *         returned.
-     * @throws MessagingException if any errors occur during the sending of messages
-     * @throws MuleException
-     * @see org.mule.compatibility.core.routing.outbound.FilteringOutboundRouter
-     * @see org.mule.compatibility.core.routing.outbound.ExceptionBasedRouter
-     * @see org.mule.compatibility.core.routing.outbound.MulticastingRouter
-     * @since 2.1 the synchronous argument has been removed. Instead use the
-     *        synchronous attribute of the endpoint you are dispatching to.
-     */
-    @Override
-    MuleEvent process(MuleEvent event) throws MuleException;
+public interface InterfaceBinding extends MessageProcessor {
 
-    /**
-     * @deprecated Transport infrastructure is deprecated.
-     */
-    @Deprecated
-    void setEndpoint(ImmutableEndpoint endpoint) throws MuleException;
+  /**
+   * This method is responsible for routing the Message via the MuleSession. The logic for this method will change for each type
+   * of router depending on expected behaviour. For example, a MulticastingRouter might just iterate through the list of
+   * assoaciated endpoints sending the message. Another type of router such as the ExceptionBasedRouter will hit the first
+   * endpoint, if it fails try the second, and so on. Most router implementations will extends the FilteringOutboundRouter which
+   * implements all the common logic need for a router.
+   *
+   * @return a result message if any from the invocation. If the endpoint bound has a one-way exchange pattern configured a null
+   *         result will always be returned.
+   * @throws MessagingException if any errors occur during the sending of messages
+   * @throws MuleException
+   * @see org.mule.compatibility.core.routing.outbound.FilteringOutboundRouter
+   * @see org.mule.compatibility.core.routing.outbound.ExceptionBasedRouter
+   * @see org.mule.compatibility.core.routing.outbound.MulticastingRouter
+   * @since 2.1 the synchronous argument has been removed. Instead use the synchronous attribute of the endpoint you are
+   *        dispatching to.
+   */
+  @Override
+  MuleEvent process(MuleEvent event) throws MuleException;
 
-    /**
-     * @deprecated Transport infrastructure is deprecated.
-     */
-    @Deprecated
-    ImmutableEndpoint getEndpoint();
+  /**
+   * @deprecated Transport infrastructure is deprecated.
+   */
+  @Deprecated
+  void setEndpoint(ImmutableEndpoint endpoint) throws MuleException;
 
-    Class<?> getInterface();
+  /**
+   * @deprecated Transport infrastructure is deprecated.
+   */
+  @Deprecated
+  ImmutableEndpoint getEndpoint();
 
-    void setInterface(Class<?> interfaceClass);
+  Class<?> getInterface();
 
-    String getMethod();
+  void setInterface(Class<?> interfaceClass);
 
-    void setMethod(String method);
+  String getMethod();
 
-    /**
-     * This wires the dynamic proxy to the service object.
-     */
-    Object createProxy(Object target);
+  void setMethod(String method);
+
+  /**
+   * This wires the dynamic proxy to the service object.
+   */
+  Object createProxy(Object target);
 }

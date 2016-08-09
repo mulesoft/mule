@@ -36,174 +36,151 @@ import org.springframework.context.ApplicationContext;
 /**
  * Provides global CXF configuration defaults.
  */
-public class CxfConfiguration implements Initialisable, Disposable, MuleContextAware
-{
-    public static final String CXF = "cxf";
-    public static final String CONFIGURATION_LOCATION = "configurationLocation";
-    public static final String DEFAULT_MULE_NAMESPACE_URI = "http://www.muleumo.org";
-    public static final String BUS_PROPERTY = CXF;
+public class CxfConfiguration implements Initialisable, Disposable, MuleContextAware {
 
-    protected transient Logger logger = LoggerFactory.getLogger(getClass());
+  public static final String CXF = "cxf";
+  public static final String CONFIGURATION_LOCATION = "configurationLocation";
+  public static final String DEFAULT_MULE_NAMESPACE_URI = "http://www.muleumo.org";
+  public static final String BUS_PROPERTY = CXF;
 
-    // The CXF Bus object
-    private Bus bus;
-    private String configurationLocation;
-    private boolean initializeStaticBusInstance;
-    private MuleContext muleContext;
-    private boolean enableMuleSoapHeaders = true;
+  protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        BusFactory.setDefaultBus(null);
-        ApplicationContext context = (ApplicationContext) muleContext.getRegistry().lookupObject(SpringRegistry.SPRING_APPLICATION_CONTEXT);
+  // The CXF Bus object
+  private Bus bus;
+  private String configurationLocation;
+  private boolean initializeStaticBusInstance;
+  private MuleContext muleContext;
+  private boolean enableMuleSoapHeaders = true;
 
-        if (configurationLocation != null)
-        {
-            bus = new SpringBusFactory(context).createBus(configurationLocation, true);
-        }
-        else
-        {
-            bus = new SpringBusFactory().createBus((String) null, true);
+  @Override
+  public void initialise() throws InitialisationException {
+    BusFactory.setDefaultBus(null);
+    ApplicationContext context =
+        (ApplicationContext) muleContext.getRegistry().lookupObject(SpringRegistry.SPRING_APPLICATION_CONTEXT);
 
-        }
+    if (configurationLocation != null) {
+      bus = new SpringBusFactory(context).createBus(configurationLocation, true);
+    } else {
+      bus = new SpringBusFactory().createBus((String) null, true);
 
-        if (!initializeStaticBusInstance)
-        {
-            BusFactory.setDefaultBus(null);
-        }
-
-        MuleUniversalTransport transport = new MuleUniversalTransport(this, muleContext.getRegistry().lookupObject("_muleUniversalConduitFacotry"));
-        DestinationFactoryManager dfm = bus.getExtension(DestinationFactoryManager.class);
-        dfm.registerDestinationFactory("http://schemas.xmlsoap.org/soap/http", transport);
-        dfm.registerDestinationFactory("http://schemas.xmlsoap.org/wsdl/soap/http", transport);
-        dfm.registerDestinationFactory("http://cxf.apache.org/transports/http/configuration", transport);
-        dfm.registerDestinationFactory("http://schemas.xmlsoap.org/wsdl/http/", transport);
-        dfm.registerDestinationFactory("http://www.w3.org/2003/05/soap/bindings/HTTP/", transport);
-        dfm.registerDestinationFactory("http://cxf.apache.org/transports/jms", transport);
-        dfm.registerDestinationFactory("http://cxf.apache.org/transports/http", transport);
-
-        dfm.registerDestinationFactory(MuleUniversalTransport.TRANSPORT_ID, transport);
-
-        ConduitInitiatorManager extension = bus.getExtension(ConduitInitiatorManager.class);
-        try
-        {
-            // Force the HTTP transport to load if available, otherwise it could
-            // overwrite our namespaces later
-            extension.getConduitInitiator("http://schemas.xmlsoap.org/soap/http");
-        }
-        catch (BusException e1)
-        {
-            // If unavailable eat exception and continue
-        }
-        extension.registerConduitInitiator("http://cxf.apache.org/transports/http", transport);
-        extension.registerConduitInitiator("http://schemas.xmlsoap.org/wsdl/soap/", transport);
-        extension.registerConduitInitiator("http://schemas.xmlsoap.org/soap/http", transport);
-        extension.registerConduitInitiator("http://schemas.xmlsoap.org/soap/http/", transport);
-        extension.registerConduitInitiator("http://schemas.xmlsoap.org/wsdl/soap/http", transport);
-        extension.registerConduitInitiator("http://schemas.xmlsoap.org/wsdl/http/", transport);
-        extension.registerConduitInitiator("http://www.w3.org/2003/05/soap/bindings/HTTP/", transport);
-        extension.registerConduitInitiator("http://cxf.apache.org/transports/http/configuration", transport);
-        extension.registerConduitInitiator("http://cxf.apache.org/bindings/xformat", transport);
-        extension.registerConduitInitiator("http://cxf.apache.org/transports/jms", transport);
-        extension.registerConduitInitiator(MuleUniversalTransport.TRANSPORT_ID, transport);
-
-        bus.getOutInterceptors().add(new MuleProtocolHeadersOutInterceptor());
-        bus.getOutFaultInterceptors().add(new MuleProtocolHeadersOutInterceptor());
-
-        if (enableMuleSoapHeaders)
-        {
-            bus.getInInterceptors().add(new MuleHeadersInInterceptor());
-            bus.getInFaultInterceptors().add(new MuleHeadersInInterceptor());
-            bus.getOutInterceptors().add(new MuleHeadersOutInterceptor());
-            bus.getOutFaultInterceptors().add(new MuleHeadersOutInterceptor());
-        }
     }
 
-    @Override
-    public void dispose()
-    {
-        bus.shutdown(true);
-        // clear static caches preventing memory leaks on redeploy
-        // needed because cxf core classes are loaded by the Mule system classloader, not app's
-        JAXBContextCache.clearCaches();
-        try
-        {
-            // ASMHelper.LOADER_MAP is a protected static field
-            final Field cacheField = ASMHelper.class.getDeclaredField("LOADER_MAP");
-            cacheField.setAccessible(true);
-            // static field
-            final Map cache = (Map) cacheField.get(null);
-            cache.clear();
-        }
-        catch (Throwable t)
-        {
-            logger.warn("Error disposing CxfConfiguration, this may cause a memory leak", t);
-        }
+    if (!initializeStaticBusInstance) {
+      BusFactory.setDefaultBus(null);
     }
 
-    public Bus getCxfBus()
-    {
-        return bus;
-    }
+    MuleUniversalTransport transport =
+        new MuleUniversalTransport(this, muleContext.getRegistry().lookupObject("_muleUniversalConduitFacotry"));
+    DestinationFactoryManager dfm = bus.getExtension(DestinationFactoryManager.class);
+    dfm.registerDestinationFactory("http://schemas.xmlsoap.org/soap/http", transport);
+    dfm.registerDestinationFactory("http://schemas.xmlsoap.org/wsdl/soap/http", transport);
+    dfm.registerDestinationFactory("http://cxf.apache.org/transports/http/configuration", transport);
+    dfm.registerDestinationFactory("http://schemas.xmlsoap.org/wsdl/http/", transport);
+    dfm.registerDestinationFactory("http://www.w3.org/2003/05/soap/bindings/HTTP/", transport);
+    dfm.registerDestinationFactory("http://cxf.apache.org/transports/jms", transport);
+    dfm.registerDestinationFactory("http://cxf.apache.org/transports/http", transport);
 
-    public void setCxfBus(Bus bus)
-    {
-        this.bus = bus;
-    }
+    dfm.registerDestinationFactory(MuleUniversalTransport.TRANSPORT_ID, transport);
 
-    public String getConfigurationLocation()
-    {
-        return configurationLocation;
+    ConduitInitiatorManager extension = bus.getExtension(ConduitInitiatorManager.class);
+    try {
+      // Force the HTTP transport to load if available, otherwise it could
+      // overwrite our namespaces later
+      extension.getConduitInitiator("http://schemas.xmlsoap.org/soap/http");
+    } catch (BusException e1) {
+      // If unavailable eat exception and continue
     }
+    extension.registerConduitInitiator("http://cxf.apache.org/transports/http", transport);
+    extension.registerConduitInitiator("http://schemas.xmlsoap.org/wsdl/soap/", transport);
+    extension.registerConduitInitiator("http://schemas.xmlsoap.org/soap/http", transport);
+    extension.registerConduitInitiator("http://schemas.xmlsoap.org/soap/http/", transport);
+    extension.registerConduitInitiator("http://schemas.xmlsoap.org/wsdl/soap/http", transport);
+    extension.registerConduitInitiator("http://schemas.xmlsoap.org/wsdl/http/", transport);
+    extension.registerConduitInitiator("http://www.w3.org/2003/05/soap/bindings/HTTP/", transport);
+    extension.registerConduitInitiator("http://cxf.apache.org/transports/http/configuration", transport);
+    extension.registerConduitInitiator("http://cxf.apache.org/bindings/xformat", transport);
+    extension.registerConduitInitiator("http://cxf.apache.org/transports/jms", transport);
+    extension.registerConduitInitiator(MuleUniversalTransport.TRANSPORT_ID, transport);
 
-    public void setConfigurationLocation(String configurationLocation)
-    {
-        this.configurationLocation = configurationLocation;
-    }
-    
-    public boolean isInitializeStaticBusInstance()
-    {
-        return initializeStaticBusInstance;
-    }
+    bus.getOutInterceptors().add(new MuleProtocolHeadersOutInterceptor());
+    bus.getOutFaultInterceptors().add(new MuleProtocolHeadersOutInterceptor());
 
-    public void setInitializeStaticBusInstance(boolean initializeStaticBusInstance)
-    {
-        this.initializeStaticBusInstance = initializeStaticBusInstance;
+    if (enableMuleSoapHeaders) {
+      bus.getInInterceptors().add(new MuleHeadersInInterceptor());
+      bus.getInFaultInterceptors().add(new MuleHeadersInInterceptor());
+      bus.getOutInterceptors().add(new MuleHeadersOutInterceptor());
+      bus.getOutFaultInterceptors().add(new MuleHeadersOutInterceptor());
     }
+  }
 
-    @Override
-    public void setMuleContext(MuleContext context)
-    {
-        this.muleContext = context;
+  @Override
+  public void dispose() {
+    bus.shutdown(true);
+    // clear static caches preventing memory leaks on redeploy
+    // needed because cxf core classes are loaded by the Mule system classloader, not app's
+    JAXBContextCache.clearCaches();
+    try {
+      // ASMHelper.LOADER_MAP is a protected static field
+      final Field cacheField = ASMHelper.class.getDeclaredField("LOADER_MAP");
+      cacheField.setAccessible(true);
+      // static field
+      final Map cache = (Map) cacheField.get(null);
+      cache.clear();
+    } catch (Throwable t) {
+      logger.warn("Error disposing CxfConfiguration, this may cause a memory leak", t);
     }
+  }
 
-    public MuleContext getMuleContext()
-    {
-        return muleContext;
-    }
+  public Bus getCxfBus() {
+    return bus;
+  }
 
-    public static CxfConfiguration getConfiguration(MuleContext muleContext) throws MuleException
-    {
-        CxfConfiguration configuration = muleContext.getRegistry().get(CxfConstants.DEFAULT_CXF_CONFIGURATION);
-        if (configuration == null)
-        {
-            configuration = new CxfConfiguration();
-            configuration.setMuleContext(muleContext);
-            configuration.initialise();
-            muleContext.getRegistry().registerObject(CxfConstants.DEFAULT_CXF_CONFIGURATION, configuration);
-        }
-        return configuration;
-    }
+  public void setCxfBus(Bus bus) {
+    this.bus = bus;
+  }
 
-    public boolean isEnableMuleSoapHeaders()
-    {
-        return enableMuleSoapHeaders;
-    }
+  public String getConfigurationLocation() {
+    return configurationLocation;
+  }
 
-    public void setEnableMuleSoapHeaders(boolean enableMuleSoapHeaders)
-    {
-        this.enableMuleSoapHeaders = enableMuleSoapHeaders;
+  public void setConfigurationLocation(String configurationLocation) {
+    this.configurationLocation = configurationLocation;
+  }
+
+  public boolean isInitializeStaticBusInstance() {
+    return initializeStaticBusInstance;
+  }
+
+  public void setInitializeStaticBusInstance(boolean initializeStaticBusInstance) {
+    this.initializeStaticBusInstance = initializeStaticBusInstance;
+  }
+
+  @Override
+  public void setMuleContext(MuleContext context) {
+    this.muleContext = context;
+  }
+
+  public MuleContext getMuleContext() {
+    return muleContext;
+  }
+
+  public static CxfConfiguration getConfiguration(MuleContext muleContext) throws MuleException {
+    CxfConfiguration configuration = muleContext.getRegistry().get(CxfConstants.DEFAULT_CXF_CONFIGURATION);
+    if (configuration == null) {
+      configuration = new CxfConfiguration();
+      configuration.setMuleContext(muleContext);
+      configuration.initialise();
+      muleContext.getRegistry().registerObject(CxfConstants.DEFAULT_CXF_CONFIGURATION, configuration);
     }
+    return configuration;
+  }
+
+  public boolean isEnableMuleSoapHeaders() {
+    return enableMuleSoapHeaders;
+  }
+
+  public void setEnableMuleSoapHeaders(boolean enableMuleSoapHeaders) {
+    this.enableMuleSoapHeaders = enableMuleSoapHeaders;
+  }
 
 }

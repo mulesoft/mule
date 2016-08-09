@@ -28,145 +28,130 @@ import java.util.Comparator;
 
 import org.junit.Test;
 
-public class ResequencerTestCase extends AbstractMuleContextTestCase
-{
+public class ResequencerTestCase extends AbstractMuleContextTestCase {
 
-    public ResequencerTestCase()
-    {
-        setStartContext(true);
+  public ResequencerTestCase() {
+    setStartContext(true);
+  }
+
+  @Test
+  public void testMessageResequencer() throws Exception {
+    MuleSession session = getTestSession(null, muleContext);
+    Flow flow = getTestFlow("test", Apple.class);
+    assertNotNull(flow);
+
+    TestEventResequencer router = new TestEventResequencer(3);
+    router.setMuleContext(muleContext);
+    router.setFlowConstruct(flow);
+    router.initialise();
+
+    MuleMessage message1 = MuleMessage.builder().payload("test event A").build();
+    MuleMessage message2 = MuleMessage.builder().payload("test event B").build();
+    MuleMessage message3 = MuleMessage.builder().payload("test event C").build();
+    final String correlationId = message1.getUniqueId();
+    message1 = MuleMessage.builder(message1).correlationId(correlationId).build();
+    message2 = MuleMessage.builder(message2).correlationId(correlationId).build();
+    message3 = MuleMessage.builder(message1).correlationId(correlationId).build();
+
+    MuleEvent event1 = new DefaultMuleEvent(message1, getTestFlow(), session);
+    MuleEvent event2 = new DefaultMuleEvent(message2, getTestFlow(), session);
+    MuleEvent event3 = new DefaultMuleEvent(message3, getTestFlow(), session);
+
+    assertNull(router.process(event2));
+    assertNull(router.process(event3));
+
+    MuleEvent resultEvent = router.process(event1);
+    assertNotNull(resultEvent);
+    MuleMessage resultMessage = resultEvent.getMessage();
+    assertNotNull(resultMessage);
+
+    assertTrue(getPayloadAsString(resultMessage).equals("test event A")
+        || getPayloadAsString(resultMessage).equals("test event B") || getPayloadAsString(resultMessage).equals("test event C"));
+
+  }
+
+  @Test
+  public void testMessageResequencerWithComparator() throws Exception {
+    MuleSession session = getTestSession(null, muleContext);
+    Flow flow = getTestFlow("test", Apple.class);
+    assertNotNull(flow);
+
+    TestEventResequencer router = new TestEventResequencer(3);
+    router.setMuleContext(muleContext);
+    router.setFlowConstruct(flow);
+    router.initialise();
+
+    MuleMessage message1 = MuleMessage.builder().payload("test event A").build();
+    MuleMessage message2 = MuleMessage.builder().payload("test event B").build();
+    MuleMessage message3 = MuleMessage.builder().payload("test event C").build();
+    final String correlationId = message1.getUniqueId();
+    message1 = MuleMessage.builder(message1).correlationId(correlationId).build();
+    message2 = MuleMessage.builder(message2).correlationId(correlationId).build();
+    message3 = MuleMessage.builder(message3).correlationId(correlationId).build();
+
+    MuleEvent event1 = new DefaultMuleEvent(message1, getTestFlow(), session);
+    MuleEvent event2 = new DefaultMuleEvent(message2, getTestFlow(), session);
+    MuleEvent event3 = new DefaultMuleEvent(message3, getTestFlow(), session);
+
+    // set a resequencing comparator. We need to reset the router since it will
+    // not process the same event group
+    // twice
+    router = new TestEventResequencer(3);
+    router.setMuleContext(muleContext);
+    router.setEventComparator(new EventPayloadComparator());
+    router.setFlowConstruct(flow);
+    router.initialise();
+
+    assertNull(router.process(event2));
+    assertNull(router.process(event3));
+
+    MuleEvent resultEvent = router.process(event1);
+    assertNotNull(resultEvent);
+    MuleMessage resultMessage = resultEvent.getMessage();
+    assertNotNull(resultMessage);
+
+    assertEquals("test event C", getPayloadAsString(resultMessage));
+  }
+
+
+  public static class TestEventResequencer extends Resequencer {
+
+    private int eventCount = 0;
+    private int eventthreshold = 1;
+
+    public TestEventResequencer(int eventthreshold) {
+      super();
+      this.eventthreshold = eventthreshold;
+      this.setEventComparator(new CorrelationSequenceComparator());
     }
 
-    @Test
-    public void testMessageResequencer() throws Exception
-    {
-        MuleSession session = getTestSession(null, muleContext);
-        Flow flow = getTestFlow("test", Apple.class);
-        assertNotNull(flow);
-
-        TestEventResequencer router = new TestEventResequencer(3);
-        router.setMuleContext(muleContext);
-        router.setFlowConstruct(flow);
-        router.initialise();
-
-        MuleMessage message1 = MuleMessage.builder().payload("test event A").build();
-        MuleMessage message2 = MuleMessage.builder().payload("test event B").build();
-        MuleMessage message3 = MuleMessage.builder().payload("test event C").build();
-        final String correlationId = message1.getUniqueId();
-        message1 = MuleMessage.builder(message1).correlationId(correlationId).build();
-        message2 = MuleMessage.builder(message2).correlationId(correlationId).build();
-        message3 = MuleMessage.builder(message1).correlationId(correlationId).build();
-
-        MuleEvent event1 = new DefaultMuleEvent(message1, getTestFlow(), session);
-        MuleEvent event2 = new DefaultMuleEvent(message2, getTestFlow(), session);
-        MuleEvent event3 = new DefaultMuleEvent(message3, getTestFlow(), session);
-
-        assertNull(router.process(event2));
-        assertNull(router.process(event3));
-
-        MuleEvent resultEvent = router.process(event1);
-        assertNotNull(resultEvent);
-        MuleMessage resultMessage = resultEvent.getMessage();
-        assertNotNull(resultMessage);
-
-        assertTrue(getPayloadAsString(resultMessage).equals("test event A")
-                   || getPayloadAsString(resultMessage).equals("test event B")
-                   || getPayloadAsString(resultMessage).equals("test event C"));
-
-    }
-
-    @Test
-    public void testMessageResequencerWithComparator() throws Exception
-    {
-        MuleSession session = getTestSession(null, muleContext);
-        Flow flow = getTestFlow("test", Apple.class);
-        assertNotNull(flow);
-
-        TestEventResequencer router = new TestEventResequencer(3);
-        router.setMuleContext(muleContext);
-        router.setFlowConstruct(flow);
-        router.initialise();
-
-        MuleMessage message1 = MuleMessage.builder().payload("test event A").build();
-        MuleMessage message2 = MuleMessage.builder().payload("test event B").build();
-        MuleMessage message3 = MuleMessage.builder().payload("test event C").build();
-        final String correlationId = message1.getUniqueId();
-        message1 = MuleMessage.builder(message1).correlationId(correlationId).build();
-        message2 = MuleMessage.builder(message2).correlationId(correlationId).build();
-        message3 = MuleMessage.builder(message3).correlationId(correlationId).build();
-
-        MuleEvent event1 = new DefaultMuleEvent(message1, getTestFlow(), session);
-        MuleEvent event2 = new DefaultMuleEvent(message2, getTestFlow(), session);
-        MuleEvent event3 = new DefaultMuleEvent(message3, getTestFlow(), session);
-
-        // set a resequencing comparator. We need to reset the router since it will
-        // not process the same event group
-        // twice
-        router = new TestEventResequencer(3);
-        router.setMuleContext(muleContext);
-        router.setEventComparator(new EventPayloadComparator());
-        router.setFlowConstruct(flow);
-        router.initialise();
-
-        assertNull(router.process(event2));
-        assertNull(router.process(event3));
-
-        MuleEvent resultEvent = router.process(event1);
-        assertNotNull(resultEvent);
-        MuleMessage resultMessage = resultEvent.getMessage();
-        assertNotNull(resultMessage);
-
-        assertEquals("test event C", getPayloadAsString(resultMessage));
-    }
-
-
-    public static class TestEventResequencer extends Resequencer
-    {
-
-        private int eventCount = 0;
-        private int eventthreshold = 1;
-
-        public TestEventResequencer(int eventthreshold)
-        {
-            super();
-            this.eventthreshold = eventthreshold;
-            this.setEventComparator(new CorrelationSequenceComparator());
-        }
+    @Override
+    protected EventCorrelatorCallback getCorrelatorCallback(MuleContext muleContext) {
+      return new ResequenceMessagesCorrelatorCallback(getEventComparator(), muleContext, storePrefix) {
 
         @Override
-        protected EventCorrelatorCallback getCorrelatorCallback(MuleContext muleContext)
-        {
-            return new ResequenceMessagesCorrelatorCallback(getEventComparator(), muleContext, storePrefix)
-            {
-                @Override
-                public boolean shouldAggregateEvents(EventGroup events)
-                {
-                    eventCount++;
-                    if (eventCount == eventthreshold)
-                    {
-                        eventCount = 0;
-                        return true;
-                    }
-                    return false;
-                }
-            };
+        public boolean shouldAggregateEvents(EventGroup events) {
+          eventCount++;
+          if (eventCount == eventthreshold) {
+            eventCount = 0;
+            return true;
+          }
+          return false;
         }
+      };
     }
+  }
 
-    public static class EventPayloadComparator implements Comparator
-    {
+  public static class EventPayloadComparator implements Comparator {
 
-        @Override
-        public int compare(Object o1, Object o2)
-        {
-            try
-            {
-                return ((MuleEvent) o1).getMessageAsString().compareTo(((MuleEvent) o2).getMessageAsString());
-            }
-            catch (MuleException e)
-            {
-                throw new IllegalArgumentException(e.getMessage());
-            }
+    @Override
+    public int compare(Object o1, Object o2) {
+      try {
+        return ((MuleEvent) o1).getMessageAsString().compareTo(((MuleEvent) o2).getMessageAsString());
+      } catch (MuleException e) {
+        throw new IllegalArgumentException(e.getMessage());
+      }
 
-        }
     }
+  }
 }

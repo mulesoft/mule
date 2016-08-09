@@ -20,59 +20,46 @@ import java.util.List;
  * @deprecated Transport infrastructure is deprecated.
  */
 @Deprecated
-public class ExpressionRecipientList extends AbstractRecipientList
-{
-    public static final String DEFAULT_SELECTOR_PROPERTY = "recipients";
-    public static final String DEFAULT_SELECTOR_EXPRESSION = DEFAULT_SELECTOR_PROPERTY;
+public class ExpressionRecipientList extends AbstractRecipientList {
 
-    protected ExpressionConfig expressionConfig = new ExpressionConfig();
+  public static final String DEFAULT_SELECTOR_PROPERTY = "recipients";
+  public static final String DEFAULT_SELECTOR_EXPRESSION = DEFAULT_SELECTOR_PROPERTY;
 
-    @Override
-    protected List<Object> getRecipients(MuleEvent event) throws CouldNotRouteOutboundMessageException
-    {
-        String expr = getFullExpression();
-        if (!muleContext.getExpressionManager().isValidExpression(expr))
-        {
-            throw new CouldNotRouteOutboundMessageException(
-                    CoreMessages.expressionInvalidForProperty("expression", expr), event, null);
-        }
+  protected ExpressionConfig expressionConfig = new ExpressionConfig();
 
-        Object msgRecipients = muleContext.getExpressionManager().evaluate(expr, event);
-        if (msgRecipients == null)
-        {
-            throw new CouldNotRouteOutboundMessageException(
-                    CoreMessages.propertyIsNotSetOnEvent(getFullExpression()), event, null);
-        }
-        else if (msgRecipients instanceof String)
-        {
-            Object[] recipients = StringUtils.splitAndTrim(msgRecipients.toString(), " ,;:");
-            return Arrays.asList(recipients);
-        }
-        else if (msgRecipients instanceof List)
-        {
-            return new ArrayList<Object>((List<?>) msgRecipients);
-        }
-        else
-        {
-            logger.error("Recipients on message are neither String nor List but: " + msgRecipients.getClass());
-            throw new CouldNotRouteOutboundMessageException(
-                    CoreMessages.propertyIsNotSupportedType(getFullExpression(), new Class[] {String.class, List.class}, msgRecipients.getClass()), event, null);
-        }
+  @Override
+  protected List<Object> getRecipients(MuleEvent event) throws CouldNotRouteOutboundMessageException {
+    String expr = getFullExpression();
+    if (!muleContext.getExpressionManager().isValidExpression(expr)) {
+      throw new CouldNotRouteOutboundMessageException(CoreMessages.expressionInvalidForProperty("expression", expr), event, null);
     }
 
-    public String getFullExpression()
-    {
-        return expressionConfig.getFullExpression(muleContext.getExpressionManager());
+    Object msgRecipients = muleContext.getExpressionManager().evaluate(expr, event);
+    if (msgRecipients == null) {
+      throw new CouldNotRouteOutboundMessageException(CoreMessages.propertyIsNotSetOnEvent(getFullExpression()), event, null);
+    } else if (msgRecipients instanceof String) {
+      Object[] recipients = StringUtils.splitAndTrim(msgRecipients.toString(), " ,;:");
+      return Arrays.asList(recipients);
+    } else if (msgRecipients instanceof List) {
+      return new ArrayList<Object>((List<?>) msgRecipients);
+    } else {
+      logger.error("Recipients on message are neither String nor List but: " + msgRecipients.getClass());
+      throw new CouldNotRouteOutboundMessageException(CoreMessages
+          .propertyIsNotSupportedType(getFullExpression(), new Class[] {String.class, List.class}, msgRecipients.getClass()),
+                                                      event, null);
     }
+  }
 
-    public String getExpression()
-    {
-        return expressionConfig.getExpression();
-    }
+  public String getFullExpression() {
+    return expressionConfig.getFullExpression(muleContext.getExpressionManager());
+  }
 
-    public void setExpression(String expression)
-    {
-        expressionConfig.setExpression(expression);
-    }
+  public String getExpression() {
+    return expressionConfig.getExpression();
+  }
+
+  public void setExpression(String expression) {
+    expressionConfig.setExpression(expression);
+  }
 
 }

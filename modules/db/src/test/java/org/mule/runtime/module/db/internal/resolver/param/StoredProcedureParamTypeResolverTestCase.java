@@ -33,35 +33,41 @@ import java.util.Map;
 import org.junit.Test;
 
 @SmallTest
-public class StoredProcedureParamTypeResolverTestCase extends AbstractMuleTestCase
-{
+public class StoredProcedureParamTypeResolverTestCase extends AbstractMuleTestCase {
 
-    public static final String TYPE_COLUMN = "type";
-    public static final String NAME_COLUMN = "name";
+  public static final String TYPE_COLUMN = "type";
+  public static final String NAME_COLUMN = "name";
 
-    @Test
-    public void resolvesStoredProcedureParamTypes() throws Exception
-    {
-        final String catalog = "test";
+  @Test
+  public void resolvesStoredProcedureParamTypes() throws Exception {
+    final String catalog = "test";
 
-        ResultSet procedureColumns = new StoredProcedureColumnTypesBuilder().with(TestDbTypeMetadata.INTEGER_DB_TYPE_METADATA).build();
-        DatabaseMetaData databaseMetaData = new DatabaseMetaDataBuilder().returningStoredProcedureColumns(catalog, "testStoredProcedure", procedureColumns).build();
+    ResultSet procedureColumns =
+        new StoredProcedureColumnTypesBuilder().with(TestDbTypeMetadata.INTEGER_DB_TYPE_METADATA).build();
+    DatabaseMetaData databaseMetaData =
+        new DatabaseMetaDataBuilder().returningStoredProcedureColumns(catalog, "testStoredProcedure", procedureColumns).build();
 
-        final String sqlText = "call testStoredProcedure(?)";
+    final String sqlText = "call testStoredProcedure(?)";
 
-        DbConnection connection = new DbConnectionBuilder().onCalatog(catalog).with(databaseMetaData).build();
+    DbConnection connection = new DbConnectionBuilder().onCalatog(catalog).with(databaseMetaData).build();
 
-        QueryTemplate queryTemplate = new QueryTemplate(sqlText, QueryType.STORE_PROCEDURE_CALL, Collections.<org.mule.runtime.module.db.internal.domain.param.QueryParam>singletonList(new DefaultInputQueryParam(1, UnknownDbType.getInstance(), "7", TYPE_COLUMN)));
+    QueryTemplate queryTemplate =
+        new QueryTemplate(sqlText, QueryType.STORE_PROCEDURE_CALL,
+                          Collections.<org.mule.runtime.module.db.internal.domain.param.QueryParam>singletonList(new DefaultInputQueryParam(1,
+                                                                                                                                            UnknownDbType
+                                                                                                                                                .getInstance(),
+                                                                                                                                            "7",
+                                                                                                                                            TYPE_COLUMN)));
 
-        DbTypeManager dbTypeManager = new DbTypeManagerBuilder().on(connection).managing(JdbcTypes.INTEGER_DB_TYPE).build();
+    DbTypeManager dbTypeManager = new DbTypeManagerBuilder().on(connection).managing(JdbcTypes.INTEGER_DB_TYPE).build();
 
-        StoredProcedureParamTypeResolver paramTypeResolver = new StoredProcedureParamTypeResolver(dbTypeManager);
+    StoredProcedureParamTypeResolver paramTypeResolver = new StoredProcedureParamTypeResolver(dbTypeManager);
 
-        Map<Integer, DbType> parameterTypes = paramTypeResolver.getParameterTypes(connection, queryTemplate);
+    Map<Integer, DbType> parameterTypes = paramTypeResolver.getParameterTypes(connection, queryTemplate);
 
-        assertThat(parameterTypes.size(), equalTo(1));
-        assertThat(parameterTypes.get(1), equalTo(JdbcTypes.INTEGER_DB_TYPE));
-    }
+    assertThat(parameterTypes.size(), equalTo(1));
+    assertThat(parameterTypes.get(1), equalTo(JdbcTypes.INTEGER_DB_TYPE));
+  }
 
 }
 

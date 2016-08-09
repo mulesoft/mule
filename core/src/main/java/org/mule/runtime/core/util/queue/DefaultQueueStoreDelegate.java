@@ -13,67 +13,57 @@ import java.util.LinkedList;
 /**
  * The default QueueStoreDelegate. This uses a LinkedList to store the members of the queue.
  */
-public class DefaultQueueStoreDelegate extends AbstractQueueStoreDelegate
-{
-    private final LinkedList<Serializable> list;
+public class DefaultQueueStoreDelegate extends AbstractQueueStoreDelegate {
 
-    public DefaultQueueStoreDelegate(int capacity)
-    {
-        super(capacity);
-        list = new LinkedList<Serializable>();
-    }
+  private final LinkedList<Serializable> list;
 
-    @Override
-    protected void add(Serializable o)
-    {
-        list.addLast(o);
-    }
+  public DefaultQueueStoreDelegate(int capacity) {
+    super(capacity);
+    list = new LinkedList<Serializable>();
+  }
 
-    @Override
-    protected Serializable removeFirst()
-    {
-        return list.removeFirst();
-    }
+  @Override
+  protected void add(Serializable o) {
+    list.addLast(o);
+  }
 
-    @Override
-    protected boolean isEmpty()
-    {
-        return list.isEmpty();
-    }
+  @Override
+  protected Serializable removeFirst() {
+    return list.removeFirst();
+  }
 
-    @Override
-    protected Serializable getFirst()
-    {
-        return list.getFirst();
-    }
+  @Override
+  protected boolean isEmpty() {
+    return list.isEmpty();
+  }
 
-    @Override
-    protected void addFirst(Serializable item)
-    {
-        list.addFirst(item);
-    }
+  @Override
+  protected Serializable getFirst() {
+    return list.getFirst();
+  }
 
-    @Override
-    protected void doClear()
-    {
-        list.clear();
-    }
+  @Override
+  protected void addFirst(Serializable item) {
+    list.addFirst(item);
+  }
 
-    @Override
-    public int size()
-    {
-        return list.size();
-    }
+  @Override
+  protected void doClear() {
+    list.clear();
+  }
 
-    @Override
-    protected boolean doAddAll(Collection<? extends Serializable> items)
-    {
-        return list.addAll(items);
-    }
+  @Override
+  public int size() {
+    return list.size();
+  }
 
-    @Override
-    public void dispose()
-    {
-        doClear();
-    }
+  @Override
+  protected boolean doAddAll(Collection<? extends Serializable> items) {
+    return list.addAll(items);
+  }
+
+  @Override
+  public void dispose() {
+    doClear();
+  }
 }

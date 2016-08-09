@@ -15,15 +15,14 @@ import java.util.List;
 /**
  * SPI for dynamic route resolvers
  */
-public interface DynamicRouteResolver
-{
+public interface DynamicRouteResolver {
 
-    /**
-     * Return a list of {@link MessageProcessor} to route the message.
-     *
-     * @param event the event holding the message to route
-     * @return a list of {@link MessageProcessor} to which the message will be routed to
-     * @throws MessagingException
-     */
-    List<MessageProcessor> resolveRoutes(MuleEvent event) throws MessagingException;
+  /**
+   * Return a list of {@link MessageProcessor} to route the message.
+   *
+   * @param event the event holding the message to route
+   * @return a list of {@link MessageProcessor} to which the message will be routed to
+   * @throws MessagingException
+   */
+  List<MessageProcessor> resolveRoutes(MuleEvent event) throws MessagingException;
 }

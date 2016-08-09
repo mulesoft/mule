@@ -18,79 +18,61 @@ import java.util.Collection;
 import java.util.Map;
 
 /**
- * An {@link AbstractValidator} which verifies that {@link #value} has a size between certain inclusive boundaries. This
- * validator is capable of handling instances of {@link String}, {@link Collection},
- * {@link Map} and arrays
+ * An {@link AbstractValidator} which verifies that {@link #value} has a size between certain inclusive boundaries. This validator
+ * is capable of handling instances of {@link String}, {@link Collection}, {@link Map} and arrays
  *
  * @since 3.7.0
  */
-public class SizeValidator extends AbstractValidator
-{
+public class SizeValidator extends AbstractValidator {
 
-    private final Object value;
-    private final int minSize;
-    private final Integer maxSize;
+  private final Object value;
+  private final int minSize;
+  private final Integer maxSize;
 
-    private Message errorMessage;
+  private Message errorMessage;
 
-    public SizeValidator(Object value, int minSize, Integer maxSize, ValidationContext validationContext)
-    {
-        super(validationContext);
-        this.value = value;
-        this.minSize = minSize;
-        this.maxSize = maxSize;
+  public SizeValidator(Object value, int minSize, Integer maxSize, ValidationContext validationContext) {
+    super(validationContext);
+    this.value = value;
+    this.minSize = minSize;
+    this.maxSize = maxSize;
+  }
+
+  @Override
+  public ValidationResult validate(MuleEvent event) {
+    int inputLength = getSize(value);
+    if (inputLength < minSize) {
+      errorMessage = getMessages().lowerThanMinSize(value, minSize, inputLength);
+      return fail();
     }
 
-    @Override
-    public ValidationResult validate(MuleEvent event)
-    {
-        int inputLength = getSize(value);
-        if (inputLength < minSize)
-        {
-            errorMessage = getMessages().lowerThanMinSize(value, minSize, inputLength);
-            return fail();
-        }
-
-        if (maxSize != null && inputLength > maxSize)
-        {
-            errorMessage = getMessages().greaterThanMaxSize(value, maxSize, inputLength);
-            return fail();
-        }
-
-        return ok();
+    if (maxSize != null && inputLength > maxSize) {
+      errorMessage = getMessages().greaterThanMaxSize(value, maxSize, inputLength);
+      return fail();
     }
 
-    private int getSize(Object value)
-    {
-        checkArgument(value != null, "Cannot check size of a null value");
-        if (value instanceof String)
-        {
-            return ((String) value).length();
-        }
-        else if (value instanceof Collection)
-        {
-            return ((Collection<?>) value).size();
-        }
-        else if (value instanceof Map)
-        {
-            return ((Map<?, ?>) value).size();
-        }
-        else if (value.getClass().isArray())
-        {
-            return ArrayUtils.getLength(value);
-        }
-        else
-        {
-            throw new IllegalArgumentException(
-                    String.format(
-                            "Only instances of Map, Collection, Array and String can be checked for size. Instance of %s was found instead",
-                            value.getClass().getName()));
-        }
-    }
+    return ok();
+  }
 
-    @Override
-    protected Message getDefaultErrorMessage()
-    {
-        return errorMessage;
+  private int getSize(Object value) {
+    checkArgument(value != null, "Cannot check size of a null value");
+    if (value instanceof String) {
+      return ((String) value).length();
+    } else if (value instanceof Collection) {
+      return ((Collection<?>) value).size();
+    } else if (value instanceof Map) {
+      return ((Map<?, ?>) value).size();
+    } else if (value.getClass().isArray()) {
+      return ArrayUtils.getLength(value);
+    } else {
+      throw new IllegalArgumentException(String.format(
+                                                       "Only instances of Map, Collection, Array and String can be checked for size. Instance of %s was found instead",
+                                                       value.getClass().getName()));
     }
+  }
+
+  @Override
+  protected Message getDefaultErrorMessage() {
+    return errorMessage;
+  }
 }

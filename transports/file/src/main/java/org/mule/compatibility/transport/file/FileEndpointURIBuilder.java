@@ -13,26 +13,22 @@ import java.net.URI;
 import java.util.Properties;
 
 /**
- * <code>FileEndpointBuilder</code> File uris need some special processing because
- * the uri path can be any length, and the default resolver relies on a particular
- * path format.
+ * <code>FileEndpointBuilder</code> File uris need some special processing because the uri path can be any length, and the default
+ * resolver relies on a particular path format.
  */
 
-public class FileEndpointURIBuilder extends AbstractEndpointURIBuilder
-{
-    @Override
-    protected void setEndpoint(URI uri, Properties props) throws MalformedEndpointException
-    {
-        address = uri.getSchemeSpecificPart();
-        if (address.startsWith("//"))
-        {
-            address = address.substring(2);
-        }
+public class FileEndpointURIBuilder extends AbstractEndpointURIBuilder {
 
-        int i = address.indexOf("?");
-        if (i > -1)
-        {
-            address = address.substring(0, i);
-        }
+  @Override
+  protected void setEndpoint(URI uri, Properties props) throws MalformedEndpointException {
+    address = uri.getSchemeSpecificPart();
+    if (address.startsWith("//")) {
+      address = address.substring(2);
     }
+
+    int i = address.indexOf("?");
+    if (i > -1) {
+      address = address.substring(0, i);
+    }
+  }
 }

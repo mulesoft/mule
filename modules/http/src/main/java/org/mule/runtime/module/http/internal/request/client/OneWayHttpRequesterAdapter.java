@@ -20,38 +20,30 @@ import org.apache.commons.io.IOUtils;
 /**
  * Adapts an HTTP operation to be one-way.
  */
-public class OneWayHttpRequesterAdapter implements MessageProcessor
-{
+public class OneWayHttpRequesterAdapter implements MessageProcessor {
 
-    private MessageProcessor httpRequester;
+  private MessageProcessor httpRequester;
 
 
-    public OneWayHttpRequesterAdapter(final MessageProcessor httpRequester)
-    {
-        this.httpRequester = httpRequester;
+  public OneWayHttpRequesterAdapter(final MessageProcessor httpRequester) {
+    this.httpRequester = httpRequester;
+  }
+
+  @Override
+  public MuleEvent process(MuleEvent event) throws MuleException {
+    final MuleEvent result = this.httpRequester.process(event);
+    consumePayload(event, result);
+    return VoidMuleEvent.getInstance();
+  }
+
+  private void consumePayload(MuleEvent event, MuleEvent result) throws MessagingException {
+    final Object payload = result.getMessage().getPayload();
+    if (payload instanceof InputStream) {
+      try {
+        IOUtils.toByteArray((InputStream) payload);
+      } catch (IOException e) {
+        throw new MessagingException(event, e, this);
+      }
     }
-
-    @Override
-    public MuleEvent process(MuleEvent event) throws MuleException
-    {
-        final MuleEvent result = this.httpRequester.process(event);
-        consumePayload(event, result);
-        return VoidMuleEvent.getInstance();
-    }
-
-    private void consumePayload(MuleEvent event, MuleEvent result) throws MessagingException
-    {
-        final Object payload = result.getMessage().getPayload();
-        if (payload instanceof InputStream)
-        {
-            try
-            {
-                IOUtils.toByteArray((InputStream) payload);
-            }
-            catch (IOException e)
-            {
-                throw new MessagingException(event, e, this);
-            }
-        }
-    }
+  }
 }

@@ -27,75 +27,59 @@ import java.lang.reflect.Field;
 import java.util.Collection;
 
 /**
- * A {@link ModelEnricher} which looks for configurations with fields
- * annotated with {@link ConfigName}.
+ * A {@link ModelEnricher} which looks for configurations with fields annotated with {@link ConfigName}.
  * <p>
- * It validates that the annotations is used properly and if so it adds
- * a {@link RequireNameField} on the {@link ConfigurationDeclaration}.
+ * It validates that the annotations is used properly and if so it adds a {@link RequireNameField} on the
+ * {@link ConfigurationDeclaration}.
  * <p>
- * If the {@link ConfigName} annotation is used in a way which breaks
- * the rules set on its javadoc, an {@link IllegalConfigurationModelDefinitionException}
- * is thrown
+ * If the {@link ConfigName} annotation is used in a way which breaks the rules set on its javadoc, an
+ * {@link IllegalConfigurationModelDefinitionException} is thrown
  *
  * @since 4.0
  */
-public final class ConfigNameModelEnricher implements ModelEnricher
-{
+public final class ConfigNameModelEnricher implements ModelEnricher {
 
-    @Override
-    public void enrich(DescribingContext describingContext)
-    {
-        new IdempotentDeclarationWalker()
-        {
-            @Override
-            public void onConfiguration(ConfigurationDeclaration declaration)
-            {
-                doEnrich(declaration);
-            }
+  @Override
+  public void enrich(DescribingContext describingContext) {
+    new IdempotentDeclarationWalker() {
 
-            @Override
-            protected void onConnectionProvider(ConnectionProviderDeclaration declaration)
-            {
-                doEnrich(declaration);
-            }
-        }.walk(describingContext.getExtensionDeclarer().getDeclaration());
-    }
+      @Override
+      public void onConfiguration(ConfigurationDeclaration declaration) {
+        doEnrich(declaration);
+      }
 
-    private void doEnrich(BaseDeclaration declaration)
-    {
+      @Override
+      protected void onConnectionProvider(ConnectionProviderDeclaration declaration) {
+        doEnrich(declaration);
+      }
+    }.walk(describingContext.getExtensionDeclarer().getDeclaration());
+  }
 
-        declaration.getModelProperty(ImplementingTypeModelProperty.class).ifPresent(p -> {
-            ImplementingTypeModelProperty typeProperty = (ImplementingTypeModelProperty) p;
-            Collection<Field> fields = getAllFields(typeProperty.getType(), withAnnotation(ConfigName.class));
-            if (CollectionUtils.isEmpty(fields))
-            {
-                return;
-            }
+  private void doEnrich(BaseDeclaration declaration) {
 
-            if (fields.size() > 1)
-            {
-                throw new IllegalConfigurationModelDefinitionException(String.format(
-                        "Only one configuration field is allowed to be annotated with @%s, but class '%s' has %d fields " +
-                        "with such annotation. Offending fields are: [%s]",
-                        ConfigName.class.getSimpleName(),
-                        typeProperty.getType().getName(),
-                        fields.size(),
-                        Joiner.on(", ").join(fields.stream().map(Field::getName).collect(toList()))));
-            }
+    declaration.getModelProperty(ImplementingTypeModelProperty.class).ifPresent(p -> {
+      ImplementingTypeModelProperty typeProperty = (ImplementingTypeModelProperty) p;
+      Collection<Field> fields = getAllFields(typeProperty.getType(), withAnnotation(ConfigName.class));
+      if (CollectionUtils.isEmpty(fields)) {
+        return;
+      }
 
-            final Field configNameField = fields.iterator().next();
-            if (!String.class.equals(configNameField.getType()))
-            {
-                throw new IllegalConfigurationModelDefinitionException(String.format(
-                        "Config class '%s' declares the field '%s' which is annotated with @%s and is of type '%s'. Only " +
-                        "fields of type String are allowed to carry such annotation",
-                        typeProperty.getType().getName(),
-                        configNameField.getName(),
-                        ConfigName.class.getSimpleName(),
-                        configNameField.getType().getName()));
-            }
+      if (fields.size() > 1) {
+        throw new IllegalConfigurationModelDefinitionException(String
+            .format("Only one configuration field is allowed to be annotated with @%s, but class '%s' has %d fields "
+                + "with such annotation. Offending fields are: [%s]", ConfigName.class.getSimpleName(), typeProperty.getType()
+                    .getName(), fields.size(), Joiner.on(", ").join(fields.stream().map(Field::getName).collect(toList()))));
+      }
 
-            declaration.addModelProperty(new RequireNameField(configNameField));
-        });
-    }
+      final Field configNameField = fields.iterator().next();
+      if (!String.class.equals(configNameField.getType())) {
+        throw new IllegalConfigurationModelDefinitionException(String
+            .format("Config class '%s' declares the field '%s' which is annotated with @%s and is of type '%s'. Only "
+                + "fields of type String are allowed to carry such annotation", typeProperty.getType().getName(),
+                    configNameField.getName(), ConfigName.class.getSimpleName(), configNameField.getType().getName()));
+      }
+
+      declaration.addModelProperty(new RequireNameField(configNameField));
+    });
+  }
 }

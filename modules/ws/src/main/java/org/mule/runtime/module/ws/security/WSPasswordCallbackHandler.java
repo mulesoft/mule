@@ -15,41 +15,36 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import org.apache.ws.security.WSPasswordCallback;
 
 /**
- * Abstract implementation of {@link javax.security.auth.callback.CallbackHandler} that only handles instances
- * of {@link org.apache.ws.security.WSPasswordCallback} with a specific usage.
+ * Abstract implementation of {@link javax.security.auth.callback.CallbackHandler} that only handles instances of
+ * {@link org.apache.ws.security.WSPasswordCallback} with a specific usage.
  */
-public abstract class WSPasswordCallbackHandler implements CallbackHandler
-{
-    private final int usage;
+public abstract class WSPasswordCallbackHandler implements CallbackHandler {
 
-    /**
-     * @param usage A constant from {@link org.apache.ws.security.WSPasswordCallback} indicating the usage of this callback.
-     */
-    public WSPasswordCallbackHandler(int usage)
-    {
-        this.usage = usage;
-    }
+  private final int usage;
 
-    @Override
-    public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException
-    {
-        for (Callback callback : callbacks)
-        {
-            if (callback instanceof WSPasswordCallback)
-            {
-                WSPasswordCallback passwordCallback = (WSPasswordCallback) callback;
-                if (passwordCallback.getUsage() == usage)
-                {
-                    handle(passwordCallback);
-                }
-            }
+  /**
+   * @param usage A constant from {@link org.apache.ws.security.WSPasswordCallback} indicating the usage of this callback.
+   */
+  public WSPasswordCallbackHandler(int usage) {
+    this.usage = usage;
+  }
+
+  @Override
+  public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
+    for (Callback callback : callbacks) {
+      if (callback instanceof WSPasswordCallback) {
+        WSPasswordCallback passwordCallback = (WSPasswordCallback) callback;
+        if (passwordCallback.getUsage() == usage) {
+          handle(passwordCallback);
         }
+      }
     }
+  }
 
-    /**
-     * Handles a password callback. This method will be called with the password callback that matches
-     * the usage provided in the constructor of this class.
-     */
-    public abstract void handle(WSPasswordCallback passwordCallback);
+  /**
+   * Handles a password callback. This method will be called with the password callback that matches the usage provided in the
+   * constructor of this class.
+   */
+  public abstract void handle(WSPasswordCallback passwordCallback);
 
 }

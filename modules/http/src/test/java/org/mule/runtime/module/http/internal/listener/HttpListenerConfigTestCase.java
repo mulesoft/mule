@@ -24,25 +24,25 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 @SmallTest
-public class HttpListenerConfigTestCase extends AbstractMuleTestCase
-{
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
+public class HttpListenerConfigTestCase extends AbstractMuleTestCase {
 
-    @Test
-    public void initializationFailsWhenNoTlsKeyStoreConfigured() throws Exception
-    {
-        final DefaultHttpListenerConfig httpListenerConfig = new DefaultHttpListenerConfig();
-        httpListenerConfig.setProtocol(HTTPS);
-        final MuleContext mockMuleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS.get());
-        httpListenerConfig.setMuleContext(mockMuleContext);
-        final TlsContextFactory mockTlsContextFactory = mock(TlsContextFactory.class);
-        httpListenerConfig.setTlsContext(mockTlsContextFactory);
-        when((Object) (mockMuleContext.getRegistry().lookupObject(HttpListenerConnectionManager.class))).thenReturn(mock(HttpListenerConnectionManager.class));
-        when(mockTlsContextFactory.isKeyStoreConfigured()).thenReturn(false);
-        expectedException.expect(InitialisationException.class);
-        expectedException.expectMessage(containsString("KeyStore must be configured for server side SSL"));
-        httpListenerConfig.initialise();
-    }
+  @Rule
+  public ExpectedException expectedException = ExpectedException.none();
+
+  @Test
+  public void initializationFailsWhenNoTlsKeyStoreConfigured() throws Exception {
+    final DefaultHttpListenerConfig httpListenerConfig = new DefaultHttpListenerConfig();
+    httpListenerConfig.setProtocol(HTTPS);
+    final MuleContext mockMuleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS.get());
+    httpListenerConfig.setMuleContext(mockMuleContext);
+    final TlsContextFactory mockTlsContextFactory = mock(TlsContextFactory.class);
+    httpListenerConfig.setTlsContext(mockTlsContextFactory);
+    when((Object) (mockMuleContext.getRegistry().lookupObject(HttpListenerConnectionManager.class)))
+        .thenReturn(mock(HttpListenerConnectionManager.class));
+    when(mockTlsContextFactory.isKeyStoreConfigured()).thenReturn(false);
+    expectedException.expect(InitialisationException.class);
+    expectedException.expectMessage(containsString("KeyStore must be configured for server side SSL"));
+    httpListenerConfig.initialise();
+  }
 
 }

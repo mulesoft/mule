@@ -14,25 +14,22 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class AsyncExceptionHandlingTestCase extends AbstractIntegrationTestCase
-{
+public class AsyncExceptionHandlingTestCase extends AbstractIntegrationTestCase {
 
-    @Rule
-    public DynamicPort dynamicPort1 = new DynamicPort("port1");
-    @Rule
-    public DynamicPort dynamicPort2 = new DynamicPort("port2");
+  @Rule
+  public DynamicPort dynamicPort1 = new DynamicPort("port1");
+  @Rule
+  public DynamicPort dynamicPort2 = new DynamicPort("port2");
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/integration/exceptions/async-exception-handling-flow.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/integration/exceptions/async-exception-handling-flow.xml";
+  }
 
-    @Test
-    public void testAsyncExceptionHandlingTestCase() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        flowRunner("SearchWebServiceBridge").runExpectingException();
-        assertNotNull(client.request("test://back-channel", RECEIVE_TIMEOUT));
-    }
+  @Test
+  public void testAsyncExceptionHandlingTestCase() throws Exception {
+    MuleClient client = muleContext.getClient();
+    flowRunner("SearchWebServiceBridge").runExpectingException();
+    assertNotNull(client.request("test://back-channel", RECEIVE_TIMEOUT));
+  }
 }

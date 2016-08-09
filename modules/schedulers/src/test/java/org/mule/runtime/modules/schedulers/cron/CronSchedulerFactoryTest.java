@@ -17,19 +17,17 @@ import org.mule.runtime.core.source.polling.PollingWorker;
 
 import org.junit.Test;
 
-public class CronSchedulerFactoryTest
-{
+public class CronSchedulerFactoryTest {
 
-    @Test
-    public void testSchedulerCreation()
-    {
-        CronSchedulerFactory factory = new CronSchedulerFactory();
-        factory.setExpression("my expression");
+  @Test
+  public void testSchedulerCreation() {
+    CronSchedulerFactory factory = new CronSchedulerFactory();
+    factory.setExpression("my expression");
 
-        Scheduler scheduler = factory.create("name", new PollingWorker(mock(PollingTask.class), mock(SystemExceptionHandler.class)));
+    Scheduler scheduler = factory.create("name", new PollingWorker(mock(PollingTask.class), mock(SystemExceptionHandler.class)));
 
-        assertTrue(scheduler instanceof CronScheduler);
-        assertEquals("my expression", ((CronScheduler) scheduler).getCronExpression());
-    }
+    assertTrue(scheduler instanceof CronScheduler);
+    assertEquals("my expression", ((CronScheduler) scheduler).getCronExpression());
+  }
 
 }

@@ -13,89 +13,79 @@ import org.mule.runtime.core.transformer.TransformerUtils;
 import java.util.List;
 
 /**
- * <code>TransformerException</code> is a simple exception that is thrown by
- * transformers.
+ * <code>TransformerException</code> is a simple exception that is thrown by transformers.
  */
 
-public class TransformerException extends MuleException
-{
-    private static final String TRANSFORMER = "Transformer";
-    
-    /**
-     * Serial version
-     */
-    private static final long serialVersionUID = 2943589828020763649L;
+public class TransformerException extends MuleException {
 
-    private transient Transformer transformer;
+  private static final String TRANSFORMER = "Transformer";
 
-    /**
-     * @param message the exception message
-     */
-    public TransformerException(Message message, Transformer transformer)
-    {
-        super(message);
-        this.transformer = transformer;
-        addInfo(TRANSFORMER, transformer.toString());
-    }
+  /**
+   * Serial version
+   */
+  private static final long serialVersionUID = 2943589828020763649L;
 
-    public TransformerException(Message message, List<Transformer> transformers)
-    {
-        super(message);
-        this.transformer = TransformerUtils.firstOrNull(transformers);
-        addInfo(TRANSFORMER, TransformerUtils.toString(transformers));
-    }
+  private transient Transformer transformer;
 
-    /**
-     * @param message the exception message
-     * @param cause the exception that cause this exception to be thrown
-     */
-    public TransformerException(Message message, Transformer transformer, Throwable cause)
-    {
-        super(message, cause);
-        this.transformer = transformer;
-        addInfo(TRANSFORMER, transformer.toString());
-    }
+  /**
+   * @param message the exception message
+   */
+  public TransformerException(Message message, Transformer transformer) {
+    super(message);
+    this.transformer = transformer;
+    addInfo(TRANSFORMER, transformer.toString());
+  }
 
-    public TransformerException(Message message, List<Transformer> transformers, Throwable cause)
-    {
-        super(message, cause);
-        this.transformer = TransformerUtils.firstOrNull(transformers);
-        addInfo(TRANSFORMER, TransformerUtils.toString(transformers));
-    }
+  public TransformerException(Message message, List<Transformer> transformers) {
+    super(message);
+    this.transformer = TransformerUtils.firstOrNull(transformers);
+    addInfo(TRANSFORMER, TransformerUtils.toString(transformers));
+  }
 
-    public TransformerException(Transformer transformer, Throwable cause)
-    {
-        super(cause);
-        this.transformer = transformer;
-        addInfo(TRANSFORMER, (transformer == null ? "null" : transformer.toString()));
-    }
+  /**
+   * @param message the exception message
+   * @param cause the exception that cause this exception to be thrown
+   */
+  public TransformerException(Message message, Transformer transformer, Throwable cause) {
+    super(message, cause);
+    this.transformer = transformer;
+    addInfo(TRANSFORMER, transformer.toString());
+  }
 
-     public TransformerException(List<Transformer> transformers, Throwable cause)
-    {
-        super(cause);
-        this.transformer = TransformerUtils.firstOrNull(transformers);
-        addInfo(TRANSFORMER, TransformerUtils.toString(transformers));
-    }
+  public TransformerException(Message message, List<Transformer> transformers, Throwable cause) {
+    super(message, cause);
+    this.transformer = TransformerUtils.firstOrNull(transformers);
+    addInfo(TRANSFORMER, TransformerUtils.toString(transformers));
+  }
 
-   /**
-     * @param message the exception message
-     * @param cause the exception that cause this exception to be thrown
-     */
-    public TransformerException(Message message, Throwable cause)
-    {
-        super(message, cause);
-    }
+  public TransformerException(Transformer transformer, Throwable cause) {
+    super(cause);
+    this.transformer = transformer;
+    addInfo(TRANSFORMER, (transformer == null ? "null" : transformer.toString()));
+  }
 
-    /**
-     * @param message the exception message
-     */
-    public TransformerException(Message message)
-    {
-        super(message);
-    }
+  public TransformerException(List<Transformer> transformers, Throwable cause) {
+    super(cause);
+    this.transformer = TransformerUtils.firstOrNull(transformers);
+    addInfo(TRANSFORMER, TransformerUtils.toString(transformers));
+  }
 
-    public Transformer getTransformer()
-    {
-        return transformer;
-    }
+  /**
+   * @param message the exception message
+   * @param cause the exception that cause this exception to be thrown
+   */
+  public TransformerException(Message message, Throwable cause) {
+    super(message, cause);
+  }
+
+  /**
+   * @param message the exception message
+   */
+  public TransformerException(Message message) {
+    super(message);
+  }
+
+  public Transformer getTransformer() {
+    return transformer;
+  }
 }

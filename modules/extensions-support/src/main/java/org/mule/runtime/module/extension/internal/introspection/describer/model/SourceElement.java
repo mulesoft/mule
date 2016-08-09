@@ -16,11 +16,10 @@ import java.util.List;
  *
  * @since 4.0
  */
-public interface SourceElement extends ParameterizableTypeElement
-{
+public interface SourceElement extends ParameterizableTypeElement {
 
-    /**
-     * @return The list of generics of the super class {@link Source}
-     */
-    List<Type> getSuperClassGenerics();
+  /**
+   * @return The list of generics of the super class {@link Source}
+   */
+  List<Type> getSuperClassGenerics();
 }

@@ -28,94 +28,83 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Implementation of {@link OperationExecutor} which relies on a
- * {@link #executorDelegate} and a reference to one of its {@link Method}s.
- * When {@link #execute(OperationContext)} is invoked, the {@link #operationMethod}
- * is invoked over the {@link #executorDelegate}.
+ * Implementation of {@link OperationExecutor} which relies on a {@link #executorDelegate} and a reference to one of its
+ * {@link Method}s. When {@link #execute(OperationContext)} is invoked, the {@link #operationMethod} is invoked over the
+ * {@link #executorDelegate}.
  * <p/>
- * All the {@link Lifecycle} events that {@code this} instance receives are propagated
- * to the {@link #executorDelegate}
+ * All the {@link Lifecycle} events that {@code this} instance receives are propagated to the {@link #executorDelegate}
  *
  * @since 3.7.0
  */
-public final class ReflectiveMethodOperationExecutor implements OperationExecutor, MuleContextAware, Lifecycle
-{
+public final class ReflectiveMethodOperationExecutor implements OperationExecutor, MuleContextAware, Lifecycle {
 
-    private static class NoArgumentsResolverDelegate implements ArgumentResolverDelegate
-    {
+  private static class NoArgumentsResolverDelegate implements ArgumentResolverDelegate {
 
-        private static final Object[] EMPTY = new Object[] {};
-
-        @Override
-        public Object[] resolve(OperationContext operationContext, Class<?>[] parameterTypes)
-        {
-            return EMPTY;
-        }
-    }
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(ReflectiveMethodOperationExecutor.class);
-    private static final ArgumentResolverDelegate NO_ARGS_DELEGATE = new NoArgumentsResolverDelegate();
-
-    private final Method operationMethod;
-    private final Object executorDelegate;
-    private final ArgumentResolverDelegate argumentResolverDelegate;
-    private final ClassLoader extensionClassLoader;
-
-    private MuleContext muleContext;
-
-    ReflectiveMethodOperationExecutor(OperationModel operationModel, Method operationMethod, Object executorDelegate)
-    {
-        this.operationMethod = operationMethod;
-        this.executorDelegate = executorDelegate;
-        argumentResolverDelegate = isEmpty(operationMethod.getParameterTypes()) ? NO_ARGS_DELEGATE : new MethodArgumentResolverDelegate(operationModel, operationMethod);
-        extensionClassLoader = operationMethod.getDeclaringClass().getClassLoader();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Object execute(OperationContext operationContext) throws Exception
-    {
-        return withContextClassLoader(extensionClassLoader, () -> invokeMethod(operationMethod, executorDelegate, getParameterValues(operationContext, operationMethod.getParameterTypes())));
-    }
-
-    private Object[] getParameterValues(OperationContext operationContext, Class<?>[] parameterTypes)
-    {
-        return argumentResolverDelegate.resolve(operationContext, parameterTypes);
-    }
+    private static final Object[] EMPTY = new Object[] {};
 
     @Override
-    public void initialise() throws InitialisationException
-    {
-        initialiseIfNeeded(executorDelegate, true, muleContext);
+    public Object[] resolve(OperationContext operationContext, Class<?>[] parameterTypes) {
+      return EMPTY;
     }
+  }
 
-    @Override
-    public void start() throws MuleException
-    {
-        startIfNeeded(executorDelegate);
-    }
+  private static final Logger LOGGER = LoggerFactory.getLogger(ReflectiveMethodOperationExecutor.class);
+  private static final ArgumentResolverDelegate NO_ARGS_DELEGATE = new NoArgumentsResolverDelegate();
 
-    @Override
-    public void stop() throws MuleException
-    {
-        stopIfNeeded(executorDelegate);
-    }
+  private final Method operationMethod;
+  private final Object executorDelegate;
+  private final ArgumentResolverDelegate argumentResolverDelegate;
+  private final ClassLoader extensionClassLoader;
 
-    @Override
-    public void dispose()
-    {
-        disposeIfNeeded(executorDelegate, LOGGER);
-    }
+  private MuleContext muleContext;
 
-    @Override
-    public void setMuleContext(MuleContext context)
-    {
-        muleContext = context;
-        if (executorDelegate instanceof MuleContextAware)
-        {
-            ((MuleContextAware) executorDelegate).setMuleContext(context);
-        }
+  ReflectiveMethodOperationExecutor(OperationModel operationModel, Method operationMethod, Object executorDelegate) {
+    this.operationMethod = operationMethod;
+    this.executorDelegate = executorDelegate;
+    argumentResolverDelegate = isEmpty(operationMethod.getParameterTypes()) ? NO_ARGS_DELEGATE
+        : new MethodArgumentResolverDelegate(operationModel, operationMethod);
+    extensionClassLoader = operationMethod.getDeclaringClass().getClassLoader();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Object execute(OperationContext operationContext) throws Exception {
+    return withContextClassLoader(extensionClassLoader,
+                                  () -> invokeMethod(operationMethod, executorDelegate,
+                                                     getParameterValues(operationContext, operationMethod.getParameterTypes())));
+  }
+
+  private Object[] getParameterValues(OperationContext operationContext, Class<?>[] parameterTypes) {
+    return argumentResolverDelegate.resolve(operationContext, parameterTypes);
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    initialiseIfNeeded(executorDelegate, true, muleContext);
+  }
+
+  @Override
+  public void start() throws MuleException {
+    startIfNeeded(executorDelegate);
+  }
+
+  @Override
+  public void stop() throws MuleException {
+    stopIfNeeded(executorDelegate);
+  }
+
+  @Override
+  public void dispose() {
+    disposeIfNeeded(executorDelegate, LOGGER);
+  }
+
+  @Override
+  public void setMuleContext(MuleContext context) {
+    muleContext = context;
+    if (executorDelegate instanceof MuleContextAware) {
+      ((MuleContextAware) executorDelegate).setMuleContext(context);
     }
+  }
 }

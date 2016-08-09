@@ -19,48 +19,40 @@ import org.mockito.Mockito;
 /**
  * @author David Dossot (david@dossot.net)
  */
-public class LifecycleTrackerProcessor extends AbstractLifecycleTracker
-    implements FlowConstructAware, MessageProcessor
-{
-    public static String LIFECYCLE_TRACKER_PROCESSOR_PROPERTY = "lifecycle";
-    public static String FLOW_CONSRUCT_PROPERTY = "flowConstruct";
+public class LifecycleTrackerProcessor extends AbstractLifecycleTracker implements FlowConstructAware, MessageProcessor {
 
-    private FlowConstruct flowConstruct;
+  public static String LIFECYCLE_TRACKER_PROCESSOR_PROPERTY = "lifecycle";
+  public static String FLOW_CONSRUCT_PROPERTY = "flowConstruct";
 
-    public void springInitialize()
-    {
-        getTracker().add("springInitialize");
-    }
+  private FlowConstruct flowConstruct;
 
-    public void springDestroy()
-    {
-        getTracker().add("springDestroy");
-    }
+  public void springInitialize() {
+    getTracker().add("springInitialize");
+  }
 
-    @Override
-    public void setFlowConstruct(final FlowConstruct flowConstruct)
-    {
-        getTracker().add("setService");
-        this.flowConstruct = flowConstruct;
-    }
+  public void springDestroy() {
+    getTracker().add("springDestroy");
+  }
 
-    public FlowConstruct getFlowConstruct()
-    {
-        return flowConstruct;
-    }
+  @Override
+  public void setFlowConstruct(final FlowConstruct flowConstruct) {
+    getTracker().add("setService");
+    this.flowConstruct = flowConstruct;
+  }
 
-    public ComponentStatistics getStatistics()
-    {
-        return Mockito.mock(ComponentStatistics.class);
-    }
+  public FlowConstruct getFlowConstruct() {
+    return flowConstruct;
+  }
 
-    @Override
-    public MuleEvent process(MuleEvent event) throws MuleException
-    {
-        event.setMessage(MuleMessage.builder(event.getMessage())
-                                    .addOutboundProperty(LIFECYCLE_TRACKER_PROCESSOR_PROPERTY, getTracker().toString())
-                                    .build());
-        event.setFlowVariable(FLOW_CONSRUCT_PROPERTY, flowConstruct);
-        return event;
-    }
+  public ComponentStatistics getStatistics() {
+    return Mockito.mock(ComponentStatistics.class);
+  }
+
+  @Override
+  public MuleEvent process(MuleEvent event) throws MuleException {
+    event.setMessage(MuleMessage.builder(event.getMessage())
+        .addOutboundProperty(LIFECYCLE_TRACKER_PROCESSOR_PROPERTY, getTracker().toString()).build());
+    event.setFlowVariable(FLOW_CONSRUCT_PROPERTY, flowConstruct);
+    return event;
+  }
 }

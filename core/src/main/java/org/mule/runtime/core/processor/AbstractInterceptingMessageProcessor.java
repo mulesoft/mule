@@ -9,11 +9,9 @@ package org.mule.runtime.core.processor;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 
 /**
- * Abstract implementation of {@link InterceptingMessageProcessor} that simply
- * provides an implementation of setNext and holds the next message processor as an
- * attribute.
+ * Abstract implementation of {@link InterceptingMessageProcessor} that simply provides an implementation of setNext and holds the
+ * next message processor as an attribute.
  */
 public abstract class AbstractInterceptingMessageProcessor extends AbstractInterceptingMessageProcessorBase
-    implements InterceptingMessageProcessor
-{
+    implements InterceptingMessageProcessor {
 }

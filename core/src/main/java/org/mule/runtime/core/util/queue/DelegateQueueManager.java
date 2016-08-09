@@ -20,95 +20,76 @@ import org.slf4j.LoggerFactory;
 /**
  * Delegates every call to the real QueueManager.
  *
- * If there's a system property with mule.queue.objectstoremode=true then the old version of
- * the QueueManager will be used. This is to maintain backward compatibility in case a
- * customer is relaying on ObjectStore for queue store customization.
+ * If there's a system property with mule.queue.objectstoremode=true then the old version of the QueueManager will be used. This
+ * is to maintain backward compatibility in case a customer is relaying on ObjectStore for queue store customization.
  */
-public class DelegateQueueManager implements QueueManager, Lifecycle, MuleContextAware
-{
+public class DelegateQueueManager implements QueueManager, Lifecycle, MuleContextAware {
 
-    public static final String MULE_QUEUE_OLD_MODE_KEY = "mule.queue.objectstoremode";
+  public static final String MULE_QUEUE_OLD_MODE_KEY = "mule.queue.objectstoremode";
 
-    protected final Logger logger = LoggerFactory.getLogger(this.getClass());
-    private QueueManager delegate;
+  protected final Logger logger = LoggerFactory.getLogger(this.getClass());
+  private QueueManager delegate;
 
-    public DelegateQueueManager()
-    {
-        if (isOldModeEnabled())
-        {
-            logger.info("Using old QueueManager implementation");
-            delegate = new org.mule.runtime.core.util.queue.objectstore.TransactionalQueueManager();
-        }
-        else
-        {
-            delegate = new TransactionalQueueManager();
-        }
+  public DelegateQueueManager() {
+    if (isOldModeEnabled()) {
+      logger.info("Using old QueueManager implementation");
+      delegate = new org.mule.runtime.core.util.queue.objectstore.TransactionalQueueManager();
+    } else {
+      delegate = new TransactionalQueueManager();
     }
+  }
 
-    @Override
-    public QueueSession getQueueSession()
-    {
-        return delegate.getQueueSession();
-    }
+  @Override
+  public QueueSession getQueueSession() {
+    return delegate.getQueueSession();
+  }
 
-    @Override
-    public void setDefaultQueueConfiguration(QueueConfiguration config)
-    {
-        delegate.setDefaultQueueConfiguration(config);
-    }
+  @Override
+  public void setDefaultQueueConfiguration(QueueConfiguration config) {
+    delegate.setDefaultQueueConfiguration(config);
+  }
 
-    @Override
-    public void setQueueConfiguration(String queueName, QueueConfiguration config)
-    {
-        delegate.setQueueConfiguration(queueName, config);
-    }
+  @Override
+  public void setQueueConfiguration(String queueName, QueueConfiguration config) {
+    delegate.setQueueConfiguration(queueName, config);
+  }
 
-    @Override
-    public void start() throws MuleException
-    {
-        this.delegate.start();
-    }
+  @Override
+  public void start() throws MuleException {
+    this.delegate.start();
+  }
 
-    @Override
-    public void stop() throws MuleException
-    {
-        this.delegate.stop();
-    }
+  @Override
+  public void stop() throws MuleException {
+    this.delegate.stop();
+  }
 
-    @Override
-    public void dispose()
-    {
-        if (this.delegate instanceof Disposable)
-        {
-            ((Disposable) this.delegate).dispose();
-        }
+  @Override
+  public void dispose() {
+    if (this.delegate instanceof Disposable) {
+      ((Disposable) this.delegate).dispose();
     }
+  }
 
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        if (this.delegate instanceof Initialisable)
-        {
-            ((Initialisable) this.delegate).initialise();
-        }
+  @Override
+  public void initialise() throws InitialisationException {
+    if (this.delegate instanceof Initialisable) {
+      ((Initialisable) this.delegate).initialise();
     }
+  }
 
-    @Override
-    public void setMuleContext(MuleContext context)
-    {
-        if (this.delegate instanceof MuleContextAware)
-        {
-            ((MuleContextAware) this.delegate).setMuleContext(context);
-        }
+  @Override
+  public void setMuleContext(MuleContext context) {
+    if (this.delegate instanceof MuleContextAware) {
+      ((MuleContextAware) this.delegate).setMuleContext(context);
     }
+  }
 
-    public static boolean isOldModeEnabled()
-    {
-        return Boolean.getBoolean(MULE_QUEUE_OLD_MODE_KEY);
-    }
+  public static boolean isOldModeEnabled() {
+    return Boolean.getBoolean(MULE_QUEUE_OLD_MODE_KEY);
+  }
 
-    QueueManager getDelegate()
-    {
-        return delegate;
-    }
+  QueueManager getDelegate() {
+    return delegate;
+  }
 }

@@ -10,11 +10,10 @@ import org.mule.runtime.core.MessageExchangePattern;
 
 import java.beans.PropertyEditorSupport;
 
-public class MessageExchangePatternPropertyEditor extends PropertyEditorSupport
-{
-    @Override
-    public void setAsText(String text) throws IllegalArgumentException
-    {
-        setValue(MessageExchangePattern.fromString(text));
-    }
+public class MessageExchangePatternPropertyEditor extends PropertyEditorSupport {
+
+  @Override
+  public void setAsText(String text) throws IllegalArgumentException {
+    setValue(MessageExchangePattern.fromString(text));
+  }
 }

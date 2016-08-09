@@ -11,30 +11,26 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
-public class HttpRequestSocketConfigTestCase extends AbstractHttpRequestTestCase
-{
+public class HttpRequestSocketConfigTestCase extends AbstractHttpRequestTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "http-request-socket-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "http-request-socket-config.xml";
+  }
 
-    @Test
-    public void globalClientSocketProperties() throws Exception
-    {
-        // For now, just test that the context is parsed correctly.
-        flowRunner("globalConfigFlow").withPayload(TEST_MESSAGE).run();
-        assertThat(body, equalTo(TEST_MESSAGE));
-    }
+  @Test
+  public void globalClientSocketProperties() throws Exception {
+    // For now, just test that the context is parsed correctly.
+    flowRunner("globalConfigFlow").withPayload(TEST_MESSAGE).run();
+    assertThat(body, equalTo(TEST_MESSAGE));
+  }
 
-    @Test
-    public void nestedClientSocketProperties() throws Exception
-    {
-        // For now, just test that the context is parsed correctly.
-        flowRunner("nestedConfigFlow").withPayload(TEST_MESSAGE).run();
-        assertThat(body, equalTo(TEST_MESSAGE));
-    }
+  @Test
+  public void nestedClientSocketProperties() throws Exception {
+    // For now, just test that the context is parsed correctly.
+    flowRunner("nestedConfigFlow").withPayload(TEST_MESSAGE).run();
+    assertThat(body, equalTo(TEST_MESSAGE));
+  }
 
 
 }

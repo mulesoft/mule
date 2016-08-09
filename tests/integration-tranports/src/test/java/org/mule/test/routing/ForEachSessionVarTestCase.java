@@ -27,77 +27,69 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang.RandomStringUtils;
 import org.junit.Test;
 
-public class ForEachSessionVarTestCase extends FunctionalTestCase
-{
+public class ForEachSessionVarTestCase extends FunctionalTestCase {
 
-    protected static MuleEvent event;
-    private static final String MY_SESSION_LIST = "mySessionList";
+  protected static MuleEvent event;
+  private static final String MY_SESSION_LIST = "mySessionList";
+
+  @Override
+  protected String getConfigFile() {
+    return "foreach-session-var-config.xml";
+  }
+
+  @Test
+  public void testSessionVars() throws Exception {
+    Collection<String> expectedArray = new ArrayList<>();
+    expectedArray.add("Hello World A");
+    expectedArray.add("Hello World B");
+
+    flowRunner("test-foreachFlow1").withPayload(getTestMuleMessage()).run();
+
+    // propierty should exist in the session and the message
+    assertThat(event.getSession().<Collection<String>>getProperty(MY_SESSION_LIST), is(expectedArray));
+    // removing the property from the session should affect the message as well
+    event.getSession().removeProperty(MY_SESSION_LIST);
+    assertThat(event.getSession().<Collection<String>>getProperty(MY_SESSION_LIST), is(nullValue()));
+  }
+
+  @Test
+  public void counterConfiguration() throws Exception {
+    final Collection<String> payload = new ArrayList<>();
+    payload.add("wolfgang");
+    payload.add("amadeus");
+    payload.add("mozart");
+
+    MuleMessage result = flowRunner("counter-config").withPayload(payload).run().getMessage();
+    assertThat(result.getPayload(), instanceOf(Collection.class));
+    Collection<?> resultPayload = (Collection<?>) result.getPayload();
+    assertThat(resultPayload, hasSize(3));
+    assertSame(payload, resultPayload);
+
+    assertThat(result.getOutboundProperty("msg-last-index"), is(3));
+  }
+
+  @Test
+  public void foreachWithAsync() throws Exception {
+    final int size = 20;
+    List<String> list = new ArrayList<>(size);
+
+    for (int i = 0; i < size; i++) {
+      list.add(RandomStringUtils.randomAlphabetic(10));
+    }
+
+    CountDownLatch latch = new CountDownLatch(size);
+    flowRunner("foreachWithAsync").withPayload(list).withFlowVariable("latch", latch).run();
+
+    latch.await(10, TimeUnit.SECONDS);
+  }
+
+  public static class EventSaverProcessor implements MessageProcessor {
 
     @Override
-    protected String getConfigFile()
-    {
-        return "foreach-session-var-config.xml";
+    public MuleEvent process(MuleEvent receivedEvent) throws MuleException {
+      event = receivedEvent;
+      return receivedEvent;
     }
-
-    @Test
-    public void testSessionVars() throws Exception
-    {
-        Collection<String> expectedArray = new ArrayList<>();
-        expectedArray.add("Hello World A");
-        expectedArray.add("Hello World B");
-        
-        flowRunner("test-foreachFlow1").withPayload(getTestMuleMessage()).run();
-        
-        //propierty should exist in the session and the message
-        assertThat(event.getSession().<Collection<String>>getProperty(MY_SESSION_LIST), is(expectedArray));
-        //removing the property from the session should affect the message as well
-        event.getSession().removeProperty(MY_SESSION_LIST);
-        assertThat(event.getSession().<Collection<String>>getProperty(MY_SESSION_LIST), is(nullValue()));
-    }
-
-    @Test
-    public void counterConfiguration() throws Exception
-    {
-        final Collection<String> payload = new ArrayList<>();
-        payload.add("wolfgang");
-        payload.add("amadeus");
-        payload.add("mozart");
-
-        MuleMessage result = flowRunner("counter-config").withPayload(payload).run().getMessage();
-        assertThat(result.getPayload(), instanceOf(Collection.class));
-        Collection<?> resultPayload = (Collection<?>) result.getPayload();
-        assertThat(resultPayload, hasSize(3));
-        assertSame(payload, resultPayload);
-
-        assertThat(result.getOutboundProperty("msg-last-index"), is(3));
-    }
-
-    @Test
-    public void foreachWithAsync() throws Exception
-    {
-        final int size = 20;
-        List<String> list = new ArrayList<>(size);
-
-        for (int i = 0; i < size; i++)
-        {
-            list.add(RandomStringUtils.randomAlphabetic(10));
-        }
-
-        CountDownLatch latch = new CountDownLatch(size);
-        flowRunner("foreachWithAsync").withPayload(list).withFlowVariable("latch", latch).run();
-
-        latch.await(10, TimeUnit.SECONDS);
-    }
-
-    public static class EventSaverProcessor implements MessageProcessor
-    {
-
-        @Override
-        public MuleEvent process(MuleEvent receivedEvent) throws MuleException
-        {
-            event = receivedEvent;
-            return receivedEvent;
-        }
-    }
+  }
 
 }

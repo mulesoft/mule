@@ -9,8 +9,7 @@ package org.mule.runtime.core.api.exception;
 import org.mule.runtime.core.api.Acceptor;
 
 /**
- *  MessagingExceptionHandlers that will only be executed if accepts to manage MuleEvent
+ * MessagingExceptionHandlers that will only be executed if accepts to manage MuleEvent
  */
-public interface MessagingExceptionHandlerAcceptor extends MessagingExceptionHandler, Acceptor
-{
+public interface MessagingExceptionHandlerAcceptor extends MessagingExceptionHandler, Acceptor {
 }

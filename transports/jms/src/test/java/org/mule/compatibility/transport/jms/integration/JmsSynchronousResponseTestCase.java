@@ -20,49 +20,44 @@ import org.junit.Test;
 /**
  * see EE-1688/MULE-3059
  */
-public class JmsSynchronousResponseTestCase extends AbstractJmsFunctionalTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "integration/jms-synchronous-response.xml";
-    }
+public class JmsSynchronousResponseTestCase extends AbstractJmsFunctionalTestCase {
 
-    @Test
-    public void testResponseWithoutReplyTo() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
+  @Override
+  protected String getConfigFile() {
+    return "integration/jms-synchronous-response.xml";
+  }
 
-        MuleMessage response = client.send("out1", "TEST_MESSAGE", null);
-        assertNotNull(response);
-        assertTrue("Response is not a JMS Message", response.getPayload() instanceof javax.jms.Message);
-        assertJmsMessageIdPresent(response);
-    }
+  @Test
+  public void testResponseWithoutReplyTo() throws Exception {
+    MuleClient client = muleContext.getClient();
 
-    @Test
-    public void testResponseWithoutReplyToEndpointProperties() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
+    MuleMessage response = client.send("out1", "TEST_MESSAGE", null);
+    assertNotNull(response);
+    assertTrue("Response is not a JMS Message", response.getPayload() instanceof javax.jms.Message);
+    assertJmsMessageIdPresent(response);
+  }
 
-        MuleMessage response = client.send("out2", "TEST_MESSAGE", null);
-        assertNotNull(response);
-        assertTrue("Response is not a JMS Message", response.getPayload() instanceof javax.jms.Message);
-        assertJmsMessageIdPresent(response);
-    }
+  @Test
+  public void testResponseWithoutReplyToEndpointProperties() throws Exception {
+    MuleClient client = muleContext.getClient();
 
-    @Test
-    public void testResponseWithReplyTo() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
+    MuleMessage response = client.send("out2", "TEST_MESSAGE", null);
+    assertNotNull(response);
+    assertTrue("Response is not a JMS Message", response.getPayload() instanceof javax.jms.Message);
+    assertJmsMessageIdPresent(response);
+  }
 
-        MuleMessage response = client.send("out3", "TEST_MESSAGE", null);
-        assertNotNull(response);
-        assertFalse("Response should not be NullPayload", response.getPayload() == null);
-    }
+  @Test
+  public void testResponseWithReplyTo() throws Exception {
+    MuleClient client = muleContext.getClient();
 
-    private void assertJmsMessageIdPresent(MuleMessage message)
-    {
-        String messageId = message.getInboundProperty(JmsConstants.JMS_MESSAGE_ID);
-        assertTrue("JMSMessageID is missing", StringUtils.isNotBlank(messageId));
-    }
+    MuleMessage response = client.send("out3", "TEST_MESSAGE", null);
+    assertNotNull(response);
+    assertFalse("Response should not be NullPayload", response.getPayload() == null);
+  }
+
+  private void assertJmsMessageIdPresent(MuleMessage message) {
+    String messageId = message.getInboundProperty(JmsConstants.JMS_MESSAGE_ID);
+    assertTrue("JMSMessageID is missing", StringUtils.isNotBlank(messageId));
+  }
 }

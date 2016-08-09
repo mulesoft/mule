@@ -10,11 +10,10 @@ package org.mule.runtime.module.artifact.classloader;
 /**
  * Enables access {@link ClassLoaderLookupPolicy} used on a given classLoader.
  */
-public interface ClassLoaderLookupPolicyProvider
-{
+public interface ClassLoaderLookupPolicyProvider {
 
-    /**
-     * @return lookup policy used on the classLoader. Non null.
-     */
-    ClassLoaderLookupPolicy getClassLoaderLookupPolicy();
+  /**
+   * @return lookup policy used on the classLoader. Non null.
+   */
+  ClassLoaderLookupPolicy getClassLoaderLookupPolicy();
 }

@@ -16,22 +16,20 @@ import java.time.LocalDateTime;
 import org.junit.Test;
 
 @SmallTest
-public class TimeSinceFunctionTestCase extends AbstractMuleTestCase
-{
+public class TimeSinceFunctionTestCase extends AbstractMuleTestCase {
 
-    private static final LocalDateTime LOWER_BOUND = LocalDateTime.of(1983, 4, 20, 21, 15);
-    private static final LocalDateTime UPPER_BOUND = LocalDateTime.of(2012, 3, 7, 18, 45);
+  private static final LocalDateTime LOWER_BOUND = LocalDateTime.of(1983, 4, 20, 21, 15);
+  private static final LocalDateTime UPPER_BOUND = LocalDateTime.of(2012, 3, 7, 18, 45);
 
-    private TimeSinceFunction function = new TimeSinceFunction();
+  private TimeSinceFunction function = new TimeSinceFunction();
 
-    @Test
-    public void isBefore()
-    {
-        assertThat(function.apply(LOWER_BOUND, UPPER_BOUND), is(true));
-    }
+  @Test
+  public void isBefore() {
+    assertThat(function.apply(LOWER_BOUND, UPPER_BOUND), is(true));
+  }
 
-    @Test
-    public void isAfter() {
-        assertThat(function.apply(UPPER_BOUND, LOWER_BOUND), is(false));
-    }
+  @Test
+  public void isAfter() {
+    assertThat(function.apply(UPPER_BOUND, LOWER_BOUND), is(false));
+  }
 }

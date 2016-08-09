@@ -16,54 +16,41 @@ import org.mule.runtime.core.routing.AggregationStrategy;
 
 import org.w3c.dom.Element;
 
-public class AggregationStrategyDefinitionParser extends ChildDefinitionParser
-{
+public class AggregationStrategyDefinitionParser extends ChildDefinitionParser {
 
-    public AggregationStrategyDefinitionParser()
-    {
-        super("aggregationStrategy", null, AggregationStrategy.class);
-        this.setAllowClassAttribute(true);
-        this.registerPreProcessor(new CheckExclusiveAttribute(ATTRIBUTE_CLASS));
-        this.registerPreProcessor(new CheckExclusiveAttribute(ATTRIBUTE_REF));
+  public AggregationStrategyDefinitionParser() {
+    super("aggregationStrategy", null, AggregationStrategy.class);
+    this.setAllowClassAttribute(true);
+    this.registerPreProcessor(new CheckExclusiveAttribute(ATTRIBUTE_CLASS));
+    this.registerPreProcessor(new CheckExclusiveAttribute(ATTRIBUTE_REF));
+  }
+
+  @Override
+  protected Class<?> getBeanClass(Element element) {
+    Class<?> clazz = super.getBeanClass(element);
+    if (clazz != null) {
+      return clazz;
+    } else {
+      if (element.hasAttribute(ATTRIBUTE_REF)) {
+        return AggregationStrategyDelegate.class;
+      } else {
+        throw new IllegalStateException("<custom-merge-strategy> requires you to provide a value for either 'class' or 'ref' attributes");
+      }
     }
+  }
+
+  public static class AggregationStrategyDelegate implements AggregationStrategy {
+
+    private AggregationStrategy ref;
 
     @Override
-    protected Class<?> getBeanClass(Element element)
-    {
-        Class<?> clazz = super.getBeanClass(element);
-        if (clazz != null)
-        {
-            return clazz;
-        }
-        else
-        {
-            if (element.hasAttribute(ATTRIBUTE_REF))
-            {
-                return AggregationStrategyDelegate.class;
-            }
-            else
-            {
-                throw new IllegalStateException(
-                    "<custom-merge-strategy> requires you to provide a value for either 'class' or 'ref' attributes");
-            }
-        }
+    public MuleEvent aggregate(AggregationContext context) throws MuleException {
+      return this.ref.aggregate(context);
     }
 
-    public static class AggregationStrategyDelegate implements AggregationStrategy
-    {
-
-        private AggregationStrategy ref;
-
-        @Override
-        public MuleEvent aggregate(AggregationContext context) throws MuleException
-        {
-            return this.ref.aggregate(context);
-        }
-
-        public void setRef(AggregationStrategy ref)
-        {
-            this.ref = ref;
-        }
+    public void setRef(AggregationStrategy ref) {
+      this.ref = ref;
     }
+  }
 
 }

@@ -32,135 +32,114 @@ import org.slf4j.LoggerFactory;
 /**
  * Composite classloader to use on {@link Artifact}
  */
-public class CompositeArtifactClassLoader extends CompositeClassLoader implements ArtifactClassLoader
-{
-    static
-    {
-        registerAsParallelCapable();
-    }
+public class CompositeArtifactClassLoader extends CompositeClassLoader implements ArtifactClassLoader {
 
-    protected static final Logger logger = LoggerFactory.getLogger(CompositeApplicationClassLoader.class);
-    private final String artifactName;
-    private final List<ArtifactClassLoader> artifactClassLoaders;
+  static {
+    registerAsParallelCapable();
+  }
 
-    /**
-     * Creates a new instance
-     *  @param artifactName         name of the artifact owning the created instance.
-     * @param parent               parent class loader used to delegate the lookup process. Can be null.
-     * @param artifactClassLoaders artifact class loaders to compose. Non empty.
-     * @param lookupPolicy         policy used to guide the lookup process. Non null
-     */
-    public CompositeArtifactClassLoader(String artifactName, ClassLoader parent, List<ArtifactClassLoader> artifactClassLoaders, ClassLoaderLookupPolicy lookupPolicy)
-    {
-        super(parent, getClassLoaders(artifactClassLoaders), lookupPolicy);
-        this.artifactName = artifactName;
-        this.artifactClassLoaders = artifactClassLoaders;
-    }
+  protected static final Logger logger = LoggerFactory.getLogger(CompositeApplicationClassLoader.class);
+  private final String artifactName;
+  private final List<ArtifactClassLoader> artifactClassLoaders;
 
-    private static List<ClassLoader> getClassLoaders(List<ArtifactClassLoader> artifactClassLoaders)
-    {
-        return artifactClassLoaders.stream().map(ArtifactClassLoader::getClassLoader).collect(toCollection(LinkedList::new));
-    }
+  /**
+   * Creates a new instance
+   * 
+   * @param artifactName name of the artifact owning the created instance.
+   * @param parent parent class loader used to delegate the lookup process. Can be null.
+   * @param artifactClassLoaders artifact class loaders to compose. Non empty.
+   * @param lookupPolicy policy used to guide the lookup process. Non null
+   */
+  public CompositeArtifactClassLoader(String artifactName, ClassLoader parent, List<ArtifactClassLoader> artifactClassLoaders,
+                                      ClassLoaderLookupPolicy lookupPolicy) {
+    super(parent, getClassLoaders(artifactClassLoaders), lookupPolicy);
+    this.artifactName = artifactName;
+    this.artifactClassLoaders = artifactClassLoaders;
+  }
 
-    @Override
-    public String getArtifactName()
-    {
-        return this.artifactName;
-    }
+  private static List<ClassLoader> getClassLoaders(List<ArtifactClassLoader> artifactClassLoaders) {
+    return artifactClassLoaders.stream().map(ArtifactClassLoader::getClassLoader).collect(toCollection(LinkedList::new));
+  }
 
-    //TODO: MULE-10082 Do we have to resolve it by delegating to the parent class loader if resource is not found?
-    @Override
-    public URL findResource(String name)
-    {
-        for (ArtifactClassLoader artifactClassLoader : artifactClassLoaders)
-        {
-            final URL resource = artifactClassLoader.findResource(name);
+  @Override
+  public String getArtifactName() {
+    return this.artifactName;
+  }
 
-            if (resource != null)
-            {
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug(String.format("Resource '%s' loaded from classLoader '%s", name, artifactClassLoader));
-                }
+  // TODO: MULE-10082 Do we have to resolve it by delegating to the parent class loader if resource is not found?
+  @Override
+  public URL findResource(String name) {
+    for (ArtifactClassLoader artifactClassLoader : artifactClassLoaders) {
+      final URL resource = artifactClassLoader.findResource(name);
 
-                return resource;
-            }
+      if (resource != null) {
+        if (logger.isDebugEnabled()) {
+          logger.debug(String.format("Resource '%s' loaded from classLoader '%s", name, artifactClassLoader));
         }
 
-        return null;
+        return resource;
+      }
     }
 
-    @Override
-    public Enumeration<URL> findResources(String name) throws IOException
-    {
-        final Map<String, URL> resources = new HashMap<>();
+    return null;
+  }
 
-        for (ArtifactClassLoader artifactClassLoader : artifactClassLoaders)
-        {
-            Enumeration<URL> partialResources = artifactClassLoader.findResources(name);
+  @Override
+  public Enumeration<URL> findResources(String name) throws IOException {
+    final Map<String, URL> resources = new HashMap<>();
 
-            while (partialResources.hasMoreElements())
-            {
-                URL url = partialResources.nextElement();
-                if (resources.get(url.toString()) == null)
-                {
-                    resources.put(url.toString(), url);
-                }
-            }
+    for (ArtifactClassLoader artifactClassLoader : artifactClassLoaders) {
+      Enumeration<URL> partialResources = artifactClassLoader.findResources(name);
+
+      while (partialResources.hasMoreElements()) {
+        URL url = partialResources.nextElement();
+        if (resources.get(url.toString()) == null) {
+          resources.put(url.toString(), url);
         }
-
-        return new EnumerationAdapter<>(resources.values());
+      }
     }
 
-    @Override
-    public URL findLocalResource(String resourceName)
-    {
-        for (ArtifactClassLoader artifactClassLoader : artifactClassLoaders)
-        {
-            URL resource = artifactClassLoader.findLocalResource(resourceName);
+    return new EnumerationAdapter<>(resources.values());
+  }
 
-            if (resource != null)
-            {
-                return resource;
-            }
-        }
-        return null;
-    }
+  @Override
+  public URL findLocalResource(String resourceName) {
+    for (ArtifactClassLoader artifactClassLoader : artifactClassLoaders) {
+      URL resource = artifactClassLoader.findLocalResource(resourceName);
 
-    @Override
-    public ClassLoader getClassLoader()
-    {
-        return this;
+      if (resource != null) {
+        return resource;
+      }
     }
+    return null;
+  }
 
-    @Override
-    public void dispose()
-    {
-        for (ClassLoader classLoader : classLoaders)
-        {
-            if (classLoader instanceof DisposableClassLoader)
-            {
-                ((DisposableClassLoader) classLoader).dispose();
-            }
-        }
-    }
+  @Override
+  public ClassLoader getClassLoader() {
+    return this;
+  }
 
-    @Override
-    public void addShutdownListener(ShutdownListener listener)
-    {
-        for (ClassLoader classLoader : classLoaders)
-        {
-            if (classLoader instanceof MuleApplicationClassLoader)
-            {
-                ((MuleApplicationClassLoader) classLoader).addShutdownListener(listener);
-                return;
-            }
-        }
+  @Override
+  public void dispose() {
+    for (ClassLoader classLoader : classLoaders) {
+      if (classLoader instanceof DisposableClassLoader) {
+        ((DisposableClassLoader) classLoader).dispose();
+      }
     }
+  }
 
-    @Override
-    public String toString()
-    {
-        return getClass().getSimpleName() + classLoaders.toString();
+  @Override
+  public void addShutdownListener(ShutdownListener listener) {
+    for (ClassLoader classLoader : classLoaders) {
+      if (classLoader instanceof MuleApplicationClassLoader) {
+        ((MuleApplicationClassLoader) classLoader).addShutdownListener(listener);
+        return;
+      }
     }
+  }
+
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + classLoaders.toString();
+  }
 }

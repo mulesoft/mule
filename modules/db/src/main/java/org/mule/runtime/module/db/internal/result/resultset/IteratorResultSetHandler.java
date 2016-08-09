@@ -17,32 +17,27 @@ import java.sql.SQLException;
 /**
  * Processes a {@link ResultSet} returning an iterator of maps.
  * <p/>
- * The {@link ResultSet} backing the returned {@link ResultSetIterator} will be closed when the connection it came from
- * is closed.
+ * The {@link ResultSet} backing the returned {@link ResultSetIterator} will be closed when the connection it came from is closed.
  */
-public class IteratorResultSetHandler implements ResultSetHandler
-{
+public class IteratorResultSetHandler implements ResultSetHandler {
 
-    private final RowHandler rowHandler;
-    private final StatementStreamingResultSetCloser streamingResultSetCloser;
+  private final RowHandler rowHandler;
+  private final StatementStreamingResultSetCloser streamingResultSetCloser;
 
-    public IteratorResultSetHandler(RowHandler rowHandler, StatementStreamingResultSetCloser streamingResultSetCloser)
-    {
-        this.rowHandler = rowHandler;
-        this.streamingResultSetCloser = streamingResultSetCloser;
-    }
+  public IteratorResultSetHandler(RowHandler rowHandler, StatementStreamingResultSetCloser streamingResultSetCloser) {
+    this.rowHandler = rowHandler;
+    this.streamingResultSetCloser = streamingResultSetCloser;
+  }
 
-    @Override
-    public ResultSetIterator processResultSet(DbConnection connection, ResultSet resultSet) throws SQLException
-    {
-        streamingResultSetCloser.trackResultSet(connection, resultSet);
+  @Override
+  public ResultSetIterator processResultSet(DbConnection connection, ResultSet resultSet) throws SQLException {
+    streamingResultSetCloser.trackResultSet(connection, resultSet);
 
-        return new ResultSetIterator(connection, resultSet, rowHandler, streamingResultSetCloser);
-    }
+    return new ResultSetIterator(connection, resultSet, rowHandler, streamingResultSetCloser);
+  }
 
-    @Override
-    public boolean requiresMultipleOpenedResults()
-    {
-        return true;
-    }
+  @Override
+  public boolean requiresMultipleOpenedResults() {
+    return true;
+  }
 }

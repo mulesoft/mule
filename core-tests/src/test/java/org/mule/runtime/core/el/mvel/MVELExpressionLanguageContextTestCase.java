@@ -19,34 +19,29 @@ import java.util.Collections;
 
 import org.junit.Test;
 
-public class MVELExpressionLanguageContextTestCase extends AbstractMuleContextTestCase
-{
+public class MVELExpressionLanguageContextTestCase extends AbstractMuleContextTestCase {
 
-    private ParserConfiguration parserConfig = new ParserConfiguration();
+  private ParserConfiguration parserConfig = new ParserConfiguration();
 
-    @Test
-    public void testGetVariableResolver()
-    {
-        MuleBaseVariableResolverFactory resoverFactory = new MVELExpressionLanguageContext(parserConfig,
-            muleContext);
-        resoverFactory.addResolver("foo", new SimpleValueResolver("val"));
+  @Test
+  public void testGetVariableResolver() {
+    MuleBaseVariableResolverFactory resoverFactory = new MVELExpressionLanguageContext(parserConfig, muleContext);
+    resoverFactory.addResolver("foo", new SimpleValueResolver("val"));
 
-        assertNotNull(resoverFactory.getVariableResolver("foo"));
-        assertEquals("val", resoverFactory.getVariableResolver("foo").getValue());
-        assertNull(resoverFactory.getVariableResolver("bar"));
-    }
+    assertNotNull(resoverFactory.getVariableResolver("foo"));
+    assertEquals("val", resoverFactory.getVariableResolver("foo").getValue());
+    assertNull(resoverFactory.getVariableResolver("bar"));
+  }
 
-    @Test
-    public void testGetVariableResolverNextFactory()
-    {
-        parserConfig.addImport(String.class);
+  @Test
+  public void testGetVariableResolverNextFactory() {
+    parserConfig.addImport(String.class);
 
-        MuleBaseVariableResolverFactory resoverFactory = new MVELExpressionLanguageContext(parserConfig,
-            muleContext);
-        resoverFactory.setNextFactory(new MapVariableResolverFactory(Collections.singletonMap("foo", "val")));
+    MuleBaseVariableResolverFactory resoverFactory = new MVELExpressionLanguageContext(parserConfig, muleContext);
+    resoverFactory.setNextFactory(new MapVariableResolverFactory(Collections.singletonMap("foo", "val")));
 
-        assertNotNull(resoverFactory.getVariableResolver("foo"));
-        assertEquals("val", resoverFactory.getVariableResolver("foo").getValue());
-        assertNull(resoverFactory.getVariableResolver("bar"));
-    }
+    assertNotNull(resoverFactory.getVariableResolver("foo"));
+    assertEquals("val", resoverFactory.getVariableResolver("foo").getValue());
+    assertNull(resoverFactory.getVariableResolver("bar"));
+  }
 }

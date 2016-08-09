@@ -23,49 +23,44 @@ import org.junit.Before;
 import org.junit.Test;
 
 @SmallTest
-public class HttpRequestConnectionsConfigurationTestCase extends AbstractMuleTestCase
-{
-    private MuleContext mockMuleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS.get());
+public class HttpRequestConnectionsConfigurationTestCase extends AbstractMuleTestCase {
 
-    @Before
-    public void before()
-    {
-        MuleRegistry registry = mock(MuleRegistry.class);
-        when(registry.get(OBJECT_HTTP_CLIENT_FACTORY)).thenReturn(null);
-        when(mockMuleContext.getRegistry()).thenReturn(registry);
-    }
+  private MuleContext mockMuleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS.get());
 
-    @Test(expected=InitialisationException.class)
-    public void invalidMaxConnections() throws InitialisationException
-    {
-        DefaultHttpRequesterConfig httpRequesterConfig = createRequesterConfig();
-        httpRequesterConfig.setMaxConnections(-2);
-        httpRequesterConfig.initialise();
-    }
+  @Before
+  public void before() {
+    MuleRegistry registry = mock(MuleRegistry.class);
+    when(registry.get(OBJECT_HTTP_CLIENT_FACTORY)).thenReturn(null);
+    when(mockMuleContext.getRegistry()).thenReturn(registry);
+  }
 
-    @Test(expected=InitialisationException.class)
-    public void invalidMaxConnections0() throws InitialisationException
-    {
-        DefaultHttpRequesterConfig httpRequesterConfig = createRequesterConfig();
-        httpRequesterConfig.setMaxConnections(0);
-        httpRequesterConfig.initialise();
-    }
+  @Test(expected = InitialisationException.class)
+  public void invalidMaxConnections() throws InitialisationException {
+    DefaultHttpRequesterConfig httpRequesterConfig = createRequesterConfig();
+    httpRequesterConfig.setMaxConnections(-2);
+    httpRequesterConfig.initialise();
+  }
 
-    @Test
-    public void ignoreIdleTimeoutIfNotPersistentConnections() throws MuleException
-    {
-        DefaultHttpRequesterConfig httpRequesterConfig = createRequesterConfig();
-        httpRequesterConfig.setUsePersistentConnections(false);
-        httpRequesterConfig.setConnectionIdleTimeout(-2);
-        httpRequesterConfig.initialise();
-        httpRequesterConfig.stop();
-    }
+  @Test(expected = InitialisationException.class)
+  public void invalidMaxConnections0() throws InitialisationException {
+    DefaultHttpRequesterConfig httpRequesterConfig = createRequesterConfig();
+    httpRequesterConfig.setMaxConnections(0);
+    httpRequesterConfig.initialise();
+  }
 
-    private DefaultHttpRequesterConfig createRequesterConfig()
-    {
-        DefaultHttpRequesterConfig requesterConfig = new DefaultHttpRequesterConfig();
-        requesterConfig.setMuleContext(mockMuleContext);
-        requesterConfig.setName("TestConfig");
-        return requesterConfig;
-    }
+  @Test
+  public void ignoreIdleTimeoutIfNotPersistentConnections() throws MuleException {
+    DefaultHttpRequesterConfig httpRequesterConfig = createRequesterConfig();
+    httpRequesterConfig.setUsePersistentConnections(false);
+    httpRequesterConfig.setConnectionIdleTimeout(-2);
+    httpRequesterConfig.initialise();
+    httpRequesterConfig.stop();
+  }
+
+  private DefaultHttpRequesterConfig createRequesterConfig() {
+    DefaultHttpRequesterConfig requesterConfig = new DefaultHttpRequesterConfig();
+    requesterConfig.setMuleContext(mockMuleContext);
+    requesterConfig.setName("TestConfig");
+    return requesterConfig;
+  }
 }

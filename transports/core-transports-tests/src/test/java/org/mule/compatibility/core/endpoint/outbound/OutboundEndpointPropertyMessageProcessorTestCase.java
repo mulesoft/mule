@@ -19,20 +19,18 @@ import org.mule.runtime.core.api.processor.MessageProcessor;
 
 import org.junit.Test;
 
-public class OutboundEndpointPropertyMessageProcessorTestCase extends AbstractMessageProcessorTestCase
-{
+public class OutboundEndpointPropertyMessageProcessorTestCase extends AbstractMessageProcessorTestCase {
 
-    @Test
-    public void testProcess() throws Exception
-    {
-        OutboundEndpoint endpoint = createTestOutboundEndpoint(null, null);
-        MessageProcessor mp = new OutboundEndpointPropertyMessageProcessor(endpoint);
+  @Test
+  public void testProcess() throws Exception {
+    OutboundEndpoint endpoint = createTestOutboundEndpoint(null, null);
+    MessageProcessor mp = new OutboundEndpointPropertyMessageProcessor(endpoint);
 
-        MuleEvent event = mp.process(createTestOutboundEvent());
+    MuleEvent event = mp.process(createTestOutboundEvent());
 
-        assertEquals(endpoint.getEndpointURI().getUri().toString(),
-                     event.getMessage().getOutboundProperty(MuleProperties.MULE_ENDPOINT_PROPERTY));
-        assertSame(event, RequestContext.getEvent());
-    }
+    assertEquals(endpoint.getEndpointURI().getUri().toString(),
+                 event.getMessage().getOutboundProperty(MuleProperties.MULE_ENDPOINT_PROPERTY));
+    assertSame(event, RequestContext.getEvent());
+  }
 
 }

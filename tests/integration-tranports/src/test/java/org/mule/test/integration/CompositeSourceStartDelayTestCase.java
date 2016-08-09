@@ -24,137 +24,108 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class CompositeSourceStartDelayTestCase extends FunctionalTestCase
-{
+public class CompositeSourceStartDelayTestCase extends FunctionalTestCase {
 
-    public static final CountDownLatch startLatch = new CountDownLatch(1);
+  public static final CountDownLatch startLatch = new CountDownLatch(1);
 
-    @Rule
-    public DynamicPort httpPort = new DynamicPort("httpPort");
+  @Rule
+  public DynamicPort httpPort = new DynamicPort("httpPort");
 
-    public CompositeSourceStartDelayTestCase()
-    {
-        setStartContext(false);
+  public CompositeSourceStartDelayTestCase() {
+    setStartContext(false);
+  }
+
+  @Override
+  protected String getConfigFile() {
+    return "composite-source-start-delay-config.xml";
+  }
+
+  @Test
+  public void testProcessMessageWhenAnSourceIsNotStartedYet() throws Exception {
+    try {
+      asynchronousMuleContextStart();
+
+      PollingProber prober = new PollingProber(RECEIVE_TIMEOUT, 50);
+      prober.check(new ProcessMessageProbe());
+    } finally {
+      startLatch.countDown();
+    }
+  }
+
+  private void asynchronousMuleContextStart() {
+    Thread thread = new Thread(new Runnable() {
+
+      @Override
+      public void run() {
+        try {
+          muleContext.start();
+        } catch (MuleException e) {
+          // Nothing to do
+        }
+      }
+    });
+
+    thread.start();
+  }
+
+  private class ProcessMessageProbe implements Probe {
+
+    private final HttpClient httpClient = new HttpClient();
+
+    @Override
+    public boolean isSatisfied() {
+      GetMethod method = new GetMethod("http://localhost:" + httpPort.getValue());
+
+      try {
+        int statusCode = httpClient.executeMethod(method);
+        String response = method.getResponseBodyAsString();
+
+        return 200 == statusCode && "Processed".equals(response);
+      } catch (Exception e) {
+        return false;
+      }
     }
 
     @Override
-    protected String getConfigFile()
-    {
-        return "composite-source-start-delay-config.xml";
+    public String describeFailure() {
+      return "Unable to process message when composite source was not completely started";
+    }
+  }
+
+  public static class DelayedStartEndpointFactory extends DefaultEndpointFactory {
+
+    @Override
+    public InboundEndpoint getInboundEndpoint(EndpointBuilder builder) throws MuleException {
+      InboundEndpoint endpoint = builder.buildInboundEndpoint();
+
+      if (endpoint.getName().equals("sleepingTestIn")) {
+        InboundEndpointWrapper wrappedEndpoint = new DelayedStartInboundEndpointWrapper(endpoint);
+
+        return wrappedEndpoint;
+      } else {
+        return endpoint;
+      }
+    }
+  }
+
+  public static class DelayedStartInboundEndpointWrapper extends InboundEndpointWrapper {
+
+    public DelayedStartInboundEndpointWrapper(InboundEndpoint delegate) {
+      super(delegate);
     }
 
-    @Test
-    public void testProcessMessageWhenAnSourceIsNotStartedYet() throws Exception
-    {
-        try
-        {
-            asynchronousMuleContextStart();
+    @Override
+    public void start() throws MuleException {
+      try {
+        startLatch.await();
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+        throw new StartException(e, this);
+      }
 
-            PollingProber prober = new PollingProber(RECEIVE_TIMEOUT, 50);
-            prober.check(new ProcessMessageProbe());
-        }
-        finally
-        {
-            startLatch.countDown();
-        }
+      super.start();
     }
-
-    private void asynchronousMuleContextStart()
-    {
-        Thread thread = new Thread(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                try
-                {
-                    muleContext.start();
-                }
-                catch (MuleException e)
-                {
-                    // Nothing to do
-                }
-            }
-        });
-
-        thread.start();
-    }
-
-    private class ProcessMessageProbe implements Probe
-    {
-
-        private final HttpClient httpClient = new HttpClient();
-
-        @Override
-        public boolean isSatisfied()
-        {
-            GetMethod method = new GetMethod("http://localhost:" + httpPort.getValue());
-
-            try
-            {
-                int statusCode = httpClient.executeMethod(method);
-                String response = method.getResponseBodyAsString();
-
-                return 200 == statusCode && "Processed".equals(response);
-            }
-            catch (Exception e)
-            {
-                return false;
-            }
-        }
-
-        @Override
-        public String describeFailure()
-        {
-            return "Unable to process message when composite source was not completely started";
-        }
-    }
-
-    public static class DelayedStartEndpointFactory extends DefaultEndpointFactory
-    {
-
-        @Override
-        public InboundEndpoint getInboundEndpoint(EndpointBuilder builder) throws MuleException
-        {
-            InboundEndpoint endpoint = builder.buildInboundEndpoint();
-
-            if (endpoint.getName().equals("sleepingTestIn"))
-            {
-                InboundEndpointWrapper wrappedEndpoint = new DelayedStartInboundEndpointWrapper(endpoint);
-
-                return wrappedEndpoint;
-            }
-            else
-            {
-                return endpoint;
-            }
-        }
-    }
-
-    public static class DelayedStartInboundEndpointWrapper extends InboundEndpointWrapper
-    {
-
-        public DelayedStartInboundEndpointWrapper(InboundEndpoint delegate)
-        {
-            super(delegate);
-        }
-
-        @Override
-        public void start() throws MuleException
-        {
-            try
-            {
-                startLatch.await();
-            }
-            catch (InterruptedException e)
-            {
-                Thread.currentThread().interrupt();
-                throw new StartException(e, this);
-            }
-
-            super.start();
-        }
-    }
+  }
 }
 
 

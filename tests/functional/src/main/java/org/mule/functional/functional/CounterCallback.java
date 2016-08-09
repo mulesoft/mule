@@ -13,36 +13,32 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * A test callback that counts the number of messages received.
  */
-public class CounterCallback implements EventCallback
-{
-    private AtomicInteger callbackCount;
+public class CounterCallback implements EventCallback {
 
-    public CounterCallback()
-    {
-        callbackCount = new AtomicInteger(0);
-    }
+  private AtomicInteger callbackCount;
 
-    public CounterCallback(AtomicInteger callbackCount)
-    {
-        this.callbackCount = callbackCount;
-    }
+  public CounterCallback() {
+    callbackCount = new AtomicInteger(0);
+  }
 
-    public void eventReceived(MuleEventContext context, Object Component) throws Exception
-    {
-        incCallbackCount();
-    }
+  public CounterCallback(AtomicInteger callbackCount) {
+    this.callbackCount = callbackCount;
+  }
 
-    /**
-     * Increment callback count.
-     * @return current count after increment
-     */
-    protected int incCallbackCount()
-    {
-        return callbackCount.incrementAndGet();
-    }
+  public void eventReceived(MuleEventContext context, Object Component) throws Exception {
+    incCallbackCount();
+  }
 
-    public int getCallbackCount()
-    {
-        return callbackCount.intValue();
-    }
+  /**
+   * Increment callback count.
+   * 
+   * @return current count after increment
+   */
+  protected int incCallbackCount() {
+    return callbackCount.incrementAndGet();
+  }
+
+  public int getCallbackCount() {
+    return callbackCount.intValue();
+  }
 }

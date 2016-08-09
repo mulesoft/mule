@@ -23,70 +23,59 @@ import java.util.HashMap;
 import org.junit.Before;
 import org.junit.Test;
 
-public class FileTransformersSourceTypesTestCase extends AbstractMuleContextEndpointTestCase
-{
+public class FileTransformersSourceTypesTestCase extends AbstractMuleContextEndpointTestCase {
 
-    @Before
-    public void registerTransformers() throws MuleException
-    {
-        muleContext.getRegistry().registerTransformer(new FileToByteArray());
-        muleContext.getRegistry().registerTransformer(new FileToString());
-    }
+  @Before
+  public void registerTransformers() throws MuleException {
+    muleContext.getRegistry().registerTransformer(new FileToByteArray());
+    muleContext.getRegistry().registerTransformer(new FileToString());
+  }
 
-    @Test
-    public void fileToByteArrayIgnoresOtherSerializableObjects() throws Exception
-    {
-        assertSingleTransformer(HashMap.class, byte[].class, ObjectToByteArray.class);
-    }
+  @Test
+  public void fileToByteArrayIgnoresOtherSerializableObjects() throws Exception {
+    assertSingleTransformer(HashMap.class, byte[].class, ObjectToByteArray.class);
+  }
 
-    @Test
-    public void fileToStringIgnoresOtherSerializableObjects() throws Exception
-    {
-        assertSingleTransformer(HashMap.class, String.class, ObjectToString.class);
-    }
+  @Test
+  public void fileToStringIgnoresOtherSerializableObjects() throws Exception {
+    assertSingleTransformer(HashMap.class, String.class, ObjectToString.class);
+  }
 
-    @Test
-    public void fileToByteArrayIgnoresInputStream() throws Exception
-    {
-        assertSingleTransformer(InputStream.class, byte[].class, ObjectToByteArray.class);
-    }
+  @Test
+  public void fileToByteArrayIgnoresInputStream() throws Exception {
+    assertSingleTransformer(InputStream.class, byte[].class, ObjectToByteArray.class);
+  }
 
-    @Test
-    public void fileToStringIgnoresInputStream() throws Exception
-    {
-        assertSingleTransformer(InputStream.class, String.class, ObjectToString.class);
-    }
+  @Test
+  public void fileToStringIgnoresInputStream() throws Exception {
+    assertSingleTransformer(InputStream.class, String.class, ObjectToString.class);
+  }
 
-    @Test
-    public void fileToByteArrayAcceptsFileObjects() throws Exception
-    {
-        assertSingleTransformer(File.class, byte[].class, FileToByteArray.class);
-    }
+  @Test
+  public void fileToByteArrayAcceptsFileObjects() throws Exception {
+    assertSingleTransformer(File.class, byte[].class, FileToByteArray.class);
+  }
 
-    @Test
-    public void fileToStringAcceptsFileObjects() throws Exception
-    {
-        assertSingleTransformer(File.class, String.class, FileToString.class);
-    }
+  @Test
+  public void fileToStringAcceptsFileObjects() throws Exception {
+    assertSingleTransformer(File.class, String.class, FileToString.class);
+  }
 
-    @Test
-    public void fileToByteArrayAcceptsFileInputStreamObjects() throws Exception
-    {
-        assertSingleTransformer(FileInputStream.class, byte[].class, FileToByteArray.class);
-    }
+  @Test
+  public void fileToByteArrayAcceptsFileInputStreamObjects() throws Exception {
+    assertSingleTransformer(FileInputStream.class, byte[].class, FileToByteArray.class);
+  }
 
-    @Test
-    public void fileToStringAcceptsFileInputStreamObjects() throws Exception
-    {
-        assertSingleTransformer(FileInputStream.class, String.class, FileToString.class);
-    }
+  @Test
+  public void fileToStringAcceptsFileInputStreamObjects() throws Exception {
+    assertSingleTransformer(FileInputStream.class, String.class, FileToString.class);
+  }
 
 
-    private void assertSingleTransformer(Class<?> source, Class<?> target, Class<?> expectedTransformerType) throws Exception
-    {
-        // This lookup method fails if there is more than one transformer available.
-        Transformer transformer = muleContext.getRegistry().lookupTransformer(DataType.fromType(source), DataType.fromType(target));
-        assertEquals(expectedTransformerType, transformer.getClass());
-    }
+  private void assertSingleTransformer(Class<?> source, Class<?> target, Class<?> expectedTransformerType) throws Exception {
+    // This lookup method fails if there is more than one transformer available.
+    Transformer transformer = muleContext.getRegistry().lookupTransformer(DataType.fromType(source), DataType.fromType(target));
+    assertEquals(expectedTransformerType, transformer.getClass());
+  }
 
 }

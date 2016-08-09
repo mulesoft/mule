@@ -14,24 +14,22 @@ import org.mule.tck.size.SmallTest;
 import org.junit.Test;
 
 @SmallTest
-public class TempWrapperPropertyConfigurationTestCase extends AbstractBasePropertyConfigurationTestCase
-{
+public class TempWrapperPropertyConfigurationTestCase extends AbstractBasePropertyConfigurationTestCase {
 
-    public static final String REFERENCE = "reference";
-    public static final String WRAPPER = "wrapper";
+  public static final String REFERENCE = "reference";
+  public static final String WRAPPER = "wrapper";
 
-    @Test
-    public void testTempWrapper()
-    {
-        PropertyConfiguration reference = new SimplePropertyConfiguration();
-        setTestValues(REFERENCE, reference); // as normal
-        PropertyConfiguration wrapper = new TempWrapperPropertyConfiguration(reference);
-        verifyTestValues(REFERENCE, wrapper); // transparent wrapper
-        setTestValues(WRAPPER, wrapper); // add extra values
-        verifyTestValues(REFERENCE, wrapper); // original values still visible via wrapper
-        verifyTestValues(WRAPPER, wrapper); // new values also visible via wrapper
-        verifyMissing(WRAPPER, reference); // new values not in reference
-        verifyTestValues(REFERENCE, reference); // reference values still ok
-    }
+  @Test
+  public void testTempWrapper() {
+    PropertyConfiguration reference = new SimplePropertyConfiguration();
+    setTestValues(REFERENCE, reference); // as normal
+    PropertyConfiguration wrapper = new TempWrapperPropertyConfiguration(reference);
+    verifyTestValues(REFERENCE, wrapper); // transparent wrapper
+    setTestValues(WRAPPER, wrapper); // add extra values
+    verifyTestValues(REFERENCE, wrapper); // original values still visible via wrapper
+    verifyTestValues(WRAPPER, wrapper); // new values also visible via wrapper
+    verifyMissing(WRAPPER, reference); // new values not in reference
+    verifyTestValues(REFERENCE, reference); // reference values still ok
+  }
 
 }

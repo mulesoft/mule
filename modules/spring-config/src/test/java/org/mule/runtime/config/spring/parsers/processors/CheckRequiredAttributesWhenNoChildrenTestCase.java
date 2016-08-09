@@ -12,38 +12,33 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.junit.Test;
 
-public class CheckRequiredAttributesWhenNoChildrenTestCase extends AbstractPreProcessorTestCase
-{
+public class CheckRequiredAttributesWhenNoChildrenTestCase extends AbstractPreProcessorTestCase {
 
-    private static final String MULE_NAMESPACE_URL = "http://www.mulesoft.org/schema/mule/core";
+  private static final String MULE_NAMESPACE_URL = "http://www.mulesoft.org/schema/mule/core";
 
-    @Test
-    public void testChildWithoutNamespace() throws ParserConfigurationException
-    {
-        assertOk(new String[][]{new String[] {"constraintAttribute"}}, "", "aChild", null);
-    }
+  @Test
+  public void testChildWithoutNamespace() throws ParserConfigurationException {
+    assertOk(new String[][] {new String[] {"constraintAttribute"}}, "", "aChild", null);
+  }
 
-    @Test
-    public void testChildWithNamespace() throws ParserConfigurationException
-    {
-        assertOk(new String[][]{new String[] {"constraintAttribute"}}, "", "aChild", MULE_NAMESPACE_URL);
-    }
+  @Test
+  public void testChildWithNamespace() throws ParserConfigurationException {
+    assertOk(new String[][] {new String[] {"constraintAttribute"}}, "", "aChild", MULE_NAMESPACE_URL);
+  }
 
-    @Test(expected = CheckRequiredAttributes.CheckRequiredAttributesException.class)
-    public void testAttributeNotPresentAndNoChildren() throws CheckRequiredAttributes.CheckRequiredAttributesException, ParserConfigurationException
-    {
-        assertOk(new String[][]{new String[] {"constraintAttribute"}}, "", null, MULE_NAMESPACE_URL);
-    }
+  @Test(expected = CheckRequiredAttributes.CheckRequiredAttributesException.class)
+  public void testAttributeNotPresentAndNoChildren()
+      throws CheckRequiredAttributes.CheckRequiredAttributesException, ParserConfigurationException {
+    assertOk(new String[][] {new String[] {"constraintAttribute"}}, "", null, MULE_NAMESPACE_URL);
+  }
 
-    @Test
-    public void testAttributePresentAndNoChildren() throws ParserConfigurationException
-    {
-        assertOk(new String[][]{new String[] {"constraintAttribute"}}, "constraintAttribute", null, MULE_NAMESPACE_URL);
-    }
+  @Test
+  public void testAttributePresentAndNoChildren() throws ParserConfigurationException {
+    assertOk(new String[][] {new String[] {"constraintAttribute"}}, "constraintAttribute", null, MULE_NAMESPACE_URL);
+  }
 
-    @Override
-    protected PreProcessor createCheck(String[][] constraint, String elementName, String elementNamespaceUrl)
-    {
-        return new CheckRequiredAttributesWhenNoChildren(constraint, elementName, elementNamespaceUrl);
-    }
+  @Override
+  protected PreProcessor createCheck(String[][] constraint, String elementName, String elementNamespaceUrl) {
+    return new CheckRequiredAttributesWhenNoChildren(constraint, elementName, elementNamespaceUrl);
+  }
 }

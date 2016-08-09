@@ -13,24 +13,18 @@ import org.mule.runtime.config.spring.parsers.processors.AddAttribute;
 /**
  * Generate an Endpoint URI from simple address components.
  */
-public class ChildAddressDefinitionParser extends ChildDefinitionParser
-{
+public class ChildAddressDefinitionParser extends ChildDefinitionParser {
 
-    public static final boolean META = true;
-    public static final boolean PROTOCOL = false;
+  public static final boolean META = true;
+  public static final boolean PROTOCOL = false;
 
-    public ChildAddressDefinitionParser(String protocol)
-    {
-        this(protocol, PROTOCOL);
-    }
+  public ChildAddressDefinitionParser(String protocol) {
+    this(protocol, PROTOCOL);
+  }
 
-    public ChildAddressDefinitionParser(String metaOrProtocol, boolean isMeta)
-    {
-        super(EndpointUtils.URI_BUILDER_ATTRIBUTE, URIBuilder.class);
-        registerPreProcessor(
-                new AddAttribute(
-                        isMeta ? URIBuilder.META : URIBuilder.PROTOCOL,
-                        metaOrProtocol));
-    }
+  public ChildAddressDefinitionParser(String metaOrProtocol, boolean isMeta) {
+    super(EndpointUtils.URI_BUILDER_ATTRIBUTE, URIBuilder.class);
+    registerPreProcessor(new AddAttribute(isMeta ? URIBuilder.META : URIBuilder.PROTOCOL, metaOrProtocol));
+  }
 
 }

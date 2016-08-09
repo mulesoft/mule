@@ -12,61 +12,53 @@ import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyPart;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 
-public class LocationKey
-{
-    @MetadataKeyPart(order = 1)
-    @Parameter
-    private String continent;
+public class LocationKey {
 
-    @MetadataKeyPart(order = 2)
-    @Parameter
-    private String country;
+  @MetadataKeyPart(order = 1)
+  @Parameter
+  private String continent;
 
-    @DisplayName("State | City")
-    @MetadataKeyPart(order = 3)
-    @Parameter
-    private String city;
+  @MetadataKeyPart(order = 2)
+  @Parameter
+  private String country;
+
+  @DisplayName("State | City")
+  @MetadataKeyPart(order = 3)
+  @Parameter
+  private String city;
 
 
-    public String getContinent()
-    {
-        return continent;
-    }
+  public String getContinent() {
+    return continent;
+  }
 
-    public String getCountry()
-    {
-        return country;
-    }
+  public String getCountry() {
+    return country;
+  }
 
-    public String getCity()
-    {
-        return city;
-    }
+  public String getCity() {
+    return city;
+  }
 
-    public void setCity(String city)
-    {
-        this.city = city;
-    }
+  public void setCity(String city) {
+    this.city = city;
+  }
 
-    public void setContinent(String continent)
-    {
-        this.continent = continent;
-    }
+  public void setContinent(String continent) {
+    this.continent = continent;
+  }
 
-    public void setCountry(String country)
-    {
-        this.country = country;
-    }
+  public void setCountry(String country) {
+    this.country = country;
+  }
 
-    @Override
-    public String toString()
-    {
-        return String.format("%s|%s|%s", continent, country, city);
-    }
+  @Override
+  public String toString() {
+    return String.format("%s|%s|%s", continent, country, city);
+  }
 
-    @Override
-    public boolean equals(Object obj)
-    {
-        return reflectionEquals(this, obj);
-    }
+  @Override
+  public boolean equals(Object obj) {
+    return reflectionEquals(this, obj);
+  }
 }

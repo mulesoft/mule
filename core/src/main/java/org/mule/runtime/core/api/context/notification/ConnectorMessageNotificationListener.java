@@ -11,7 +11,7 @@ import org.mule.runtime.core.context.notification.ConnectorMessageNotification;
 /**
  * Observer interface to receive notifications about messages being sent and received from connectors
  */
-public interface ConnectorMessageNotificationListener<T extends ConnectorMessageNotification> extends ServerNotificationListener<ConnectorMessageNotification>
-{
-    // no methods
+public interface ConnectorMessageNotificationListener<T extends ConnectorMessageNotification>
+    extends ServerNotificationListener<ConnectorMessageNotification> {
+  // no methods
 }

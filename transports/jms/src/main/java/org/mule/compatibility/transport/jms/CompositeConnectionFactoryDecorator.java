@@ -13,43 +13,36 @@ import java.util.LinkedList;
 
 import javax.jms.ConnectionFactory;
 
-public class CompositeConnectionFactoryDecorator implements ConnectionFactoryDecorator
-{
+public class CompositeConnectionFactoryDecorator implements ConnectionFactoryDecorator {
 
-    private LinkedList<ConnectionFactoryDecorator> decorators = new LinkedList<ConnectionFactoryDecorator>();
+  private LinkedList<ConnectionFactoryDecorator> decorators = new LinkedList<ConnectionFactoryDecorator>();
 
-    public CompositeConnectionFactoryDecorator()
-    {
-        decorators.add(new DefaultConnectionFactoryDecorator());
-        decorators.add(new CachingConnectionFactoryDecorator());
+  public CompositeConnectionFactoryDecorator() {
+    decorators.add(new DefaultConnectionFactoryDecorator());
+    decorators.add(new CachingConnectionFactoryDecorator());
+  }
+
+  @Override
+  public ConnectionFactory decorate(ConnectionFactory connectionFactory, JmsConnector jmsConnector, MuleContext mulecontext) {
+    for (ConnectionFactoryDecorator decorator : decorators) {
+      if (decorator.appliesTo(connectionFactory, mulecontext)) {
+        return decorator.decorate(connectionFactory, jmsConnector, mulecontext);
+      }
     }
+    return connectionFactory;
+  }
 
-    @Override
-    public ConnectionFactory decorate(ConnectionFactory connectionFactory, JmsConnector jmsConnector, MuleContext mulecontext)
-    {
-        for (ConnectionFactoryDecorator decorator : decorators)
-        {
-            if (decorator.appliesTo(connectionFactory, mulecontext))
-            {
-                return decorator.decorate(connectionFactory, jmsConnector, mulecontext);
-            }
-        }
-        return connectionFactory;
-    }
+  @Override
+  public boolean appliesTo(ConnectionFactory connectionFactory, MuleContext muleContext) {
+    return true;
+  }
 
-    @Override
-    public boolean appliesTo(ConnectionFactory connectionFactory, MuleContext muleContext)
-    {
-        return true;
+  public void init(MuleContext muleContext) {
+    Collection<ConnectionFactoryDecorator> connectionFactoryDecorators =
+        muleContext.getRegistry().lookupObjects(ConnectionFactoryDecorator.class);
+    for (ConnectionFactoryDecorator connectionFactoryDecorator : connectionFactoryDecorators) {
+      decorators.addFirst(connectionFactoryDecorator);
     }
-
-    public void init(MuleContext muleContext)
-    {
-        Collection<ConnectionFactoryDecorator> connectionFactoryDecorators = muleContext.getRegistry().lookupObjects(ConnectionFactoryDecorator.class);
-        for (ConnectionFactoryDecorator connectionFactoryDecorator : connectionFactoryDecorators)
-        {
-            decorators.addFirst(connectionFactoryDecorator);
-        }
-    }
+  }
 
 }

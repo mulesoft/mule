@@ -21,33 +21,28 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class DeleteParameterizedQueryTestCase extends AbstractDbIntegrationTestCase
-{
+public class DeleteParameterizedQueryTestCase extends AbstractDbIntegrationTestCase {
 
-    public DeleteParameterizedQueryTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public DeleteParameterizedQueryTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Parameterized.Parameters
-    public static List<Object[]> parameters()
-    {
-        return TestDbConfig.getResources();
-    }
+  @Parameterized.Parameters
+  public static List<Object[]> parameters() {
+    return TestDbConfig.getResources();
+  }
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/delete/delete-parameterized-query-config.xml"};
-    }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/delete/delete-parameterized-query-config.xml"};
+  }
 
-    @Test
-    public void usesParameterizedQuery() throws Exception
-    {
-        final MuleEvent responseEvent = flowRunner("deleteParameterizedQuery").withPayload(VENUS.getName()).run();
+  @Test
+  public void usesParameterizedQuery() throws Exception {
+    final MuleEvent responseEvent = flowRunner("deleteParameterizedQuery").withPayload(VENUS.getName()).run();
 
-        final MuleMessage response = responseEvent.getMessage();
-        assertThat(response.getPayload(), equalTo(1));
-        assertDeletedPlanetRecords(VENUS.getName());
-    }
+    final MuleMessage response = responseEvent.getMessage();
+    assertThat(response.getPayload(), equalTo(1));
+    assertDeletedPlanetRecords(VENUS.getName());
+  }
 }

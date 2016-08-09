@@ -19,34 +19,34 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class ChunkingTestCase extends FunctionalTestCase
-{
-    @Rule
-    public DynamicPort dynamicPort = new DynamicPort("port1");
+public class ChunkingTestCase extends FunctionalTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "chunking-test.xml";
-    }
+  @Rule
+  public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    @Test
-    public void testPartiallyReadRequest() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
+  @Override
+  protected String getConfigFile() {
+    return "chunking-test.xml";
+  }
 
-        byte[] msg = new byte[100*1024];
+  @Test
+  public void testPartiallyReadRequest() throws Exception {
+    MuleClient client = muleContext.getClient();
 
-        MuleMessage result = client.send(((InboundEndpoint) ((Flow) muleContext.getRegistry().lookupObject("/foo")).getMessageSource()).getAddress(),
-            msg, null);
-        assertEquals("Hello", getPayloadAsString(result));
-        int status = result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0);
-        assertEquals(200, status);
+    byte[] msg = new byte[100 * 1024];
 
-        result = client.send(((InboundEndpoint) ((Flow) muleContext.getRegistry().lookupObject("/foo")).getMessageSource()).getAddress(),
-            msg, null);
-        assertEquals("Hello", getPayloadAsString(result));
-        status = result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0);
-        assertEquals(200, status);
-    }
+    MuleMessage result =
+        client.send(((InboundEndpoint) ((Flow) muleContext.getRegistry().lookupObject("/foo")).getMessageSource()).getAddress(),
+                    msg, null);
+    assertEquals("Hello", getPayloadAsString(result));
+    int status = result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0);
+    assertEquals(200, status);
+
+    result =
+        client.send(((InboundEndpoint) ((Flow) muleContext.getRegistry().lookupObject("/foo")).getMessageSource()).getAddress(),
+                    msg, null);
+    assertEquals("Hello", getPayloadAsString(result));
+    status = result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0);
+    assertEquals(200, status);
+  }
 }

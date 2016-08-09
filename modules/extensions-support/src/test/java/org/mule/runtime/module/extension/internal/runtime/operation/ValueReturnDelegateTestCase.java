@@ -19,23 +19,21 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class ValueReturnDelegateTestCase extends ValueReturnDelegateContractTestCase
-{
+public class ValueReturnDelegateTestCase extends ValueReturnDelegateContractTestCase {
 
-    @Override
-    protected ReturnDelegate createReturnDelegate()
-    {
-        return new ValueReturnDelegate(muleContext);
-    }
+  @Override
+  protected ReturnDelegate createReturnDelegate() {
+    return new ValueReturnDelegate(muleContext);
+  }
 
-    @Override
-    protected MuleMessage getOutputMessage()
-    {
-        ArgumentCaptor<org.mule.runtime.core.api.MuleMessage> captor = ArgumentCaptor.forClass(org.mule.runtime.core.api.MuleMessage.class);
-        verify(event).setMessage(captor.capture());
-        MuleMessage message = captor.getValue();
+  @Override
+  protected MuleMessage getOutputMessage() {
+    ArgumentCaptor<org.mule.runtime.core.api.MuleMessage> captor =
+        ArgumentCaptor.forClass(org.mule.runtime.core.api.MuleMessage.class);
+    verify(event).setMessage(captor.capture());
+    MuleMessage message = captor.getValue();
 
-        assertThat(message, is(notNullValue()));
-        return message;
-    }
+    assertThat(message, is(notNullValue()));
+    return message;
+  }
 }

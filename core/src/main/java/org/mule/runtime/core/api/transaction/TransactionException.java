@@ -11,35 +11,32 @@ import org.mule.runtime.core.config.i18n.Message;
 
 /**
  * <p>
- * <code>TransactionException</code> is thrown when an exception occurs while
- * trying to create, start commit or rollback an exception
+ * <code>TransactionException</code> is thrown when an exception occurs while trying to create, start commit or rollback an
+ * exception
  */
-public class TransactionException extends MuleException
-{
-    /**
-     * Serial version
-     */
-    private static final long serialVersionUID = -3470229644235978820L;
+public class TransactionException extends MuleException {
 
-    /**
-     * @param message the exception message
-     */
-    public TransactionException(Message message)
-    {
-        super(message);
-    }
+  /**
+   * Serial version
+   */
+  private static final long serialVersionUID = -3470229644235978820L;
 
-    /**
-     * @param message the exception message
-     * @param cause the exception that cause this exception to be thrown
-     */
-    public TransactionException(Message message, Throwable cause)
-    {
-        super(message, cause);
-    }
+  /**
+   * @param message the exception message
+   */
+  public TransactionException(Message message) {
+    super(message);
+  }
 
-    public TransactionException(Throwable cause)
-    {
-        super(cause);
-    }
+  /**
+   * @param message the exception message
+   * @param cause the exception that cause this exception to be thrown
+   */
+  public TransactionException(Message message, Throwable cause) {
+    super(message, cause);
+  }
+
+  public TransactionException(Throwable cause) {
+    super(cause);
+  }
 }

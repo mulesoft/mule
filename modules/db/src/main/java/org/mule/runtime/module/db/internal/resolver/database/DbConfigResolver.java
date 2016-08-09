@@ -16,15 +16,14 @@ import org.mule.runtime.module.db.internal.domain.database.DbConfig;
 /**
  * Resolves a {@link DbConfig} for a given {@link MuleEvent}
  */
-public interface DbConfigResolver extends AnnotatedObject, Testable, ConnectorMetaDataEnabled
-{
+public interface DbConfigResolver extends AnnotatedObject, Testable, ConnectorMetaDataEnabled {
 
-    /**
-     * Resolves which database configuration to use for a given event
-     *
-     * @param muleEvent event used to resolve the configuration. Not null.
-     * @return a non null database configuration to use to process the given event
-     * @throws UnresolvableDbConfigException when is not possible to resolve a database configuration
-     */
-    DbConfig resolve(MuleEvent muleEvent) throws UnresolvableDbConfigException;
+  /**
+   * Resolves which database configuration to use for a given event
+   *
+   * @param muleEvent event used to resolve the configuration. Not null.
+   * @return a non null database configuration to use to process the given event
+   * @throws UnresolvableDbConfigException when is not possible to resolve a database configuration
+   */
+  DbConfig resolve(MuleEvent muleEvent) throws UnresolvableDbConfigException;
 }

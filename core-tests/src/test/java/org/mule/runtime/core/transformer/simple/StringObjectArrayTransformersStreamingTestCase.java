@@ -11,23 +11,20 @@ import org.mule.runtime.core.util.IOUtils;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
-public class StringObjectArrayTransformersStreamingTestCase extends StringObjectArrayTransformersTestCase
-{
+public class StringObjectArrayTransformersStreamingTestCase extends StringObjectArrayTransformersTestCase {
 
-    public Object getTestData()
-    {
-        String testData = (String) super.getTestData();
-        return new ByteArrayInputStream(testData.getBytes());
-    }
+  public Object getTestData() {
+    String testData = (String) super.getTestData();
+    return new ByteArrayInputStream(testData.getBytes());
+  }
 
-    public boolean compareRoundtripResults(Object src, Object result)
-    {
-        InputStream input = (InputStream) src;
-        String expected = IOUtils.toString(input);
-        
-        return expected.equals(result);
-    }
-    
+  public boolean compareRoundtripResults(Object src, Object result) {
+    InputStream input = (InputStream) src;
+    String expected = IOUtils.toString(input);
+
+    return expected.equals(result);
+  }
+
 }
 
 

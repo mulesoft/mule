@@ -11,21 +11,18 @@ import org.mule.runtime.config.spring.parsers.collection.ChildSingletonMapDefini
 
 import org.w3c.dom.Element;
 
-public class SimplePropertyDefinitionParser extends ChildSingletonMapDefinitionParser
-{
+public class SimplePropertyDefinitionParser extends ChildSingletonMapDefinitionParser {
 
-    public SimplePropertyDefinitionParser()
-    {
-        super(MapEntryCombiner.VALUE);
-    }
+  public SimplePropertyDefinitionParser() {
+    super(MapEntryCombiner.VALUE);
+  }
 
-    protected void preProcess(Element element)
-    {
-        super.preProcess(element);
-        // this is crazy, but because we use a single property config for target and bean, and both
-        // are the same, and target properties are transient, and we only want target value to be
-        // a collection, we have to do this here!
-        getTargetPropertyConfiguration().addCollection(MapEntryCombiner.VALUE);
-    }
-    
+  protected void preProcess(Element element) {
+    super.preProcess(element);
+    // this is crazy, but because we use a single property config for target and bean, and both
+    // are the same, and target properties are transient, and we only want target value to be
+    // a collection, we have to do this here!
+    getTargetPropertyConfiguration().addCollection(MapEntryCombiner.VALUE);
+  }
+
 }

@@ -13,45 +13,36 @@ import org.hamcrest.Factory;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 
-public class Running extends TypeSafeMatcher<MuleProcessController>
-{
+public class Running extends TypeSafeMatcher<MuleProcessController> {
 
-    private boolean isRunning;
+  private boolean isRunning;
 
-    public Running(boolean status)
-    {
-        this.isRunning = status;
+  public Running(boolean status) {
+    this.isRunning = status;
+  }
+
+  @Override
+  public boolean matchesSafely(MuleProcessController mule) {
+    try {
+      return isRunning == mule.isRunning();
+    } catch (Error e) {
+      return false;
     }
+  }
 
-    @Override
-    public boolean matchesSafely(MuleProcessController mule)
-    {
-        try
-        {
-            return isRunning == mule.isRunning();
-        }
-        catch (Error e)
-        {
-            return false;
-        }
-    }
+  @Override
+  public void describeTo(Description description) {
+    description.appendText("a Mule Standalone server that is " + (isRunning ? "" : "not ") + "running");
+  }
 
-    @Override
-    public void describeTo(Description description)
-    {
-        description.appendText("a Mule Standalone server that is " + (isRunning ? "": "not ") + "running");
-    }
+  @Factory
+  public static <T> Matcher<MuleProcessController> isRunning() {
+    return new Running(true);
+  }
 
-    @Factory
-    public static <T> Matcher<MuleProcessController> isRunning()
-    {
-        return new Running(true);
-    }
-
-    @Factory
-    public static <T> Matcher<MuleProcessController> notRunning()
-    {
-        return new Running(false);
-    }
+  @Factory
+  public static <T> Matcher<MuleProcessController> notRunning() {
+    return new Running(false);
+  }
 
 };

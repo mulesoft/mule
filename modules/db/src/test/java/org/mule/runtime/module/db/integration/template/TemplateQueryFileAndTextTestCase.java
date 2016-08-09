@@ -11,19 +11,16 @@ import org.mule.runtime.module.db.integration.config.AbstractConfigurationErrorT
 
 import org.junit.Test;
 
-public class TemplateQueryFileAndTextTestCase extends AbstractConfigurationErrorTestCase
-{
+public class TemplateQueryFileAndTextTestCase extends AbstractConfigurationErrorTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "integration/template/template-query-file-and-text-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "integration/template/template-query-file-and-text-config.xml";
+  }
 
-    @Test
-    public void doesNotAllowSimultaneousQueryTextAndFile() throws Exception
-    {
-        assertConfigurationError("Able to define a template query with text content and file simultaneously");
+  @Test
+  public void doesNotAllowSimultaneousQueryTextAndFile() throws Exception {
+    assertConfigurationError("Able to define a template query with text content and file simultaneously");
 
-    }
+  }
 }

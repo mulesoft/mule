@@ -33,29 +33,40 @@ import org.mule.runtime.config.spring.parsers.generic.MuleOrphanDefinitionParser
 /**
  * Registers a Bean Definition Parser for handling <code><tcp:connector></code> elements.
  */
-public class TcpNamespaceHandler extends AbstractMuleTransportsNamespaceHandler
-{
-    private static final String TCP_PROTOCOL_PROPERTY = "tcpProtocol";
+public class TcpNamespaceHandler extends AbstractMuleTransportsNamespaceHandler {
 
-    @Override
-    public void init()
-    {
-        registerStandardTransportEndpoints(TcpConnector.TCP, URIBuilder.SOCKET_ATTRIBUTES);
-        registerConnectorDefinitionParser(TcpConnector.class);
+  private static final String TCP_PROTOCOL_PROPERTY = "tcpProtocol";
 
-        registerBeanDefinitionParser("polling-connector", new MuleOrphanDefinitionParser(PollingTcpConnector.class, true));
-        registerBeanDefinitionParser("custom-protocol", new ChildDefinitionParser("tcpProtocol", null, TcpProtocol.class, true));
-        registerBeanDefinitionParser("xml-protocol", new ChildDefinitionParser("tcpProtocol", XmlMessageProtocol.class));
-        registerBeanDefinitionParser("xml-eof-protocol", new ChildDefinitionParser("tcpProtocol", XmlMessageEOFProtocol.class));
-        registerBeanDefinitionParser("safe-protocol", new ByteOrMessageProtocolDefinitionParser(SafeProtocol.class, MuleMessageSafeProtocol.class));
-        registerBeanDefinitionParser("length-protocol", new ByteOrMessageProtocolDefinitionParser(LengthProtocol.class, MuleMessageLengthProtocol.class));
-        registerBeanDefinitionParser("eof-protocol", new ByteOrMessageProtocolDefinitionParser(EOFProtocol.class, MuleMessageEOFProtocol.class));
-        registerBeanDefinitionParser("direct-protocol", new ByteOrMessageProtocolDefinitionParser(DirectProtocol.class, MuleMessageDirectProtocol.class));
-        registerBeanDefinitionParser("streaming-protocol", new ByteOrMessageProtocolDefinitionParser(StreamingProtocol.class, MuleMessageDirectProtocol.class));
-        registerBeanDefinitionParser("custom-protocol", new ClassOrRefDefinitionParser(TCP_PROTOCOL_PROPERTY));
-        registerBeanDefinitionParser("custom-class-loading-protocol", new ByteOrMessageProtocolDefinitionParser(CustomClassLoadingLengthProtocol.class, CustomClassLoadingLengthProtocol.class));
-        registerBeanDefinitionParser("client-socket-properties", new RootOrNestedElementBeanDefinitionParser(DefaultTcpClientSocketProperties.class, "clientSocketProperties"));
-        registerBeanDefinitionParser("server-socket-properties",  new RootOrNestedElementBeanDefinitionParser(DefaultTcpServerSocketProperties.class, "serverSocketProperties"));
-    }
+  @Override
+  public void init() {
+    registerStandardTransportEndpoints(TcpConnector.TCP, URIBuilder.SOCKET_ATTRIBUTES);
+    registerConnectorDefinitionParser(TcpConnector.class);
+
+    registerBeanDefinitionParser("polling-connector", new MuleOrphanDefinitionParser(PollingTcpConnector.class, true));
+    registerBeanDefinitionParser("custom-protocol", new ChildDefinitionParser("tcpProtocol", null, TcpProtocol.class, true));
+    registerBeanDefinitionParser("xml-protocol", new ChildDefinitionParser("tcpProtocol", XmlMessageProtocol.class));
+    registerBeanDefinitionParser("xml-eof-protocol", new ChildDefinitionParser("tcpProtocol", XmlMessageEOFProtocol.class));
+    registerBeanDefinitionParser("safe-protocol",
+                                 new ByteOrMessageProtocolDefinitionParser(SafeProtocol.class, MuleMessageSafeProtocol.class));
+    registerBeanDefinitionParser("length-protocol", new ByteOrMessageProtocolDefinitionParser(LengthProtocol.class,
+                                                                                              MuleMessageLengthProtocol.class));
+    registerBeanDefinitionParser("eof-protocol",
+                                 new ByteOrMessageProtocolDefinitionParser(EOFProtocol.class, MuleMessageEOFProtocol.class));
+    registerBeanDefinitionParser("direct-protocol", new ByteOrMessageProtocolDefinitionParser(DirectProtocol.class,
+                                                                                              MuleMessageDirectProtocol.class));
+    registerBeanDefinitionParser("streaming-protocol",
+                                 new ByteOrMessageProtocolDefinitionParser(StreamingProtocol.class,
+                                                                           MuleMessageDirectProtocol.class));
+    registerBeanDefinitionParser("custom-protocol", new ClassOrRefDefinitionParser(TCP_PROTOCOL_PROPERTY));
+    registerBeanDefinitionParser("custom-class-loading-protocol",
+                                 new ByteOrMessageProtocolDefinitionParser(CustomClassLoadingLengthProtocol.class,
+                                                                           CustomClassLoadingLengthProtocol.class));
+    registerBeanDefinitionParser("client-socket-properties",
+                                 new RootOrNestedElementBeanDefinitionParser(DefaultTcpClientSocketProperties.class,
+                                                                             "clientSocketProperties"));
+    registerBeanDefinitionParser("server-socket-properties",
+                                 new RootOrNestedElementBeanDefinitionParser(DefaultTcpServerSocketProperties.class,
+                                                                             "serverSocketProperties"));
+  }
 
 }

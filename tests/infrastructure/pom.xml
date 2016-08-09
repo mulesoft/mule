@@ -12,6 +12,10 @@
 	<description>Tests infrastructure library for creating mule automated test cases.</description>
 	<packaging>jar</packaging>
 
+    <properties>
+        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
+    </properties>
+
 	<dependencies>
         <dependency>
             <groupId>org.mule</groupId>

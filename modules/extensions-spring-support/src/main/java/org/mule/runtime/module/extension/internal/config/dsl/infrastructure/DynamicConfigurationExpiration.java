@@ -9,23 +9,19 @@ package org.mule.runtime.module.extension.internal.config.dsl.infrastructure;
 import org.mule.runtime.core.time.Time;
 
 /**
- * Contains information about how much time should
- * a dynamic config be idle before it can be considered
- * elegible for expiration
+ * Contains information about how much time should a dynamic config be idle before it can be considered elegible for expiration
  *
  * @since 4.0
  */
-public class DynamicConfigurationExpiration
-{
-    private final Time frequency;
+public class DynamicConfigurationExpiration {
 
-    public DynamicConfigurationExpiration(Time frequency)
-    {
-        this.frequency = frequency;
-    }
+  private final Time frequency;
 
-    public Time getFrequency()
-    {
-        return frequency;
-    }
+  public DynamicConfigurationExpiration(Time frequency) {
+    this.frequency = frequency;
+  }
+
+  public Time getFrequency() {
+    return frequency;
+  }
 }

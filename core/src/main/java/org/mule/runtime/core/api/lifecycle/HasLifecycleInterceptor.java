@@ -11,13 +11,12 @@ package org.mule.runtime.core.api.lifecycle;
  *
  * @since 3.8
  */
-public interface HasLifecycleInterceptor
-{
+public interface HasLifecycleInterceptor {
 
-    /**
-     * Sets the given {@code interceptor}
-     *
-     * @param interceptor a {@link LifecycleInterceptor}
-     */
-    void setLifecycleInterceptor(LifecycleInterceptor interceptor);
+  /**
+   * Sets the given {@code interceptor}
+   *
+   * @param interceptor a {@link LifecycleInterceptor}
+   */
+  void setLifecycleInterceptor(LifecycleInterceptor interceptor);
 }

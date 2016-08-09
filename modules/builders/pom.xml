@@ -11,6 +11,10 @@
     <packaging>jar</packaging>
     <description>Standard configuration builders for Mule</description>
 
+    <properties>
+        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.mule</groupId>

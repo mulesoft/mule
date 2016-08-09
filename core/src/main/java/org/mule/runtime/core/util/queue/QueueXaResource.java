@@ -13,41 +13,36 @@ import org.mule.runtime.core.util.xa.XaTransactionRecoverer;
 import javax.transaction.xa.XAException;
 import javax.transaction.xa.Xid;
 
-public class QueueXaResource extends DefaultXASession<XaQueueTypeTransactionContextAdapter>
-{
+public class QueueXaResource extends DefaultXASession<XaQueueTypeTransactionContextAdapter> {
 
-    private final XaTransactionRecoverer xaTransactionRecoverer;
-    private final QueueProvider queueProvider;
+  private final XaTransactionRecoverer xaTransactionRecoverer;
+  private final QueueProvider queueProvider;
 
-    public QueueXaResource(AbstractXAResourceManager xaResourceManager, XaTransactionRecoverer xaTransactionRecoverer, QueueProvider queueProvider)
-    {
-        super(xaResourceManager);
-        this.xaTransactionRecoverer = xaTransactionRecoverer;
-        this.queueProvider = queueProvider;
-    }
+  public QueueXaResource(AbstractXAResourceManager xaResourceManager, XaTransactionRecoverer xaTransactionRecoverer,
+                         QueueProvider queueProvider) {
+    super(xaResourceManager);
+    this.xaTransactionRecoverer = xaTransactionRecoverer;
+    this.queueProvider = queueProvider;
+  }
 
-    // XA transaction implementation
-    @Override
-    protected void commitDanglingTransaction(Xid xid, boolean onePhase) throws XAException
-    {
-        xaTransactionRecoverer.commitDandlingTransaction(xid, onePhase);
-    }
+  // XA transaction implementation
+  @Override
+  protected void commitDanglingTransaction(Xid xid, boolean onePhase) throws XAException {
+    xaTransactionRecoverer.commitDandlingTransaction(xid, onePhase);
+  }
 
-    @Override
-    protected void rollbackDandlingTransaction(Xid xid) throws XAException
-    {
-        xaTransactionRecoverer.rollbackDandlingTransaction(xid);
-    }
+  @Override
+  protected void rollbackDandlingTransaction(Xid xid) throws XAException {
+    xaTransactionRecoverer.rollbackDandlingTransaction(xid);
+  }
 
-    @Override
-    protected XaQueueTypeTransactionContextAdapter createTransactionContext(Xid xid)
-    {
-        return new XaQueueTypeTransactionContextAdapter(xaTransactionRecoverer.getXaTxQueueTransactionJournal(), queueProvider, xid);
-    }
+  @Override
+  protected XaQueueTypeTransactionContextAdapter createTransactionContext(Xid xid) {
+    return new XaQueueTypeTransactionContextAdapter(xaTransactionRecoverer.getXaTxQueueTransactionJournal(), queueProvider, xid);
+  }
 
-    @Override
-    public Xid[] recover(int i) throws XAException
-    {
-        return xaTransactionRecoverer.recover(i);
-    }
+  @Override
+  public Xid[] recover(int i) throws XAException {
+    return xaTransactionRecoverer.recover(i);
+  }
 }

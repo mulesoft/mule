@@ -17,27 +17,26 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 @SmallTest
-public class DateUtilsTestCase extends AbstractMuleTestCase
-{
-    private final String TEST_DATE_FORMAT = "dd/MM/yyyy hh:mm:ss";
-    private final String TEST_DATE_FORMAT_2 = "dd-MM-yy, hh:mm";
+public class DateUtilsTestCase extends AbstractMuleTestCase {
 
-    @Test
-    public void testDateUtils() throws Exception
-    {
-        String date = "12/11/2002 12:06:47";
+  private final String TEST_DATE_FORMAT = "dd/MM/yyyy hh:mm:ss";
+  private final String TEST_DATE_FORMAT_2 = "dd-MM-yy, hh:mm";
 
-        Date result = DateUtils.getDateFromString(date, TEST_DATE_FORMAT);
-        assertTrue(result.before(new Date(System.currentTimeMillis())));
+  @Test
+  public void testDateUtils() throws Exception {
+    String date = "12/11/2002 12:06:47";
 
-        String newDate = DateUtils.getStringFromDate(result, TEST_DATE_FORMAT);
-        assertEquals(date, newDate);
+    Date result = DateUtils.getDateFromString(date, TEST_DATE_FORMAT);
+    assertTrue(result.before(new Date(System.currentTimeMillis())));
 
-        String timestamp = DateUtils.formatTimeStamp(result, TEST_DATE_FORMAT_2);
-        assertEquals("12-11-02, 12:06", timestamp);
+    String newDate = DateUtils.getStringFromDate(result, TEST_DATE_FORMAT);
+    assertEquals(date, newDate);
 
-        String newTimestamp = DateUtils.getTimeStamp(TEST_DATE_FORMAT_2);
-        assertEquals(DateUtils.getStringFromDate(new Date(), TEST_DATE_FORMAT_2), newTimestamp);
-    }
+    String timestamp = DateUtils.formatTimeStamp(result, TEST_DATE_FORMAT_2);
+    assertEquals("12-11-02, 12:06", timestamp);
+
+    String newTimestamp = DateUtils.getTimeStamp(TEST_DATE_FORMAT_2);
+    assertEquals(DateUtils.getStringFromDate(new Date(), TEST_DATE_FORMAT_2), newTimestamp);
+  }
 
 }

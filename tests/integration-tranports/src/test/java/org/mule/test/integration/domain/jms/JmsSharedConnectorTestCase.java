@@ -27,105 +27,84 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
-public class JmsSharedConnectorTestCase extends DomainFunctionalTestCase
-{
+public class JmsSharedConnectorTestCase extends DomainFunctionalTestCase {
 
-    public static final String CLIENT_APP = "client";
-    public static final String SERVER_APP = "server";
-    public static final String CONNECTOR_PARAMETER = "connector=sharedJmsConnector";
+  public static final String CLIENT_APP = "client";
+  public static final String SERVER_APP = "server";
+  public static final String CONNECTOR_PARAMETER = "connector=sharedJmsConnector";
 
-    @Rule
-    public SystemProperty transportScheme = new SystemProperty("scheme", getTransportScheme());
-    @Rule
-    public SystemProperty connectorParameter = new SystemProperty("connectorParameter", CONNECTOR_PARAMETER);
+  @Rule
+  public SystemProperty transportScheme = new SystemProperty("scheme", getTransportScheme());
+  @Rule
+  public SystemProperty connectorParameter = new SystemProperty("connectorParameter", CONNECTOR_PARAMETER);
 
-    private final String domainConfig;
+  private final String domainConfig;
 
-    public JmsSharedConnectorTestCase(String domainConfig)
-    {
-        this.domainConfig = domainConfig;
-    }
+  public JmsSharedConnectorTestCase(String domainConfig) {
+    this.domainConfig = domainConfig;
+  }
 
-    @Parameterized.Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][] {
-                {"domain/jms/jms-activemq-embedded-shared-connector.xml"},
-                {"domain/jms/jms-custom-shared-connector.xml"},
-                {"domain/jms/jms-shared-connnector.xml"},
-                {"domain/jms/jms-caching-connection-factory-shared-connnector.xml"}
-        });
-    }
+  @Parameterized.Parameters
+  public static Collection<Object[]> parameters() {
+    return Arrays.asList(new Object[][] {{"domain/jms/jms-activemq-embedded-shared-connector.xml"},
+        {"domain/jms/jms-custom-shared-connector.xml"}, {"domain/jms/jms-shared-connnector.xml"},
+        {"domain/jms/jms-caching-connection-factory-shared-connnector.xml"}});
+  }
 
-    @Override
-    protected String getDomainConfig()
-    {
-        return domainConfig;
-    }
+  @Override
+  protected String getDomainConfig() {
+    return domainConfig;
+  }
 
-    @Override
-    public ApplicationConfig[] getConfigResources()
-    {
-        return new ApplicationConfig[] {
-                new ApplicationConfig(CLIENT_APP, new String[] {"domain/jms/jms-client-app.xml"}),
-                new ApplicationConfig(SERVER_APP, new String[] {"domain/jms/jms-server-app.xml"})
-            };
-    }
+  @Override
+  public ApplicationConfig[] getConfigResources() {
+    return new ApplicationConfig[] {new ApplicationConfig(CLIENT_APP, new String[] {"domain/jms/jms-client-app.xml"}),
+        new ApplicationConfig(SERVER_APP, new String[] {"domain/jms/jms-server-app.xml"})};
+  }
 
-    @Test
-    public void clientCallServerUsingRequestResponse() throws Exception
-    {
-        executeScenario("in", "out2");
-    }
+  @Test
+  public void clientCallServerUsingRequestResponse() throws Exception {
+    executeScenario("in", "out2");
+  }
 
-    @Test
-    public void clientCallServerUsingRequestReply() throws Exception
-    {
-        executeScenario("in2", "out5");
-    }
+  @Test
+  public void clientCallServerUsingRequestReply() throws Exception {
+    executeScenario("in2", "out5");
+  }
 
-    private void executeScenario(final String inQueue,final String outQueue) throws Exception
-    {
-        getMuleContextForApp(CLIENT_APP).getClient().dispatch(queueAddress(inQueue), MuleMessage.builder().payload("test").build());
-        final AtomicReference<MuleMessage> response = new AtomicReference<>();
-        new PollingProber(10000,100).check(new Probe()
-        {
-            @Override
-            public boolean isSatisfied()
-            {
-                MuleMessage responseMessage;
-                try
-                {
-                    responseMessage = getMuleContextForApp(CLIENT_APP).getClient().request(queueAddress(outQueue), 10);
-                }
-                catch (MuleException e)
-                {
-                    throw new RuntimeException(e);
-                }
-                if (responseMessage != null)
-                {
-                    response.set(responseMessage);
-                    return true;
-                }
-                return false;
-            }
+  private void executeScenario(final String inQueue, final String outQueue) throws Exception {
+    getMuleContextForApp(CLIENT_APP).getClient().dispatch(queueAddress(inQueue), MuleMessage.builder().payload("test").build());
+    final AtomicReference<MuleMessage> response = new AtomicReference<>();
+    new PollingProber(10000, 100).check(new Probe() {
 
-            @Override
-            public String describeFailure()
-            {
-                return "response message never arrived";
-            }
-        });
-        assertThat(getPayloadAsString(response.get(), getMuleContextForApp(CLIENT_APP)), is("works"));
-    }
+      @Override
+      public boolean isSatisfied() {
+        MuleMessage responseMessage;
+        try {
+          responseMessage = getMuleContextForApp(CLIENT_APP).getClient().request(queueAddress(outQueue), 10);
+        } catch (MuleException e) {
+          throw new RuntimeException(e);
+        }
+        if (responseMessage != null) {
+          response.set(responseMessage);
+          return true;
+        }
+        return false;
+      }
 
-    private String queueAddress(String inQueue)
-    {
-        return format("%s://%s?%s", getTransportScheme(), inQueue, CONNECTOR_PARAMETER);
-    }
+      @Override
+      public String describeFailure() {
+        return "response message never arrived";
+      }
+    });
+    assertThat(getPayloadAsString(response.get(), getMuleContextForApp(CLIENT_APP)), is("works"));
+  }
 
-    protected String getTransportScheme()
-    {
-        return "jms";
-    }
+  private String queueAddress(String inQueue) {
+    return format("%s://%s?%s", getTransportScheme(), inQueue, CONNECTOR_PARAMETER);
+  }
+
+  protected String getTransportScheme() {
+    return "jms";
+  }
 }

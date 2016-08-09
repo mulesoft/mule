@@ -27,60 +27,54 @@ import org.apache.ws.security.handler.WSHandlerConstants;
 import org.junit.Before;
 import org.junit.Test;
 
-public class SimpleClientMessageProcessorBuilderTestCase extends AbstractMuleContextTestCase
-{
-    private SimpleClientMessageProcessorBuilder simpleClientMessageProcessorBuilder;
-    private static final String SERVICE_CLASS = "org.mule.runtime.module.cxf.testmodels.Echo";
+public class SimpleClientMessageProcessorBuilderTestCase extends AbstractMuleContextTestCase {
+
+  private SimpleClientMessageProcessorBuilder simpleClientMessageProcessorBuilder;
+  private static final String SERVICE_CLASS = "org.mule.runtime.module.cxf.testmodels.Echo";
 
 
-    @Before
-    public void setUp()
-    {
-        simpleClientMessageProcessorBuilder = new SimpleClientMessageProcessorBuilder();
+  @Before
+  public void setUp() {
+    simpleClientMessageProcessorBuilder = new SimpleClientMessageProcessorBuilder();
+  }
+
+  @Test
+  public void testWsSecurityConfig() throws MuleException {
+    WsSecurity wsSecurity = new WsSecurity();
+    addConfigProperties(wsSecurity);
+
+    simpleClientMessageProcessorBuilder.setWsSecurity(wsSecurity);
+    simpleClientMessageProcessorBuilder.setServiceClass(SERVICE_CLASS.getClass());
+    simpleClientMessageProcessorBuilder.setMuleContext(muleContext);
+    CxfOutboundMessageProcessor messageProcessor = simpleClientMessageProcessorBuilder.build();
+
+    assertNotNull(messageProcessor);
+    WSS4JOutInterceptor wss4JOutInterceptor = getInterceptor(messageProcessor.getClient().getOutInterceptors());
+    assertNotNull(wss4JOutInterceptor);
+
+    Map<String, Object> wss4jProperties = wss4JOutInterceptor.getProperties();
+    assertFalse(wss4jProperties.isEmpty());
+
+    assertEquals(WSHandlerConstants.USERNAME_TOKEN, wss4jProperties.get(WSHandlerConstants.ACTION));
+
+  }
+
+  private WSS4JOutInterceptor getInterceptor(List<Interceptor<? extends Message>> interceptors) {
+    for (Interceptor interceptor : interceptors) {
+      if (interceptor instanceof WSS4JOutInterceptor) {
+        return (WSS4JOutInterceptor) interceptor;
+      }
     }
+    return null;
+  }
 
-    @Test
-    public void testWsSecurityConfig() throws MuleException
-    {
-        WsSecurity wsSecurity = new WsSecurity();
-        addConfigProperties(wsSecurity);
+  private void addConfigProperties(WsSecurity wsSecurity) {
+    Map<String, Object> configProperties = new HashMap<>();
+    configProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.USERNAME_TOKEN);
 
-        simpleClientMessageProcessorBuilder.setWsSecurity(wsSecurity);
-        simpleClientMessageProcessorBuilder.setServiceClass(SERVICE_CLASS.getClass());
-        simpleClientMessageProcessorBuilder.setMuleContext(muleContext);
-        CxfOutboundMessageProcessor messageProcessor = simpleClientMessageProcessorBuilder.build();
-
-        assertNotNull(messageProcessor);
-        WSS4JOutInterceptor wss4JOutInterceptor = getInterceptor(messageProcessor.getClient().getOutInterceptors());
-        assertNotNull(wss4JOutInterceptor);
-
-        Map<String, Object> wss4jProperties = wss4JOutInterceptor.getProperties();
-        assertFalse(wss4jProperties.isEmpty());
-
-        assertEquals(WSHandlerConstants.USERNAME_TOKEN, wss4jProperties.get(WSHandlerConstants.ACTION));
-
-    }
-
-    private WSS4JOutInterceptor getInterceptor(List<Interceptor<? extends Message>> interceptors)
-    {
-        for(Interceptor interceptor : interceptors)
-        {
-            if(interceptor instanceof WSS4JOutInterceptor)
-            {
-                return (WSS4JOutInterceptor)interceptor;
-            }
-        }
-        return null;
-    }
-
-    private void addConfigProperties(WsSecurity wsSecurity)
-    {
-        Map<String, Object> configProperties = new HashMap<>();
-        configProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.USERNAME_TOKEN);
-
-        final WsConfig wsConfig = new WsConfig(configProperties);
-        wsConfig.setMuleContext(muleContext);
-        wsSecurity.setWsConfig(wsConfig);
-    }
+    final WsConfig wsConfig = new WsConfig(configProperties);
+    wsConfig.setMuleContext(muleContext);
+    wsSecurity.setWsConfig(wsConfig);
+  }
 
 }

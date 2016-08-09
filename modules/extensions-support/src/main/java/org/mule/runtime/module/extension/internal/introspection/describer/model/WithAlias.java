@@ -13,26 +13,23 @@ import org.mule.runtime.extension.api.annotation.Alias;
  *
  * @since 4.0
  */
-interface WithAlias extends WithAnnotations, WithName
-{
+interface WithAlias extends WithAnnotations, WithName {
 
-    String EMPTY = "";
+  String EMPTY = "";
 
-    /**
-     * @return The alias of the implementer component
-     */
-    default String getAlias()
-    {
-        final java.util.Optional<Alias> alias = getAnnotation(Alias.class);
-        return alias.isPresent() ? alias.get().value() : getName();
-    }
+  /**
+   * @return The alias of the implementer component
+   */
+  default String getAlias() {
+    final java.util.Optional<Alias> alias = getAnnotation(Alias.class);
+    return alias.isPresent() ? alias.get().value() : getName();
+  }
 
-    /**
-     * @return The description of the implementer component
-     */
-    default String getDescription()
-    {
-        final java.util.Optional<Alias> alias = getAnnotation(Alias.class);
-        return alias.isPresent() ? alias.get().description() : EMPTY;
-    }
+  /**
+   * @return The description of the implementer component
+   */
+  default String getDescription() {
+    final java.util.Optional<Alias> alias = getAnnotation(Alias.class);
+    return alias.isPresent() ? alias.get().description() : EMPTY;
+  }
 }

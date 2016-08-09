@@ -19,47 +19,42 @@ import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 
-public class TcpDispatcherPoolFactoryTestCase extends FunctionalTestCase
-{
+public class TcpDispatcherPoolFactoryTestCase extends FunctionalTestCase {
+
+  @Override
+  protected String getConfigFile() {
+    return "tcp-dispatcher-pool-factory-config.xml";
+  }
+
+  public static class StubConfigurableKeyedObjectPool extends DefaultConfigurableKeyedObjectPool {
+
+  }
+
+  public static class StubDispatcherPoolFactory implements ConfigurableKeyedObjectPoolFactory {
+
     @Override
-    protected String getConfigFile()
-    {
-        return "tcp-dispatcher-pool-factory-config.xml";
+    public ConfigurableKeyedObjectPool createObjectPool() {
+      return new StubConfigurableKeyedObjectPool();
     }
+  }
 
-    public static class StubConfigurableKeyedObjectPool extends DefaultConfigurableKeyedObjectPool
-    {
+  @Test
+  public void testConnectorUsingDefaultDispatcherPoolFactory() {
+    Connector connector = muleContext.getRegistry().lookupObject("tcpConnectorWithDefaultFactory");
 
-    }
+    assertTrue(connector instanceof TcpConnector);
+    TcpConnector tcpConnector = (TcpConnector) connector;
+    assertEquals(DefaultConfigurableKeyedObjectPoolFactory.class, tcpConnector.getDispatcherPoolFactory().getClass());
+    assertEquals(DefaultConfigurableKeyedObjectPool.class, tcpConnector.getDispatchers().getClass());
+  }
 
-    public static class StubDispatcherPoolFactory implements ConfigurableKeyedObjectPoolFactory
-    {
-        @Override
-        public ConfigurableKeyedObjectPool createObjectPool()
-        {
-            return new StubConfigurableKeyedObjectPool();
-        }
-    }
+  @Test
+  public void testConnectorUsingOverriddenDispatcherPoolFactory() {
+    Connector connector = muleContext.getRegistry().lookupObject("tcpConnectorWithOverriddenFactory");
 
-    @Test
-    public void testConnectorUsingDefaultDispatcherPoolFactory()
-    {
-        Connector connector = muleContext.getRegistry().lookupObject("tcpConnectorWithDefaultFactory");
-
-        assertTrue(connector instanceof TcpConnector);
-        TcpConnector tcpConnector = (TcpConnector) connector;
-        assertEquals(DefaultConfigurableKeyedObjectPoolFactory.class, tcpConnector.getDispatcherPoolFactory().getClass());
-        assertEquals(DefaultConfigurableKeyedObjectPool.class, tcpConnector.getDispatchers().getClass());
-    }
-
-    @Test
-    public void testConnectorUsingOverriddenDispatcherPoolFactory()
-    {
-        Connector connector = muleContext.getRegistry().lookupObject("tcpConnectorWithOverriddenFactory");
-
-        assertTrue(connector instanceof TcpConnector);
-        TcpConnector tcpConnector = (TcpConnector) connector;
-        assertEquals(StubDispatcherPoolFactory.class, tcpConnector.getDispatcherPoolFactory().getClass());
-        assertEquals(StubConfigurableKeyedObjectPool.class, tcpConnector.getDispatchers().getClass());
-    }
+    assertTrue(connector instanceof TcpConnector);
+    TcpConnector tcpConnector = (TcpConnector) connector;
+    assertEquals(StubDispatcherPoolFactory.class, tcpConnector.getDispatcherPoolFactory().getClass());
+    assertEquals(StubConfigurableKeyedObjectPool.class, tcpConnector.getDispatchers().getClass());
+  }
 }

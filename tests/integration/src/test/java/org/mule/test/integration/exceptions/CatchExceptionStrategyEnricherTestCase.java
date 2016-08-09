@@ -17,31 +17,28 @@ import org.mule.runtime.core.api.processor.MessageProcessor;
 
 import org.junit.Test;
 
-public class CatchExceptionStrategyEnricherTestCase extends AbstractIntegrationTestCase
-{
-    public static class ErrorProcessor implements MessageProcessor
-    {
-        private static Throwable handled;
+public class CatchExceptionStrategyEnricherTestCase extends AbstractIntegrationTestCase {
 
-        @Override
-        public MuleEvent process(MuleEvent event) throws MuleException
-        {
-            handled = event.getMessage().getExceptionPayload().getException();
-            return event;
-        }
-    }
+  public static class ErrorProcessor implements MessageProcessor {
+
+    private static Throwable handled;
 
     @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/integration/exceptions/catch-exception-strategy-enricher.xml";
+    public MuleEvent process(MuleEvent event) throws MuleException {
+      handled = event.getMessage().getExceptionPayload().getException();
+      return event;
     }
+  }
 
-    @Test
-    public void testFlowRefHandlingException() throws Exception
-    {
-        MuleMessage response = flowRunner("enricherExceptionFlow").withPayload(getTestMuleMessage()).run().getMessage();
-        assertThat(ErrorProcessor.handled, not(nullValue()));
-        assertThat(response.getExceptionPayload(), nullValue());
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/integration/exceptions/catch-exception-strategy-enricher.xml";
+  }
+
+  @Test
+  public void testFlowRefHandlingException() throws Exception {
+    MuleMessage response = flowRunner("enricherExceptionFlow").withPayload(getTestMuleMessage()).run().getMessage();
+    assertThat(ErrorProcessor.handled, not(nullValue()));
+    assertThat(response.getExceptionPayload(), nullValue());
+  }
 }

@@ -20,50 +20,45 @@ import org.mule.tck.size.SmallTest;
 import org.junit.Test;
 
 @SmallTest
-public class StaticBulkQueryResolverTestCase extends AbstractBulkQueryResolverTestCase
-{
+public class StaticBulkQueryResolverTestCase extends AbstractBulkQueryResolverTestCase {
 
-    @Test
-    public void doesNotResolvesBulkQueryWhenThereIsNoEvent() throws Exception
-    {
-        StaticBulkQueryResolver bulkQueryResolver = new StaticBulkQueryResolver(BULK_SQL_QUERY, null);
+  @Test
+  public void doesNotResolvesBulkQueryWhenThereIsNoEvent() throws Exception {
+    StaticBulkQueryResolver bulkQueryResolver = new StaticBulkQueryResolver(BULK_SQL_QUERY, null);
 
-        BulkQuery resolvedBulkQuery = bulkQueryResolver.resolve(null);
+    BulkQuery resolvedBulkQuery = bulkQueryResolver.resolve(null);
 
-        assertThat(resolvedBulkQuery, nullValue());
-    }
+    assertThat(resolvedBulkQuery, nullValue());
+  }
 
-    @Test(expected = QueryResolutionException.class)
-    public void throwsErrorOnEmptyBulkQuery() throws Exception
-    {
-        StaticBulkQueryResolver bulkQueryResolver = new StaticBulkQueryResolver("", null);
-        bulkQueryResolver.resolve(muleEvent);
-    }
+  @Test(expected = QueryResolutionException.class)
+  public void throwsErrorOnEmptyBulkQuery() throws Exception {
+    StaticBulkQueryResolver bulkQueryResolver = new StaticBulkQueryResolver("", null);
+    bulkQueryResolver.resolve(muleEvent);
+  }
 
-    @Test
-    public void resolvesStaticBulkQuery() throws Exception
-    {
-        QueryTemplateParser queryTemplateParser = createQueryTemplateParser();
+  @Test
+  public void resolvesStaticBulkQuery() throws Exception {
+    QueryTemplateParser queryTemplateParser = createQueryTemplateParser();
 
-        StaticBulkQueryResolver bulkQueryResolver = new StaticBulkQueryResolver(BULK_SQL_QUERY, queryTemplateParser);
+    StaticBulkQueryResolver bulkQueryResolver = new StaticBulkQueryResolver(BULK_SQL_QUERY, queryTemplateParser);
 
-        BulkQuery resolvedBulkQuery = bulkQueryResolver.resolve(muleEvent);
+    BulkQuery resolvedBulkQuery = bulkQueryResolver.resolve(muleEvent);
 
-        assertResolvedBulkQuery(resolvedBulkQuery);
-    }
+    assertResolvedBulkQuery(resolvedBulkQuery);
+  }
 
-    @Test
-    public void cachesResolvedBulkQueries() throws Exception
-    {
-        QueryTemplateParser queryTemplateParser = createQueryTemplateParser();
+  @Test
+  public void cachesResolvedBulkQueries() throws Exception {
+    QueryTemplateParser queryTemplateParser = createQueryTemplateParser();
 
-        StaticBulkQueryResolver bulkQueryResolver = new StaticBulkQueryResolver(BULK_SQL_QUERY, queryTemplateParser);
+    StaticBulkQueryResolver bulkQueryResolver = new StaticBulkQueryResolver(BULK_SQL_QUERY, queryTemplateParser);
 
-        BulkQuery resolvedBulkQuery1 = bulkQueryResolver.resolve(muleEvent);
-        BulkQuery resolvedBulkQuery2 = bulkQueryResolver.resolve(muleEvent);
+    BulkQuery resolvedBulkQuery1 = bulkQueryResolver.resolve(muleEvent);
+    BulkQuery resolvedBulkQuery2 = bulkQueryResolver.resolve(muleEvent);
 
-        assertThat(resolvedBulkQuery1, sameInstance(resolvedBulkQuery2));
-        verify(queryTemplateParser, times(2)).parse(anyString());
-    }
+    assertThat(resolvedBulkQuery1, sameInstance(resolvedBulkQuery2));
+    verify(queryTemplateParser, times(2)).parse(anyString());
+  }
 
 }

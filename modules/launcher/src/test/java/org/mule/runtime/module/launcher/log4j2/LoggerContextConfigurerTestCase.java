@@ -57,157 +57,140 @@ import org.mockito.stubbing.Answer;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class LoggerContextConfigurerTestCase extends AbstractMuleTestCase
-{
+public class LoggerContextConfigurerTestCase extends AbstractMuleTestCase {
 
-    private static final String CURRENT_DIRECTORY = ".";
-    private static final String INTERVAL_PROPERTY = "interval";
-    private static final String SHUTDOWN_HOOK_PROPERTY = "isShutdownHookEnabled";
-    private static final int MONITOR_INTERVAL = 60000;
-    private static final String CONVERTER_COMPONENT = "Converter";
-    private static final String FILE_PATTERN_PROPERTY = "filePattern";
-    private static final String FILE_PATTERN_TEMPLATE_DATE_SECTION = "%d{yyyy-MM-dd}";
+  private static final String CURRENT_DIRECTORY = ".";
+  private static final String INTERVAL_PROPERTY = "interval";
+  private static final String SHUTDOWN_HOOK_PROPERTY = "isShutdownHookEnabled";
+  private static final int MONITOR_INTERVAL = 60000;
+  private static final String CONVERTER_COMPONENT = "Converter";
+  private static final String FILE_PATTERN_PROPERTY = "filePattern";
+  private static final String FILE_PATTERN_TEMPLATE_DATE_SECTION = "%d{yyyy-MM-dd}";
 
-    private LoggerContextConfigurer contextConfigurer;
+  private LoggerContextConfigurer contextConfigurer;
 
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private MuleLoggerContext context;
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  private MuleLoggerContext context;
 
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS, extraInterfaces = {Reconfigurable.class})
-    private DefaultConfiguration configuration;
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS, extraInterfaces = {Reconfigurable.class})
+  private DefaultConfiguration configuration;
 
-    private Object converter;
+  private Object converter;
 
-    @Before
-    public void before()
-    {
-        contextConfigurer = new LoggerContextConfigurer();
-        when(context.isStandlone()).thenReturn(true);
-        when(context.getConfiguration()).thenReturn(configuration);
+  @Before
+  public void before() {
+    contextConfigurer = new LoggerContextConfigurer();
+    when(context.isStandlone()).thenReturn(true);
+    when(context.getConfiguration()).thenReturn(configuration);
 
-        converter = null;
+    converter = null;
 
-        doAnswer(new Answer<Object>()
-        {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable
-            {
-                converter = invocation.getArguments()[1];
-                return null;
-            }
-        }).when(configuration).addComponent(eq("Converter"), anyObject());
+    doAnswer(new Answer<Object>() {
 
-        when(configuration.getComponent(CONVERTER_COMPONENT)).thenAnswer(
-                new Answer<Object>()
-                {
-                    @Override
-                    public Object answer(InvocationOnMock invocation) throws Throwable
-                    {
-                        return converter;
-                    }
-                }
-        );
-    }
+      @Override
+      public Object answer(InvocationOnMock invocation) throws Throwable {
+        converter = invocation.getArguments()[1];
+        return null;
+      }
+    }).when(configuration).addComponent(eq("Converter"), anyObject());
 
-    @Test
-    public void disableShutdownHook() throws Exception
-    {
-        contextConfigurer.configure(context);
-        assertThat((boolean) ClassUtils.getFieldValue(context.getConfiguration(), SHUTDOWN_HOOK_PROPERTY, true), is(false));
-    }
+    when(configuration.getComponent(CONVERTER_COMPONENT)).thenAnswer(new Answer<Object>() {
 
-    @Test
-    public void configurationMonitor() throws Exception
-    {
-        WatchManager watchManager = mock(WatchManager.class);
-        when(configuration.getWatchManager()).thenReturn(watchManager);
+      @Override
+      public Object answer(InvocationOnMock invocation) throws Throwable {
+        return converter;
+      }
+    });
+  }
 
-        when(context.getConfigFile()).thenReturn(new File(CURRENT_DIRECTORY).toURI());
-        contextConfigurer.configure(context);
-        ArgumentCaptor<ConfiguratonFileWatcher> captor = ArgumentCaptor.forClass(ConfiguratonFileWatcher.class);
-        verify(watchManager).watchFile(any(File.class), captor.capture());
+  @Test
+  public void disableShutdownHook() throws Exception {
+    contextConfigurer.configure(context);
+    assertThat((boolean) ClassUtils.getFieldValue(context.getConfiguration(), SHUTDOWN_HOOK_PROPERTY, true), is(false));
+  }
 
-        assertThat(captor.getValue(), instanceOf(ConfiguratonFileWatcher.class));
-        verify(watchManager).setIntervalSeconds(eq((int) TimeUnit.MILLISECONDS.toSeconds(MONITOR_INTERVAL)));
-    }
+  @Test
+  public void configurationMonitor() throws Exception {
+    WatchManager watchManager = mock(WatchManager.class);
+    when(configuration.getWatchManager()).thenReturn(watchManager);
 
-    @Test
-    public void forceConsoleLog()
-    {
-        withForceConsoleLog(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                contextConfigurer.update(context);
-                ArgumentCaptor<ConsoleAppender> appenderCaptor = ArgumentCaptor.forClass(ConsoleAppender.class);
-                verify(context.getConfiguration()).addAppender(appenderCaptor.capture());
+    when(context.getConfigFile()).thenReturn(new File(CURRENT_DIRECTORY).toURI());
+    contextConfigurer.configure(context);
+    ArgumentCaptor<ConfiguratonFileWatcher> captor = ArgumentCaptor.forClass(ConfiguratonFileWatcher.class);
+    verify(watchManager).watchFile(any(File.class), captor.capture());
 
-                Appender forcedConsoleAppender = appenderCaptor.getValue();
+    assertThat(captor.getValue(), instanceOf(ConfiguratonFileWatcher.class));
+    verify(watchManager).setIntervalSeconds(eq((int) TimeUnit.MILLISECONDS.toSeconds(MONITOR_INTERVAL)));
+  }
 
-                assertThat(forcedConsoleAppender, notNullValue());
-                assertThat(forcedConsoleAppender.getName(), equalTo(FORCED_CONSOLE_APPENDER_NAME));
-                assertThat(forcedConsoleAppender.isStarted(), is(true));
+  @Test
+  public void forceConsoleLog() {
+    withForceConsoleLog(new Runnable() {
 
-                LoggerConfig rootLogger = ((AbstractConfiguration) context.getConfiguration()).getRootLogger();
-                verify(rootLogger).addAppender(forcedConsoleAppender, Level.ALL, null);
-            }
-        });
-    }
-
-    @Test
-    public void perAppDefaultAppender() throws Exception
-    {
-        when(context.isArtifactClassloader()).thenReturn(true);
+      @Override
+      public void run() {
         contextConfigurer.update(context);
-        ArgumentCaptor<RollingFileAppender> appenderCaptor = ArgumentCaptor.forClass(RollingFileAppender.class);
+        ArgumentCaptor<ConsoleAppender> appenderCaptor = ArgumentCaptor.forClass(ConsoleAppender.class);
         verify(context.getConfiguration()).addAppender(appenderCaptor.capture());
 
-        Appender perAppAppender = appenderCaptor.getValue();
+        Appender forcedConsoleAppender = appenderCaptor.getValue();
 
-        assertThat(perAppAppender, notNullValue());
-        assertThat(perAppAppender.getName(), equalTo(PER_APP_FILE_APPENDER_NAME));
-        assertThat(perAppAppender.isStarted(), is(true));
-
-        String filePattern = ClassUtils.getFieldValue(perAppAppender, FILE_PATTERN_PROPERTY, true);
-        String filePatternTemplate = filePattern.substring(filePattern.lastIndexOf('/') + 1);
-        String filePatternTemplateDateSuffix = filePatternTemplate.substring(filePatternTemplate.lastIndexOf('.') + 1);
-        assertThat(filePatternTemplateDateSuffix, equalTo(FILE_PATTERN_TEMPLATE_DATE_SECTION));
+        assertThat(forcedConsoleAppender, notNullValue());
+        assertThat(forcedConsoleAppender.getName(), equalTo(FORCED_CONSOLE_APPENDER_NAME));
+        assertThat(forcedConsoleAppender.isStarted(), is(true));
 
         LoggerConfig rootLogger = ((AbstractConfiguration) context.getConfiguration()).getRootLogger();
-        verify(rootLogger).addAppender(perAppAppender, Level.ALL, null);
-    }
+        verify(rootLogger).addAppender(forcedConsoleAppender, Level.ALL, null);
+      }
+    });
+  }
 
-    @Test
-    public void forceConsoleLogWithAppenderAlreadyPresent()
-    {
-        withForceConsoleLog(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                LoggerConfig rootLogger = ((AbstractConfiguration) context.getConfiguration()).getRootLogger();
-                Collection<Appender> appenders = new ArrayList<>();
-                appenders.add(ConsoleAppender.createAppender(mock(Layout.class), null, null, "Console", null, null));
-                when(rootLogger.getAppenders().values()).thenReturn(appenders);
+  @Test
+  public void perAppDefaultAppender() throws Exception {
+    when(context.isArtifactClassloader()).thenReturn(true);
+    contextConfigurer.update(context);
+    ArgumentCaptor<RollingFileAppender> appenderCaptor = ArgumentCaptor.forClass(RollingFileAppender.class);
+    verify(context.getConfiguration()).addAppender(appenderCaptor.capture());
 
-                contextConfigurer.configure(context);
-                verify(context.getConfiguration(), never()).addAppender(any(ConsoleAppender.class));
-                verify(rootLogger, never()).addAppender(any(ConsoleAppender.class), same(Level.INFO), any(Filter.class));
-            }
-        });
-    }
+    Appender perAppAppender = appenderCaptor.getValue();
 
-    private void withForceConsoleLog(Runnable assertion)
-    {
-        System.setProperty(MuleProperties.MULE_FORCE_CONSOLE_LOG, "");
-        try
-        {
-            assertion.run();
-        }
-        finally
-        {
-            System.clearProperty(MuleProperties.MULE_FORCE_CONSOLE_LOG);
-        }
+    assertThat(perAppAppender, notNullValue());
+    assertThat(perAppAppender.getName(), equalTo(PER_APP_FILE_APPENDER_NAME));
+    assertThat(perAppAppender.isStarted(), is(true));
+
+    String filePattern = ClassUtils.getFieldValue(perAppAppender, FILE_PATTERN_PROPERTY, true);
+    String filePatternTemplate = filePattern.substring(filePattern.lastIndexOf('/') + 1);
+    String filePatternTemplateDateSuffix = filePatternTemplate.substring(filePatternTemplate.lastIndexOf('.') + 1);
+    assertThat(filePatternTemplateDateSuffix, equalTo(FILE_PATTERN_TEMPLATE_DATE_SECTION));
+
+    LoggerConfig rootLogger = ((AbstractConfiguration) context.getConfiguration()).getRootLogger();
+    verify(rootLogger).addAppender(perAppAppender, Level.ALL, null);
+  }
+
+  @Test
+  public void forceConsoleLogWithAppenderAlreadyPresent() {
+    withForceConsoleLog(new Runnable() {
+
+      @Override
+      public void run() {
+        LoggerConfig rootLogger = ((AbstractConfiguration) context.getConfiguration()).getRootLogger();
+        Collection<Appender> appenders = new ArrayList<>();
+        appenders.add(ConsoleAppender.createAppender(mock(Layout.class), null, null, "Console", null, null));
+        when(rootLogger.getAppenders().values()).thenReturn(appenders);
+
+        contextConfigurer.configure(context);
+        verify(context.getConfiguration(), never()).addAppender(any(ConsoleAppender.class));
+        verify(rootLogger, never()).addAppender(any(ConsoleAppender.class), same(Level.INFO), any(Filter.class));
+      }
+    });
+  }
+
+  private void withForceConsoleLog(Runnable assertion) {
+    System.setProperty(MuleProperties.MULE_FORCE_CONSOLE_LOG, "");
+    try {
+      assertion.run();
+    } finally {
+      System.clearProperty(MuleProperties.MULE_FORCE_CONSOLE_LOG);
     }
+  }
 }

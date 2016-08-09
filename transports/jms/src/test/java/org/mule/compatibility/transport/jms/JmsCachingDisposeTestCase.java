@@ -11,20 +11,17 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 
-public class JmsCachingDisposeTestCase extends AbstractBrokerFunctionalTestCase
-{
+public class JmsCachingDisposeTestCase extends AbstractBrokerFunctionalTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "jms-caching-dispose-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "jms-caching-dispose-config.xml";
+  }
 
-    @Test
-    public void closesConnectionWhenMuleContextIsDisposed() throws Exception
-    {
-        assertEquals(1, getConnectionsCount());
-        muleContext.dispose();
-        assertEquals(0, getConnectionsCount());
-    }
+  @Test
+  public void closesConnectionWhenMuleContextIsDisposed() throws Exception {
+    assertEquals(1, getConnectionsCount());
+    muleContext.dispose();
+    assertEquals(0, getConnectionsCount());
+  }
 }

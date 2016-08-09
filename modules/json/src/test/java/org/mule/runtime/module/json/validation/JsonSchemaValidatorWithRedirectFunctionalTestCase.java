@@ -12,30 +12,25 @@ import static org.mule.runtime.module.json.validation.JsonSchemaTestUtils.getGoo
 
 import org.junit.Test;
 
-public class JsonSchemaValidatorWithRedirectFunctionalTestCase extends AbstractValidateSchemaFunctionalTestCase
-{
+public class JsonSchemaValidatorWithRedirectFunctionalTestCase extends AbstractValidateSchemaFunctionalTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "validate-schema-with-redirects-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "validate-schema-with-redirects-config.xml";
+  }
 
-    @Test
-    public void good() throws Exception
-    {
-        flowRunner(VALIDATE_FLOW).withPayload(getGoodFstab()).run();
-    }
+  @Test
+  public void good() throws Exception {
+    flowRunner(VALIDATE_FLOW).withPayload(getGoodFstab()).run();
+  }
 
-    @Test(expected = JsonSchemaValidationException.class)
-    public void bad() throws Throwable
-    {
-        runAndExpectFailure(getBadFstab());
-    }
+  @Test(expected = JsonSchemaValidationException.class)
+  public void bad() throws Throwable {
+    runAndExpectFailure(getBadFstab());
+  }
 
-    @Test(expected = JsonSchemaValidationException.class)
-    public void bad2() throws Throwable
-    {
-        runAndExpectFailure(getBadFstab2());
-    }
+  @Test(expected = JsonSchemaValidationException.class)
+  public void bad2() throws Throwable {
+    runAndExpectFailure(getBadFstab2());
+  }
 }

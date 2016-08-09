@@ -12,19 +12,16 @@ import org.mule.runtime.api.metadata.DataType;
 
 import java.io.Serializable;
 
-public class AddSessionVariableTransformer extends AbstractAddVariablePropertyTransformer<Object>
-{
+public class AddSessionVariableTransformer extends AbstractAddVariablePropertyTransformer<Object> {
 
-    @Override
-    protected void addProperty(MuleEvent event, String propertyName, Object value, DataType dataType)
-    {
-        event.getSession().setProperty(propertyName, (Serializable) value, dataType );
-    }
+  @Override
+  protected void addProperty(MuleEvent event, String propertyName, Object value, DataType dataType) {
+    event.getSession().setProperty(propertyName, (Serializable) value, dataType);
+  }
 
-    @Override
-    protected void removeProperty(MuleEvent event, String propertyName)
-    {
-        event.getSession().removeProperty(propertyName);
-    }
+  @Override
+  protected void removeProperty(MuleEvent event, String propertyName) {
+    event.getSession().removeProperty(propertyName);
+  }
 
 }

@@ -20,33 +20,32 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Test;
 
-public class IdempotentMessageFilterTestCase extends AbstractMuleContextTestCase
-{
-    @Test
-    public void testIdempotentReceiver() throws Exception
-    {
-        Flow flow = getTestFlow();
+public class IdempotentMessageFilterTestCase extends AbstractMuleContextTestCase {
 
-        MuleSession session = mock(MuleSession.class);
+  @Test
+  public void testIdempotentReceiver() throws Exception {
+    Flow flow = getTestFlow();
 
-        IdempotentMessageFilter ir = new IdempotentMessageFilter();
-        ir.setIdExpression("#[message.inboundProperties.id]");
-        ir.setFlowConstruct(flow);
-        ir.setThrowOnUnaccepted(false);
-        ir.setStorePrefix("foo");
-        ir.setStore(new InMemoryObjectStore<String>());
+    MuleSession session = mock(MuleSession.class);
 
-        MuleMessage okMessage = MuleMessage.builder().payload("OK").addOutboundProperty("id", "1").build();
-        MuleEvent event = new DefaultMuleEvent(okMessage, getTestFlow(), session);
+    IdempotentMessageFilter ir = new IdempotentMessageFilter();
+    ir.setIdExpression("#[message.inboundProperties.id]");
+    ir.setFlowConstruct(flow);
+    ir.setThrowOnUnaccepted(false);
+    ir.setStorePrefix("foo");
+    ir.setStore(new InMemoryObjectStore<String>());
 
-        // This one will process the event on the target endpoint
-        MuleEvent processedEvent = ir.process(event);
-        assertNotNull(processedEvent);
+    MuleMessage okMessage = MuleMessage.builder().payload("OK").addOutboundProperty("id", "1").build();
+    MuleEvent event = new DefaultMuleEvent(okMessage, getTestFlow(), session);
 
-         // This will not process, because the ID is a duplicate
-        okMessage = MuleMessage.builder().payload("OK").addOutboundProperty("id", "1").build();
-        event = new DefaultMuleEvent(okMessage, getTestFlow(), session);
-        processedEvent = ir.process(event);
-        assertNull(processedEvent);
-    }
+    // This one will process the event on the target endpoint
+    MuleEvent processedEvent = ir.process(event);
+    assertNotNull(processedEvent);
+
+    // This will not process, because the ID is a duplicate
+    okMessage = MuleMessage.builder().payload("OK").addOutboundProperty("id", "1").build();
+    event = new DefaultMuleEvent(okMessage, getTestFlow(), session);
+    processedEvent = ir.process(event);
+    assertNull(processedEvent);
+  }
 }

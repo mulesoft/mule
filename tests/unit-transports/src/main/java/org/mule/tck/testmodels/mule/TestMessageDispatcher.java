@@ -20,119 +20,94 @@ import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.routing.RoutingException;
 import org.mule.tck.processor.TestNonBlockingProcessor;
 
-public class TestMessageDispatcher extends AbstractMessageDispatcher
-{
-    public TestMessageDispatcher(final OutboundEndpoint endpoint)
-    {
-        super(endpoint);
+public class TestMessageDispatcher extends AbstractMessageDispatcher {
+
+  public TestMessageDispatcher(final OutboundEndpoint endpoint) {
+    super(endpoint);
+  }
+
+  private TestNonBlockingProcessor nonBlockingProcessor = new TestNonBlockingProcessor();
+
+  @Override
+  protected void doInitialise() {
+    try {
+      nonBlockingProcessor.initialise();
+    } catch (InitialisationException e) {
+      throw new MuleRuntimeException(e);
     }
+  }
 
-    private TestNonBlockingProcessor nonBlockingProcessor = new TestNonBlockingProcessor();
+  @Override
+  protected void doDispose() {
+    nonBlockingProcessor.dispose();
+  }
 
-    @Override
-    protected void doInitialise()
-    {
-        try
-        {
-            nonBlockingProcessor.initialise();
-        }
-        catch (InitialisationException e)
-        {
-            throw new MuleRuntimeException(e);
-        }
+  @Override
+  protected void doDispatch(MuleEvent event) throws Exception {
+    if (endpoint.getEndpointURI().toString().equals("test://AlwaysFail")) {
+      throw new RoutingException(event, (OutboundEndpoint) endpoint);
     }
+  }
 
-    @Override
-    protected void doDispose()
-    {
-        nonBlockingProcessor.dispose();
+  @Override
+  protected MuleMessage doSend(MuleEvent event) throws Exception {
+    if (endpoint.getEndpointURI().toString().equals("test://AlwaysFail")) {
+      throw new RoutingException(event, (OutboundEndpoint) endpoint);
     }
+    return event.getMessage();
+  }
 
-    @Override
-    protected void doDispatch(MuleEvent event) throws Exception
-    {
-        if (endpoint.getEndpointURI().toString().equals("test://AlwaysFail"))
-        {
-            throw new RoutingException(event, (OutboundEndpoint) endpoint);
-        }
+  @Override
+  protected void doSendNonBlocking(MuleEvent event, final CompletionHandler<MuleMessage, Exception, Void> completionHandler) {
+    if (endpoint.getEndpointURI().toString().equals("test://AlwaysFail")) {
+      completionHandler.onFailure(new RoutingException(event, (OutboundEndpoint) endpoint));
+    } else {
+      try {
+        final MuleMessage response = event.getMessage();
+        event = new DefaultMuleEvent(event, new ReplyToHandler() {
+
+          @Override
+          public void processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) {
+            completionHandler.onCompletion(response, (ExceptionCallback<Void, Exception>) (exception -> {
+              // TODO MULE-9629
+              return null;
+            }));
+          }
+
+          @Override
+          public void processExceptionReplyTo(MessagingException exception, Object replyTo) {
+            completionHandler.onFailure(exception);
+          }
+        });
+        nonBlockingProcessor.process(event);
+      } catch (Exception e) {
+        completionHandler.onFailure(e);
+      }
     }
+  }
 
-    @Override
-    protected MuleMessage doSend(MuleEvent event) throws Exception
-    {
-        if (endpoint.getEndpointURI().toString().equals("test://AlwaysFail"))
-        {
-            throw new RoutingException(event, (OutboundEndpoint) endpoint);
-        }
-        return event.getMessage();
-    }
+  @Override
+  protected void doConnect() throws Exception {
+    // no op
+  }
 
-    @Override
-    protected void doSendNonBlocking(MuleEvent event, final CompletionHandler<MuleMessage, Exception, Void> completionHandler)
-    {
-        if (endpoint.getEndpointURI().toString().equals("test://AlwaysFail"))
-        {
-            completionHandler.onFailure(new RoutingException(event, (OutboundEndpoint) endpoint));
-        }
-        else
-        {
-            try
-            {
-                final MuleMessage response = event.getMessage();
-                event = new DefaultMuleEvent(event, new ReplyToHandler()
-                {
-                    @Override
-                    public void processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo)
-                    {
-                        completionHandler.onCompletion(response, (ExceptionCallback<Void, Exception>) (exception ->
-                        {
-                            // TODO MULE-9629
-                            return null;
-                        }));
-                    }
+  @Override
+  protected void doDisconnect() throws Exception {
+    // no op
+  }
 
-                    @Override
-                    public void processExceptionReplyTo(MessagingException exception, Object replyTo)
-                    {
-                        completionHandler.onFailure(exception);
-                    }
-                });
-                nonBlockingProcessor.process(event);
-            }
-            catch (Exception e)
-            {
-                completionHandler.onFailure(e);
-            }
-        }
-    }
+  @Override
+  protected void doStart() {
+    // no op
+  }
 
-    @Override
-    protected void doConnect() throws Exception
-    {
-        // no op
-    }
+  @Override
+  protected void doStop() {
+    // no op
+  }
 
-    @Override
-    protected void doDisconnect() throws Exception
-    {
-        // no op
-    }
-
-    @Override
-    protected void doStart() 
-    {
-        // no op
-    }
-
-    @Override
-    protected void doStop() 
-    {
-        // no op
-    }
-
-    @Override
-    protected boolean isSupportsNonBlocking()
-    {
-        return true;
-    }
+  @Override
+  protected boolean isSupportsNonBlocking() {
+    return true;
+  }
 }

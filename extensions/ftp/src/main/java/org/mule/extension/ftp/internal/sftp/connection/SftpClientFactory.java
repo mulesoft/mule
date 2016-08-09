@@ -13,19 +13,16 @@ import com.jcraft.jsch.JSch;
  *
  * @since 4.0
  */
-public class SftpClientFactory
-{
+public class SftpClientFactory {
 
-    /**
-     * Creates a new instance which will connect to the given
-     * {@code host} and {@code port}
-     *
-     * @param host the host address
-     * @param port the remote connection port
-     * @return a {@link SftpClient}
-     */
-    public SftpClient createInstance(String host, int port)
-    {
-        return new SftpClient(host, port, JSch::new);
-    }
+  /**
+   * Creates a new instance which will connect to the given {@code host} and {@code port}
+   *
+   * @param host the host address
+   * @param port the remote connection port
+   * @return a {@link SftpClient}
+   */
+  public SftpClient createInstance(String host, int port) {
+    return new SftpClient(host, port, JSch::new);
+  }
 }

@@ -29,60 +29,53 @@ import java.util.List;
 /**
  * Base class for message processors processing only one query
  */
-public abstract class AbstractSingleQueryDbMessageProcessor extends AbstractDbMessageProcessor
-{
+public abstract class AbstractSingleQueryDbMessageProcessor extends AbstractDbMessageProcessor {
 
-    private final QueryResolver queryResolver;
+  private final QueryResolver queryResolver;
 
-    public AbstractSingleQueryDbMessageProcessor(DbConfigResolver dbConfigResolver, QueryResolver queryResolver, TransactionalAction transactionalAction)
-    {
-        super(dbConfigResolver, transactionalAction);
-        this.queryResolver = queryResolver;
+  public AbstractSingleQueryDbMessageProcessor(DbConfigResolver dbConfigResolver, QueryResolver queryResolver,
+                                               TransactionalAction transactionalAction) {
+    super(dbConfigResolver, transactionalAction);
+    this.queryResolver = queryResolver;
+  }
+
+  @Override
+  protected Object executeQuery(DbConnection connection, MuleEvent muleEvent) throws SQLException {
+    MuleEvent eventToUse = resolveSource(muleEvent);
+
+    Query resolvedQuery = queryResolver.resolve(connection, eventToUse);
+
+    validateQueryType(resolvedQuery.getQueryTemplate());
+
+    return doExecuteQuery(connection, resolvedQuery);
+  }
+
+  protected abstract Object doExecuteQuery(DbConnection connection, Query query) throws SQLException;
+
+  @Override
+  protected List<FieldDebugInfo<?>> getMessageProcessorDebugInfo(DbConnection connection, MuleEvent muleEvent) {
+    MuleEvent eventToUse = resolveSource(muleEvent);
+    final List<FieldDebugInfo<?>> fields = new ArrayList<>();
+
+    Query resolvedQuery;
+    try {
+      resolvedQuery = queryResolver.resolve(connection, eventToUse);
+    } catch (QueryResolutionException e) {
+      fields.add(createFieldDebugInfo(SQL_TEXT_DEBUG_FIELD, String.class, e));
+      return fields;
     }
 
-    @Override
-    protected Object executeQuery(DbConnection connection, MuleEvent muleEvent) throws SQLException
-    {
-        MuleEvent eventToUse = resolveSource(muleEvent);
+    fields.add(createFieldDebugInfo(SQL_TEXT_DEBUG_FIELD, String.class, resolvedQuery.getQueryTemplate().getSqlText()));
+    fields.add(createFieldDebugInfo(TYPE_DEBUG_FIELD, String.class, resolvedQuery.getQueryTemplate().getType().toString()));
 
-        Query resolvedQuery = queryResolver.resolve(connection, eventToUse);
-
-        validateQueryType(resolvedQuery.getQueryTemplate());
-
-        return doExecuteQuery(connection, resolvedQuery);
+    final List<FieldDebugInfo<?>> paramFields = new ArrayList<>();
+    int paramIndex = 1;
+    for (QueryParamValue queryParamValue : resolvedQuery.getParamValues()) {
+      final String name = queryParamValue.getName() == null ? PARAM_DEBUG_FIELD_PREFIX + paramIndex++ : queryParamValue.getName();
+      paramFields.add(createFieldDebugInfo(name, String.class, queryParamValue.getValue()));
     }
+    fields.add(createFieldDebugInfo(INPUT_PARAMS_DEBUG_FIELD, List.class, paramFields));
 
-    protected abstract Object doExecuteQuery(DbConnection connection, Query query) throws SQLException;
-
-    @Override
-    protected List<FieldDebugInfo<?>> getMessageProcessorDebugInfo(DbConnection connection, MuleEvent muleEvent)
-    {
-        MuleEvent eventToUse = resolveSource(muleEvent);
-        final List<FieldDebugInfo<?>> fields = new ArrayList<>();
-
-        Query resolvedQuery;
-        try
-        {
-            resolvedQuery = queryResolver.resolve(connection, eventToUse);
-        }
-        catch (QueryResolutionException e)
-        {
-            fields.add(createFieldDebugInfo(SQL_TEXT_DEBUG_FIELD, String.class, e));
-            return fields;
-        }
-
-        fields.add(createFieldDebugInfo(SQL_TEXT_DEBUG_FIELD, String.class, resolvedQuery.getQueryTemplate().getSqlText()));
-        fields.add(createFieldDebugInfo(TYPE_DEBUG_FIELD, String.class, resolvedQuery.getQueryTemplate().getType().toString()));
-
-        final List<FieldDebugInfo<?>> paramFields = new ArrayList<>();
-        int paramIndex = 1;
-        for (QueryParamValue queryParamValue : resolvedQuery.getParamValues())
-        {
-            final String name = queryParamValue.getName() == null ? PARAM_DEBUG_FIELD_PREFIX + paramIndex++ : queryParamValue.getName();
-            paramFields.add(createFieldDebugInfo(name, String.class, queryParamValue.getValue()));
-        }
-        fields.add(createFieldDebugInfo(INPUT_PARAMS_DEBUG_FIELD, List.class, paramFields));
-
-        return fields;
-    }
+    return fields;
+  }
 }

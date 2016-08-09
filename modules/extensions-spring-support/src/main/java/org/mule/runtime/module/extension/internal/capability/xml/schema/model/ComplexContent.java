@@ -23,10 +23,13 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for anonymous complex type.
+ * <p>
+ * Java class for anonymous complex type.
  * <p/>
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>
+ * The following schema fragment specifies the expected content contained within this class.
  * <p/>
+ * 
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
@@ -43,83 +46,67 @@ import javax.xml.bind.annotation.XmlType;
  * </pre>
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = {
-        "restriction",
-        "extension"
-})
+@XmlType(name = "", propOrder = {"restriction", "extension"})
 @XmlRootElement(name = "complexContent")
-public class ComplexContent extends Annotated
-{
+public class ComplexContent extends Annotated {
 
-    protected ComplexRestrictionType restriction;
-    protected ExtensionType extension;
-    @XmlAttribute(name = "mixed")
-    protected Boolean mixed;
+  protected ComplexRestrictionType restriction;
+  protected ExtensionType extension;
+  @XmlAttribute(name = "mixed")
+  protected Boolean mixed;
 
-    /**
-     * Gets the value of the restriction property.
-     *
-     * @return possible object is
-     * {@link ComplexRestrictionType }
-     */
-    public ComplexRestrictionType getRestriction()
-    {
-        return restriction;
-    }
+  /**
+   * Gets the value of the restriction property.
+   *
+   * @return possible object is {@link ComplexRestrictionType }
+   */
+  public ComplexRestrictionType getRestriction() {
+    return restriction;
+  }
 
-    /**
-     * Sets the value of the restriction property.
-     *
-     * @param value allowed object is
-     *              {@link ComplexRestrictionType }
-     */
-    public void setRestriction(ComplexRestrictionType value)
-    {
-        this.restriction = value;
-    }
+  /**
+   * Sets the value of the restriction property.
+   *
+   * @param value allowed object is {@link ComplexRestrictionType }
+   */
+  public void setRestriction(ComplexRestrictionType value) {
+    this.restriction = value;
+  }
 
-    /**
-     * Gets the value of the extension property.
-     *
-     * @return possible object is
-     * {@link ExtensionType }
-     */
-    public ExtensionType getExtension()
-    {
-        return extension;
-    }
+  /**
+   * Gets the value of the extension property.
+   *
+   * @return possible object is {@link ExtensionType }
+   */
+  public ExtensionType getExtension() {
+    return extension;
+  }
 
-    /**
-     * Sets the value of the extension property.
-     *
-     * @param value allowed object is
-     *              {@link ExtensionType }
-     */
-    public void setExtension(ExtensionType value)
-    {
-        this.extension = value;
-    }
+  /**
+   * Sets the value of the extension property.
+   *
+   * @param value allowed object is {@link ExtensionType }
+   */
+  public void setExtension(ExtensionType value) {
+    this.extension = value;
+  }
 
-    /**
-     * Gets the value of the mixed property.
-     *
-     * @return possible object is
-     * {@link Boolean }
-     */
-    public Boolean isMixed()
-    {
-        return mixed;
-    }
+  /**
+   * Gets the value of the mixed property.
+   *
+   * @return possible object is {@link Boolean }
+   */
+  public Boolean isMixed() {
+    return mixed;
+  }
 
-    /**
-     * Sets the value of the mixed property.
-     *
-     * @param value allowed object is
-     *              {@link Boolean }
-     */
-    public void setMixed(Boolean value)
-    {
-        this.mixed = value;
-    }
+  /**
+   * Sets the value of the mixed property.
+   *
+   * @param value allowed object is {@link Boolean }
+   */
+  public void setMixed(Boolean value) {
+    this.mixed = value;
+  }
 
 }

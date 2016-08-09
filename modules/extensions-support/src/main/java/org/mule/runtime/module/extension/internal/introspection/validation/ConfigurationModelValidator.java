@@ -20,54 +20,49 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 
 /**
- * {@link ModelValidator} which applies to {@link ExtensionModel}s which contains
- * {@link ConfigurationModel}s and {@link OperationModel}s .
+ * {@link ModelValidator} which applies to {@link ExtensionModel}s which contains {@link ConfigurationModel}s and
+ * {@link OperationModel}s .
  * <p>
- * This validator makes sure that all {@link OperationModel operations } are compatible with the
- * defined {@link ConfigurationModel c}
+ * This validator makes sure that all {@link OperationModel operations } are compatible with the defined {@link ConfigurationModel
+ * c}
  *
  * @since 4.0
  */
-public final class ConfigurationModelValidator implements ModelValidator
-{
+public final class ConfigurationModelValidator implements ModelValidator {
 
-    @Override
-    public void validate(ExtensionModel model) throws IllegalModelDefinitionException
-    {
-        ListMultimap<Class, String> configParams = getParameterConfigsFromOperations(model);
+  @Override
+  public void validate(ExtensionModel model) throws IllegalModelDefinitionException {
+    ListMultimap<Class, String> configParams = getParameterConfigsFromOperations(model);
 
-        for (ConfigurationModel configurationModel : model.getConfigurationModels())
-        {
-            if (!(configurationModel instanceof RuntimeConfigurationModel))
-            {
-                continue;
-            }
+    for (ConfigurationModel configurationModel : model.getConfigurationModels()) {
+      if (!(configurationModel instanceof RuntimeConfigurationModel)) {
+        continue;
+      }
 
-            for (Class clazz : configParams.keySet())
-            {
-                final ConfigurationFactory configurationFactory = ((RuntimeConfigurationModel) configurationModel).getConfigurationFactory();
-                if (!clazz.isAssignableFrom(configurationFactory.getObjectType()))
-                {
-                    throw new IllegalConfigurationModelDefinitionException(String.format("Extension '%s' defines the '%s' configuration. However, the extension's operations %s expect configurations of type '%s'. " +
-                                                                                         "Please make sure that all configurations in the extension can be used with all its operations.",
-                                                                                         model.getName(), configurationFactory.getObjectType(), clazz, configParams.get(clazz)));
-                }
-            }
+      for (Class clazz : configParams.keySet()) {
+        final ConfigurationFactory configurationFactory =
+            ((RuntimeConfigurationModel) configurationModel).getConfigurationFactory();
+        if (!clazz.isAssignableFrom(configurationFactory.getObjectType())) {
+          throw new IllegalConfigurationModelDefinitionException(String.format(
+                                                                               "Extension '%s' defines the '%s' configuration. However, the extension's operations %s expect configurations of type '%s'. "
+                                                                                   + "Please make sure that all configurations in the extension can be used with all its operations.",
+                                                                               model.getName(),
+                                                                               configurationFactory.getObjectType(), clazz,
+                                                                               configParams.get(clazz)));
         }
+      }
+    }
+  }
+
+  private ListMultimap<Class, String> getParameterConfigsFromOperations(ExtensionModel model) {
+    ListMultimap<Class, String> operationsByConfig = ArrayListMultimap.create();
+
+    for (OperationModel operationModel : model.getOperationModels()) {
+      operationModel.getModelProperty(ConfigTypeModelProperty.class)
+          .ifPresent(modelProperty -> operationsByConfig.put(getType(modelProperty.getConfigType()), operationModel.getName()));
     }
 
-    private ListMultimap<Class, String> getParameterConfigsFromOperations(ExtensionModel model)
-    {
-        ListMultimap<Class, String> operationsByConfig = ArrayListMultimap.create();
-
-        for (OperationModel operationModel : model.getOperationModels())
-        {
-            operationModel.getModelProperty(ConfigTypeModelProperty.class)
-                    .ifPresent(modelProperty -> operationsByConfig.put(getType(modelProperty.getConfigType()),
-                                                                       operationModel.getName()));
-        }
-
-        return operationsByConfig;
-    }
+    return operationsByConfig;
+  }
 
 }

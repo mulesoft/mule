@@ -6,17 +6,15 @@
  */
 package org.mule.test.subtypes.extension;
 
-public class ParentShape
-{
-    private Integer area;
+public class ParentShape {
 
-    public Integer getArea()
-    {
-        return area;
-    }
+  private Integer area;
 
-    public void setArea(Integer area)
-    {
-        this.area = area;
-    }
+  public Integer getArea() {
+    return area;
+  }
+
+  public void setArea(Integer area) {
+    this.area = area;
+  }
 }

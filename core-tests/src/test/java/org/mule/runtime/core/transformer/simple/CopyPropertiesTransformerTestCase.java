@@ -38,79 +38,73 @@ import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class CopyPropertiesTransformerTestCase extends AbstractMuleTestCase
-{
-    public static final Charset ENCODING = US_ASCII;
-    public static final String INBOUND_PROPERTY_KEY = "propKey";
-    public static final DataType PROPERTY_DATA_TYPE = DataType.STRING;
-    private static final Serializable PROPERTY_VALUE = "propValue";
+public class CopyPropertiesTransformerTestCase extends AbstractMuleTestCase {
 
-    @Mock(answer = RETURNS_DEEP_STUBS)
-    private MuleContext mockMuleContext;
+  public static final Charset ENCODING = US_ASCII;
+  public static final String INBOUND_PROPERTY_KEY = "propKey";
+  public static final DataType PROPERTY_DATA_TYPE = DataType.STRING;
+  private static final Serializable PROPERTY_VALUE = "propValue";
 
-    private MuleMessage muleMessage;
-    @Mock
-    private ExpressionManager mockExpressionManager;
+  @Mock(answer = RETURNS_DEEP_STUBS)
+  private MuleContext mockMuleContext;
 
-    @Before
-    public void setUp() throws Exception
-    {
-        when(mockMuleContext.getExpressionManager()).thenReturn(mockExpressionManager);
-        Mockito.when(mockExpressionManager.parse(anyString(), Mockito.any(MuleEvent.class))).thenAnswer(
-                invocation -> (String) invocation.getArguments()[0]);
+  private MuleMessage muleMessage;
+  @Mock
+  private ExpressionManager mockExpressionManager;
 
-        muleMessage = MuleMessage.builder().payload("").mediaType(PROPERTY_DATA_TYPE.getMediaType()).build();
-    }
+  @Before
+  public void setUp() throws Exception {
+    when(mockMuleContext.getExpressionManager()).thenReturn(mockExpressionManager);
+    Mockito.when(mockExpressionManager.parse(anyString(), Mockito.any(MuleEvent.class)))
+        .thenAnswer(invocation -> (String) invocation.getArguments()[0]);
 
-    @Test
-    public void testCopySingleProperty() throws TransformerException, InitialisationException
-    {
-        CopyPropertiesTransformer copyPropertiesTransformer = createCopyPropertiesTransformer(INBOUND_PROPERTY_KEY);
-        muleMessage = MuleMessage.builder(muleMessage).addInboundProperty(INBOUND_PROPERTY_KEY, PROPERTY_VALUE, PROPERTY_DATA_TYPE).build();
+    muleMessage = MuleMessage.builder().payload("").mediaType(PROPERTY_DATA_TYPE.getMediaType()).build();
+  }
 
-        final MuleMessage transformed = (MuleMessage) copyPropertiesTransformer.transform(muleMessage, ENCODING);
+  @Test
+  public void testCopySingleProperty() throws TransformerException, InitialisationException {
+    CopyPropertiesTransformer copyPropertiesTransformer = createCopyPropertiesTransformer(INBOUND_PROPERTY_KEY);
+    muleMessage =
+        MuleMessage.builder(muleMessage).addInboundProperty(INBOUND_PROPERTY_KEY, PROPERTY_VALUE, PROPERTY_DATA_TYPE).build();
 
-        assertThat(transformed.getOutboundProperty(INBOUND_PROPERTY_KEY), is(PROPERTY_VALUE));
-        assertThat(transformed.getInboundPropertyNames(), hasSize(1));
-    }
+    final MuleMessage transformed = (MuleMessage) copyPropertiesTransformer.transform(muleMessage, ENCODING);
 
-    @Test
-    public void testCopyNonExistentProperty() throws TransformerException, InitialisationException
-    {
-        CopyPropertiesTransformer copyPropertiesTransformer = createCopyPropertiesTransformer(INBOUND_PROPERTY_KEY);
+    assertThat(transformed.getOutboundProperty(INBOUND_PROPERTY_KEY), is(PROPERTY_VALUE));
+    assertThat(transformed.getInboundPropertyNames(), hasSize(1));
+  }
 
-        final MuleMessage transformed = (MuleMessage) copyPropertiesTransformer.transform(muleMessage, ENCODING);
+  @Test
+  public void testCopyNonExistentProperty() throws TransformerException, InitialisationException {
+    CopyPropertiesTransformer copyPropertiesTransformer = createCopyPropertiesTransformer(INBOUND_PROPERTY_KEY);
 
-        assertThat(transformed.getInboundPropertyNames(), hasSize(0));
-    }
+    final MuleMessage transformed = (MuleMessage) copyPropertiesTransformer.transform(muleMessage, ENCODING);
 
-    @Test
-    public void testCopyUsingRegex() throws InitialisationException, TransformerException
-    {
-        CopyPropertiesTransformer copyPropertiesTransformer = createCopyPropertiesTransformer("MULE_*");
+    assertThat(transformed.getInboundPropertyNames(), hasSize(0));
+  }
 
-        muleMessage = MuleMessage.builder(muleMessage)
-                                 .correlationId(PROPERTY_VALUE.toString())
-                                 .addInboundProperty("MULE_ID", PROPERTY_VALUE, PROPERTY_DATA_TYPE)
-                                 .addInboundProperty("MULE_GROUP_ID", PROPERTY_VALUE, PROPERTY_DATA_TYPE)
-                                 .addInboundProperty("SomeVar", PROPERTY_VALUE, PROPERTY_DATA_TYPE)
-                                 .build();
+  @Test
+  public void testCopyUsingRegex() throws InitialisationException, TransformerException {
+    CopyPropertiesTransformer copyPropertiesTransformer = createCopyPropertiesTransformer("MULE_*");
 
-        final MuleMessage transformed = (MuleMessage) copyPropertiesTransformer.transform(muleMessage, ENCODING);
+    muleMessage = MuleMessage.builder(muleMessage).correlationId(PROPERTY_VALUE.toString())
+        .addInboundProperty("MULE_ID", PROPERTY_VALUE, PROPERTY_DATA_TYPE)
+        .addInboundProperty("MULE_GROUP_ID", PROPERTY_VALUE, PROPERTY_DATA_TYPE)
+        .addInboundProperty("SomeVar", PROPERTY_VALUE, PROPERTY_DATA_TYPE).build();
 
-        assertThat(transformed.getCorrelation().getId().get(), is(PROPERTY_VALUE));
-        assertThat(transformed.getOutboundProperty("SomeVar"), is(nullValue()));
-        assertThat(transformed.getOutboundProperty("MULE_ID"), is(PROPERTY_VALUE));
-        assertThat(transformed.getOutboundProperty("MULE_GROUP_ID"), is(PROPERTY_VALUE));
-    }
+    final MuleMessage transformed = (MuleMessage) copyPropertiesTransformer.transform(muleMessage, ENCODING);
 
-    public CopyPropertiesTransformer createCopyPropertiesTransformer(String inboundPropertyKey) throws InitialisationException
-    {
-        CopyPropertiesTransformer copyPropertiesTransformer = new CopyPropertiesTransformer();
-        copyPropertiesTransformer.setMuleContext(mockMuleContext);
-        copyPropertiesTransformer.setPropertyName(inboundPropertyKey);
-        copyPropertiesTransformer.initialise();
+    assertThat(transformed.getCorrelation().getId().get(), is(PROPERTY_VALUE));
+    assertThat(transformed.getOutboundProperty("SomeVar"), is(nullValue()));
+    assertThat(transformed.getOutboundProperty("MULE_ID"), is(PROPERTY_VALUE));
+    assertThat(transformed.getOutboundProperty("MULE_GROUP_ID"), is(PROPERTY_VALUE));
+  }
 
-        return copyPropertiesTransformer;
-    }
+  public CopyPropertiesTransformer createCopyPropertiesTransformer(String inboundPropertyKey) throws InitialisationException {
+    CopyPropertiesTransformer copyPropertiesTransformer = new CopyPropertiesTransformer();
+    copyPropertiesTransformer.setMuleContext(mockMuleContext);
+    copyPropertiesTransformer.setPropertyName(inboundPropertyKey);
+    copyPropertiesTransformer.initialise();
+
+    return copyPropertiesTransformer;
+  }
 }

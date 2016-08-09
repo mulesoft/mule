@@ -11,42 +11,41 @@ import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport;
 
-public class Owner
-{
+public class Owner {
 
-    @Parameter
-    private String requiredFieldDefault;
+  @Parameter
+  private String requiredFieldDefault;
 
-    @Parameter
-    @Expression(ExpressionSupport.SUPPORTED)
-    private String requiredFieldExpressionSupported;
+  @Parameter
+  @Expression(ExpressionSupport.SUPPORTED)
+  private String requiredFieldExpressionSupported;
 
 
-    @Parameter
-    @Expression(ExpressionSupport.REQUIRED)
-    private String requiredFieldExpressionRequired;
+  @Parameter
+  @Expression(ExpressionSupport.REQUIRED)
+  private String requiredFieldExpressionRequired;
 
-    @Parameter
-    @Expression(ExpressionSupport.NOT_SUPPORTED)
-    private String requiredFieldExpressionNotSupported;
+  @Parameter
+  @Expression(ExpressionSupport.NOT_SUPPORTED)
+  private String requiredFieldExpressionNotSupported;
 
-    @Parameter
-    @Optional
-    private String optionalFieldDefault;
+  @Parameter
+  @Optional
+  private String optionalFieldDefault;
 
-    @Parameter
-    @Expression(ExpressionSupport.SUPPORTED)
-    @Optional
-    private String optionalFieldExpressionSupported;
+  @Parameter
+  @Expression(ExpressionSupport.SUPPORTED)
+  @Optional
+  private String optionalFieldExpressionSupported;
 
-    @Parameter
-    @Expression(ExpressionSupport.REQUIRED)
-    @Optional
-    private String optionalFieldExpressionRequired;
+  @Parameter
+  @Expression(ExpressionSupport.REQUIRED)
+  @Optional
+  private String optionalFieldExpressionRequired;
 
-    @Parameter
-    @Expression(ExpressionSupport.NOT_SUPPORTED)
-    @Optional
-    private String optionalFieldExpressionNotSupported;
+  @Parameter
+  @Expression(ExpressionSupport.NOT_SUPPORTED)
+  @Optional
+  private String optionalFieldExpressionNotSupported;
 
 }

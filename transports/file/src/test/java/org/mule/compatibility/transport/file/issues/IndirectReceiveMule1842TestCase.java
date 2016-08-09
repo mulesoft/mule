@@ -22,33 +22,30 @@ import java.io.File;
 import org.junit.Test;
 
 /**
- * This used to be part of FileFunctionalTest; moved here to allow isolation of
- * individual case.
+ * This used to be part of FileFunctionalTest; moved here to allow isolation of individual case.
  */
-public class IndirectReceiveMule1842TestCase extends AbstractFileFunctionalTestCase
-{
+public class IndirectReceiveMule1842TestCase extends AbstractFileFunctionalTestCase {
 
-    @Test
-    public void testIndirectRequest() throws Exception
-    {
-        File target = initForRequest();
+  @Test
+  public void testIndirectRequest() throws Exception {
+    File target = initForRequest();
 
-        // add a receiver endpoint that will poll the readFromDirectory
-        Object relay = muleContext.getRegistry().lookupObject("relay");
-        assertNotNull(relay);
-        String url = fileToUrl(target) + "?connector=receiveConnector";
-        logger.debug(url);
+    // add a receiver endpoint that will poll the readFromDirectory
+    Object relay = muleContext.getRegistry().lookupObject("relay");
+    assertNotNull(relay);
+    String url = fileToUrl(target) + "?connector=receiveConnector";
+    logger.debug(url);
 
-        InboundEndpoint endpoint = getEndpointFactory().getInboundEndpoint(url);
+    InboundEndpoint endpoint = getEndpointFactory().getInboundEndpoint(url);
 
-        ((CompositeMessageSource) ((Flow) relay).getMessageSource()).addSource(endpoint);
+    ((CompositeMessageSource) ((Flow) relay).getMessageSource()).addSource(endpoint);
 
-        ((Stoppable) relay).stop();
-        ((Startable) relay).start();
+    ((Stoppable) relay).stop();
+    ((Startable) relay).start();
 
-        // then read from the queue that the polling receiver will write to
-        MuleClient client = muleContext.getClient();
-        MuleMessage message = client.request("receive", 3000);
-        checkReceivedMessage(message);
-    }
+    // then read from the queue that the polling receiver will write to
+    MuleClient client = muleContext.getClient();
+    MuleMessage message = client.request("receive", 3000);
+    checkReceivedMessage(message);
+  }
 }

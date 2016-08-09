@@ -19,57 +19,44 @@ import java.util.List;
 
 import org.springframework.beans.factory.FactoryBean;
 
-public class ResponseMessageProcessorsFactoryBean implements FactoryBean, MuleContextAware
-{
+public class ResponseMessageProcessorsFactoryBean implements FactoryBean, MuleContextAware {
 
-    protected List messageProcessors;
-    private MuleContext muleContext;
+  protected List messageProcessors;
+  private MuleContext muleContext;
 
-    public Class getObjectType()
-    {
-        return MessageProcessor.class;
+  public Class getObjectType() {
+    return MessageProcessor.class;
+  }
+
+  public void setMessageProcessors(List messageProcessors) {
+    this.messageProcessors = messageProcessors;
+  }
+
+  public Object getObject() throws Exception {
+    DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
+    builder.setName("'response' child processor chain");
+    for (Object processor : messageProcessors) {
+      if (processor instanceof MessageProcessor) {
+        builder.chain((MessageProcessor) processor);
+      } else if (processor instanceof MessageProcessorBuilder) {
+        builder.chain((MessageProcessorBuilder) processor);
+      } else {
+        throw new IllegalArgumentException("MessageProcessorBuilder should only have MessageProcessor's or MessageProcessorBuilder's configured");
+      }
     }
+    ResponseMessageProcessorAdapter responseAdapter = new ResponseMessageProcessorAdapter();
+    responseAdapter.setProcessor(builder.build());
+    responseAdapter.setMuleContext(muleContext);
+    return responseAdapter;
+  }
 
-    public void setMessageProcessors(List messageProcessors)
-    {
-        this.messageProcessors = messageProcessors;
-    }
+  public boolean isSingleton() {
+    return false;
+  }
 
-    public Object getObject() throws Exception
-    {
-        DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
-        builder.setName("'response' child processor chain");
-        for (Object processor : messageProcessors)
-        {
-            if (processor instanceof MessageProcessor)
-            {
-                builder.chain((MessageProcessor) processor);
-            }
-            else if (processor instanceof MessageProcessorBuilder)
-            {
-                builder.chain((MessageProcessorBuilder) processor);
-            }
-            else
-            {
-                throw new IllegalArgumentException(
-                    "MessageProcessorBuilder should only have MessageProcessor's or MessageProcessorBuilder's configured");
-            }
-        }
-        ResponseMessageProcessorAdapter responseAdapter = new ResponseMessageProcessorAdapter();
-        responseAdapter.setProcessor(builder.build());
-        responseAdapter.setMuleContext(muleContext);
-        return responseAdapter;
-    }
-
-    public boolean isSingleton()
-    {
-        return false;
-    }
-
-    @Override
-    public void setMuleContext(MuleContext context)
-    {
-        this.muleContext = context;
-    }
+  @Override
+  public void setMuleContext(MuleContext context) {
+    this.muleContext = context;
+  }
 
 }

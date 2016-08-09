@@ -6,9 +6,9 @@
  */
 package org.mule.compatibility.transport.jms.integration.routing;
 
-public interface HelloInterface
-{
-    String hello(String s, Integer v);
-    
-    public Object returnNull();
+public interface HelloInterface {
+
+  String hello(String s, Integer v);
+
+  public Object returnNull();
 }

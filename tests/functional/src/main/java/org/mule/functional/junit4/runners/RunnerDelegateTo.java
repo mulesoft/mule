@@ -24,12 +24,11 @@ import org.junit.runners.BlockJUnit4ClassRunner;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 @Inherited
-public @interface RunnerDelegateTo
-{
+public @interface RunnerDelegateTo {
 
-    /**
-     * @return the {@link Runner} that would be used to delegate the execution of the test.
-     */
-    Class<? extends Runner> value() default BlockJUnit4ClassRunner.class;
+  /**
+   * @return the {@link Runner} that would be used to delegate the execution of the test.
+   */
+  Class<? extends Runner> value() default BlockJUnit4ClassRunner.class;
 
 }

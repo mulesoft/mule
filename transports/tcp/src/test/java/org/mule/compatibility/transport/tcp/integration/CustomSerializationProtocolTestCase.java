@@ -20,39 +20,34 @@ import org.junit.Test;
 /**
  * This test was set for the new changes due to Mule1199
  */
-public class CustomSerializationProtocolTestCase extends FunctionalTestCase
-{
+public class CustomSerializationProtocolTestCase extends FunctionalTestCase {
 
-    final private int messages = 1;
+  final private int messages = 1;
 
-    @Rule
-    public DynamicPort dynamicPort = new DynamicPort("port1");
+  @Rule
+  public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "custom-serialisation-mule-config-flow.xml";
+  @Override
+  protected String getConfigFile() {
+    return "custom-serialisation-mule-config-flow.xml";
+  }
+
+  @Test
+  public void testCustomObject() throws Exception {
+    MuleClient client = muleContext.getClient();
+    NonSerializableMessageObject message = new NonSerializableMessageObject(1, "Hello", true);
+
+    for (int i = 0; i < messages; i++) {
+      client.dispatch("vm://in", getTestMuleMessage(message));
     }
 
-    @Test
-    public void testCustomObject() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        NonSerializableMessageObject message = new NonSerializableMessageObject(1, "Hello", true);
-
-        for (int i = 0; i < messages; i++)
-        {
-            client.dispatch("vm://in", getTestMuleMessage(message));
-        }
-
-        for (int i = 0; i < messages; i++)
-        {
-            MuleMessage msg = client.request("vm://out", 30000);
-            assertTrue(msg.getPayload() instanceof NonSerializableMessageObject);
-            NonSerializableMessageObject received = (NonSerializableMessageObject)msg.getPayload();
-            assertEquals("Hello", received.s);
-            assertEquals(1, received.i);
-            assertEquals(true, received.b);
-        }
+    for (int i = 0; i < messages; i++) {
+      MuleMessage msg = client.request("vm://out", 30000);
+      assertTrue(msg.getPayload() instanceof NonSerializableMessageObject);
+      NonSerializableMessageObject received = (NonSerializableMessageObject) msg.getPayload();
+      assertEquals("Hello", received.s);
+      assertEquals(1, received.i);
+      assertEquals(true, received.b);
     }
+  }
 }

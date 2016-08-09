@@ -16,30 +16,26 @@ import java.util.List;
 
 import org.junit.runners.Parameterized;
 
-public class StoredProcedureStreamingReturningResultsetTestCase extends AbstractStoredProcedureStreamingReturningResultsetTestCase
-{
+public class StoredProcedureStreamingReturningResultsetTestCase
+    extends AbstractStoredProcedureStreamingReturningResultsetTestCase {
 
-    public StoredProcedureStreamingReturningResultsetTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public StoredProcedureStreamingReturningResultsetTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Parameterized.Parameters
-    public static List<Object[]> parameters()
-    {
-        return TestDbConfig.getResources();
-    }
+  @Parameterized.Parameters
+  public static List<Object[]> parameters() {
+    return TestDbConfig.getResources();
+  }
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/storedprocedure/stored-procedure-streaming-returning-resultset-config.xml"};
-    }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/storedprocedure/stored-procedure-streaming-returning-resultset-config.xml"};
+  }
 
-    @Override
-    public void setupStoredProcedure() throws Exception
-    {
-        assumeThat(getDefaultDataSource(), new SupportsReturningStoredProcedureResultsWithoutParameters());
-        super.setupStoredProcedure();
-    }
+  @Override
+  public void setupStoredProcedure() throws Exception {
+    assumeThat(getDefaultDataSource(), new SupportsReturningStoredProcedureResultsWithoutParameters());
+    super.setupStoredProcedure();
+  }
 }

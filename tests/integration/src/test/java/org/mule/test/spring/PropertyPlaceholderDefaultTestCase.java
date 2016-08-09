@@ -12,32 +12,28 @@ import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Test;
 
-public class PropertyPlaceholderDefaultTestCase extends AbstractIntegrationTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/spring/property-placeholder-default-test.xml";
-    }
+public class PropertyPlaceholderDefaultTestCase extends AbstractIntegrationTestCase {
 
-    protected String getProperty(String propertyName)
-    {
-        MapHolder holder = (MapHolder) muleContext.getRegistry().lookupObject("props");
-        String value = (String) holder.getMap().get(propertyName);
-        assertNotNull(propertyName, value);
-        return value;
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/spring/property-placeholder-default-test.xml";
+  }
 
-    @Test
-    public void testSpringPropertyNotDefinedAndDefault()
-    {
-        assertEquals("default1", getProperty("prop1"));
-    }
+  protected String getProperty(String propertyName) {
+    MapHolder holder = (MapHolder) muleContext.getRegistry().lookupObject("props");
+    String value = (String) holder.getMap().get(propertyName);
+    assertNotNull(propertyName, value);
+    return value;
+  }
 
-    @Test
-    public void testSpringPropertyDefinedAndDefault()
-    {
-        assertEquals("value2", getProperty("prop2"));
-    }
+  @Test
+  public void testSpringPropertyNotDefinedAndDefault() {
+    assertEquals("default1", getProperty("prop1"));
+  }
+
+  @Test
+  public void testSpringPropertyDefinedAndDefault() {
+    assertEquals("value2", getProperty("prop2"));
+  }
 
 }

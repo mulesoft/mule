@@ -15,25 +15,21 @@ import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
-public class ExpressionLanguageDefinitionParser extends NamedDefinitionParser
-{
+public class ExpressionLanguageDefinitionParser extends NamedDefinitionParser {
 
-    public ExpressionLanguageDefinitionParser()
-    {
-        super(MuleProperties.OBJECT_EXPRESSION_LANGUAGE);
-        singleton = true;
-    }
+  public ExpressionLanguageDefinitionParser() {
+    super(MuleProperties.OBJECT_EXPRESSION_LANGUAGE);
+    singleton = true;
+  }
 
-    protected Class getBeanClass(Element element)
-    {
-        return MVELExpressionLanguageWrapper.class;
-    }
+  protected Class getBeanClass(Element element) {
+    return MVELExpressionLanguageWrapper.class;
+  }
 
-    @Override
-    protected String resolveId(Element element, AbstractBeanDefinition definition, ParserContext parserContext)
-        throws BeanDefinitionStoreException
-    {
-        return MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
-    }
+  @Override
+  protected String resolveId(Element element, AbstractBeanDefinition definition, ParserContext parserContext)
+      throws BeanDefinitionStoreException {
+    return MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
+  }
 
 }

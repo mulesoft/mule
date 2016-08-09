@@ -8,19 +8,16 @@ package org.mule.test.spring;
 
 import java.util.Map;
 
-public class MapHolder
-{
+public class MapHolder {
 
-    private Map map;
+  private Map map;
 
-    public Map getMap()
-    {
-        return map;
-    }
+  public Map getMap() {
+    return map;
+  }
 
-    public void setMap(Map map)
-    {
-        this.map = map;
-    }
-    
+  public void setMap(Map map) {
+    this.map = map;
+  }
+
 }

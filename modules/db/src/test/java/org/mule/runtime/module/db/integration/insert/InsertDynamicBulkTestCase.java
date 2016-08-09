@@ -9,17 +9,14 @@ package org.mule.runtime.module.db.integration.insert;
 
 import org.mule.runtime.module.db.integration.model.AbstractTestDatabase;
 
-public class InsertDynamicBulkTestCase extends InsertBulkTestCase
-{
+public class InsertDynamicBulkTestCase extends InsertBulkTestCase {
 
-    public InsertDynamicBulkTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public InsertDynamicBulkTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/insert/insert-dynamic-bulk-config.xml"};
-    }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/insert/insert-dynamic-bulk-config.xml"};
+  }
 }

@@ -15,6 +15,10 @@
         Reusable components for extensions built using Mule's SDK which operate over file systems (e.g: file, ftp, sftp, etc)
     </description>
 
+    <properties>
+        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
+    </properties>
+
     <dependencies>
         <!-- Mule Dependencies -->
         <dependency>

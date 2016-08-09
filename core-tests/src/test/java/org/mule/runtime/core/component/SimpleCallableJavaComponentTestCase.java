@@ -18,104 +18,86 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 
-public class SimpleCallableJavaComponentTestCase extends AbstractComponentTestCase
-{
+public class SimpleCallableJavaComponentTestCase extends AbstractComponentTestCase {
 
-    @Test
-    public void testComponentCreationWithObjectFactory() throws Exception
-    {
-        PrototypeObjectFactory objectFactory = new PrototypeObjectFactory(
-            Apple.class);
-        objectFactory.setObjectClass(Apple.class);
-        objectFactory.initialise();
+  @Test
+  public void testComponentCreationWithObjectFactory() throws Exception {
+    PrototypeObjectFactory objectFactory = new PrototypeObjectFactory(Apple.class);
+    objectFactory.setObjectClass(Apple.class);
+    objectFactory.initialise();
 
-        SimpleCallableJavaComponent component = new SimpleCallableJavaComponent(
-            objectFactory);
+    SimpleCallableJavaComponent component = new SimpleCallableJavaComponent(objectFactory);
 
-        assertNotNull(component.getObjectFactory());
-        assertEquals(objectFactory, component.getObjectFactory());
-        assertEquals(Apple.class, component.getObjectFactory().getObjectClass());
-        assertEquals(Apple.class, component.getObjectType());
+    assertNotNull(component.getObjectFactory());
+    assertEquals(objectFactory, component.getObjectFactory());
+    assertEquals(Apple.class, component.getObjectFactory().getObjectClass());
+    assertEquals(Apple.class, component.getObjectType());
 
-        objectFactory = new PrototypeObjectFactory(Orange.class);
-        objectFactory.setObjectClass(Orange.class);
-        objectFactory.initialise();
+    objectFactory = new PrototypeObjectFactory(Orange.class);
+    objectFactory.setObjectClass(Orange.class);
+    objectFactory.initialise();
 
-        try
-        {
-            component = new SimpleCallableJavaComponent(objectFactory);
-        }
-        catch (Exception e)
-        {
-            assertSame(DefaultMuleException.class, e.getClass());
-        }
+    try {
+      component = new SimpleCallableJavaComponent(objectFactory);
+    } catch (Exception e) {
+      assertSame(DefaultMuleException.class, e.getClass());
     }
+  }
 
-    @Test
-    public void testDirectComponentCreation() throws Exception
-    {
-        SimpleCallableJavaComponent component = new SimpleCallableJavaComponent(Apple.class);
+  @Test
+  public void testDirectComponentCreation() throws Exception {
+    SimpleCallableJavaComponent component = new SimpleCallableJavaComponent(Apple.class);
 
-        assertNotNull(component.getObjectFactory());
-        assertEquals(Apple.class, component.getObjectFactory().getObjectClass());
-        assertEquals(Apple.class, component.getObjectType());
+    assertNotNull(component.getObjectFactory());
+    assertEquals(Apple.class, component.getObjectFactory().getObjectClass());
+    assertEquals(Apple.class, component.getObjectType());
 
-        try
-        {
-            component = new SimpleCallableJavaComponent(Orange.class);
-        }
-        catch (Exception e)
-        {
-            assertSame(DefaultMuleException.class, e.getClass());
-        }
+    try {
+      component = new SimpleCallableJavaComponent(Orange.class);
+    } catch (Exception e) {
+      assertSame(DefaultMuleException.class, e.getClass());
     }
+  }
 
-    @Test
-    public void testSimpleComponentCreation() throws Exception
-    {
-        SimpleCallableJavaComponent component = new SimpleCallableJavaComponent(
-            new Apple());
+  @Test
+  public void testSimpleComponentCreation() throws Exception {
+    SimpleCallableJavaComponent component = new SimpleCallableJavaComponent(new Apple());
 
-        assertNotNull(component.getObjectFactory());
-        assertEquals(Apple.class, component.getObjectFactory().getObjectClass());
-        assertEquals(Apple.class, component.getObjectType());
+    assertNotNull(component.getObjectFactory());
+    assertEquals(Apple.class, component.getObjectFactory().getObjectClass());
+    assertEquals(Apple.class, component.getObjectType());
 
-        try
-        {
-            component = new SimpleCallableJavaComponent(new Orange());
-        }
-        catch (Exception e)
-        {
-            assertSame(DefaultMuleException.class, e.getClass());
-        }
+    try {
+      component = new SimpleCallableJavaComponent(new Orange());
+    } catch (Exception e) {
+      assertSame(DefaultMuleException.class, e.getClass());
     }
+  }
 
-    @Test
-    public void testLifecycle() throws Exception
-    {
-        SimpleCallableJavaComponent component = new SimpleCallableJavaComponent(
-            new Apple());
-        component.setFlowConstruct(getTestFlow());
-        component.setMuleContext(muleContext);
-        component.initialise();
-        component.start();
+  @Test
+  public void testLifecycle() throws Exception {
+    SimpleCallableJavaComponent component = new SimpleCallableJavaComponent(new Apple());
+    component.setFlowConstruct(getTestFlow());
+    component.setMuleContext(muleContext);
+    component.initialise();
+    component.start();
 
-        assertNull(component.borrowComponentLifecycleAdaptor());
+    assertNull(component.borrowComponentLifecycleAdaptor());
 
-        Object obj = component.getObjectFactory().getInstance(muleContext);
-        assertNotNull(obj);
+    Object obj = component.getObjectFactory().getInstance(muleContext);
+    assertNotNull(obj);
 
-        component.stop();
-        component.dispose();
-//        try
-//        {
-//            component.checkDisposed();
-//        }
-//        catch (Exception e)
-//        {
-//            assertSame(DisposeException.class, e.getClass());
-//        }
+    component.stop();
+    component.dispose();
+    // try
+    // {
+    // component.checkDisposed();
+    // }
+    // catch (Exception e)
+    // {
+    // assertSame(DisposeException.class, e.getClass());
+    // }
 
-    }
+  }
 
 }

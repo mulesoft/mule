@@ -33,116 +33,96 @@ import javax.activation.DataHandler;
 /**
  * <code>VMMessageDispatcher</code> is used for providing in memory interaction between components.
  */
-public class VMMessageDispatcher extends AbstractMessageDispatcher
-{
-    private final VMConnector connector;
+public class VMMessageDispatcher extends AbstractMessageDispatcher {
 
-    public VMMessageDispatcher(OutboundEndpoint endpoint)
-    {
-        super(endpoint);
-        this.connector = (VMConnector) endpoint.getConnector();
+  private final VMConnector connector;
+
+  public VMMessageDispatcher(OutboundEndpoint endpoint) {
+    super(endpoint);
+    this.connector = (VMConnector) endpoint.getConnector();
+  }
+
+  @Override
+  protected void doDispatch(final MuleEvent event) throws Exception {
+    EndpointURI endpointUri = endpoint.getEndpointURI();
+
+    if (endpointUri == null) {
+      throw new DispatchException(CoreMessages.objectIsNull("Endpoint"), event, getEndpoint());
+    }
+    MuleEvent eventToDispatch = DefaultMuleEvent.copy(event);
+    eventToDispatch.clearFlowVariables();
+    eventToDispatch.setMessage(createInboundMessage(eventToDispatch.getMessage()));
+    QueueSession session = getQueueSession();
+    Queue queue = session.getQueue(endpointUri.getAddress());
+    if (!queue.offer(eventToDispatch.getMessage(), connector.getQueueTimeout())) {
+      // queue is full
+      throw new DispatchException(VMMessages.queueIsFull(queue.getName(), queue.size()), eventToDispatch, getEndpoint());
+    }
+    if (logger.isDebugEnabled()) {
+      logger.debug("dispatched MuleEvent on endpointUri: " + endpointUri);
+    }
+  }
+
+  private QueueSession getQueueSession() throws MuleException {
+    return connector.getTransactionalResource(endpoint);
+  }
+
+  @Override
+  protected MuleMessage doSend(final MuleEvent event) throws Exception {
+    MuleMessage retMessage;
+    final VMMessageReceiver receiver = connector.getReceiver(endpoint.getEndpointURI());
+    // Apply any outbound transformers on this event before we dispatch
+
+    if (receiver == null) {
+      throw new NoReceiverForEndpointException(VMMessages.noReceiverForEndpoint(connector.getName(), endpoint.getEndpointURI()));
     }
 
-    @Override
-    protected void doDispatch(final MuleEvent event) throws Exception
-    {
-        EndpointURI endpointUri = endpoint.getEndpointURI();
+    MuleEvent eventToSend = DefaultMuleEvent.copy(event);
+    final MuleMessage message = createInboundMessage(eventToSend.getMessage());
 
-        if (endpointUri == null)
-        {
-            throw new DispatchException(CoreMessages.objectIsNull("Endpoint"), event, getEndpoint());
-        }
-        MuleEvent eventToDispatch = DefaultMuleEvent.copy(event);
-        eventToDispatch.clearFlowVariables();
-        eventToDispatch.setMessage(createInboundMessage(eventToDispatch.getMessage()));
-        QueueSession session = getQueueSession();
-        Queue queue = session.getQueue(endpointUri.getAddress());
-        if (!queue.offer(eventToDispatch.getMessage(), connector.getQueueTimeout()))
-        {
-            // queue is full
-            throw new DispatchException(VMMessages.queueIsFull(queue.getName(), queue.size()),
-                eventToDispatch, getEndpoint());
-        }
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("dispatched MuleEvent on endpointUri: " + endpointUri);
-        }
+    ExecutionTemplate<MuleMessage> executionTemplate = TransactionalExecutionTemplate
+        .createTransactionalExecutionTemplate(event.getMuleContext(), receiver.getEndpoint().getTransactionConfig());
+    ExecutionCallback<MuleMessage> processingCallback = () -> receiver.onCall(message);
+    retMessage = executionTemplate.execute(processingCallback);
+
+    if (logger.isDebugEnabled()) {
+      logger.debug("sent event on endpointUri: " + endpoint.getEndpointURI());
     }
-
-    private QueueSession getQueueSession() throws MuleException
-    {
-        return connector.getTransactionalResource(endpoint);
+    if (retMessage != null) {
+      retMessage = createInboundMessage(retMessage);
     }
+    return retMessage;
+  }
 
-    @Override
-    protected MuleMessage doSend(final MuleEvent event) throws Exception
-    {
-        MuleMessage retMessage;
-        final VMMessageReceiver receiver = connector.getReceiver(endpoint.getEndpointURI());
-        // Apply any outbound transformers on this event before we dispatch
+  @Override
+  protected void doDispose() {
+    // template method
+  }
 
-        if (receiver == null)
-        {
-            throw new NoReceiverForEndpointException(VMMessages.noReceiverForEndpoint(connector.getName(),
-                endpoint.getEndpointURI()));
-        }
-
-        MuleEvent eventToSend = DefaultMuleEvent.copy(event);
-        final MuleMessage message = createInboundMessage(eventToSend.getMessage());
-
-        ExecutionTemplate<MuleMessage> executionTemplate = TransactionalExecutionTemplate.createTransactionalExecutionTemplate(
-                event.getMuleContext(), receiver.getEndpoint().getTransactionConfig());
-        ExecutionCallback<MuleMessage> processingCallback = () -> receiver.onCall(message);
-        retMessage = executionTemplate.execute(processingCallback);
-
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("sent event on endpointUri: " + endpoint.getEndpointURI());
-        }
-        if (retMessage != null)
-        {
-            retMessage = createInboundMessage(retMessage);
-        }
-        return retMessage;
+  @Override
+  protected void doConnect() throws Exception {
+    if (!endpoint.getExchangePattern().hasResponse()) {
+      // use the default queue profile to configure this queue.
+      connector.getQueueProfile().configureQueue(endpoint.getMuleContext(), endpoint.getEndpointURI().getAddress(),
+                                                 connector.getQueueManager());
     }
+  }
 
-    @Override
-    protected void doDispose()
-    {
-        // template method
-    }
+  @Override
+  protected void doDisconnect() throws Exception {
+    // template method
+  }
 
-    @Override
-    protected void doConnect() throws Exception
-    {
-        if (!endpoint.getExchangePattern().hasResponse())
-        {
-            // use the default queue profile to configure this queue.
-            connector.getQueueProfile().configureQueue(endpoint.getMuleContext(),
-                endpoint.getEndpointURI().getAddress(), connector.getQueueManager());
-        }
-    }
+  private MuleMessage createInboundMessage(MuleMessage message) {
+    Map<String, Serializable> outboundProperties = new HashMap<>();
+    Map<String, DataHandler> outboundAttachments = new HashMap<>();
 
-    @Override
-    protected void doDisconnect() throws Exception
-    {
-        // template method
-    }
+    message.getOutboundPropertyNames().stream().forEach(key -> outboundProperties.put(key, message.getOutboundProperty(key)));
+    message.getOutboundAttachmentNames().stream()
+        .forEach(key -> outboundAttachments.put(key, message.getOutboundAttachment(key)));
 
-    private MuleMessage createInboundMessage(MuleMessage message)
-    {
-        Map<String, Serializable> outboundProperties = new HashMap<>();
-        Map<String, DataHandler> outboundAttachments = new HashMap<>();
-
-        message.getOutboundPropertyNames().stream().forEach(key -> outboundProperties.put(key, message.getOutboundProperty(key)));
-        message.getOutboundAttachmentNames().stream().forEach(key -> outboundAttachments.put(key, message.getOutboundAttachment(key)));
-
-        return MuleMessage.builder(message)
-                .inboundProperties(outboundProperties)
-                .inboundAttachments(outboundAttachments)
-                .outboundProperties(emptyMap())
-                .outboundAttachments(emptyMap())
-                .build();
-    }
+    return MuleMessage.builder(message).inboundProperties(outboundProperties).inboundAttachments(outboundAttachments)
+        .outboundProperties(emptyMap()).outboundAttachments(emptyMap()).build();
+  }
 
 }

@@ -16,31 +16,28 @@ import org.mule.runtime.core.api.client.MuleClient;
 
 import org.junit.Test;
 
-public class InOutAsyncTestCase extends FunctionalTestCase
-{
-    public static final long TIMEOUT = 3000;
+public class InOutAsyncTestCase extends FunctionalTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/integration/messaging/meps/pattern_In-Out-Async-flow.xml";
-    }
+  public static final long TIMEOUT = 3000;
 
-    @Test
-    public void testExchange() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/integration/messaging/meps/pattern_In-Out-Async-flow.xml";
+  }
 
-        MuleMessage result = client.send("inboundEndpoint", MuleMessage.builder()
-                                                                       .payload("some data")
-                                                                       // Almost any endpoint can be used here
-                                                                       .addOutboundProperty(MULE_REPLY_TO_PROPERTY, "jms://client-reply")
-                                                                       .build());
-        assertNotNull(result);
-        assertEquals("got it!", getPayloadAsString(result));
+  @Test
+  public void testExchange() throws Exception {
+    MuleClient client = muleContext.getClient();
 
-        final Object foo = result.getInboundProperty("foo");
-        assertNotNull(foo);
-        assertEquals("bar", foo);
-    }
+    MuleMessage result = client.send("inboundEndpoint",
+                                     MuleMessage.builder().payload("some data")
+                                         // Almost any endpoint can be used here
+                                         .addOutboundProperty(MULE_REPLY_TO_PROPERTY, "jms://client-reply").build());
+    assertNotNull(result);
+    assertEquals("got it!", getPayloadAsString(result));
+
+    final Object foo = result.getInboundProperty("foo");
+    assertNotNull(foo);
+    assertEquals("bar", foo);
+  }
 }

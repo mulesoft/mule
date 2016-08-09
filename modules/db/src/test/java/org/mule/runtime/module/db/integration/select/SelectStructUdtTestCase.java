@@ -25,41 +25,40 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class SelectStructUdtTestCase extends AbstractDbIntegrationTestCase
-{
-    public SelectStructUdtTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
+public class SelectStructUdtTestCase extends AbstractDbIntegrationTestCase {
+
+  public SelectStructUdtTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
+
+  @Parameterized.Parameters
+  public static List<Object[]> parameters() {
+    List<Object[]> params = new LinkedList<>();
+
+    if (!getOracleResource().isEmpty()) {
+      params.add(new Object[] {"integration/config/oracle-unmapped-udt-db-config.xml", new OracleTestDatabase()});
     }
 
-    @Parameterized.Parameters
-    public static List<Object[]> parameters()
-    {
-        List<Object[]> params = new LinkedList<>();
+    return params;
+  }
 
-        if (!getOracleResource().isEmpty())
-        {
-            params.add(new Object[] {"integration/config/oracle-unmapped-udt-db-config.xml", new OracleTestDatabase()});
-        }
-
-        return params;
-    }
-
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/select/select-udt-config.xml"};
-    }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/select/select-udt-config.xml"};
+  }
 
 
-    @Test
-    public void returnsMappedObject() throws Exception
-    {
-        final MuleEvent responseEvent = flowRunner("returnsUDT").withPayload(TEST_MESSAGE).run();
-        final MuleMessage response = responseEvent.getMessage();
+  @Test
+  public void returnsMappedObject() throws Exception {
+    final MuleEvent responseEvent = flowRunner("returnsUDT").withPayload(TEST_MESSAGE).run();
+    final MuleMessage response = responseEvent.getMessage();
 
-        assertRecords(response.getPayload(),
-                      new Record(new Field("REGION_NAME", SOUTHWEST_MANAGER.getRegionName()), new Field("MANAGER_NAME", SOUTHWEST_MANAGER.getName()), new Field("DETAILS", SOUTHWEST_MANAGER.getContactDetails().asObjectArray())),
-                      new Record(new Field("REGION_NAME", NORTHWEST_MANAGER.getRegionName()), new Field("MANAGER_NAME", NORTHWEST_MANAGER.getName()), new Field("DETAILS", NORTHWEST_MANAGER.getContactDetails().asObjectArray())));
-    }
+    assertRecords(response.getPayload(),
+                  new Record(new Field("REGION_NAME", SOUTHWEST_MANAGER.getRegionName()),
+                             new Field("MANAGER_NAME", SOUTHWEST_MANAGER.getName()),
+                             new Field("DETAILS", SOUTHWEST_MANAGER.getContactDetails().asObjectArray())),
+                  new Record(new Field("REGION_NAME", NORTHWEST_MANAGER.getRegionName()),
+                             new Field("MANAGER_NAME", NORTHWEST_MANAGER.getName()),
+                             new Field("DETAILS", NORTHWEST_MANAGER.getContactDetails().asObjectArray())));
+  }
 }

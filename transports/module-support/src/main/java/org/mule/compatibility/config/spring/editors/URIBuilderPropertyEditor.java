@@ -16,20 +16,18 @@ import java.beans.PropertyEditorSupport;
  * Translates a connector name property into the corresponding {@link org.mule.compatibility.core.api.transport.Connector}
  * instance.
  */
-public class URIBuilderPropertyEditor extends PropertyEditorSupport implements MuleContextAware
-{
-    private MuleContext muleContext;
+public class URIBuilderPropertyEditor extends PropertyEditorSupport implements MuleContextAware {
 
-    @Override
-    public void setMuleContext(MuleContext context)
-    {
-        this.muleContext = context;
-    }
+  private MuleContext muleContext;
 
-    @Override
-    public void setAsText(String text)
-    {
-        setValue(new URIBuilder(text, muleContext));
-    }
+  @Override
+  public void setMuleContext(MuleContext context) {
+    this.muleContext = context;
+  }
+
+  @Override
+  public void setAsText(String text) {
+    setValue(new URIBuilder(text, muleContext));
+  }
 
 }

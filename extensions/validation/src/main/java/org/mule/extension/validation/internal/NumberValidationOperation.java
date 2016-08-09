@@ -24,48 +24,35 @@ import java.util.Locale;
  *
  * @since 3.7.0
  */
-public class NumberValidationOperation extends ValidationSupport
-{
+public class NumberValidationOperation extends ValidationSupport {
 
-    /**
-     * Receives a numeric {@code value} as a {@link String} and validates that it can be parsed
-     * per the rules of a {@code numberType}
-     *
-     * @param value      the value to be tested
-     * @param locale     The locale to use for the format. If not provided it defaults to the system {@link Locale}
-     * @param pattern    The pattern used to format the value
-     * @param minValue   If provided, check that the parsed value is greater or equal than this value
-     * @param maxValue   If provided, check that the parsed value is less or equal than this value
-     * @param numberType the type of number to test {@code value} against
-     * @param options    the {@link ValidationOptions}
-     * @param event      the current {@link MuleEvent}
-     */
-    public void isNumber(String value,
-                         @Optional String locale,
-                         @Optional String pattern,
-                         @Optional String minValue,
-                         @Optional String maxValue,
-                         NumberType numberType,
-                         @ParameterGroup ValidationOptions options,
-                         MuleEvent event,
-                         @UseConfig ValidationExtension config) throws Exception
-    {
+  /**
+   * Receives a numeric {@code value} as a {@link String} and validates that it can be parsed per the rules of a
+   * {@code numberType}
+   *
+   * @param value the value to be tested
+   * @param locale The locale to use for the format. If not provided it defaults to the system {@link Locale}
+   * @param pattern The pattern used to format the value
+   * @param minValue If provided, check that the parsed value is greater or equal than this value
+   * @param maxValue If provided, check that the parsed value is less or equal than this value
+   * @param numberType the type of number to test {@code value} against
+   * @param options the {@link ValidationOptions}
+   * @param event the current {@link MuleEvent}
+   */
+  public void isNumber(String value, @Optional String locale, @Optional String pattern, @Optional String minValue,
+                       @Optional String maxValue, NumberType numberType, @ParameterGroup ValidationOptions options,
+                       MuleEvent event, @UseConfig ValidationExtension config)
+      throws Exception {
 
-        ValidationContext context = createContext(options, event, config);
-        Validator validator = new NumberValidator(value,
-                                                  parseLocale(locale),
-                                                  pattern,
-                                                  parseNumber(minValue, numberType),
-                                                  parseNumber(maxValue, numberType),
-                                                  numberType,
-                                                  context);
+    ValidationContext context = createContext(options, event, config);
+    Validator validator = new NumberValidator(value, parseLocale(locale), pattern, parseNumber(minValue, numberType),
+                                              parseNumber(maxValue, numberType), numberType, context);
 
-        validateWith(validator, context, event);
-    }
+    validateWith(validator, context, event);
+  }
 
-    private Number parseNumber(String value, NumberType numberType)
-    {
-        return StringUtils.isBlank(value) ? null : numberType.toNumber(value, null, parseLocale(null));
-    }
+  private Number parseNumber(String value, NumberType numberType) {
+    return StringUtils.isBlank(value) ? null : numberType.toNumber(value, null, parseLocale(null));
+  }
 
 }

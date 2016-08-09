@@ -12,44 +12,43 @@ import org.mule.runtime.core.lifecycle.LifecycleObject;
 import java.util.Set;
 
 /**
- * Encapsulates the notion of a lifecycle phase i.e. 'stop'.  Implementations of this class are responsible
- * for invoking the lifecycle phase on a set of objects and also for knowing which phases can preceed and go
- * after it.  This objects are configurable so that lifecycles can be customised.
+ * Encapsulates the notion of a lifecycle phase i.e. 'stop'. Implementations of this class are responsible for invoking the
+ * lifecycle phase on a set of objects and also for knowing which phases can preceed and go after it. This objects are
+ * configurable so that lifecycles can be customised.
  *
  * Note that users wouldn't normally customise the lifecycle of the server.
  */
 
-public interface LifecyclePhase extends NamedObject
-{
-    
-    String ALL_PHASES = "all";
+public interface LifecyclePhase extends NamedObject {
 
-    void addOrderedLifecycleObject(LifecycleObject lco);
+  String ALL_PHASES = "all";
 
-    void removeOrderedLifecycleObject(LifecycleObject lco);
+  void addOrderedLifecycleObject(LifecycleObject lco);
 
-    Set<LifecycleObject> getOrderedLifecycleObjects();
+  void removeOrderedLifecycleObject(LifecycleObject lco);
 
-    void setOrderedLifecycleObjects(Set<LifecycleObject> orderedLifecycleObjects);
+  Set<LifecycleObject> getOrderedLifecycleObjects();
 
-    Class<?>[] getIgnoredObjectTypes();
+  void setOrderedLifecycleObjects(Set<LifecycleObject> orderedLifecycleObjects);
 
-    void setIgnoredObjectTypes(Class<?>[] ignorredObjectTypes);
+  Class<?>[] getIgnoredObjectTypes();
 
-    Class<?> getLifecycleClass();
+  void setIgnoredObjectTypes(Class<?>[] ignorredObjectTypes);
 
-    void setLifecycleClass(Class<?> lifecycleClass);
+  Class<?> getLifecycleClass();
 
-    Set<String> getSupportedPhases();
+  void setLifecycleClass(Class<?> lifecycleClass);
 
-    void setSupportedPhases(Set<String> supportedPhases);
+  Set<String> getSupportedPhases();
 
-    void registerSupportedPhase(String phase);
+  void setSupportedPhases(Set<String> supportedPhases);
 
-    boolean isPhaseSupported(String phase);
+  void registerSupportedPhase(String phase);
 
-    void applyLifecycle(Object o) throws LifecycleException;
+  boolean isPhaseSupported(String phase);
 
-    String getOppositeLifecyclePhase();
+  void applyLifecycle(Object o) throws LifecycleException;
+
+  String getOppositeLifecyclePhase();
 
 }

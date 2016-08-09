@@ -16,47 +16,36 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
- * An {@link AbstractValidator} which verifies
- * that an instance of {@link URL} can be created
- * from a given {@link #url}. If
- * {@link URL#URL(String)} throws exception
- * when invoked with {@link #url}, then
- * the validation will fail
+ * An {@link AbstractValidator} which verifies that an instance of {@link URL} can be created from a given {@link #url}. If
+ * {@link URL#URL(String)} throws exception when invoked with {@link #url}, then the validation will fail
  *
  * @since 3.7.0
  */
-public class UrlValidator extends AbstractValidator
-{
+public class UrlValidator extends AbstractValidator {
 
-    /**
-     * the url to be tested
-     */
-    private final String url;
+  /**
+   * the url to be tested
+   */
+  private final String url;
 
 
-    public UrlValidator(String url, ValidationContext validationContext)
-    {
-        super(validationContext);
-        this.url = url;
+  public UrlValidator(String url, ValidationContext validationContext) {
+    super(validationContext);
+    this.url = url;
+  }
+
+  @Override
+  public ValidationResult validate(MuleEvent event) {
+    try {
+      new URL(url);
+      return ok();
+    } catch (MalformedURLException e) {
+      return fail();
     }
+  }
 
-    @Override
-    public ValidationResult validate(MuleEvent event)
-    {
-        try
-        {
-            new URL(url);
-            return ok();
-        }
-        catch (MalformedURLException e)
-        {
-            return fail();
-        }
-    }
-
-    @Override
-    protected Message getDefaultErrorMessage()
-    {
-        return getMessages().invalidUrl(url);
-    }
+  @Override
+  protected Message getDefaultErrorMessage() {
+    return getMessages().invalidUrl(url);
+  }
 }

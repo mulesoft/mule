@@ -13,50 +13,41 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 import java.nio.charset.Charset;
 
 /** TODO */
-public class TransformerTemplate extends AbstractMessageTransformer
-{
-    private TransformerCallback callback;
+public class TransformerTemplate extends AbstractMessageTransformer {
 
-    public TransformerTemplate(TransformerCallback callback)
-    {
-        this.callback = callback;
+  private TransformerCallback callback;
+
+  public TransformerTemplate(TransformerCallback callback) {
+    this.callback = callback;
+  }
+
+  @Override
+  public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException {
+    try {
+      return callback.doTransform(event.getMessage());
+    } catch (TransformerException e) {
+      throw new TransformerException(e.getI18nMessage(), this, e);
+    } catch (Exception e) {
+      throw new TransformerException(this, e);
+    }
+  }
+
+  public interface TransformerCallback {
+
+    public Object doTransform(MuleMessage message) throws Exception;
+  }
+
+  public static class OverwitePayloadCallback implements TransformerCallback {
+
+    private Object payload;
+
+    public OverwitePayloadCallback(Object payload) {
+      this.payload = payload;
     }
 
     @Override
-    public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException
-    {
-        try
-        {
-            return callback.doTransform(event.getMessage());
-        }
-        catch (TransformerException e)
-        {
-            throw new TransformerException(e.getI18nMessage(),this, e);
-        }
-        catch (Exception e)
-        {
-            throw new TransformerException(this, e);
-        }
+    public Object doTransform(MuleMessage message) throws Exception {
+      return payload;
     }
-
-    public interface TransformerCallback
-    {
-        public Object doTransform(MuleMessage message) throws Exception;
-    }
-
-    public static class OverwitePayloadCallback implements TransformerCallback
-    {
-        private Object payload;
-
-        public OverwitePayloadCallback(Object payload)
-        {
-            this.payload = payload;
-        }
-
-        @Override
-        public Object doTransform(MuleMessage message) throws Exception
-        {
-            return payload;
-        }
-    }
+  }
 }

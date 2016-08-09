@@ -11,15 +11,14 @@ import static org.junit.Assert.assertNotNull;
 import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MuleException;
 
-public abstract class AbstractInterceptorTestCase extends AbstractIntegrationTestCase
-{
-    public static final String MESSAGE = "boo";
+public abstract class AbstractInterceptorTestCase extends AbstractIntegrationTestCase {
 
-    public void assertMessageIntercepted() throws MuleException, InterruptedException
-    {
-        FunctionalTestAdvice advice = muleContext.getRegistry().lookupObject("advice");
-        assertNotNull("Cannot find advice", advice);
-        String message = advice.getMessage(RECEIVE_TIMEOUT);
-        assertEquals("Bad message", MESSAGE, message);
-    }
+  public static final String MESSAGE = "boo";
+
+  public void assertMessageIntercepted() throws MuleException, InterruptedException {
+    FunctionalTestAdvice advice = muleContext.getRegistry().lookupObject("advice");
+    assertNotNull("Cannot find advice", advice);
+    String message = advice.getMessage(RECEIVE_TIMEOUT);
+    assertEquals("Bad message", MESSAGE, message);
+  }
 }

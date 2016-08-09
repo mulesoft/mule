@@ -10,16 +10,15 @@ import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
 import org.mule.compatibility.core.endpoint.EndpointAware;
 import org.mule.runtime.core.api.transformer.Transformer;
 
-public interface EndpointAwareTransformer extends EndpointAware, Transformer
-{
+public interface EndpointAwareTransformer extends EndpointAware, Transformer {
 
-    /**
-     * The endpoint that this transformer is attached to
-     * 
-     * @return the endpoint associated with the transformer
-     * @deprecated
-     */
-    @Deprecated
-    ImmutableEndpoint getEndpoint();
+  /**
+   * The endpoint that this transformer is attached to
+   * 
+   * @return the endpoint associated with the transformer
+   * @deprecated
+   */
+  @Deprecated
+  ImmutableEndpoint getEndpoint();
 
 }

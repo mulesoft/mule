@@ -18,31 +18,26 @@ import org.springframework.beans.factory.FactoryBean;
 /**
  * Creates a {@link QueryTemplate} for a dynamic query
  */
-public class DynamicQueryTemplateFactoryBean implements FactoryBean<QueryTemplate>
-{
+public class DynamicQueryTemplateFactoryBean implements FactoryBean<QueryTemplate> {
 
-    private final String sqlText;
+  private final String sqlText;
 
-    public DynamicQueryTemplateFactoryBean(String sqlText)
-    {
-        this.sqlText = sqlText;
-    }
+  public DynamicQueryTemplateFactoryBean(String sqlText) {
+    this.sqlText = sqlText;
+  }
 
-    @Override
-    public QueryTemplate getObject() throws Exception
-    {
-        return new QueryTemplate(sqlText, QueryType.DDL, Collections.<QueryParam>emptyList(), true);
-    }
+  @Override
+  public QueryTemplate getObject() throws Exception {
+    return new QueryTemplate(sqlText, QueryType.DDL, Collections.<QueryParam>emptyList(), true);
+  }
 
-    @Override
-    public Class<?> getObjectType()
-    {
-        return QueryTemplate.class;
-    }
+  @Override
+  public Class<?> getObjectType() {
+    return QueryTemplate.class;
+  }
 
-    @Override
-    public boolean isSingleton()
-    {
-        return false;
-    }
+  @Override
+  public boolean isSingleton() {
+    return false;
+  }
 }

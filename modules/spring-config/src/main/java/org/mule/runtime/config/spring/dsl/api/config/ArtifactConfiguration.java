@@ -16,29 +16,26 @@ import java.util.List;
  *
  * @since 4.0
  */
-public class ArtifactConfiguration
-{
+public class ArtifactConfiguration {
 
-    private List<ComponentConfiguration> componentConfiguration = new ArrayList<>();
+  private List<ComponentConfiguration> componentConfiguration = new ArrayList<>();
 
-    /**
-     * Creates an {@code ArtifactConfiguration} from a collection of root mule configuration components.
-     *
-     * Each {@link ComponentConfiguration} may have other nested configuration components.
-     *
-     * @param componentConfigurations collection of root configuration elements of a mule configuration. Non null.
-     */
-    public ArtifactConfiguration(List<ComponentConfiguration> componentConfigurations)
-    {
-        checkArgument(componentConfigurations != null, "component configurations cannot be null");
-        this.componentConfiguration = componentConfigurations;
-    }
+  /**
+   * Creates an {@code ArtifactConfiguration} from a collection of root mule configuration components.
+   *
+   * Each {@link ComponentConfiguration} may have other nested configuration components.
+   *
+   * @param componentConfigurations collection of root configuration elements of a mule configuration. Non null.
+   */
+  public ArtifactConfiguration(List<ComponentConfiguration> componentConfigurations) {
+    checkArgument(componentConfigurations != null, "component configurations cannot be null");
+    this.componentConfiguration = componentConfigurations;
+  }
 
-    /**
-     * @return collection of root mule configuration elements.
-     */
-    public List<ComponentConfiguration> getComponentConfiguration()
-    {
-        return componentConfiguration;
-    }
+  /**
+   * @return collection of root mule configuration elements.
+   */
+  public List<ComponentConfiguration> getComponentConfiguration() {
+    return componentConfiguration;
+  }
 }

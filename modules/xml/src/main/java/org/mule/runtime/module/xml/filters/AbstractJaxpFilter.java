@@ -21,61 +21,53 @@ import org.w3c.dom.Node;
 /**
  * Common filter functionality for filters which need to convert payloads to {@link Document}s.
  */
-public abstract class AbstractJaxpFilter
-{
+public abstract class AbstractJaxpFilter {
 
-    private XmlToDomDocument xmlToDom = new XmlToDomDocument();
+  private XmlToDomDocument xmlToDom = new XmlToDomDocument();
 
-    private DocumentBuilderFactory documentBuilderFactory;
-    
-    public AbstractJaxpFilter()
-    {
-        super();
-        xmlToDom.setReturnDataType(DataType.fromType(Document.class));
-    }
-    public void initialise() throws InitialisationException
-    {
-        if (getDocumentBuilderFactory() == null)
-        {
-            DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
-            builderFactory.setNamespaceAware(true);
-            setDocumentBuilderFactory(builderFactory);
-        }
-    }
+  private DocumentBuilderFactory documentBuilderFactory;
 
-    /**
-     * @deprecated use {@link #toDOMNode(Object, MuleEvent)} instead
-     */
-    @Deprecated
-    public Node toDOMNode(Object src) throws Exception
-    {
-        return toDOMNode(src, RequestContext.getEvent());
-    }
+  public AbstractJaxpFilter() {
+    super();
+    xmlToDom.setReturnDataType(DataType.fromType(Document.class));
+  }
 
-    public Node toDOMNode(Object src, MuleEvent event) throws Exception
-    {
-        Node node = XMLUtils.toDOMNode(src, event, getDocumentBuilderFactory());
-        return node == null ? (Node) xmlToDom.transform(src) : node;
+  public void initialise() throws InitialisationException {
+    if (getDocumentBuilderFactory() == null) {
+      DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
+      builderFactory.setNamespaceAware(true);
+      setDocumentBuilderFactory(builderFactory);
     }
+  }
 
-    /**
-     * The document builder factory to use in case XML needs to be parsed.
-     * 
-     * @return The document builder factory to use in case XML needs to be parsed.
-     */
-    public DocumentBuilderFactory getDocumentBuilderFactory()
-    {
-        return documentBuilderFactory;
-    }
+  /**
+   * @deprecated use {@link #toDOMNode(Object, MuleEvent)} instead
+   */
+  @Deprecated
+  public Node toDOMNode(Object src) throws Exception {
+    return toDOMNode(src, RequestContext.getEvent());
+  }
 
-    /**
-     * The document builder factory to use in case XML needs to be parsed.
-     * 
-     * @param documentBuilderFactory The document builder factory to use in case XML
-     *            needs to be parsed.
-     */
-    public void setDocumentBuilderFactory(DocumentBuilderFactory documentBuilderFactory)
-    {
-        this.documentBuilderFactory = documentBuilderFactory;
-    }
+  public Node toDOMNode(Object src, MuleEvent event) throws Exception {
+    Node node = XMLUtils.toDOMNode(src, event, getDocumentBuilderFactory());
+    return node == null ? (Node) xmlToDom.transform(src) : node;
+  }
+
+  /**
+   * The document builder factory to use in case XML needs to be parsed.
+   * 
+   * @return The document builder factory to use in case XML needs to be parsed.
+   */
+  public DocumentBuilderFactory getDocumentBuilderFactory() {
+    return documentBuilderFactory;
+  }
+
+  /**
+   * The document builder factory to use in case XML needs to be parsed.
+   * 
+   * @param documentBuilderFactory The document builder factory to use in case XML needs to be parsed.
+   */
+  public void setDocumentBuilderFactory(DocumentBuilderFactory documentBuilderFactory) {
+    this.documentBuilderFactory = documentBuilderFactory;
+  }
 }

@@ -13,68 +13,57 @@ import java.io.Serializable;
 /**
  * Adapter for {@link TransientQueueTransactionContext} to an {@link org.mule.runtime.core.util.queue.XaQueueTransactionContext}
  */
-public class TransientXaTransactionAdapter implements XaQueueTransactionContext
-{
+public class TransientXaTransactionAdapter implements XaQueueTransactionContext {
 
-    private final TransientQueueTransactionContext adaptedTransactionContext;
+  private final TransientQueueTransactionContext adaptedTransactionContext;
 
-    public TransientXaTransactionAdapter(TransientQueueTransactionContext transactionContext)
-    {
-        this.adaptedTransactionContext = transactionContext;
-    }
+  public TransientXaTransactionAdapter(TransientQueueTransactionContext transactionContext) {
+    this.adaptedTransactionContext = transactionContext;
+  }
 
-    @Override
-    public boolean offer(QueueStore queue, Serializable item, long offerTimeout) throws InterruptedException
-    {
-        return adaptedTransactionContext.offer(queue, item, offerTimeout);
-    }
+  @Override
+  public boolean offer(QueueStore queue, Serializable item, long offerTimeout) throws InterruptedException {
+    return adaptedTransactionContext.offer(queue, item, offerTimeout);
+  }
 
-    @Override
-    public void untake(QueueStore queue, Serializable item) throws InterruptedException
-    {
-        adaptedTransactionContext.untake(queue, item);
-    }
+  @Override
+  public void untake(QueueStore queue, Serializable item) throws InterruptedException {
+    adaptedTransactionContext.untake(queue, item);
+  }
 
-    @Override
-    public void clear(QueueStore queue) throws InterruptedException
-    {
-        adaptedTransactionContext.clear(queue);
-    }
+  @Override
+  public void clear(QueueStore queue) throws InterruptedException {
+    adaptedTransactionContext.clear(queue);
+  }
 
-    @Override
-    public Serializable poll(QueueStore queue, long pollTimeout) throws InterruptedException
-    {
-        return adaptedTransactionContext.poll(queue, pollTimeout);
-    }
+  @Override
+  public Serializable poll(QueueStore queue, long pollTimeout) throws InterruptedException {
+    return adaptedTransactionContext.poll(queue, pollTimeout);
+  }
 
-    @Override
-    public Serializable peek(QueueStore queue) throws InterruptedException
-    {
-        return adaptedTransactionContext.peek(queue);
-    }
+  @Override
+  public Serializable peek(QueueStore queue) throws InterruptedException {
+    return adaptedTransactionContext.peek(queue);
+  }
 
-    @Override
-    public int size(QueueStore queue)
-    {
-        return adaptedTransactionContext.size(queue);
-    }
+  @Override
+  public int size(QueueStore queue) {
+    return adaptedTransactionContext.size(queue);
+  }
 
-    @Override
-    public void doCommit() throws ResourceManagerException
-    {
-        adaptedTransactionContext.doCommit();
-    }
+  @Override
+  public void doCommit() throws ResourceManagerException {
+    adaptedTransactionContext.doCommit();
+  }
 
-    @Override
-    public void doRollback() throws ResourceManagerException
-    {
-        adaptedTransactionContext.doRollback();
-    }
+  @Override
+  public void doRollback() throws ResourceManagerException {
+    adaptedTransactionContext.doRollback();
+  }
 
-    @Override
-    public void doPrepare() throws ResourceManagerException
-    {
-        //Nothing to do.
-    }
+  @Override
+  public void doPrepare() throws ResourceManagerException {
+    // Nothing to do.
+  }
 
 }

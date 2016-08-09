@@ -20,16 +20,16 @@ import java.util.List;
  *
  * @since 4.0
  */
-public class TemporaryArtifactClassLoaderFactory implements DeployableArtifactClassLoaderFactory<ArtifactDescriptor>
-{
+public class TemporaryArtifactClassLoaderFactory implements DeployableArtifactClassLoaderFactory<ArtifactDescriptor> {
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ArtifactClassLoader create(ArtifactClassLoader parent, ArtifactDescriptor descriptor, List<ArtifactClassLoader> artifactPluginClassLoaders)
-    {
-        return new MuleDeployableArtifactClassLoader(getUUID(), new URL[0], parent.getClassLoader(), parent.getClassLoaderLookupPolicy(), artifactPluginClassLoaders);
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public ArtifactClassLoader create(ArtifactClassLoader parent, ArtifactDescriptor descriptor,
+                                    List<ArtifactClassLoader> artifactPluginClassLoaders) {
+    return new MuleDeployableArtifactClassLoader(getUUID(), new URL[0], parent.getClassLoader(),
+                                                 parent.getClassLoaderLookupPolicy(), artifactPluginClassLoaders);
+  }
 
 }

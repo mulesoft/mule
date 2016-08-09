@@ -19,88 +19,72 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
 /**
- * Support for extending a
- * {@link org.mule.runtime.config.spring.parsers.MuleDefinitionParser} without
- * needing to subclass.
+ * Support for extending a {@link org.mule.runtime.config.spring.parsers.MuleDefinitionParser} without needing to subclass.
  */
-public abstract class AbstractPluggableDelegate implements MuleDefinitionParser
-{
+public abstract class AbstractPluggableDelegate implements MuleDefinitionParser {
 
-    private MuleDefinitionParser delegate;
+  private MuleDefinitionParser delegate;
 
-    public AbstractPluggableDelegate(MuleDefinitionParser delegate)
-    {
-        this.delegate = delegate;
-    }
+  public AbstractPluggableDelegate(MuleDefinitionParser delegate) {
+    this.delegate = delegate;
+  }
 
-    public AbstractBeanDefinition muleParse(Element element, ParserContext parserContext)
-    {
-        return delegate.muleParse(element, parserContext);
-    }
+  public AbstractBeanDefinition muleParse(Element element, ParserContext parserContext) {
+    return delegate.muleParse(element, parserContext);
+  }
 
-    public MuleDefinitionParserConfiguration registerPreProcessor(PreProcessor preProcessor)
-    {
-        delegate.registerPreProcessor(preProcessor);
-        return this;
-    }
+  public MuleDefinitionParserConfiguration registerPreProcessor(PreProcessor preProcessor) {
+    delegate.registerPreProcessor(preProcessor);
+    return this;
+  }
 
-    public MuleDefinitionParserConfiguration registerPostProcessor(PostProcessor postProcessor)
-    {
-        delegate.registerPostProcessor(postProcessor);
-        return this;
-    }
+  public MuleDefinitionParserConfiguration registerPostProcessor(PostProcessor postProcessor) {
+    delegate.registerPostProcessor(postProcessor);
+    return this;
+  }
 
-    public MuleDefinitionParserConfiguration addReference(String propertyName)
-    {
-        delegate.addReference(propertyName);
-        return this;
-    }
+  public MuleDefinitionParserConfiguration addReference(String propertyName) {
+    delegate.addReference(propertyName);
+    return this;
+  }
 
-    public MuleDefinitionParserConfiguration addMapping(String propertyName, Map mappings)
-    {
-        delegate.addMapping(propertyName, mappings);
-        return this;
-    }
+  public MuleDefinitionParserConfiguration addMapping(String propertyName, Map mappings) {
+    delegate.addMapping(propertyName, mappings);
+    return this;
+  }
 
-    public MuleDefinitionParserConfiguration addMapping(String propertyName, String mappings)
-    {
-        delegate.addMapping(propertyName, mappings);
-        return this;
-    }
+  public MuleDefinitionParserConfiguration addMapping(String propertyName, String mappings) {
+    delegate.addMapping(propertyName, mappings);
+    return this;
+  }
 
-    public MuleDefinitionParserConfiguration addMapping(String propertyName, ValueMap mappings)
-    {
-        delegate.addMapping(propertyName, mappings);
-        return this;
-    }
+  public MuleDefinitionParserConfiguration addMapping(String propertyName, ValueMap mappings) {
+    delegate.addMapping(propertyName, mappings);
+    return this;
+  }
 
-    public MuleDefinitionParserConfiguration addAlias(String alias, String propertyName)
-    {
-        delegate.addAlias(alias, propertyName);
-        return this;
-    }
+  public MuleDefinitionParserConfiguration addAlias(String alias, String propertyName) {
+    delegate.addAlias(alias, propertyName);
+    return this;
+  }
 
-    public MuleDefinitionParserConfiguration addCollection(String propertyName)
-    {
-        delegate.addCollection(propertyName);
-        return this;
-    }
+  public MuleDefinitionParserConfiguration addCollection(String propertyName) {
+    delegate.addCollection(propertyName);
+    return this;
+  }
 
-    public MuleDefinitionParserConfiguration addIgnored(String propertyName)
-    {
-        delegate.addIgnored(propertyName);
-        return this;
-    }
+  public MuleDefinitionParserConfiguration addIgnored(String propertyName) {
+    delegate.addIgnored(propertyName);
+    return this;
+  }
 
-    public MuleDefinitionParserConfiguration removeIgnored(String propertyName)
-    {
-        delegate.removeIgnored(propertyName);
-        return this;
-    }
+  public MuleDefinitionParserConfiguration removeIgnored(String propertyName) {
+    delegate.removeIgnored(propertyName);
+    return this;
+  }
 
-    public MuleDefinitionParserConfiguration setIgnoredDefault(boolean ignoreAll)
-    {
-        delegate.setIgnoredDefault(ignoreAll);
-        return this;
-    }
+  public MuleDefinitionParserConfiguration setIgnoredDefault(boolean ignoreAll) {
+    delegate.setIgnoredDefault(ignoreAll);
+    return this;
+  }
 }

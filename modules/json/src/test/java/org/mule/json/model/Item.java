@@ -10,44 +10,38 @@ import org.codehaus.jackson.annotate.JsonAutoDetect;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 @JsonAutoDetect(org.codehaus.jackson.annotate.JsonMethod.FIELD)
-public class Item
-{
-    @JsonProperty
-    private String code;
-    
-    @JsonProperty
-    private String description;
+public class Item {
 
-    @JsonProperty("in-stock")
-    private boolean inStock;
+  @JsonProperty
+  private String code;
 
-    public String getCode()
-    {
-        return code;
-    }
+  @JsonProperty
+  private String description;
 
-    public void setCode(String code)
-    {
-        this.code = code;
-    }
+  @JsonProperty("in-stock")
+  private boolean inStock;
 
-    public String getDescription()
-    {
-        return description;
-    }
+  public String getCode() {
+    return code;
+  }
 
-    public void setDescription(String description)
-    {
-        this.description = description;
-    }
+  public void setCode(String code) {
+    this.code = code;
+  }
 
-    public boolean isInStock()
-    {
-        return inStock;
-    }
+  public String getDescription() {
+    return description;
+  }
 
-    public void setInStock(boolean inStock)
-    {
-        this.inStock = inStock;
-    }
+  public void setDescription(String description) {
+    this.description = description;
+  }
+
+  public boolean isInStock() {
+    return inStock;
+  }
+
+  public void setInStock(boolean inStock) {
+    this.inStock = inStock;
+  }
 }

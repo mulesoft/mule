@@ -28,92 +28,79 @@ import java.io.InputStream;
 
 import javax.activation.MimetypesFileTypeMap;
 
-public class StaticResourceLoader
-{
-    private static final String ANY_PATH = "/*";
-    private static final String ROOT_PATH = "/";
-    private static final String DEFAULT_MIME_TYPE = "application/octet-stream";
-    private MimetypesFileTypeMap mimeTypes = new MimetypesFileTypeMap();
+public class StaticResourceLoader {
 
-    /**
-     * The resource base from where documents are served up. For example: /Users/maxthemule/resources
-     */
-    @Parameter
-    private String resourceBasePath;
+  private static final String ANY_PATH = "/*";
+  private static final String ROOT_PATH = "/";
+  private static final String DEFAULT_MIME_TYPE = "application/octet-stream";
+  private MimetypesFileTypeMap mimeTypes = new MimetypesFileTypeMap();
 
-    /**
-     * The default file to serve when a directory is specified. The default value is 'index.html'.
-     */
-    @Parameter
-    @Optional(defaultValue = "index.html")
-    private String defaultFile;
+  /**
+   * The resource base from where documents are served up. For example: /Users/maxthemule/resources
+   */
+  @Parameter
+  private String resourceBasePath;
 
-    public MuleMessage load(MuleEvent event) throws ResourceNotFoundException
-    {
-        //TODO: MULE-10163 - Analyse removing the static resource loader in favor of file read
-        checkArgument(event.getMessage().getAttributes() instanceof HttpRequestAttributes, "Message attributes must be HttpRequestAttributes.");
-        HttpRequestAttributes attributes = (HttpRequestAttributes) event.getMessage().getAttributes();
-        String path = attributes.getRequestPath();
-        String contextPath = attributes.getListenerPath();
+  /**
+   * The default file to serve when a directory is specified. The default value is 'index.html'.
+   */
+  @Parameter
+  @Optional(defaultValue = "index.html")
+  private String defaultFile;
 
-        //Get rid of ending wildcards.
-        if (contextPath.equals(ANY_PATH))
-        {
-            contextPath = ROOT_PATH;
-        }
-        if (contextPath.endsWith(ANY_PATH))
-        {
-            contextPath = StringUtils.removeEnd(contextPath, ANY_PATH);
-        }
+  public MuleMessage load(MuleEvent event) throws ResourceNotFoundException {
+    // TODO: MULE-10163 - Analyse removing the static resource loader in favor of file read
+    checkArgument(event.getMessage().getAttributes() instanceof HttpRequestAttributes,
+                  "Message attributes must be HttpRequestAttributes.");
+    HttpRequestAttributes attributes = (HttpRequestAttributes) event.getMessage().getAttributes();
+    String path = attributes.getRequestPath();
+    String contextPath = attributes.getListenerPath();
 
-        if (!ROOT_PATH.equals(contextPath))
-        {
-            // Remove the listener context path from the request as this isn't part of the path.
-            path = path.substring(contextPath.length());
-        }
-
-        File file = new File(resourceBasePath + path);
-        MuleMessage result;
-
-        if (file.isDirectory())
-        {
-            if (!path.endsWith("/"))
-            {
-                // Just fix the path, don't force a redirect
-                path = path + "/";
-            }
-            file = new File(resourceBasePath + path +  defaultFile);
-        }
-
-        InputStream in = null;
-        try
-        {
-            in = new FileInputStream(file);
-
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            IOUtils.copyLarge(in, baos);
-
-            byte[] buffer = baos.toByteArray();
-
-            String mimeType = mimeTypes.getContentType(file);
-            if (mimeType == null)
-            {
-                mimeType = DEFAULT_MIME_TYPE;
-            }
-
-            result = MuleMessage.builder()
-                    .payload(buffer)
-                    .mediaType(MediaType.parse(mimeType))
-                    .build();
-            return result;
-        }
-        catch (IOException e)
-        {
-            throw new ResourceNotFoundException(createStaticMessage(format("The file: %s was not found.", resourceBasePath + path)), event, e);
-        }
-        finally
-        {
-            IOUtils.closeQuietly(in);
-        }
+    // Get rid of ending wildcards.
+    if (contextPath.equals(ANY_PATH)) {
+      contextPath = ROOT_PATH;
     }
+    if (contextPath.endsWith(ANY_PATH)) {
+      contextPath = StringUtils.removeEnd(contextPath, ANY_PATH);
+    }
+
+    if (!ROOT_PATH.equals(contextPath)) {
+      // Remove the listener context path from the request as this isn't part of the path.
+      path = path.substring(contextPath.length());
+    }
+
+    File file = new File(resourceBasePath + path);
+    MuleMessage result;
+
+    if (file.isDirectory()) {
+      if (!path.endsWith("/")) {
+        // Just fix the path, don't force a redirect
+        path = path + "/";
+      }
+      file = new File(resourceBasePath + path + defaultFile);
+    }
+
+    InputStream in = null;
+    try {
+      in = new FileInputStream(file);
+
+      ByteArrayOutputStream baos = new ByteArrayOutputStream();
+      IOUtils.copyLarge(in, baos);
+
+      byte[] buffer = baos.toByteArray();
+
+      String mimeType = mimeTypes.getContentType(file);
+      if (mimeType == null) {
+        mimeType = DEFAULT_MIME_TYPE;
+      }
+
+      result = MuleMessage.builder().payload(buffer).mediaType(MediaType.parse(mimeType)).build();
+      return result;
+    } catch (IOException e) {
+      throw new ResourceNotFoundException(createStaticMessage(format("The file: %s was not found.", resourceBasePath + path)),
+                                          event, e);
+    } finally {
+      IOUtils.closeQuietly(in);
+    }
+  }
 }

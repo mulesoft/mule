@@ -22,86 +22,65 @@ import javax.jms.TopicConnectionFactory;
 import org.springframework.jms.connection.CachingConnectionFactory;
 import org.springframework.jms.connection.SingleConnectionFactory;
 
-public class CustomCachingConnectionFactory extends CachingConnectionFactory implements Closeable, Disposable
-{
+public class CustomCachingConnectionFactory extends CachingConnectionFactory implements Closeable, Disposable {
 
-    private final String username;
-    private final String password;
+  private final String username;
+  private final String password;
 
-    public CustomCachingConnectionFactory(ConnectionFactory targetConnectionFactory, String username, String password)
-    {
-        super(targetConnectionFactory);
-        this.username = username;
-        this.password = password;
+  public CustomCachingConnectionFactory(ConnectionFactory targetConnectionFactory, String username, String password) {
+    super(targetConnectionFactory);
+    this.username = username;
+    this.password = password;
+  }
+
+  @Override
+  public Connection createConnection(String username, String password) throws JMSException {
+    throw new javax.jms.IllegalStateException("CustomCachingConnectionFactory does not support creating a connection with username and password. Provide the desired username and password when the instance is defined");
+  }
+
+  @Override
+  protected Connection doCreateConnection() throws JMSException {
+    if (username == null && password == null) {
+      return super.doCreateConnection();
+    } else {
+      ConnectionFactory cf = getTargetConnectionFactory();
+      if (Boolean.FALSE.equals(getPubSubMode()) && cf instanceof QueueConnectionFactory) {
+        return ((QueueConnectionFactory) cf).createQueueConnection(username, password);
+      } else if (Boolean.TRUE.equals(getPubSubMode()) && cf instanceof TopicConnectionFactory) {
+        return ((TopicConnectionFactory) cf).createTopicConnection(username, password);
+      } else {
+        return getTargetConnectionFactory().createConnection(username, password);
+      }
     }
+  }
 
-    @Override
-    public Connection createConnection(String username, String password) throws JMSException
-    {
-        throw new javax.jms.IllegalStateException(
-                "CustomCachingConnectionFactory does not support creating a connection with username and password. Provide the desired username and password when the instance is defined");
+  public String getUsername() {
+    return username;
+  }
+
+  public String getPassword() {
+    return password;
+  }
+
+  private boolean getPubSubMode() {
+    try {
+      Field pubSubModeField = SingleConnectionFactory.class.getDeclaredField("pubSubMode");
+      pubSubModeField.setAccessible(true);
+
+      Object value = pubSubModeField.get(this);
+      return value == null ? false : ((Boolean) value);
+    } catch (Exception e) {
+      throw new IllegalStateException("Unable to determine value of pubSubMode field", e);
     }
+  }
 
-    @Override
-    protected Connection doCreateConnection() throws JMSException
-    {
-        if (username == null && password == null)
-        {
-            return super.doCreateConnection();
-        }
-        else
-        {
-            ConnectionFactory cf = getTargetConnectionFactory();
-            if (Boolean.FALSE.equals(getPubSubMode()) && cf instanceof QueueConnectionFactory)
-            {
-                return ((QueueConnectionFactory) cf).createQueueConnection(username, password);
-            }
-            else if (Boolean.TRUE.equals(getPubSubMode()) && cf instanceof TopicConnectionFactory)
-            {
-                return ((TopicConnectionFactory) cf).createTopicConnection(username, password);
-            }
-            else
-            {
-                return getTargetConnectionFactory().createConnection(username, password);
-            }
-        }
-    }
+  @Override
+  public void close() throws MuleException {
+    resetConnection();
+  }
 
-    public String getUsername()
-    {
-        return username;
-    }
-
-    public String getPassword()
-    {
-        return password;
-    }
-
-    private boolean getPubSubMode()
-    {
-        try
-        {
-            Field pubSubModeField = SingleConnectionFactory.class.getDeclaredField("pubSubMode");
-            pubSubModeField.setAccessible(true);
-
-            Object value = pubSubModeField.get(this);
-            return value == null ? false : ((Boolean) value);
-        }
-        catch (Exception e)
-        {
-            throw new IllegalStateException("Unable to determine value of pubSubMode field", e);
-        }
-    }
-
-    @Override
-    public void close() throws MuleException
-    {
-        resetConnection();
-    }
-
-    @Override
-    public void dispose()
-    {
-        destroy();
-    }
+  @Override
+  public void dispose() {
+    destroy();
+  }
 }

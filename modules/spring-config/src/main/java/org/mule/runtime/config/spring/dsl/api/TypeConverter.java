@@ -7,21 +7,20 @@
 package org.mule.runtime.config.spring.dsl.api;
 
 /**
- * Converter from one type to another. Meant to be used for converting plain values
- * from the mule configuration to specific types required by a runtime object.
+ * Converter from one type to another. Meant to be used for converting plain values from the mule configuration to specific types
+ * required by a runtime object.
  *
- * @param <InputType>  type of the value to be converted.
+ * @param <InputType> type of the value to be converted.
  * @param <OutputType> type of the converted value.
  */
-public interface TypeConverter<InputType, OutputType>
-{
+public interface TypeConverter<InputType, OutputType> {
 
-    /**
-     * Converters from one type to another.
-     *
-     * @param inputType the value to be converted.
-     * @return the converted value.
-     */
-    OutputType convert(InputType inputType);
+  /**
+   * Converters from one type to another.
+   *
+   * @param inputType the value to be converted.
+   * @return the converted value.
+   */
+  OutputType convert(InputType inputType);
 
 }

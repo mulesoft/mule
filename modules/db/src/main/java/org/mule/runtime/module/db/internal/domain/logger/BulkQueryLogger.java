@@ -10,13 +10,12 @@ package org.mule.runtime.module.db.internal.domain.logger;
 /**
  * Logs a bulk query
  */
-public interface BulkQueryLogger extends QueryLogger
-{
+public interface BulkQueryLogger extends QueryLogger {
 
-    /**
-     * Adds a new query to log
-     *
-     * @param query query added to the bulk
-     */
-    void addQuery(String query);
+  /**
+   * Adds a new query to log
+   *
+   * @param query query added to the bulk
+   */
+  void addQuery(String query);
 }

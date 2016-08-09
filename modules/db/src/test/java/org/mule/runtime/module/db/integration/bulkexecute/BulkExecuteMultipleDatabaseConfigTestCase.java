@@ -10,17 +10,14 @@ package org.mule.runtime.module.db.integration.bulkexecute;
 import org.mule.runtime.module.db.integration.config.AbstractMultipleDatabaseConfigErrorTestCase;
 import org.mule.runtime.module.db.integration.model.AbstractTestDatabase;
 
-public class BulkExecuteMultipleDatabaseConfigTestCase extends AbstractMultipleDatabaseConfigErrorTestCase
-{
+public class BulkExecuteMultipleDatabaseConfigTestCase extends AbstractMultipleDatabaseConfigErrorTestCase {
 
-    public BulkExecuteMultipleDatabaseConfigTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public BulkExecuteMultipleDatabaseConfigTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/bulkexecute/bulk-execute-multiple-database-config.xml"};
-    }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/bulkexecute/bulk-execute-multiple-database-config.xml"};
+  }
 }

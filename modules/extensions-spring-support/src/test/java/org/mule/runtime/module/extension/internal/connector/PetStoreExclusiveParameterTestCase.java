@@ -9,18 +9,15 @@ package org.mule.runtime.module.extension.internal.connector;
 import org.mule.functional.junit4.InvalidExtensionConfigTestCase;
 import org.mule.test.petstore.extension.PetStoreConnector;
 
-public class PetStoreExclusiveParameterTestCase extends InvalidExtensionConfigTestCase
-{
+public class PetStoreExclusiveParameterTestCase extends InvalidExtensionConfigTestCase {
 
-    @Override
-    protected Class<?>[] getAnnotatedExtensionClasses()
-    {
-        return new Class<?>[] {PetStoreConnector.class};
-    }
+  @Override
+  protected Class<?>[] getAnnotatedExtensionClasses() {
+    return new Class<?>[] {PetStoreConnector.class};
+  }
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "petstore-exclusive-parameters-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "petstore-exclusive-parameters-config.xml";
+  }
 }

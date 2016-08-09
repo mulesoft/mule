@@ -10,11 +10,10 @@ import org.mule.runtime.core.context.notification.ManagementNotification;
 
 
 /**
- * <code>ManagementNotificationListener</code> is an observer interface that
- * objects can use to receive notifications about the state of the Mule instance and
- * its resources
+ * <code>ManagementNotificationListener</code> is an observer interface that objects can use to receive notifications about the
+ * state of the Mule instance and its resources
  */
-public interface ManagementNotificationListener<T extends ManagementNotification> extends ServerNotificationListener<ManagementNotification>
-{
-    // no methods
+public interface ManagementNotificationListener<T extends ManagementNotification>
+    extends ServerNotificationListener<ManagementNotification> {
+  // no methods
 }

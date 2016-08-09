@@ -9,15 +9,14 @@ package org.mule.functional.functional;
 import org.mule.runtime.core.api.MuleEventContext;
 
 /**
- * The scope of the MuleEvent Callback is to be able to get a the message currently
- * being processed by the {@link FunctionalTestComponent} and make assertions
- * on the message payload, headers or attachments or to make changes required
+ * The scope of the MuleEvent Callback is to be able to get a the message currently being processed by the
+ * {@link FunctionalTestComponent} and make assertions on the message payload, headers or attachments or to make changes required
  * for the test.
  *
  * @see FunctionalTestComponent
  */
 
-public interface EventCallback
-{
-    public void eventReceived(MuleEventContext context, Object component) throws Exception;
+public interface EventCallback {
+
+  public void eventReceived(MuleEventContext context, Object component) throws Exception;
 }

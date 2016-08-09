@@ -15,11 +15,10 @@ import javax.xml.ws.BindingType;
 
 @WebService
 @BindingType(javax.xml.ws.soap.SOAPBinding.SOAP11HTTP_BINDING)
-public interface Greeter
-{
-    @WebResult(name="name")
-    public String greet(@WebParam(name = "name") String name);
-}
+public interface Greeter {
 
+  @WebResult(name = "name")
+  public String greet(@WebParam(name = "name") String name);
+}
 
 

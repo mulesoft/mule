@@ -9,21 +9,19 @@ package org.mule.runtime.module.spring.i18n;
 import org.mule.runtime.core.config.i18n.Message;
 import org.mule.runtime.core.config.i18n.MessageFactory;
 
-public class SpringMessages extends MessageFactory
-{
-    private static final SpringMessages factory = new SpringMessages();
-    
-    private static final String BUNDLE_PATH = getBundlePath("spring");
+public class SpringMessages extends MessageFactory {
 
-    public static Message failedToReinitMule()
-    {
-        return factory.createMessage(BUNDLE_PATH, 1);
-    }
+  private static final SpringMessages factory = new SpringMessages();
 
-    public static Message beanNotInstanceOfApplicationListener(String name)
-    {
-        return factory.createMessage(BUNDLE_PATH, 12, name);
-    }
+  private static final String BUNDLE_PATH = getBundlePath("spring");
+
+  public static Message failedToReinitMule() {
+    return factory.createMessage(BUNDLE_PATH, 1);
+  }
+
+  public static Message beanNotInstanceOfApplicationListener(String name) {
+    return factory.createMessage(BUNDLE_PATH, 12, name);
+  }
 }
 
 

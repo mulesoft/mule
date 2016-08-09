@@ -17,45 +17,39 @@ import java.io.ByteArrayInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ErrorRequestHandler implements RequestHandler
-{
-    private Logger logger = LoggerFactory.getLogger(getClass());
+public class ErrorRequestHandler implements RequestHandler {
 
-    private int statusCode;
-    private String reasonPhrase;
-    private String entityFormat;
+  private Logger logger = LoggerFactory.getLogger(getClass());
 
-    public ErrorRequestHandler(int statusCode, String reasonPhrase, String entityFormat)
-    {
-        this.statusCode = statusCode;
-        this.reasonPhrase = reasonPhrase;
-        this.entityFormat = entityFormat;
-    }
+  private int statusCode;
+  private String reasonPhrase;
+  private String entityFormat;
 
-    @Override
-    public void handleRequest(HttpRequestContext requestContext, HttpResponseReadyCallback responseCallback)
-    {
-        String resolvedEntity = String.format(entityFormat, requestContext.getRequest().getUri());
-        responseCallback.responseReady(new org.mule.runtime.module.http.internal.domain.response.HttpResponseBuilder()
-                                               .setStatusCode(statusCode)
-                                               .setReasonPhrase(reasonPhrase)
-                                               .setEntity(new InputStreamHttpEntity(new ByteArrayInputStream(resolvedEntity.getBytes())))
-                                               .build(), new ResponseStatusCallback()
-        {
-            @Override
-            public void responseSendFailure(Throwable exception)
-            {
-                logger.warn(String.format("Error while sending %s response %s", statusCode, exception.getMessage()));
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("exception thrown",exception);
-                }
-            }
+  public ErrorRequestHandler(int statusCode, String reasonPhrase, String entityFormat) {
+    this.statusCode = statusCode;
+    this.reasonPhrase = reasonPhrase;
+    this.entityFormat = entityFormat;
+  }
 
-            @Override
-            public void responseSendSuccessfully()
-            {
-            }
-        });
-    }
+  @Override
+  public void handleRequest(HttpRequestContext requestContext, HttpResponseReadyCallback responseCallback) {
+    String resolvedEntity = String.format(entityFormat, requestContext.getRequest().getUri());
+    responseCallback.responseReady(new org.mule.runtime.module.http.internal.domain.response.HttpResponseBuilder()
+        .setStatusCode(statusCode).setReasonPhrase(reasonPhrase)
+        .setEntity(new InputStreamHttpEntity(new ByteArrayInputStream(resolvedEntity.getBytes()))).build(),
+                                   new ResponseStatusCallback() {
+
+                                     @Override
+                                     public void responseSendFailure(Throwable exception) {
+                                       logger.warn(String.format("Error while sending %s response %s", statusCode,
+                                                                 exception.getMessage()));
+                                       if (logger.isDebugEnabled()) {
+                                         logger.debug("exception thrown", exception);
+                                       }
+                                     }
+
+                                     @Override
+                                     public void responseSendSuccessfully() {}
+                                   });
+  }
 }

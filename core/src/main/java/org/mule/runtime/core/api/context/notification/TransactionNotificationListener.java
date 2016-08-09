@@ -10,11 +10,10 @@ import org.mule.runtime.core.context.notification.TransactionNotification;
 
 
 /**
- * <code>TransactionNotificationListener</code> is an observer interface that objects
- * can implement and then register themselves with the Mule manager to be notified
- * when a Transaction event occurs.
+ * <code>TransactionNotificationListener</code> is an observer interface that objects can implement and then register themselves
+ * with the Mule manager to be notified when a Transaction event occurs.
  */
-public interface TransactionNotificationListener<T extends TransactionNotification> extends ServerNotificationListener<TransactionNotification>
-{
-    // no methods
+public interface TransactionNotificationListener<T extends TransactionNotification>
+    extends ServerNotificationListener<TransactionNotification> {
+  // no methods
 }

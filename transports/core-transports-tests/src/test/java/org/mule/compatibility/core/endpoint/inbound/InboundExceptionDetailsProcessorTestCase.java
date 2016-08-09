@@ -17,26 +17,23 @@ import org.mule.runtime.core.message.DefaultExceptionPayload;
 
 import org.junit.Test;
 
-public class InboundExceptionDetailsProcessorTestCase extends AbstractMessageProcessorTestCase
-{
+public class InboundExceptionDetailsProcessorTestCase extends AbstractMessageProcessorTestCase {
 
-    @Test
-    public void testProcess() throws Exception
-    {
-        InboundEndpoint endpoint = createTestInboundEndpoint(null, null);
-        InboundExceptionDetailsMessageProcessor mp = new InboundExceptionDetailsMessageProcessor(endpoint.getConnector());
-        mp.setMuleContext(muleContext);
-        MuleEvent event = createTestInboundEvent(endpoint);
+  @Test
+  public void testProcess() throws Exception {
+    InboundEndpoint endpoint = createTestInboundEndpoint(null, null);
+    InboundExceptionDetailsMessageProcessor mp = new InboundExceptionDetailsMessageProcessor(endpoint.getConnector());
+    mp.setMuleContext(muleContext);
+    MuleEvent event = createTestInboundEvent(endpoint);
 
-        event.setMessage(MuleMessage.builder(event.getMessage())
-                                    .exceptionPayload(new DefaultExceptionPayload(new RuntimeException()))
-                                    .build());
+    event.setMessage(MuleMessage.builder(event.getMessage()).exceptionPayload(new DefaultExceptionPayload(new RuntimeException()))
+        .build());
 
-        MuleEvent result = mp.process(event);
+    MuleEvent result = mp.process(event);
 
-        assertNotNull(result);
-        final int status = result.getMessage().getOutboundProperty("status", 0);
-        assertEquals(500, status);
-    }
+    assertNotNull(result);
+    final int status = result.getMessage().getOutboundProperty("status", 0);
+    assertEquals(500, status);
+  }
 
 }

@@ -24,79 +24,70 @@ import org.springframework.core.ResolvableType;
  *
  * @since 4.0
  */
-public final class ParameterWrapper implements ParameterElement
-{
+public final class ParameterWrapper implements ParameterElement {
 
-    private final Parameter parameter;
-    private final Method owner;
-    private final int index;
+  private final Parameter parameter;
+  private final Method owner;
+  private final int index;
 
-    public ParameterWrapper(Method owner, int index)
-    {
-        this.index = index;
-        this.parameter = owner.getParameters()[index];
-        this.owner = owner;
-    }
+  public ParameterWrapper(Method owner, int index) {
+    this.index = index;
+    this.parameter = owner.getParameters()[index];
+    this.owner = owner;
+  }
 
-    /**
-     * @return the wrapped {@link Parameter}
-     */
-    public Parameter getParameter()
-    {
-        return parameter;
-    }
+  /**
+   * @return the wrapped {@link Parameter}
+   */
+  public Parameter getParameter() {
+    return parameter;
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public TypeWrapper getType()
-    {
-        return new TypeWrapper(parameter.getType());
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public TypeWrapper getType() {
+    return new TypeWrapper(parameter.getType());
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public MetadataType getMetadataType(ClassTypeLoader typeLoader)
-    {
-        return typeLoader.load(ResolvableType.forMethodParameter(owner, index).getType());
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public MetadataType getMetadataType(ClassTypeLoader typeLoader) {
+    return typeLoader.load(ResolvableType.forMethodParameter(owner, index).getType());
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Annotation[] getAnnotations()
-    {
-        return parameter.getAnnotations();
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Annotation[] getAnnotations() {
+    return parameter.getAnnotations();
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public <A extends Annotation> Optional<A> getAnnotation(Class<A> annotationClass)
-    {
-        return Optional.ofNullable(parameter.getAnnotation(annotationClass));
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public <A extends Annotation> Optional<A> getAnnotation(Class<A> annotationClass) {
+    return Optional.ofNullable(parameter.getAnnotation(annotationClass));
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getName()
-    {
-        return parameter.getName();
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String getName() {
+    return parameter.getName();
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getOwnerDescription()
-    {
-        return format("Method: '%s'", owner.getName());
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String getOwnerDescription() {
+    return format("Method: '%s'", owner.getName());
+  }
 }

@@ -14,21 +14,19 @@ import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Test;
 
-public class TransformerArraysTestCase extends AbstractIntegrationTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "transformer-arrays-config.xml";
-    }
+public class TransformerArraysTestCase extends AbstractIntegrationTestCase {
 
-    @Test
-    public void testArrayReturnType() throws Exception
-    {
+  @Override
+  protected String getConfigFile() {
+    return "transformer-arrays-config.xml";
+  }
 
-        Transformer trans = muleContext.getRegistry().lookupTransformer("testTrans");
+  @Test
+  public void testArrayReturnType() throws Exception {
 
-        assertNotNull(trans);
-        assertEquals(Orange[].class, trans.getReturnDataType().getType());
-    }
+    Transformer trans = muleContext.getRegistry().lookupTransformer("testTrans");
+
+    assertNotNull(trans);
+    assertEquals(Orange[].class, trans.getReturnDataType().getType());
+  }
 }

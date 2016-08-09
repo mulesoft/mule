@@ -20,29 +20,26 @@ import java.io.NotSerializableException;
 import org.junit.Test;
 
 @SmallTest
-public class SHA256MuleEventKeyGeneratorTestCase extends AbstractMuleContextTestCase
-{
+public class SHA256MuleEventKeyGeneratorTestCase extends AbstractMuleContextTestCase {
 
-    private static final String TEST_INPUT = "TEST";
+  private static final String TEST_INPUT = "TEST";
 
-    private static final String TEST_HASH = "94ee059335e587e501cc4bf90613e0814f00a7b08bc7c648fd865a2af6a22cc2";
+  private static final String TEST_HASH = "94ee059335e587e501cc4bf90613e0814f00a7b08bc7c648fd865a2af6a22cc2";
 
-    private SHA256MuleEventKeyGenerator keyGenerator = new SHA256MuleEventKeyGenerator();
+  private SHA256MuleEventKeyGenerator keyGenerator = new SHA256MuleEventKeyGenerator();
 
-    @Test
-    public void generatesKeyApplyingSHA256ToPayload() throws Exception
-    {
-        MuleEvent event = getTestEvent(TEST_INPUT);
-        String key = (String) keyGenerator.generateKey(event);
-        assertEquals(TEST_HASH, key);
-    }
+  @Test
+  public void generatesKeyApplyingSHA256ToPayload() throws Exception {
+    MuleEvent event = getTestEvent(TEST_INPUT);
+    String key = (String) keyGenerator.generateKey(event);
+    assertEquals(TEST_HASH, key);
+  }
 
-    @Test(expected = NotSerializableException.class)
-    public void failsToGenerateKeyWhenCannotReadPayload() throws Exception
-    {
-        MuleEvent event = mock(MuleEvent.class);
-        when(event.getMessageAsBytes()).thenThrow(new DefaultMuleException("Fail"));
-        keyGenerator.generateKey(event);
-    }
+  @Test(expected = NotSerializableException.class)
+  public void failsToGenerateKeyWhenCannotReadPayload() throws Exception {
+    MuleEvent event = mock(MuleEvent.class);
+    when(event.getMessageAsBytes()).thenThrow(new DefaultMuleException("Fail"));
+    keyGenerator.generateKey(event);
+  }
 
 }

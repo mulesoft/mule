@@ -11,15 +11,13 @@ package org.mule.runtime.module.repository.api;
  *
  * @since 4.0
  */
-public class RepositoryServiceDisabledException extends RuntimeException
-{
+public class RepositoryServiceDisabledException extends RuntimeException {
 
-    /**
-     * {@inheritDoc}
-     */
-    public RepositoryServiceDisabledException(String message)
-    {
-        super(message);
-    }
+  /**
+   * {@inheritDoc}
+   */
+  public RepositoryServiceDisabledException(String message) {
+    super(message);
+  }
 
 }

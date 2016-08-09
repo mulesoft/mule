@@ -14,24 +14,21 @@ import org.mule.runtime.core.util.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class OutboundLoggingMessageProcessor implements MessageProcessor
-{
-    protected final transient Logger logger = LoggerFactory.getLogger(getClass());
+public class OutboundLoggingMessageProcessor implements MessageProcessor {
 
-    @Override
-    public MuleEvent process(MuleEvent event) throws MuleException
-    {
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("sending event: " + event);
-        }
+  protected final transient Logger logger = LoggerFactory.getLogger(getClass());
 
-        return event;
+  @Override
+  public MuleEvent process(MuleEvent event) throws MuleException {
+    if (logger.isDebugEnabled()) {
+      logger.debug("sending event: " + event);
     }
 
-    @Override
-    public String toString()
-    {
-        return ObjectUtils.toString(this);
-    }
+    return event;
+  }
+
+  @Override
+  public String toString() {
+    return ObjectUtils.toString(this);
+  }
 }

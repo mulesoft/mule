@@ -13,38 +13,30 @@ import org.mule.extension.validation.api.ValidationResult;
 import org.mule.extension.validation.internal.ValidationContext;
 
 /**
- * An {@link AbstractValidator} which verifies that a {@link #email} address
- * is valid
+ * An {@link AbstractValidator} which verifies that a {@link #email} address is valid
  *
  * @since 3.7.0
  */
-public class EmailValidator extends AbstractValidator
-{
+public class EmailValidator extends AbstractValidator {
 
-    private final String email;
+  private final String email;
 
-    public EmailValidator(String email, ValidationContext validationContext)
-    {
-        super(validationContext);
-        this.email = email;
+  public EmailValidator(String email, ValidationContext validationContext) {
+    super(validationContext);
+    this.email = email;
+  }
+
+  @Override
+  public ValidationResult validate(MuleEvent event) {
+    if (!email.trim().equals(email)) {
+      return fail();
     }
 
-    @Override
-    public ValidationResult validate(MuleEvent event)
-    {
-        if (!email.trim().equals(email))
-        {
-            return fail();
-        }
+    return org.apache.commons.validator.routines.EmailValidator.getInstance().isValid(email) ? ok() : fail();
+  }
 
-        return org.apache.commons.validator.routines.EmailValidator.getInstance().isValid(email)
-               ? ok()
-               : fail();
-    }
-
-    @Override
-    protected Message getDefaultErrorMessage()
-    {
-        return getMessages().invalidEmail(email);
-    }
+  @Override
+  protected Message getDefaultErrorMessage() {
+    return getMessages().invalidEmail(email);
+  }
 }

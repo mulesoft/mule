@@ -10,33 +10,27 @@ package org.mule.runtime.module.ws.functional;
 import org.junit.Test;
 
 
-public class DecryptSecurityFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase
-{
+public class DecryptSecurityFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "decrypt-security-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "decrypt-security-config.xml";
+  }
 
-    @Test
-    public void responseDecryptedWithValidKeyReturnsExpectedResult() throws Exception
-    {
-        assertValidResponse("responseValidKey");
-    }
+  @Test
+  public void responseDecryptedWithValidKeyReturnsExpectedResult() throws Exception {
+    assertValidResponse("responseValidKey");
+  }
 
-    @Test
-    public void responseDecryptedWithInvalidKeyFails() throws Exception
-    {
-        assertSoapFault("responseInvalidKey", "Client");
-    }
+  @Test
+  public void responseDecryptedWithInvalidKeyFails() throws Exception {
+    assertSoapFault("responseInvalidKey", "Client");
+  }
 
-    @Test
-    public void responseNotEncryptedFailsToDecrypt() throws Exception
-    {
-        assertSoapFault("responseNoEncryption", "InvalidSecurity");
-    }
-
+  @Test
+  public void responseNotEncryptedFailsToDecrypt() throws Exception {
+    assertSoapFault("responseNoEncryption", "InvalidSecurity");
+  }
 
 
 

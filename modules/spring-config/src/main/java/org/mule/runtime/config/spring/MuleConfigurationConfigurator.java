@@ -33,172 +33,141 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.SmartFactoryBean;
 
 /**
- * This class is a "SmartFactoryBean" which allows a few XML attributes to be set on the 
- * otherwise read-only MuleConfiguration.  It looks up the MuleConfiguration from the 
- * MuleContext and does some class-casting to be able to modify it.  Note that this will
- * only work if the MuleContext has not yet been started, otherwise the modifications 
- * will be ignored (and warnings logged).
+ * This class is a "SmartFactoryBean" which allows a few XML attributes to be set on the otherwise read-only MuleConfiguration. It
+ * looks up the MuleConfiguration from the MuleContext and does some class-casting to be able to modify it. Note that this will
+ * only work if the MuleContext has not yet been started, otherwise the modifications will be ignored (and warnings logged).
  */
-//TODO MULE-9638 remove usage of SmartFactoryBean
-public class MuleConfigurationConfigurator implements MuleContextAware, SmartFactoryBean, ObjectFactory
-{
-    private MuleContext muleContext;
+// TODO MULE-9638 remove usage of SmartFactoryBean
+public class MuleConfigurationConfigurator implements MuleContextAware, SmartFactoryBean, ObjectFactory {
 
-    // We instantiate DefaultMuleConfiguration to make sure we get the default values for
-    // any properties not set by the user.
-    private DefaultMuleConfiguration config = new DefaultMuleConfiguration();
+  private MuleContext muleContext;
 
-    protected transient Logger logger = LoggerFactory.getLogger(MuleConfigurationConfigurator.class);
+  // We instantiate DefaultMuleConfiguration to make sure we get the default values for
+  // any properties not set by the user.
+  private DefaultMuleConfiguration config = new DefaultMuleConfiguration();
 
-    public void setMuleContext(MuleContext context)
-    {
-        this.muleContext = context;
+  protected transient Logger logger = LoggerFactory.getLogger(MuleConfigurationConfigurator.class);
+
+  public void setMuleContext(MuleContext context) {
+    this.muleContext = context;
+  }
+
+  public boolean isEagerInit() {
+    return true;
+  }
+
+  public boolean isPrototype() {
+    return false;
+  }
+
+  public Object getObject() throws Exception {
+    MuleConfiguration configuration = muleContext.getConfiguration();
+    if (configuration instanceof DefaultMuleConfiguration) {
+      DefaultMuleConfiguration defaultConfig = (DefaultMuleConfiguration) configuration;
+      defaultConfig.setDefaultResponseTimeout(config.getDefaultResponseTimeout());
+      defaultConfig.setDefaultTransactionTimeout(config.getDefaultTransactionTimeout());
+      defaultConfig.setShutdownTimeout(config.getShutdownTimeout());
+      defaultConfig.setDefaultExceptionStrategyName(config.getDefaultExceptionStrategyName());
+      defaultConfig.addExtensions(config.getExtensions());
+      defaultConfig.setMaxQueueTransactionFilesSize(config.getMaxQueueTransactionFilesSizeInMegabytes());
+      determineDefaultProcessingStrategy(defaultConfig);
+      validateDefaultExceptionStrategy();
+      applyDefaultIfNoObjectSerializerSet(defaultConfig);
+
+      return configuration;
+    } else {
+      throw new ConfigurationException(MessageFactory
+          .createStaticMessage("Unable to set properties on read-only MuleConfiguration: " + configuration.getClass()));
     }
+  }
 
-    public boolean isEagerInit()
-    {
-        return true;
+  private void determineDefaultProcessingStrategy(DefaultMuleConfiguration defaultConfig) {
+    if (config.getDefaultProcessingStrategy() != null) {
+      defaultConfig.setDefaultProcessingStrategy(config.getDefaultProcessingStrategy());
+    } else {
+      String processingStrategyFromSystemProperty = System.getProperty(MuleProperties.MULE_DEFAULT_PROCESSING_STRATEGY);
+      if (!StringUtils.isBlank(processingStrategyFromSystemProperty)) {
+        defaultConfig
+            .setDefaultProcessingStrategy(ProcessingStrategyUtils.parseProcessingStrategy(processingStrategyFromSystemProperty));
+      }
     }
+  }
 
-    public boolean isPrototype()
-    {
-        return false;
-    }
-
-    public Object getObject() throws Exception
-    {
-        MuleConfiguration configuration = muleContext.getConfiguration();
-        if (configuration instanceof DefaultMuleConfiguration)
-        {
-            DefaultMuleConfiguration defaultConfig = (DefaultMuleConfiguration) configuration;
-            defaultConfig.setDefaultResponseTimeout(config.getDefaultResponseTimeout());
-            defaultConfig.setDefaultTransactionTimeout(config.getDefaultTransactionTimeout());
-            defaultConfig.setShutdownTimeout(config.getShutdownTimeout());
-            defaultConfig.setDefaultExceptionStrategyName(config.getDefaultExceptionStrategyName());
-            defaultConfig.addExtensions(config.getExtensions());
-            defaultConfig.setMaxQueueTransactionFilesSize(config.getMaxQueueTransactionFilesSizeInMegabytes());
-            determineDefaultProcessingStrategy(defaultConfig);
-            validateDefaultExceptionStrategy();
-            applyDefaultIfNoObjectSerializerSet(defaultConfig);
-
-            return configuration;
+  private void validateDefaultExceptionStrategy() {
+    String defaultExceptionStrategyName = config.getDefaultExceptionStrategyName();
+    if (defaultExceptionStrategyName != null) {
+      MessagingExceptionHandler messagingExceptionHandler = muleContext.getRegistry().lookupObject(defaultExceptionStrategyName);
+      if (messagingExceptionHandler == null) {
+        throw new MuleRuntimeException(CoreMessages.createStaticMessage(String
+            .format("No global exception strategy defined with name %s.", defaultExceptionStrategyName)));
+      }
+      if (messagingExceptionHandler instanceof MessagingExceptionHandlerAcceptor) {
+        MessagingExceptionHandlerAcceptor messagingExceptionHandlerAcceptor =
+            (MessagingExceptionHandlerAcceptor) messagingExceptionHandler;
+        if (!messagingExceptionHandlerAcceptor.acceptsAll()) {
+          throw new MuleRuntimeException(CoreMessages
+              .createStaticMessage("Default exception strategy must not have expression attribute. It must accept any message."));
         }
-        else
-        {
-            throw new ConfigurationException(MessageFactory.createStaticMessage("Unable to set properties on read-only MuleConfiguration: " + configuration.getClass()));
-        }
+      }
+    }
+  }
+
+  private void applyDefaultIfNoObjectSerializerSet(DefaultMuleConfiguration configuration) {
+    ObjectSerializer configuredSerializer = config.getDefaultObjectSerializer();
+    if (configuredSerializer == null) {
+      configuredSerializer = new JavaObjectSerializer();
+      ((MuleContextAware) configuredSerializer).setMuleContext(muleContext);
+      config.setDefaultObjectSerializer(configuredSerializer);
     }
 
-    private void determineDefaultProcessingStrategy(DefaultMuleConfiguration defaultConfig)
-    {
-        if (config.getDefaultProcessingStrategy() != null)
-        {
-            defaultConfig.setDefaultProcessingStrategy(config.getDefaultProcessingStrategy());
-        }
-        else
-        {
-            String processingStrategyFromSystemProperty = System.getProperty(MuleProperties.MULE_DEFAULT_PROCESSING_STRATEGY);
-            if (!StringUtils.isBlank(processingStrategyFromSystemProperty))
-            {
-                defaultConfig.setDefaultProcessingStrategy(ProcessingStrategyUtils.parseProcessingStrategy(processingStrategyFromSystemProperty));
-            }
-        }
+    configuration.setDefaultObjectSerializer(configuredSerializer);
+    if (muleContext instanceof DefaultMuleContext) {
+      ((DefaultMuleContext) muleContext).setObjectSerializer(configuredSerializer);
     }
+  }
 
-    private void validateDefaultExceptionStrategy()
-    {
-        String defaultExceptionStrategyName = config.getDefaultExceptionStrategyName();
-        if (defaultExceptionStrategyName != null)
-        {
-            MessagingExceptionHandler messagingExceptionHandler = muleContext.getRegistry().lookupObject(
-                defaultExceptionStrategyName);
-            if (messagingExceptionHandler == null)
-            {
-                throw new MuleRuntimeException(CoreMessages.createStaticMessage(String.format(
-                    "No global exception strategy defined with name %s.", defaultExceptionStrategyName)));
-            }
-            if (messagingExceptionHandler instanceof MessagingExceptionHandlerAcceptor)
-            {
-                MessagingExceptionHandlerAcceptor messagingExceptionHandlerAcceptor = (MessagingExceptionHandlerAcceptor) messagingExceptionHandler;
-                if (!messagingExceptionHandlerAcceptor.acceptsAll())
-                {
-                    throw new MuleRuntimeException(
-                        CoreMessages.createStaticMessage("Default exception strategy must not have expression attribute. It must accept any message."));
-                }
-            }
-        }
-    }
+  public Class<?> getObjectType() {
+    return MuleConfiguration.class;
+  }
 
-    private void applyDefaultIfNoObjectSerializerSet(DefaultMuleConfiguration configuration)
-    {
-        ObjectSerializer configuredSerializer = config.getDefaultObjectSerializer();
-        if (configuredSerializer == null)
-        {
-            configuredSerializer = new JavaObjectSerializer();
-            ((MuleContextAware) configuredSerializer).setMuleContext(muleContext);
-            config.setDefaultObjectSerializer(configuredSerializer);
-        }
+  public boolean isSingleton() {
+    return true;
+  }
 
-        configuration.setDefaultObjectSerializer(configuredSerializer);
-        if (muleContext instanceof DefaultMuleContext)
-        {
-            ((DefaultMuleContext) muleContext).setObjectSerializer(configuredSerializer);
-        }
-    }
+  public void setDefaultSynchronousEndpoints(boolean synchronous) {
+    config.setDefaultSynchronousEndpoints(synchronous);
+  }
 
-    public Class<?> getObjectType()
-    {
-        return MuleConfiguration.class;
-    }
+  public void setDefaultResponseTimeout(int responseTimeout) {
+    config.setDefaultResponseTimeout(responseTimeout);
+  }
 
-    public boolean isSingleton()
-    {
-        return true;
-    }
+  public void setDefaultTransactionTimeout(int defaultTransactionTimeout) {
+    config.setDefaultTransactionTimeout(defaultTransactionTimeout);
+  }
 
-    public void setDefaultSynchronousEndpoints(boolean synchronous)
-    {
-        config.setDefaultSynchronousEndpoints(synchronous);
-    }
+  public void setShutdownTimeout(int shutdownTimeout) {
+    config.setShutdownTimeout(shutdownTimeout);
+  }
 
-    public void setDefaultResponseTimeout(int responseTimeout)
-    {
-        config.setDefaultResponseTimeout(responseTimeout);
-    }
+  public void setDefaultExceptionStrategyName(String defaultExceptionStrategyName) {
+    config.setDefaultExceptionStrategyName(defaultExceptionStrategyName);
+  }
 
-    public void setDefaultTransactionTimeout(int defaultTransactionTimeout)
-    {
-        config.setDefaultTransactionTimeout(defaultTransactionTimeout);
-    }
+  public void setDefaultObjectSerializer(ObjectSerializer objectSerializer) {
+    config.setDefaultObjectSerializer(objectSerializer);
+  }
 
-    public void setShutdownTimeout(int shutdownTimeout)
-    {
-        config.setShutdownTimeout(shutdownTimeout);
-    }
+  public void setDefaultProcessingStrategy(ProcessingStrategy processingStrategy) {
+    config.setDefaultProcessingStrategy(processingStrategy);
+  }
 
-    public void setDefaultExceptionStrategyName(String defaultExceptionStrategyName)
-    {
-        config.setDefaultExceptionStrategyName(defaultExceptionStrategyName);
-    }
+  public void setMaxQueueTransactionFilesSize(int queueTransactionFilesSizeInMegabytes) {
+    config.setMaxQueueTransactionFilesSize(queueTransactionFilesSizeInMegabytes);
+  }
 
-    public void setDefaultObjectSerializer(ObjectSerializer objectSerializer)
-    {
-        config.setDefaultObjectSerializer(objectSerializer);
-    }
-
-    public void setDefaultProcessingStrategy(ProcessingStrategy processingStrategy)
-    {
-        config.setDefaultProcessingStrategy(processingStrategy);
-    }
-
-    public void setMaxQueueTransactionFilesSize(int queueTransactionFilesSizeInMegabytes)
-    {
-        config.setMaxQueueTransactionFilesSize(queueTransactionFilesSizeInMegabytes);
-    }
-
-    public void setExtensions(List<ConfigurationExtension> extensions)
-    {
-        config.addExtensions(extensions);
-    }
+  public void setExtensions(List<ConfigurationExtension> extensions) {
+    config.addExtensions(extensions);
+  }
 
 }

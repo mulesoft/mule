@@ -11,48 +11,39 @@ import org.springframework.beans.factory.parsing.Problem;
 import org.w3c.dom.Element;
 
 /**
- * A very simple extension to {@link org.springframework.beans.factory.parsing.FailFastProblemReporter}
- * that intercepts errors related to missing definition parsers to give a more helpful message.
- * In the future we may want to replace this by something more sophisticated that allows
- * different problems to be resolved by different "pluggable" components...
+ * A very simple extension to {@link org.springframework.beans.factory.parsing.FailFastProblemReporter} that intercepts errors
+ * related to missing definition parsers to give a more helpful message. In the future we may want to replace this by something
+ * more sophisticated that allows different problems to be resolved by different "pluggable" components...
  */
-public class MissingParserProblemReporter extends FailFastProblemReporter
-{
+public class MissingParserProblemReporter extends FailFastProblemReporter {
 
-    public static final String NO_PARSER_PREFIX = "Cannot locate BeanDefinitionParser";
+  public static final String NO_PARSER_PREFIX = "Cannot locate BeanDefinitionParser";
 
-    @Override
-    public void fatal(Problem problem)
-    {
-        if (isMissingParser(problem))
-        {
-            problem = extendProblemDetails(problem);
-        }
-        super.fatal(problem);
+  @Override
+  public void fatal(Problem problem) {
+    if (isMissingParser(problem)) {
+      problem = extendProblemDetails(problem);
     }
+    super.fatal(problem);
+  }
 
-    protected boolean isMissingParser(Problem problem)
-    {
-        // Spring doesn't give us much useful data here - parseState and rootCause are null
-        String message = problem.getMessage();
-        return (null != message && message.startsWith(NO_PARSER_PREFIX));
-    }
+  protected boolean isMissingParser(Problem problem) {
+    // Spring doesn't give us much useful data here - parseState and rootCause are null
+    String message = problem.getMessage();
+    return (null != message && message.startsWith(NO_PARSER_PREFIX));
+  }
 
-    protected Problem extendProblemDetails(Problem problem)
-    {
-        try
-        {
-            String element = ((Element) problem.getLocation().getSource()).getLocalName();
-            String namespace = ((Element) problem.getLocation().getSource()).getNamespaceURI();
-            String message = "The element '" + element + "' does not have an associated Bean Definition Parser."
-                    +"  Is the module or extension associated with " + namespace + " present on the classpath?";
-            return new Problem(message, problem.getLocation(), problem.getParseState(), problem.getRootCause());
-        }
-        catch (Exception e)
-        {
-            // fall back to previous message
-            return problem;
-        }
+  protected Problem extendProblemDetails(Problem problem) {
+    try {
+      String element = ((Element) problem.getLocation().getSource()).getLocalName();
+      String namespace = ((Element) problem.getLocation().getSource()).getNamespaceURI();
+      String message = "The element '" + element + "' does not have an associated Bean Definition Parser."
+          + "  Is the module or extension associated with " + namespace + " present on the classpath?";
+      return new Problem(message, problem.getLocation(), problem.getParseState(), problem.getRootCause());
+    } catch (Exception e) {
+      // fall back to previous message
+      return problem;
     }
+  }
 
 }

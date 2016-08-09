@@ -16,26 +16,22 @@ import org.mule.runtime.module.db.integration.model.AbstractTestDatabase;
 
 import org.junit.Test;
 
-public abstract class AbstractDatabaseConfigTestCase extends AbstractDbIntegrationTestCase
-{
+public abstract class AbstractDatabaseConfigTestCase extends AbstractDbIntegrationTestCase {
 
-    public AbstractDatabaseConfigTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public AbstractDatabaseConfigTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/config/simple-select-config.xml"};
-    }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/config/simple-select-config.xml"};
+  }
 
-    @Test
-    public void configuresDatabaseSuccessfully() throws Exception
-    {
-        final MuleEvent responseEvent = flowRunner("simpleSelect").withPayload(TEST_MESSAGE).run();
+  @Test
+  public void configuresDatabaseSuccessfully() throws Exception {
+    final MuleEvent responseEvent = flowRunner("simpleSelect").withPayload(TEST_MESSAGE).run();
 
-        final MuleMessage response = responseEvent.getMessage();
-        assertMessageContains(response, getAllPlanetRecords());
-    }
+    final MuleMessage response = responseEvent.getMessage();
+    assertMessageContains(response, getAllPlanetRecords());
+  }
 }

@@ -15,63 +15,52 @@ import org.mule.runtime.core.util.StringUtils;
 import groovy.lang.GroovyObject;
 import groovy.lang.MetaMethod;
 
-public class GroovyRefreshableBeanBuilder implements Callable
-{
-    private volatile Object refreshableBean;
-    private String methodName;
-    private static final String ON_CALL = "onCall";
-    private static final Class[] MULE_EVENT_CONTEXT = new Class[]{MuleEventContext.class};
+public class GroovyRefreshableBeanBuilder implements Callable {
 
-    public GroovyRefreshableBeanBuilder()
-    {
-        super();
-    }
+  private volatile Object refreshableBean;
+  private String methodName;
+  private static final String ON_CALL = "onCall";
+  private static final Class[] MULE_EVENT_CONTEXT = new Class[] {MuleEventContext.class};
 
-    public Object onCall(MuleEventContext eventContext) throws Exception
-    {
-        if (refreshableBean instanceof GroovyObject)
-        {
-            GroovyObject script = (GroovyObject)refreshableBean;
-            MetaMethod onCall = script.getMetaClass().pickMethod("onCall", MULE_EVENT_CONTEXT);
+  public GroovyRefreshableBeanBuilder() {
+    super();
+  }
 
-            if (onCall != null)
-            {
-                return script.invokeMethod(ON_CALL, eventContext);
-            }
-            else
-            {
-                if (StringUtils.isEmpty(methodName))
-                {
-                    throw new DefaultMuleException(CoreMessages.propertiesNotSet("methodName"));
-                }
-                
-                return script.invokeMethod(methodName, eventContext.getMessage().getPayload());
-            }
-            
+  public Object onCall(MuleEventContext eventContext) throws Exception {
+    if (refreshableBean instanceof GroovyObject) {
+      GroovyObject script = (GroovyObject) refreshableBean;
+      MetaMethod onCall = script.getMetaClass().pickMethod("onCall", MULE_EVENT_CONTEXT);
+
+      if (onCall != null) {
+        return script.invokeMethod(ON_CALL, eventContext);
+      } else {
+        if (StringUtils.isEmpty(methodName)) {
+          throw new DefaultMuleException(CoreMessages.propertiesNotSet("methodName"));
         }
-        
-        throw new Exception(new DefaultMuleException("script engine not supported"));
+
+        return script.invokeMethod(methodName, eventContext.getMessage().getPayload());
+      }
+
     }
 
-    public Object getRefreshableBean()
-    {
-        return refreshableBean;
-    }
+    throw new Exception(new DefaultMuleException("script engine not supported"));
+  }
 
-    public void setRefreshableBean(Object refreshableBean)
-    {
-        this.refreshableBean = refreshableBean;
-    }
-    
-    public String getMethodName()
-    {
-        return methodName;
-    }
+  public Object getRefreshableBean() {
+    return refreshableBean;
+  }
 
-    public void setMethodName(String methodName)
-    {
-        this.methodName = methodName;
-    }
+  public void setRefreshableBean(Object refreshableBean) {
+    this.refreshableBean = refreshableBean;
+  }
+
+  public String getMethodName() {
+    return methodName;
+  }
+
+  public void setMethodName(String methodName) {
+    this.methodName = methodName;
+  }
 }
 
 

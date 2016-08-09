@@ -9,28 +9,27 @@ package org.mule.runtime.module.management.mbean;
 import javax.management.ObjectName;
 
 /**
- * <code>FlowConstructServiceMBean</code> defines the management interface for a mule
- * managed flow construct.
+ * <code>FlowConstructServiceMBean</code> defines the management interface for a mule managed flow construct.
  */
-public interface FlowConstructServiceMBean  extends FlowConstructStatsMBean
-{
-    /**
-     * The statistics for this flow construct
-     *
-     * @return statistics for this flow construct
-     * @see org.mule.runtime.module.management.mbean.FlowConstructStats
-     */
-    ObjectName getStatistics();
+public interface FlowConstructServiceMBean extends FlowConstructStatsMBean {
 
-    /**
-     * The name of this service
-     *
-     * @return The name of this service
-     */
-    String getName();
+  /**
+   * The statistics for this flow construct
+   *
+   * @return statistics for this flow construct
+   * @see org.mule.runtime.module.management.mbean.FlowConstructStats
+   */
+  ObjectName getStatistics();
 
-    /**
-     * The type of flow construct
-     */
-    String getType();
+  /**
+   * The name of this service
+   *
+   * @return The name of this service
+   */
+  String getName();
+
+  /**
+   * The type of flow construct
+   */
+  String getType();
 }

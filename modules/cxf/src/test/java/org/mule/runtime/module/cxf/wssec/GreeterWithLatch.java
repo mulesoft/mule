@@ -12,29 +12,26 @@ import org.mule.runtime.core.util.concurrent.Latch;
 
 import org.apache.hello_world_soap_http.GreeterImpl;
 
-public class GreeterWithLatch extends GreeterImpl
-{
-    private Latch greetLatch = new Latch();
-    private SecurityContext securityContext;
+public class GreeterWithLatch extends GreeterImpl {
 
-    @Override
-    public String greetMe(String me)
-    {
-        String result = super.greetMe(me);
-        greetLatch.countDown();
-        securityContext = RequestContext.getEvent().getSession().getSecurityContext();
-        return result;
-    }
-    
-    public Latch getLatch()
-    {
-        return greetLatch;
-    }
-    
-    public SecurityContext getSecurityContext()
-    {
-        return securityContext;
-    }
+  private Latch greetLatch = new Latch();
+  private SecurityContext securityContext;
+
+  @Override
+  public String greetMe(String me) {
+    String result = super.greetMe(me);
+    greetLatch.countDown();
+    securityContext = RequestContext.getEvent().getSession().getSecurityContext();
+    return result;
+  }
+
+  public Latch getLatch() {
+    return greetLatch;
+  }
+
+  public SecurityContext getSecurityContext() {
+    return securityContext;
+  }
 }
 
 

@@ -12,28 +12,27 @@ import org.mule.runtime.module.db.internal.domain.connection.DbConnection;
 /**
  * Manages types for a database instance
  */
-public interface DbTypeManager
-{
+public interface DbTypeManager {
 
-    /**
-     * Finds a mapping for a given type ID and name
-     *
-     * @param connection connection used to connect to the database if required
-     * @param id type ID
-     * @param name type name
-     * @return a type that corresponds to the given ID and name
-     * @throws UnknownDbTypeException when there is no managed type with the given ID and name
-     */
-    DbType lookup(DbConnection connection, int id, String name) throws UnknownDbTypeException;
+  /**
+   * Finds a mapping for a given type ID and name
+   *
+   * @param connection connection used to connect to the database if required
+   * @param id type ID
+   * @param name type name
+   * @return a type that corresponds to the given ID and name
+   * @throws UnknownDbTypeException when there is no managed type with the given ID and name
+   */
+  DbType lookup(DbConnection connection, int id, String name) throws UnknownDbTypeException;
 
-    /**
-     * Finds a mapping for a given type name
-     *
-     * @param connection connection used to connect to the database if required
-     * @param id type ID
-     * @param name type name
-     * @return a type that corresponds to the given name
-     * @throws UnknownDbTypeException when there is no managed type with the given name
-     */
-    DbType lookup(DbConnection connection, String name) throws UnknownDbTypeException;
+  /**
+   * Finds a mapping for a given type name
+   *
+   * @param connection connection used to connect to the database if required
+   * @param id type ID
+   * @param name type name
+   * @return a type that corresponds to the given name
+   * @throws UnknownDbTypeException when there is no managed type with the given name
+   */
+  DbType lookup(DbConnection connection, String name) throws UnknownDbTypeException;
 }

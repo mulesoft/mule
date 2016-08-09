@@ -14,8 +14,7 @@ import java.util.List;
 /**
  * Defines a way to search for available {@link MuleCoreExtension}
  */
-public interface MuleCoreExtensionDiscoverer
-{
+public interface MuleCoreExtensionDiscoverer {
 
-    List<MuleCoreExtension> discover() throws DefaultMuleException;
+  List<MuleCoreExtension> discover() throws DefaultMuleException;
 }

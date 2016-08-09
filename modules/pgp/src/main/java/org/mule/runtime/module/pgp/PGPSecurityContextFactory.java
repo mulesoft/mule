@@ -10,10 +10,9 @@ import org.mule.runtime.core.api.security.Authentication;
 import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.api.security.SecurityContextFactory;
 
-public class PGPSecurityContextFactory implements SecurityContextFactory
-{
-    public SecurityContext create(Authentication authentication)
-    {
-        return new PGPSecurityContext((PGPAuthentication) authentication);
-    }
+public class PGPSecurityContextFactory implements SecurityContextFactory {
+
+  public SecurityContext create(Authentication authentication) {
+    return new PGPSecurityContext((PGPAuthentication) authentication);
+  }
 }

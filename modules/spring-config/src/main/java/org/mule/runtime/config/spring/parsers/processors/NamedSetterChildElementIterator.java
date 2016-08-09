@@ -13,30 +13,28 @@ import org.mule.runtime.config.spring.parsers.assembly.configuration.PropertyCon
 import org.w3c.dom.Element;
 
 /**
- * This iterates over the child elements, generates beans, and sets them on the current bean via the
- * setter given.  So presumably there's either a single child or the destination is a collection.
+ * This iterates over the child elements, generates beans, and sets them on the current bean via the setter given. So presumably
+ * there's either a single child or the destination is a collection.
  *
- * <p>Since this handles the iteration over children explicitly you need to set the flag
- * {@link org.mule.runtime.config.spring.MuleHierarchicalBeanDefinitionParserDelegate#MULE_NO_RECURSE}
- * on the parser.
+ * <p>
+ * Since this handles the iteration over children explicitly you need to set the flag
+ * {@link org.mule.runtime.config.spring.MuleHierarchicalBeanDefinitionParserDelegate#MULE_NO_RECURSE} on the parser.
  *
- * @see org.mule.runtime.config.spring.parsers.processors.AbstractChildElementIterator - please read the
- * documentation for that processor
+ * @see org.mule.runtime.config.spring.parsers.processors.AbstractChildElementIterator - please read the documentation for that
+ *      processor
  */
-public class NamedSetterChildElementIterator extends AbstractChildElementIterator
-{
+public class NamedSetterChildElementIterator extends AbstractChildElementIterator {
 
-    private String setter;
+  private String setter;
 
-    public NamedSetterChildElementIterator(String setter, BeanAssemblerFactory beanAssemblerFactory, PropertyConfiguration configuration)
-    {
-        super(beanAssemblerFactory, configuration);
-        this.setter = setter;
-    }
+  public NamedSetterChildElementIterator(String setter, BeanAssemblerFactory beanAssemblerFactory,
+                                         PropertyConfiguration configuration) {
+    super(beanAssemblerFactory, configuration);
+    this.setter = setter;
+  }
 
-    protected void insertBean(BeanAssembler targetAssembler, Object childBean, Element parent, Element child)
-    {
-        targetAssembler.extendTarget(setter, setter, childBean);
-    }
+  protected void insertBean(BeanAssembler targetAssembler, Object childBean, Element parent, Element child) {
+    targetAssembler.extendTarget(setter, setter, childBean);
+  }
 
 }

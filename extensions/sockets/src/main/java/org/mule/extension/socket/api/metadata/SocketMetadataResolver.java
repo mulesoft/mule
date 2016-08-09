@@ -34,34 +34,34 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * The output metadata only depends on whether {@link SocketOperations#send(RequesterConnection, RequesterConfig, Object, String, String, MuleMessage)}
- * should await a response or not. If no response is needed, the operation metadata should behave like a void operation.
+ * The output metadata only depends on whether
+ * {@link SocketOperations#send(RequesterConnection, RequesterConfig, Object, String, String, MuleMessage)} should await a
+ * response or not. If no response is needed, the operation metadata should behave like a void operation.
  */
-public class SocketMetadataResolver implements MetadataOutputResolver<String>, MetadataAttributesResolver<String>, MetadataKeysResolver
-{
+public class SocketMetadataResolver
+    implements MetadataOutputResolver<String>, MetadataAttributesResolver<String>, MetadataKeysResolver {
 
-    private final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(getClass().getClassLoader());
+  private final ClassTypeLoader typeLoader =
+      ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(getClass().getClassLoader());
 
-    @Override
-    public MetadataType getOutputMetadata(MetadataContext metadataContext, String key) throws MetadataResolvingException, ConnectionException
-    {
-        return valueOf(key) ? BaseTypeBuilder.create(MetadataFormat.JAVA).binaryType().build()
-                            : BaseTypeBuilder.create(MetadataFormat.JAVA).anyType().build();
-    }
+  @Override
+  public MetadataType getOutputMetadata(MetadataContext metadataContext, String key)
+      throws MetadataResolvingException, ConnectionException {
+    return valueOf(key) ? BaseTypeBuilder.create(MetadataFormat.JAVA).binaryType().build()
+        : BaseTypeBuilder.create(MetadataFormat.JAVA).anyType().build();
+  }
 
-    @Override
-    public MetadataType getAttributesMetadata(MetadataContext context, String key) throws MetadataResolvingException, ConnectionException
-    {
-        return valueOf(key) ? typeLoader.load(ImmutableSocketAttributes.class)
-                            : BaseTypeBuilder.create(MetadataFormat.JAVA).anyType().build();
+  @Override
+  public MetadataType getAttributesMetadata(MetadataContext context, String key)
+      throws MetadataResolvingException, ConnectionException {
+    return valueOf(key) ? typeLoader.load(ImmutableSocketAttributes.class)
+        : BaseTypeBuilder.create(MetadataFormat.JAVA).anyType().build();
 
-    }
+  }
 
-    @Override
-    public Set<MetadataKey> getMetadataKeys(MetadataContext metadataContext) throws MetadataResolvingException, ConnectionException
-    {
-        return Stream.of(TRUE, FALSE)
-                .map(b -> newKey(b.toString()).build())
-                .collect(Collectors.toSet());
-    }
+  @Override
+  public Set<MetadataKey> getMetadataKeys(MetadataContext metadataContext)
+      throws MetadataResolvingException, ConnectionException {
+    return Stream.of(TRUE, FALSE).map(b -> newKey(b.toString()).build()).collect(Collectors.toSet());
+  }
 }

@@ -16,16 +16,15 @@ import org.mule.runtime.module.launcher.plugin.ArtifactPluginDescriptor;
  *
  * @since 4.0
  */
-public interface ArtifactPluginFactory
-{
+public interface ArtifactPluginFactory {
 
-    /**
-     * Creates an {@link ArtifactPlugin} along with its classloader. The classloader for the application plugin
-     * would be a child classloader of the given parent and it will use the same {@link ClassLoaderLookupPolicy} as the parent.
-     *
-     * @param descriptor that defines the application plugin
-     * @param parent {@link ArtifactClassLoader} to be used as parent classloader
-     * @return an {@link ArtifactPlugin}
-     */
-    ArtifactPlugin create(ArtifactPluginDescriptor descriptor, ArtifactClassLoader parent);
+  /**
+   * Creates an {@link ArtifactPlugin} along with its classloader. The classloader for the application plugin would be a child
+   * classloader of the given parent and it will use the same {@link ClassLoaderLookupPolicy} as the parent.
+   *
+   * @param descriptor that defines the application plugin
+   * @param parent {@link ArtifactClassLoader} to be used as parent classloader
+   * @return an {@link ArtifactPlugin}
+   */
+  ArtifactPlugin create(ArtifactPluginDescriptor descriptor, ArtifactClassLoader parent);
 }

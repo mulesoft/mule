@@ -15,31 +15,23 @@ import java.net.Socket;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 
-public class SslSocketFactory extends AbstractTcpSocketFactory
-{
+public class SslSocketFactory extends AbstractTcpSocketFactory {
 
-    private TlsConfiguration tls;
+  private TlsConfiguration tls;
 
-    public SslSocketFactory(TlsConfiguration tls)
-    {
-        this.tls = tls;
+  public SslSocketFactory(TlsConfiguration tls) {
+    this.tls = tls;
+  }
+
+  @Override
+  protected Socket createSocket(TcpSocketKey key) throws IOException {
+    try {
+      return tls.getSocketFactory().createSocket(key.getInetAddress(), key.getPort());
+    } catch (NoSuchAlgorithmException e) {
+      throw (IOException) new IOException(e.getMessage()).initCause(e);
+    } catch (KeyManagementException e) {
+      throw (IOException) new IOException(e.getMessage()).initCause(e);
     }
-
-    @Override
-    protected Socket createSocket(TcpSocketKey key) throws IOException
-    {
-        try
-        {
-            return tls.getSocketFactory().createSocket(key.getInetAddress(), key.getPort());
-        }
-        catch (NoSuchAlgorithmException e)
-        {
-            throw (IOException) new IOException(e.getMessage()).initCause(e);
-        }
-        catch (KeyManagementException e)
-        {
-            throw (IOException) new IOException(e.getMessage()).initCause(e);
-        }
-    }
+  }
 
 }

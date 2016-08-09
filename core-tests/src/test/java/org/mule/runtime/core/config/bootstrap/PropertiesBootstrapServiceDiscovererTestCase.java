@@ -21,50 +21,46 @@ import java.util.Properties;
 import org.junit.Test;
 
 @SmallTest
-public class PropertiesBootstrapServiceDiscovererTestCase extends AbstractMuleTestCase
-{
+public class PropertiesBootstrapServiceDiscovererTestCase extends AbstractMuleTestCase {
 
-    @Test
-    public void discoversServiceOnDefaultClassLoader() throws Exception
-    {
-        final ClassLoader classLoader = mock(ClassLoader.class);
+  @Test
+  public void discoversServiceOnDefaultClassLoader() throws Exception {
+    final ClassLoader classLoader = mock(ClassLoader.class);
 
-        final PropertiesBootstrapServiceDiscoverer propertiesBootstrapServiceDiscoverer = new PropertiesBootstrapServiceDiscoverer(classLoader);
+    final PropertiesBootstrapServiceDiscoverer propertiesBootstrapServiceDiscoverer =
+        new PropertiesBootstrapServiceDiscoverer(classLoader);
 
-        final List<BootstrapService> services = propertiesBootstrapServiceDiscoverer.discover();
+    final List<BootstrapService> services = propertiesBootstrapServiceDiscoverer.discover();
 
-        assertThat(services.size(), is(1));
+    assertThat(services.size(), is(1));
+  }
+
+  @Test
+  public void discoversMultipleServices() throws Exception {
+    final List<Properties> properties = new ArrayList<>();
+    properties.add(new Properties());
+    properties.add(new Properties());
+
+    doCustomClassLoaderDiscoverTest(properties);
+  }
+
+  @Test
+  public void discoversNoServices() throws Exception {
+    doCustomClassLoaderDiscoverTest(new ArrayList<>());
+  }
+
+  private void doCustomClassLoaderDiscoverTest(List<Properties> properties) throws BootstrapException {
+    final ClassLoader classLoader = mock(ClassLoader.class);
+    final RegistryBootstrapDiscoverer registryBootstrapDiscoverer = mock(RegistryBootstrapDiscoverer.class);
+    when(registryBootstrapDiscoverer.discover()).thenReturn(properties);
+    final PropertiesBootstrapServiceDiscoverer propertiesBootstrapServiceDiscoverer =
+        new PropertiesBootstrapServiceDiscoverer(classLoader, registryBootstrapDiscoverer);
+
+    final List<BootstrapService> services = propertiesBootstrapServiceDiscoverer.discover();
+
+    assertThat(services.size(), is(properties.size()));
+    for (int i = 0; i < services.size(); i++) {
+      assertThat(services.get(i).getProperties(), is(properties.get(i)));
     }
-
-    @Test
-    public void discoversMultipleServices() throws Exception
-    {
-        final List<Properties> properties = new ArrayList<>();
-        properties.add(new Properties());
-        properties.add(new Properties());
-
-        doCustomClassLoaderDiscoverTest(properties);
-    }
-
-    @Test
-    public void discoversNoServices() throws Exception
-    {
-        doCustomClassLoaderDiscoverTest(new ArrayList<>());
-    }
-
-    private void doCustomClassLoaderDiscoverTest(List<Properties> properties) throws BootstrapException
-    {
-        final ClassLoader classLoader = mock(ClassLoader.class);
-        final RegistryBootstrapDiscoverer registryBootstrapDiscoverer = mock(RegistryBootstrapDiscoverer.class);
-        when(registryBootstrapDiscoverer.discover()).thenReturn(properties);
-        final PropertiesBootstrapServiceDiscoverer propertiesBootstrapServiceDiscoverer = new PropertiesBootstrapServiceDiscoverer(classLoader, registryBootstrapDiscoverer);
-
-        final List<BootstrapService> services = propertiesBootstrapServiceDiscoverer.discover();
-
-        assertThat(services.size(), is(properties.size()));
-        for (int i = 0; i < services.size(); i++)
-        {
-            assertThat(services.get(i).getProperties(), is(properties.get(i)));
-        }
-    }
+  }
 }

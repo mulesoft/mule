@@ -16,27 +16,21 @@ import java.sql.Statement;
 /**
  * Invocation handler for statements
  */
-public class StatementInvocationHandler implements InvocationHandler
-{
+public class StatementInvocationHandler implements InvocationHandler {
 
-    private final Statement statement;
+  private final Statement statement;
 
-    public StatementInvocationHandler(Statement statement)
-    {
-        this.statement = statement;
+  public StatementInvocationHandler(Statement statement) {
+    this.statement = statement;
+  }
+
+  @Override
+  public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+    try {
+      return method.invoke(statement, args);
+    } catch (InvocationTargetException ex) {
+      throw ex.getCause();
     }
-
-    @Override
-    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
-    {
-        try
-        {
-            return method.invoke(statement, args);
-        }
-        catch (InvocationTargetException ex)
-        {
-            throw ex.getCause();
-        }
-    }
+  }
 
 }

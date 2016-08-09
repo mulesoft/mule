@@ -11,83 +11,70 @@ import org.mule.runtime.core.config.i18n.Message;
 import org.mule.extension.validation.api.ValidationResult;
 
 /**
- * An immutable implementation of {@link ValidationResult}.
- * It provides a series of static factory methods
- * for creating a result in which the validation succeeded
- * ({@link #ok()}), and other two for validations that failed
- * ({@link #error(Message)} and {@link #error(String)}).
+ * An immutable implementation of {@link ValidationResult}. It provides a series of static factory methods for creating a result
+ * in which the validation succeeded ({@link #ok()}), and other two for validations that failed ({@link #error(Message)} and
+ * {@link #error(String)}).
  *
  * @since 3.7.0
  */
-public class ImmutableValidationResult implements ValidationResult
-{
+public class ImmutableValidationResult implements ValidationResult {
 
-    /**
-     * Since this class is immutable, we can always use the same instance
-     * for results which represent a successful validation
-     */
-    private static final ValidationResult OK = new ImmutableValidationResult(EMPTY, false);
+  /**
+   * Since this class is immutable, we can always use the same instance for results which represent a successful validation
+   */
+  private static final ValidationResult OK = new ImmutableValidationResult(EMPTY, false);
 
-    private final String message;
-    private final boolean error;
+  private final String message;
+  private final boolean error;
 
-    /**
-     * Creates a new instance with the given {@code message}
-     * and which {@link #isError()} returns {@code true}
-     *
-     * @param message a message
-     * @return a new instance of {@link ImmutableValidationResult}
-     */
-    public static ValidationResult error(String message)
-    {
-        return new ImmutableValidationResult(message, true);
-    }
+  /**
+   * Creates a new instance with the given {@code message} and which {@link #isError()} returns {@code true}
+   *
+   * @param message a message
+   * @return a new instance of {@link ImmutableValidationResult}
+   */
+  public static ValidationResult error(String message) {
+    return new ImmutableValidationResult(message, true);
+  }
 
-    /**
-     * Creates a new instance with the given {@code message}
-     * and which {@link #isError()} returns {@code true}
-     *
-     * @param message a message
-     * @return a new instance of {@link ImmutableValidationResult}
-     */
-    public static ValidationResult error(Message message)
-    {
-        return error(message.getMessage());
-    }
+  /**
+   * Creates a new instance with the given {@code message} and which {@link #isError()} returns {@code true}
+   *
+   * @param message a message
+   * @return a new instance of {@link ImmutableValidationResult}
+   */
+  public static ValidationResult error(Message message) {
+    return error(message.getMessage());
+  }
 
-    /**
-     * returns a {@link ImmutableValidationResult} without message and
-     * which {@link #isError()} method returns {@code false}. Since this
-     * class is immutable, the same instance is always returned
-     *
-     * @return {@link #OK}
-     */
-    public static ValidationResult ok()
-    {
-        return OK;
-    }
+  /**
+   * returns a {@link ImmutableValidationResult} without message and which {@link #isError()} method returns {@code false}. Since
+   * this class is immutable, the same instance is always returned
+   *
+   * @return {@link #OK}
+   */
+  public static ValidationResult ok() {
+    return OK;
+  }
 
-    private ImmutableValidationResult(String message, boolean error)
-    {
-        this.message = message;
-        this.error = error;
-    }
+  private ImmutableValidationResult(String message, boolean error) {
+    this.message = message;
+    this.error = error;
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getMessage()
-    {
-        return message;
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String getMessage() {
+    return message;
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean isError()
-    {
-        return error;
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean isError() {
+    return error;
+  }
 }

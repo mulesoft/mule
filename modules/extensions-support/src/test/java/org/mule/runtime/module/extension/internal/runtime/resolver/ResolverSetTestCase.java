@@ -31,96 +31,84 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class ResolverSetTestCase extends AbstractMuleTestCase
-{
+public class ResolverSetTestCase extends AbstractMuleTestCase {
 
-    private static final String NAME = "MG";
-    private static final int AGE = 31;
+  private static final String NAME = "MG";
+  private static final int AGE = 31;
 
-    private ResolverSet set;
-    private Map<ParameterModel, ValueResolver> mapping;
+  private ResolverSet set;
+  private Map<ParameterModel, ValueResolver> mapping;
 
-    @Mock
-    private MuleEvent event;
+  @Mock
+  private MuleEvent event;
 
-    @Mock
-    private MuleContext muleContext;
+  @Mock
+  private MuleContext muleContext;
 
-    @Before
-    public void before() throws Exception
-    {
-        mapping = new LinkedHashMap<>();
-        mapping.put(getParameter("myName", String.class), getResolver(NAME));
-        mapping.put(getParameter("age", Integer.class), getResolver(AGE));
+  @Before
+  public void before() throws Exception {
+    mapping = new LinkedHashMap<>();
+    mapping.put(getParameter("myName", String.class), getResolver(NAME));
+    mapping.put(getParameter("age", Integer.class), getResolver(AGE));
 
-        set = buildSet(mapping);
+    set = buildSet(mapping);
+  }
+
+  @Test
+  public void resolve() throws Exception {
+    ResolverSetResult result = set.resolve(event);
+    assertResult(result, mapping);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void addNullParameter() throws Exception {
+    set.add(null, getResolver(null));
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void addNullresolver() throws Exception {
+    set.add("blah", null);
+  }
+
+  @Test(expected = IllegalStateException.class)
+  public void addRepeatedParameter() throws Exception {
+    final String parameterName = "name";
+    ValueResolver<String> resolver = getResolver(NAME);
+
+    set.add(parameterName, resolver);
+    set.add(parameterName, resolver);
+  }
+
+  @Test
+  public void isNotDynamic() {
+    assertThat(set.isDynamic(), is(false));
+  }
+
+  @Test
+  public void isDynamic() throws Exception {
+    ValueResolver resolver = getResolver(null);
+    when(resolver.isDynamic()).thenReturn(true);
+
+    set.add("whatever", resolver);
+    assertThat(set.isDynamic(), is(true));
+  }
+
+  private void assertResult(ResolverSetResult result, Map<ParameterModel, ValueResolver> mapping) throws Exception {
+    assertThat(result, is(notNullValue()));
+    for (Map.Entry<ParameterModel, ValueResolver> entry : mapping.entrySet()) {
+      Object value = result.get(entry.getKey().getName());
+      assertThat(value, is(entry.getValue().resolve(event)));
     }
+  }
 
-    @Test
-    public void resolve() throws Exception
-    {
-        ResolverSetResult result = set.resolve(event);
-        assertResult(result, mapping);
-    }
+  private ResolverSet buildSet(Map<ParameterModel, ValueResolver> mapping) {
+    ResolverSet set = new ResolverSet();
+    mapping.forEach((key, value) -> set.add(key.getName(), value));
 
-    @Test(expected = IllegalArgumentException.class)
-    public void addNullParameter() throws Exception
-    {
-        set.add(null, getResolver(null));
-    }
+    return set;
+  }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void addNullresolver() throws Exception
-    {
-        set.add("blah", null);
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void addRepeatedParameter() throws Exception
-    {
-        final String parameterName = "name";
-        ValueResolver<String> resolver = getResolver(NAME);
-
-        set.add(parameterName, resolver);
-        set.add(parameterName, resolver);
-    }
-
-    @Test
-    public void isNotDynamic()
-    {
-        assertThat(set.isDynamic(), is(false));
-    }
-
-    @Test
-    public void isDynamic() throws Exception
-    {
-        ValueResolver resolver = getResolver(null);
-        when(resolver.isDynamic()).thenReturn(true);
-
-        set.add("whatever", resolver);
-        assertThat(set.isDynamic(), is(true));
-    }
-
-    private void assertResult(ResolverSetResult result, Map<ParameterModel, ValueResolver> mapping) throws Exception
-    {
-        assertThat(result, is(notNullValue()));
-        for (Map.Entry<ParameterModel, ValueResolver> entry : mapping.entrySet())
-        {
-            Object value = result.get(entry.getKey().getName());
-            assertThat(value, is(entry.getValue().resolve(event)));
-        }
-    }
-
-    private ResolverSet buildSet(Map<ParameterModel, ValueResolver> mapping)
-    {
-        ResolverSet set = new ResolverSet();
-        mapping.forEach((key, value) -> set.add(key.getName(), value));
-
-        return set;
-    }
-
-    private ValueResolver getResolver(Object value) throws Exception
-    {
-        return ExtensionsTestUtils.getResolver(value, event, false, MuleContextAware.class, Lifecycle.class);
-    }
+  private ValueResolver getResolver(Object value) throws Exception {
+    return ExtensionsTestUtils.getResolver(value, event, false, MuleContextAware.class, Lifecycle.class);
+  }
 }

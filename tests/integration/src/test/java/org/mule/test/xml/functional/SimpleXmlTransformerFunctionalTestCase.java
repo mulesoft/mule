@@ -18,97 +18,83 @@ import org.mule.runtime.core.api.client.MuleClient;
 
 import org.junit.Test;
 
-public class SimpleXmlTransformerFunctionalTestCase extends AbstractIntegrationTestCase
-{
-    public static final String SERIALIZED = "<org.mule.test.xml.functional.SimpleXmlTransformerFunctionalTestCase_-Parent>\n" +
-            "  <child>\n" +
-            "    <name>theChild</name>\n" +
-            "  </child>\n" +
-            "</org.mule.test.xml.functional.SimpleXmlTransformerFunctionalTestCase_-Parent>";
+public class SimpleXmlTransformerFunctionalTestCase extends AbstractIntegrationTestCase {
+
+  public static final String SERIALIZED = "<org.mule.test.xml.functional.SimpleXmlTransformerFunctionalTestCase_-Parent>\n"
+      + "  <child>\n" + "    <name>theChild</name>\n" + "  </child>\n"
+      + "</org.mule.test.xml.functional.SimpleXmlTransformerFunctionalTestCase_-Parent>";
 
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/module/xml/simple-xml-transformer-functional-test-flow.xml";
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/module/xml/simple-xml-transformer-functional-test-flow.xml";
+  }
+
+  @Test
+  public void testXmlOut() throws Exception {
+    MuleClient client = muleContext.getClient();
+    flowRunner("xml to object").withPayload(SERIALIZED).asynchronously().run();
+    Parent parent = (Parent) request(client, "test://xml-object-out", Parent.class);
+    assertNotNull(parent);
+    assertNotNull(parent.getChild());
+    assertThat(parent.getChild().getName(), is("theChild"));
+  }
+
+  @Test
+  public void testObjectXmlOut() throws Exception {
+    MuleClient client = muleContext.getClient();
+    flowRunner("object to xml").withPayload(new Parent(new Child("theChild"))).asynchronously().run();
+    String xml = (String) request(client, "test://object-xml-out", String.class);
+    assertXMLEqual(SERIALIZED, xml);
+  }
+
+  protected Object request(MuleClient client, String endpoint, Class<?> clazz) throws MuleException {
+    MuleMessage message = client.request(endpoint, RECEIVE_TIMEOUT);
+    assertNotNull(message);
+    assertNotNull(message.getPayload());
+    assertThat(message.getDataType().getType().getName(), message.getPayload(), instanceOf(clazz));
+    return message.getPayload();
+  }
+
+  public static class Parent {
+
+    private Child child;
+
+    public Parent() {
+      this(null);
     }
 
-    @Test
-    public void testXmlOut() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        flowRunner("xml to object").withPayload(SERIALIZED).asynchronously().run();
-        Parent parent = (Parent) request(client, "test://xml-object-out", Parent.class);
-        assertNotNull(parent);
-        assertNotNull(parent.getChild());
-        assertThat(parent.getChild().getName(), is("theChild"));
+    public Parent(Child child) {
+      setChild(child);
     }
 
-    @Test
-    public void testObjectXmlOut() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        flowRunner("object to xml").withPayload(new Parent(new Child("theChild"))).asynchronously().run();
-        String xml = (String) request(client, "test://object-xml-out", String.class);
-        assertXMLEqual(SERIALIZED, xml);
+    public Child getChild() {
+      return child;
     }
 
-    protected Object request(MuleClient client, String endpoint, Class<?> clazz) throws MuleException
-    {
-        MuleMessage message = client.request(endpoint, RECEIVE_TIMEOUT);
-        assertNotNull(message);
-        assertNotNull(message.getPayload());
-        assertThat(message.getDataType().getType().getName(), message.getPayload(), instanceOf(clazz));
-        return message.getPayload();
+    public void setChild(Child child) {
+      this.child = child;
+    }
+  }
+
+  public static class Child {
+
+    private String name;
+
+    public Child() {
+      this(null);
     }
 
-    public static class Parent
-    {
-        private Child child;
-
-        public Parent()
-        {
-            this(null);
-        }
-
-        public Parent(Child child)
-        {
-            setChild(child);
-        }
-
-        public Child getChild()
-        {
-            return child;
-        }
-
-        public void setChild(Child child)
-        {
-            this.child = child;
-        }
+    public Child(String name) {
+      this.name = name;
     }
 
-    public static class Child
-    {
-        private String name;
-
-        public Child()
-        {
-            this(null);
-        }
-
-        public Child(String name)
-        {
-            this.name = name;
-        }
-
-        public String getName()
-        {
-            return name;
-        }
-
-        public void setName(String name)
-        {
-            this.name = name;
-        }
+    public String getName() {
+      return name;
     }
+
+    public void setName(String name) {
+      this.name = name;
+    }
+  }
 }

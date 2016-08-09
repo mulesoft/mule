@@ -16,37 +16,34 @@ import org.mule.runtime.module.xml.transformer.XmlPrettyPrinter;
 
 import org.junit.Test;
 
-public class XmlPrettyPrinterConfigurationTestCase extends AbstractIntegrationTestCase
-{
-    public XmlPrettyPrinterConfigurationTestCase()
-    {
-        setStartContext(false);
-    }
+public class XmlPrettyPrinterConfigurationTestCase extends AbstractIntegrationTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/module/xml/xml-prettyprinter-config.xml";
-    }
+  public XmlPrettyPrinterConfigurationTestCase() {
+    setStartContext(false);
+  }
 
-    @Test
-    public void testPrettyPrinter()
-    {
-        XmlPrettyPrinter pp = (XmlPrettyPrinter) muleContext.getRegistry().lookupTransformer("MyXMLPrettyPrinter");
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/module/xml/xml-prettyprinter-config.xml";
+  }
 
-        assertNotNull(pp);
-        assertEquals("ISO-8859-15", pp.getEncoding());
-        assertEquals(true, pp.isExpandEmptyElements());
-        assertEquals(true, pp.getIndentEnabled());
-        assertEquals("   ", pp.getIndentString());
-        assertEquals("\\n\\n", pp.getLineSeparator());
-        assertEquals(1, pp.getNewLineAfterNTags());
-        assertFalse(pp.isNewlines());
-        assertFalse(pp.isNewLineAfterDeclaration());
-        assertFalse(pp.isOmitEncoding());
-        assertFalse(pp.isPadText());
-        assertFalse(pp.isTrimText());
-        assertFalse(pp.isSuppressDeclaration());
-        assertTrue(pp.isXHTML());
-    }
+  @Test
+  public void testPrettyPrinter() {
+    XmlPrettyPrinter pp = (XmlPrettyPrinter) muleContext.getRegistry().lookupTransformer("MyXMLPrettyPrinter");
+
+    assertNotNull(pp);
+    assertEquals("ISO-8859-15", pp.getEncoding());
+    assertEquals(true, pp.isExpandEmptyElements());
+    assertEquals(true, pp.getIndentEnabled());
+    assertEquals("   ", pp.getIndentString());
+    assertEquals("\\n\\n", pp.getLineSeparator());
+    assertEquals(1, pp.getNewLineAfterNTags());
+    assertFalse(pp.isNewlines());
+    assertFalse(pp.isNewLineAfterDeclaration());
+    assertFalse(pp.isOmitEncoding());
+    assertFalse(pp.isPadText());
+    assertFalse(pp.isTrimText());
+    assertFalse(pp.isSuppressDeclaration());
+    assertTrue(pp.isXHTML());
+  }
 }

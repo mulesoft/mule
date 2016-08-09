@@ -25,119 +25,103 @@ import javax.sql.DataSource;
 import org.junit.Test;
 
 @SmallTest
-public class DataSourceFactoryTestCase extends AbstractMuleTestCase
-{
+public class DataSourceFactoryTestCase extends AbstractMuleTestCase {
 
-    private final PooledDataSource dataSource = mock(PooledDataSource.class);
-    private final DisposableDataSource disposableDataSource = mock(DisposableDataSource.class);
-    private final DataSourceFactory dataSourceFactory = new DataSourceFactory("test")
-    {
-        @Override
-        protected DataSource createPooledDataSource(DataSourceConfig dataSourceConfig) throws SQLException
-        {
-            return dataSource;
-        }
+  private final PooledDataSource dataSource = mock(PooledDataSource.class);
+  private final DisposableDataSource disposableDataSource = mock(DisposableDataSource.class);
+  private final DataSourceFactory dataSourceFactory = new DataSourceFactory("test") {
 
-        @Override
-        public DataSource decorateDataSource(DataSource dataSource, DbPoolingProfile poolingProfile, MuleContext muleContext)
-        {
-            return disposableDataSource;
-        }
-    };
-
-    public interface DisposableDataSource extends DataSource, Disposable
-    {
+    @Override
+    protected DataSource createPooledDataSource(DataSourceConfig dataSourceConfig) throws SQLException {
+      return dataSource;
     }
 
-    @Test
-    public void destroysPooledDataSource() throws Exception
-    {
-        DataSourceConfig dataSourceConfig = new DataSourceConfig();
-        dataSourceConfig.setPoolingProfile(mock(DbPoolingProfile.class));
-
-        doCloseTest(dataSourceConfig, 1);
+    @Override
+    public DataSource decorateDataSource(DataSource dataSource, DbPoolingProfile poolingProfile, MuleContext muleContext) {
+      return disposableDataSource;
     }
+  };
 
-    @Test
-    public void doesNotDestroySingleDataSource() throws Exception
-    {
-        DataSourceConfig dataSourceConfig = new DataSourceConfig();
-        doCloseTest(dataSourceConfig, 0);
-    }
+  public interface DisposableDataSource extends DataSource, Disposable {
+  }
 
-    @Test
-    public void doesNotDestroySingleXaDataSource() throws Exception
-    {
-        DataSourceConfig dataSourceConfig = new DataSourceConfig();
-        dataSourceConfig.setUseXaTransactions(true);
-        doCloseTest(dataSourceConfig, 0);
-    }
+  @Test
+  public void destroysPooledDataSource() throws Exception {
+    DataSourceConfig dataSourceConfig = new DataSourceConfig();
+    dataSourceConfig.setPoolingProfile(mock(DbPoolingProfile.class));
 
-    @Test
-    public void doesNotDestroyPooledXaDataSource() throws Exception
-    {
-        DataSourceConfig dataSourceConfig = new DataSourceConfig();
-        dataSourceConfig.setUseXaTransactions(true);
-        dataSourceConfig.setPoolingProfile(mock(DbPoolingProfile.class));
-        doCloseTest(dataSourceConfig, 0);
-    }
+    doCloseTest(dataSourceConfig, 1);
+  }
 
-    @Test
-    public void doesNotDisposesPooledDataSource() throws Exception
-    {
-        DataSourceConfig dataSourceConfig = new DataSourceConfig();
-        dataSourceConfig.setPoolingProfile(mock(DbPoolingProfile.class));
-        doDisposeTest(dataSourceConfig, 0);
-    }
+  @Test
+  public void doesNotDestroySingleDataSource() throws Exception {
+    DataSourceConfig dataSourceConfig = new DataSourceConfig();
+    doCloseTest(dataSourceConfig, 0);
+  }
 
-    @Test
-    public void doesNotDisposesSingleDataSource() throws Exception
-    {
-        DataSourceConfig dataSourceConfig = new DataSourceConfig();
-        doDisposeTest(dataSourceConfig, 0);
-    }
+  @Test
+  public void doesNotDestroySingleXaDataSource() throws Exception {
+    DataSourceConfig dataSourceConfig = new DataSourceConfig();
+    dataSourceConfig.setUseXaTransactions(true);
+    doCloseTest(dataSourceConfig, 0);
+  }
 
-    @Test
-    public void disposesSingleXaDataSource() throws Exception
-    {
-        DataSourceConfig dataSourceConfig = new DataSourceConfig();
-        dataSourceConfig.setUseXaTransactions(true);
-        doDisposeTest(dataSourceConfig, 1);
-    }
+  @Test
+  public void doesNotDestroyPooledXaDataSource() throws Exception {
+    DataSourceConfig dataSourceConfig = new DataSourceConfig();
+    dataSourceConfig.setUseXaTransactions(true);
+    dataSourceConfig.setPoolingProfile(mock(DbPoolingProfile.class));
+    doCloseTest(dataSourceConfig, 0);
+  }
 
-    @Test
-    public void disposesPooledXaDataSource() throws Exception
-    {
-        DataSourceConfig dataSourceConfig = new DataSourceConfig();
-        dataSourceConfig.setUseXaTransactions(true);
-        dataSourceConfig.setPoolingProfile(mock(DbPoolingProfile.class));
-        doDisposeTest(dataSourceConfig, 1);
-    }
+  @Test
+  public void doesNotDisposesPooledDataSource() throws Exception {
+    DataSourceConfig dataSourceConfig = new DataSourceConfig();
+    dataSourceConfig.setPoolingProfile(mock(DbPoolingProfile.class));
+    doDisposeTest(dataSourceConfig, 0);
+  }
 
-    @Test
-    public void disposesDisposableDatasource() throws Exception
-    {
-        DataSourceConfig dataSourceConfig = new DataSourceConfig();
-        dataSourceConfig.setUseXaTransactions(true);
+  @Test
+  public void doesNotDisposesSingleDataSource() throws Exception {
+    DataSourceConfig dataSourceConfig = new DataSourceConfig();
+    doDisposeTest(dataSourceConfig, 0);
+  }
 
-        doDisposeTest(dataSourceConfig, 1);
-    }
+  @Test
+  public void disposesSingleXaDataSource() throws Exception {
+    DataSourceConfig dataSourceConfig = new DataSourceConfig();
+    dataSourceConfig.setUseXaTransactions(true);
+    doDisposeTest(dataSourceConfig, 1);
+  }
 
-    private void doCloseTest(DataSourceConfig dataSourceConfig, int expectedCloseInvocations) throws SQLException
-    {
-        configureFactory(dataSourceConfig);
-        verify(dataSource, times(expectedCloseInvocations)).close(false);
-    }
+  @Test
+  public void disposesPooledXaDataSource() throws Exception {
+    DataSourceConfig dataSourceConfig = new DataSourceConfig();
+    dataSourceConfig.setUseXaTransactions(true);
+    dataSourceConfig.setPoolingProfile(mock(DbPoolingProfile.class));
+    doDisposeTest(dataSourceConfig, 1);
+  }
 
-    private void doDisposeTest(DataSourceConfig dataSourceConfig, int expectedDisposeInvocations) throws SQLException
-    {
-        configureFactory(dataSourceConfig);
-        verify(disposableDataSource, times(expectedDisposeInvocations)).dispose();
-    }
+  @Test
+  public void disposesDisposableDatasource() throws Exception {
+    DataSourceConfig dataSourceConfig = new DataSourceConfig();
+    dataSourceConfig.setUseXaTransactions(true);
 
-    private void configureFactory(DataSourceConfig dataSourceConfig) throws SQLException
-    {
-        dataSourceFactory.create(dataSourceConfig);
-        dataSourceFactory.dispose();
-    }
+    doDisposeTest(dataSourceConfig, 1);
+  }
+
+  private void doCloseTest(DataSourceConfig dataSourceConfig, int expectedCloseInvocations) throws SQLException {
+    configureFactory(dataSourceConfig);
+    verify(dataSource, times(expectedCloseInvocations)).close(false);
+  }
+
+  private void doDisposeTest(DataSourceConfig dataSourceConfig, int expectedDisposeInvocations) throws SQLException {
+    configureFactory(dataSourceConfig);
+    verify(disposableDataSource, times(expectedDisposeInvocations)).dispose();
+  }
+
+  private void configureFactory(DataSourceConfig dataSourceConfig) throws SQLException {
+    dataSourceFactory.create(dataSourceConfig);
+    dataSourceFactory.dispose();
+  }
 }

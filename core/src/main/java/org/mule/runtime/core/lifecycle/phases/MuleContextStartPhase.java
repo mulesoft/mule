@@ -29,48 +29,46 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
- * The Start phase for the MuleContext. Calling
- * {@link MuleContext#start()} will initiate this phase via the
+ * The Start phase for the MuleContext. Calling {@link MuleContext#start()} will initiate this phase via the
  * {@link org.mule.runtime.core.api.lifecycle.LifecycleManager}.
  * <p/>
- * The MuleContextStartPhase defines the lifecycle behaviour when the Mule context is started.  The MuleContext is associated
- * with one or more registries that inherit the lifecycle of the MuleContext.
+ * The MuleContextStartPhase defines the lifecycle behaviour when the Mule context is started. The MuleContext is associated with
+ * one or more registries that inherit the lifecycle of the MuleContext.
  * <p/>
- * This phase is responsible for starting objects. Any object that implements {@link org.mule.runtime.core.api.lifecycle.Startable} will
- * have its {@link org.mule.runtime.core.api.lifecycle.Startable#start()} method called.  Objects are initialised in the order based on type:
- * {@link org.mule.runtime.core.api.agent.Agent}, {@link org.mule.runtime.core.api.construct.FlowConstruct}, followed
- * by any other object that implements {@link org.mule.runtime.core.api.lifecycle.Startable}.
+ * This phase is responsible for starting objects. Any object that implements
+ * {@link org.mule.runtime.core.api.lifecycle.Startable} will have its
+ * {@link org.mule.runtime.core.api.lifecycle.Startable#start()} method called. Objects are initialised in the order based on
+ * type: {@link org.mule.runtime.core.api.agent.Agent}, {@link org.mule.runtime.core.api.construct.FlowConstruct}, followed by any
+ * other object that implements {@link org.mule.runtime.core.api.lifecycle.Startable}.
  *
  * @see org.mule.runtime.core.api.MuleContext
  * @see org.mule.runtime.core.api.lifecycle.LifecycleManager
  * @see org.mule.runtime.core.api.lifecycle.Startable
  * @since 3.0
  */
-public class MuleContextStartPhase extends DefaultLifecyclePhase
-{
+public class MuleContextStartPhase extends DefaultLifecyclePhase {
 
-    public MuleContextStartPhase()
-    {
-        this(new Class[] {Registry.class, MuleContext.class, MessageSource.class, InterceptingMessageProcessor.class, Component.class, OutboundRouter.class, MuleContext.class, Service.class});
-    }
+  public MuleContextStartPhase() {
+    this(new Class[] {Registry.class, MuleContext.class, MessageSource.class, InterceptingMessageProcessor.class, Component.class,
+        OutboundRouter.class, MuleContext.class, Service.class});
+  }
 
-    public MuleContextStartPhase(Class<?>[] ignoredObjects)
-    {
-        super(Startable.PHASE_NAME, Startable.class, Stoppable.PHASE_NAME);
+  public MuleContextStartPhase(Class<?>[] ignoredObjects) {
+    super(Startable.PHASE_NAME, Startable.class, Stoppable.PHASE_NAME);
 
-        Set<LifecycleObject> startOrderedObjects = new LinkedHashSet<>();
-        startOrderedObjects.add(new NotificationLifecycleObject(QueueManager.class));
-        startOrderedObjects.add(new NotificationLifecycleObject(ConfigurationProvider.class));
-        startOrderedObjects.add(new NotificationLifecycleObject(Config.class));
-        startOrderedObjects.add(new NotificationLifecycleObject(LegacyConnector.class));
-        startOrderedObjects.add(new NotificationLifecycleObject(Agent.class));
-        startOrderedObjects.add(new NotificationLifecycleObject(FlowConstruct.class));
-        startOrderedObjects.add(new NotificationLifecycleObject(Startable.class));
+    Set<LifecycleObject> startOrderedObjects = new LinkedHashSet<>();
+    startOrderedObjects.add(new NotificationLifecycleObject(QueueManager.class));
+    startOrderedObjects.add(new NotificationLifecycleObject(ConfigurationProvider.class));
+    startOrderedObjects.add(new NotificationLifecycleObject(Config.class));
+    startOrderedObjects.add(new NotificationLifecycleObject(LegacyConnector.class));
+    startOrderedObjects.add(new NotificationLifecycleObject(Agent.class));
+    startOrderedObjects.add(new NotificationLifecycleObject(FlowConstruct.class));
+    startOrderedObjects.add(new NotificationLifecycleObject(Startable.class));
 
-        setIgnoredObjectTypes(ignoredObjects);
-        setOrderedLifecycleObjects(startOrderedObjects);
-        registerSupportedPhase(Initialisable.PHASE_NAME);
-        //Start/Stop/Start 
-        registerSupportedPhase(Stoppable.PHASE_NAME);
-    }
+    setIgnoredObjectTypes(ignoredObjects);
+    setOrderedLifecycleObjects(startOrderedObjects);
+    registerSupportedPhase(Initialisable.PHASE_NAME);
+    // Start/Stop/Start
+    registerSupportedPhase(Stoppable.PHASE_NAME);
+  }
 }

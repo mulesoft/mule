@@ -26,106 +26,87 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class CxfDataTypeTestCase extends FunctionalTestCase
-{
-    private static final String requestPayload =
-        "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"\n" +
-            "           xmlns:hi=\"http://example.cxf.module.runtime.mule.org/\">\n" +
-            "<soap:Body>\n" +
-            "<hi:sayHi>\n" +
-            "    <arg0>Hello</arg0>\n" +
-            "</hi:sayHi>\n" +
-            "</soap:Body>\n" +
-            "</soap:Envelope>";
+public class CxfDataTypeTestCase extends FunctionalTestCase {
 
-    @Rule
-    public DynamicPort dynamicPort = new DynamicPort("port1");
+  private static final String requestPayload = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"\n"
+      + "           xmlns:hi=\"http://example.cxf.module.runtime.mule.org/\">\n" + "<soap:Body>\n" + "<hi:sayHi>\n"
+      + "    <arg0>Hello</arg0>\n" + "</hi:sayHi>\n" + "</soap:Body>\n" + "</soap:Envelope>";
+
+  @Rule
+  public DynamicPort dynamicPort = new DynamicPort("port1");
+
+  @Override
+  protected String getConfigFile() {
+    return "cxf-datatype-conf.xml";
+  }
+
+  @Test
+  public void testCxfService() throws Exception {
+    MuleMessage request = MuleMessage.builder().payload(requestPayload).build();
+    MuleMessage received = muleContext.getClient().send("http://localhost:" + dynamicPort.getNumber() + "/hello", request,
+                                                        newOptions().method(POST.name()).disableStatusCodeValidation().build());
+    Assert.assertThat(getPayloadAsString(received), not(containsString("Fault")));
+  }
+
+  @Test
+  public void testCxfClient() throws Exception {
+    MuleMessage received = flowRunner("helloServiceClient").withPayload("hello").run().getMessage();
+    Assert.assertThat(getPayloadAsString(received), not(containsString("Fault")));
+  }
+
+  @Test
+  public void testCxfProxy() throws Exception {
+    MuleMessage request = MuleMessage.builder().payload(requestPayload).build();
+    MuleMessage received = muleContext.getClient().send("http://localhost:" + dynamicPort.getNumber() + "/hello-proxy", request,
+                                                        newOptions().method(POST.name()).disableStatusCodeValidation().build());
+    Assert.assertThat(getPayloadAsString(received), not(containsString("Fault")));
+  }
+
+  @Test
+  public void testCxfSimpleService() throws Exception {
+    MuleClient client = muleContext.getClient();
+    InputStream xml = getClass().getResourceAsStream("/direct/direct-request.xml");
+    MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/echo",
+                                     MuleMessage.builder().payload(xml).mediaType(APP_SOAP_XML).build(),
+                                     newOptions().method(POST.name()).disableStatusCodeValidation().build());
+    Assert.assertThat(getPayloadAsString(result), not(containsString("Fault")));
+  }
+
+  @Test
+  public void testCxfSimpleClient() throws Exception {
+    MuleMessage received = flowRunner("helloServiceClient").withPayload("hello").run().getMessage();
+    Assert.assertThat(getPayloadAsString(received), not(containsString("Fault")));
+  }
+
+  public static class EnsureXmlDataType extends EnsureDataType {
+
+    public EnsureXmlDataType() {
+      super(MediaType.XML);
+    }
+  }
+
+  public static class EnsureAnyDataType extends EnsureDataType {
+
+    public EnsureAnyDataType() {
+      super(MediaType.ANY);
+    }
+  }
+
+  private static class EnsureDataType implements Callable {
+
+    private final MediaType mimeType;
+
+    public EnsureDataType(MediaType mimeType) {
+      this.mimeType = mimeType;
+    }
 
     @Override
-    protected String getConfigFile()
-    {
-        return "cxf-datatype-conf.xml";
+    public Object onCall(MuleEventContext eventContext) throws Exception {
+      if (!eventContext.getMessage().getDataType().getMediaType().matches(mimeType)) {
+        throw new RuntimeException();
+      }
+      return eventContext.getMessage().getPayload();
     }
-
-    @Test
-    public void testCxfService() throws Exception
-    {
-        MuleMessage request = MuleMessage.builder().payload(requestPayload).build();
-        MuleMessage received = muleContext.getClient().send("http://localhost:" + dynamicPort.getNumber() + "/hello", request, newOptions().method(POST.name()).disableStatusCodeValidation().build());
-        Assert.assertThat(getPayloadAsString(received), not(containsString("Fault")));
-    }
-
-    @Test
-    public void testCxfClient() throws Exception
-    {
-        MuleMessage received = flowRunner("helloServiceClient").withPayload("hello").run().getMessage();
-        Assert.assertThat(getPayloadAsString(received), not(containsString("Fault")));
-    }
-
-    @Test
-    public void testCxfProxy() throws Exception
-    {
-        MuleMessage request = MuleMessage.builder().payload(requestPayload).build();
-MuleMessage received = muleContext.getClient().send("http://localhost:" + dynamicPort.getNumber() + "/hello-proxy", request, newOptions().method(POST.name()).disableStatusCodeValidation().build());
-        Assert.assertThat(getPayloadAsString(received), not(containsString("Fault")));
-    }
-
-    @Test
-    public void testCxfSimpleService() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        InputStream xml = getClass().getResourceAsStream("/direct/direct-request.xml");
-        MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/echo", MuleMessage.builder().payload(xml).mediaType(APP_SOAP_XML).build(),
-                newOptions().method(POST.name())
-                            .disableStatusCodeValidation()
-                            .build());
-        Assert.assertThat(getPayloadAsString(result), not(containsString("Fault")));
-    }
-
-    @Test
-    public void testCxfSimpleClient() throws Exception
-    {
-        MuleMessage received = flowRunner("helloServiceClient").withPayload("hello").run().getMessage();
-        Assert.assertThat(getPayloadAsString(received), not(containsString("Fault")));
-    }
-
-    public static class EnsureXmlDataType extends EnsureDataType
-    {
-
-        public EnsureXmlDataType()
-        {
-            super(MediaType.XML);
-        }
-    }
-
-    public static class EnsureAnyDataType extends EnsureDataType
-    {
-
-        public EnsureAnyDataType()
-        {
-            super(MediaType.ANY);
-        }
-    }
-
-    private static class EnsureDataType implements Callable
-    {
-
-        private final MediaType mimeType;
-
-        public EnsureDataType(MediaType mimeType)
-        {
-            this.mimeType = mimeType;
-        }
-
-        @Override
-        public Object onCall(MuleEventContext eventContext) throws Exception
-        {
-            if (!eventContext.getMessage().getDataType().getMediaType().matches(mimeType))
-            {
-                throw new RuntimeException();
-            }
-            return eventContext.getMessage().getPayload();
-        }
-    }
+  }
 
 }

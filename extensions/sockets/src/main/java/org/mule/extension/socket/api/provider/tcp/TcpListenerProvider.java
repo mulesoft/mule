@@ -41,95 +41,83 @@ import javax.net.ssl.SSLServerSocket;
 
 
 /**
- * A {@link ConnectionProvider} which provides instances of
- * {@link TcpListenerConnection} to be used by {@link SocketListener}
+ * A {@link ConnectionProvider} which provides instances of {@link TcpListenerConnection} to be used by {@link SocketListener}
  *
  * @since 4.0
  */
 @Alias("tcp-listener")
-public final class TcpListenerProvider implements ConnectionProvider<TcpListenerConnection>, Initialisable
-{
+public final class TcpListenerProvider implements ConnectionProvider<TcpListenerConnection>, Initialisable {
 
-    /**
-     * Its presence will imply the use of {@link SSLServerSocket}
-     * instead of plain TCP {@link ServerSocket} for accepting new SSL connections.
-     */
-    @Parameter
-    @Optional
-    @DisplayName(TLS_CONFIGURATION)
-    @Placement(tab = TLS, group = TLS_CONFIGURATION)
-    private TlsContextFactory tlsContext;
+  /**
+   * Its presence will imply the use of {@link SSLServerSocket} instead of plain TCP {@link ServerSocket} for accepting new SSL
+   * connections.
+   */
+  @Parameter
+  @Optional
+  @DisplayName(TLS_CONFIGURATION)
+  @Placement(tab = TLS, group = TLS_CONFIGURATION)
+  private TlsContextFactory tlsContext;
 
-    /**
-     * This configuration parameter refers to the address where the TCP socket should listen for incoming connections.
-     */
-    @ParameterGroup
-    private ConnectionSettings connectionSettings;
+  /**
+   * This configuration parameter refers to the address where the TCP socket should listen for incoming connections.
+   */
+  @ParameterGroup
+  private ConnectionSettings connectionSettings;
 
-    /**
-     * {@link ServerSocket} configuration properties
-     */
-    @ParameterGroup
-    private TcpServerSocketProperties tcpServerSocketProperties;
+  /**
+   * {@link ServerSocket} configuration properties
+   */
+  @ParameterGroup
+  private TcpServerSocketProperties tcpServerSocketProperties;
 
-    /**
-     * {@link TcpProtocol} that knows how the data is going to be read and written.
-     * If not specified, the {@link SafeProtocol} will be used.
-     */
-    @Parameter
-    @Optional
-    @Summary("TCP Protocol to use to receive external request")
-    private TcpProtocol protocol = new SafeProtocol();
+  /**
+   * {@link TcpProtocol} that knows how the data is going to be read and written. If not specified, the {@link SafeProtocol} will
+   * be used.
+   */
+  @Parameter
+  @Optional
+  @Summary("TCP Protocol to use to receive external request")
+  private TcpProtocol protocol = new SafeProtocol();
 
-    @Override
-    public TcpListenerConnection connect() throws ConnectionException
-    {
-        SimpleServerSocketFactory serverSocketFactory = null;
+  @Override
+  public TcpListenerConnection connect() throws ConnectionException {
+    SimpleServerSocketFactory serverSocketFactory = null;
 
-        try
-        {
-            serverSocketFactory = tlsContext != null
-                                  ? new SslServerSocketFactory(tlsContext)
-                                  : new TcpServerSocketFactory();
-        }
-        catch (Exception e)
-        {
-            throw new MuleRuntimeException(e);
-        }
-
-        TcpListenerConnection connection = new TcpListenerConnection(connectionSettings, protocol,
-                                                                     tcpServerSocketProperties,
-                                                                     serverSocketFactory);
-        connection.connect();
-        return connection;
+    try {
+      serverSocketFactory = tlsContext != null ? new SslServerSocketFactory(tlsContext) : new TcpServerSocketFactory();
+    } catch (Exception e) {
+      throw new MuleRuntimeException(e);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void disconnect(TcpListenerConnection connection)
-    {
-        connection.disconnect();
+    TcpListenerConnection connection =
+        new TcpListenerConnection(connectionSettings, protocol, tcpServerSocketProperties, serverSocketFactory);
+    connection.connect();
+    return connection;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void disconnect(TcpListenerConnection connection) {
+    connection.disconnect();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public ConnectionValidationResult validate(TcpListenerConnection connection) {
+    return SocketUtils.validate(connection);
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    if (tlsContext != null && !tlsContext.isKeyStoreConfigured()) {
+      throw new InitialisationException(CoreMessages.createStaticMessage("KeyStore must be configured for server side SSL"),
+                                        this);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ConnectionValidationResult validate(TcpListenerConnection connection)
-    {
-        return SocketUtils.validate(connection);
-    }
-
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        if (tlsContext != null && !tlsContext.isKeyStoreConfigured())
-        {
-            throw new InitialisationException(CoreMessages.createStaticMessage("KeyStore must be configured for server side SSL"), this);
-        }
-
-        initialiseIfNeeded(tlsContext);
-    }
+    initialiseIfNeeded(tlsContext);
+  }
 }

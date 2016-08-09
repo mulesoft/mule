@@ -12,18 +12,16 @@ import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.config.i18n.MessageFactory;
 
-public class PartialStartupRudeMessageProcessor implements MessageProcessor, Startable
-{
-	@Override
-	public MuleEvent process(MuleEvent event) throws MuleException
-	{
-		return event;
-	}
-	
-	@Override
-	public void start() throws MuleException
-	{
-		throw new MuleException(MessageFactory.createStaticMessage("TOO RUDE!")){};
-	}
-	
+public class PartialStartupRudeMessageProcessor implements MessageProcessor, Startable {
+
+  @Override
+  public MuleEvent process(MuleEvent event) throws MuleException {
+    return event;
+  }
+
+  @Override
+  public void start() throws MuleException {
+    throw new MuleException(MessageFactory.createStaticMessage("TOO RUDE!")) {};
+  }
+
 }

@@ -11,26 +11,23 @@ import org.mule.compatibility.core.api.transport.MessageReceiver;
 import org.mule.compatibility.core.transport.AbstractMessageReceiverTestCase;
 import org.mule.compatibility.transport.vm.VMMessageReceiver;
 
-public class VMMessageReceiverTestCase extends AbstractMessageReceiverTestCase
-{
-    VMMessageReceiver receiver;
+public class VMMessageReceiverTestCase extends AbstractMessageReceiverTestCase {
 
-    @Override
-    protected void doSetUp() throws Exception
-    {
-        super.doSetUp();
-        receiver = new VMMessageReceiver(endpoint.getConnector(), flow, endpoint);
-    }
+  VMMessageReceiver receiver;
 
-    @Override
-    public MessageReceiver getMessageReceiver()
-    {
-        return receiver;
-    }
+  @Override
+  protected void doSetUp() throws Exception {
+    super.doSetUp();
+    receiver = new VMMessageReceiver(endpoint.getConnector(), flow, endpoint);
+  }
 
-    @Override
-    public InboundEndpoint getEndpoint() throws Exception
-    {
-        return getEndpointFactory().getInboundEndpoint("vm://test");
-    }
+  @Override
+  public MessageReceiver getMessageReceiver() {
+    return receiver;
+  }
+
+  @Override
+  public InboundEndpoint getEndpoint() throws Exception {
+    return getEndpointFactory().getInboundEndpoint("vm://test");
+  }
 }

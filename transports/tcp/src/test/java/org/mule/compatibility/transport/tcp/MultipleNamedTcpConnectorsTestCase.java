@@ -12,22 +12,19 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class MultipleNamedTcpConnectorsTestCase extends FunctionalTestCase
-{
+public class MultipleNamedTcpConnectorsTestCase extends FunctionalTestCase {
 
-    @Rule
-    public DynamicPort dynamicPort = new DynamicPort("port1");
+  @Rule
+  public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "multiple-named-tcp-connectors-test-flow.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "multiple-named-tcp-connectors-test-flow.xml";
+  }
 
-    @Test
-    public void testMultipleNamedConnectors() throws Exception
-    {
-        // no-op, the initialization must not fail.
-    }
+  @Test
+  public void testMultipleNamedConnectors() throws Exception {
+    // no-op, the initialization must not fail.
+  }
 
 }

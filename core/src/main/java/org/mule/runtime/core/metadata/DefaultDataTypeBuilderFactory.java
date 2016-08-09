@@ -10,18 +10,15 @@ import org.mule.runtime.api.metadata.AbstractDataTypeBuilderFactory;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeBuilder;
 
-public class DefaultDataTypeBuilderFactory extends AbstractDataTypeBuilderFactory
-{
+public class DefaultDataTypeBuilderFactory extends AbstractDataTypeBuilderFactory {
 
-    @Override
-    protected DataTypeBuilder create()
-    {
-        return new DefaultDataTypeBuilder();
-    }
+  @Override
+  protected DataTypeBuilder create() {
+    return new DefaultDataTypeBuilder();
+  }
 
-    @Override
-    protected DataTypeBuilder create(DataType dataType)
-    {
-        return new DefaultDataTypeBuilder(dataType);
-    }
+  @Override
+  protected DataTypeBuilder create(DataType dataType) {
+    return new DefaultDataTypeBuilder(dataType);
+  }
 }

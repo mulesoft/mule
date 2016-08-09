@@ -13,39 +13,33 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Keeps track of the deployment status of the artifact listening to the deployment notifications
  */
-public class ArtifactDeploymentStatusTracker  extends AbstractDeploymentListener
-{
+public class ArtifactDeploymentStatusTracker extends AbstractDeploymentListener {
 
-    public static enum DeploymentState
-    {
-        // The deployment is in progress
-        DEPLOYING,
-        // The deployment was finished with a failure
-        FAILED,
-        // The deployment was successfully finished
-        DEPLOYED
-    }
+  public static enum DeploymentState {
+    // The deployment is in progress
+    DEPLOYING,
+    // The deployment was finished with a failure
+    FAILED,
+    // The deployment was successfully finished
+    DEPLOYED
+  }
 
-    protected Map<String, DeploymentState> deploymentStates = new ConcurrentHashMap<String, DeploymentState>();
+  protected Map<String, DeploymentState> deploymentStates = new ConcurrentHashMap<String, DeploymentState>();
 
-    public Map<String, DeploymentState> getDeploymentStates()
-    {
-        return Collections.unmodifiableMap(deploymentStates);
-    }
+  public Map<String, DeploymentState> getDeploymentStates() {
+    return Collections.unmodifiableMap(deploymentStates);
+  }
 
-    public void onDeploymentStart(String artifactName)
-    {
-        deploymentStates.put(artifactName, DeploymentState.DEPLOYING);
-    }
+  public void onDeploymentStart(String artifactName) {
+    deploymentStates.put(artifactName, DeploymentState.DEPLOYING);
+  }
 
-    public void onDeploymentSuccess(String artifactName)
-    {
-        deploymentStates.put(artifactName, DeploymentState.DEPLOYED);
-    }
+  public void onDeploymentSuccess(String artifactName) {
+    deploymentStates.put(artifactName, DeploymentState.DEPLOYED);
+  }
 
-    public void onDeploymentFailure(String artifactName, Throwable failureCause)
-    {
-        deploymentStates.put(artifactName, DeploymentState.FAILED);
-    }
+  public void onDeploymentFailure(String artifactName, Throwable failureCause) {
+    deploymentStates.put(artifactName, DeploymentState.FAILED);
+  }
 
 }

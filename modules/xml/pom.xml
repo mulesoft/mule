@@ -11,6 +11,10 @@
     <name>XML Extensions</name>
     <description>Functionality for working with XML</description>
 
+    <properties>
+        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
+    </properties>
+
     <build>
         <plugins>
             <plugin>

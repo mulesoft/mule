@@ -27,46 +27,42 @@ import org.junit.Before;
 import org.junit.Test;
 
 @SmallTest
-public class JmsExceptionReaderTestCase extends AbstractMuleTestCase
-{
+public class JmsExceptionReaderTestCase extends AbstractMuleTestCase {
 
-    @Before
-    public void registerExceptionReader()
-    {
-        ExceptionHelper.registerExceptionReader(new JmsExceptionReader());
-    }
+  @Before
+  public void registerExceptionReader() {
+    ExceptionHelper.registerExceptionReader(new JmsExceptionReader());
+  }
 
-    @Test
-    public void testNestedExceptionRetrieval() throws Exception
-    {
-        Exception testException = getException();
-        Throwable t = ExceptionHelper.getRootException(testException);
-        assertNotNull(t);
-        assertEquals("blah", t.getMessage());
-        assertNull(t.getCause());
+  @Test
+  public void testNestedExceptionRetrieval() throws Exception {
+    Exception testException = getException();
+    Throwable t = ExceptionHelper.getRootException(testException);
+    assertNotNull(t);
+    assertEquals("blah", t.getMessage());
+    assertNull(t.getCause());
 
-        t = ExceptionHelper.getRootMuleException(testException);
-        assertNotNull(t);
-        assertEquals("bar", t.getMessage());
-        assertNotNull(t.getCause());
+    t = ExceptionHelper.getRootMuleException(testException);
+    assertNotNull(t);
+    assertEquals("bar", t.getMessage());
+    assertNotNull(t.getCause());
 
-        List<Throwable> l = ExceptionHelper.getExceptionsAsList(testException);
-        assertEquals(4, l.size());
+    List<Throwable> l = ExceptionHelper.getExceptionsAsList(testException);
+    assertEquals(4, l.size());
 
-        Map info = ExceptionHelper.getExceptionInfo(testException);
-        assertNotNull(info);
-        assertEquals(1, info.size());
-        assertEquals("1234", info.get("JMS Code"));
-    }
+    Map info = ExceptionHelper.getExceptionInfo(testException);
+    assertNotNull(info);
+    assertEquals(1, info.size());
+    assertEquals("1234", info.get("JMS Code"));
+  }
 
-    private Exception getException()
-    {
+  private Exception getException() {
 
-        JMSException e = new JMSException("Jms error", "1234");
-        e.setLinkedException(new IOException("blah"));
+    JMSException e = new JMSException("Jms error", "1234");
+    e.setLinkedException(new IOException("blah"));
 
-        return new DefaultMuleException(MessageFactory.createStaticMessage("foo"), new DefaultMuleException(
-            MessageFactory.createStaticMessage("bar"), e));
-    }
+    return new DefaultMuleException(MessageFactory.createStaticMessage("foo"),
+                                    new DefaultMuleException(MessageFactory.createStaticMessage("bar"), e));
+  }
 
 }

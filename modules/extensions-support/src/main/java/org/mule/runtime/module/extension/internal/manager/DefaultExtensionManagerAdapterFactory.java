@@ -14,32 +14,26 @@ import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 
 /**
- * Default implementation of {@link ExtensionManagerAdapterFactory} which
- * creates instances of {@link DefaultExtensionManagerAdapterFactory}
- * and sets them into the owning {@link MuleContext}
+ * Default implementation of {@link ExtensionManagerAdapterFactory} which creates instances of
+ * {@link DefaultExtensionManagerAdapterFactory} and sets them into the owning {@link MuleContext}
  *
  * @since 4.0
  */
-public class DefaultExtensionManagerAdapterFactory implements ExtensionManagerAdapterFactory
-{
+public class DefaultExtensionManagerAdapterFactory implements ExtensionManagerAdapterFactory {
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ExtensionManagerAdapter createExtensionManager(MuleContext muleContext)
-    {
-        ExtensionManagerAdapter extensionManager = new DefaultExtensionManager();
-        ((DefaultMuleContext) muleContext).setExtensionManager(extensionManager);
-        try
-        {
-            initialiseIfNeeded(extensionManager, muleContext);
-        }
-        catch (InitialisationException e)
-        {
-            throw new MuleRuntimeException(createStaticMessage("Could not initialise extension manager"), e);
-        }
-
-        return extensionManager;
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public ExtensionManagerAdapter createExtensionManager(MuleContext muleContext) {
+    ExtensionManagerAdapter extensionManager = new DefaultExtensionManager();
+    ((DefaultMuleContext) muleContext).setExtensionManager(extensionManager);
+    try {
+      initialiseIfNeeded(extensionManager, muleContext);
+    } catch (InitialisationException e) {
+      throw new MuleRuntimeException(createStaticMessage("Could not initialise extension manager"), e);
     }
+
+    return extensionManager;
+  }
 }

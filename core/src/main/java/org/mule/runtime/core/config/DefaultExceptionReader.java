@@ -12,36 +12,30 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * This is the default exception reader used if there is no specific one registered
- * for the current exception.
+ * This is the default exception reader used if there is no specific one registered for the current exception.
  */
-public final class DefaultExceptionReader implements ExceptionReader
-{
+public final class DefaultExceptionReader implements ExceptionReader {
 
-    private Map<?, ?> info = new HashMap<Object, Object>();
+  private Map<?, ?> info = new HashMap<Object, Object>();
 
-    public String getMessage(Throwable t)
-    {
-        return t.getMessage();
-    }
+  public String getMessage(Throwable t) {
+    return t.getMessage();
+  }
 
-    public Throwable getCause(Throwable t)
-    {
-        return t.getCause();
-    }
+  public Throwable getCause(Throwable t) {
+    return t.getCause();
+  }
 
-    public Class<?> getExceptionType()
-    {
-        return Throwable.class;
-    }
+  public Class<?> getExceptionType() {
+    return Throwable.class;
+  }
 
-    /**
-     * Returns a map of the non-stanard information stored on the exception
-     * 
-     * @return a map of the non-stanard information stored on the exception
-     */
-    public Map<?, ?> getInfo(Throwable t)
-    {
-        return info;
-    }
+  /**
+   * Returns a map of the non-stanard information stored on the exception
+   * 
+   * @return a map of the non-stanard information stored on the exception
+   */
+  public Map<?, ?> getInfo(Throwable t) {
+    return info;
+  }
 }

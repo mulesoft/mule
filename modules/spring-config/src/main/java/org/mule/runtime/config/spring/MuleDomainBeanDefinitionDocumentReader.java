@@ -11,22 +11,20 @@ import org.mule.runtime.config.spring.dsl.spring.BeanDefinitionFactory;
 import org.mule.runtime.config.spring.parsers.specific.DomainElementsValidator;
 
 /**
- * Allows us to hook in our own Hierarchical Parser delegate. this enables the
- * parsing of custom spring bean elements nested within each other
+ * Allows us to hook in our own Hierarchical Parser delegate. this enables the parsing of custom spring bean elements nested
+ * within each other
  *
  * @since 3.6.0
  */
-public class MuleDomainBeanDefinitionDocumentReader extends MuleBeanDefinitionDocumentReader
-{
+public class MuleDomainBeanDefinitionDocumentReader extends MuleBeanDefinitionDocumentReader {
 
-    public MuleDomainBeanDefinitionDocumentReader(BeanDefinitionFactory beanDefinitionFactory, XmlApplicationParser xmlApplicationParser)
-    {
-        super(beanDefinitionFactory, xmlApplicationParser);
-    }
+  public MuleDomainBeanDefinitionDocumentReader(BeanDefinitionFactory beanDefinitionFactory,
+                                                XmlApplicationParser xmlApplicationParser) {
+    super(beanDefinitionFactory, xmlApplicationParser);
+  }
 
-    @Override
-    protected ElementValidator[] getElementsValidator()
-    {
-        return new ElementValidator[]{new DomainElementsValidator()};
-    }
+  @Override
+  protected ElementValidator[] getElementsValidator() {
+    return new ElementValidator[] {new DomainElementsValidator()};
+  }
 }

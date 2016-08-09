@@ -12,27 +12,25 @@ import org.mule.runtime.core.api.MuleContext;
 import javax.jms.ConnectionFactory;
 
 /**
- * Decorates the jms ConnectionFactory with a {@link org.mule.compatibility.transport.jms.xa.DefaultXAConnectionFactoryWrapper} in order
- * to avoid releasing jms resources before the XA transaction has ended.
+ * Decorates the jms ConnectionFactory with a {@link org.mule.compatibility.transport.jms.xa.DefaultXAConnectionFactoryWrapper} in
+ * order to avoid releasing jms resources before the XA transaction has ended.
  */
-public class DefaultConnectionFactoryDecorator extends AbstractConnectionFactoryDecorator
-{
+public class DefaultConnectionFactoryDecorator extends AbstractConnectionFactoryDecorator {
 
-    @Override
-    protected ConnectionFactory doDecorate(ConnectionFactory connectionFactory, JmsConnector jmsConnector, MuleContext muleContext)
-    {
-        return new DefaultXAConnectionFactoryWrapper(connectionFactory, jmsConnector.getSameRMOverrideValue());
-    }
+  @Override
+  protected ConnectionFactory doDecorate(ConnectionFactory connectionFactory, JmsConnector jmsConnector,
+                                         MuleContext muleContext) {
+    return new DefaultXAConnectionFactoryWrapper(connectionFactory, jmsConnector.getSameRMOverrideValue());
+  }
 
-    @Override
-    public boolean appliesTo(ConnectionFactory connectionFactory, MuleContext muleContext)
-    {
-        return !isConnectionFactoryWrapper(connectionFactory) && isConnectionFactoryXaAndThereIsATxManager(connectionFactory, muleContext);
-    }
+  @Override
+  public boolean appliesTo(ConnectionFactory connectionFactory, MuleContext muleContext) {
+    return !isConnectionFactoryWrapper(connectionFactory)
+        && isConnectionFactoryXaAndThereIsATxManager(connectionFactory, muleContext);
+  }
 
-    private boolean isConnectionFactoryXaAndThereIsATxManager(ConnectionFactory connectionFactory, MuleContext muleContext)
-    {
-        return (isXaConnectionFactory(connectionFactory) && muleContext.getTransactionManager() != null);
-    }
+  private boolean isConnectionFactoryXaAndThereIsATxManager(ConnectionFactory connectionFactory, MuleContext muleContext) {
+    return (isXaConnectionFactory(connectionFactory) && muleContext.getTransactionManager() != null);
+  }
 
 }

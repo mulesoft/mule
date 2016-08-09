@@ -11,11 +11,9 @@ import org.mule.runtime.config.spring.parsers.assembly.configuration.PropertyCon
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 
-public interface BeanAssemblerFactory
-{
+public interface BeanAssemblerFactory {
 
-    BeanAssembler newBeanAssembler(
-            PropertyConfiguration beanConfig, BeanDefinitionBuilder bean,
-            PropertyConfiguration targetConfig, BeanDefinition target);
+  BeanAssembler newBeanAssembler(PropertyConfiguration beanConfig, BeanDefinitionBuilder bean, PropertyConfiguration targetConfig,
+                                 BeanDefinition target);
 
 }

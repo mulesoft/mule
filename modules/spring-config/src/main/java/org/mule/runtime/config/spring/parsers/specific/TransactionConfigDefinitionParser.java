@@ -9,13 +9,11 @@ package org.mule.runtime.config.spring.parsers.specific;
 import org.mule.runtime.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
 
-public class TransactionConfigDefinitionParser extends ChildDefinitionParser
-{
+public class TransactionConfigDefinitionParser extends ChildDefinitionParser {
 
-    public TransactionConfigDefinitionParser()
-    {
-        super("transactionConfig", MuleTransactionConfig.class);
-        addMapping("action", "NONE=0,ALWAYS_BEGIN=1,BEGIN_OR_JOIN=2,ALWAYS_JOIN=3,JOIN_IF_POSSIBLE=4,NOT_SUPPORTED=7");
-    }
+  public TransactionConfigDefinitionParser() {
+    super("transactionConfig", MuleTransactionConfig.class);
+    addMapping("action", "NONE=0,ALWAYS_BEGIN=1,BEGIN_OR_JOIN=2,ALWAYS_JOIN=3,JOIN_IF_POSSIBLE=4,NOT_SUPPORTED=7");
+  }
 
 }

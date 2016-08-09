@@ -15,56 +15,44 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 
 /**
- * <code>MuleObjectNameProcessor</code> is used to set spring ids to Mule object
- * names so the the bean id and name property on the object don't both have to be
- * set.
+ * <code>MuleObjectNameProcessor</code> is used to set spring ids to Mule object names so the the bean id and name property on the
+ * object don't both have to be set.
  */
 
-public class MuleObjectNameProcessor implements BeanPostProcessor
-{
-    private boolean overwrite = false;
-    private final Class<? extends NameableObject> managedTypes[] = new Class[] {
-                                                                                LegacyConnector.class,
-                                                                                Transformer.class,
-                                                                                Agent.class
-    };
+public class MuleObjectNameProcessor implements BeanPostProcessor {
 
-    @Override
-    public Object postProcessBeforeInitialization(Object object, String beanName) throws BeansException
-    {
-        for (Class<? extends NameableObject> managedType : managedTypes)
-        {
-            if (managedType.isInstance(object))
-            {
-                setNameIfNecessary((NameableObject) object, beanName);
-            }
-        }
+  private boolean overwrite = false;
+  private final Class<? extends NameableObject> managedTypes[] =
+      new Class[] {LegacyConnector.class, Transformer.class, Agent.class};
 
-        return object;
+  @Override
+  public Object postProcessBeforeInitialization(Object object, String beanName) throws BeansException {
+    for (Class<? extends NameableObject> managedType : managedTypes) {
+      if (managedType.isInstance(object)) {
+        setNameIfNecessary((NameableObject) object, beanName);
+      }
     }
 
-    private void setNameIfNecessary(NameableObject nameable, String name)
-    {
-        if (nameable.getName() == null || overwrite)
-        {
-            nameable.setName(name);
-        }
-    }
+    return object;
+  }
 
-    @Override
-    public Object postProcessAfterInitialization(Object o, String s) throws BeansException
-    {
-        return o;
+  private void setNameIfNecessary(NameableObject nameable, String name) {
+    if (nameable.getName() == null || overwrite) {
+      nameable.setName(name);
     }
+  }
 
-    public boolean isOverwrite()
-    {
-        return overwrite;
-    }
+  @Override
+  public Object postProcessAfterInitialization(Object o, String s) throws BeansException {
+    return o;
+  }
 
-    public void setOverwrite(boolean overwrite)
-    {
-        this.overwrite = overwrite;
-    }
+  public boolean isOverwrite() {
+    return overwrite;
+  }
+
+  public void setOverwrite(boolean overwrite) {
+    this.overwrite = overwrite;
+  }
 
 }

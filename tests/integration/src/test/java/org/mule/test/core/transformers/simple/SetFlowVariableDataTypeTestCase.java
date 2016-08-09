@@ -21,32 +21,27 @@ import org.mule.runtime.core.api.lifecycle.Callable;
 
 import org.junit.Test;
 
-public class SetFlowVariableDataTypeTestCase extends AbstractIntegrationTestCase
-{
+public class SetFlowVariableDataTypeTestCase extends AbstractIntegrationTestCase {
+
+  @Override
+  protected String getConfigFile() {
+    return "set-flow-variable-data-type-config.xml";
+  }
+
+  @Test
+  public void setsPropertyDataType() throws Exception {
+    final MuleEvent muleEvent = flowRunner("main").withPayload(TEST_MESSAGE).run();
+
+    MuleMessage response = muleEvent.getMessage();
+    DataType dataType = (DataType) response.getPayload();
+    assertThat(dataType, like(String.class, MediaType.XML, UTF_16));
+  }
+
+  public static class FlowVariableDataTypeAccessor implements Callable {
 
     @Override
-    protected String getConfigFile()
-    {
-        return "set-flow-variable-data-type-config.xml";
+    public Object onCall(MuleEventContext eventContext) throws Exception {
+      return eventContext.getEvent().getFlowVariableDataType("testVariable");
     }
-
-    @Test
-    public void setsPropertyDataType() throws Exception
-    {
-        final MuleEvent muleEvent = flowRunner("main").withPayload(TEST_MESSAGE).run();
-
-        MuleMessage response = muleEvent.getMessage();
-        DataType dataType = (DataType) response.getPayload();
-        assertThat(dataType, like(String.class, MediaType.XML, UTF_16));
-    }
-
-    public static class FlowVariableDataTypeAccessor implements Callable
-    {
-
-        @Override
-        public Object onCall(MuleEventContext eventContext) throws Exception
-        {
-            return eventContext.getEvent().getFlowVariableDataType("testVariable");
-        }
-    }
+  }
 }

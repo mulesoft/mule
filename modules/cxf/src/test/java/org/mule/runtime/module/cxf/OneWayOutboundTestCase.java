@@ -22,39 +22,34 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class OneWayOutboundTestCase extends FunctionalTestCase
-{
+public class OneWayOutboundTestCase extends FunctionalTestCase {
 
-    @Rule
-    public DynamicPort httpPort = new DynamicPort("httpPort");
+  @Rule
+  public DynamicPort httpPort = new DynamicPort("httpPort");
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "one-way-outbound-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "one-way-outbound-config.xml";
+  }
 
-    @Test
-    public void jaxwsClientSupportsOneWayCall() throws Exception
-    {
-        MuleEvent event = flowRunner("jaxwsClient").withPayload(TEST_MESSAGE).run();
-        assertOneWayResponse(event);
-    }
+  @Test
+  public void jaxwsClientSupportsOneWayCall() throws Exception {
+    MuleEvent event = flowRunner("jaxwsClient").withPayload(TEST_MESSAGE).run();
+    assertOneWayResponse(event);
+  }
 
-    @Test
-    public void proxyClientSupportsOneWayCall() throws Exception
-    {
-        String message = "<ns:send xmlns:ns=\"http://testmodels.cxf.module.runtime.mule.org/\"><text>hello</text></ns:send>";
-        MuleEvent event = flowRunner("proxyClient").withPayload(message).run();
-        assertOneWayResponse(event);
-    }
+  @Test
+  public void proxyClientSupportsOneWayCall() throws Exception {
+    String message = "<ns:send xmlns:ns=\"http://testmodels.cxf.module.runtime.mule.org/\"><text>hello</text></ns:send>";
+    MuleEvent event = flowRunner("proxyClient").withPayload(message).run();
+    assertOneWayResponse(event);
+  }
 
-    private void assertOneWayResponse(MuleEvent event) throws Exception
-    {
-        assertThat(event.getMessage().getPayload(), is(nullValue()));
-        assertThat(event.getMessage().<Integer> getInboundProperty(HTTP_STATUS_PROPERTY), is(ACCEPTED.getStatusCode()));
+  private void assertOneWayResponse(MuleEvent event) throws Exception {
+    assertThat(event.getMessage().getPayload(), is(nullValue()));
+    assertThat(event.getMessage().<Integer>getInboundProperty(HTTP_STATUS_PROPERTY), is(ACCEPTED.getStatusCode()));
 
-        AsyncService component = (AsyncService) getComponent("asyncService");
-        assertTrue(component.getLatch().await(RECEIVE_TIMEOUT, MILLISECONDS));
-    }
+    AsyncService component = (AsyncService) getComponent("asyncService");
+    assertTrue(component.getLatch().await(RECEIVE_TIMEOUT, MILLISECONDS));
+  }
 }

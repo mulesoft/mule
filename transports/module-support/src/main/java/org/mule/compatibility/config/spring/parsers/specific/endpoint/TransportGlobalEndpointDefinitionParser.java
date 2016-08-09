@@ -12,67 +12,51 @@ import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
 import org.mule.compatibility.core.endpoint.URIBuilder;
 
 /**
- * A parser for global endpoints.  Note that the blocking of "ref" is left to the schema.
+ * A parser for global endpoints. Note that the blocking of "ref" is left to the schema.
  */
-public class TransportGlobalEndpointDefinitionParser extends AddressedEndpointDefinitionParser
-{
+public class TransportGlobalEndpointDefinitionParser extends AddressedEndpointDefinitionParser {
 
-    public TransportGlobalEndpointDefinitionParser(String protocol, String[] requiredAddressAttributes)
-    {
-        this(protocol, PROTOCOL, requiredAddressAttributes);
-    }
+  public TransportGlobalEndpointDefinitionParser(String protocol, String[] requiredAddressAttributes) {
+    this(protocol, PROTOCOL, requiredAddressAttributes);
+  }
 
-    public TransportGlobalEndpointDefinitionParser(String metaOrProtocol, boolean isMeta, String[] requiredAddressAttributes)
-    {
-        this(metaOrProtocol, isMeta, requiredAddressAttributes, new String[]{});
-    }
+  public TransportGlobalEndpointDefinitionParser(String metaOrProtocol, boolean isMeta, String[] requiredAddressAttributes) {
+    this(metaOrProtocol, isMeta, requiredAddressAttributes, new String[] {});
+  }
 
-    /**
-     * @param metaOrProtocol The transport metaOrProtocol ("tcp" etc)
-     * @param isMeta Whether transport is "meta" or not (eg cxf)
-     * @param requiredAddressAttributes A list of attribute names that are required if "address"
-     * isn't present
-     * @param requiredProperties A list of property names that are required if "address" isn't present
-     */
-    public TransportGlobalEndpointDefinitionParser(String metaOrProtocol, boolean isMeta,
-                                                   String[] requiredAddressAttributes, String[] requiredProperties)
-    {
-        super(metaOrProtocol, isMeta, new OrphanEndpointDefinitionParser(EndpointURIEndpointBuilder.class),
-                requiredAddressAttributes, requiredProperties);
-    }
+  /**
+   * @param metaOrProtocol The transport metaOrProtocol ("tcp" etc)
+   * @param isMeta Whether transport is "meta" or not (eg cxf)
+   * @param requiredAddressAttributes A list of attribute names that are required if "address" isn't present
+   * @param requiredProperties A list of property names that are required if "address" isn't present
+   */
+  public TransportGlobalEndpointDefinitionParser(String metaOrProtocol, boolean isMeta, String[] requiredAddressAttributes,
+                                                 String[] requiredProperties) {
+    super(metaOrProtocol, isMeta, new OrphanEndpointDefinitionParser(EndpointURIEndpointBuilder.class), requiredAddressAttributes,
+          requiredProperties);
+  }
 
-    /**
-     * @param metaOrProtocol The transport metaOrProtocol ("tcp" etc)
-     * @param isMeta Whether transport is "meta" or not (eg cxf)
-     * @param requiredAddressAttributes A list of attribute names that are required if "address"
-     * isn't present
-     * @param requiredProperties A list of property names that are required if "address" isn't present
-     */
-    public TransportGlobalEndpointDefinitionParser(String metaOrProtocol, boolean isMeta, Class clazz,
-                                                   String[] requiredAddressAttributes, String[] requiredProperties)
-    {
-        super(metaOrProtocol, isMeta, new OrphanEndpointDefinitionParser(clazz),
-                requiredAddressAttributes, requiredProperties);
-    }
+  /**
+   * @param metaOrProtocol The transport metaOrProtocol ("tcp" etc)
+   * @param isMeta Whether transport is "meta" or not (eg cxf)
+   * @param requiredAddressAttributes A list of attribute names that are required if "address" isn't present
+   * @param requiredProperties A list of property names that are required if "address" isn't present
+   */
+  public TransportGlobalEndpointDefinitionParser(String metaOrProtocol, boolean isMeta, Class clazz,
+                                                 String[] requiredAddressAttributes, String[] requiredProperties) {
+    super(metaOrProtocol, isMeta, new OrphanEndpointDefinitionParser(clazz), requiredAddressAttributes, requiredProperties);
+  }
 
-    public TransportGlobalEndpointDefinitionParser(String metaOrProtocol, boolean isMeta,
-                                                   String[] endpointAttributes,
-                                                   String[][] requiredAddressAttributes,
-                                                   String[][] requiredProperties)
-    {
-        this(metaOrProtocol, isMeta, URIBuilder.ALL_ATTRIBUTES,
-                endpointAttributes, requiredAddressAttributes, requiredProperties);
-    }
+  public TransportGlobalEndpointDefinitionParser(String metaOrProtocol, boolean isMeta, String[] endpointAttributes,
+                                                 String[][] requiredAddressAttributes, String[][] requiredProperties) {
+    this(metaOrProtocol, isMeta, URIBuilder.ALL_ATTRIBUTES, endpointAttributes, requiredAddressAttributes, requiredProperties);
+  }
 
-    public TransportGlobalEndpointDefinitionParser(String metaOrProtocol, boolean isMeta,
-                                                   String[] endpointAttributes,
-                                                   String[] addressAttributes,
-                                                   String[][] requiredAddressAttributes,
-                                                   String[][] requiredProperties)
-    {
-        super(metaOrProtocol, isMeta,
-                new OrphanEndpointDefinitionParser(EndpointURIEndpointBuilder.class),
-                addressAttributes, endpointAttributes, requiredAddressAttributes, requiredProperties);
-    }
+  public TransportGlobalEndpointDefinitionParser(String metaOrProtocol, boolean isMeta, String[] endpointAttributes,
+                                                 String[] addressAttributes, String[][] requiredAddressAttributes,
+                                                 String[][] requiredProperties) {
+    super(metaOrProtocol, isMeta, new OrphanEndpointDefinitionParser(EndpointURIEndpointBuilder.class), addressAttributes,
+          endpointAttributes, requiredAddressAttributes, requiredProperties);
+  }
 
 }

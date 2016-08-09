@@ -21,52 +21,45 @@ import org.mule.tck.probe.Prober;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpDispatcherLifecycleTestCase extends FunctionalTestCase
-{
+public class HttpDispatcherLifecycleTestCase extends FunctionalTestCase {
 
-    @Rule
-    public DynamicPort port = new DynamicPort("httpPort");
+  @Rule
+  public DynamicPort port = new DynamicPort("httpPort");
 
-    private Prober prober = new PollingProber(3000, 500);
+  private Prober prober = new PollingProber(3000, 500);
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "http-dispatcher-lifecycle-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "http-dispatcher-lifecycle-config.xml";
+  }
 
-    @Test
-    public void dispatcherThreadFinishesAfterDispose() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
+  @Test
+  public void dispatcherThreadFinishesAfterDispose() throws Exception {
+    MuleClient client = muleContext.getClient();
 
-        MuleMessage response = client.send("http://localhost:" + port.getValue(), TEST_MESSAGE, null);
-        assertThat(getPayloadAsString(response), equalTo(TEST_MESSAGE));
+    MuleMessage response = client.send("http://localhost:" + port.getValue(), TEST_MESSAGE, null);
+    assertThat(getPayloadAsString(response), equalTo(TEST_MESSAGE));
 
-        muleContext.dispose();
+    muleContext.dispose();
 
-        prober.check(new Probe()
-        {
-            @Override
-            public boolean isSatisfied()
-            {
-                for (Thread thread : Thread.getAllStackTraces().keySet())
-                {
-                    if (thread.getName().startsWith("http.request.dispatch"))
-                    {
-                        return false;
-                    }
-                }
-                return true;
-            }
+    prober.check(new Probe() {
 
-            @Override
-            public String describeFailure()
-            {
-                return "Dispatcher thread was not stopped";
-            }
-        });
+      @Override
+      public boolean isSatisfied() {
+        for (Thread thread : Thread.getAllStackTraces().keySet()) {
+          if (thread.getName().startsWith("http.request.dispatch")) {
+            return false;
+          }
+        }
+        return true;
+      }
 
-    }
+      @Override
+      public String describeFailure() {
+        return "Dispatcher thread was not stopped";
+      }
+    });
+
+  }
 
 }

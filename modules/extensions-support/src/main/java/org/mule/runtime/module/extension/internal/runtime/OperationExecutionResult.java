@@ -13,50 +13,43 @@ import java.util.Optional;
  *
  * @since 4.0
  */
-final class OperationExecutionResult
-{
+final class OperationExecutionResult {
 
-    private final Object output;
-    private final Throwable exception;
-    private final Optional<InterceptorsRetryRequest> retryRequest;
+  private final Object output;
+  private final Throwable exception;
+  private final Optional<InterceptorsRetryRequest> retryRequest;
 
-    public OperationExecutionResult(Object output, Throwable exception, Optional<InterceptorsRetryRequest> retryRequest)
-    {
-        this.output = output;
-        this.exception = exception;
-        this.retryRequest = retryRequest;
-    }
+  public OperationExecutionResult(Object output, Throwable exception, Optional<InterceptorsRetryRequest> retryRequest) {
+    this.output = output;
+    this.exception = exception;
+    this.retryRequest = retryRequest;
+  }
 
-    /**
-     * @return the {@link Throwable} that caused the execution failure
-     */
-    public Throwable getException()
-    {
-        return exception;
-    }
+  /**
+   * @return the {@link Throwable} that caused the execution failure
+   */
+  public Throwable getException() {
+    return exception;
+  }
 
-    /**
-     * @return the return of the operation
-     */
-    public Object getOutput()
-    {
-        return output;
-    }
+  /**
+   * @return the return of the operation
+   */
+  public Object getOutput() {
+    return output;
+  }
 
-    /**
-     * @return the {@link Optional} {@link InterceptorsRetryRequest} which contains if the
-     * interceptors asked to retry the request
-     */
-    public Optional<InterceptorsRetryRequest> getRetryRequest()
-    {
-        return retryRequest;
-    }
+  /**
+   * @return the {@link Optional} {@link InterceptorsRetryRequest} which contains if the interceptors asked to retry the request
+   */
+  public Optional<InterceptorsRetryRequest> getRetryRequest() {
+    return retryRequest;
+  }
 
-    /**
-     * @return boolean that represents if the execution finished correctly
-     */
-    public boolean isOk()
-    {
-        return exception == null;
-    }
+  /**
+   * @return boolean that represents if the execution finished correctly
+   */
+  public boolean isOk() {
+    return exception == null;
+  }
 }

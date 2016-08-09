@@ -10,12 +10,10 @@ package org.mule.compatibility.transport.http;
 import org.junit.Ignore;
 
 @Ignore("MULE-6926: flaky test")
-public class HttpsConnectionTimeoutTestCase extends HttpConnectionTimeoutTestCase
-{
+public class HttpsConnectionTimeoutTestCase extends HttpConnectionTimeoutTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "https-connection-timeout-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "https-connection-timeout-config.xml";
+  }
 }

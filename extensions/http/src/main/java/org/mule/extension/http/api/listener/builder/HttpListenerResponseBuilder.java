@@ -24,53 +24,49 @@ import javax.activation.DataHandler;
  * @since 4.0
  */
 @Alias("response-builder")
-public class HttpListenerResponseBuilder extends HttpMessageBuilder
-{
-    /**
-     * HTTP status code the response should have.
-     */
-    @Parameter
-    @Optional
-    private Function<MuleEvent, Integer> statusCode;
+public class HttpListenerResponseBuilder extends HttpMessageBuilder {
 
-    /**
-     * HTTP reason phrase the response should have.
-     */
-    @Parameter
-    @Optional
-    private Function<MuleEvent, String> reasonPhrase;
+  /**
+   * HTTP status code the response should have.
+   */
+  @Parameter
+  @Optional
+  private Function<MuleEvent, Integer> statusCode;
 
-    /**
-     * HTTP headers the response should have, as an expression. Will override the headers attribute.
-     */
-    @Parameter
-    @Optional
-    private Function<MuleEvent, Map> headersRef;
+  /**
+   * HTTP reason phrase the response should have.
+   */
+  @Parameter
+  @Optional
+  private Function<MuleEvent, String> reasonPhrase;
 
-    /**
-     * HTTP parts the message should include, as an expression. Will override the parts attribute.
-     */
-    @Parameter
-    @Optional
-    private Function<MuleEvent, List> partsRef;
+  /**
+   * HTTP headers the response should have, as an expression. Will override the headers attribute.
+   */
+  @Parameter
+  @Optional
+  private Function<MuleEvent, Map> headersRef;
 
-    public Integer getStatusCode(MuleEvent event)
-    {
-        return statusCode != null ? statusCode.apply(event) : null;
-    }
+  /**
+   * HTTP parts the message should include, as an expression. Will override the parts attribute.
+   */
+  @Parameter
+  @Optional
+  private Function<MuleEvent, List> partsRef;
 
-    public String getReasonPhrase(MuleEvent event)
-    {
-        return reasonPhrase != null ? reasonPhrase.apply(event) : null;
-    }
+  public Integer getStatusCode(MuleEvent event) {
+    return statusCode != null ? statusCode.apply(event) : null;
+  }
 
-    public Map<String, String> getHeaders(MuleEvent event)
-    {
-        return headersRef != null ? headersRef.apply(event) : headers;
-    }
+  public String getReasonPhrase(MuleEvent event) {
+    return reasonPhrase != null ? reasonPhrase.apply(event) : null;
+  }
 
-    public Map<String, DataHandler> getParts(MuleEvent event)
-    {
-        return partsRef != null ? getResolvedParts(partsRef.apply(event)) : getParts();
-    }
+  public Map<String, String> getHeaders(MuleEvent event) {
+    return headersRef != null ? headersRef.apply(event) : headers;
+  }
+
+  public Map<String, DataHandler> getParts(MuleEvent event) {
+    return partsRef != null ? getResolvedParts(partsRef.apply(event)) : getParts();
+  }
 }

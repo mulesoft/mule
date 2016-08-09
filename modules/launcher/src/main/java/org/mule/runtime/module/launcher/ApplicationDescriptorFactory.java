@@ -42,163 +42,137 @@ import org.apache.commons.io.filefilter.SuffixFileFilter;
 /**
  * Creates artifact descriptor for application
  */
-public class ApplicationDescriptorFactory implements ArtifactDescriptorFactory<ApplicationDescriptor>
-{
+public class ApplicationDescriptorFactory implements ArtifactDescriptorFactory<ApplicationDescriptor> {
 
-    public static final String SYSTEM_PROPERTY_OVERRIDE = "-O";
+  public static final String SYSTEM_PROPERTY_OVERRIDE = "-O";
 
-    private final ArtifactPluginRepository applicationPluginRepository;
-    private final ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader;
+  private final ArtifactPluginRepository applicationPluginRepository;
+  private final ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader;
 
-    public ApplicationDescriptorFactory(ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader, ArtifactPluginRepository applicationPluginRepository)
-    {
-        checkArgument(artifactPluginDescriptorLoader != null, "ApplicationPluginDescriptorFactory cannot be null");
-        checkArgument(applicationPluginRepository  != null, "ApplicationPluginRepository cannot be null");
-        this.applicationPluginRepository = applicationPluginRepository;
-        this.artifactPluginDescriptorLoader = artifactPluginDescriptorLoader;
+  public ApplicationDescriptorFactory(ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader,
+                                      ArtifactPluginRepository applicationPluginRepository) {
+    checkArgument(artifactPluginDescriptorLoader != null, "ApplicationPluginDescriptorFactory cannot be null");
+    checkArgument(applicationPluginRepository != null, "ApplicationPluginRepository cannot be null");
+    this.applicationPluginRepository = applicationPluginRepository;
+    this.artifactPluginDescriptorLoader = artifactPluginDescriptorLoader;
+  }
+
+  public ApplicationDescriptor create(File artifactFolder) throws ArtifactDescriptorCreateException {
+    if (!artifactFolder.exists()) {
+      throw new IllegalArgumentException(format("Application directory does not exist: '%s'", artifactFolder));
     }
 
-    public ApplicationDescriptor create(File artifactFolder) throws ArtifactDescriptorCreateException
-    {
-        if (!artifactFolder.exists())
-        {
-            throw new IllegalArgumentException(format("Application directory does not exist: '%s'", artifactFolder));
-        }
+    final String appName = artifactFolder.getName();
+    ApplicationDescriptor desc;
 
-        final String appName = artifactFolder.getName();
-        ApplicationDescriptor desc;
+    try {
+      final File deployPropertiesFile = getDeploymentFile(artifactFolder);
+      if (deployPropertiesFile != null) {
+        // lookup the implementation by extension
+        final PropertiesDescriptorParser descriptorParser = new PropertiesDescriptorParser();
+        desc = descriptorParser.parse(deployPropertiesFile, appName);
+      } else {
+        desc = new EmptyApplicationDescriptor(appName);
+      }
 
-        try
-        {
-            final File deployPropertiesFile = getDeploymentFile(artifactFolder);
-            if (deployPropertiesFile != null)
-            {
-                // lookup the implementation by extension
-                final PropertiesDescriptorParser descriptorParser = new PropertiesDescriptorParser();
-                desc = descriptorParser.parse(deployPropertiesFile, appName);
-            }
-            else
-            {
-                desc = new EmptyApplicationDescriptor(appName);
-            }
+      // get a ref to an optional app props file (right next to the descriptor)
+      final File appPropsFile = new File(artifactFolder, DEFAULT_APP_PROPERTIES_RESOURCE);
+      setApplicationProperties(desc, appPropsFile);
 
-            // get a ref to an optional app props file (right next to the descriptor)
-            final File appPropsFile = new File(artifactFolder, DEFAULT_APP_PROPERTIES_RESOURCE);
-            setApplicationProperties(desc, appPropsFile);
+      final Set<ArtifactPluginDescriptor> plugins = parsePluginDescriptors(artifactFolder, desc);
+      verifyPluginExportedPackages(getAllApplicationPlugins(plugins));
+      desc.setPlugins(plugins);
 
-            final Set<ArtifactPluginDescriptor> plugins = parsePluginDescriptors(artifactFolder, desc);
-            verifyPluginExportedPackages(getAllApplicationPlugins(plugins));
-            desc.setPlugins(plugins);
-
-            desc.setSharedPluginFolder(getAppSharedPluginLibsFolder(appName));
-        }
-        catch (IOException e)
-        {
-            throw new ArtifactDescriptorCreateException("Unable to create application descriptor", e);
-        }
-
-        return desc;
+      desc.setSharedPluginFolder(getAppSharedPluginLibsFolder(appName));
+    } catch (IOException e) {
+      throw new ArtifactDescriptorCreateException("Unable to create application descriptor", e);
     }
 
-    private List<ArtifactPluginDescriptor> getAllApplicationPlugins(Set<ArtifactPluginDescriptor> plugins)
-    {
-        final List<ArtifactPluginDescriptor> result = new LinkedList<>(applicationPluginRepository.getContainerArtifactPluginDescriptors());
-        result.addAll(plugins);
+    return desc;
+  }
 
-        // Sorts plugins by name to ensure consistent deployment
-        result.sort(new Comparator<ArtifactPluginDescriptor>()
-        {
-            @Override
-            public int compare(ArtifactPluginDescriptor descriptor1, ArtifactPluginDescriptor descriptor2)
-            {
-                return descriptor1.getName().compareTo(descriptor2.getName());
-            }
-        });
+  private List<ArtifactPluginDescriptor> getAllApplicationPlugins(Set<ArtifactPluginDescriptor> plugins) {
+    final List<ArtifactPluginDescriptor> result =
+        new LinkedList<>(applicationPluginRepository.getContainerArtifactPluginDescriptors());
+    result.addAll(plugins);
 
-        return result;
+    // Sorts plugins by name to ensure consistent deployment
+    result.sort(new Comparator<ArtifactPluginDescriptor>() {
+
+      @Override
+      public int compare(ArtifactPluginDescriptor descriptor1, ArtifactPluginDescriptor descriptor2) {
+        return descriptor1.getName().compareTo(descriptor2.getName());
+      }
+    });
+
+    return result;
+  }
+
+  private void verifyPluginExportedPackages(List<ArtifactPluginDescriptor> plugins) {
+    final Map<String, List<String>> exportedPackages = new HashMap<>();
+
+    boolean error = false;
+    for (ArtifactPluginDescriptor plugin : plugins) {
+      for (String packageName : plugin.getClassLoaderFilter().getExportedClassPackages()) {
+        List<String> exportedOn = exportedPackages.get(packageName);
+
+        if (exportedOn == null) {
+          exportedOn = new LinkedList<>();
+          exportedPackages.put(packageName, exportedOn);
+        } else {
+          error = true;
+        }
+        exportedOn.add(plugin.getName());
+      }
     }
 
-    private void verifyPluginExportedPackages(List<ArtifactPluginDescriptor> plugins)
-    {
-        final Map<String, List<String>> exportedPackages = new HashMap<>();
+    // TODO(pablo.kraan): MULE-9649 - de add validation when a decision is made about how to, in a plugin,
+  }
 
-        boolean error = false;
-        for (ArtifactPluginDescriptor plugin : plugins)
-        {
-            for (String packageName : plugin.getClassLoaderFilter().getExportedClassPackages())
-            {
-                List<String> exportedOn = exportedPackages.get(packageName);
-
-                if (exportedOn == null)
-                {
-                    exportedOn = new LinkedList<>();
-                    exportedPackages.put(packageName, exportedOn);
-                }
-                else
-                {
-                    error = true;
-                }
-                exportedOn.add(plugin.getName());
-            }
-        }
-
-        //TODO(pablo.kraan): MULE-9649 - de add validation when a decision is made about how to, in a plugin,
+  private Set<ArtifactPluginDescriptor> parsePluginDescriptors(File appDir, ApplicationDescriptor appDescriptor)
+      throws IOException {
+    final File pluginsDir = new File(appDir, PLUGINS_FOLDER);
+    String[] pluginZips = pluginsDir.list(new SuffixFileFilter(".zip"));
+    if (pluginZips == null || pluginZips.length == 0) {
+      return Collections.emptySet();
     }
 
-    private Set<ArtifactPluginDescriptor> parsePluginDescriptors(File appDir, ApplicationDescriptor appDescriptor) throws IOException
-    {
-        final File pluginsDir = new File(appDir, PLUGINS_FOLDER);
-        String[] pluginZips = pluginsDir.list(new SuffixFileFilter(".zip"));
-        if (pluginZips == null || pluginZips.length == 0)
-        {
-            return Collections.emptySet();
-        }
+    Arrays.sort(pluginZips);
+    Set<ArtifactPluginDescriptor> pds = new HashSet<>(pluginZips.length);
 
-        Arrays.sort(pluginZips);
-        Set<ArtifactPluginDescriptor> pds = new HashSet<>(pluginZips.length);
+    for (String pluginZip : pluginZips) {
+      String unpackDestinationFolder = appDescriptor.getName() + separator + PLUGINS_FOLDER + separator;
+      File pluginZipFile = new File(pluginsDir, pluginZip);
+      pds.add(artifactPluginDescriptorLoader
+          .load(pluginZipFile, new File(MuleContainerBootstrapUtils.getMuleTmpDir(), unpackDestinationFolder)));
+    }
+    return pds;
+  }
 
-        for (String pluginZip : pluginZips)
-        {
-            String unpackDestinationFolder = appDescriptor.getName() + separator + PLUGINS_FOLDER + separator;
-            File pluginZipFile = new File(pluginsDir, pluginZip);
-            pds.add(artifactPluginDescriptorLoader.load(pluginZipFile, new File(MuleContainerBootstrapUtils.getMuleTmpDir(),
-                                                                                unpackDestinationFolder)));
-        }
-        return pds;
+  public void setApplicationProperties(ApplicationDescriptor desc, File appPropsFile) {
+    // ugh, no straightforward way to convert a HashTable to a map
+    Map<String, String> m = new HashMap<>();
+
+    if (appPropsFile.exists() && appPropsFile.canRead()) {
+      final Properties props;
+      try {
+        props = PropertiesUtils.loadProperties(appPropsFile.toURI().toURL());
+      } catch (IOException e) {
+        throw new IllegalArgumentException("Unable to obtain application properties file URL", e);
+      }
+      for (Object key : props.keySet()) {
+        m.put(key.toString(), props.getProperty(key.toString()));
+      }
     }
 
-    public void setApplicationProperties(ApplicationDescriptor desc, File appPropsFile)
-    {
-        // ugh, no straightforward way to convert a HashTable to a map
-        Map<String, String> m = new HashMap<>();
-
-        if (appPropsFile.exists() && appPropsFile.canRead())
-        {
-            final Properties props;
-            try
-            {
-                props = PropertiesUtils.loadProperties(appPropsFile.toURI().toURL());
-            }
-            catch (IOException e)
-            {
-                throw new IllegalArgumentException("Unable to obtain application properties file URL", e);
-            }
-            for (Object key : props.keySet())
-            {
-                m.put(key.toString(), props.getProperty(key.toString()));
-            }
-        }
-
-        // Override with any system properties prepended with "-O" for ("override"))
-        Properties sysProps = System.getProperties();
-        for (Map.Entry<Object, Object> entry : sysProps.entrySet())
-        {
-            String key = entry.getKey().toString();
-            if (key.startsWith(SYSTEM_PROPERTY_OVERRIDE))
-            {
-                m.put(key.substring(SYSTEM_PROPERTY_OVERRIDE.length()), entry.getValue().toString());
-            }
-        }
-        desc.setAppProperties(m);
+    // Override with any system properties prepended with "-O" for ("override"))
+    Properties sysProps = System.getProperties();
+    for (Map.Entry<Object, Object> entry : sysProps.entrySet()) {
+      String key = entry.getKey().toString();
+      if (key.startsWith(SYSTEM_PROPERTY_OVERRIDE)) {
+        m.put(key.substring(SYSTEM_PROPERTY_OVERRIDE.length()), entry.getValue().toString());
+      }
     }
+    desc.setAppProperties(m);
+  }
 }

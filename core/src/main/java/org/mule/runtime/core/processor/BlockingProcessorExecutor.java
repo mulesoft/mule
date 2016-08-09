@@ -22,94 +22,78 @@ import org.mule.runtime.core.routing.MessageFilter;
 import java.util.List;
 
 /**
- * This {@link org.mule.runtime.core.api.processor.ProcessorExecutor} implementation executes each {@link org.mule.runtime.core.api.processor.MessageProcessor}
- * in sucession in the same thread until or processors have been invoked or one of the following is returned by a processor:
+ * This {@link org.mule.runtime.core.api.processor.ProcessorExecutor} implementation executes each
+ * {@link org.mule.runtime.core.api.processor.MessageProcessor} in sucession in the same thread until or processors have been
+ * invoked or one of the following is returned by a processor:
  * <li>{@link org.mule.runtime.core.VoidMuleEvent}</li>
  * <li><code>null</code></li>
  */
-public class BlockingProcessorExecutor implements ProcessorExecutor
-{
+public class BlockingProcessorExecutor implements ProcessorExecutor {
 
-    protected final MessageProcessorExecutionTemplate messageProcessorExecutionTemplate;
-    protected final boolean copyOnVoidEvent;
-    protected final List<MessageProcessor> processors;
+  protected final MessageProcessorExecutionTemplate messageProcessorExecutionTemplate;
+  protected final boolean copyOnVoidEvent;
+  protected final List<MessageProcessor> processors;
 
-    protected MuleEvent event;
-    private int index;
+  protected MuleEvent event;
+  private int index;
 
-    public BlockingProcessorExecutor(MuleEvent event, List<MessageProcessor> processors,
-                                     MessageProcessorExecutionTemplate messageProcessorExecutionTemplate, boolean
-            copyOnVoidEvent)
-    {
-        this.event = event;
-        this.processors = processors;
-        this.copyOnVoidEvent = copyOnVoidEvent;
-        this.messageProcessorExecutionTemplate = messageProcessorExecutionTemplate;
+  public BlockingProcessorExecutor(MuleEvent event, List<MessageProcessor> processors,
+                                   MessageProcessorExecutionTemplate messageProcessorExecutionTemplate, boolean copyOnVoidEvent) {
+    this.event = event;
+    this.processors = processors;
+    this.copyOnVoidEvent = copyOnVoidEvent;
+    this.messageProcessorExecutionTemplate = messageProcessorExecutionTemplate;
+  }
+
+  @Override
+  public final MuleEvent execute() throws MessagingException {
+    MuleEvent result = event;
+    while (hasNext() && isEventValid(event)) {
+      result = executeNext();
+      if (!isEventValid(result)) {
+        break;
+      }
+      event = result;
     }
+    return result;
+  }
 
-    @Override
-    public final MuleEvent execute() throws MessagingException
-    {
-        MuleEvent result = event;
-        while (hasNext() && isEventValid(event))
-        {
-            result = executeNext();
-            if (!isEventValid(result))
-            {
-                break;
-            }
-            event = result;
-        }
-        return result;
+  private boolean isEventValid(MuleEvent result) {
+    return result != null && !(result instanceof VoidMuleEvent);
+  }
+
+  protected boolean hasNext() {
+    return index < processors.size();
+  }
+
+  protected MuleEvent executeNext() throws MessagingException {
+    MessageProcessor processor = nextProcessor();
+
+    preProcess(processor);
+
+    if (copyOnVoidEvent
+        && !(processor instanceof Transformer || processor instanceof MessageFilter || processor instanceof Component
+            || (processor instanceof LegacyOutboundEndpoint && !((LegacyOutboundEndpoint) processor).mayReturnVoidEvent()))) {
+      MuleEvent copy = new DefaultMuleEvent(event.getMessage(), event);
+      MuleEvent result = messageProcessorExecutionTemplate.execute(processor, event);
+      if (isUseEventCopy(result)) {
+        OptimizedRequestContext.unsafeSetEvent(copy);
+        result = copy;
+      }
+      return result;
+    } else {
+      return messageProcessorExecutionTemplate.execute(processor, event);
     }
+  }
 
-    private boolean isEventValid(MuleEvent result)
-    {
-        return result != null && !(result instanceof VoidMuleEvent);
-    }
+  protected boolean isUseEventCopy(MuleEvent result) {
+    return VoidMuleEvent.getInstance().equals(result);
+  }
 
-    protected boolean hasNext()
-    {
-        return index < processors.size();
-    }
+  protected void preProcess(MessageProcessor processor) {}
 
-    protected MuleEvent executeNext() throws MessagingException
-    {
-        MessageProcessor processor = nextProcessor();
-
-        preProcess(processor);
-
-        if (copyOnVoidEvent
-            && !(processor instanceof Transformer || processor instanceof MessageFilter || processor instanceof Component
-                 || (processor instanceof LegacyOutboundEndpoint && !((LegacyOutboundEndpoint) processor).mayReturnVoidEvent())))
-        {
-            MuleEvent copy = new DefaultMuleEvent(event.getMessage(), event);
-            MuleEvent result = messageProcessorExecutionTemplate.execute(processor, event);
-            if (isUseEventCopy(result))
-            {
-                OptimizedRequestContext.unsafeSetEvent(copy);
-                result = copy;
-            }
-            return result;
-        }
-        else
-        {
-            return messageProcessorExecutionTemplate.execute(processor, event);
-        }
-    }
-
-    protected boolean isUseEventCopy(MuleEvent result)
-    {
-        return VoidMuleEvent.getInstance().equals(result);
-    }
-
-    protected void preProcess(MessageProcessor processor)
-    {
-    }
-
-    protected MessageProcessor nextProcessor()
-    {
-        return processors.get(index++);
-    }
+  protected MessageProcessor nextProcessor() {
+    return processors.get(index++);
+  }
 
 }

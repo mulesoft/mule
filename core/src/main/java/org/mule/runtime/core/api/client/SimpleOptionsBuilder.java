@@ -11,27 +11,22 @@ import org.mule.runtime.core.client.SimpleOptions;
 /**
  * Most basic options builder that every connector must be able to use for configuration.
  */
-public class SimpleOptionsBuilder extends AbstractBaseOptionsBuilder<SimpleOptionsBuilder, OperationOptions>
-{
+public class SimpleOptionsBuilder extends AbstractBaseOptionsBuilder<SimpleOptionsBuilder, OperationOptions> {
 
-    protected SimpleOptionsBuilder()
-    {
-    }
+  protected SimpleOptionsBuilder() {}
 
-    @Override
-    public OperationOptions build()
-    {
-        return new SimpleOptions(getResponseTimeout(), isOutbound());
-    }
+  @Override
+  public OperationOptions build() {
+    return new SimpleOptions(getResponseTimeout(), isOutbound());
+  }
 
-    /**
-     * Factory method for the builder.
-     *
-     * @return a new options builder
-     */
-    public static SimpleOptionsBuilder newOptions()
-    {
-        return new SimpleOptionsBuilder();
-    }
+  /**
+   * Factory method for the builder.
+   *
+   * @return a new options builder
+   */
+  public static SimpleOptionsBuilder newOptions() {
+    return new SimpleOptionsBuilder();
+  }
 
 }

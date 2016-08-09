@@ -22,148 +22,126 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-public class ChoiceExceptionStrategyTestCase extends AbstractIntegrationTestCase
-{
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
+public class ChoiceExceptionStrategyTestCase extends AbstractIntegrationTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/integration/exceptions/choice-exception-strategy.xml";
-    }
+  @Rule
+  public ExpectedException expectedException = ExpectedException.none();
 
-    @Test
-    public void testMatchesCorrectExceptionStrategy() throws Exception
-    {
-        callAndThrowException(new IllegalStateException(), "0 catch-2");
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/integration/exceptions/choice-exception-strategy.xml";
+  }
 
-    @Test
-    public void testMatchesCorrectExceptionStrategyUsingWrapper() throws Exception
-    {
-        callAndThrowException(new ResolverException(CoreMessages.createStaticMessage(""), new IllegalStateException()), "0 catch-2");
-    }
+  @Test
+  public void testMatchesCorrectExceptionStrategy() throws Exception {
+    callAndThrowException(new IllegalStateException(), "0 catch-2");
+  }
 
-    @Test
-    public void testMatchesCorrectExceptionStrategyUsingWrapperAndCause() throws Exception
-    {
-        callAndThrowException(new ResolverException(CoreMessages.createStaticMessage(""), new RuntimeException(new IllegalStateException())), "0 catch-2");
-    }
+  @Test
+  public void testMatchesCorrectExceptionStrategyUsingWrapper() throws Exception {
+    callAndThrowException(new ResolverException(CoreMessages.createStaticMessage(""), new IllegalStateException()), "0 catch-2");
+  }
 
-    @Test
-    public void testMatchesCorrectExceptionStrategyUsingBaseClass() throws Exception
-    {
-        callAndThrowException(new BaseException(), "0 catch-3");
-    }
+  @Test
+  public void testMatchesCorrectExceptionStrategyUsingWrapperAndCause() throws Exception {
+    callAndThrowException(new ResolverException(CoreMessages.createStaticMessage(""),
+                                                new RuntimeException(new IllegalStateException())),
+                          "0 catch-2");
+  }
 
-    @Test
-    public void testMatchesCorrectExceptionStrategyUsingSubtypeClass() throws Exception
-    {
-        callAndThrowException(new ResolverException(CoreMessages.createStaticMessage(""), new SubtypeException()), "0 catch-4");
-    }
+  @Test
+  public void testMatchesCorrectExceptionStrategyUsingBaseClass() throws Exception {
+    callAndThrowException(new BaseException(), "0 catch-3");
+  }
 
-    @Test
-    public void testMatchesCorrectExceptionStrategyUsingSubtypeSubtypeClass() throws Exception
-    {
-        callAndThrowException(new SubtypeSubtypeException(), "0 catch-4");
-    }
+  @Test
+  public void testMatchesCorrectExceptionStrategyUsingSubtypeClass() throws Exception {
+    callAndThrowException(new ResolverException(CoreMessages.createStaticMessage(""), new SubtypeException()), "0 catch-4");
+  }
 
-    @Test
-    public void testMatchesCorrectExceptionStrategyUsingRegex() throws Exception
-    {
-        callAndThrowException(new AnotherTypeMyException(), "0 catch-5");
-    }
-    
-    @Test
-    public void testMatchesCorrectExceptionStrategyUsingGroovyExpressionEvaluator() throws Exception
-    {
-        callAndThrowException("groovy", new SQLDataException(), "groovy catch-6");
-    }
+  @Test
+  public void testMatchesCorrectExceptionStrategyUsingSubtypeSubtypeClass() throws Exception {
+    callAndThrowException(new SubtypeSubtypeException(), "0 catch-4");
+  }
 
-    @Test
-    public void testMatchesCorrectExceptionStrategyUsingStartsWithWildcard() throws Exception
-    {
-        callAndThrowException(new StartsWithException(), "0 catch-7");
-    }
+  @Test
+  public void testMatchesCorrectExceptionStrategyUsingRegex() throws Exception {
+    callAndThrowException(new AnotherTypeMyException(), "0 catch-5");
+  }
 
-    @Test
-    public void testMatchesCorrectExceptionStrategyUsingFinishesWithWildcard() throws Exception
-    {
-        callAndThrowException(new ThisExceptionFinishesWithException(), "0 catch-8");
-    }
+  @Test
+  public void testMatchesCorrectExceptionStrategyUsingGroovyExpressionEvaluator() throws Exception {
+    callAndThrowException("groovy", new SQLDataException(), "groovy catch-6");
+  }
 
-    @Test
-    public void testMatchesCorrectExceptionStrategyUsingMatchesAll() throws Exception
-    {
-        callAndThrowException(new AnotherTotallyDifferentKindOfException(), "0 catch-9");
-    }
-    
-    @Test
-    public void testMatchesCorrectExceptionStrategyUsingFinishesWithSomethingElse() throws Exception
-    {
-        callAndThrowException(new ThisExceptionFinishesWithSomethingElse(), "0 groovified");
-    }
+  @Test
+  public void testMatchesCorrectExceptionStrategyUsingStartsWithWildcard() throws Exception {
+    callAndThrowException(new StartsWithException(), "0 catch-7");
+  }
 
-    @Test
-    public void testMatchesCorrectExceptionUsingNoCause() throws Exception
-    {
-        expectedException.expect(ComponentException.class);
-        expectedException.expectCause(instanceOf(ResolverException.class));
-        callAndThrowException(new ResolverException(CoreMessages.createStaticMessage("")), null);
-    }
+  @Test
+  public void testMatchesCorrectExceptionStrategyUsingFinishesWithWildcard() throws Exception {
+    callAndThrowException(new ThisExceptionFinishesWithException(), "0 catch-8");
+  }
 
-    @Test
-    public void testNoMatchThenCallDefaultExceptionStrategy() throws Exception
-    {
-        callAndThrowException(new ArithmeticException(), "0 global catch es");
-    }
+  @Test
+  public void testMatchesCorrectExceptionStrategyUsingMatchesAll() throws Exception {
+    callAndThrowException(new AnotherTotallyDifferentKindOfException(), "0 catch-9");
+  }
 
-    private void callAndThrowException(final Exception exceptionToThrow, final String expectedMessage) throws Exception
-    {
-        callAndThrowException("0", exceptionToThrow, expectedMessage);
-    }
-    
-    private void callAndThrowException(Object payload, final Exception exceptionToThrow, final String expectedMessage) throws Exception
-    {
-        FunctionalTestComponent ftc = getFunctionalTestComponent("matchesCorrectExceptionStrategyUsingExceptionType");
-        ftc.setEventCallback((context, component) ->
-        {
-            throw exceptionToThrow;
-        });
-        MuleMessage response = flowRunner("matchesCorrectExceptionStrategyUsingExceptionType").withPayload(payload).run().getMessage();
-        assertThat(getPayloadAsString(response), is(expectedMessage));
-    }
+  @Test
+  public void testMatchesCorrectExceptionStrategyUsingFinishesWithSomethingElse() throws Exception {
+    callAndThrowException(new ThisExceptionFinishesWithSomethingElse(), "0 groovified");
+  }
 
-    public static class BaseException extends Exception
-    {
-    }
+  @Test
+  public void testMatchesCorrectExceptionUsingNoCause() throws Exception {
+    expectedException.expect(ComponentException.class);
+    expectedException.expectCause(instanceOf(ResolverException.class));
+    callAndThrowException(new ResolverException(CoreMessages.createStaticMessage("")), null);
+  }
 
-    public static class SubtypeException extends BaseException
-    {
-    }
+  @Test
+  public void testNoMatchThenCallDefaultExceptionStrategy() throws Exception {
+    callAndThrowException(new ArithmeticException(), "0 global catch es");
+  }
 
-    public static class SubtypeSubtypeException extends SubtypeException
-    {
-    }
+  private void callAndThrowException(final Exception exceptionToThrow, final String expectedMessage) throws Exception {
+    callAndThrowException("0", exceptionToThrow, expectedMessage);
+  }
 
-    public static class AnotherTypeMyException extends Exception
-    {
-    }
+  private void callAndThrowException(Object payload, final Exception exceptionToThrow, final String expectedMessage)
+      throws Exception {
+    FunctionalTestComponent ftc = getFunctionalTestComponent("matchesCorrectExceptionStrategyUsingExceptionType");
+    ftc.setEventCallback((context, component) -> {
+      throw exceptionToThrow;
+    });
+    MuleMessage response =
+        flowRunner("matchesCorrectExceptionStrategyUsingExceptionType").withPayload(payload).run().getMessage();
+    assertThat(getPayloadAsString(response), is(expectedMessage));
+  }
 
-    public static class StartsWithException extends Exception
-    {
-    }
+  public static class BaseException extends Exception {
+  }
 
-    public static class ThisExceptionFinishesWithException extends Exception
-    {
-    }
+  public static class SubtypeException extends BaseException {
+  }
 
-    public static class ThisExceptionFinishesWithSomethingElse extends Exception
-    {
-    }
+  public static class SubtypeSubtypeException extends SubtypeException {
+  }
 
-    public static class AnotherTotallyDifferentKindOfException extends Exception
-    {
-    }
+  public static class AnotherTypeMyException extends Exception {
+  }
+
+  public static class StartsWithException extends Exception {
+  }
+
+  public static class ThisExceptionFinishesWithException extends Exception {
+  }
+
+  public static class ThisExceptionFinishesWithSomethingElse extends Exception {
+  }
+
+  public static class AnotherTotallyDifferentKindOfException extends Exception {
+  }
 }

@@ -9,7 +9,6 @@ package org.mule.runtime.core.api.processor;
 /**
  * Marker interface that tells that a Message Processor is for internal use only.
  */
-public interface InternalMessageProcessor
-{
+public interface InternalMessageProcessor {
 
 }

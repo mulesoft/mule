@@ -19,97 +19,76 @@ import org.springframework.beans.factory.support.InstantiationStrategy;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 
 /**
- * A {@link InstantiationStrategy} which doesn't fail if a bean
- * cannot be instantiated, as long as such bean has been marked as optional
- * in a {@link OptionalObjectsController}. In such case, the object
- * is marked as discarded with the controller and a placeholder object is returned.
+ * A {@link InstantiationStrategy} which doesn't fail if a bean cannot be instantiated, as long as such bean has been marked as
+ * optional in a {@link OptionalObjectsController}. In such case, the object is marked as discarded with the controller and a
+ * placeholder object is returned.
  * <p/>
- * This object delegates actual instantiation into a {@code delegate} which
- * it wraps
+ * This object delegates actual instantiation into a {@code delegate} which it wraps
  *
  * @since 3.7.0
  * @see DiscardedOptionalBeanPostProcessor
  */
-public class LaxInstantiationStrategyWrapper implements InstantiationStrategy
-{
+public class LaxInstantiationStrategyWrapper implements InstantiationStrategy {
 
-    private final InstantiationStrategy delegate;
-    private final OptionalObjectsController optionalObjectsController;
+  private final InstantiationStrategy delegate;
+  private final OptionalObjectsController optionalObjectsController;
 
-    public LaxInstantiationStrategyWrapper(InstantiationStrategy delegate, OptionalObjectsController optionalObjectsController)
-    {
-        this.delegate = delegate;
-        this.optionalObjectsController = optionalObjectsController;
+  public LaxInstantiationStrategyWrapper(InstantiationStrategy delegate, OptionalObjectsController optionalObjectsController) {
+    this.delegate = delegate;
+    this.optionalObjectsController = optionalObjectsController;
+  }
+
+  @Override
+  public Object instantiate(RootBeanDefinition bd, String beanName, BeanFactory owner) throws BeansException {
+    // TODO MULE-10002 - review approach to load the internal classes of the extensions when using them in the parsers.
+    return withContextClassLoader(getClassLoader(bd), () -> {
+      try {
+        return delegate.instantiate(bd, beanName, owner);
+      } catch (BeansException e) {
+        return failIfNotOptional(e, beanName);
+      }
+    });
+  }
+
+  private ClassLoader getClassLoader(RootBeanDefinition bd) {
+    try {
+      return bd.getBeanClass().getClassLoader();
+    } catch (IllegalStateException e) {
+      return Thread.currentThread().getContextClassLoader();
     }
+  }
 
-    @Override
-    public Object instantiate(RootBeanDefinition bd, String beanName, BeanFactory owner) throws BeansException
-    {
-        //TODO MULE-10002 - review approach to load the internal classes of the extensions when using them in the parsers.
-        return withContextClassLoader(getClassLoader(bd), () -> {
-            try
-            {
-                return delegate.instantiate(bd, beanName, owner);
-            }
-            catch (BeansException e)
-            {
-                return failIfNotOptional(e, beanName);
-            }
-        });
-    }
+  @Override
+  public Object instantiate(RootBeanDefinition bd, String beanName, BeanFactory owner, Constructor<?> ctor, Object... args)
+      throws BeansException {
+    return withContextClassLoader(getClassLoader(bd), () -> {
+      try {
+        return delegate.instantiate(bd, beanName, owner, ctor, args);
+      } catch (BeansException e) {
+        return failIfNotOptional(e, beanName);
+      }
+    });
+  }
 
-    private ClassLoader getClassLoader(RootBeanDefinition bd)
-    {
-        try
-        {
-            return bd.getBeanClass().getClassLoader();
-        }
-        catch (IllegalStateException e)
-        {
-            return Thread.currentThread().getContextClassLoader();
-        }
-    }
+  @Override
+  public Object instantiate(RootBeanDefinition bd, String beanName, BeanFactory owner, Object factoryBean, Method factoryMethod,
+                            Object... args)
+      throws BeansException {
+    return withContextClassLoader(getClassLoader(bd), () -> {
+      try {
+        return delegate.instantiate(bd, beanName, owner, factoryBean, factoryMethod, args);
+      } catch (BeansException e) {
+        return failIfNotOptional(e, beanName);
+      }
+    });
+  }
 
-    @Override
-    public Object instantiate(RootBeanDefinition bd, String beanName, BeanFactory owner, Constructor<?> ctor, Object... args) throws BeansException
-    {
-        return withContextClassLoader(getClassLoader(bd), () -> {
-            try
-            {
-                return delegate.instantiate(bd, beanName, owner, ctor, args);
-            }
-            catch (BeansException e)
-            {
-                return failIfNotOptional(e, beanName);
-            }
-        });
+  private Object failIfNotOptional(BeansException exception, String beanName) throws BeansException {
+    if (optionalObjectsController.isOptional(beanName)) {
+      optionalObjectsController.discardOptionalObject(beanName);
+      return optionalObjectsController.getDiscardedObjectPlaceholder();
+    } else {
+      throw exception;
     }
-
-    @Override
-    public Object instantiate(RootBeanDefinition bd, String beanName, BeanFactory owner, Object factoryBean, Method factoryMethod, Object... args) throws BeansException
-    {
-        return withContextClassLoader(getClassLoader(bd), () -> {
-            try
-            {
-                return delegate.instantiate(bd, beanName, owner, factoryBean, factoryMethod, args);
-            }
-            catch (BeansException e)
-            {
-                return failIfNotOptional(e, beanName);
-            }
-        });
-    }
-
-    private Object failIfNotOptional(BeansException exception, String beanName) throws BeansException
-    {
-        if (optionalObjectsController.isOptional(beanName))
-        {
-            optionalObjectsController.discardOptionalObject(beanName);
-            return optionalObjectsController.getDiscardedObjectPlaceholder();
-        }
-        else
-        {
-            throw exception;
-        }
-    }
+  }
 }

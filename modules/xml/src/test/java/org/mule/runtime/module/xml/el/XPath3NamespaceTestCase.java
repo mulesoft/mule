@@ -14,20 +14,17 @@ import java.io.InputStream;
 
 import org.junit.Test;
 
-public class XPath3NamespaceTestCase extends FunctionalTestCase
-{
+public class XPath3NamespaceTestCase extends FunctionalTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "xpath-namespace-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "xpath-namespace-config.xml";
+  }
 
-    @Test
-    public void xpathWithNamespace() throws Exception
-    {
-        InputStream soapEnvelope = getClass().getResourceAsStream("/request.xml");
-        String result = getPayloadAsString(flowRunner("xpathWithNamespace").withPayload(soapEnvelope).run().getMessage());
-        assertThat(result, equalTo("Hello!"));
-    }
+  @Test
+  public void xpathWithNamespace() throws Exception {
+    InputStream soapEnvelope = getClass().getResourceAsStream("/request.xml");
+    String result = getPayloadAsString(flowRunner("xpathWithNamespace").withPayload(soapEnvelope).run().getMessage());
+    assertThat(result, equalTo("Hello!"));
+  }
 }

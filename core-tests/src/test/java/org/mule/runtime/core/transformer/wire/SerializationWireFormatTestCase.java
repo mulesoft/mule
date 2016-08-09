@@ -12,27 +12,23 @@ import org.mule.runtime.core.api.transformer.wire.WireFormat;
 import org.mule.runtime.core.transformer.simple.ByteArrayToSerializable;
 import org.mule.runtime.core.transformer.simple.SerializableToByteArray;
 
-public class SerializationWireFormatTestCase extends AbstractWireFormatTestCase
-{
+public class SerializationWireFormatTestCase extends AbstractWireFormatTestCase {
 
-    @Override
-    protected WireFormat getWireFormat() throws Exception
-    {
-        return createObject(SerializationWireFormat.class);
-    }
+  @Override
+  protected WireFormat getWireFormat() throws Exception {
+    return createObject(SerializationWireFormat.class);
+  }
 
-    @Override
-    public void testGetDefaultInboundTransformer()
-    {
-        SerializationWireFormat wireFormat = new SerializationWireFormat();
-        assertEquals(ByteArrayToSerializable.class, wireFormat.getInboundTransformer().getClass());
-    }
+  @Override
+  public void testGetDefaultInboundTransformer() {
+    SerializationWireFormat wireFormat = new SerializationWireFormat();
+    assertEquals(ByteArrayToSerializable.class, wireFormat.getInboundTransformer().getClass());
+  }
 
-    @Override
-    public void testGetDefaultOutboundTransformer()
-    {
-        SerializationWireFormat wireFormat = new SerializationWireFormat();
-        assertEquals(SerializableToByteArray.class, wireFormat.getOutboundTransformer().getClass());
-    }
+  @Override
+  public void testGetDefaultOutboundTransformer() {
+    SerializationWireFormat wireFormat = new SerializationWireFormat();
+    assertEquals(SerializableToByteArray.class, wireFormat.getOutboundTransformer().getClass());
+  }
 
 }

@@ -9,17 +9,14 @@ package org.mule.runtime.core.util.concurrent;
 import java.util.concurrent.CountDownLatch;
 
 // @ThreadSafe
-public class Latch extends CountDownLatch
-{
+public class Latch extends CountDownLatch {
 
-    public Latch()
-    {
-        super(1);
-    }
+  public Latch() {
+    super(1);
+  }
 
-    public void release()
-    {
-        countDown();
-    }
+  public void release() {
+    countDown();
+  }
 
 }

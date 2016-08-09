@@ -24,189 +24,166 @@ import java.util.List;
 
 import org.junit.Test;
 
-public class InterceptorTestCase extends AbstractMuleContextTestCase
-{
-    private final String BEFORE = "Before";
-    private final String AFTER = "After";
-    private final String COMPONENT = "component";
-    private final String INTERCEPTOR_ONE = "inteceptor1";
-    private final String INTERCEPTOR_TWO = "inteceptor2";
-    private final String INTERCEPTOR_THREE = "inteceptor3";
+public class InterceptorTestCase extends AbstractMuleContextTestCase {
 
-    private final String SINGLE_INTERCEPTOR_RESULT = INTERCEPTOR_ONE + BEFORE + COMPONENT + INTERCEPTOR_ONE
-                                                     + AFTER;
-    private final String MULTIPLE_INTERCEPTOR_RESULT = INTERCEPTOR_ONE + BEFORE + INTERCEPTOR_TWO + BEFORE
-                                                       + INTERCEPTOR_THREE + BEFORE + COMPONENT
-                                                       + INTERCEPTOR_THREE + AFTER + INTERCEPTOR_TWO + AFTER
-                                                       + INTERCEPTOR_ONE + AFTER;
+  private final String BEFORE = "Before";
+  private final String AFTER = "After";
+  private final String COMPONENT = "component";
+  private final String INTERCEPTOR_ONE = "inteceptor1";
+  private final String INTERCEPTOR_TWO = "inteceptor2";
+  private final String INTERCEPTOR_THREE = "inteceptor3";
 
-    @Test
-    public void testSingleInterceptor() throws Exception
-    {
-        Flow flow = createUninitializedFlow();
-        TestComponent component = (TestComponent) flow.getMessageProcessors().get(0);
+  private final String SINGLE_INTERCEPTOR_RESULT = INTERCEPTOR_ONE + BEFORE + COMPONENT + INTERCEPTOR_ONE + AFTER;
+  private final String MULTIPLE_INTERCEPTOR_RESULT = INTERCEPTOR_ONE + BEFORE + INTERCEPTOR_TWO + BEFORE + INTERCEPTOR_THREE
+      + BEFORE + COMPONENT + INTERCEPTOR_THREE + AFTER + INTERCEPTOR_TWO + AFTER + INTERCEPTOR_ONE + AFTER;
 
-        List<Interceptor> interceptors = new ArrayList<>();
-        interceptors.add(new TestInterceptor(INTERCEPTOR_ONE));
-        component.setInterceptors(interceptors);
-        flow.initialise();
-        flow.start();
+  @Test
+  public void testSingleInterceptor() throws Exception {
+    Flow flow = createUninitializedFlow();
+    TestComponent component = (TestComponent) flow.getMessageProcessors().get(0);
 
-        MuleEvent result = component.process(getTestEvent(""));
+    List<Interceptor> interceptors = new ArrayList<>();
+    interceptors.add(new TestInterceptor(INTERCEPTOR_ONE));
+    component.setInterceptors(interceptors);
+    flow.initialise();
+    flow.start();
 
-        assertEquals(SINGLE_INTERCEPTOR_RESULT, result.getMessageAsString());
+    MuleEvent result = component.process(getTestEvent(""));
+
+    assertEquals(SINGLE_INTERCEPTOR_RESULT, result.getMessageAsString());
+  }
+
+  @Test
+  public void testMultipleInterceptor() throws Exception {
+    Flow flow = createUninitializedFlow();
+    TestComponent component = (TestComponent) flow.getMessageProcessors().get(0);
+
+    List<Interceptor> interceptors = new ArrayList<>();
+    interceptors.add(new TestInterceptor(INTERCEPTOR_ONE));
+    interceptors.add(new TestInterceptor(INTERCEPTOR_TWO));
+    interceptors.add(new TestInterceptor(INTERCEPTOR_THREE));
+    component.setInterceptors(interceptors);
+    flow.initialise();
+    flow.start();
+
+    MuleEvent result = component.process(getTestEvent(""));
+
+    assertEquals(MULTIPLE_INTERCEPTOR_RESULT, result.getMessageAsString());
+  }
+
+  @Test
+  public void testSingleInterceptorStack() throws Exception {
+    Flow flow = createUninitializedFlow();
+    TestComponent component = (TestComponent) flow.getMessageProcessors().get(0);
+
+    List<Interceptor> interceptors = new ArrayList<>();
+    List<Interceptor> stackInterceptors = new ArrayList<>();
+    stackInterceptors.add(new TestInterceptor(INTERCEPTOR_ONE));
+    interceptors.add(new InterceptorStack(stackInterceptors));
+    component.setInterceptors(interceptors);
+    flow.initialise();
+    flow.start();
+
+    MuleEvent result = component.process(getTestEvent(""));
+
+    assertEquals(SINGLE_INTERCEPTOR_RESULT, result.getMessageAsString());
+  }
+
+  @Test
+  public void testMultipleInterceptorStack() throws Exception {
+    Flow flow = createUninitializedFlow();
+    TestComponent component = (TestComponent) flow.getMessageProcessors().get(0);
+
+    List<Interceptor> interceptors = new ArrayList<>();
+    interceptors.add(new TestInterceptor(INTERCEPTOR_ONE));
+    List<Interceptor> stackInterceptors = new ArrayList<>();
+    stackInterceptors.add(new TestInterceptor(INTERCEPTOR_TWO));
+    stackInterceptors.add(new TestInterceptor(INTERCEPTOR_THREE));
+    interceptors.add(new InterceptorStack(stackInterceptors));
+    component.setInterceptors(interceptors);
+    flow.initialise();
+    flow.start();
+
+    MuleEvent result = component.process(getTestEvent(""));
+
+    assertEquals(MULTIPLE_INTERCEPTOR_RESULT, result.getMessageAsString());
+  }
+
+  @Test
+  public void testMultipleInterceptorStack2() throws Exception {
+    Flow flow = createUninitializedFlow();
+    TestComponent component = (TestComponent) flow.getMessageProcessors().get(0);
+
+    List<Interceptor> interceptors = new ArrayList<>();
+    interceptors.add(new TestInterceptor(INTERCEPTOR_ONE));
+    interceptors.add(new TestInterceptor(INTERCEPTOR_TWO));
+    interceptors.add(new TestInterceptor(INTERCEPTOR_THREE));
+    List<Interceptor> stackInterceptors = new ArrayList<>();
+    stackInterceptors.add(new TestInterceptor(INTERCEPTOR_ONE));
+    stackInterceptors.add(new TestInterceptor(INTERCEPTOR_TWO));
+    stackInterceptors.add(new TestInterceptor(INTERCEPTOR_THREE));
+    interceptors.add(new InterceptorStack(stackInterceptors));
+    component.setInterceptors(interceptors);
+    flow.initialise();
+    flow.start();
+
+    MuleEvent result = component.process(getTestEvent(""));
+
+    assertEquals(INTERCEPTOR_ONE + BEFORE + INTERCEPTOR_TWO + BEFORE + INTERCEPTOR_THREE + BEFORE + INTERCEPTOR_ONE + BEFORE
+        + INTERCEPTOR_TWO + BEFORE + INTERCEPTOR_THREE + BEFORE + COMPONENT + INTERCEPTOR_THREE + AFTER + INTERCEPTOR_TWO + AFTER
+        + INTERCEPTOR_ONE + AFTER + INTERCEPTOR_THREE + AFTER + INTERCEPTOR_TWO + AFTER + INTERCEPTOR_ONE + AFTER,
+                 result.getMessageAsString());
+  }
+
+  class TestInterceptor extends AbstractEnvelopeInterceptor {
+
+    private String name;
+
+    public TestInterceptor(String name) {
+      this.name = name;
     }
 
-    @Test
-    public void testMultipleInterceptor() throws Exception
-    {
-        Flow flow = createUninitializedFlow();
-        TestComponent component = (TestComponent) flow.getMessageProcessors().get(0);
-
-        List<Interceptor> interceptors = new ArrayList<>();
-        interceptors.add(new TestInterceptor(INTERCEPTOR_ONE));
-        interceptors.add(new TestInterceptor(INTERCEPTOR_TWO));
-        interceptors.add(new TestInterceptor(INTERCEPTOR_THREE));
-        component.setInterceptors(interceptors);
-        flow.initialise();
-        flow.start();
-
-        MuleEvent result = component.process(getTestEvent(""));
-
-        assertEquals(MULTIPLE_INTERCEPTOR_RESULT, result.getMessageAsString());
+    @Override
+    public MuleEvent after(MuleEvent event) {
+      try {
+        event.setMessage(MuleMessage.builder(event.getMessage()).payload(getPayloadAsString(event.getMessage()) + name + AFTER)
+            .build());
+      } catch (Exception e) {
+        fail(e.getMessage());
+      }
+      return event;
     }
 
-    @Test
-    public void testSingleInterceptorStack() throws Exception
-    {
-        Flow flow = createUninitializedFlow();
-        TestComponent component = (TestComponent) flow.getMessageProcessors().get(0);
-
-        List<Interceptor> interceptors = new ArrayList<>();
-        List<Interceptor> stackInterceptors = new ArrayList<>();
-        stackInterceptors.add(new TestInterceptor(INTERCEPTOR_ONE));
-        interceptors.add(new InterceptorStack(stackInterceptors));
-        component.setInterceptors(interceptors);
-        flow.initialise();
-        flow.start();
-
-        MuleEvent result = component.process(getTestEvent(""));
-
-        assertEquals(SINGLE_INTERCEPTOR_RESULT, result.getMessageAsString());
+    @Override
+    public MuleEvent before(MuleEvent event) {
+      try {
+        event.setMessage(MuleMessage.builder(event.getMessage()).payload(getPayloadAsString(event.getMessage()) + name + BEFORE)
+            .build());
+      } catch (Exception e) {
+        fail(e.getMessage());
+      }
+      return event;
     }
 
-    @Test
-    public void testMultipleInterceptorStack() throws Exception
-    {
-        Flow flow = createUninitializedFlow();
-        TestComponent component = (TestComponent) flow.getMessageProcessors().get(0);
-
-        List<Interceptor> interceptors = new ArrayList<>();
-        interceptors.add(new TestInterceptor(INTERCEPTOR_ONE));
-        List<Interceptor> stackInterceptors = new ArrayList<>();
-        stackInterceptors.add(new TestInterceptor(INTERCEPTOR_TWO));
-        stackInterceptors.add(new TestInterceptor(INTERCEPTOR_THREE));
-        interceptors.add(new InterceptorStack(stackInterceptors));
-        component.setInterceptors(interceptors);
-        flow.initialise();
-        flow.start();
-
-        MuleEvent result = component.process(getTestEvent(""));
-
-        assertEquals(MULTIPLE_INTERCEPTOR_RESULT, result.getMessageAsString());
+    @Override
+    public MuleEvent last(MuleEvent event, ProcessingTime time, long startTime, boolean exceptionWasThrown) throws MuleException {
+      return event;
     }
+  }
 
-    @Test
-    public void testMultipleInterceptorStack2() throws Exception
-    {
-        Flow flow = createUninitializedFlow();
-        TestComponent component = (TestComponent) flow.getMessageProcessors().get(0);
+  protected Flow createUninitializedFlow() throws Exception {
+    TestComponent component = new TestComponent();
+    Flow flow = new Flow("name", muleContext);
+    flow.setMessageProcessors(new ArrayList<MessageProcessor>());
+    flow.getMessageProcessors().add(component);
+    return flow;
+  }
 
-        List<Interceptor> interceptors = new ArrayList<>();
-        interceptors.add(new TestInterceptor(INTERCEPTOR_ONE));
-        interceptors.add(new TestInterceptor(INTERCEPTOR_TWO));
-        interceptors.add(new TestInterceptor(INTERCEPTOR_THREE));
-        List<Interceptor> stackInterceptors = new ArrayList<>();
-        stackInterceptors.add(new TestInterceptor(INTERCEPTOR_ONE));
-        stackInterceptors.add(new TestInterceptor(INTERCEPTOR_TWO));
-        stackInterceptors.add(new TestInterceptor(INTERCEPTOR_THREE));
-        interceptors.add(new InterceptorStack(stackInterceptors));
-        component.setInterceptors(interceptors);
-        flow.initialise();
-        flow.start();
+  class TestComponent extends AbstractComponent {
 
-        MuleEvent result = component.process(getTestEvent(""));
-
-        assertEquals(INTERCEPTOR_ONE + BEFORE + INTERCEPTOR_TWO + BEFORE + INTERCEPTOR_THREE + BEFORE
-                     + INTERCEPTOR_ONE + BEFORE + INTERCEPTOR_TWO + BEFORE + INTERCEPTOR_THREE + BEFORE
-                     + COMPONENT + INTERCEPTOR_THREE + AFTER + INTERCEPTOR_TWO + AFTER + INTERCEPTOR_ONE
-                     + AFTER + INTERCEPTOR_THREE + AFTER + INTERCEPTOR_TWO + AFTER + INTERCEPTOR_ONE + AFTER,
-            result.getMessageAsString());
+    @Override
+    protected Object doInvoke(MuleEvent event) throws Exception {
+      return event.getMessageAsString() + COMPONENT;
     }
-
-    class TestInterceptor extends AbstractEnvelopeInterceptor
-    {
-        private String name;
-
-        public TestInterceptor(String name)
-        {
-            this.name = name;
-        }
-
-        @Override
-        public MuleEvent after(MuleEvent event)
-        {
-            try
-            {
-                event.setMessage(MuleMessage.builder(event.getMessage())
-                                            .payload(getPayloadAsString(event.getMessage()) + name + AFTER)
-                                            .build());
-            }
-            catch (Exception e)
-            {
-                fail(e.getMessage());
-            }
-            return event;
-        }
-
-        @Override
-        public MuleEvent before(MuleEvent event)
-        {
-            try
-            {
-                event.setMessage(MuleMessage.builder(event.getMessage())
-                                            .payload(getPayloadAsString(event.getMessage()) + name + BEFORE)
-                                            .build());
-            }
-            catch (Exception e)
-            {
-                fail(e.getMessage());
-            }
-            return event;
-        }
-
-        @Override
-        public MuleEvent last(MuleEvent event, ProcessingTime time, long startTime, boolean exceptionWasThrown) throws MuleException
-        {
-            return event;
-        }
-    }
-
-    protected Flow createUninitializedFlow() throws Exception
-    {
-        TestComponent component = new TestComponent();
-        Flow flow = new Flow("name",muleContext);
-        flow.setMessageProcessors(new ArrayList<MessageProcessor>());
-        flow.getMessageProcessors().add(component);
-        return flow;
-    }
-
-    class TestComponent extends AbstractComponent
-    {
-        @Override
-        protected Object doInvoke(MuleEvent event) throws Exception
-        {
-            return event.getMessageAsString() + COMPONENT;
-        }
-    }
+  }
 }

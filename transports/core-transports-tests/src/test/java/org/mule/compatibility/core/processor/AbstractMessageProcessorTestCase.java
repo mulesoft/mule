@@ -52,311 +52,257 @@ import java.util.concurrent.CountDownLatch;
 
 import org.mockito.stubbing.Answer;
 
-public abstract class AbstractMessageProcessorTestCase extends AbstractMuleContextEndpointTestCase
-{
-    protected static final String TEST_URI = "test://myTestUri";
-    protected static String RESPONSE_MESSAGE = "response-message";
-    protected static MuleMessage responseMessage;
-    protected Answer<MuleEvent> echoEventAnswer = invocation -> (MuleEvent) invocation.getArguments()[0];
+public abstract class AbstractMessageProcessorTestCase extends AbstractMuleContextEndpointTestCase {
 
-    @Override
-    protected void doSetUp() throws Exception
-    {
-        super.doSetUp();
-        responseMessage = createTestResponseMuleMessage();
-        muleContext.start();
+  protected static final String TEST_URI = "test://myTestUri";
+  protected static String RESPONSE_MESSAGE = "response-message";
+  protected static MuleMessage responseMessage;
+  protected Answer<MuleEvent> echoEventAnswer = invocation -> (MuleEvent) invocation.getArguments()[0];
+
+  @Override
+  protected void doSetUp() throws Exception {
+    super.doSetUp();
+    responseMessage = createTestResponseMuleMessage();
+    muleContext.start();
+  }
+
+  @Override
+  protected void configureMuleContext(MuleContextBuilder builder) {
+    super.configureMuleContext(builder);
+
+    // Configure EndpointMessageNotificationListener for notifications test
+    ServerNotificationManager notificationManager = new ServerNotificationManager();
+    notificationManager.addInterfaceToType(EndpointMessageNotificationListener.class, EndpointMessageNotification.class);
+    notificationManager.addInterfaceToType(SecurityNotificationListener.class, SecurityNotification.class);
+
+    builder.setNotificationManager(notificationManager);
+  }
+
+  protected InboundEndpoint createTestInboundEndpoint(Transformer transformer, Transformer responseTransformer)
+      throws EndpointException, InitialisationException {
+    return createTestInboundEndpoint(null, null, transformer, responseTransformer, MessageExchangePattern.REQUEST_RESPONSE, null);
+  }
+
+  protected InboundEndpoint createTestInboundEndpoint(Filter filter, SecurityFilter securityFilter,
+                                                      MessageExchangePattern exchangePattern, TransactionConfig txConfig)
+      throws InitialisationException, EndpointException {
+    return createTestInboundEndpoint(filter, securityFilter, null, null, exchangePattern, txConfig);
+  }
+
+  protected InboundEndpoint createTestInboundEndpoint(Filter filter, SecurityFilter securityFilter, Transformer transformer,
+                                                      Transformer responseTransformer, MessageExchangePattern exchangePattern,
+                                                      TransactionConfig txConfig)
+      throws EndpointException, InitialisationException {
+    EndpointURIEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(TEST_URI, muleContext);
+    if (filter != null) {
+      endpointBuilder.addMessageProcessor(new MessageFilter(filter));
+    }
+    if (securityFilter != null) {
+      endpointBuilder.addMessageProcessor(new SecurityFilterMessageProcessor(securityFilter));
+    }
+    if (transformer != null) {
+      endpointBuilder.setMessageProcessors(Collections.<MessageProcessor>singletonList(transformer));
+    }
+    if (responseTransformer != null) {
+      endpointBuilder.setResponseMessageProcessors(Collections.<MessageProcessor>singletonList(responseTransformer));
+    }
+    endpointBuilder.setExchangePattern(exchangePattern);
+    endpointBuilder.setTransactionConfig(txConfig);
+    InboundEndpoint endpoint = endpointBuilder.buildInboundEndpoint();
+    return endpoint;
+  }
+
+  protected MuleEvent createTestInboundEvent(InboundEndpoint endpoint) throws Exception {
+    final DefaultMuleEvent event =
+        new DefaultMuleEvent(MuleMessage.builder().payload(TEST_MESSAGE).addOutboundProperty("prop1", "value1").build(),
+                             getTestFlow(), getTestSession(null, muleContext));
+    DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, endpoint);
+    return event;
+  }
+
+  protected OutboundEndpoint createTestOutboundEndpoint(Transformer transformer, Transformer responseTransformer)
+      throws EndpointException, InitialisationException {
+    return createTestOutboundEndpoint(null, null, transformer, responseTransformer, MessageExchangePattern.REQUEST_RESPONSE,
+                                      null);
+  }
+
+  protected OutboundEndpoint createTestOutboundEndpoint(Filter filter, EndpointSecurityFilter securityFilter,
+                                                        MessageExchangePattern exchangePattern, TransactionConfig txConfig)
+      throws InitialisationException, EndpointException {
+    return createTestOutboundEndpoint(filter, securityFilter, null, null, exchangePattern, txConfig);
+  }
+
+  protected OutboundEndpoint createTestOutboundEndpoint(Filter filter, EndpointSecurityFilter securityFilter,
+                                                        Transformer transformer, Transformer responseTransformer,
+                                                        MessageExchangePattern exchangePattern, TransactionConfig txConfig)
+      throws EndpointException, InitialisationException {
+    return createTestOutboundEndpoint("test://test", filter, securityFilter, transformer, responseTransformer, exchangePattern,
+                                      txConfig);
+  }
+
+  protected OutboundEndpoint createTestOutboundEndpoint(String uri, Filter filter, SecurityFilter securityFilter,
+                                                        Transformer transformer, Transformer responseTransformer,
+                                                        MessageExchangePattern exchangePattern, TransactionConfig txConfig)
+      throws EndpointException, InitialisationException {
+    EndpointURIEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(uri, muleContext);
+    if (filter != null) {
+      endpointBuilder.addMessageProcessor(new MessageFilter(filter));
+    }
+    if (securityFilter != null) {
+      endpointBuilder.addMessageProcessor(new SecurityFilterMessageProcessor(securityFilter));
+    }
+    if (transformer != null) {
+      endpointBuilder.setMessageProcessors(Collections.<MessageProcessor>singletonList(transformer));
+    }
+    if (responseTransformer != null) {
+      endpointBuilder.setResponseMessageProcessors(Collections.<MessageProcessor>singletonList(responseTransformer));
+    }
+    endpointBuilder.setExchangePattern(exchangePattern);
+    endpointBuilder.setTransactionConfig(txConfig);
+    customizeEndpointBuilder(endpointBuilder);
+    return endpointBuilder.buildOutboundEndpoint();
+  }
+
+  protected void customizeEndpointBuilder(EndpointBuilder endpointBuilder) {
+    // template method
+  }
+
+  protected MuleEvent createTestOutboundEvent() throws Exception {
+    return createTestOutboundEvent(null);
+  }
+
+  protected MuleEvent createTestOutboundEvent(MessagingExceptionHandler exceptionListener) throws Exception {
+    Map<String, Serializable> props = new HashMap<>();
+    props.put("prop1", "value1");
+    props.put("port", 12345);
+
+    Flow flow = getTestFlow();
+    if (exceptionListener != null) {
+      flow.setExceptionListener(exceptionListener);
+    }
+    final DefaultMuleEvent event =
+        new DefaultMuleEvent(MuleMessage.builder().payload(TEST_MESSAGE).outboundProperties(props).build(), flow,
+                             getTestSession(null, muleContext));
+    DefaultMuleEventEndpointUtils
+        .populateFieldsFromInboundEndpoint(event, getTestInboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE));
+    return event;
+  }
+
+  protected MuleMessage createTestResponseMuleMessage() {
+    return MuleMessage.builder().payload(RESPONSE_MESSAGE).build();
+  }
+
+  public static class TestFilter implements Filter {
+
+    public boolean accept;
+
+    public TestFilter(boolean accept) {
+      this.accept = accept;
     }
 
     @Override
-    protected void configureMuleContext(MuleContextBuilder builder)
-    {
-        super.configureMuleContext(builder);
+    public boolean accept(MuleMessage message) {
+      return accept;
+    }
+  }
 
-        // Configure EndpointMessageNotificationListener for notifications test
-        ServerNotificationManager notificationManager = new ServerNotificationManager();
-        notificationManager.addInterfaceToType(EndpointMessageNotificationListener.class,
-                EndpointMessageNotification.class);
-        notificationManager.addInterfaceToType(SecurityNotificationListener.class, SecurityNotification.class);
+  public static class TestSecurityNotificationListener implements SecurityNotificationListener<SecurityNotification> {
 
-        builder.setNotificationManager(notificationManager);
+    public SecurityNotification securityNotification;
+    public Latch latch = new Latch();
+
+    @Override
+    public void onNotification(SecurityNotification notification) {
+      securityNotification = notification;
+      latch.countDown();
+    }
+  }
+
+  public static class TestListener implements MessageProcessor {
+
+    public MuleEvent sensedEvent;
+
+    @Override
+    public MuleEvent process(MuleEvent event) throws MuleException {
+      sensedEvent = event;
+      return event;
+    }
+  }
+
+  public static class TestEndpointMessageNotificationListener
+      implements EndpointMessageNotificationListener<EndpointMessageNotification> {
+
+    public TestEndpointMessageNotificationListener() {
+      latchFirst = new CountDownLatch(1);
+      latch = new CountDownLatch(1);
     }
 
-    protected InboundEndpoint createTestInboundEndpoint(Transformer transformer,
-                                                        Transformer responseTransformer)
-            throws EndpointException, InitialisationException
-    {
-        return createTestInboundEndpoint(null, null, transformer, responseTransformer,
-                MessageExchangePattern.REQUEST_RESPONSE, null);
+    public TestEndpointMessageNotificationListener(int numExpected) {
+      latchFirst = new CountDownLatch(1);
+      latch = new CountDownLatch(numExpected);
     }
 
-    protected InboundEndpoint createTestInboundEndpoint(Filter filter,
-                                                        SecurityFilter securityFilter,
-                                                        MessageExchangePattern exchangePattern,
-                                                        TransactionConfig txConfig)
-            throws InitialisationException, EndpointException
-    {
-        return createTestInboundEndpoint(filter, securityFilter, null, null, exchangePattern, txConfig);
+    public EndpointMessageNotification messageNotification;
+    public List<EndpointMessageNotification> messageNotificationList = new ArrayList<>();
+
+    public CountDownLatch latchFirst;
+    public CountDownLatch latch;
+
+    @Override
+    public void onNotification(EndpointMessageNotification notification) {
+      messageNotification = notification;
+      messageNotificationList.add(notification);
+      if (latchFirst.getCount() > 0) {
+        latchFirst.countDown();
+      }
+      latch.countDown();
+    }
+  }
+
+  public static class ExceptionThrowingMessageProcessor implements MessageProcessor {
+
+    @Override
+    public MuleEvent process(MuleEvent event) throws MuleException {
+      throw new IllegalStateException();
+    }
+  }
+
+  public static class TestExceptionListener implements MessagingExceptionHandler {
+
+    public Exception sensedException;
+
+    @Override
+    public MuleEvent handleException(Exception exception, MuleEvent event) {
+      sensedException = exception;
+      event.setMessage(MuleMessage.builder(event.getMessage()).nullPayload()
+          .exceptionPayload(new DefaultExceptionPayload(exception)).build());
+      return event;
+    }
+  }
+
+  public class ObjectAwareProcessor implements MessageProcessor, EndpointAware, MuleContextAware {
+
+    public MuleContext context;
+    public ImmutableEndpoint endpoint;
+
+    @Override
+    public MuleEvent process(MuleEvent event) throws MuleException {
+      return null;
     }
 
-    protected InboundEndpoint createTestInboundEndpoint(Filter filter,
-                                                        SecurityFilter securityFilter,
-                                                        Transformer transformer,
-                                                        Transformer responseTransformer,
-                                                        MessageExchangePattern exchangePattern,
-                                                        TransactionConfig txConfig)
-            throws EndpointException, InitialisationException
-    {
-        EndpointURIEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(TEST_URI, muleContext);
-        if (filter != null)
-        {
-            endpointBuilder.addMessageProcessor(new MessageFilter(filter));
-        }
-        if (securityFilter != null)
-        {
-            endpointBuilder.addMessageProcessor(new SecurityFilterMessageProcessor(securityFilter));
-        }
-        if (transformer != null)
-        {
-            endpointBuilder.setMessageProcessors(Collections.<MessageProcessor> singletonList(transformer));
-        }
-        if (responseTransformer != null)
-        {
-            endpointBuilder.setResponseMessageProcessors(Collections.<MessageProcessor> singletonList(responseTransformer));
-        }
-        endpointBuilder.setExchangePattern(exchangePattern);
-        endpointBuilder.setTransactionConfig(txConfig);
-        InboundEndpoint endpoint = endpointBuilder.buildInboundEndpoint();
-        return endpoint;
+    @Override
+    public void setEndpoint(ImmutableEndpoint endpoint) {
+      this.endpoint = endpoint;
     }
 
-    protected MuleEvent createTestInboundEvent(InboundEndpoint endpoint) throws Exception
-    {
-        final DefaultMuleEvent event = new DefaultMuleEvent(MuleMessage.builder().payload(TEST_MESSAGE).addOutboundProperty("prop1", "value1").build(),
-                getTestFlow(), getTestSession(null, muleContext));
-        DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, endpoint);
-        return event;
+    @Override
+    public ImmutableEndpoint getEndpoint() {
+      return endpoint;
     }
 
-    protected OutboundEndpoint createTestOutboundEndpoint(Transformer transformer,
-                                                          Transformer responseTransformer)
-            throws EndpointException, InitialisationException
-    {
-        return createTestOutboundEndpoint(null, null, transformer, responseTransformer,
-                MessageExchangePattern.REQUEST_RESPONSE, null);
+    @Override
+    public void setMuleContext(MuleContext context) {
+      this.context = context;
     }
-
-    protected OutboundEndpoint createTestOutboundEndpoint(Filter filter,
-                                                          EndpointSecurityFilter securityFilter,
-                                                          MessageExchangePattern exchangePattern,
-                                                          TransactionConfig txConfig)
-            throws InitialisationException, EndpointException
-    {
-        return createTestOutboundEndpoint(filter, securityFilter, null, null, exchangePattern,
-                txConfig);
-    }
-
-    protected OutboundEndpoint createTestOutboundEndpoint(Filter filter,
-                                                          EndpointSecurityFilter securityFilter,
-                                                          Transformer transformer,
-                                                          Transformer responseTransformer,
-                                                          MessageExchangePattern exchangePattern,
-                                                          TransactionConfig txConfig)
-            throws EndpointException, InitialisationException
-    {
-        return createTestOutboundEndpoint("test://test", filter, securityFilter, transformer, responseTransformer, exchangePattern, txConfig);
-    }
-
-    protected OutboundEndpoint createTestOutboundEndpoint(String uri, Filter filter,
-                                                          SecurityFilter securityFilter,
-                                                          Transformer transformer,
-                                                          Transformer responseTransformer,
-                                                          MessageExchangePattern exchangePattern,
-                                                          TransactionConfig txConfig)
-            throws EndpointException, InitialisationException
-    {
-        EndpointURIEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(uri,
-                muleContext);
-        if (filter != null)
-        {
-            endpointBuilder.addMessageProcessor(new MessageFilter(filter));
-        }
-        if (securityFilter != null)
-        {
-            endpointBuilder.addMessageProcessor(new SecurityFilterMessageProcessor(securityFilter));
-        }
-        if (transformer != null)
-        {
-            endpointBuilder.setMessageProcessors(Collections.<MessageProcessor> singletonList(transformer));
-        }
-        if (responseTransformer != null)
-        {
-            endpointBuilder.setResponseMessageProcessors(Collections.<MessageProcessor> singletonList(responseTransformer));
-        }
-        endpointBuilder.setExchangePattern(exchangePattern);
-        endpointBuilder.setTransactionConfig(txConfig);
-        customizeEndpointBuilder(endpointBuilder);
-        return endpointBuilder.buildOutboundEndpoint();
-    }
-
-    protected void customizeEndpointBuilder(EndpointBuilder endpointBuilder)
-    {
-        // template method
-    }
-
-    protected MuleEvent createTestOutboundEvent() throws Exception
-    {
-        return createTestOutboundEvent(null);
-    }
-
-    protected MuleEvent createTestOutboundEvent(MessagingExceptionHandler exceptionListener) throws Exception
-    {
-        Map<String, Serializable> props = new HashMap<>();
-        props.put("prop1", "value1");
-        props.put("port", 12345);
-
-        Flow flow = getTestFlow();
-        if (exceptionListener != null)
-        {
-            flow.setExceptionListener(exceptionListener);
-        }
-        final DefaultMuleEvent event = new DefaultMuleEvent(MuleMessage.builder().payload(TEST_MESSAGE).outboundProperties(props).build(),
-                flow, getTestSession(null, muleContext));
-        DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, getTestInboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE));
-        return event;
-    }
-
-    protected MuleMessage createTestResponseMuleMessage()
-    {
-        return MuleMessage.builder().payload(RESPONSE_MESSAGE).build();
-    }
-
-    public static class TestFilter implements Filter
-    {
-        public boolean accept;
-
-        public TestFilter(boolean accept)
-        {
-            this.accept = accept;
-        }
-
-        @Override
-        public boolean accept(MuleMessage message)
-        {
-            return accept;
-        }
-    }
-
-    public static class TestSecurityNotificationListener implements SecurityNotificationListener<SecurityNotification>
-    {
-        public SecurityNotification securityNotification;
-        public Latch latch = new Latch();
-
-        @Override
-        public void onNotification(SecurityNotification notification)
-        {
-            securityNotification = notification;
-            latch.countDown();
-        }
-    }
-
-    public static class TestListener implements MessageProcessor
-    {
-        public MuleEvent sensedEvent;
-
-        @Override
-        public MuleEvent process(MuleEvent event) throws MuleException
-        {
-            sensedEvent = event;
-            return event;
-        }
-    }
-
-    public static class TestEndpointMessageNotificationListener implements EndpointMessageNotificationListener<EndpointMessageNotification>
-    {
-        public TestEndpointMessageNotificationListener()
-        {
-            latchFirst = new CountDownLatch(1);
-            latch = new CountDownLatch(1);
-        }
-
-        public TestEndpointMessageNotificationListener(int numExpected)
-        {
-            latchFirst = new CountDownLatch(1);
-            latch = new CountDownLatch(numExpected);
-        }
-
-        public EndpointMessageNotification messageNotification;
-        public List<EndpointMessageNotification> messageNotificationList = new ArrayList<>();
-
-        public CountDownLatch latchFirst;
-        public CountDownLatch latch;
-
-        @Override
-        public void onNotification(EndpointMessageNotification notification)
-        {
-            messageNotification = notification;
-            messageNotificationList.add(notification);
-            if (latchFirst.getCount() > 0)
-            {
-                latchFirst.countDown();
-            }
-            latch.countDown();
-        }
-    }
-
-    public static class ExceptionThrowingMessageProcessor implements MessageProcessor
-    {
-        @Override
-        public MuleEvent process(MuleEvent event) throws MuleException
-        {
-            throw new IllegalStateException();
-        }
-    }
-
-    public static class TestExceptionListener implements MessagingExceptionHandler
-    {
-        public Exception sensedException;
-
-        @Override
-        public MuleEvent handleException(Exception exception, MuleEvent event)
-        {
-            sensedException = exception;
-            event.setMessage(MuleMessage.builder(event.getMessage())
-                                     .nullPayload()
-                                     .exceptionPayload(new DefaultExceptionPayload(exception))
-                                     .build());
-            return event;
-        }
-    }
-
-    public class ObjectAwareProcessor implements MessageProcessor, EndpointAware, MuleContextAware
-    {
-
-        public MuleContext context;
-        public ImmutableEndpoint endpoint;
-
-        @Override
-        public MuleEvent process(MuleEvent event) throws MuleException
-        {
-            return null;
-        }
-
-        @Override
-        public void setEndpoint(ImmutableEndpoint endpoint)
-        {
-            this.endpoint = endpoint;
-        }
-
-        @Override
-        public ImmutableEndpoint getEndpoint()
-        {
-            return endpoint;
-        }
-
-        @Override
-        public void setMuleContext(MuleContext context)
-        {
-            this.context = context;
-        }
-    }
+  }
 }

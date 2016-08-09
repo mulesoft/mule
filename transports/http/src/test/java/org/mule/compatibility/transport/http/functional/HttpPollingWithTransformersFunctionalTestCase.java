@@ -25,41 +25,37 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpPollingWithTransformersFunctionalTestCase extends FunctionalTestCase
-{
-    @Rule
-    public DynamicPort dynamicPort = new DynamicPort("port1");
+public class HttpPollingWithTransformersFunctionalTestCase extends FunctionalTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "mule-http-polling-with-transformers-config-flow.xml";
-    }
+  @Rule
+  public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    @Test
-    public void testPollingHttpConnector() throws Exception
-    {
-        final Latch latch = new Latch();
-        final AtomicBoolean transformPropagated = new AtomicBoolean(false);
-        muleContext.registerListener(new FunctionalTestNotificationListener()
-        {
-            @Override
-            public void onNotification(ServerNotification notification)
-            {
-                latch.countDown();
-                if (notification.getSource().toString().endsWith("toClient-only"))
-                {
-                    transformPropagated.set(true);
-                }
-            }
-        }, "polledUMO");
+  @Override
+  protected String getConfigFile() {
+    return "mule-http-polling-with-transformers-config-flow.xml";
+  }
 
-        MuleClient client = muleContext.getClient();
-        MuleMessage result = client.request("vm://toclient", 50000);
-        assertNotNull(result.getPayload());
-        assertTrue("Callback called", latch.await(1000, TimeUnit.MILLISECONDS));
-        assertEquals("/foo toClient-only", getPayloadAsString(result));
-        // The transform should not have been propagated to the outbound endpoint
-        assertFalse(transformPropagated.get());
-    }
+  @Test
+  public void testPollingHttpConnector() throws Exception {
+    final Latch latch = new Latch();
+    final AtomicBoolean transformPropagated = new AtomicBoolean(false);
+    muleContext.registerListener(new FunctionalTestNotificationListener() {
+
+      @Override
+      public void onNotification(ServerNotification notification) {
+        latch.countDown();
+        if (notification.getSource().toString().endsWith("toClient-only")) {
+          transformPropagated.set(true);
+        }
+      }
+    }, "polledUMO");
+
+    MuleClient client = muleContext.getClient();
+    MuleMessage result = client.request("vm://toclient", 50000);
+    assertNotNull(result.getPayload());
+    assertTrue("Callback called", latch.await(1000, TimeUnit.MILLISECONDS));
+    assertEquals("/foo toClient-only", getPayloadAsString(result));
+    // The transform should not have been propagated to the outbound endpoint
+    assertFalse(transformPropagated.get());
+  }
 }

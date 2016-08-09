@@ -28,72 +28,57 @@ import javax.script.Bindings;
  * @deprecated Transport infrastructure is deprecated.
  */
 @Deprecated
-public class ScriptComponentWithBindings extends ScriptComponent
-{
+public class ScriptComponentWithBindings extends ScriptComponent {
 
-    protected List<InterfaceBinding> bindings = new ArrayList<InterfaceBinding>();
+  protected List<InterfaceBinding> bindings = new ArrayList<InterfaceBinding>();
 
-    private Map<String, Object> proxies;
+  private Map<String, Object> proxies;
 
-    @Override
-    protected void doInitialise() throws InitialisationException
-    {
-        super.doInitialise();
-        try
-        {
-            configureComponentBindings();
+  @Override
+  protected void doInitialise() throws InitialisationException {
+    super.doInitialise();
+    try {
+      configureComponentBindings();
+    } catch (MuleException e) {
+      throw new InitialisationException(e, this);
+    }
+  }
+
+  public List<InterfaceBinding> getInterfaceBindings() {
+    return bindings;
+  }
+
+  public void setInterfaceBindings(List<InterfaceBinding> bindingCollection) {
+    this.bindings = bindingCollection;
+  }
+
+  @Override
+  protected void putBindings(Bindings bindings) {
+    if (proxies.size() > 0) {
+      bindings.putAll(proxies);
+    }
+  }
+
+  protected void configureComponentBindings() throws MuleException {
+    proxies = new HashMap<String, Object>();
+    // Initialise the nested router and bind the endpoints to the methods using a
+    // Proxy
+    if (bindings != null && bindings.size() > 0) {
+      for (Iterator<?> it = bindings.iterator(); it.hasNext();) {
+        InterfaceBinding interfaceBinding = (InterfaceBinding) it.next();
+        String bindingName = ClassUtils.getSimpleName(interfaceBinding.getInterface());
+        if (proxies.containsKey(bindingName)) {
+          Object proxy = proxies.get(bindingName);
+          BindingInvocationHandler handler = (BindingInvocationHandler) Proxy.getInvocationHandler(proxy);
+          handler.addRouterForInterface(interfaceBinding);
+        } else {
+          Object proxy =
+              Proxy.newProxyInstance(muleContext.getExecutionClassLoader(), new Class[] {interfaceBinding.getInterface()},
+                                     new BindingInvocationHandler(interfaceBinding));
+          // new BindingInvocationHandler(interfaceBinding, muleContext));
+          proxies.put(bindingName, proxy);
         }
-        catch (MuleException e)
-        {
-            throw new InitialisationException(e, this);
-        }
+      }
     }
-
-    public List<InterfaceBinding> getInterfaceBindings()
-    {
-        return bindings;
-    }
-
-    public void setInterfaceBindings(List<InterfaceBinding> bindingCollection)
-    {
-        this.bindings = bindingCollection;
-    }
-
-    @Override
-    protected void putBindings(Bindings bindings)
-    {
-        if (proxies.size() > 0)
-        {
-            bindings.putAll(proxies);
-        }
-    }
-
-    protected void configureComponentBindings() throws MuleException
-    {
-        proxies = new HashMap<String, Object>();
-        // Initialise the nested router and bind the endpoints to the methods using a
-        // Proxy
-        if (bindings != null && bindings.size() > 0)
-        {
-            for (Iterator<?> it = bindings.iterator(); it.hasNext();)
-            {
-                InterfaceBinding interfaceBinding = (InterfaceBinding) it.next();
-                String bindingName = ClassUtils.getSimpleName(interfaceBinding.getInterface());
-                if (proxies.containsKey(bindingName))
-                {
-                    Object proxy = proxies.get(bindingName);
-                    BindingInvocationHandler handler = (BindingInvocationHandler) Proxy.getInvocationHandler(proxy);
-                    handler.addRouterForInterface(interfaceBinding);
-                }
-                else
-                {
-                    Object proxy = Proxy.newProxyInstance(muleContext.getExecutionClassLoader(),
-                        new Class[]{interfaceBinding.getInterface()},
-                            new BindingInvocationHandler(interfaceBinding));
-                    // new BindingInvocationHandler(interfaceBinding, muleContext));
-                    proxies.put(bindingName, proxy);
-                }
-            }
-        }
-    }
+  }
 }

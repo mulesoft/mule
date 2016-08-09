@@ -7,15 +7,14 @@
 package org.mule.runtime.core.util;
 
 /**
- *  Class to check that system properties introduced to maintain backwards compatibility
- *  are enabled or not, the latter being the default. It can be used to track said properties.
+ * Class to check that system properties introduced to maintain backwards compatibility are enabled or not, the latter being the
+ * default. It can be used to track said properties.
  *
- *  @since 3.6.0
+ * @since 3.6.0
  */
-public class BackwardsCompatibilityPropertyChecker extends PropertyChecker
-{
-    public BackwardsCompatibilityPropertyChecker(String propertyName)
-    {
-        super(propertyName);
-    }
+public class BackwardsCompatibilityPropertyChecker extends PropertyChecker {
+
+  public BackwardsCompatibilityPropertyChecker(String propertyName) {
+    super(propertyName);
+  }
 }

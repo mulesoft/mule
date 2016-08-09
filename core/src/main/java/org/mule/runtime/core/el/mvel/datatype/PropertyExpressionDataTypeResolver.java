@@ -12,26 +12,18 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.mvel2.ast.ASTNode;
 
 /**
- * Resolves data type for expressions representing a reference to a invocation
- * or session variable.
+ * Resolves data type for expressions representing a reference to a invocation or session variable.
  */
-public class PropertyExpressionDataTypeResolver extends AbstractExpressionDataTypeResolver
-{
+public class PropertyExpressionDataTypeResolver extends AbstractExpressionDataTypeResolver {
 
-    @Override
-    protected DataType getDataType(MuleEvent event, ASTNode node)
-    {
-        if (node.isIdentifier() && event.getFlowVariableNames().contains(node.getName()))
-        {
-            return event.getFlowVariableDataType(node.getName());
-        }
-        else if (node.isIdentifier() && event.getSession().getPropertyNamesAsSet().contains(node.getName()))
-        {
-            return event.getSession().getPropertyDataType(node.getName());
-        }
-        else
-        {
-            return null;
-        }
+  @Override
+  protected DataType getDataType(MuleEvent event, ASTNode node) {
+    if (node.isIdentifier() && event.getFlowVariableNames().contains(node.getName())) {
+      return event.getFlowVariableDataType(node.getName());
+    } else if (node.isIdentifier() && event.getSession().getPropertyNamesAsSet().contains(node.getName())) {
+      return event.getSession().getPropertyDataType(node.getName());
+    } else {
+      return null;
     }
+  }
 }

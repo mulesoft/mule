@@ -27,25 +27,23 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 @SmallTest
-public class UpdateTestCase extends AbstractMuleTestCase
-{
+public class UpdateTestCase extends AbstractMuleTestCase {
 
-    @Test
-    public void testUpdate() throws Exception
-    {
-        Statement statement = mock(Statement.class);
-        String sqlText = "UPDATE dummy SET NAME='Mercury' WHERE id=777";
-        when(statement.executeUpdate(sqlText, Statement.NO_GENERATED_KEYS)).thenReturn(1);
-        StatementFactory statementFactory = mock(StatementFactory.class);
-        DbConnection connection = mock(DbConnection.class);
-        UpdateExecutor updateExecutor = new UpdateExecutor(statementFactory);
+  @Test
+  public void testUpdate() throws Exception {
+    Statement statement = mock(Statement.class);
+    String sqlText = "UPDATE dummy SET NAME='Mercury' WHERE id=777";
+    when(statement.executeUpdate(sqlText, Statement.NO_GENERATED_KEYS)).thenReturn(1);
+    StatementFactory statementFactory = mock(StatementFactory.class);
+    DbConnection connection = mock(DbConnection.class);
+    UpdateExecutor updateExecutor = new UpdateExecutor(statementFactory);
 
-        QueryTemplate queryTemplate = new QueryTemplate(sqlText, QueryType.UPDATE, Collections.<QueryParam>emptyList());
-        Mockito.when(statementFactory.create(connection, queryTemplate)).thenReturn(statement);
-        Query query = new Query(queryTemplate, null);
+    QueryTemplate queryTemplate = new QueryTemplate(sqlText, QueryType.UPDATE, Collections.<QueryParam>emptyList());
+    Mockito.when(statementFactory.create(connection, queryTemplate)).thenReturn(statement);
+    Query query = new Query(queryTemplate, null);
 
-        Object result = updateExecutor.execute(connection, query);
+    Object result = updateExecutor.execute(connection, query);
 
-        assertEquals(1, result);
-    }
+    assertEquals(1, result);
+  }
 }

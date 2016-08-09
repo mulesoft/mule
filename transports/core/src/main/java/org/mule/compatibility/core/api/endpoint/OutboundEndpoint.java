@@ -16,18 +16,19 @@ import java.util.List;
  * @deprecated Transport infrastructure is deprecated.
  */
 @Deprecated
-public interface OutboundEndpoint extends ImmutableEndpoint, NonBlockingMessageProcessor, MessagingExceptionHandlerAware, LegacyOutboundEndpoint
-{    
-    /**
-     * @return a list of properties which should be carried over from the request message to the response message
-     * in the case of a synchronous call.
-     */
-    List<String> getResponseProperties();
+public interface OutboundEndpoint
+    extends ImmutableEndpoint, NonBlockingMessageProcessor, MessagingExceptionHandlerAware, LegacyOutboundEndpoint {
 
-    /**
-     * @return true if the destination is compute in every request, false if the destination is always the same.
-     */
-    boolean isDynamic();
+  /**
+   * @return a list of properties which should be carried over from the request message to the response message in the case of a
+   *         synchronous call.
+   */
+  List<String> getResponseProperties();
+
+  /**
+   * @return true if the destination is compute in every request, false if the destination is always the same.
+   */
+  boolean isDynamic();
 }
 
 

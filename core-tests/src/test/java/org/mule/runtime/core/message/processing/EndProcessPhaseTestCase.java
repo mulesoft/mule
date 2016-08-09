@@ -26,32 +26,30 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 @SmallTest
-public class EndProcessPhaseTestCase extends AbstractMuleTestCase
-{
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private MessageProcessTemplate notSupportedTemplate;
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private EndPhaseTemplate supportedTemplate;
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private PhaseResultNotifier mockPhaseResultNotifier;
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private MessageProcessContext mockMessageContext;
-    private EndProcessPhase endProcessPhase = new EndProcessPhase();
+public class EndProcessPhaseTestCase extends AbstractMuleTestCase {
 
-    @Test
-    public void supportedTemplates()
-    {
-        new PhaseSupportTestHelper<EndPhaseTemplate>(EndPhaseTemplate.class).testSupportTemplates(endProcessPhase);
-    }
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  private MessageProcessTemplate notSupportedTemplate;
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  private EndPhaseTemplate supportedTemplate;
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  private PhaseResultNotifier mockPhaseResultNotifier;
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  private MessageProcessContext mockMessageContext;
+  private EndProcessPhase endProcessPhase = new EndProcessPhase();
 
-    @Test
-    public void phaseExecution()
-    {
-        endProcessPhase.runPhase(supportedTemplate,mockMessageContext,mockPhaseResultNotifier);
-        verify(mockPhaseResultNotifier, times(0)).phaseConsumedMessage();
-        verify(mockPhaseResultNotifier, times(0)).phaseFailure(any(Exception.class));
-        verify(mockPhaseResultNotifier, times(0)).phaseConsumedMessage();
-        verify(supportedTemplate, times(1)).messageProcessingEnded();
-    }
+  @Test
+  public void supportedTemplates() {
+    new PhaseSupportTestHelper<EndPhaseTemplate>(EndPhaseTemplate.class).testSupportTemplates(endProcessPhase);
+  }
+
+  @Test
+  public void phaseExecution() {
+    endProcessPhase.runPhase(supportedTemplate, mockMessageContext, mockPhaseResultNotifier);
+    verify(mockPhaseResultNotifier, times(0)).phaseConsumedMessage();
+    verify(mockPhaseResultNotifier, times(0)).phaseFailure(any(Exception.class));
+    verify(mockPhaseResultNotifier, times(0)).phaseConsumedMessage();
+    verify(supportedTemplate, times(1)).messageProcessingEnded();
+  }
 
 }

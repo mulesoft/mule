@@ -13,53 +13,44 @@ import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.config.i18n.Message;
 
 /**
- * <code>ComponentException</code> should be thrown when some action on a component
- * fails, such as starting or stopping
+ * <code>ComponentException</code> should be thrown when some action on a component fails, such as starting or stopping
  */
 // @ThreadSafe
-public class ComponentException extends MessagingException
-{
-    /**
-     * Serial version
-     */
-    private static final long serialVersionUID = 56178344205041600L;
+public class ComponentException extends MessagingException {
 
-    private final transient Component component;
+  /**
+   * Serial version
+   */
+  private static final long serialVersionUID = 56178344205041600L;
 
-    public ComponentException(Message message, MuleEvent muleMessage, Component component)
-    {
-        super(generateMessage(message, component), muleMessage, component);
-        this.component = component;
+  private final transient Component component;
+
+  public ComponentException(Message message, MuleEvent muleMessage, Component component) {
+    super(generateMessage(message, component), muleMessage, component);
+    this.component = component;
+  }
+
+  public ComponentException(Message message, MuleEvent event, Component component, Throwable cause) {
+    super(generateMessage(message, component), event, cause, component);
+    this.component = component;
+  }
+
+  public ComponentException(MuleEvent message, Component component, Throwable cause) {
+    super(generateMessage(null, component), message, cause, component);
+    this.component = component;
+  }
+
+  public Component getComponent() {
+    return component;
+  }
+
+  private static Message generateMessage(Message previousMessage, Component component) {
+    Message returnMessage = CoreMessages.componentCausedErrorIs(component);
+    if (previousMessage != null) {
+      previousMessage.setNextMessage(returnMessage);
+      return previousMessage;
+    } else {
+      return returnMessage;
     }
-
-    public ComponentException(Message message, MuleEvent event, Component component, Throwable cause)
-    {
-        super(generateMessage(message, component), event, cause, component);
-        this.component = component;
-    }
-
-    public ComponentException(MuleEvent message, Component component, Throwable cause)
-    {
-        super(generateMessage(null, component), message, cause, component);
-        this.component = component;
-    }
-
-    public Component getComponent()
-    {
-        return component;
-    }
-
-    private static Message generateMessage(Message previousMessage, Component component)
-    {
-        Message returnMessage = CoreMessages.componentCausedErrorIs(component);
-        if (previousMessage != null)
-        {
-            previousMessage.setNextMessage(returnMessage);
-            return previousMessage;
-        }
-        else
-        {
-            return returnMessage;
-        }
-    }
+  }
 }

@@ -11,10 +11,9 @@ import org.mule.runtime.core.api.MuleEvent;
 import java.util.List;
 
 /**
- * An SPI interface where custom logic can be plugged in to control how collections and single messages
- * are returned from routers.
+ * An SPI interface where custom logic can be plugged in to control how collections and single messages are returned from routers.
  */
-public interface RouterResultsHandler
-{
-    MuleEvent aggregateResults(List<MuleEvent> results, MuleEvent previous);
+public interface RouterResultsHandler {
+
+  MuleEvent aggregateResults(List<MuleEvent> results, MuleEvent previous);
 }

@@ -14,47 +14,47 @@ import java.io.Serializable;
 /**
  * Create the default object stores
  */
-public interface DefaultObjectStoreFactory
-{
-    /**
-     * Creates an in memory object store for mule components
-     *
-     * @return in memory object store
-     */
-    ObjectStore<Serializable> createDefaultInMemoryObjectStore();
+public interface DefaultObjectStoreFactory {
 
-    /**
-     * Creates a persistent object store for mule components
-     *
-     * @return persistent object store
-     */
-    ObjectStore<Serializable> createDefaultPersistentObjectStore();
+  /**
+   * Creates an in memory object store for mule components
+   *
+   * @return in memory object store
+   */
+  ObjectStore<Serializable> createDefaultInMemoryObjectStore();
 
-    /**
-     * Creates an in memory object store for storing queue events
-     *
-     * @return in memory queue store
-     */
-    QueueStore<Serializable> createDefaultInMemoryQueueStore();
+  /**
+   * Creates a persistent object store for mule components
+   *
+   * @return persistent object store
+   */
+  ObjectStore<Serializable> createDefaultPersistentObjectStore();
 
-    /**
-     * Creates a persistent object store for storing queue events
-     *
-     * @return persistent queue store
-     */
-    QueueStore<Serializable> createDefaultPersistentQueueStore();
+  /**
+   * Creates an in memory object store for storing queue events
+   *
+   * @return in memory queue store
+   */
+  QueueStore<Serializable> createDefaultInMemoryQueueStore();
 
-    /**
-     * Creates a persistent object store for custom components
-     *
-     * @return persistent object store
-     */
-    ObjectStore<Serializable> createDefaultUserObjectStore();
+  /**
+   * Creates a persistent object store for storing queue events
+   *
+   * @return persistent queue store
+   */
+  QueueStore<Serializable> createDefaultPersistentQueueStore();
 
-    /**
-     * Creates a transient object store for custom components
-     *
-     * @return transient object store
-     */
-    ObjectStore<Serializable> createDefaultUserTransientObjectStore();
+  /**
+   * Creates a persistent object store for custom components
+   *
+   * @return persistent object store
+   */
+  ObjectStore<Serializable> createDefaultUserObjectStore();
+
+  /**
+   * Creates a transient object store for custom components
+   *
+   * @return transient object store
+   */
+  ObjectStore<Serializable> createDefaultUserTransientObjectStore();
 }

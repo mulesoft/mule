@@ -13,12 +13,10 @@ import org.mule.runtime.module.db.internal.domain.param.InputQueryParam;
  * Null implementation of {@link SingleQueryLogger}
  */
 
-public class NullSingleQueryLogger extends AbstractNullQueryLogger  implements SingleQueryLogger
-{
+public class NullSingleQueryLogger extends AbstractNullQueryLogger implements SingleQueryLogger {
 
-    @Override
-    public void addParameter(InputQueryParam param, Object value)
-    {
-        // Do nothing
-    }
+  @Override
+  public void addParameter(InputQueryParam param, Object value) {
+    // Do nothing
+  }
 }

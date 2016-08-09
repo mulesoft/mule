@@ -26,36 +26,33 @@ import java.net.Socket;
 import org.junit.Rule;
 import org.junit.Test;
 
-public abstract class AbstractMuleMessageProtocolReadTestCase extends FunctionalTestCase
-{
+public abstract class AbstractMuleMessageProtocolReadTestCase extends FunctionalTestCase {
 
-    @Rule
-    public DynamicPort port = new DynamicPort("port");
+  @Rule
+  public DynamicPort port = new DynamicPort("port");
 
 
-    @Test
-    public void testServer() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        safeProtocolSend("localhost", port.getNumber(), MuleMessage.builder().payload(TEST_MESSAGE).build());
-        MuleMessage response = client.request("vm://testOut", RECEIVE_TIMEOUT);
-        assertEquals(TEST_MESSAGE, response.getPayload());
-    }
+  @Test
+  public void testServer() throws Exception {
+    MuleClient client = muleContext.getClient();
+    safeProtocolSend("localhost", port.getNumber(), MuleMessage.builder().payload(TEST_MESSAGE).build());
+    MuleMessage response = client.request("vm://testOut", RECEIVE_TIMEOUT);
+    assertEquals(TEST_MESSAGE, response.getPayload());
+  }
 
-    private void safeProtocolSend(String host, int port, MuleMessage msg) throws IOException, MuleException
-    {
-        Socket clientSocket = new Socket(host, port);
-        DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
+  private void safeProtocolSend(String host, int port, MuleMessage msg) throws IOException, MuleException {
+    Socket clientSocket = new Socket(host, port);
+    DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        WireFormat wireFormat = new SerializedMuleMessageWireFormat();
-        wireFormat.setMuleContext(muleContext);
-        wireFormat.write(baos, msg, msg.getDataType().getMediaType().getCharset().orElse(getDefaultEncoding(muleContext)));
-        TcpProtocol delegate = createMuleMessageProtocol();
-        delegate.write(outToServer, baos.toByteArray());
-        clientSocket.close();
-    }
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    WireFormat wireFormat = new SerializedMuleMessageWireFormat();
+    wireFormat.setMuleContext(muleContext);
+    wireFormat.write(baos, msg, msg.getDataType().getMediaType().getCharset().orElse(getDefaultEncoding(muleContext)));
+    TcpProtocol delegate = createMuleMessageProtocol();
+    delegate.write(outToServer, baos.toByteArray());
+    clientSocket.close();
+  }
 
-    protected abstract TcpProtocol createMuleMessageProtocol();
+  protected abstract TcpProtocol createMuleMessageProtocol();
 
 }

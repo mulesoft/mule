@@ -19,36 +19,31 @@ import org.mule.runtime.core.construct.Flow;
 
 import org.junit.Test;
 
-public class DomainEndpointCreationTestCase extends DomainFunctionalTestCase
-{
+public class DomainEndpointCreationTestCase extends DomainFunctionalTestCase {
 
-    private static final String APP = "app";
-    private static final String[] APPLICATION_RESOURCES = new String[] {"domain/app-jms-endpoints-config.xml"};
+  private static final String APP = "app";
+  private static final String[] APPLICATION_RESOURCES = new String[] {"domain/app-jms-endpoints-config.xml"};
 
-    @Override
-    protected String getDomainConfig()
-    {
-        return "domain/jms-shared-connector.xml";
-    }
+  @Override
+  protected String getDomainConfig() {
+    return "domain/jms-shared-connector.xml";
+  }
 
-    @Override
-    public ApplicationConfig[] getConfigResources()
-    {
-        return new ApplicationConfig[] {new ApplicationConfig(APP, APPLICATION_RESOURCES),
-        };
-    }
+  @Override
+  public ApplicationConfig[] getConfigResources() {
+    return new ApplicationConfig[] {new ApplicationConfig(APP, APPLICATION_RESOURCES),};
+  }
 
-    @Test
-    public void registerTransformerOnce() throws Exception
-    {
-        final MuleContext appContext = getMuleContextForApp(APP);
+  @Test
+  public void registerTransformerOnce() throws Exception {
+    final MuleContext appContext = getMuleContextForApp(APP);
 
-        Flow flow = appContext.getRegistry().lookupObject("main");
+    Flow flow = appContext.getRegistry().lookupObject("main");
 
-        final MessageSource messageSource = flow.getMessageSource();
-        assertThat(((AbstractEndpoint) messageSource).getMuleContext(), equalTo(appContext));
+    final MessageSource messageSource = flow.getMessageSource();
+    assertThat(((AbstractEndpoint) messageSource).getMuleContext(), equalTo(appContext));
 
-        final MessageProcessor messageProcessor = flow.getMessageProcessors().get(0);
-        assertThat(((AbstractEndpoint) messageProcessor).getMuleContext(), equalTo(appContext));
-    }
+    final MessageProcessor messageProcessor = flow.getMessageProcessors().get(0);
+    assertThat(((AbstractEndpoint) messageProcessor).getMuleContext(), equalTo(appContext));
+  }
 }

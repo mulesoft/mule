@@ -9,11 +9,10 @@ package org.mule.runtime.core.transformer.simple;
 import org.mule.runtime.api.metadata.DataType;
 
 /** TODO */
-public class ByteArrayToMuleMessage extends ByteArrayToSerializable
-{
-    public ByteArrayToMuleMessage()
-    {
-        super();
-        setReturnDataType(DataType.MULE_MESSAGE);
-    }
+public class ByteArrayToMuleMessage extends ByteArrayToSerializable {
+
+  public ByteArrayToMuleMessage() {
+    super();
+    setReturnDataType(DataType.MULE_MESSAGE);
+  }
 }

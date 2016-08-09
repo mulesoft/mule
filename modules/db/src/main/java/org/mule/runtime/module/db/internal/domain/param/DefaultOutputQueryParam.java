@@ -9,12 +9,10 @@ package org.mule.runtime.module.db.internal.domain.param;
 
 import org.mule.runtime.module.db.internal.domain.type.DbType;
 
-public class DefaultOutputQueryParam extends AbstractQueryParam implements OutputQueryParam
-{
+public class DefaultOutputQueryParam extends AbstractQueryParam implements OutputQueryParam {
 
-    public DefaultOutputQueryParam(int index, DbType type, String name)
-    {
-        super(index, type, name);
-    }
+  public DefaultOutputQueryParam(int index, DbType type, String name) {
+    super(index, type, name);
+  }
 
 }

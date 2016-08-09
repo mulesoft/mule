@@ -17,27 +17,25 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 @Ignore("These tests have a property propagation / MEPs issue")
-public class InOutOutOnlyAsyncRouterTestCase extends FunctionalTestCase
-{
-    public static final long TIMEOUT = 3000;
+public class InOutOutOnlyAsyncRouterTestCase extends FunctionalTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/integration/messaging/meps/pattern_In-Out_Out-Only-Async-Router.xml";
-    }
+  public static final long TIMEOUT = 3000;
 
-    @Test
-    public void testExchange() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/integration/messaging/meps/pattern_In-Out_Out-Only-Async-Router.xml";
+  }
 
-        MuleMessage result = client.send("inboundEndpoint", "some data", null);
-        assertNotNull(result);
-        assertEquals("got it!", getPayloadAsString(result));
+  @Test
+  public void testExchange() throws Exception {
+    MuleClient client = muleContext.getClient();
 
-        final Object foo = result.getInboundProperty("foo");
-        assertNotNull(foo);
-        assertEquals("bar", foo);
-    }
+    MuleMessage result = client.send("inboundEndpoint", "some data", null);
+    assertNotNull(result);
+    assertEquals("got it!", getPayloadAsString(result));
+
+    final Object foo = result.getInboundProperty("foo");
+    assertNotNull(foo);
+    assertEquals("bar", foo);
+  }
 }

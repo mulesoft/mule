@@ -16,34 +16,30 @@ import org.mule.tck.junit4.rule.SystemProperty;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class ConfigurationProcessingTestCase extends AbstractIntegrationTestCase
-{
+public class ConfigurationProcessingTestCase extends AbstractIntegrationTestCase {
 
-    @Rule
-    public SystemProperty frequency = new SystemProperty("frequency", "1000");
+  @Rule
+  public SystemProperty frequency = new SystemProperty("frequency", "1000");
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/dsl/parsing-test-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/dsl/parsing-test-config.xml";
+  }
 
-    @Test
-    public void simpleFlowConfiguration() throws Exception
-    {
-        Flow flow = (Flow) getFlowConstruct("simpleFlow");
-        assertThat(flow, notNullValue());
-        assertThat(flow.getMessageProcessors(), notNullValue());
-        assertThat(flow.getMessageProcessors().size(), is(1));
-    }
+  @Test
+  public void simpleFlowConfiguration() throws Exception {
+    Flow flow = (Flow) getFlowConstruct("simpleFlow");
+    assertThat(flow, notNullValue());
+    assertThat(flow.getMessageProcessors(), notNullValue());
+    assertThat(flow.getMessageProcessors().size(), is(1));
+  }
 
-    @Test
-    public void complexFlowConfiguration() throws Exception
-    {
-        Flow flow = (Flow) getFlowConstruct("complexFlow");
-        assertThat(flow, notNullValue());
-        assertThat(flow.getMessageSource(), notNullValue());
-        assertThat(flow.getMessageProcessors(), notNullValue());
-        assertThat(flow.getMessageProcessors().size(), is(3));
-    }
+  @Test
+  public void complexFlowConfiguration() throws Exception {
+    Flow flow = (Flow) getFlowConstruct("complexFlow");
+    assertThat(flow, notNullValue());
+    assertThat(flow.getMessageSource(), notNullValue());
+    assertThat(flow.getMessageProcessors(), notNullValue());
+    assertThat(flow.getMessageProcessors().size(), is(3));
+  }
 }

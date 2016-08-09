@@ -11,25 +11,23 @@ import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
 
 /**
- * Executes operations while coordinating the several moving parts that are
- * affected by the execution process, so that such pieces can remain decoupled.
+ * Executes operations while coordinating the several moving parts that are affected by the execution process, so that such pieces
+ * can remain decoupled.
  * <p/>
- * This mediator will coordinate {@link OperationExecutor operation executors},
- * {@link Interceptor interceptors}, {@link RetryRequest}, configuration expiration,
- * statistics, etc.
+ * This mediator will coordinate {@link OperationExecutor operation executors}, {@link Interceptor interceptors},
+ * {@link RetryRequest}, configuration expiration, statistics, etc.
  *
  * @since 4.0
  */
-public interface ExecutionMediator
-{
+public interface ExecutionMediator {
 
-    /**
-     * Coordinates the execution of the {@code executor} using the given {@code context}
-     *
-     * @param executor an {@link OperationExecutor}
-     * @param context  an {@link OperationContextAdapter}
-     * @return the operation's result
-     * @throws Exception if any exception is encountered
-     */
-    Object execute(OperationExecutor executor, OperationContextAdapter context) throws Throwable;
+  /**
+   * Coordinates the execution of the {@code executor} using the given {@code context}
+   *
+   * @param executor an {@link OperationExecutor}
+   * @param context an {@link OperationContextAdapter}
+   * @return the operation's result
+   * @throws Exception if any exception is encountered
+   */
+  Object execute(OperationExecutor executor, OperationContextAdapter context) throws Throwable;
 }

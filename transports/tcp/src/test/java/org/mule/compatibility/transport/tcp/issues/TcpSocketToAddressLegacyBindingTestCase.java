@@ -20,32 +20,32 @@ import org.junit.Rule;
 import org.junit.Test;
 
 /**
- * Tests socket binding with legacy behaviour setting the MULE_TCP_BIND_LOCALHOST_TO_ALL_LOCAL_INTERFACES_PROPERTY to
- * true. This test can be deleted once the legacy behaviour is not supported any longer.
+ * Tests socket binding with legacy behaviour setting the MULE_TCP_BIND_LOCALHOST_TO_ALL_LOCAL_INTERFACES_PROPERTY to true. This
+ * test can be deleted once the legacy behaviour is not supported any longer.
  */
-public class TcpSocketToAddressLegacyBindingTestCase extends AbstractTcpSocketToAddressBindingTestCase
-{
-    @Rule
-    public SystemProperty bindLocalhostToAllLocalInterfaces = new SystemProperty(TcpPropertyHelper.MULE_TCP_BIND_LOCALHOST_TO_ALL_LOCAL_INTERFACES_PROPERTY, "true");
+public class TcpSocketToAddressLegacyBindingTestCase extends AbstractTcpSocketToAddressBindingTestCase {
 
-    public TcpSocketToAddressLegacyBindingTestCase() throws SocketException
-    {
-        super();
+  @Rule
+  public SystemProperty bindLocalhostToAllLocalInterfaces =
+      new SystemProperty(TcpPropertyHelper.MULE_TCP_BIND_LOCALHOST_TO_ALL_LOCAL_INTERFACES_PROPERTY, "true");
+
+  public TcpSocketToAddressLegacyBindingTestCase() throws SocketException {
+    super();
+  }
+
+  @Test
+  public void testRequestNotUsingLoopbackAddressAtLocalhost() throws Exception {
+    MuleClient client = muleContext.getClient();
+    MuleMessage result;
+
+    // Iterate over local addresses.
+    for (InetAddress inetAddress : localInetAddresses) {
+      /*
+       * Request not using loopback address to endpoint listening at all local addresses should get an appropriate response.
+       */
+      result = client.send(getTransportName() + "://" + inetAddress.getHostAddress() + ":" + dynamicPort2.getNumber(),
+                           TEST_MESSAGE, null);
+      assertEquals(TEST_MESSAGE + " Received", getPayloadAsString(result));
     }
-
-    @Test
-    public void testRequestNotUsingLoopbackAddressAtLocalhost() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        MuleMessage result;
-
-        // Iterate over local addresses.
-        for (InetAddress inetAddress : localInetAddresses)
-        {
-            /* Request not using loopback address to endpoint listening at all local addresses should get an
-             * appropriate response. */
-            result = client.send(getTransportName()+"://"+inetAddress.getHostAddress()+":"+dynamicPort2.getNumber(), TEST_MESSAGE, null);
-            assertEquals(TEST_MESSAGE + " Received", getPayloadAsString(result));
-        }
-    }
+  }
 }

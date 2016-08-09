@@ -29,41 +29,37 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class NullConnectionManagementStrategyTestCase extends AbstractMuleTestCase
-{
+public class NullConnectionManagementStrategyTestCase extends AbstractMuleTestCase {
 
-    @Mock
-    private ConnectionProvider<Banana> connectionProvider;
+  @Mock
+  private ConnectionProvider<Banana> connectionProvider;
 
-    @Mock
-    private Apple config;
+  @Mock
+  private Apple config;
 
-    @Mock
-    private Banana connection;
+  @Mock
+  private Banana connection;
 
-    @Mock
-    private MuleContext muleContext;
+  @Mock
+  private MuleContext muleContext;
 
-    private NullConnectionManagementStrategy<Banana> strategy;
+  private NullConnectionManagementStrategy<Banana> strategy;
 
-    @Before
-    public void before() throws Exception
-    {
-        when(connectionProvider.connect()).thenReturn(connection);
-        strategy = new NullConnectionManagementStrategy<>(connectionProvider, muleContext);
-    }
+  @Before
+  public void before() throws Exception {
+    when(connectionProvider.connect()).thenReturn(connection);
+    strategy = new NullConnectionManagementStrategy<>(connectionProvider, muleContext);
+  }
 
-    @Test
-    public void getConnection() throws Exception
-    {
-        ConnectionHandler<Banana> connectionHandler = strategy.getConnectionHandler();
-        assertThat(connectionHandler.getConnection(), is(sameInstance(connection)));
-    }
+  @Test
+  public void getConnection() throws Exception {
+    ConnectionHandler<Banana> connectionHandler = strategy.getConnectionHandler();
+    assertThat(connectionHandler.getConnection(), is(sameInstance(connection)));
+  }
 
-    @Test
-    public void close() throws Exception
-    {
-        strategy.close();
-        verify(connectionProvider, never()).disconnect(any(Banana.class));
-    }
+  @Test
+  public void close() throws Exception {
+    strategy.close();
+    verify(connectionProvider, never()).disconnect(any(Banana.class));
+  }
 }

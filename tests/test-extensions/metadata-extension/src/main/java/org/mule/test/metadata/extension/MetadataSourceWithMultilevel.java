@@ -20,33 +20,28 @@ import org.mule.test.metadata.extension.resolver.TestOutputNullTypeResolver;
 
 import java.util.Map;
 
-@MetadataScope(keysResolver = TestMultiLevelKeyResolver.class, contentResolver = TestMultiLevelKeyResolver.class, outputResolver = TestOutputNullTypeResolver.class)
-public class MetadataSourceWithMultilevel extends Source<Map<String, Object>, StringAttributes>
-{
+@MetadataScope(keysResolver = TestMultiLevelKeyResolver.class, contentResolver = TestMultiLevelKeyResolver.class,
+    outputResolver = TestOutputNullTypeResolver.class)
+public class MetadataSourceWithMultilevel extends Source<Map<String, Object>, StringAttributes> {
 
-    private static final String ERROR_MESSAGE = "LocationKey field was not injected properly";
+  private static final String ERROR_MESSAGE = "LocationKey field was not injected properly";
 
-    @MetadataKeyId
-    @ParameterGroup
-    public LocationKey key;
+  @MetadataKeyId
+  @ParameterGroup
+  public LocationKey key;
 
-    @Override
-    public void start()
-    {
-        boolean injectedProperly = key != null
-                               && key.getCity().equals(BUENOS_AIRES)
-                               && key.getCountry().equals(ARGENTINA)
-                               && key.getContinent().equals(AMERICA);
+  @Override
+  public void start() {
+    boolean injectedProperly = key != null && key.getCity().equals(BUENOS_AIRES) && key.getCountry().equals(ARGENTINA)
+        && key.getContinent().equals(AMERICA);
 
-        if (!injectedProperly)
-        {
-            throw new RuntimeException(ERROR_MESSAGE);
-        }
+    if (!injectedProperly) {
+      throw new RuntimeException(ERROR_MESSAGE);
     }
+  }
 
-    @Override
-    public void stop()
-    {
+  @Override
+  public void stop() {
 
-    }
+  }
 }

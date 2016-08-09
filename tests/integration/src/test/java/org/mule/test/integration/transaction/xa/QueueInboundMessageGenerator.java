@@ -10,25 +10,21 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.context.MuleContextAware;
 
-public class QueueInboundMessageGenerator implements TransactionScenarios.InboundMessagesGenerator, MuleContextAware
-{
+public class QueueInboundMessageGenerator implements TransactionScenarios.InboundMessagesGenerator, MuleContextAware {
 
-    private MuleClient muleClient;
+  private MuleClient muleClient;
 
-    @Override
-    public Integer generateInboundMessages() throws Exception
-    {
-        while (muleClient.request("inboundDispatcher", 100) != null);
-        for (int i = 0; i < NUMBER_OF_MESSAGES; i++)
-        {
-            muleClient.dispatch("inboundDispatcher", "test" + i, null);
-        }
-        return NUMBER_OF_MESSAGES;
+  @Override
+  public Integer generateInboundMessages() throws Exception {
+    while (muleClient.request("inboundDispatcher", 100) != null);
+    for (int i = 0; i < NUMBER_OF_MESSAGES; i++) {
+      muleClient.dispatch("inboundDispatcher", "test" + i, null);
     }
+    return NUMBER_OF_MESSAGES;
+  }
 
-    @Override
-    public void setMuleContext(MuleContext context)
-    {
-        this.muleClient = context.getClient();
-    }
+  @Override
+  public void setMuleContext(MuleContext context) {
+    this.muleClient = context.getClient();
+  }
 }

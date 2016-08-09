@@ -16,18 +16,15 @@ import org.mule.runtime.core.api.MuleEvent;
  * Resolves data type for session var when sessionVars['x'] syntax is used
  */
 
-public class SessionVarExpressionDataTypeResolver extends AbstractVariableExpressionDataTypeResolver
-{
+public class SessionVarExpressionDataTypeResolver extends AbstractVariableExpressionDataTypeResolver {
 
-    public SessionVarExpressionDataTypeResolver()
-    {
-        super(SESSION_VARS);
-    }
+  public SessionVarExpressionDataTypeResolver() {
+    super(SESSION_VARS);
+  }
 
-    @Override
-    protected DataType getVariableDataType(MuleEvent event, String propertyName)
-    {
-        return event.getSession().getPropertyDataType(propertyName);
-    }
+  @Override
+  protected DataType getVariableDataType(MuleEvent event, String propertyName) {
+    return event.getSession().getPropertyDataType(propertyName);
+  }
 
 }

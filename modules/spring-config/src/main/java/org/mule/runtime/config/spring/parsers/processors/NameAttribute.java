@@ -8,12 +8,10 @@ package org.mule.runtime.config.spring.parsers.processors;
 
 import org.mule.runtime.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 
-public class NameAttribute extends AddAttribute
-{
+public class NameAttribute extends AddAttribute {
 
-    public NameAttribute(String name)
-    {
-        super(AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME, name);
-    }
+  public NameAttribute(String name) {
+    super(AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME, name);
+  }
 
 }

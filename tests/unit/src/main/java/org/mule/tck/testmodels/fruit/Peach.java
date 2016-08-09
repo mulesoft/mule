@@ -6,18 +6,15 @@
  */
 package org.mule.tck.testmodels.fruit;
 
-public class Peach implements Fruit
-{
+public class Peach implements Fruit {
 
-    @Override
-    public void bite()
-    {
+  @Override
+  public void bite() {
 
-    }
+  }
 
-    @Override
-    public boolean isBitten()
-    {
-        return false;
-    }
+  @Override
+  public boolean isBitten() {
+    return false;
+  }
 }

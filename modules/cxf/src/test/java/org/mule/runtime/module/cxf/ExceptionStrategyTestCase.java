@@ -38,124 +38,109 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-public class ExceptionStrategyTestCase extends FunctionalTestCase
-{
+public class ExceptionStrategyTestCase extends FunctionalTestCase {
 
-    private static final String requestPayload =
-        "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"\n" +
-            "           xmlns:hi=\"http://example.cxf.module.runtime.mule.org/\">\n" +
-            "<soap:Body>\n" +
-            "<hi:sayHi>\n" +
-            "    <arg0>Hello</arg0>\n" +
-            "</hi:sayHi>\n" +
-            "</soap:Body>\n" +
-            "</soap:Envelope>";
+  private static final String requestPayload = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"\n"
+      + "           xmlns:hi=\"http://example.cxf.module.runtime.mule.org/\">\n" + "<soap:Body>\n" + "<hi:sayHi>\n"
+      + "    <arg0>Hello</arg0>\n" + "</hi:sayHi>\n" + "</soap:Body>\n" + "</soap:Envelope>";
 
-    private static final String requestFaultPayload =
-        "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"\n" +
-            "           xmlns:hi=\"http://cxf.module.runtime.mule.org/\">\n" +
-            "<soap:Body>\n" +
-            "<hi:sayHi>\n" +
-            "    <arg0>Hello</arg0>\n" +
-            "</hi:sayHi>\n" +
-            "</soap:Body>\n" +
-            "</soap:Envelope>";
+  private static final String requestFaultPayload = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"\n"
+      + "           xmlns:hi=\"http://cxf.module.runtime.mule.org/\">\n" + "<soap:Body>\n" + "<hi:sayHi>\n"
+      + "    <arg0>Hello</arg0>\n" + "</hi:sayHi>\n" + "</soap:Body>\n" + "</soap:Envelope>";
 
-    private static final HttpRequestOptions HTTP_REQUEST_OPTIONS = newOptions().method(org.mule.runtime.module.http.api.HttpConstants.Methods.POST.name()).disableStatusCodeValidation().build();
+  private static final HttpRequestOptions HTTP_REQUEST_OPTIONS = newOptions()
+      .method(org.mule.runtime.module.http.api.HttpConstants.Methods.POST.name()).disableStatusCodeValidation().build();
 
-    private CountDownLatch latch;
+  private CountDownLatch latch;
 
-    @Rule
-    public DynamicPort dynamicPort = new DynamicPort("port1");
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
+  @Rule
+  public DynamicPort dynamicPort = new DynamicPort("port1");
+  @Rule
+  public ExpectedException expectedException = ExpectedException.none();
+
+  @Override
+  protected String getConfigFile() {
+    return "exception-strategy-flow-conf-httpn.xml";
+  }
+
+  @Test
+  public void testFaultInCxfService() throws Exception {
+    MuleMessage request = MuleMessage.builder().payload(requestFaultPayload).build();
+    MuleClient client = muleContext.getClient();
+    latch = new CountDownLatch(1);
+    registerExceptionNotificationListener();
+    MuleMessage response =
+        client.send("http://localhost:" + dynamicPort.getNumber() + "/testServiceWithFault", request, HTTP_REQUEST_OPTIONS);
+    assertNotNull(response);
+    assertTrue(getPayloadAsString(response).contains("<faultstring>"));
+    assertEquals(String.valueOf(INTERNAL_SERVER_ERROR.getStatusCode()),
+                 response.getInboundProperty(HTTP_STATUS_PROPERTY).toString());
+    assertTrue(latch.await(3000, TimeUnit.MILLISECONDS));
+  }
+
+  @Test
+  public void testExceptionInCxfService() throws Exception {
+    MuleMessage request = MuleMessage.builder().payload(requestPayload).build();
+    MuleClient client = muleContext.getClient();
+    latch = new CountDownLatch(1);
+    registerExceptionNotificationListener();
+    MuleMessage response =
+        client.send("http://localhost:" + dynamicPort.getNumber() + "/testServiceWithException", request, HTTP_REQUEST_OPTIONS);
+    assertNotNull(response);
+    assertTrue(getPayloadAsString(response).contains("<faultstring>"));
+    assertEquals(String.valueOf(INTERNAL_SERVER_ERROR.getStatusCode()),
+                 response.getInboundProperty(HTTP_STATUS_PROPERTY).toString());
+    assertTrue(latch.await(3000, TimeUnit.MILLISECONDS));
+  }
+
+  @Test
+  public void testClientWithTransformerExceptionDefaultException() throws Exception {
+    expectedException.expect(MessagingException.class);
+    expectedException.expectMessage("Failed to build message");
+    flowRunner("FlowWithClientAndTransformerExceptionDefaultException").withPayload("hello").run();
+  }
+
+  @Test
+  public void testClientWithFaultDefaultException() throws Exception {
+    expectedException.expectCause(instanceOf(Fault.class));
+    expectedException.expectMessage("Failed to route event");
+    flowRunner("FlowWithClientWithFaultDefaultException").withPayload("hello").run();
+  }
+
+  @Test
+  public void testServerClientProxyDefaultException() throws Exception {
+    MuleClient client = muleContext.getClient();
+    latch = new CountDownLatch(1);
+    registerExceptionNotificationListener();
+    MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/proxyExceptionStrategy",
+                                       getTestMuleMessage(requestPayload), HTTP_REQUEST_OPTIONS);
+    assertNotNull(response);
+    assertTrue(getPayloadAsString(response).contains("<faultstring>"));
+
+    assertEquals(String.valueOf(INTERNAL_SERVER_ERROR.getStatusCode()),
+                 response.getInboundProperty(HTTP_STATUS_PROPERTY).toString());
+    assertTrue(latch.await(3000, TimeUnit.MILLISECONDS));
+  }
+
+  protected void registerExceptionNotificationListener() throws NotificationException {
+    // Do not inline this variable, otherwise the type of the listener is lost.
+    ExceptionNotificationListener listener = notification -> latch.countDown();
+    muleContext.registerListener(listener);
+  }
+
+  public static class CxfTransformerThrowsExceptions extends AbstractTransformer {
 
     @Override
-    protected String getConfigFile()
-    {
-        return "exception-strategy-flow-conf-httpn.xml";
+    protected Object doTransform(Object src, Charset enc) throws TransformerException {
+      throw new TransformerException(CoreMessages.failedToBuildMessage());
     }
+  }
 
-    @Test
-    public void testFaultInCxfService() throws Exception
-    {
-        MuleMessage request = MuleMessage.builder().payload(requestFaultPayload).build();
-        MuleClient client = muleContext.getClient();
-        latch = new CountDownLatch(1);
-        registerExceptionNotificationListener();
-        MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/testServiceWithFault", request, HTTP_REQUEST_OPTIONS);
-        assertNotNull(response);
-        assertTrue(getPayloadAsString(response).contains("<faultstring>"));
-        assertEquals(String.valueOf(INTERNAL_SERVER_ERROR.getStatusCode()), response.getInboundProperty(HTTP_STATUS_PROPERTY).toString());
-        assertTrue(latch.await(3000, TimeUnit.MILLISECONDS));
+  public static class CustomProcessor implements MessageProcessor {
+
+    @Override
+    public MuleEvent process(MuleEvent event) throws MuleException {
+      return event;
     }
-
-    @Test
-    public void testExceptionInCxfService() throws Exception
-    {
-        MuleMessage request = MuleMessage.builder().payload(requestPayload).build();
-        MuleClient client = muleContext.getClient();
-        latch = new CountDownLatch(1);
-        registerExceptionNotificationListener();
-        MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/testServiceWithException", request, HTTP_REQUEST_OPTIONS);
-        assertNotNull(response);
-        assertTrue(getPayloadAsString(response).contains("<faultstring>"));
-        assertEquals(String.valueOf(INTERNAL_SERVER_ERROR.getStatusCode()), response.getInboundProperty(HTTP_STATUS_PROPERTY).toString());
-        assertTrue(latch.await(3000, TimeUnit.MILLISECONDS));
-    }
-
-    @Test
-    public void testClientWithTransformerExceptionDefaultException() throws Exception
-    {
-        expectedException.expect(MessagingException.class);
-        expectedException.expectMessage("Failed to build message");
-        flowRunner("FlowWithClientAndTransformerExceptionDefaultException").withPayload("hello").run();
-    }
-
-    @Test
-    public void testClientWithFaultDefaultException() throws Exception
-    {
-        expectedException.expectCause(instanceOf(Fault.class));
-        expectedException.expectMessage("Failed to route event");
-        flowRunner("FlowWithClientWithFaultDefaultException").withPayload("hello").run();
-    }
-
-    @Test
-    public void testServerClientProxyDefaultException() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        latch = new CountDownLatch(1);
-        registerExceptionNotificationListener();
-        MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/proxyExceptionStrategy", getTestMuleMessage(requestPayload), HTTP_REQUEST_OPTIONS);
-        assertNotNull(response);
-        assertTrue(getPayloadAsString(response).contains("<faultstring>"));
-
-        assertEquals(String.valueOf(INTERNAL_SERVER_ERROR.getStatusCode()), response.getInboundProperty(HTTP_STATUS_PROPERTY).toString());
-        assertTrue(latch.await(3000, TimeUnit.MILLISECONDS));
-    }
-
-    protected void registerExceptionNotificationListener() throws NotificationException
-    {
-        // Do not inline this variable, otherwise the type of the listener is lost.
-        ExceptionNotificationListener listener = notification -> latch.countDown();
-        muleContext.registerListener(listener);
-    }
-
-    public static class CxfTransformerThrowsExceptions extends AbstractTransformer
-    {
-        @Override
-        protected Object doTransform(Object src, Charset enc) throws TransformerException
-        {
-            throw new TransformerException(CoreMessages.failedToBuildMessage());
-        }
-    }
-
-    public static class CustomProcessor implements MessageProcessor
-    {
-        @Override
-        public MuleEvent process(MuleEvent event) throws MuleException
-        {
-            return event;
-        }
-    }
+  }
 }

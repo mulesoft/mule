@@ -17,24 +17,21 @@ import org.apache.cxf.phase.AbstractPhaseInterceptor;
 /**
  * Creates a ReversibleXMLStreamReader to be able to track and replay events from the XMLStreamReader.
  */
-public abstract class ReversibleStaxInterceptor extends AbstractPhaseInterceptor<Message>
-{
-    public ReversibleStaxInterceptor(String phase)
-    {
-        super(phase);
-    }
+public abstract class ReversibleStaxInterceptor extends AbstractPhaseInterceptor<Message> {
 
-    public void handleMessage(Message message) throws Fault
-    {
-        XMLStreamReader reader = message.getContent(XMLStreamReader.class);
+  public ReversibleStaxInterceptor(String phase) {
+    super(phase);
+  }
 
-        if (reader != null)
-        {
-            ReversibleXMLStreamReader reversible = new ReversibleXMLStreamReader(reader);
-            reversible.setTracking(true);
-            message.setContent(XMLStreamReader.class, reversible);
-            message.setContent(ReversibleXMLStreamReader.class, reversible);
-        }
+  public void handleMessage(Message message) throws Fault {
+    XMLStreamReader reader = message.getContent(XMLStreamReader.class);
+
+    if (reader != null) {
+      ReversibleXMLStreamReader reversible = new ReversibleXMLStreamReader(reader);
+      reversible.setTracking(true);
+      message.setContent(XMLStreamReader.class, reversible);
+      message.setContent(ReversibleXMLStreamReader.class, reversible);
     }
+  }
 
 }

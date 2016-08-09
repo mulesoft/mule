@@ -8,20 +8,18 @@ package org.mule.runtime.module.jboss.transactions;
 
 import org.junit.Test;
 
-public class JBossArjunaDefaultConfigurationTestCase extends AbstractJbossArjunaConfigurationTestCase
-{
+public class JBossArjunaDefaultConfigurationTestCase extends AbstractJbossArjunaConfigurationTestCase {
 
-    @Override
-    protected String getConfigResources()
-    {
-        return "jbossts-default-configuration.xml";
-    }
+  @Override
+  protected String getConfigResources() {
+    return "jbossts-default-configuration.xml";
+  }
 
-    @Test
-    public void testConfiguration()
-    {
-        assertTransactionManagerPresent();
-        assertObjectStoreDir(muleContext.getConfiguration().getWorkingDirectory() + "/transaction-log", muleContext.getConfiguration().getWorkingDirectory());
-    }
+  @Test
+  public void testConfiguration() {
+    assertTransactionManagerPresent();
+    assertObjectStoreDir(muleContext.getConfiguration().getWorkingDirectory() + "/transaction-log",
+                         muleContext.getConfiguration().getWorkingDirectory());
+  }
 
 }

@@ -15,50 +15,43 @@ import java.nio.file.Paths;
 
 import org.junit.Test;
 
-public class FtpCreateDirectoryTestCase extends FtpConnectorTestCase
-{
+public class FtpCreateDirectoryTestCase extends FtpConnectorTestCase {
 
-    private static final String DIRECTORY = "validDirectory";
+  private static final String DIRECTORY = "validDirectory";
 
-    public FtpCreateDirectoryTestCase(String name, FtpTestHarness testHarness)
-    {
-        super(name, testHarness);
-    }
+  public FtpCreateDirectoryTestCase(String name, FtpTestHarness testHarness) {
+    super(name, testHarness);
+  }
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "ftp-create-directory-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "ftp-create-directory-config.xml";
+  }
 
-    @Test
-    public void createDirectory() throws Exception
-    {
-        doCreateDirectory(DIRECTORY);
-        assertThat(testHarness.dirExists(DIRECTORY), is(true));
-    }
+  @Test
+  public void createDirectory() throws Exception {
+    doCreateDirectory(DIRECTORY);
+    assertThat(testHarness.dirExists(DIRECTORY), is(true));
+  }
 
-    @Test
-    public void createExistingDirectory() throws Exception
-    {
-        final String directory = "washerefirst";
-        testHarness.makeDir(directory);
-        testHarness.expectedException().expectCause(instanceOf(IllegalArgumentException.class));
+  @Test
+  public void createExistingDirectory() throws Exception {
+    final String directory = "washerefirst";
+    testHarness.makeDir(directory);
+    testHarness.expectedException().expectCause(instanceOf(IllegalArgumentException.class));
 
-        doCreateDirectory(directory);
-    }
+    doCreateDirectory(directory);
+  }
 
-    @Test
-    public void createDirectoryWithComplexPath() throws Exception
-    {
-        final String base = testHarness.getWorkingDirectory();
-        doCreateDirectory(Paths.get(base).resolve(DIRECTORY).toAbsolutePath().toString());
+  @Test
+  public void createDirectoryWithComplexPath() throws Exception {
+    final String base = testHarness.getWorkingDirectory();
+    doCreateDirectory(Paths.get(base).resolve(DIRECTORY).toAbsolutePath().toString());
 
-        assertThat(testHarness.dirExists(DIRECTORY), is(true));
-    }
+    assertThat(testHarness.dirExists(DIRECTORY), is(true));
+  }
 
-    private void doCreateDirectory(String directory) throws Exception
-    {
-        flowRunner("createDirectory").withFlowVariable("directory", directory).run();
-    }
+  private void doCreateDirectory(String directory) throws Exception {
+    flowRunner("createDirectory").withFlowVariable("directory", directory).run();
+  }
 }

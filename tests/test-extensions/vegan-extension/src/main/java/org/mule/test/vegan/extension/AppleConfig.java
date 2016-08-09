@@ -18,13 +18,12 @@ import org.mule.runtime.extension.api.annotation.connector.Providers;
 @Operations({EatAppleOperation.class, SpreadVeganismOperation.class})
 @Sources({HarvestApplesSource.class, PaulMcCartneySource.class})
 @Providers(VeganAppleConnectionProvider.class)
-public class AppleConfig
-{
-    @Parameter
-    private VeganCookBook cookBook;
+public class AppleConfig {
 
-    public VeganCookBook getCookBook()
-    {
-        return cookBook;
-    }
+  @Parameter
+  private VeganCookBook cookBook;
+
+  public VeganCookBook getCookBook() {
+    return cookBook;
+  }
 }

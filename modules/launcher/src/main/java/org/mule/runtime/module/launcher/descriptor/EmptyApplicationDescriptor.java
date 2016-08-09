@@ -14,16 +14,14 @@ import java.io.File;
 /**
  * Encapsulates defaults when no explicit descriptor provided with an app.
  */
-public class EmptyApplicationDescriptor extends ApplicationDescriptor
-{
+public class EmptyApplicationDescriptor extends ApplicationDescriptor {
 
-    public EmptyApplicationDescriptor(String appName)
-    {
-        setName(appName);
-        setConfigResources(new String[] {MuleServer.DEFAULT_CONFIGURATION});
-        File configPathFile = MuleContainerBootstrapUtils.getMuleAppDefaultConfigFile(appName);
-        String configPath = String.format(configPathFile.getAbsolutePath());
-        setAbsoluteResourcePaths(new String[] {configPath});
-        setConfigResourcesFile(new File[] {configPathFile});
-    }
+  public EmptyApplicationDescriptor(String appName) {
+    setName(appName);
+    setConfigResources(new String[] {MuleServer.DEFAULT_CONFIGURATION});
+    File configPathFile = MuleContainerBootstrapUtils.getMuleAppDefaultConfigFile(appName);
+    String configPath = String.format(configPathFile.getAbsolutePath());
+    setAbsoluteResourcePaths(new String[] {configPath});
+    setConfigResourcesFile(new File[] {configPathFile});
+  }
 }

@@ -11,24 +11,23 @@ import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.config.i18n.Message;
 
 /**
- * <code>EncryptionNotSupportedException</code> is thrown if an algorithm is set in
- * the MULE_USER header but it doesn't match the algorithm set on the security filter
+ * <code>EncryptionNotSupportedException</code> is thrown if an algorithm is set in the MULE_USER header but it doesn't match the
+ * algorithm set on the security filter
  */
 
-public class EncryptionNotSupportedException extends SecurityException
-{
-    /**
-     * Serial version
-     */
-    private static final long serialVersionUID = -1661059380853528624L;
-    
-    public EncryptionNotSupportedException(Message message, MuleEvent event)
-    {
-        super(message, event);
-    }
+public class EncryptionNotSupportedException extends SecurityException {
 
-    public EncryptionNotSupportedException(Message message, MuleEvent event, Throwable cause, MessageProcessor failingMessageProcessor)
-    {
-        super(message, event, cause, failingMessageProcessor);
-    }
+  /**
+   * Serial version
+   */
+  private static final long serialVersionUID = -1661059380853528624L;
+
+  public EncryptionNotSupportedException(Message message, MuleEvent event) {
+    super(message, event);
+  }
+
+  public EncryptionNotSupportedException(Message message, MuleEvent event, Throwable cause,
+                                         MessageProcessor failingMessageProcessor) {
+    super(message, event, cause, failingMessageProcessor);
+  }
 }

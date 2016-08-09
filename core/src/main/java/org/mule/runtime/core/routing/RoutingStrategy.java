@@ -13,17 +13,17 @@ import org.mule.runtime.core.api.processor.MessageProcessor;
 import java.util.List;
 
 /**
- * Defines an strategy to route a {@link org.mule.runtime.core.api.MuleEvent} through a set of {@link org.mule.runtime.core.api.processor.MessageProcessor}
+ * Defines an strategy to route a {@link org.mule.runtime.core.api.MuleEvent} through a set of
+ * {@link org.mule.runtime.core.api.processor.MessageProcessor}
  */
-public interface RoutingStrategy
-{
+public interface RoutingStrategy {
 
-    /**
-     * Routes {@link MuleEvent} through a set of {@link MessageProcessor}
-     *
-     * @param event
-     * @param messageProcessors
-     * @return
-     */
-    MuleEvent route(MuleEvent event, List<MessageProcessor> messageProcessors) throws MessagingException;
+  /**
+   * Routes {@link MuleEvent} through a set of {@link MessageProcessor}
+   *
+   * @param event
+   * @param messageProcessors
+   * @return
+   */
+  MuleEvent route(MuleEvent event, List<MessageProcessor> messageProcessors) throws MessagingException;
 }

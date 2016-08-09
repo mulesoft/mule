@@ -13,37 +13,31 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 /**
- * A {@link PreProcessor} that validates that no mule element
- * is used inside a &lt;spring:beans&gt; element.
+ * A {@link PreProcessor} that validates that no mule element is used inside a &lt;spring:beans&gt; element.
  *
- * This is for security and consistency reasons. A way of enforcing
- * that XSD is not cheated
+ * This is for security and consistency reasons. A way of enforcing that XSD is not cheated
  *
  * @since 3.6.0
  */
-public class DomainElementsValidator implements ElementValidator
-{
+public class DomainElementsValidator implements ElementValidator {
 
-    @Override
-    public void validate(Element element)
-    {
-        Node node = element.getParentNode();
+  @Override
+  public void validate(Element element) {
+    Node node = element.getParentNode();
 
-        while (node != null)
-        {
-            Node parent = node.getParentNode();
-            if (parent == null)
-            {
-                return;
-            }
+    while (node != null) {
+      Node parent = node.getParentNode();
+      if (parent == null) {
+        return;
+      }
 
-            if (node.getNamespaceURI().contains("mule") && "beans".equals(parent.getLocalName()) && parent.getNamespaceURI().contains("spring"))
-            {
-                throw new IllegalStateException("Mule elements are not allowed inside Spring elements when used in a domain");
-            }
+      if (node.getNamespaceURI().contains("mule") && "beans".equals(parent.getLocalName())
+          && parent.getNamespaceURI().contains("spring")) {
+        throw new IllegalStateException("Mule elements are not allowed inside Spring elements when used in a domain");
+      }
 
-            node = parent;
-        }
+      node = parent;
     }
+  }
 
 }

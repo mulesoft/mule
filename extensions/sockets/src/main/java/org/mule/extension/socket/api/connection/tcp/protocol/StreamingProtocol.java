@@ -21,51 +21,43 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
- * This protocol is an application level {@link TcpProtocol} that wraps an {@link InputStream} and does not consume it.
- * This allows the {@link SocketOperations#send(RequesterConnection, RequesterConfig, Object, String, String, MuleMessage)} to return
- * a {@link MuleMessage} with the original {@link InputStream} as payload.
+ * This protocol is an application level {@link TcpProtocol} that wraps an {@link InputStream} and does not consume it. This
+ * allows the {@link SocketOperations#send(RequesterConnection, RequesterConfig, Object, String, String, MuleMessage)} to return a
+ * {@link MuleMessage} with the original {@link InputStream} as payload.
  *
  * @since 4.0
  */
-public class StreamingProtocol extends EOFProtocol
-{
+public class StreamingProtocol extends EOFProtocol {
 
-    public StreamingProtocol()
-    {
-        super();
+  public StreamingProtocol() {
+    super();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public InputStream read(InputStream is) throws IOException {
+    if (is instanceof TcpInputStream) {
+      ((TcpInputStream) is).setStreaming(true);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public InputStream read(InputStream is) throws IOException
-    {
-        if (is instanceof TcpInputStream)
-        {
-            ((TcpInputStream) is).setStreaming(true);
-        }
+    return is;
+  }
 
-        return is;
+
+  @Override
+  public void write(OutputStream os, Object data, String encoding) throws IOException {
+    if (data instanceof InputStream) {
+      InputStream is = (InputStream) data;
+      copyLarge(is, os);
+      os.flush();
+      os.close();
+      is.close();
+    } else {
+      this.writeByteArray(os, getByteArray(data, false, true, encoding, objectSerializer));
     }
-
-
-    @Override
-    public void write(OutputStream os, Object data, String encoding) throws IOException
-    {
-        if (data instanceof InputStream)
-        {
-            InputStream is = (InputStream) data;
-            copyLarge(is, os);
-            os.flush();
-            os.close();
-            is.close();
-        }
-        else
-        {
-            this.writeByteArray(os, getByteArray(data, false, true, encoding, objectSerializer));
-        }
-    }
+  }
 }
 
 

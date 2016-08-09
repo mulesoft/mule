@@ -12,83 +12,80 @@ import java.io.Serializable;
 import java.util.Set;
 
 /**
- *  Use to obtain message proprties defined in two scopes, inbound and outbound.
+ * Use to obtain message proprties defined in two scopes, inbound and outbound.
  */
-public interface MessageProperties
-{
+public interface MessageProperties {
 
-    /**
-     * Gets an outbound property from the message.
-     *
-     * @param name the name or key of the property. This must be non-null.
-     * @return the property value or null if the property does not exist in the specified scope
-     */
-    <T extends Serializable> T getOutboundProperty(String name);
+  /**
+   * Gets an outbound property from the message.
+   *
+   * @param name the name or key of the property. This must be non-null.
+   * @return the property value or null if the property does not exist in the specified scope
+   */
+  <T extends Serializable> T getOutboundProperty(String name);
 
-    /**
-     * Gets an outbound property from the message and provides a default value if the property is not
-     * present on the message in the scope specified.  The method will also type check against the default value
-     * to ensure that the value is of the correct type.  If null is used for the default value no type checking is
-     * done.
-     *
-     * @param <T> the defaultValue type ,this is used to validate the property value type
-     * @param name the name or key of the property. This must be non-null.
-     * @param defaultValue the value to return if the property is not in the scope provided. Can be null
-     * @return the property value or the defaultValue if the property does not exist in the specified scope
-     * @throws IllegalArgumentException if the value for the property key is not assignable from the defaultValue type
-     */
-    <T extends Serializable> T getOutboundProperty(String name, T defaultValue);
+  /**
+   * Gets an outbound property from the message and provides a default value if the property is not present on the message in the
+   * scope specified. The method will also type check against the default value to ensure that the value is of the correct type.
+   * If null is used for the default value no type checking is done.
+   *
+   * @param <T> the defaultValue type ,this is used to validate the property value type
+   * @param name the name or key of the property. This must be non-null.
+   * @param defaultValue the value to return if the property is not in the scope provided. Can be null
+   * @return the property value or the defaultValue if the property does not exist in the specified scope
+   * @throws IllegalArgumentException if the value for the property key is not assignable from the defaultValue type
+   */
+  <T extends Serializable> T getOutboundProperty(String name, T defaultValue);
 
-    /**
-     * Gets an outbound property data type from the message.
-     *
-     * @param name the name or key of the property. This must be non-null.
-     * @return the property data type or null if the property does not exist in the specified scope
-     */
-    DataType getOutboundPropertyDataType(String name);
+  /**
+   * Gets an outbound property data type from the message.
+   *
+   * @param name the name or key of the property. This must be non-null.
+   * @return the property data type or null if the property does not exist in the specified scope
+   */
+  DataType getOutboundPropertyDataType(String name);
 
-    /**
-     * Gets all outbound property names.
-     *
-     * @return all outbound property keys of this message
-     */
-    Set<String> getOutboundPropertyNames();
+  /**
+   * Gets all outbound property names.
+   *
+   * @return all outbound property keys of this message
+   */
+  Set<String> getOutboundPropertyNames();
 
-    /**
-     * Gets an inbound property from the message.
-     *
-     * @param name the name or key of the property. This must be non-null.
-     * @return the property value or null if the property does not exist in the specified scope
-     */
-    <T extends Serializable> T getInboundProperty(String name);
+  /**
+   * Gets an inbound property from the message.
+   *
+   * @param name the name or key of the property. This must be non-null.
+   * @return the property value or null if the property does not exist in the specified scope
+   */
+  <T extends Serializable> T getInboundProperty(String name);
 
-    /**
-     * Gets an inbound property from the message and provides a default value if the property is not
-     * present on the message in the scope specified.  The method will also type check against the default value
-     * to ensure that the value is of the correct type.  If null is used for the default value no type checking is
-     * done.
-     *
-     * @param <T> the defaultValue type ,this is used to validate the property value type
-     * @param name the name or key of the property. This must be non-null.
-     * @param defaultValue the value to return if the property is not in the scope provided. Can be null
-     * @return the property value or the defaultValue if the property does not exist in the specified scope
-     * @throws IllegalArgumentException if the value for the property key is not assignable from the defaultValue type
-     */
-    <T extends Serializable> T getInboundProperty(String name, T defaultValue);
+  /**
+   * Gets an inbound property from the message and provides a default value if the property is not present on the message in the
+   * scope specified. The method will also type check against the default value to ensure that the value is of the correct type.
+   * If null is used for the default value no type checking is done.
+   *
+   * @param <T> the defaultValue type ,this is used to validate the property value type
+   * @param name the name or key of the property. This must be non-null.
+   * @param defaultValue the value to return if the property is not in the scope provided. Can be null
+   * @return the property value or the defaultValue if the property does not exist in the specified scope
+   * @throws IllegalArgumentException if the value for the property key is not assignable from the defaultValue type
+   */
+  <T extends Serializable> T getInboundProperty(String name, T defaultValue);
 
-    /**
-     * Gets an inbound property data type from the message.
-     *
-     * @param name the name or key of the property. This must be non-null.
-     * @return the property data type or null if the property does not exist in the specified scope
-     */
-    DataType getInboundPropertyDataType(String name);
+  /**
+   * Gets an inbound property data type from the message.
+   *
+   * @param name the name or key of the property. This must be non-null.
+   * @return the property data type or null if the property does not exist in the specified scope
+   */
+  DataType getInboundPropertyDataType(String name);
 
-    /**
-     * Gets all inbound property names.
-     *
-     * @return all inbound property keys on this message.
-     */
-    Set<String> getInboundPropertyNames();
+  /**
+   * Gets all inbound property names.
+   *
+   * @return all inbound property keys on this message.
+   */
+  Set<String> getInboundPropertyNames();
 
 }

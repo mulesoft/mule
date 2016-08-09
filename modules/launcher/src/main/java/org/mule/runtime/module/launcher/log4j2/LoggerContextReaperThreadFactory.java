@@ -9,31 +9,27 @@ package org.mule.runtime.module.launcher.log4j2;
 import java.util.concurrent.ThreadFactory;
 
 /**
- * A {@link ThreadFactory} which creates a thread of name
- * {@link #THREAD_NAME} and which TCCL is {@link #contextClassLoader}
+ * A {@link ThreadFactory} which creates a thread of name {@link #THREAD_NAME} and which TCCL is {@link #contextClassLoader}
  */
-final class LoggerContextReaperThreadFactory implements ThreadFactory
-{
+final class LoggerContextReaperThreadFactory implements ThreadFactory {
 
-    static final String THREAD_NAME = "logger.context.reaper";
-    private final ClassLoader contextClassLoader;
+  static final String THREAD_NAME = "logger.context.reaper";
+  private final ClassLoader contextClassLoader;
 
-    /**
-     * Creates a new instance for the given {@code contextClassLoader}
-     *
-     * @param contextClassLoader the {@link ClassLoader} which should be used as TCCL of the created threads
-     */
-    LoggerContextReaperThreadFactory(ClassLoader contextClassLoader)
-    {
-        this.contextClassLoader = contextClassLoader;
-    }
+  /**
+   * Creates a new instance for the given {@code contextClassLoader}
+   *
+   * @param contextClassLoader the {@link ClassLoader} which should be used as TCCL of the created threads
+   */
+  LoggerContextReaperThreadFactory(ClassLoader contextClassLoader) {
+    this.contextClassLoader = contextClassLoader;
+  }
 
-    @Override
-    public Thread newThread(Runnable runnable)
-    {
-        Thread thread = new Thread(runnable, THREAD_NAME);
-        thread.setContextClassLoader(contextClassLoader);
+  @Override
+  public Thread newThread(Runnable runnable) {
+    Thread thread = new Thread(runnable, THREAD_NAME);
+    thread.setContextClassLoader(contextClassLoader);
 
-        return thread;
-    }
+    return thread;
+  }
 }

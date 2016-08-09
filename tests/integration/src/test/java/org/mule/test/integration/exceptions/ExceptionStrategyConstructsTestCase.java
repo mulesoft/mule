@@ -21,47 +21,41 @@ import org.mule.runtime.core.message.ExceptionMessage;
 
 import org.junit.Test;
 
-public class ExceptionStrategyConstructsTestCase extends AbstractIntegrationTestCase
-{
+public class ExceptionStrategyConstructsTestCase extends AbstractIntegrationTestCase {
+
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/integration/exceptions/exception-strategy-constructs-config-flow.xml";
+  }
+
+  @Test
+  public void testDefaultExceptionStrategySingleEndpoint() throws Exception {
+    MuleClient client = muleContext.getClient();
+
+    flowRunner("testService").withPayload(getTestMuleMessage(TEST_PAYLOAD)).asynchronously().run();
+    assertExceptionMessage(client.request("test://modelout", RECEIVE_TIMEOUT));
+
+    flowRunner("testService1").withPayload(getTestMuleMessage(TEST_PAYLOAD)).asynchronously().run();
+    assertExceptionMessage(client.request("test://service1out", RECEIVE_TIMEOUT));
+
+    flowRunner("testflow1").withPayload(getTestMuleMessage(TEST_PAYLOAD)).asynchronously().run();
+    assertExceptionMessage(client.request("test://flow1out", RECEIVE_TIMEOUT));
+  }
+
+  private void assertExceptionMessage(MuleMessage out) {
+    assertNotNull(out);
+    assertTrue(out.getPayload() instanceof ExceptionMessage);
+    ExceptionMessage exceptionMessage = (ExceptionMessage) out.getPayload();
+    assertTrue(exceptionMessage.getException().getClass() == FunctionalTestException.class
+        || exceptionMessage.getException().getCause().getClass() == FunctionalTestException.class);
+    assertEquals("test", exceptionMessage.getPayload());
+  }
+
+  public static class ExceptionThrowingProcessor implements MessageProcessor {
 
     @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/integration/exceptions/exception-strategy-constructs-config-flow.xml";
+    public MuleEvent process(MuleEvent event) throws MuleException {
+      throw new MessagingException(event, new FunctionalTestException());
     }
-
-    @Test
-    public void testDefaultExceptionStrategySingleEndpoint() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-
-        flowRunner("testService").withPayload(getTestMuleMessage(TEST_PAYLOAD)).asynchronously().run();
-        assertExceptionMessage(client.request("test://modelout", RECEIVE_TIMEOUT));
-
-        flowRunner("testService1").withPayload(getTestMuleMessage(TEST_PAYLOAD)).asynchronously().run();
-        assertExceptionMessage(client.request("test://service1out", RECEIVE_TIMEOUT));
-
-        flowRunner("testflow1").withPayload(getTestMuleMessage(TEST_PAYLOAD)).asynchronously().run();
-        assertExceptionMessage(client.request("test://flow1out", RECEIVE_TIMEOUT));
-    }
-
-    private void assertExceptionMessage(MuleMessage out)
-    {
-        assertNotNull(out);
-        assertTrue(out.getPayload() instanceof ExceptionMessage);
-        ExceptionMessage exceptionMessage = (ExceptionMessage) out.getPayload();
-        assertTrue(exceptionMessage.getException().getClass() == FunctionalTestException.class
-                   || exceptionMessage.getException().getCause().getClass() == FunctionalTestException.class);
-        assertEquals("test", exceptionMessage.getPayload());
-    }
-
-    public static class ExceptionThrowingProcessor implements MessageProcessor
-    {
-
-        @Override
-        public MuleEvent process(MuleEvent event) throws MuleException
-        {
-            throw new MessagingException(event, new FunctionalTestException());
-        }
-    }
+  }
 }

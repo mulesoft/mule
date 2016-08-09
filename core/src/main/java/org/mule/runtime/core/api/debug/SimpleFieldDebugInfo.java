@@ -14,20 +14,18 @@ import static org.mule.runtime.core.util.Preconditions.checkArgument;
  *
  * @since 3.8.0
  */
-public class SimpleFieldDebugInfo extends FieldDebugInfo<Object>
-{
+public class SimpleFieldDebugInfo extends FieldDebugInfo<Object> {
 
-    /**
-     * Creates a debug information for a simple field
-     *
-     * @param name name of the created field. Must be a not blank {@link String}
-     * @param type class of the field. Cannot be null.
-     * @param value value of the field. Can be null
-     */
-    SimpleFieldDebugInfo(String name, String type, Object value)
-    {
-        super(name, type, value);
-        checkArgument(type != null, "Type cannot be null");
-    }
+  /**
+   * Creates a debug information for a simple field
+   *
+   * @param name name of the created field. Must be a not blank {@link String}
+   * @param type class of the field. Cannot be null.
+   * @param value value of the field. Can be null
+   */
+  SimpleFieldDebugInfo(String name, String type, Object value) {
+    super(name, type, value);
+    checkArgument(type != null, "Type cannot be null");
+  }
 
 }

@@ -32,62 +32,51 @@ import javax.mail.MessagingException;
  *
  * @since 4.0
  */
-public final class ListCommand
-{
+public final class ListCommand {
 
-    /**
-     * Retrieves all the emails in the specified {@code folderName}.
-     * <p>
-     * A new {@link MuleMessage} is created for each fetched email from the folder, where
-     * the payload is the text body of the email and the other metadata is carried by
-     * an {@link EmailAttributes} instance.
-     * <p>
-     * For folder implementations (like IMAP) that support fetching without reading the content, if the content
-     * should NOT be read ({@code readContent} = false) the SEEN flag is not going to be set.
-     *
-     * @param connection  the associated {@link RetrieverConnection}.
-     * @param folderName  the name of the folder where the emails are stored.
-     * @param readContent if should read the email content or not.
-     * @param matcher     a {@link Predicate} of {@link EmailAttributes} used to filter the output list  @return a {@link List} of {@link MuleMessage} carrying all the emails and it's corresponding attributes.
-     */
-    public List<MuleMessage> list(RetrieverConnection connection,
-                                  String folderName,
-                                  boolean readContent,
-                                  Predicate<EmailAttributes> matcher)
-    {
-        try
-        {
-            Folder folder = connection.getFolder(folderName, READ_ONLY);
-            List<MuleMessage> list = new LinkedList<>();
-            for (Message m : folder.getMessages())
-            {
-                Object body = "";
-                EmailAttributes attributes = fromMessage(m);
-                if (matcher.test(attributes))
-                {
-                    if (readContent)
-                    {
-                        body = EmailContentProcessor.process(m).getBody();
+  /**
+   * Retrieves all the emails in the specified {@code folderName}.
+   * <p>
+   * A new {@link MuleMessage} is created for each fetched email from the folder, where the payload is the text body of the email
+   * and the other metadata is carried by an {@link EmailAttributes} instance.
+   * <p>
+   * For folder implementations (like IMAP) that support fetching without reading the content, if the content should NOT be read
+   * ({@code readContent} = false) the SEEN flag is not going to be set.
+   *
+   * @param connection the associated {@link RetrieverConnection}.
+   * @param folderName the name of the folder where the emails are stored.
+   * @param readContent if should read the email content or not.
+   * @param matcher a {@link Predicate} of {@link EmailAttributes} used to filter the output list @return a {@link List} of
+   *        {@link MuleMessage} carrying all the emails and it's corresponding attributes.
+   */
+  public List<MuleMessage> list(RetrieverConnection connection, String folderName, boolean readContent,
+                                Predicate<EmailAttributes> matcher) {
+    try {
+      Folder folder = connection.getFolder(folderName, READ_ONLY);
+      List<MuleMessage> list = new LinkedList<>();
+      for (Message m : folder.getMessages()) {
+        Object body = "";
+        EmailAttributes attributes = fromMessage(m);
+        if (matcher.test(attributes)) {
+          if (readContent) {
+            body = EmailContentProcessor.process(m).getBody();
 
-                        final List<MuleMessage> attachmentParts = process(m).getAttachments();
-                        if(!attachmentParts.isEmpty())
-                        {
-                            final List<MuleMessage> parts = new ArrayList<>();
-                            parts.add(MuleMessage.builder().payload(body).attributes(BODY_ATTRIBUTES).build());
-                            parts.addAll(attachmentParts);
+            final List<MuleMessage> attachmentParts = process(m).getAttachments();
+            if (!attachmentParts.isEmpty()) {
+              final List<MuleMessage> parts = new ArrayList<>();
+              parts.add(MuleMessage.builder().payload(body).attributes(BODY_ATTRIBUTES).build());
+              parts.addAll(attachmentParts);
 
-                            body = new DefaultMultiPartPayload(parts);
-                        }
-                    }
-                    attributes = fromMessage(m);
-                    list.add(MuleMessage.builder().payload(body).attributes(attributes).build());
-                }
+              body = new DefaultMultiPartPayload(parts);
             }
-            return list;
+          }
+          attributes = fromMessage(m);
+          list.add(MuleMessage.builder().payload(body).attributes(attributes).build());
         }
-        catch (MessagingException me)
-        {
-            throw new EmailRetrieverException(me);
-        }
+      }
+      return list;
+    } catch (MessagingException me) {
+      throw new EmailRetrieverException(me);
     }
+  }
 }

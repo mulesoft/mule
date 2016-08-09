@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.api.component.simple;
 
-public interface EchoService
-{
-    String echo(String echo);
+public interface EchoService {
+
+  String echo(String echo);
 }

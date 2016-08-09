@@ -7,31 +7,30 @@
 package org.mule.extension.http.api.request.proxy;
 
 /**
- *  HTTP proxy configuration for making http requests.
+ * HTTP proxy configuration for making http requests.
  *
- *  @since 4.0
+ * @since 4.0
  */
-public interface ProxyConfig
-{
+public interface ProxyConfig {
 
-    /**
-     * @return the http proxy host
-     */
-    public String getHost();
+  /**
+   * @return the http proxy host
+   */
+  public String getHost();
 
-    /**
-     * @return the http proxy port
-     */
-    public int getPort();
+  /**
+   * @return the http proxy port
+   */
+  public int getPort();
 
-    /**
-     * @return the http proxy authentication username
-     */
-    public String getUsername();
+  /**
+   * @return the http proxy authentication username
+   */
+  public String getUsername();
 
-    /**
-     * @return the http proxy authentication password
-     */
-    public String getPassword();
+  /**
+   * @return the http proxy authentication password
+   */
+  public String getPassword();
 
 }

@@ -14,42 +14,32 @@ import java.io.OutputStream;
 
 import org.apache.commons.lang.SerializationUtils;
 
-public class CustomSerializationProtocol extends DirectProtocol
-{
+public class CustomSerializationProtocol extends DirectProtocol {
 
-    @Override
-    public void write(OutputStream os, Object data) throws IOException
-    {
-        if (data instanceof NonSerializableMessageObject)
-        {
-            NonSerializableMessageObject in = (NonSerializableMessageObject)data;
+  @Override
+  public void write(OutputStream os, Object data) throws IOException {
+    if (data instanceof NonSerializableMessageObject) {
+      NonSerializableMessageObject in = (NonSerializableMessageObject) data;
 
-            // do serialization... will use normal Serialization to simplify code...
-            MessageObject serializableObject = new MessageObject(in.i, in.s, in.b);
+      // do serialization... will use normal Serialization to simplify code...
+      MessageObject serializableObject = new MessageObject(in.i, in.s, in.b);
 
-            write(os, SerializationUtils.serialize(serializableObject));
-        }
-        else
-        {
-            super.write(os, data);
-        }
+      write(os, SerializationUtils.serialize(serializableObject));
+    } else {
+      super.write(os, data);
     }
+  }
 
-    @Override
-    public Object read(InputStream is) throws IOException
-    {
-        byte[] tmp = (byte[]) super.read(is);
+  @Override
+  public Object read(InputStream is) throws IOException {
+    byte[] tmp = (byte[]) super.read(is);
 
-        if (tmp == null)
-        {
-            return null;
-        }
-        else
-        {
-            MessageObject serializableObject = (MessageObject)SerializationUtils.deserialize(tmp);
-            return new NonSerializableMessageObject(serializableObject.i, serializableObject.s,
-                serializableObject.b);
-        }
+    if (tmp == null) {
+      return null;
+    } else {
+      MessageObject serializableObject = (MessageObject) SerializationUtils.deserialize(tmp);
+      return new NonSerializableMessageObject(serializableObject.i, serializableObject.s, serializableObject.b);
     }
+  }
 
 }

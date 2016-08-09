@@ -21,45 +21,41 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-public class XsltResultDocumentTestCase extends FunctionalTestCase
-{
+public class XsltResultDocumentTestCase extends FunctionalTestCase {
 
-    private static final String INPUT_FILE = "cities.xml";
-    private static final String OUTPUT_FILE_PROPERTY = "outputFile";
-    private static final String FLOW_NAME = "listCities";
-    private static final String EXPECTED_OUTPUT = "italy - milan - 5 | france - paris - 7 | germany - munich - 4 | france - lyon - 2 | italy - venice - 1 | ";
+  private static final String INPUT_FILE = "cities.xml";
+  private static final String OUTPUT_FILE_PROPERTY = "outputFile";
+  private static final String FLOW_NAME = "listCities";
+  private static final String EXPECTED_OUTPUT =
+      "italy - milan - 5 | france - paris - 7 | germany - munich - 4 | france - lyon - 2 | italy - venice - 1 | ";
 
-    @Rule
-    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+  @Rule
+  public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "xsl/xslt-result-document-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "xsl/xslt-result-document-config.xml";
+  }
 
-    @Test
-    public void writeToSameFileSeveralTimes() throws Exception
-    {
-        String cities = IOUtils.getResourceAsString(INPUT_FILE, getClass());
+  @Test
+  public void writeToSameFileSeveralTimes() throws Exception {
+    String cities = IOUtils.getResourceAsString(INPUT_FILE, getClass());
 
-        File outputFile = temporaryFolder.newFile(UUID.getUUID());
+    File outputFile = temporaryFolder.newFile(UUID.getUUID());
 
-        executeFlowAndValidateOutput(cities, outputFile);
-        executeFlowAndValidateOutput(cities, outputFile);
-    }
+    executeFlowAndValidateOutput(cities, outputFile);
+    executeFlowAndValidateOutput(cities, outputFile);
+  }
 
-    private void executeFlowAndValidateOutput(String payload, File outputFile) throws Exception
-    {
-        outputFile.delete();
-        withPayloadAndSessionProperty(flowRunner(FLOW_NAME), payload, OUTPUT_FILE_PROPERTY, outputFile.getAbsolutePath()).run();
-        assertThat(FileUtils.readFileToString(outputFile), is(EXPECTED_OUTPUT));
-    }
+  private void executeFlowAndValidateOutput(String payload, File outputFile) throws Exception {
+    outputFile.delete();
+    withPayloadAndSessionProperty(flowRunner(FLOW_NAME), payload, OUTPUT_FILE_PROPERTY, outputFile.getAbsolutePath()).run();
+    assertThat(FileUtils.readFileToString(outputFile), is(EXPECTED_OUTPUT));
+  }
 
-    private FlowRunner withPayloadAndSessionProperty(FlowRunner runner, Object payload, String propertyName, Object propertyValue) throws Exception
-    {
-        return runner.withPayload(payload)
-                     .withSessionProperty(propertyName, propertyValue);
-    }
+  private FlowRunner withPayloadAndSessionProperty(FlowRunner runner, Object payload, String propertyName, Object propertyValue)
+      throws Exception {
+    return runner.withPayload(payload).withSessionProperty(propertyName, propertyValue);
+  }
 
 }

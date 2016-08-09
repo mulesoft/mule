@@ -21,24 +21,23 @@ import java.io.InputStream;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
-public class KBEStrategyUsingEncryptionTransformerTestCase extends AbstractEncryptionStrategyTestCase
-{
-    @Test
-    public void testEncrypt() throws Exception
-    {
-        String msg = "Test Message";
+public class KBEStrategyUsingEncryptionTransformerTestCase extends AbstractEncryptionStrategyTestCase {
 
-        MuleEvent event = getTestEvent(msg, getTestFlow("orange", Orange.class));
-        event = RequestContext.setEvent(event);
+  @Test
+  public void testEncrypt() throws Exception {
+    String msg = "Test Message";
 
-        EncryptionTransformer etrans = new EncryptionTransformer();
-        etrans.setStrategy(kbStrategy);
-        Object result = etrans.doTransform(msg.getBytes(), UTF_8);
+    MuleEvent event = getTestEvent(msg, getTestFlow("orange", Orange.class));
+    event = RequestContext.setEvent(event);
 
-        assertNotNull(result);
-        InputStream inputStream = (InputStream) result;
-        String message = IOUtils.toString(inputStream);
-        String encrypted = (String) new ByteArrayToObject().doTransform(message.getBytes(), UTF_8);
-        assertTrue(encrypted.startsWith("-----BEGIN PGP MESSAGE-----"));
-    }
+    EncryptionTransformer etrans = new EncryptionTransformer();
+    etrans.setStrategy(kbStrategy);
+    Object result = etrans.doTransform(msg.getBytes(), UTF_8);
+
+    assertNotNull(result);
+    InputStream inputStream = (InputStream) result;
+    String message = IOUtils.toString(inputStream);
+    String encrypted = (String) new ByteArrayToObject().doTransform(message.getBytes(), UTF_8);
+    assertTrue(encrypted.startsWith("-----BEGIN PGP MESSAGE-----"));
+  }
 }

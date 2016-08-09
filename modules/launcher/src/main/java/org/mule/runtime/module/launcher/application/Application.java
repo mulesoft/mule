@@ -11,19 +11,18 @@ import org.mule.runtime.module.launcher.artifact.DeployableArtifact;
 import org.mule.runtime.module.launcher.descriptor.ApplicationDescriptor;
 import org.mule.runtime.module.launcher.domain.Domain;
 
-public interface Application extends DeployableArtifact<ApplicationDescriptor>
-{
+public interface Application extends DeployableArtifact<ApplicationDescriptor> {
 
-    MuleContext getMuleContext();
+  MuleContext getMuleContext();
 
-    /**
-     * @return the domain associated with the application.
-     */
-    Domain getDomain();
+  /**
+   * @return the domain associated with the application.
+   */
+  Domain getDomain();
 
-    /**
-     * @return the current status of the application
-     */
-    ApplicationStatus getStatus();
+  /**
+   * @return the current status of the application
+   */
+  ApplicationStatus getStatus();
 
 }

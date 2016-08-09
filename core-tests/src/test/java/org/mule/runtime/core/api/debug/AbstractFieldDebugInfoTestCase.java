@@ -11,22 +11,19 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Test;
 
-public abstract class AbstractFieldDebugInfoTestCase<T> extends AbstractMuleTestCase
-{
+public abstract class AbstractFieldDebugInfoTestCase<T> extends AbstractMuleTestCase {
 
-    @Test(expected = IllegalArgumentException.class)
-    public void validatesNullFieldName() throws Exception
-    {
-        createFieldDebugInfo(null, String.class, getValue());
-    }
+  @Test(expected = IllegalArgumentException.class)
+  public void validatesNullFieldName() throws Exception {
+    createFieldDebugInfo(null, String.class, getValue());
+  }
 
-    protected abstract T getValue();
+  protected abstract T getValue();
 
-    protected abstract void createFieldDebugInfo(String name, Class type, T value);
+  protected abstract void createFieldDebugInfo(String name, Class type, T value);
 
-    @Test(expected = IllegalArgumentException.class)
-    public void validatesEmptyFieldName() throws Exception
-    {
-        createFieldDebugInfo("", String.class, getValue());
-    }
+  @Test(expected = IllegalArgumentException.class)
+  public void validatesEmptyFieldName() throws Exception {
+    createFieldDebugInfo("", String.class, getValue());
+  }
 }

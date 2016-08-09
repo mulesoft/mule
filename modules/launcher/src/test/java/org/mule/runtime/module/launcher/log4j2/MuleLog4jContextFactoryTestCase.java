@@ -23,60 +23,51 @@ import org.junit.Before;
 import org.junit.Test;
 
 @SmallTest
-public class MuleLog4jContextFactoryTestCase extends AbstractMuleTestCase
-{
-    private static final String LOG_CONFIGURATION_FACTORY_PROPERTY = "log4j.configurationFactory";
-    private static final String ASYNC_LOGGER_EXCEPTION_HANDLER_PROPERTY = "AsyncLoggerConfig.ExceptionHandler";
+public class MuleLog4jContextFactoryTestCase extends AbstractMuleTestCase {
 
-    private Map<String, String> originalSystemProperties;
+  private static final String LOG_CONFIGURATION_FACTORY_PROPERTY = "log4j.configurationFactory";
+  private static final String ASYNC_LOGGER_EXCEPTION_HANDLER_PROPERTY = "AsyncLoggerConfig.ExceptionHandler";
 
-    @Before
-    public void before()
-    {
-        originalSystemProperties = new HashMap<>();
-        originalSystemProperties.put(LOG_CONFIGURATION_FACTORY_PROPERTY, getProperty(LOG_CONFIGURATION_FACTORY_PROPERTY));
-        originalSystemProperties.put(ASYNC_LOGGER_EXCEPTION_HANDLER_PROPERTY, getProperty(ASYNC_LOGGER_EXCEPTION_HANDLER_PROPERTY));
+  private Map<String, String> originalSystemProperties;
+
+  @Before
+  public void before() {
+    originalSystemProperties = new HashMap<>();
+    originalSystemProperties.put(LOG_CONFIGURATION_FACTORY_PROPERTY, getProperty(LOG_CONFIGURATION_FACTORY_PROPERTY));
+    originalSystemProperties.put(ASYNC_LOGGER_EXCEPTION_HANDLER_PROPERTY, getProperty(ASYNC_LOGGER_EXCEPTION_HANDLER_PROPERTY));
+  }
+
+  @After
+  public void after() {
+    for (Map.Entry<String, String> entry : originalSystemProperties.entrySet()) {
+      if (entry.getValue() != null) {
+        System.setProperty(entry.getKey(), entry.getValue());
+      } else {
+        System.clearProperty(entry.getKey());
+      }
     }
+  }
 
-    @After
-    public void after()
-    {
-        for (Map.Entry<String, String> entry : originalSystemProperties.entrySet())
-        {
-            if (entry.getValue() != null)
-            {
-                System.setProperty(entry.getKey(), entry.getValue());
-            }
-            else
-            {
-                System.clearProperty(entry.getKey());
-            }
-        }
-    }
+  @Test
+  public void systemProperties() {
+    new MuleLog4jContextFactory();
+    assertThat(XmlConfigurationFactory.class.getName(), equalTo(getProperty(LOG_CONFIGURATION_FACTORY_PROPERTY)));
+    assertThat(AsyncLoggerExceptionHandler.class.getName(), equalTo(getProperty(ASYNC_LOGGER_EXCEPTION_HANDLER_PROPERTY)));
+  }
 
-    @Test
-    public void systemProperties()
-    {
-        new MuleLog4jContextFactory();
-        assertThat(XmlConfigurationFactory.class.getName(), equalTo(getProperty(LOG_CONFIGURATION_FACTORY_PROPERTY)));
-        assertThat(AsyncLoggerExceptionHandler.class.getName(), equalTo(getProperty(ASYNC_LOGGER_EXCEPTION_HANDLER_PROPERTY)));
-    }
+  @Test
+  public void customExceptionHandler() {
+    final String customHandler = "custom";
+    System.setProperty(ASYNC_LOGGER_EXCEPTION_HANDLER_PROPERTY, customHandler);
+    new MuleLog4jContextFactory();
+    assertThat(customHandler, equalTo(getProperty(ASYNC_LOGGER_EXCEPTION_HANDLER_PROPERTY)));
+  }
 
-    @Test
-    public void customExceptionHandler()
-    {
-        final String customHandler = "custom";
-        System.setProperty(ASYNC_LOGGER_EXCEPTION_HANDLER_PROPERTY, customHandler);
-        new MuleLog4jContextFactory();
-        assertThat(customHandler, equalTo(getProperty(ASYNC_LOGGER_EXCEPTION_HANDLER_PROPERTY)));
-    }
-
-    @Test
-    public void dispose()
-    {
-        ArtifactAwareContextSelector contextSelector = mock(ArtifactAwareContextSelector.class);
-        MuleLog4jContextFactory factory = new MuleLog4jContextFactory(contextSelector);
-        factory.dispose();
-        verify(contextSelector).dispose();
-    }
+  @Test
+  public void dispose() {
+    ArtifactAwareContextSelector contextSelector = mock(ArtifactAwareContextSelector.class);
+    MuleLog4jContextFactory factory = new MuleLog4jContextFactory(contextSelector);
+    factory.dispose();
+    verify(contextSelector).dispose();
+  }
 }

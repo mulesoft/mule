@@ -28,44 +28,38 @@ import javax.activation.MimetypesFileTypeMap;
 import org.junit.Test;
 
 /**
- * Ensures that some of the defined mimeTypes are properly mapped.
- * This test does not cover all the available mimeType mappings as that will
- * require to parse the mime.types file
+ * Ensures that some of the defined mimeTypes are properly mapped. This test does not cover all the available mimeType mappings as
+ * that will require to parse the mime.types file
  */
 @SmallTest
-public class FileExtensionContentTypeResolutionTestCase extends AbstractMuleTestCase
-{
+public class FileExtensionContentTypeResolutionTestCase extends AbstractMuleTestCase {
 
-    private static final MimetypesFileTypeMap mimetypesFileTypeMap = new MimetypesFileTypeMap();
-    public static final MediaType DEFAULT_CONTENT_TYPE = BINARY;
+  private static final MimetypesFileTypeMap mimetypesFileTypeMap = new MimetypesFileTypeMap();
+  public static final MediaType DEFAULT_CONTENT_TYPE = BINARY;
 
-    @Test
-    public void resolvesFileMimeType() throws Exception
-    {
-        Map<String, MediaType> mimeTypes = new HashMap<>();
-        mimeTypes.put("txt", TEXT);
-        mimeTypes.put("json", JSON);
-        mimeTypes.put("xml", XML);
-        mimeTypes.put("html", HTML);
-        mimeTypes.put("csv", MediaType.create("text", "csv"));
+  @Test
+  public void resolvesFileMimeType() throws Exception {
+    Map<String, MediaType> mimeTypes = new HashMap<>();
+    mimeTypes.put("txt", TEXT);
+    mimeTypes.put("json", JSON);
+    mimeTypes.put("xml", XML);
+    mimeTypes.put("html", HTML);
+    mimeTypes.put("csv", MediaType.create("text", "csv"));
 
-        for (String extension : mimeTypes.keySet())
-        {
-            doFileMimeTypeTest(extension, mimeTypes.get(extension));
-        }
+    for (String extension : mimeTypes.keySet()) {
+      doFileMimeTypeTest(extension, mimeTypes.get(extension));
     }
+  }
 
-    @Test
-    public void resolvesDefaultMimeType() throws Exception
-    {
-        doFileMimeTypeTest("xxxxxx", DEFAULT_CONTENT_TYPE);
-    }
+  @Test
+  public void resolvesDefaultMimeType() throws Exception {
+    doFileMimeTypeTest("xxxxxx", DEFAULT_CONTENT_TYPE);
+  }
 
-    private void doFileMimeTypeTest(String fileExtension, MediaType expectedMimeType) throws IOException
-    {
-        String filename = "test." + fileExtension;
-        String mimeType = mimetypesFileTypeMap.getContentType(filename);
+  private void doFileMimeTypeTest(String fileExtension, MediaType expectedMimeType) throws IOException {
+    String filename = "test." + fileExtension;
+    String mimeType = mimetypesFileTypeMap.getContentType(filename);
 
-        assertThat(mimeType, equalTo(expectedMimeType.toString()));
-    }
+    assertThat(mimeType, equalTo(expectedMimeType.toString()));
+  }
 }

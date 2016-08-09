@@ -11,14 +11,11 @@ import org.mule.runtime.config.spring.parsers.assembly.configuration.PropertyCon
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 
-public class AttributeMapBeanAssemblerFactory implements BeanAssemblerFactory
-{
+public class AttributeMapBeanAssemblerFactory implements BeanAssemblerFactory {
 
-    public BeanAssembler newBeanAssembler(
-            PropertyConfiguration beanConfig, BeanDefinitionBuilder bean,
-            PropertyConfiguration targetConfig, BeanDefinition target)
-    {
-        return new AttributeMapBeanAssembler(beanConfig, bean, targetConfig, target);
-    }
+  public BeanAssembler newBeanAssembler(PropertyConfiguration beanConfig, BeanDefinitionBuilder bean,
+                                        PropertyConfiguration targetConfig, BeanDefinition target) {
+    return new AttributeMapBeanAssembler(beanConfig, bean, targetConfig, target);
+  }
 
 }

@@ -17,30 +17,25 @@ import javax.xml.ws.Holder;
 import org.apache.cxf.mime.TestMtom;
 import org.apache.cxf.mime.types.XopStringType;
 
-@WebService(serviceName = "TestMtomService", portName = "TestMtomPort", targetNamespace = "http://cxf.apache.org/mime", endpointInterface = "org.apache.cxf.mime.TestMtom", wsdlLocation = "testutils/mtom_xop.wsdl")
-public class TestMtomImpl implements TestMtom
-{
+@WebService(serviceName = "TestMtomService", portName = "TestMtomPort", targetNamespace = "http://cxf.apache.org/mime",
+    endpointInterface = "org.apache.cxf.mime.TestMtom", wsdlLocation = "testutils/mtom_xop.wsdl")
+public class TestMtomImpl implements TestMtom {
 
-    public XopStringType testXopString(XopStringType data)
-    {
-        return data;
+  public XopStringType testXopString(XopStringType data) {
+    return data;
+  }
+
+  public void testXop(Holder<String> name, Holder<DataHandler> attachinfo) {
+    name.value = "return detail + " + name.value;
+
+    try {
+      InputStream inputStream = attachinfo.value.getInputStream();
+      while (inputStream.read() != -1);
+    } catch (IOException e) {
+      e.printStackTrace();
     }
 
-    public void testXop(Holder<String> name, Holder<DataHandler> attachinfo)
-    {
-        name.value = "return detail + " + name.value;
-
-        try
-        {
-            InputStream inputStream = attachinfo.value.getInputStream();
-            while (inputStream.read() != -1);
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-
-        attachinfo.value = new DataHandler(new FileDataSource("src/test/resources/mtom-conf-service.xml"));
-    }
+    attachinfo.value = new DataHandler(new FileDataSource("src/test/resources/mtom-conf-service.xml"));
+  }
 
 }

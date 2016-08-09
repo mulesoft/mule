@@ -19,73 +19,60 @@ import java.nio.charset.Charset;
 import java.util.Map;
 
 /**
- * Creates and object of type {@code getReturnDataType().getType()} and populates values of a
- * {@link java.util.Map} as bean properties on the object.
- * The bean class name can also be passed in as a property on the Map (which gets removed once read).
+ * Creates and object of type {@code getReturnDataType().getType()} and populates values of a {@link java.util.Map} as bean
+ * properties on the object. The bean class name can also be passed in as a property on the Map (which gets removed once read).
  * The {@link MapToBean#CLASS_PROPERTY} should be set as a fully qualified class name string.
  */
-public class MapToBean extends AbstractTransformer implements DiscoverableTransformer
-{
-    /**
-     * {@value}
-     */
-    public static final String CLASS_PROPERTY = "className";
+public class MapToBean extends AbstractTransformer implements DiscoverableTransformer {
 
-    private int priorityWeighting = DiscoverableTransformer.DEFAULT_PRIORITY_WEIGHTING;
+  /**
+   * {@value}
+   */
+  public static final String CLASS_PROPERTY = "className";
 
-    public MapToBean()
-    {
-        registerSourceType(DataType.fromType(Map.class));
-        setReturnDataType(DataType.OBJECT);
+  private int priorityWeighting = DiscoverableTransformer.DEFAULT_PRIORITY_WEIGHTING;
+
+  public MapToBean() {
+    registerSourceType(DataType.fromType(Map.class));
+    setReturnDataType(DataType.OBJECT);
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    super.initialise();
+    if (Object.class.equals(getReturnDataType().getType())) {
+      throw new InitialisationException(CoreMessages.propertiesNotSet("returnClass"), this);
     }
+  }
 
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        super.initialise();
-        if (Object.class.equals(getReturnDataType().getType()))
-        {
-            throw new InitialisationException(CoreMessages.propertiesNotSet("returnClass"), this);
-        }
+  @Override
+  protected Object doTransform(Object src, Charset encoding) throws TransformerException {
+    try {
+      Map props = (Map) src;
+      String c = (String) props.remove(CLASS_PROPERTY);
+      Class clazz = getReturnDataType().getType();
+      if (c == null && Object.class.equals(clazz)) {
+        throw new TransformerException(CoreMessages.transformerMapBeanClassNotSet());
+      } else if (c != null) {
+        clazz = ClassUtils.loadClass(c, getClass());
+      }
+
+      Object result = ClassUtils.instanciateClass(clazz, ClassUtils.NO_ARGS);
+      BeanUtils.populate(result, props);
+
+      return result;
+    } catch (Exception e) {
+      throw new TransformerException(this, e);
     }
+  }
 
-    @Override
-    protected Object doTransform(Object src, Charset encoding) throws TransformerException
-    {
-        try
-        {
-            Map props = (Map)src;
-            String c = (String)props.remove(CLASS_PROPERTY);
-            Class clazz = getReturnDataType().getType();
-            if (c == null && Object.class.equals(clazz))
-            {
-                throw new TransformerException(CoreMessages.transformerMapBeanClassNotSet());
-            }
-            else if (c!=null)
-            {
-                clazz = ClassUtils.loadClass(c, getClass());
-            }
+  @Override
+  public int getPriorityWeighting() {
+    return priorityWeighting;
+  }
 
-            Object result = ClassUtils.instanciateClass(clazz, ClassUtils.NO_ARGS);
-            BeanUtils.populate(result, props);
-
-            return result;
-        }
-        catch (Exception e)
-        {
-            throw new TransformerException(this, e);
-        }
-    }
-
-    @Override
-    public int getPriorityWeighting()
-    {
-        return priorityWeighting;
-    }
-
-    @Override
-    public void setPriorityWeighting(int weighting)
-    {
-        priorityWeighting = weighting;
-    }
+  @Override
+  public void setPriorityWeighting(int weighting) {
+    priorityWeighting = weighting;
+  }
 }

@@ -22,108 +22,92 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * The Transactional Queue Manager is responsible for creating and Managing
- * transactional Queues. Queues can also be persistent by setting a persistence
- * configuration for the queue.
+ * The Transactional Queue Manager is responsible for creating and Managing transactional Queues. Queues can also be persistent by
+ * setting a persistence configuration for the queue.
  */
-public class TransactionalQueueManager extends AbstractQueueManager
-{
+public class TransactionalQueueManager extends AbstractQueueManager {
 
-    private LocalTxQueueTransactionJournal localTxTransactionJournal;
-    private LocalTxQueueTransactionRecoverer localTxQueueTransactionRecoverer;
-    private XaTxQueueTransactionJournal xaTransactionJournal;
-    private XaTransactionRecoverer xaTransactionRecoverer;
-    private QueueXaResourceManager queueXaResourceManager = new QueueXaResourceManager();
-    //Due to current VMConnector and TransactionQueueManager relationship we must close all the recovered queues
-    //since queue configuration is applied after recovery and not taking into consideration once queues are created
-    //for recovery. See https://www.mulesoft.org/jira/browse/MULE-7420
-    private Map<String, RecoverableQueueStore> queuesAccessedForRecovery = new HashMap<String, RecoverableQueueStore>();
+  private LocalTxQueueTransactionJournal localTxTransactionJournal;
+  private LocalTxQueueTransactionRecoverer localTxQueueTransactionRecoverer;
+  private XaTxQueueTransactionJournal xaTransactionJournal;
+  private XaTransactionRecoverer xaTransactionRecoverer;
+  private QueueXaResourceManager queueXaResourceManager = new QueueXaResourceManager();
+  // Due to current VMConnector and TransactionQueueManager relationship we must close all the recovered queues
+  // since queue configuration is applied after recovery and not taking into consideration once queues are created
+  // for recovery. See https://www.mulesoft.org/jira/browse/MULE-7420
+  private Map<String, RecoverableQueueStore> queuesAccessedForRecovery = new HashMap<String, RecoverableQueueStore>();
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @return an instance of {@link TransactionalQueueSession}
-     */
-    @Override
-    public synchronized QueueSession getQueueSession()
-    {
-        return new TransactionalQueueSession(this, queueXaResourceManager, queueXaResourceManager, xaTransactionRecoverer, localTxTransactionJournal,getMuleContext());
+  /**
+   * {@inheritDoc}
+   * 
+   * @return an instance of {@link TransactionalQueueSession}
+   */
+  @Override
+  public synchronized QueueSession getQueueSession() {
+    return new TransactionalQueueSession(this, queueXaResourceManager, queueXaResourceManager, xaTransactionRecoverer,
+                                         localTxTransactionJournal, getMuleContext());
+  }
+
+  protected DefaultQueueStore createQueueStore(String name, QueueConfiguration config) {
+    return new DefaultQueueStore(name, getMuleContext(), config);
+  }
+
+  @Override
+  protected void doDispose() {
+    localTxTransactionJournal.close();
+    xaTransactionJournal.close();
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    String workingDirectory = getMuleContext().getConfiguration().getWorkingDirectory();
+    int queueTransactionFilesSizeInMegabytes = getMuleContext().getConfiguration().getMaxQueueTransactionFilesSizeInMegabytes();
+    localTxTransactionJournal = new LocalTxQueueTransactionJournal(workingDirectory + File.separator + "queue-tx-log",
+                                                                   getMuleContext(), queueTransactionFilesSizeInMegabytes);
+    localTxQueueTransactionRecoverer = new LocalTxQueueTransactionRecoverer(localTxTransactionJournal, this);
+    xaTransactionJournal = new XaTxQueueTransactionJournal(workingDirectory + File.separator + "queue-xa-tx-log",
+                                                           getMuleContext(), queueTransactionFilesSizeInMegabytes);
+    xaTransactionRecoverer = new XaTransactionRecoverer(xaTransactionJournal, this);
+  }
+
+  @Override
+  public RecoverableQueueStore getRecoveryQueue(String queueName) {
+    if (queuesAccessedForRecovery.containsKey(queueName)) {
+      return queuesAccessedForRecovery.get(queueName);
     }
+    DefaultQueueStore queueStore = createQueueStore(queueName, new DefaultQueueConfiguration(0, true));
+    queuesAccessedForRecovery.put(queueName, queueStore);
+    return queueStore;
+  }
 
-    protected DefaultQueueStore createQueueStore(String name, QueueConfiguration config)
-    {
-        return new DefaultQueueStore(name, getMuleContext(), config);
+  @Override
+  public void start() throws MuleException {
+    queueXaResourceManager.start();
+    localTxQueueTransactionRecoverer.recover();
+    for (QueueStore queueStore : queuesAccessedForRecovery.values()) {
+      queueStore.close();
     }
+    queuesAccessedForRecovery.clear();
 
-    @Override
-    protected void doDispose()
-    {
-        localTxTransactionJournal.close();
-        xaTransactionJournal.close();
-    }
+    // Need to do this in order to open all ListableObjectStore. See MULE-7486
+    openAllListableObjectStores();
+  }
 
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        String workingDirectory = getMuleContext().getConfiguration().getWorkingDirectory();
-        int queueTransactionFilesSizeInMegabytes = getMuleContext().getConfiguration().getMaxQueueTransactionFilesSizeInMegabytes();
-        localTxTransactionJournal = new LocalTxQueueTransactionJournal(workingDirectory + File.separator + "queue-tx-log", getMuleContext(), queueTransactionFilesSizeInMegabytes);
-        localTxQueueTransactionRecoverer = new LocalTxQueueTransactionRecoverer(localTxTransactionJournal, this);
-        xaTransactionJournal = new XaTxQueueTransactionJournal(workingDirectory + File.separator + "queue-xa-tx-log", getMuleContext(), queueTransactionFilesSizeInMegabytes);
-        xaTransactionRecoverer = new XaTransactionRecoverer(xaTransactionJournal, this);
-    }
-
-    @Override
-    public RecoverableQueueStore getRecoveryQueue(String queueName)
-    {
-        if (queuesAccessedForRecovery.containsKey(queueName))
-        {
-            return queuesAccessedForRecovery.get(queueName);
+  private void openAllListableObjectStores() {
+    if (getMuleContext() != null) {
+      for (ListableObjectStore store : getMuleContext().getRegistry().lookupByType(ListableObjectStore.class).values()) {
+        try {
+          store.open();
+        } catch (ObjectStoreException e) {
+          throw new MuleRuntimeException(e);
         }
-        DefaultQueueStore queueStore = createQueueStore(queueName, new DefaultQueueConfiguration(0, true));
-        queuesAccessedForRecovery.put(queueName, queueStore);
-        return queueStore;
+      }
     }
+  }
 
-    @Override
-    public void start() throws MuleException
-    {
-        queueXaResourceManager.start();
-        localTxQueueTransactionRecoverer.recover();
-        for (QueueStore queueStore : queuesAccessedForRecovery.values())
-        {
-            queueStore.close();
-        }
-        queuesAccessedForRecovery.clear();
-
-        //Need to do this in order to open all ListableObjectStore. See MULE-7486
-        openAllListableObjectStores();
-    }
-
-    private void openAllListableObjectStores()
-    {
-        if (getMuleContext() != null)
-        {
-            for (ListableObjectStore store : getMuleContext().getRegistry()
-                    .lookupByType(ListableObjectStore.class)
-                    .values())
-            {
-                try
-                {
-                    store.open();
-                }
-                catch (ObjectStoreException e)
-                {
-                    throw new MuleRuntimeException(e);
-                }
-            }
-        }
-    }
-
-    @Override
-    public void stop() throws MuleException
-    {
-        queueXaResourceManager.stop();
-    }
+  @Override
+  public void stop() throws MuleException {
+    queueXaResourceManager.stop();
+  }
 
 }

@@ -7,51 +7,41 @@
 
 package org.mule.runtime.module.db.integration.model;
 
-public class Alien
-{
+public class Alien {
 
-    public static final Alien ET = new Alien("Mars", "ET", "Male", true);
-    public static final Alien MONGUITO = new Alien("Saturn", "Monguito", "Male", true);
+  public static final Alien ET = new Alien("Mars", "ET", "Male", true);
+  public static final Alien MONGUITO = new Alien("Saturn", "Monguito", "Male", true);
 
-    private final String planet;
-    private final String name;
-    private final String gender;
-    private final boolean friendly;
+  private final String planet;
+  private final String name;
+  private final String gender;
+  private final boolean friendly;
 
-    public Alien(String planet, String name, String gender, boolean friendly)
-    {
-        this.planet = planet;
-        this.name = name;
-        this.gender = gender;
-        this.friendly = friendly;
-    }
+  public Alien(String planet, String name, String gender, boolean friendly) {
+    this.planet = planet;
+    this.name = name;
+    this.gender = gender;
+    this.friendly = friendly;
+  }
 
-    public String getName()
-    {
-        return name;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public String getGender()
-    {
-        return gender;
-    }
+  public String getGender() {
+    return gender;
+  }
 
-    public boolean isFriendly()
-    {
-        return friendly;
-    }
+  public boolean isFriendly() {
+    return friendly;
+  }
 
-    public String getPlanet()
-    {
-        return planet;
-    }
+  public String getPlanet() {
+    return planet;
+  }
 
-    public String getXml()
-    {
-        return "<Alien>" +
-               "<Planet>" + getPlanet() + "</Planet>"
-               +"<Gender>" + getGender() + "</Gender>" +
-               "<Friendly>" + isFriendly() + "</Friendly>" +
-               "</Alien>";
-    }
+  public String getXml() {
+    return "<Alien>" + "<Planet>" + getPlanet() + "</Planet>" + "<Gender>" + getGender() + "</Gender>" + "<Friendly>"
+        + isFriendly() + "</Friendly>" + "</Alien>";
+  }
 }

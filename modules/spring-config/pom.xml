@@ -15,6 +15,7 @@
     
     <properties>
         <springCglibVersion>3.2.2</springCglibVersion>
+        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
 
     <build>

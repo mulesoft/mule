@@ -14,56 +14,41 @@ import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.service.Pausable;
 
-public class ProcessIfStartedWaitIfPausedMessageProcessor extends ProcessIfStartedMessageProcessor
-{
+public class ProcessIfStartedWaitIfPausedMessageProcessor extends ProcessIfStartedMessageProcessor {
 
-    public ProcessIfStartedWaitIfPausedMessageProcessor(Startable startable, LifecycleState lifecycleState)
-    {
-        super(startable, lifecycleState);
-    }
+  public ProcessIfStartedWaitIfPausedMessageProcessor(Startable startable, LifecycleState lifecycleState) {
+    super(startable, lifecycleState);
+  }
 
-    @Override
-    public MuleEvent process(MuleEvent event) throws MuleException
-    {
-        if (accept(event))
-        {
-            if (isPaused())
-            {
-                try
-                {
-                    if (logger.isDebugEnabled())
-                    {
-                        logger.debug(startable.getClass().getName() + " " + getStartableName(startable)
-                                     + " is paused. Blocking call until resumd");
-                    }
-                    while (isPaused())
-                    {
-                        Thread.sleep(500);
-                    }
-                }
-                catch (InterruptedException e)
-                {
-                    throw new MessagingException(
-                        CoreMessages.interruptedWaitingForPaused(getStartableName(startable)), event, e, this);
-                }
-            }
-            return processNext(event);
+  @Override
+  public MuleEvent process(MuleEvent event) throws MuleException {
+    if (accept(event)) {
+      if (isPaused()) {
+        try {
+          if (logger.isDebugEnabled()) {
+            logger.debug(startable.getClass().getName() + " " + getStartableName(startable)
+                + " is paused. Blocking call until resumd");
+          }
+          while (isPaused()) {
+            Thread.sleep(500);
+          }
+        } catch (InterruptedException e) {
+          throw new MessagingException(CoreMessages.interruptedWaitingForPaused(getStartableName(startable)), event, e, this);
         }
-        else
-        {
-            return handleUnaccepted(event);
-        }
+      }
+      return processNext(event);
+    } else {
+      return handleUnaccepted(event);
     }
+  }
 
-    @Override
-    protected boolean accept(MuleEvent event)
-    {
-        return lifecycleState.isStarted() || isPaused();
-    }
+  @Override
+  protected boolean accept(MuleEvent event) {
+    return lifecycleState.isStarted() || isPaused();
+  }
 
-    protected boolean isPaused()
-    {
-        return lifecycleState.isPhaseComplete(Pausable.PHASE_NAME);
-    }
+  protected boolean isPaused() {
+    return lifecycleState.isPhaseComplete(Pausable.PHASE_NAME);
+  }
 
 }

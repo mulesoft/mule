@@ -10,17 +10,14 @@ import org.mule.runtime.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.runtime.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 
 /**
- * Bean definition parser that allows mapping an element either as root or nested inside other element.
- * Depending on the context, it delegates to a {@code MuleOrphanDefinitionParser} or to a
- * {@code ChildDefinitionParser}.
+ * Bean definition parser that allows mapping an element either as root or nested inside other element. Depending on the context,
+ * it delegates to a {@code MuleOrphanDefinitionParser} or to a {@code ChildDefinitionParser}.
  */
-public class RootOrNestedElementBeanDefinitionParser extends ParentContextDefinitionParser
-{
+public class RootOrNestedElementBeanDefinitionParser extends ParentContextDefinitionParser {
 
-    public RootOrNestedElementBeanDefinitionParser(Class<?> beanClass, String setterMethod)
-    {
-        super(MuleOrphanDefinitionParser.ROOT_ELEMENT, new MuleOrphanDefinitionParser(beanClass, true));
-        otherwise(new ChildDefinitionParser(setterMethod, beanClass));
-    }
+  public RootOrNestedElementBeanDefinitionParser(Class<?> beanClass, String setterMethod) {
+    super(MuleOrphanDefinitionParser.ROOT_ELEMENT, new MuleOrphanDefinitionParser(beanClass, true));
+    otherwise(new ChildDefinitionParser(setterMethod, beanClass));
+  }
 
 }

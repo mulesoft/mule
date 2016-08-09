@@ -9,15 +9,13 @@ package org.mule.test.spring;
 import org.mule.runtime.config.spring.handlers.MuleNamespaceHandler;
 import org.mule.runtime.config.spring.parsers.generic.OrphanDefinitionParser;
 
-public class DummyNamespaceHandler extends MuleNamespaceHandler
-{
+public class DummyNamespaceHandler extends MuleNamespaceHandler {
 
-    public void init()
-    {
-        registerBeanDefinitionParser("root", new OrphanDefinitionParser(Nestable.class, false));
-        registerBeanDefinitionParser("simple", new OrphanDefinitionParser(Nestable.class, false));
-        registerBeanDefinitionParser("subclass", new OrphanDefinitionParser(Nestable.class, false));
-        registerBeanDefinitionParser("random", new OrphanDefinitionParser(Nestable.class, false));
-        registerBeanDefinitionParser("another", new OrphanDefinitionParser(Nestable.class, false));
-    }
+  public void init() {
+    registerBeanDefinitionParser("root", new OrphanDefinitionParser(Nestable.class, false));
+    registerBeanDefinitionParser("simple", new OrphanDefinitionParser(Nestable.class, false));
+    registerBeanDefinitionParser("subclass", new OrphanDefinitionParser(Nestable.class, false));
+    registerBeanDefinitionParser("random", new OrphanDefinitionParser(Nestable.class, false));
+    registerBeanDefinitionParser("another", new OrphanDefinitionParser(Nestable.class, false));
+  }
 }

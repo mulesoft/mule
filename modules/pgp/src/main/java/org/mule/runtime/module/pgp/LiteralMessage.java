@@ -6,19 +6,16 @@
  */
 package org.mule.runtime.module.pgp;
 
-public class LiteralMessage implements Message
-{
+public class LiteralMessage implements Message {
 
-    private byte[] raw;
+  private byte[] raw;
 
-    public LiteralMessage(byte[] raw)
-    {
-        this.raw = raw;
-    }
+  public LiteralMessage(byte[] raw) {
+    this.raw = raw;
+  }
 
-    public String getTextData()
-    {
-        return new String(this.raw);
-    }
+  public String getTextData() {
+    return new String(this.raw);
+  }
 
 }

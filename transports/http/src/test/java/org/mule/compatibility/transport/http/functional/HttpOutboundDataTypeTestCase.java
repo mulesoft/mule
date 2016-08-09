@@ -25,42 +25,39 @@ import java.nio.charset.Charset;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpOutboundDataTypeTestCase extends FunctionalTestCase
-{
+public class HttpOutboundDataTypeTestCase extends FunctionalTestCase {
 
-    @Rule
-    public DynamicPort httpPort = new DynamicPort("httpPort");
+  @Rule
+  public DynamicPort httpPort = new DynamicPort("httpPort");
+
+  @Override
+  protected String getConfigFile() {
+    return "http-datatype-config.xml";
+  }
+
+  @Test
+  public void propagatesDataType() throws Exception {
+    MuleClient client = muleContext.getClient();
+
+    MuleMessage muleMessage = MuleMessage.builder().payload(TEST_MESSAGE)
+        .mediaType(MediaType.parse(MediaType.TEXT + "; charset=" + UTF_16.name())).build();
+
+    client.dispatch("vm://testInput", muleMessage);
+
+    MuleMessage response = client.request("vm://testOutput", 120000);
+
+    assertThat(response.getDataType().getMediaType().getPrimaryType(), equalTo(MediaType.TEXT.getPrimaryType()));
+    assertThat(response.getDataType().getMediaType().getSubType(), equalTo(MediaType.TEXT.getSubType()));
+    assertThat(response.getDataType().getMediaType().getCharset().get(), equalTo(UTF_16));
+  }
+
+  public static class SetMediaTypeTransformer extends AbstractMessageTransformer {
 
     @Override
-    protected String getConfigFile()
-    {
-        return "http-datatype-config.xml";
+    public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException {
+      final MuleMessage message = MuleMessage.builder(event.getMessage()).build();
+      event.setMessage(message);
+      return message;
     }
-
-    @Test
-    public void propagatesDataType() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-
-        MuleMessage muleMessage = MuleMessage.builder().payload(TEST_MESSAGE).mediaType(MediaType.parse(MediaType.TEXT + "; charset=" + UTF_16.name())).build();
-
-        client.dispatch("vm://testInput", muleMessage);
-
-        MuleMessage response = client.request("vm://testOutput", 120000);
-
-        assertThat(response.getDataType().getMediaType().getPrimaryType(), equalTo(MediaType.TEXT.getPrimaryType()));
-        assertThat(response.getDataType().getMediaType().getSubType(), equalTo(MediaType.TEXT.getSubType()));
-        assertThat(response.getDataType().getMediaType().getCharset().get(), equalTo(UTF_16));
-    }
-
-    public static class SetMediaTypeTransformer extends AbstractMessageTransformer
-    {
-        @Override
-        public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException
-        {
-            final MuleMessage message = MuleMessage.builder(event.getMessage()).build();
-            event.setMessage(message);
-            return message;
-        }
-    }
+  }
 }

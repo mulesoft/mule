@@ -18,23 +18,20 @@ import org.mule.runtime.core.api.MuleMessage;
 
 import org.junit.Test;
 
-public class SetSessionVariableDataTypeTestCase extends FunctionalTestCase
-{
+public class SetSessionVariableDataTypeTestCase extends FunctionalTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "set-session-variable-data-type-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "set-session-variable-data-type-config.xml";
+  }
 
-    @Test
-    public void setsPropertyDataType() throws Exception
-    {
-        final MuleEvent muleEvent = flowRunner("main").withPayload(TEST_MESSAGE).run();
+  @Test
+  public void setsPropertyDataType() throws Exception {
+    final MuleEvent muleEvent = flowRunner("main").withPayload(TEST_MESSAGE).run();
 
-        MuleMessage response = muleEvent.getMessage();
-        DataType dataType = muleEvent.getSession().getPropertyDataType("testVariable");
+    MuleMessage response = muleEvent.getMessage();
+    DataType dataType = muleEvent.getSession().getPropertyDataType("testVariable");
 
-        assertThat(dataType, like(String.class, MediaType.XML, UTF_16));
-    }
+    assertThat(dataType, like(String.class, MediaType.XML, UTF_16));
+  }
 }

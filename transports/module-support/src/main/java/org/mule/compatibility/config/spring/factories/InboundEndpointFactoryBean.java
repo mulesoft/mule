@@ -17,42 +17,33 @@ import org.mule.runtime.core.config.i18n.MessageFactory;
 /**
  * Spring FactoryBean used to create concrete instances of inbound endpoints
  */
-public class InboundEndpointFactoryBean extends AbstractEndpointFactoryBean
-{
+public class InboundEndpointFactoryBean extends AbstractEndpointFactoryBean {
 
-    public InboundEndpointFactoryBean(EndpointURIEndpointBuilder global) throws EndpointException
-    {
-        super(global);
-    }
+  public InboundEndpointFactoryBean(EndpointURIEndpointBuilder global) throws EndpointException {
+    super(global);
+  }
 
-    public InboundEndpointFactoryBean()
-    {
-        super();
-    }
+  public InboundEndpointFactoryBean() {
+    super();
+  }
 
-    @Override
-    public Class<?> getObjectType()
-    {
-        return InboundEndpoint.class;
-    }
+  @Override
+  public Class<?> getObjectType() {
+    return InboundEndpoint.class;
+  }
 
-    @Override
-    public Object doGetObject() throws Exception
-    {
-        EndpointFactory ef = getEndpointFactory();
-        if (ef != null)
-        {
-            InboundEndpoint inboundEndpoint = ef.getInboundEndpoint(this);
-            if (inboundEndpoint instanceof AbstractEndpoint)
-            {
-                AbstractEndpoint.class.cast(inboundEndpoint).setAnnotations(getAnnotations());
-            }
-            return inboundEndpoint;
-        }
-        else
-        {
-            throw new ConfigurationException(MessageFactory.createStaticMessage("EndpointFactory not found in Registry"));
-        }
+  @Override
+  public Object doGetObject() throws Exception {
+    EndpointFactory ef = getEndpointFactory();
+    if (ef != null) {
+      InboundEndpoint inboundEndpoint = ef.getInboundEndpoint(this);
+      if (inboundEndpoint instanceof AbstractEndpoint) {
+        AbstractEndpoint.class.cast(inboundEndpoint).setAnnotations(getAnnotations());
+      }
+      return inboundEndpoint;
+    } else {
+      throw new ConfigurationException(MessageFactory.createStaticMessage("EndpointFactory not found in Registry"));
     }
+  }
 
 }

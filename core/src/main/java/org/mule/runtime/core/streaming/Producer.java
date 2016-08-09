@@ -10,20 +10,18 @@ package org.mule.runtime.core.streaming;
 import org.mule.runtime.core.api.Closeable;
 
 /**
- * A producer implementation that follows the idea of the Producer-Consumer design
- * pattern. Implementing this interface does not guarantee thread safeness. Check
- * each particular implementation for information about that
+ * A producer implementation that follows the idea of the Producer-Consumer design pattern. Implementing this interface does not
+ * guarantee thread safeness. Check each particular implementation for information about that
  * 
  * @since 3.5.0
  */
-public interface Producer<T> extends Closeable, ProvidesTotalHint
-{
+public interface Producer<T> extends Closeable, ProvidesTotalHint {
 
-    /**
-     * Returns the next available item
-     * 
-     * @return an item. Might be <code>null<c/code>
-     */
-    public T produce();
+  /**
+   * Returns the next available item
+   * 
+   * @return an item. Might be <code>null<c/code>
+   */
+  public T produce();
 
 }

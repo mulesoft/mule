@@ -17,26 +17,23 @@ import org.mule.runtime.core.api.MuleException;
 
 import org.junit.Test;
 
-public class MuleRootTestCase extends FunctionalTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/spring/mule-root-test.xml";
-    }
+public class MuleRootTestCase extends FunctionalTestCase {
 
-    @Test
-    public void testModel() throws MuleException
-    {
-        ImmutableEndpoint endpoint = getEndpointFactory().getInboundEndpoint("endpoint");
-        assertNotNull("No endpoint", endpoint);
-        String address = endpoint.getEndpointURI().getAddress();
-        assertNotNull("No address", address);
-        assertEquals("value", address);
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/spring/mule-root-test.xml";
+  }
 
-    public EndpointFactory getEndpointFactory()
-    {
-        return (EndpointFactory) muleContext.getRegistry().lookupObject(MuleEndpointProperties.OBJECT_MULE_ENDPOINT_FACTORY);
-    }
+  @Test
+  public void testModel() throws MuleException {
+    ImmutableEndpoint endpoint = getEndpointFactory().getInboundEndpoint("endpoint");
+    assertNotNull("No endpoint", endpoint);
+    String address = endpoint.getEndpointURI().getAddress();
+    assertNotNull("No address", address);
+    assertEquals("value", address);
+  }
+
+  public EndpointFactory getEndpointFactory() {
+    return (EndpointFactory) muleContext.getRegistry().lookupObject(MuleEndpointProperties.OBJECT_MULE_ENDPOINT_FACTORY);
+  }
 }

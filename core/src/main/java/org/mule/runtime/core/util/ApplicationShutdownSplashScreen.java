@@ -11,19 +11,17 @@ import org.mule.runtime.core.config.i18n.CoreMessages;
 
 import java.util.Date;
 
-public class ApplicationShutdownSplashScreen extends SplashScreen
-{
-    protected void doHeader(MuleContext context)
-    {
-        long currentTime = System.currentTimeMillis();
-        header.add(CoreMessages.applicationShutdownNormally(context.getConfiguration().getId(), new Date()).getMessage());
-        long duration = 10;
-        if (context.getStartDate() > 0)
-        {
-            duration = currentTime - context.getStartDate();
-        }
-        header.add(CoreMessages.applicationWasUpForDuration(duration).getMessage());
+public class ApplicationShutdownSplashScreen extends SplashScreen {
+
+  protected void doHeader(MuleContext context) {
+    long currentTime = System.currentTimeMillis();
+    header.add(CoreMessages.applicationShutdownNormally(context.getConfiguration().getId(), new Date()).getMessage());
+    long duration = 10;
+    if (context.getStartDate() > 0) {
+      duration = currentTime - context.getStartDate();
     }
+    header.add(CoreMessages.applicationWasUpForDuration(duration).getMessage());
+  }
 }
 
 

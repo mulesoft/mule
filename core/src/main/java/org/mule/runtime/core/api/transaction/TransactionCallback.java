@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.api.transaction;
 
-public interface TransactionCallback<T>
-{
-    T doInTransaction() throws Exception;
+public interface TransactionCallback<T> {
+
+  T doInTransaction() throws Exception;
 }

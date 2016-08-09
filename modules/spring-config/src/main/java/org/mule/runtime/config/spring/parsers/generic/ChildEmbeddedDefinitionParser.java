@@ -12,58 +12,42 @@ import org.mule.runtime.core.util.StringUtils;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.w3c.dom.Element;
 
-public class ChildEmbeddedDefinitionParser extends ChildDefinitionParser
-{
+public class ChildEmbeddedDefinitionParser extends ChildDefinitionParser {
 
-    public ChildEmbeddedDefinitionParser(Class<?> clazz)
-    {
-        super("messageProcessor", clazz);
-        addIgnored(AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF);
-    }
+  public ChildEmbeddedDefinitionParser(Class<?> clazz) {
+    super("messageProcessor", clazz);
+    addIgnored(AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF);
+  }
 
-    @Override
-    public BeanDefinitionBuilder createBeanDefinitionBuilder(Element element, Class<?> beanClass)
-    {
-        BeanDefinitionBuilder builder = super.createBeanDefinitionBuilder(element, beanClass);
-        String global = element.getAttribute(AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF);
-        if (StringUtils.isNotBlank(global))
-        {
-            builder.addConstructorArgReference(global);
-            builder.addDependsOn(global);
-        }
-        return builder;
+  @Override
+  public BeanDefinitionBuilder createBeanDefinitionBuilder(Element element, Class<?> beanClass) {
+    BeanDefinitionBuilder builder = super.createBeanDefinitionBuilder(element, beanClass);
+    String global = element.getAttribute(AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF);
+    if (StringUtils.isNotBlank(global)) {
+      builder.addConstructorArgReference(global);
+      builder.addDependsOn(global);
     }
+    return builder;
+  }
 
-    @Override
-    public String getPropertyName(Element e)
-    {
-        String parent = e.getParentNode().getLocalName().toLowerCase();
-        if (e.getLocalName() != null
-            && (e.getLocalName().toLowerCase().equals("poll")))
-        {
-            return "messageSource";
-        }
-        else if ("wire-tap".equals(parent) || "wire-tap-router".equals(parent))
-        {
-            return "tap";
-        }
-        else
-        {
-            return super.getPropertyName(e);
-        }
+  @Override
+  public String getPropertyName(Element e) {
+    String parent = e.getParentNode().getLocalName().toLowerCase();
+    if (e.getLocalName() != null && (e.getLocalName().toLowerCase().equals("poll"))) {
+      return "messageSource";
+    } else if ("wire-tap".equals(parent) || "wire-tap-router".equals(parent)) {
+      return "tap";
+    } else {
+      return super.getPropertyName(e);
     }
+  }
 
-    @Override
-    public String getBeanName(Element element)
-    {
-        if (null != element.getAttributeNode(AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF))
-        {
-            return AutoIdUtils.uniqueValue("ref:"
-                                           + element.getAttribute(AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF));
-        }
-        else
-        {
-            return super.getBeanName(element);
-        }
+  @Override
+  public String getBeanName(Element element) {
+    if (null != element.getAttributeNode(AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF)) {
+      return AutoIdUtils.uniqueValue("ref:" + element.getAttribute(AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF));
+    } else {
+      return super.getBeanName(element);
     }
+  }
 }

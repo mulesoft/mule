@@ -9,17 +9,14 @@ package org.mule.runtime.module.db.integration.insert;
 
 import org.mule.runtime.module.db.integration.model.AbstractTestDatabase;
 
-public class InsertNamedParamParameterizedQueryTestCase extends InsertParameterizedQueryTestCase
-{
+public class InsertNamedParamParameterizedQueryTestCase extends InsertParameterizedQueryTestCase {
 
-    public InsertNamedParamParameterizedQueryTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public InsertNamedParamParameterizedQueryTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/insert/insert-named-param-parameterized-query-config.xml"};
-    }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/insert/insert-named-param-parameterized-query-config.xml"};
+  }
 }

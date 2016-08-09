@@ -15,53 +15,44 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 
-public class AttributeListEntryDefinitionParser
-        extends AbstractChildDefinitionParser implements DynamicAttributeDefinitionParser
-{
+public class AttributeListEntryDefinitionParser extends AbstractChildDefinitionParser
+    implements DynamicAttributeDefinitionParser {
 
-    private String setterMethod;
-    private String attributeName;
+  private String setterMethod;
+  private String attributeName;
 
-    /**
-     * Only for use with dynamic naming
-     */
-    public AttributeListEntryDefinitionParser(String setterMethod)
-    {
-        this(setterMethod, null);
+  /**
+   * Only for use with dynamic naming
+   */
+  public AttributeListEntryDefinitionParser(String setterMethod) {
+    this(setterMethod, null);
+  }
+
+  public AttributeListEntryDefinitionParser(String setterMethod, String attributeName) {
+    this.setterMethod = setterMethod;
+    setAttributeName(attributeName);
+  }
+
+  public String getPropertyName(Element element) {
+    return setterMethod;
+  }
+
+  protected Class getBeanClass(Element element) {
+    return ChildListEntryDefinitionParser.ListEntry.class;
+  }
+
+  public void setAttributeName(String attributeName) {
+    this.attributeName = attributeName;
+  }
+
+  protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
+    Attr attribute = element.getAttributeNode(attributeName);
+    if (null == attribute || StringUtils.isEmpty(attribute.getNodeValue())) {
+      throw new IllegalStateException("No value for " + attributeName + " in " + SpringXMLUtils.elementToString(element));
     }
-
-    public AttributeListEntryDefinitionParser(String setterMethod, String attributeName)
-    {
-        this.setterMethod = setterMethod;
-        setAttributeName(attributeName);
-    }
-
-    public String getPropertyName(Element element)
-    {
-        return setterMethod;
-    }
-
-    protected Class getBeanClass(Element element)
-    {
-        return ChildListEntryDefinitionParser.ListEntry.class;
-    }
-
-    public void setAttributeName(String attributeName)
-    {
-        this.attributeName = attributeName;
-    }
-
-    protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
-    {
-        Attr attribute = element.getAttributeNode(attributeName);
-        if (null == attribute || StringUtils.isEmpty(attribute.getNodeValue()))
-        {
-            throw new IllegalStateException(
-                    "No value for " + attributeName + " in " + SpringXMLUtils.elementToString(element));
-        }
-        String value = attribute.getNodeValue();
-        builder.getRawBeanDefinition().setSource(new ChildListEntryDefinitionParser.ListEntry(value));
-        this.postProcess(parserContext, getBeanAssembler(element, builder), element);
-    }
+    String value = attribute.getNodeValue();
+    builder.getRawBeanDefinition().setSource(new ChildListEntryDefinitionParser.ListEntry(value));
+    this.postProcess(parserContext, getBeanAssembler(element, builder), element);
+  }
 
 }

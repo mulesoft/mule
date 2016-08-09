@@ -15,32 +15,27 @@ import org.mule.runtime.core.api.processor.MessageProcessor;
  *
  * Provides all a set of functionality common to all MessageProcessor execution.
  */
-public class MessageProcessorExecutionTemplate
-{
-    private MessageProcessorExecutionInterceptor executionInterceptor;
+public class MessageProcessorExecutionTemplate {
 
-    private MessageProcessorExecutionTemplate(MessageProcessorExecutionInterceptor executionInterceptor)
-    {
-        this.executionInterceptor = executionInterceptor;
-    }
-    
-    public static MessageProcessorExecutionTemplate createExceptionTransformerExecutionTemplate()
-    {
-        return new MessageProcessorExecutionTemplate(new ExceptionToMessagingExceptionExecutionInterceptor());
-    }
+  private MessageProcessorExecutionInterceptor executionInterceptor;
 
-    public static MessageProcessorExecutionTemplate createExecutionTemplate()
-    {
-        return new MessageProcessorExecutionTemplate(new MessageProcessorNotificationExecutionInterceptor(new ExceptionToMessagingExceptionExecutionInterceptor()));
-    }
+  private MessageProcessorExecutionTemplate(MessageProcessorExecutionInterceptor executionInterceptor) {
+    this.executionInterceptor = executionInterceptor;
+  }
 
-    public static MessageProcessorExecutionTemplate createNotificationExecutionTemplate()
-    {
-        return new MessageProcessorExecutionTemplate(new MessageProcessorNotificationExecutionInterceptor());
-    }
+  public static MessageProcessorExecutionTemplate createExceptionTransformerExecutionTemplate() {
+    return new MessageProcessorExecutionTemplate(new ExceptionToMessagingExceptionExecutionInterceptor());
+  }
 
-    public MuleEvent execute(MessageProcessor messageProcessor, MuleEvent event) throws MessagingException
-    {
-        return this.executionInterceptor.execute(messageProcessor,event);
-    }
+  public static MessageProcessorExecutionTemplate createExecutionTemplate() {
+    return new MessageProcessorExecutionTemplate(new MessageProcessorNotificationExecutionInterceptor(new ExceptionToMessagingExceptionExecutionInterceptor()));
+  }
+
+  public static MessageProcessorExecutionTemplate createNotificationExecutionTemplate() {
+    return new MessageProcessorExecutionTemplate(new MessageProcessorNotificationExecutionInterceptor());
+  }
+
+  public MuleEvent execute(MessageProcessor messageProcessor, MuleEvent event) throws MessagingException {
+    return this.executionInterceptor.execute(messageProcessor, event);
+  }
 }

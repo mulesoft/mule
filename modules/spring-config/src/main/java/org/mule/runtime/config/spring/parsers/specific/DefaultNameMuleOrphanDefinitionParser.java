@@ -9,28 +9,23 @@ package org.mule.runtime.config.spring.parsers.specific;
 import org.mule.runtime.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.runtime.config.spring.parsers.processors.ProvideDefaultNameFromElement;
 
-public class DefaultNameMuleOrphanDefinitionParser extends MuleOrphanDefinitionParser
-{
+public class DefaultNameMuleOrphanDefinitionParser extends MuleOrphanDefinitionParser {
 
-    public DefaultNameMuleOrphanDefinitionParser()
-    {
-        this(false);
-    }
+  public DefaultNameMuleOrphanDefinitionParser() {
+    this(false);
+  }
 
-    public DefaultNameMuleOrphanDefinitionParser(boolean ignoreName)
-    {
-        super(true);
-        registerPreProcessor(new ProvideDefaultNameFromElement());
-        if (ignoreName)
-        {
-            addIgnored(ATTRIBUTE_NAME);
-        }
+  public DefaultNameMuleOrphanDefinitionParser(boolean ignoreName) {
+    super(true);
+    registerPreProcessor(new ProvideDefaultNameFromElement());
+    if (ignoreName) {
+      addIgnored(ATTRIBUTE_NAME);
     }
+  }
 
-    public DefaultNameMuleOrphanDefinitionParser(Class beanClass)
-    {
-        super(beanClass, true);
-        registerPreProcessor(new ProvideDefaultNameFromElement());
-    }
+  public DefaultNameMuleOrphanDefinitionParser(Class beanClass) {
+    super(beanClass, true);
+    registerPreProcessor(new ProvideDefaultNameFromElement());
+  }
 
 }

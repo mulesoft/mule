@@ -14,47 +14,37 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SocketListenerTestCase extends ParameterizedProtocolTestCase
-{
-    private static final Logger LOGGER = LoggerFactory.getLogger(SocketListenerTestCase.class);
+public class SocketListenerTestCase extends ParameterizedProtocolTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "tcp-send-config.xml";
-    }
+  private static final Logger LOGGER = LoggerFactory.getLogger(SocketListenerTestCase.class);
 
-    @Test
-    public void stopAndRestart() throws Exception
-    {
-        muleContext.getRegistry().lookupObjects(Flow.class).forEach(flow -> {
-            try
-            {
-                flow.stop();
-                PollingProber prober = new PollingProber(100, 5000);
-                prober.check(new JUnitLambdaProbe(() -> {
-                    try
-                    {
-                        flow.start();
-                    }
-                    catch (Exception e)
-                    {
-                        LOGGER.debug("Prober failed", e);
-                        return false;
-                    }
+  @Override
+  protected String getConfigFile() {
+    return "tcp-send-config.xml";
+  }
 
-                    return true;
-                }));
-            }
-            catch (Exception e)
-            {
-                throw new RuntimeException(e);
-            }
-        });
+  @Test
+  public void stopAndRestart() throws Exception {
+    muleContext.getRegistry().lookupObjects(Flow.class).forEach(flow -> {
+      try {
+        flow.stop();
+        PollingProber prober = new PollingProber(100, 5000);
+        prober.check(new JUnitLambdaProbe(() -> {
+          try {
+            flow.start();
+          } catch (Exception e) {
+            LOGGER.debug("Prober failed", e);
+            return false;
+          }
 
-        flowRunner("tcp-send")
-                .withPayload(testPojo)
-                .run();
-        assertPojo(receiveConnection(), testPojo);
-    }
+          return true;
+        }));
+      } catch (Exception e) {
+        throw new RuntimeException(e);
+      }
+    });
+
+    flowRunner("tcp-send").withPayload(testPojo).run();
+    assertPojo(receiveConnection(), testPojo);
+  }
 }

@@ -13,33 +13,26 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.config.i18n.Message;
 
 /**
- * An {@link AbstractValidator} which verifies that
- * a {@link #value} is {@code null}.
+ * An {@link AbstractValidator} which verifies that a {@link #value} is {@code null}.
  *
  * @since 3.7.0
  */
-public class NullValidator extends AbstractValidator
-{
+public class NullValidator extends AbstractValidator {
 
-    private final Object value;
+  private final Object value;
 
-    public NullValidator(Object value, ValidationContext validationContext)
-    {
-        super(validationContext);
-        this.value = value;
-    }
+  public NullValidator(Object value, ValidationContext validationContext) {
+    super(validationContext);
+    this.value = value;
+  }
 
-    @Override
-    public ValidationResult validate(MuleEvent event)
-    {
-        return value == null
-               ? ok()
-               : fail();
-    }
+  @Override
+  public ValidationResult validate(MuleEvent event) {
+    return value == null ? ok() : fail();
+  }
 
-    @Override
-    protected Message getDefaultErrorMessage()
-    {
-        return getMessages().wasExpectingNull();
-    }
+  @Override
+  protected Message getDefaultErrorMessage() {
+    return getMessages().wasExpectingNull();
+  }
 }

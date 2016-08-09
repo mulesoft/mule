@@ -12,24 +12,21 @@ import org.mule.runtime.module.db.internal.domain.query.QueryType;
 import org.mule.tck.size.SmallTest;
 
 @SmallTest
-public class StoredProcedureMessageProcessorDebugInfoTestCase extends AbstractParameterizedSingleQueryMessageProcessorDebugInfoTestCase
-{
+public class StoredProcedureMessageProcessorDebugInfoTestCase
+    extends AbstractParameterizedSingleQueryMessageProcessorDebugInfoTestCase {
 
-    @Override
-    protected AbstractSingleQueryDbMessageProcessor createMessageProcessor()
-    {
-        return new StoredProcedureMessageProcessor(dbConfigResolver, queryResolver, null, null, false);
-    }
+  @Override
+  protected AbstractSingleQueryDbMessageProcessor createMessageProcessor() {
+    return new StoredProcedureMessageProcessor(dbConfigResolver, queryResolver, null, null, false);
+  }
 
-    @Override
-    protected String getSqlText()
-    {
-        return "{ call getTestRecord(?, ?) }";
-    }
+  @Override
+  protected String getSqlText() {
+    return "{ call getTestRecord(?, ?) }";
+  }
 
-    @Override
-    protected QueryType getQueryType()
-    {
-        return STORE_PROCEDURE_CALL;
-    }
+  @Override
+  protected QueryType getQueryType() {
+    return STORE_PROCEDURE_CALL;
+  }
 }

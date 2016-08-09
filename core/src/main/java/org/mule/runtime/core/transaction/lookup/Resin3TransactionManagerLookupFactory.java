@@ -6,10 +6,9 @@
  */
 package org.mule.runtime.core.transaction.lookup;
 
-public class Resin3TransactionManagerLookupFactory extends GenericTransactionManagerLookupFactory
-{
-    public Resin3TransactionManagerLookupFactory()
-    {
-        setJndiName("java:comp/TransactionManager");
-    }
+public class Resin3TransactionManagerLookupFactory extends GenericTransactionManagerLookupFactory {
+
+  public Resin3TransactionManagerLookupFactory() {
+    setJndiName("java:comp/TransactionManager");
+  }
 }

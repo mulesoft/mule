@@ -17,74 +17,62 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.springframework.beans.factory.BeanNameAware;
 
-public class MockScheduler implements Scheduler, BeanNameAware
-{
+public class MockScheduler implements Scheduler, BeanNameAware {
 
-    private AtomicInteger count = new AtomicInteger(0);
-    private ScheduledExecutorService executorService;
-    private String name;
-    private Runnable task;
+  private AtomicInteger count = new AtomicInteger(0);
+  private ScheduledExecutorService executorService;
+  private String name;
+  private Runnable task;
 
-    @Override
-    public void schedule() throws Exception
-    {
-        task.run();
-    }
+  @Override
+  public void schedule() throws Exception {
+    task.run();
+  }
 
-    @Override
-    public void setName(String name)
-    {
-        // Do Nothing
-    }
+  @Override
+  public void setName(String name) {
+    // Do Nothing
+  }
 
-    @Override
-    public String getName()
-    {
-        return name;
-    }
+  @Override
+  public String getName() {
+    return name;
+  }
 
-    @Override
-    public void start() throws MuleException
-    {
-        executorService = Executors.newSingleThreadScheduledExecutor();
-        task = new Runnable()
-        {
+  @Override
+  public void start() throws MuleException {
+    executorService = Executors.newSingleThreadScheduledExecutor();
+    task = new Runnable() {
 
-            @Override
-            public void run()
-            {
-                count.incrementAndGet();
-            }
-        };
-        executorService.scheduleAtFixedRate(task, 1000, 2000, TimeUnit.MILLISECONDS);
-    }
+      @Override
+      public void run() {
+        count.incrementAndGet();
+      }
+    };
+    executorService.scheduleAtFixedRate(task, 1000, 2000, TimeUnit.MILLISECONDS);
+  }
 
-    @Override
-    public void stop() throws MuleException
-    {
-        executorService.shutdown();
-    }
+  @Override
+  public void stop() throws MuleException {
+    executorService.shutdown();
+  }
 
-    @Override
-    public void setBeanName(String name)
-    {
-        this.name = name;
-    }
+  @Override
+  public void setBeanName(String name) {
+    this.name = name;
+  }
 
-    public int getCount()
-    {
-        return count.get();
-    }
+  public int getCount() {
+    return count.get();
+  }
 
-    @Override
-    public void dispose()
-    {
+  @Override
+  public void dispose() {
 
-    }
+  }
 
-    @Override
-    public void initialise() throws InitialisationException
-    {
+  @Override
+  public void initialise() throws InitialisationException {
 
-    }
+  }
 }

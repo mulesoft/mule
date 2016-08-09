@@ -16,9 +16,11 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for ArrayOfWeatherDescription complex type.
+ * <p>
+ * Java class for ArrayOfWeatherDescription complex type.
  *
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>
+ * The following schema fragment specifies the expected content contained within this class.
  *
  * <pre>
  * &lt;complexType name="ArrayOfWeatherDescription">
@@ -35,41 +37,38 @@ import javax.xml.bind.annotation.XmlType;
  *
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "ArrayOfWeatherDescription", namespace = "http://ws.cdyne.com/WeatherWS/", propOrder = {
-    "weatherDescription"
-})
+@XmlType(name = "ArrayOfWeatherDescription", namespace = "http://ws.cdyne.com/WeatherWS/", propOrder = {"weatherDescription"})
 public class ArrayOfWeatherDescription {
 
-    @XmlElement(name = "WeatherDescription", namespace = "http://ws.cdyne.com/WeatherWS/")
-    protected List<WeatherDescription> weatherDescription;
+  @XmlElement(name = "WeatherDescription", namespace = "http://ws.cdyne.com/WeatherWS/")
+  protected List<WeatherDescription> weatherDescription;
 
-    /**
-     * Gets the value of the weatherDescription property.
-     *
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the weatherDescription property.
-     *
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getWeatherDescription().add(newItem);
-     * </pre>
-     *
-     *
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link WeatherDescription }
-     *
-     *
-     */
-    public List<WeatherDescription> getWeatherDescription() {
-        if (weatherDescription == null) {
-            weatherDescription = new ArrayList<WeatherDescription>();
-        }
-        return this.weatherDescription;
+  /**
+   * Gets the value of the weatherDescription property.
+   *
+   * <p>
+   * This accessor method returns a reference to the live list, not a snapshot. Therefore any modification you make to the
+   * returned list will be present inside the JAXB object. This is why there is not a <CODE>set</CODE> method for the
+   * weatherDescription property.
+   *
+   * <p>
+   * For example, to add a new item, do as follows:
+   * 
+   * <pre>
+   * getWeatherDescription().add(newItem);
+   * </pre>
+   *
+   *
+   * <p>
+   * Objects of the following type(s) are allowed in the list {@link WeatherDescription }
+   *
+   *
+   */
+  public List<WeatherDescription> getWeatherDescription() {
+    if (weatherDescription == null) {
+      weatherDescription = new ArrayList<WeatherDescription>();
     }
+    return this.weatherDescription;
+  }
 
 }

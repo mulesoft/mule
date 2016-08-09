@@ -13,11 +13,9 @@ import org.mule.runtime.module.extension.internal.introspection.describer.model.
  *
  * @since 4.0
  */
-public class ParameterizableTypeWrapper extends TypeWrapper implements ParameterizableTypeElement
-{
+public class ParameterizableTypeWrapper extends TypeWrapper implements ParameterizableTypeElement {
 
-    public ParameterizableTypeWrapper(Class aClass)
-    {
-        super(aClass);
-    }
+  public ParameterizableTypeWrapper(Class aClass) {
+    super(aClass);
+  }
 }

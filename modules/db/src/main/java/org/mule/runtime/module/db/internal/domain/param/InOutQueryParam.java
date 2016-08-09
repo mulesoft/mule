@@ -10,7 +10,6 @@ package org.mule.runtime.module.db.internal.domain.param;
 /**
  * Defines a parameter that provides an input value and returns an output value
  */
-public interface InOutQueryParam extends InputQueryParam, OutputQueryParam
-{
+public interface InOutQueryParam extends InputQueryParam, OutputQueryParam {
 
 }

@@ -21,28 +21,27 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.Collections;
 
-public class AbstractBulkQueryResolverTestCase extends AbstractMuleTestCase
-{
+public class AbstractBulkQueryResolverTestCase extends AbstractMuleTestCase {
 
-    public static final String STATIC_SQL_1 = "delete from test1";
-    public static final String STATIC_SQL_2 = "delete from test2";
-    public static final String BULK_SQL_QUERY = STATIC_SQL_1 + ";\n" + STATIC_SQL_2;
+  public static final String STATIC_SQL_1 = "delete from test1";
+  public static final String STATIC_SQL_2 = "delete from test2";
+  public static final String BULK_SQL_QUERY = STATIC_SQL_1 + ";\n" + STATIC_SQL_2;
 
-    protected final MuleEvent muleEvent = mock(MuleEvent.class);
+  protected final MuleEvent muleEvent = mock(MuleEvent.class);
 
-    protected QueryTemplateParser createQueryTemplateParser()
-    {
-        QueryTemplateParser queryTemplateParser = mock(QueryTemplateParser.class);
-        when(queryTemplateParser.parse(STATIC_SQL_1)).thenReturn(new QueryTemplate(STATIC_SQL_1, QueryType.DELETE, Collections.<QueryParam>emptyList()));
-        when(queryTemplateParser.parse(STATIC_SQL_2)).thenReturn(new QueryTemplate(STATIC_SQL_2, QueryType.DELETE, Collections.<QueryParam>emptyList()));
+  protected QueryTemplateParser createQueryTemplateParser() {
+    QueryTemplateParser queryTemplateParser = mock(QueryTemplateParser.class);
+    when(queryTemplateParser.parse(STATIC_SQL_1))
+        .thenReturn(new QueryTemplate(STATIC_SQL_1, QueryType.DELETE, Collections.<QueryParam>emptyList()));
+    when(queryTemplateParser.parse(STATIC_SQL_2))
+        .thenReturn(new QueryTemplate(STATIC_SQL_2, QueryType.DELETE, Collections.<QueryParam>emptyList()));
 
-        return queryTemplateParser;
-    }
+    return queryTemplateParser;
+  }
 
-    protected void assertResolvedBulkQuery(BulkQuery resolvedBulkQuery)
-    {
-        assertThat(resolvedBulkQuery.getQueryTemplates().size(), equalTo(2));
-        assertThat(resolvedBulkQuery.getQueryTemplates().get(0).getSqlText(), equalTo(STATIC_SQL_1));
-        assertThat(resolvedBulkQuery.getQueryTemplates().get(1).getSqlText(), equalTo(STATIC_SQL_2));
-    }
+  protected void assertResolvedBulkQuery(BulkQuery resolvedBulkQuery) {
+    assertThat(resolvedBulkQuery.getQueryTemplates().size(), equalTo(2));
+    assertThat(resolvedBulkQuery.getQueryTemplates().get(0).getSqlText(), equalTo(STATIC_SQL_1));
+    assertThat(resolvedBulkQuery.getQueryTemplates().get(1).getSqlText(), equalTo(STATIC_SQL_2));
+  }
 }

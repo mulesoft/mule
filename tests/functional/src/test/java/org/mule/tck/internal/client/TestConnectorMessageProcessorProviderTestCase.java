@@ -27,85 +27,85 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.junit.Before;
 import org.junit.Test;
 
-public class TestConnectorMessageProcessorProviderTestCase extends AbstractMuleTestCase
-{
+public class TestConnectorMessageProcessorProviderTestCase extends AbstractMuleTestCase {
 
-    private static final String PATH_URL = "test://path";
-    private static final String ANOTHER_PATH = "test://another";
+  private static final String PATH_URL = "test://path";
+  private static final String ANOTHER_PATH = "test://another";
 
-    private final MuleContext muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS.get());
-    private final TestConnectorMessageProcessorProvider messageProcessorProvider = new TestConnectorMessageProcessorProvider();
-    private final TestConnectorConfig connectorConfig = new TestConnectorConfig();
+  private final MuleContext muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS.get());
+  private final TestConnectorMessageProcessorProvider messageProcessorProvider = new TestConnectorMessageProcessorProvider();
+  private final TestConnectorConfig connectorConfig = new TestConnectorConfig();
 
-    @Before
-    public void setUp() throws Exception
-    {
-        when(muleContext.getRegistry().get(TestConnectorConfig.DEFAULT_CONFIG_ID)).thenReturn(connectorConfig);
-        messageProcessorProvider.setMuleContext(muleContext);
-    }
+  @Before
+  public void setUp() throws Exception {
+    when(muleContext.getRegistry().get(TestConnectorConfig.DEFAULT_CONFIG_ID)).thenReturn(connectorConfig);
+    messageProcessorProvider.setMuleContext(muleContext);
+  }
 
-    @Test
-    public void sameConfigReturnsSameInstanceUsingGenericOptions() throws Exception
-    {
-        final MessageProcessor messageProcessor = messageProcessorProvider.getMessageProcessor(PATH_URL, newOptions().build(), REQUEST_RESPONSE);
+  @Test
+  public void sameConfigReturnsSameInstanceUsingGenericOptions() throws Exception {
+    final MessageProcessor messageProcessor =
+        messageProcessorProvider.getMessageProcessor(PATH_URL, newOptions().build(), REQUEST_RESPONSE);
 
-        assertThat(messageProcessor, is(not(nullValue())));
-        assertThat(messageProcessorProvider.getMessageProcessor(PATH_URL, newOptions().build(), REQUEST_RESPONSE), is(messageProcessor));
-    }
+    assertThat(messageProcessor, is(not(nullValue())));
+    assertThat(messageProcessorProvider.getMessageProcessor(PATH_URL, newOptions().build(), REQUEST_RESPONSE),
+               is(messageProcessor));
+  }
 
-    @Test
-    public void sameConfigReturnsDifferentInstanceUsingDifferentGenericOptions() throws Exception
-    {
-        final MessageProcessor messageProcessor1 = messageProcessorProvider.getMessageProcessor(PATH_URL, newOptions().build(), REQUEST_RESPONSE);
-        final MessageProcessor messageProcessor2 = messageProcessorProvider.getMessageProcessor(PATH_URL, newOptions().responseTimeout(1000).build(), REQUEST_RESPONSE);
-        
-        assertThat(messageProcessor2, not(is(messageProcessor1)));
-    }
+  @Test
+  public void sameConfigReturnsDifferentInstanceUsingDifferentGenericOptions() throws Exception {
+    final MessageProcessor messageProcessor1 =
+        messageProcessorProvider.getMessageProcessor(PATH_URL, newOptions().build(), REQUEST_RESPONSE);
+    final MessageProcessor messageProcessor2 =
+        messageProcessorProvider.getMessageProcessor(PATH_URL, newOptions().responseTimeout(1000).build(), REQUEST_RESPONSE);
 
-    @Test
-    public void differentPathReturnsDifferentOperations() throws Exception
-    {
-        final MessageProcessor messageProcessor1 = messageProcessorProvider.getMessageProcessor(PATH_URL, newOptions().build(), ONE_WAY);
-        final MessageProcessor messageProcessor2 = messageProcessorProvider.getMessageProcessor(ANOTHER_PATH, newOptions().build(), ONE_WAY);
-        
-        assertThat(messageProcessor2, not(is(messageProcessor1)));
-    }
+    assertThat(messageProcessor2, not(is(messageProcessor1)));
+  }
 
-    @Test
-    public void differentExchangePatternsReturnsDifferentOperations() throws Exception
-    {
-        final MessageProcessor messageProcessor1 = messageProcessorProvider.getMessageProcessor(PATH_URL, newOptions().build(), ONE_WAY);
-        final MessageProcessor messageProcessor2 = messageProcessorProvider.getMessageProcessor(PATH_URL, newOptions().build(), REQUEST_RESPONSE);
-        
-        assertThat(messageProcessor2, not(is(messageProcessor1)));
-    }
+  @Test
+  public void differentPathReturnsDifferentOperations() throws Exception {
+    final MessageProcessor messageProcessor1 =
+        messageProcessorProvider.getMessageProcessor(PATH_URL, newOptions().build(), ONE_WAY);
+    final MessageProcessor messageProcessor2 =
+        messageProcessorProvider.getMessageProcessor(ANOTHER_PATH, newOptions().build(), ONE_WAY);
 
-    @Test
-    public void disposeInvalidatesCache() throws Exception
-    {
-        final MessageProcessor messageProcessor1 = messageProcessorProvider.getMessageProcessor(PATH_URL, SimpleOptionsBuilder.newOptions().build(), REQUEST_RESPONSE);
-        messageProcessorProvider.dispose();
-        
-        final MessageProcessor messageProcessor2 = messageProcessorProvider.getMessageProcessor(PATH_URL, SimpleOptionsBuilder.newOptions().build(), REQUEST_RESPONSE);
-        
-        assertThat(messageProcessor2, not(is(messageProcessor1)));
-    }
+    assertThat(messageProcessor2, not(is(messageProcessor1)));
+  }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void doNotAllowNullUrl() throws Exception
-    {
-        messageProcessorProvider.getMessageProcessor(null, newOptions().build(), ONE_WAY);
-    }
+  @Test
+  public void differentExchangePatternsReturnsDifferentOperations() throws Exception {
+    final MessageProcessor messageProcessor1 =
+        messageProcessorProvider.getMessageProcessor(PATH_URL, newOptions().build(), ONE_WAY);
+    final MessageProcessor messageProcessor2 =
+        messageProcessorProvider.getMessageProcessor(PATH_URL, newOptions().build(), REQUEST_RESPONSE);
 
-    @Test(expected = IllegalArgumentException.class)
-    public void doNotAllowNullOptions() throws Exception
-    {
-        messageProcessorProvider.getMessageProcessor(PATH_URL, null, ONE_WAY);
-    }
+    assertThat(messageProcessor2, not(is(messageProcessor1)));
+  }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void doNotAllowNullExchangePattern() throws Exception
-    {
-        messageProcessorProvider.getMessageProcessor(PATH_URL, newOptions().build(), null);
-    }
+  @Test
+  public void disposeInvalidatesCache() throws Exception {
+    final MessageProcessor messageProcessor1 =
+        messageProcessorProvider.getMessageProcessor(PATH_URL, SimpleOptionsBuilder.newOptions().build(), REQUEST_RESPONSE);
+    messageProcessorProvider.dispose();
+
+    final MessageProcessor messageProcessor2 =
+        messageProcessorProvider.getMessageProcessor(PATH_URL, SimpleOptionsBuilder.newOptions().build(), REQUEST_RESPONSE);
+
+    assertThat(messageProcessor2, not(is(messageProcessor1)));
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void doNotAllowNullUrl() throws Exception {
+    messageProcessorProvider.getMessageProcessor(null, newOptions().build(), ONE_WAY);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void doNotAllowNullOptions() throws Exception {
+    messageProcessorProvider.getMessageProcessor(PATH_URL, null, ONE_WAY);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void doNotAllowNullExchangePattern() throws Exception {
+    messageProcessorProvider.getMessageProcessor(PATH_URL, newOptions().build(), null);
+  }
 }

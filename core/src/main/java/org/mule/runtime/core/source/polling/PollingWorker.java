@@ -19,83 +19,65 @@ import javax.resource.spi.work.Work;
  * The worker is responsible of:
  * <p/>
  * <ul>
- *     <li>Stops the task if the worker get's interrupted</li>
- *     <li>Does not run the task if the worker is stopped</li>
- *     <li>calls {@link SystemExceptionHandler} in case the task throws an exception</li>
+ * <li>Stops the task if the worker get's interrupted</li>
+ * <li>Does not run the task if the worker is stopped</li>
+ * <li>calls {@link SystemExceptionHandler} in case the task throws an exception</li>
  * </ul>
  */
-public class PollingWorker implements Work
-{
-    private final PollingTask task;
-    private final SystemExceptionHandler systemExceptionHandler;
-    protected volatile boolean running = false;
+public class PollingWorker implements Work {
 
-    /**
-     * @param task task to be executed by the worker
-     * @param systemExceptionHandler exception handler for task exceptions
-     */
-    public PollingWorker(PollingTask task, SystemExceptionHandler systemExceptionHandler)
-    {
-        this.task = task;
-        this.systemExceptionHandler = systemExceptionHandler;
-    }
+  private final PollingTask task;
+  private final SystemExceptionHandler systemExceptionHandler;
+  protected volatile boolean running = false;
 
-    public boolean isRunning()
-    {
-        return running;
-    }
+  /**
+   * @param task task to be executed by the worker
+   * @param systemExceptionHandler exception handler for task exceptions
+   */
+  public PollingWorker(PollingTask task, SystemExceptionHandler systemExceptionHandler) {
+    this.task = task;
+    this.systemExceptionHandler = systemExceptionHandler;
+  }
 
-    /**
-     * Executes the task. It will exit after each call since it will be invoked again by the scheduler
-     */
-    @Override
-    public void run()
-    {
-        // Make sure we start with a clean slate.
-        RequestContext.clear();
-        if (task.isStarted())
-        {
-            running = true;
-            try
-            {
-                poll();
-            }
-            catch (InterruptedException e)
-            {
-                // stop polling
-                try
-                {
-                    task.stop();
-                }
-                catch (MuleException stopException)
-                {
-                    systemExceptionHandler.handleException(stopException);
-                }
-            }
-            catch (MessagingException e)
-            {
-                //Already handled by TransactionTemplate
-            }
-            catch (Exception e)
-            {
-                systemExceptionHandler.handleException(e);
-            }
-            finally
-            {
-                running = false;
-            }
+  public boolean isRunning() {
+    return running;
+  }
+
+  /**
+   * Executes the task. It will exit after each call since it will be invoked again by the scheduler
+   */
+  @Override
+  public void run() {
+    // Make sure we start with a clean slate.
+    RequestContext.clear();
+    if (task.isStarted()) {
+      running = true;
+      try {
+        poll();
+      } catch (InterruptedException e) {
+        // stop polling
+        try {
+          task.stop();
+        } catch (MuleException stopException) {
+          systemExceptionHandler.handleException(stopException);
         }
+      } catch (MessagingException e) {
+        // Already handled by TransactionTemplate
+      } catch (Exception e) {
+        systemExceptionHandler.handleException(e);
+      } finally {
+        running = false;
+      }
     }
+  }
 
-    protected void poll() throws Exception
-    {
-        task.run();
-    }
+  protected void poll() throws Exception {
+    task.run();
+  }
 
-    @Override
-    public void release()
-    {
-        // nop
-    }
+  @Override
+  public void release() {
+    // nop
+  }
 
 }

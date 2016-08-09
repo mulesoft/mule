@@ -12,37 +12,31 @@ import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.core.api.MuleContext;
 
 /**
- * Response validator that allows specifying which status codes will be considered as successful.
- * Other status codes in the response will cause the component to throw an exception.
+ * Response validator that allows specifying which status codes will be considered as successful. Other status codes in the
+ * response will cause the component to throw an exception.
  *
  * @since 4.0
  */
-public class SuccessStatusCodeValidator extends RangeStatusCodeValidator
-{
+public class SuccessStatusCodeValidator extends RangeStatusCodeValidator {
 
-    /**
-     * An status code validator that allows any status code.
-     */
-    public static SuccessStatusCodeValidator NULL_VALIDATOR = new SuccessStatusCodeValidator("0..599");
+  /**
+   * An status code validator that allows any status code.
+   */
+  public static SuccessStatusCodeValidator NULL_VALIDATOR = new SuccessStatusCodeValidator("0..599");
 
-    public SuccessStatusCodeValidator()
-    {
+  public SuccessStatusCodeValidator() {}
+
+  public SuccessStatusCodeValidator(String values) {
+    setValues(values);
+  }
+
+  @Override
+  public void validate(MuleMessage responseMessage, MuleContext context) throws ResponseValidatorException {
+    int status = ((HttpResponseAttributes) responseMessage.getAttributes()).getStatusCode();
+
+    if (!belongs(status)) {
+      throw new ResponseValidatorException(String.format("Response code %d mapped as failure", status), responseMessage, context);
     }
-
-    public SuccessStatusCodeValidator(String values)
-    {
-        setValues(values);
-    }
-
-    @Override
-    public void validate(MuleMessage responseMessage, MuleContext context) throws ResponseValidatorException
-    {
-        int status = ((HttpResponseAttributes) responseMessage.getAttributes()).getStatusCode();
-
-        if (!belongs(status))
-        {
-            throw new ResponseValidatorException(String.format("Response code %d mapped as failure", status), responseMessage, context);
-        }
-    }
+  }
 
 }

@@ -12,14 +12,12 @@ import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleSession;
 
 /**
- * An interface used for reading and writing session information to and from the
- * current message.
+ * An interface used for reading and writing session information to and from the current message.
  */
-public interface SessionHandler
-{
+public interface SessionHandler {
 
-    MuleMessage storeSessionInfoToMessage(MuleSession session, MuleMessage message, MuleContext context) throws MuleException;
+  MuleMessage storeSessionInfoToMessage(MuleSession session, MuleMessage message, MuleContext context) throws MuleException;
 
-    MuleSession retrieveSessionInfoFromMessage(MuleMessage message, MuleContext muleContext) throws MuleException;
+  MuleSession retrieveSessionInfoFromMessage(MuleMessage message, MuleContext muleContext) throws MuleException;
 
 }

@@ -106,6 +106,8 @@
     </modules>
 
     <properties>
+        <javaVersion>1.8</javaVersion>
+    
         <!-- Properties that can be overriden in submodules -->
         <skipExportTests>true</skipExportTests>
 
@@ -135,7 +137,7 @@
              Use the name of an Eclipse Java execution environment, Eclipse will
              choose the right one by itself.
         -->
-        <jdk8Name>JavaSE-1.8</jdk8Name>
+        <jdk8Name>JavaSE-${javaVersion}</jdk8Name>
 
         <activemqVersion>5.11.1</activemqVersion>
         <antVersion>1.7.0</antVersion>
@@ -252,6 +254,7 @@
         <antrun.plugin.version>1.8</antrun.plugin.version>
         <install.plugin.version>2.5.2</install.plugin.version>
         <checkstyle.plugin.version>2.17</checkstyle.plugin.version>
+        <javaFormatter.plugin.version>1.8.0</javaFormatter.plugin.version>
         <license.maven.plugin.version>2.11</license.maven.plugin.version>
         <gpg.plugin.version>1.6</gpg.plugin.version>
         <gmavenPluginVersion>1.5</gmavenPluginVersion>
@@ -262,6 +265,8 @@
         <maven.surefire.plugin.version>2.19.1</maven.surefire.plugin.version>
         <maven.enforcer.plugin.version>1.4.1</maven.enforcer.plugin.version>
         <depgraph.maven.plugin.version>1.0.4</depgraph.maven.plugin.version>
+        
+        <formatterConfigPath>formatter.xml</formatterConfigPath>
     </properties>
 
     <dependencies>
@@ -1433,6 +1438,32 @@
                     <version>${checkstyle.plugin.version}</version>
                 </plugin>
                 <plugin>
+                    <groupId>com.marvinformatics.formatter</groupId>
+                    <artifactId>formatter-maven-plugin</artifactId>
+                    <version>${javaFormatter.plugin.version}</version>
+                    <configuration>
+                        <compilerCompliance>${javaVersion}</compilerCompliance>
+                        <compilerSource>${javaVersion}</compilerSource>
+                        <compilerTargetPlatform>${javaVersion}</compilerTargetPlatform>
+                        <configFile>${basedir}/${formatterConfigPath}</configFile>
+                        <configJsFile>${basedir}/${formatterConfigPath}</configJsFile>
+                        <lineEnding>LF</lineEnding>
+                        <aggregator>false</aggregator>
+                        <executionRoot>true</executionRoot>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <phase>compile</phase>
+                            <goals>
+                                <goal>validate</goal>
+                            </goals>
+                            <configuration>
+                                <skipFormatting>${skipVerifications}</skipFormatting>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>${mavenCompilerVersion}</version>
@@ -1440,8 +1471,8 @@
                         <encoding>ISO-8859-1</encoding>
                         <fork>true</fork>
                         <maxmem>512m</maxmem>
-                        <source>1.8</source>
-                        <target>1.8</target>
+                        <source>${javaVersion}</source>
+                        <target>${javaVersion}</target>
                         <proc>none</proc>
                         <!-- Slightly faster builds, see https://jira.codehaus.org/browse/MCOMPILER-209 -->
                         <useIncrementalCompilation>false</useIncrementalCompilation>
@@ -1740,6 +1771,10 @@
                     </execution>
                 </executions>
             </plugin>
+                <plugin>
+                    <groupId>com.marvinformatics.formatter</groupId>
+                    <artifactId>formatter-maven-plugin</artifactId>
+                </plugin>
             <plugin>
                 <groupId>com.mycila</groupId>
                 <artifactId>license-maven-plugin</artifactId>
@@ -1829,8 +1864,8 @@
                             <Build-Revision>${buildNumber}</Build-Revision>
                             <Build-Date>${timestamp}</Build-Date>
                             <Dev-List-Email>${dev.list}</Dev-List-Email>
-                            <Supported-Jdks>[1.8.0,1.9)</Supported-Jdks>
-                            <Recommended-Jdks>[1.8.0_60,1.9)</Recommended-Jdks>
+                            <Supported-Jdks>[${javaVersion}.0,1.9)</Supported-Jdks>
+                            <Recommended-Jdks>[${javaVersion}.0_60,1.9)</Recommended-Jdks>
                         </manifestEntries>
                     </archive>
                 </configuration>
@@ -1891,7 +1926,7 @@
                                 <maxmemory>512m</maxmemory>
                                 <charset>ISO-8859-1</charset>
                                 <encoding>ISO-8859-1</encoding>
-                                <source>1.8</source>
+                                <source>${javaVersion}</source>
                                 <configuration>
                                     <additionalparam>${xDocLint}</additionalparam>
                                 </configuration>

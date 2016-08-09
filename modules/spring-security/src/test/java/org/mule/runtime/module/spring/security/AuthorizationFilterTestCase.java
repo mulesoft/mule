@@ -22,102 +22,77 @@ import org.hamcrest.core.Is;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class AuthorizationFilterTestCase extends FunctionalTestCase
-{
+public class AuthorizationFilterTestCase extends FunctionalTestCase {
 
-    @Rule
-    public DynamicPort port1 = new DynamicPort("port1");
+  @Rule
+  public DynamicPort port1 = new DynamicPort("port1");
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "http-module-filter-test.xml";
+  @Override
+  protected String getConfigFile() {
+    return "http-module-filter-test.xml";
+  }
+
+  @Test
+  public void testNotAuthenticated() throws Exception {
+    doRequest("localhost", getUrl(), 401);
+  }
+
+  @Test
+  public void testAuthenticatedButNotAuthorized() throws Exception {
+    doRequest(null, "localhost", "anon", "anon", getUrl(), false, 405);
+  }
+
+  @Test
+  public void testAuthorized() throws Exception {
+    doRequest(null, "localhost", "ross", "ross", getUrl(), false, 200);
+  }
+
+  @Test
+  public void testAuthorizedInAnotherFlow() throws Exception {
+    doRequest(null, "localhost", "ross", "ross", getUrl(), false, 200);
+  }
+
+  protected String getUrl() {
+    return "http://localhost:" + port1.getNumber() + "/authorize";
+  }
+
+  private void doRequest(String host, String url, int result) throws Exception {
+    HttpClient client = new HttpClient();
+    GetMethod get = new GetMethod(url);
+    try {
+      int status = client.executeMethod(get);
+      assertEquals(status, result);
+      assertNotNull(get.getResponseHeader("WWW-Authenticate"));
+      assertThat(get.getResponseHeader("WWW-Authenticate").getValue().contains("mule-realm"), Is.is(true));
+    } finally {
+      get.releaseConnection();
     }
+  }
 
-    @Test
-    public void testNotAuthenticated() throws Exception
-    {
-        doRequest("localhost",getUrl(), 401);
-    }
+  private void doRequest(String realm, String host, String user, String pass, String url, boolean handshake, int result)
+      throws Exception {
+    HttpClient client = new HttpClient();
+    client.getParams().setAuthenticationPreemptive(true);
+    client.getState().setCredentials(new AuthScope(host, -1, realm), new UsernamePasswordCredentials(user, pass));
+    GetMethod get = new GetMethod(url);
+    get.setDoAuthentication(handshake);
 
-    @Test
-    public void testAuthenticatedButNotAuthorized() throws Exception
-    {
-        doRequest(null, "localhost", "anon", "anon", getUrl(), false, 405);
-    }
-    
-    @Test
-    public void testAuthorized() throws Exception
-    {
-        doRequest(null, "localhost", "ross", "ross", getUrl(), false, 200);
-    }
-
-    @Test
-    public void testAuthorizedInAnotherFlow() throws Exception
-    {
-        doRequest(null, "localhost", "ross", "ross", getUrl(), false, 200);
-    }
-
-    protected String getUrl()
-    {
-        return "http://localhost:" + port1.getNumber() + "/authorize";
-    }
-
-    private void doRequest(String host,
-                           String url,
-                           int result) throws Exception
-    {
-        HttpClient client = new HttpClient();
-        GetMethod get = new GetMethod(url);
-        try
-        {
-            int status = client.executeMethod(get);
-            assertEquals(status,result);
-            assertNotNull(get.getResponseHeader("WWW-Authenticate"));
-            assertThat(get.getResponseHeader("WWW-Authenticate").getValue().contains("mule-realm"), Is.is(true));
+    try {
+      int status = client.executeMethod(get);
+      if (status == UNAUTHORIZED.getStatusCode() && handshake == true) {
+        // doAuthentication = true means that if the request returns 401,
+        // the HttpClient will resend the request with credentials
+        status = client.executeMethod(get);
+        if (status == UNAUTHORIZED.getStatusCode() && handshake == true) {
+          // doAuthentication = true means that if the request returns 401,
+          // the HttpClient will resend the request with credentials
+          status = client.executeMethod(get);
         }
-        finally
-        {
-            get.releaseConnection();
-        }
+      }
+      assertEquals(result, status);
+    } finally {
+      get.releaseConnection();
     }
-
-    private void doRequest(String realm,
-                           String host,
-                           String user,
-                           String pass,
-                           String url,
-                           boolean handshake,
-                           int result) throws Exception
-    {
-        HttpClient client = new HttpClient();
-        client.getParams().setAuthenticationPreemptive(true);
-        client.getState().setCredentials(new AuthScope(host, -1, realm),
-            new UsernamePasswordCredentials(user, pass));
-        GetMethod get = new GetMethod(url);
-        get.setDoAuthentication(handshake);
-
-        try
-        {
-            int status = client.executeMethod(get);
-            if (status == UNAUTHORIZED.getStatusCode() && handshake == true)
-            {
-                // doAuthentication = true means that if the request returns 401,
-                // the HttpClient will resend the request with credentials
-                status = client.executeMethod(get);
-                if (status == UNAUTHORIZED.getStatusCode() && handshake == true)
-                {
-                    // doAuthentication = true means that if the request returns 401,
-                    // the HttpClient will resend the request with credentials
-                    status = client.executeMethod(get);
-                }
-            }
-            assertEquals(result, status);
-        }
-        finally
-        {
-            get.releaseConnection();
-        }
-    }
+  }
 
 }

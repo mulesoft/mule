@@ -12,22 +12,19 @@ import org.mule.runtime.api.service.Service;
 /**
  * Thrown to indicate an error during the resolution process of {@link Service} instances.
  */
-public class ServiceResolutionError extends Exception
-{
+public class ServiceResolutionError extends Exception {
 
-    /**
-     * @inherited
-     */
-    public ServiceResolutionError(String message)
-    {
-        super(message);
-    }
+  /**
+   * @inherited
+   */
+  public ServiceResolutionError(String message) {
+    super(message);
+  }
 
-    /**
-     * @inherited
-     */
-    public ServiceResolutionError(String message, Throwable cause)
-    {
-        super(message, cause);
-    }
+  /**
+   * @inherited
+   */
+  public ServiceResolutionError(String message, Throwable cause) {
+    super(message, cause);
+  }
 }

@@ -20,75 +20,60 @@ import org.apache.sshd.server.shell.ProcessShellFactory;
 import org.apache.sshd.server.subsystem.sftp.SftpSubsystemFactory;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
-public class SftpServer
-{
+public class SftpServer {
 
-    public static final String USERNAME = "muletest1";
-    public static final String PASSWORD = "muletest1";
-    private SshServer sshdServer;
-    private Integer port;
+  public static final String USERNAME = "muletest1";
+  public static final String PASSWORD = "muletest1";
+  private SshServer sshdServer;
+  private Integer port;
 
-    public SftpServer(int port)
-    {
-        this.port = port;
-        configureSecurityProvider();
-        SftpSubsystemFactory factory = createFtpSubsystemFactory();
-        sshdServer = SshServer.setUpDefaultServer();
-        configureSshdServer(factory, passwordAuthenticator());
+  public SftpServer(int port) {
+    this.port = port;
+    configureSecurityProvider();
+    SftpSubsystemFactory factory = createFtpSubsystemFactory();
+    sshdServer = SshServer.setUpDefaultServer();
+    configureSshdServer(factory, passwordAuthenticator());
+  }
+
+  public void setPasswordAuthenticator(PasswordAuthenticator passwordAuthenticator) {
+    sshdServer.setPasswordAuthenticator(passwordAuthenticator);
+  }
+
+  private void configureSshdServer(SftpSubsystemFactory factory, PasswordAuthenticator passwordAuthenticator) {
+    sshdServer.setPort(port);
+    sshdServer.setKeyPairProvider(new SimpleGeneratorHostKeyProvider(new File("hostkey.ser")));
+    sshdServer.setSubsystemFactories(asList(factory));
+    sshdServer.setCommandFactory(new ScpCommandFactory());
+    sshdServer.setShellFactory(new ProcessShellFactory());
+    sshdServer.setPasswordAuthenticator(passwordAuthenticator);
+  }
+
+  private SftpSubsystemFactory createFtpSubsystemFactory() {
+    return new SftpSubsystemFactory();
+  }
+
+  private void configureSecurityProvider() {
+    Security.addProvider(new BouncyCastleProvider());
+  }
+
+  private static PasswordAuthenticator passwordAuthenticator() {
+    return (arg0, arg1, arg2) -> USERNAME.equals(arg0) && PASSWORD.equals(arg1);
+  }
+
+  public void start() {
+    try {
+      sshdServer.start();
+    } catch (IOException e) {
+      e.printStackTrace();
     }
+  }
 
-    public void setPasswordAuthenticator(PasswordAuthenticator passwordAuthenticator)
-    {
-        sshdServer.setPasswordAuthenticator(passwordAuthenticator);
+  public void stop() {
+    try {
+      sshdServer.stop(false);
+    } catch (IOException e) {
+      e.printStackTrace();
     }
-
-    private void configureSshdServer(SftpSubsystemFactory factory, PasswordAuthenticator passwordAuthenticator)
-    {
-        sshdServer.setPort(port);
-        sshdServer.setKeyPairProvider(new SimpleGeneratorHostKeyProvider(new File("hostkey.ser")));
-        sshdServer.setSubsystemFactories(asList(factory));
-        sshdServer.setCommandFactory(new ScpCommandFactory());
-        sshdServer.setShellFactory(new ProcessShellFactory());
-        sshdServer.setPasswordAuthenticator(passwordAuthenticator);
-    }
-
-        private SftpSubsystemFactory createFtpSubsystemFactory()
-        {
-            return new SftpSubsystemFactory();
-        }
-
-    private void configureSecurityProvider()
-    {
-        Security.addProvider(new BouncyCastleProvider());
-    }
-
-    private static PasswordAuthenticator passwordAuthenticator()
-    {
-        return (arg0, arg1, arg2) -> USERNAME.equals(arg0) && PASSWORD.equals(arg1);
-    }
-
-    public void start()
-    {
-        try
-        {
-            sshdServer.start();
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-    }
-
-    public void stop()
-    {
-        try
-        {
-            sshdServer.stop(false);
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-        sshdServer = null;
-    }
+    sshdServer = null;
+  }
 }

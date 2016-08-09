@@ -16,22 +16,21 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 @Extension(name = "documentation")
 @Operations({TestDocumentedExtensionOperations.class})
 @Xml(namespaceLocation = "namespaceLocation", namespace = "documentation")
-public class TestExtensionWithDocumentation
-{
+public class TestExtensionWithDocumentation {
 
-    /**
-     * Config parameter
-     */
-    @Parameter
-    private String configParameter;
+  /**
+   * Config parameter
+   */
+  @Parameter
+  private String configParameter;
 
-    /**
-     * Config {@link Parameter} with an {@link Optional} value
-     */
-    @Parameter
-    @Optional
-    private String configParameterWithComplexJavadoc;
+  /**
+   * Config {@link Parameter} with an {@link Optional} value
+   */
+  @Parameter
+  @Optional
+  private String configParameterWithComplexJavadoc;
 
-    @ParameterGroup
-    private TestDocumentedParameterGroup group;
+  @ParameterGroup
+  private TestDocumentedParameterGroup group;
 }

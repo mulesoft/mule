@@ -18,24 +18,22 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class TCPTimeoutsTest extends FunctionalTestCase
-{
-    @Rule
-    public DynamicPort tcpPort = new DynamicPort("tcpPort");
+public class TCPTimeoutsTest extends FunctionalTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "tcp-response-timeout-config.xml";
-    }
+  @Rule
+  public DynamicPort tcpPort = new DynamicPort("tcpPort");
 
-    @Test
-    public void testOutboundResponseTimeoutSet() throws Exception
-    {
-        final MuleClient client = new DefaultLocalMuleClient(muleContext);
+  @Override
+  protected String getConfigFile() {
+    return "tcp-response-timeout-config.xml";
+  }
 
-        final MuleMessage result = client.send("vm://testIn", TEST_MESSAGE, null);
+  @Test
+  public void testOutboundResponseTimeoutSet() throws Exception {
+    final MuleClient client = new DefaultLocalMuleClient(muleContext);
 
-        assertThat(result.getPayload(), is(nullValue()));
-    }
+    final MuleMessage result = client.send("vm://testIn", TEST_MESSAGE, null);
+
+    assertThat(result.getPayload(), is(nullValue()));
+  }
 }

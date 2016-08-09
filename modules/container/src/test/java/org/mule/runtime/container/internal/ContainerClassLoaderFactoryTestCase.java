@@ -29,81 +29,74 @@ import java.util.Set;
 
 import org.junit.Test;
 
-public class ContainerClassLoaderFactoryTestCase extends AbstractMuleTestCase
-{
+public class ContainerClassLoaderFactoryTestCase extends AbstractMuleTestCase {
 
-    @Test
-    public void createsClassLoaderLookupPolicy() throws Exception
-    {
-        final ContainerClassLoaderFactory factory = new ContainerClassLoaderFactory();
-        final ModuleDiscoverer moduleDiscoverer = mock(ModuleDiscoverer.class);
-        final List<MuleModule> modules = new ArrayList<>();
-        modules.add(new TestModuleBuilder("module1").exportingPackages("org.foo1", "org.foo1.bar").build());
-        modules.add(new TestModuleBuilder("module2").exportingPackages("org.foo2").build());
-        when(moduleDiscoverer.discover()).thenReturn(modules);
-        factory.setModuleDiscoverer(moduleDiscoverer);
+  @Test
+  public void createsClassLoaderLookupPolicy() throws Exception {
+    final ContainerClassLoaderFactory factory = new ContainerClassLoaderFactory();
+    final ModuleDiscoverer moduleDiscoverer = mock(ModuleDiscoverer.class);
+    final List<MuleModule> modules = new ArrayList<>();
+    modules.add(new TestModuleBuilder("module1").exportingPackages("org.foo1", "org.foo1.bar").build());
+    modules.add(new TestModuleBuilder("module2").exportingPackages("org.foo2").build());
+    when(moduleDiscoverer.discover()).thenReturn(modules);
+    factory.setModuleDiscoverer(moduleDiscoverer);
 
-        final ArtifactClassLoader containerClassLoader = factory.createContainerClassLoader(this.getClass().getClassLoader());
+    final ArtifactClassLoader containerClassLoader = factory.createContainerClassLoader(this.getClass().getClassLoader());
 
-        final ClassLoaderLookupPolicy classLoaderLookupPolicy = containerClassLoader.getClassLoaderLookupPolicy();
-        assertThat(classLoaderLookupPolicy.getLookupStrategy("org.foo1.Foo"), is(PARENT_ONLY));
-        assertThat(classLoaderLookupPolicy.getLookupStrategy("org.foo1.bar.Bar"), is(PARENT_ONLY));
-        assertThat(classLoaderLookupPolicy.getLookupStrategy("org.foo2.Fo"), is(PARENT_ONLY));
-        assertThat(classLoaderLookupPolicy.getLookupStrategy("org.foo2.bar.Bar"), is(CHILD_FIRST));
+    final ClassLoaderLookupPolicy classLoaderLookupPolicy = containerClassLoader.getClassLoaderLookupPolicy();
+    assertThat(classLoaderLookupPolicy.getLookupStrategy("org.foo1.Foo"), is(PARENT_ONLY));
+    assertThat(classLoaderLookupPolicy.getLookupStrategy("org.foo1.bar.Bar"), is(PARENT_ONLY));
+    assertThat(classLoaderLookupPolicy.getLookupStrategy("org.foo2.Fo"), is(PARENT_ONLY));
+    assertThat(classLoaderLookupPolicy.getLookupStrategy("org.foo2.bar.Bar"), is(CHILD_FIRST));
+  }
+
+  @Test
+  public void getResourcesFromParent() throws Exception {
+    final ContainerClassLoaderFactory factory = createClassLoaderExportingBootstrapProperties();
+
+    final ArtifactClassLoader containerClassLoader = factory.createContainerClassLoader(this.getClass().getClassLoader());
+
+    final Enumeration<URL> resources = containerClassLoader.getClassLoader().getResources(BOOTSTRAP_PROPERTIES);
+    assertThat(resources.hasMoreElements(), is(true));
+
+    Set<String> items = new HashSet<>();
+    int size = 0;
+    while (resources.hasMoreElements()) {
+      final String url = resources.nextElement().toString();
+      items.add(url);
+      size++;
     }
 
-    @Test
-    public void getResourcesFromParent() throws Exception
-    {
-        final ContainerClassLoaderFactory factory = createClassLoaderExportingBootstrapProperties();
+    assertThat(size, equalTo(items.size()));
+  }
 
-        final ArtifactClassLoader containerClassLoader = factory.createContainerClassLoader(this.getClass().getClassLoader());
+  @Test
+  public void doesNotFindAnyResource() throws Exception {
+    final ContainerClassLoaderFactory factory = createClassLoaderExportingBootstrapProperties();
 
-        final Enumeration<URL> resources = containerClassLoader.getClassLoader().getResources(BOOTSTRAP_PROPERTIES);
-        assertThat(resources.hasMoreElements(), is(true));
+    final ArtifactClassLoader containerClassLoader = factory.createContainerClassLoader(this.getClass().getClassLoader());
 
-        Set<String> items = new HashSet<>();
-        int size = 0;
-        while (resources.hasMoreElements())
-        {
-            final String url = resources.nextElement().toString();
-            items.add(url);
-            size++;
-        }
+    final URL resource = containerClassLoader.findResource(BOOTSTRAP_PROPERTIES);
+    assertThat(resource, is(nullValue()));
+  }
 
-        assertThat(size, equalTo(items.size()));
-    }
+  @Test
+  public void doesNotFindAnyResources() throws Exception {
+    final ContainerClassLoaderFactory factory = createClassLoaderExportingBootstrapProperties();
 
-    @Test
-    public void doesNotFindAnyResource() throws Exception
-    {
-        final ContainerClassLoaderFactory factory = createClassLoaderExportingBootstrapProperties();
+    final ArtifactClassLoader containerClassLoader = factory.createContainerClassLoader(this.getClass().getClassLoader());
 
-        final ArtifactClassLoader containerClassLoader = factory.createContainerClassLoader(this.getClass().getClassLoader());
+    final Enumeration<URL> resources = containerClassLoader.findResources(BOOTSTRAP_PROPERTIES);
+    assertThat(resources.hasMoreElements(), is(false));
+  }
 
-        final URL resource = containerClassLoader.findResource(BOOTSTRAP_PROPERTIES);
-        assertThat(resource, is(nullValue()));
-    }
-
-    @Test
-    public void doesNotFindAnyResources() throws Exception
-    {
-        final ContainerClassLoaderFactory factory = createClassLoaderExportingBootstrapProperties();
-
-        final ArtifactClassLoader containerClassLoader = factory.createContainerClassLoader(this.getClass().getClassLoader());
-
-        final Enumeration<URL> resources = containerClassLoader.findResources(BOOTSTRAP_PROPERTIES);
-        assertThat(resources.hasMoreElements(), is(false));
-    }
-
-    private ContainerClassLoaderFactory createClassLoaderExportingBootstrapProperties()
-    {
-        final ContainerClassLoaderFactory factory = new ContainerClassLoaderFactory();
-        final ModuleDiscoverer moduleDiscoverer = mock(ModuleDiscoverer.class);
-        final List<MuleModule> modules = new ArrayList<>();
-        modules.add(new TestModuleBuilder("module1").exportingResources(BOOTSTRAP_PROPERTIES).build());
-        when(moduleDiscoverer.discover()).thenReturn(modules);
-        factory.setModuleDiscoverer(moduleDiscoverer);
-        return factory;
-    }
+  private ContainerClassLoaderFactory createClassLoaderExportingBootstrapProperties() {
+    final ContainerClassLoaderFactory factory = new ContainerClassLoaderFactory();
+    final ModuleDiscoverer moduleDiscoverer = mock(ModuleDiscoverer.class);
+    final List<MuleModule> modules = new ArrayList<>();
+    modules.add(new TestModuleBuilder("module1").exportingResources(BOOTSTRAP_PROPERTIES).build());
+    when(moduleDiscoverer.discover()).thenReturn(modules);
+    factory.setModuleDiscoverer(moduleDiscoverer);
+    return factory;
+  }
 }

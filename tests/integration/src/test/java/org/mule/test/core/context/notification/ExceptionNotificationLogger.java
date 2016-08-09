@@ -8,9 +8,6 @@ package org.mule.test.core.context.notification;
 
 import org.mule.runtime.core.api.context.notification.ExceptionNotificationListener;
 
-public class ExceptionNotificationLogger
-        extends AbstractNotificationLogger
-        implements ExceptionNotificationListener
-{
-    // nothing to do here
+public class ExceptionNotificationLogger extends AbstractNotificationLogger implements ExceptionNotificationListener {
+  // nothing to do here
 }

@@ -7,18 +7,16 @@
 package org.mule.runtime.core.util.xa;
 
 /**
- * Implementations of this interface hold a reference to a factory of
- * XAResource objects.
+ * Implementations of this interface hold a reference to a factory of XAResource objects.
  *
- * This class is used in those classes that wrap jdbc XADataSource or jms XAConnectionFactory
- * or any other factory of XA resources and allows to retrieve the actual implementation.
+ * This class is used in those classes that wrap jdbc XADataSource or jms XAConnectionFactory or any other factory of XA resources
+ * and allows to retrieve the actual implementation.
  */
-public interface XaResourceFactoryHolder
-{
+public interface XaResourceFactoryHolder {
 
-    /**
-     * @return the {@link javax.transaction.xa.XAResource} provider
-     */
-    Object getHoldObject();
+  /**
+   * @return the {@link javax.transaction.xa.XAResource} provider
+   */
+  Object getHoldObject();
 
 }

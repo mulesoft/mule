@@ -18,25 +18,20 @@ import org.mule.tck.size.SmallTest;
 import org.junit.Test;
 
 @SmallTest
-public class DefaultMuleDeployerTestCase extends AbstractMuleTestCase
-{
+public class DefaultMuleDeployerTestCase extends AbstractMuleTestCase {
 
-    @Test
-    public void disposesAppOnDeployFailure() throws Exception
-    {
-        DefaultArtifactDeployer deployer = new DefaultArtifactDeployer();
-        Application app = mock(Application.class);
-        doThrow(new IllegalStateException()).when(app).init();
+  @Test
+  public void disposesAppOnDeployFailure() throws Exception {
+    DefaultArtifactDeployer deployer = new DefaultArtifactDeployer();
+    Application app = mock(Application.class);
+    doThrow(new IllegalStateException()).when(app).init();
 
-        try
-        {
-            deployer.deploy(app);
-            fail("Deployment is supposed to fail");
-        }
-        catch (DeploymentException expected)
-        {
-        }
-
-        verify(app, times(1)).dispose();
+    try {
+      deployer.deploy(app);
+      fail("Deployment is supposed to fail");
+    } catch (DeploymentException expected) {
     }
+
+    verify(app, times(1)).dispose();
+  }
 }

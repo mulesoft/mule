@@ -16,42 +16,35 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-public class GlobalVariableResolverFactory extends MVELExpressionLanguageContext
-{
-    private static final long serialVersionUID = -6819292692339684915L;
+public class GlobalVariableResolverFactory extends MVELExpressionLanguageContext {
 
-    // Minor optimization to avoid HashMap contains if it can be avoided.
-    private boolean hasTarget = false;
+  private static final long serialVersionUID = -6819292692339684915L;
 
-    public GlobalVariableResolverFactory(Map<String, String> aliases,
-                                         Map<String, Function> functions,
-                                         ParserConfiguration parserConfiguration,
-                                         MuleContext muleContext)
-    {
-        super(parserConfiguration, muleContext);
-        List<ExpressionLanguageExtension> extensions = (List<ExpressionLanguageExtension>) muleContext.getRegistry()
-            .lookupObjectsForLifecycle(ExpressionLanguageExtension.class);
+  // Minor optimization to avoid HashMap contains if it can be avoided.
+  private boolean hasTarget = false;
 
-        hasTarget = !(aliases.isEmpty() && functions.isEmpty() && extensions.isEmpty());
+  public GlobalVariableResolverFactory(Map<String, String> aliases, Map<String, Function> functions,
+                                       ParserConfiguration parserConfiguration, MuleContext muleContext) {
+    super(parserConfiguration, muleContext);
+    List<ExpressionLanguageExtension> extensions = (List<ExpressionLanguageExtension>) muleContext.getRegistry()
+        .lookupObjectsForLifecycle(ExpressionLanguageExtension.class);
 
-        for (ExpressionLanguageExtension extension : extensions)
-        {
-            extension.configureContext(this);
-        }
-        for (Entry<String, String> alias : aliases.entrySet())
-        {
-            addAlias(alias.getKey(), alias.getValue());
-        }
-        for (Entry<String, Function> function : functions.entrySet())
-        {
-            addFinalVariable(function.getKey(), new FunctionInstance(function.getValue()));
-        }
+    hasTarget = !(aliases.isEmpty() && functions.isEmpty() && extensions.isEmpty());
+
+    for (ExpressionLanguageExtension extension : extensions) {
+      extension.configureContext(this);
     }
-
-    @Override
-    public boolean isTarget(String name)
-    {
-        return hasTarget && super.isTarget(name);
+    for (Entry<String, String> alias : aliases.entrySet()) {
+      addAlias(alias.getKey(), alias.getValue());
     }
+    for (Entry<String, Function> function : functions.entrySet()) {
+      addFinalVariable(function.getKey(), new FunctionInstance(function.getValue()));
+    }
+  }
+
+  @Override
+  public boolean isTarget(String name) {
+    return hasTarget && super.isTarget(name);
+  }
 
 }

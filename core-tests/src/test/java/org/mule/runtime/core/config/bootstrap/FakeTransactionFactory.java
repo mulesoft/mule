@@ -11,25 +11,21 @@ import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionException;
 import org.mule.runtime.core.api.transaction.UniversalTransactionFactory;
 
-public final class FakeTransactionFactory implements UniversalTransactionFactory
-{
+public final class FakeTransactionFactory implements UniversalTransactionFactory {
 
-    @Override
-    public Transaction beginTransaction(MuleContext muleContext) throws TransactionException 
-    {
-        return null;
-    }
+  @Override
+  public Transaction beginTransaction(MuleContext muleContext) throws TransactionException {
+    return null;
+  }
 
-    @Override
-    public boolean isTransacted() 
-    {
-        return false;
-    }
+  @Override
+  public boolean isTransacted() {
+    return false;
+  }
 
-    @Override
-    public Transaction createUnboundTransaction(MuleContext muleContext) throws TransactionException 
-    {
-        return null;
-    }
+  @Override
+  public Transaction createUnboundTransaction(MuleContext muleContext) throws TransactionException {
+    return null;
+  }
 
 }

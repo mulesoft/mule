@@ -50,94 +50,85 @@ import org.reflections.ReflectionUtils;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class DataTypeModelEnricherTestCase extends AbstractMuleTestCase
-{
+public class DataTypeModelEnricherTestCase extends AbstractMuleTestCase {
 
-    @Mock(answer = RETURNS_DEEP_STUBS)
-    private DescribingContext describingContext;
+  @Mock(answer = RETURNS_DEEP_STUBS)
+  private DescribingContext describingContext;
 
-    @Mock(answer = RETURNS_DEEP_STUBS)
-    private ExtensionDeclarer extensionDeclarer;
+  @Mock(answer = RETURNS_DEEP_STUBS)
+  private ExtensionDeclarer extensionDeclarer;
 
-    @Mock(answer = RETURNS_DEEP_STUBS)
-    private ExtensionDeclaration extensionDeclaration;
+  @Mock(answer = RETURNS_DEEP_STUBS)
+  private ExtensionDeclaration extensionDeclaration;
 
-    @Mock(answer = RETURNS_DEEP_STUBS)
-    private OperationDeclaration annotatedOperation;
+  @Mock(answer = RETURNS_DEEP_STUBS)
+  private OperationDeclaration annotatedOperation;
 
-    @Mock(answer = RETURNS_DEEP_STUBS)
-    private OperationDeclaration notAnnotatedOperation;
+  @Mock(answer = RETURNS_DEEP_STUBS)
+  private OperationDeclaration notAnnotatedOperation;
 
-    private Method method = getAnnotatedMethod();
+  private Method method = getAnnotatedMethod();
 
-    private DataTypeModelEnricher enricher = new DataTypeModelEnricher();
+  private DataTypeModelEnricher enricher = new DataTypeModelEnricher();
 
-    @Before
-    @DataTypeParameters
-    public void before()
-    {
-        when(describingContext.getExtensionDeclarer()).thenReturn(extensionDeclarer);
-        when(extensionDeclarer.getDeclaration()).thenReturn(extensionDeclaration);
-        when(extensionDeclaration.getOperations()).thenReturn(asList(annotatedOperation, notAnnotatedOperation));
-        when(annotatedOperation.getModelProperty(ImplementingTypeModelProperty.class)).thenReturn(Optional.empty());
-        when(notAnnotatedOperation.getModelProperty(ImplementingTypeModelProperty.class)).thenReturn(Optional.empty());
-        when(annotatedOperation.getModelProperty(ImplementingMethodModelProperty.class)).thenReturn(Optional.of(new ImplementingMethodModelProperty(method)));
-        when(notAnnotatedOperation.getModelProperty(ImplementingMethodModelProperty.class)).thenReturn(Optional.empty());
-    }
+  @Before
+  @DataTypeParameters
+  public void before() {
+    when(describingContext.getExtensionDeclarer()).thenReturn(extensionDeclarer);
+    when(extensionDeclarer.getDeclaration()).thenReturn(extensionDeclaration);
+    when(extensionDeclaration.getOperations()).thenReturn(asList(annotatedOperation, notAnnotatedOperation));
+    when(annotatedOperation.getModelProperty(ImplementingTypeModelProperty.class)).thenReturn(Optional.empty());
+    when(notAnnotatedOperation.getModelProperty(ImplementingTypeModelProperty.class)).thenReturn(Optional.empty());
+    when(annotatedOperation.getModelProperty(ImplementingMethodModelProperty.class))
+        .thenReturn(Optional.of(new ImplementingMethodModelProperty(method)));
+    when(notAnnotatedOperation.getModelProperty(ImplementingMethodModelProperty.class)).thenReturn(Optional.empty());
+  }
 
-    @Test
-    public void enrichAnnotated()
-    {
-        enricher.enrich(describingContext);
-        ArgumentCaptor<ParameterDeclaration> captor = ArgumentCaptor.forClass(ParameterDeclaration.class);
-        verify(annotatedOperation, times(2)).addParameter(captor.capture());
+  @Test
+  public void enrichAnnotated() {
+    enricher.enrich(describingContext);
+    ArgumentCaptor<ParameterDeclaration> captor = ArgumentCaptor.forClass(ParameterDeclaration.class);
+    verify(annotatedOperation, times(2)).addParameter(captor.capture());
 
-        assertThat(captor.getAllValues(), hasSize(2));
-        assertParameter(captor.getAllValues().get(0), MIME_TYPE_PARAMETER_NAME);
-        assertParameter(captor.getAllValues().get(1), ENCODING_PARAMETER_NAME);
-    }
+    assertThat(captor.getAllValues(), hasSize(2));
+    assertParameter(captor.getAllValues().get(0), MIME_TYPE_PARAMETER_NAME);
+    assertParameter(captor.getAllValues().get(1), ENCODING_PARAMETER_NAME);
+  }
 
-    @Test
-    public void skipNotAnnotated()
-    {
-        enricher.enrich(describingContext);
-        verify(notAnnotatedOperation, never()).addParameter(any(ParameterDeclaration.class));
-    }
+  @Test
+  public void skipNotAnnotated() {
+    enricher.enrich(describingContext);
+    verify(notAnnotatedOperation, never()).addParameter(any(ParameterDeclaration.class));
+  }
 
-    @Test(expected = IllegalModelDefinitionException.class)
-    public void voidOperation()
-    {
-        when(annotatedOperation.getModelProperty(ImplementingMethodModelProperty.class)).thenReturn(Optional.of(new ImplementingMethodModelProperty(getVoidAnnotatedMethod())));
-        enricher.enrich(describingContext);
-    }
+  @Test(expected = IllegalModelDefinitionException.class)
+  public void voidOperation() {
+    when(annotatedOperation.getModelProperty(ImplementingMethodModelProperty.class))
+        .thenReturn(Optional.of(new ImplementingMethodModelProperty(getVoidAnnotatedMethod())));
+    enricher.enrich(describingContext);
+  }
 
-    private void assertParameter(ParameterDeclaration parameter, String name)
-    {
-        assertThat(parameter, is(notNullValue()));
-        assertThat(parameter.getName(), is(name));
-        assertThat(parameter.getType(), equalTo(toMetadataType(String.class)));
-        assertThat(parameter.isRequired(), is(false));
-        assertThat(parameter.getExpressionSupport(), is(SUPPORTED));
-        assertThat(parameter.getDefaultValue(), is(nullValue()));
-    }
+  private void assertParameter(ParameterDeclaration parameter, String name) {
+    assertThat(parameter, is(notNullValue()));
+    assertThat(parameter.getName(), is(name));
+    assertThat(parameter.getType(), equalTo(toMetadataType(String.class)));
+    assertThat(parameter.isRequired(), is(false));
+    assertThat(parameter.getExpressionSupport(), is(SUPPORTED));
+    assertThat(parameter.getDefaultValue(), is(nullValue()));
+  }
 
-    @DataTypeParameters
-    public Object operationMethod()
-    {
-        return null;
-    }
+  @DataTypeParameters
+  public Object operationMethod() {
+    return null;
+  }
 
-    private Method getAnnotatedMethod()
-    {
-        return ReflectionUtils.getMethods(getClass(), withAnnotation(DataTypeParameters.class),
-                                          withReturnType(Object.class))
-                .stream().findFirst().get();
-    }
+  private Method getAnnotatedMethod() {
+    return ReflectionUtils.getMethods(getClass(), withAnnotation(DataTypeParameters.class), withReturnType(Object.class)).stream()
+        .findFirst().get();
+  }
 
-    private Method getVoidAnnotatedMethod()
-    {
-        return ReflectionUtils.getMethods(getClass(), withAnnotation(DataTypeParameters.class),
-                                          withReturnType(void.class))
-                .stream().findFirst().get();
-    }
+  private Method getVoidAnnotatedMethod() {
+    return ReflectionUtils.getMethods(getClass(), withAnnotation(DataTypeParameters.class), withReturnType(void.class)).stream()
+        .findFirst().get();
+  }
 }

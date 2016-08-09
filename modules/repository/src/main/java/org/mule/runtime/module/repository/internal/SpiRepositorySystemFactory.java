@@ -24,28 +24,25 @@ import org.eclipse.aether.transport.http.HttpTransporterFactory;
 /**
  * {@code RepositorySystemFactory} build using SPI to find out dependencies.
  */
-public class SpiRepositorySystemFactory implements RepositorySystemFactory
-{
+public class SpiRepositorySystemFactory implements RepositorySystemFactory {
 
-    @Override
-    public RepositorySystem createRepositorySystem()
-    {
-        DefaultServiceLocator locator = new DefaultServiceLocator();
-        locator.addService(RepositoryConnectorFactory.class, BasicRepositoryConnectorFactory.class);
-        locator.addService(TransporterFactory.class, FileTransporterFactory.class);
-        locator.addService(TransporterFactory.class, HttpTransporterFactory.class);
-        locator.addService(RepositorySystem.class, DefaultRepositorySystem.class);
-        locator.addService(VersionResolver.class, DefaultVersionResolver.class);
-        locator.addService(VersionRangeResolver.class, DefaultVersionRangeResolver.class);
-        locator.addService(ArtifactDescriptorReader.class, DefaultArtifactDescriptorReader.class);
-        locator.setErrorHandler(new DefaultServiceLocator.ErrorHandler()
-        {
-            @Override
-            public void serviceCreationFailed(Class<?> type, Class<?> impl, Throwable exception)
-            {
-                exception.printStackTrace();
-            }
-        });
-        return locator.getService(RepositorySystem.class);
-    }
+  @Override
+  public RepositorySystem createRepositorySystem() {
+    DefaultServiceLocator locator = new DefaultServiceLocator();
+    locator.addService(RepositoryConnectorFactory.class, BasicRepositoryConnectorFactory.class);
+    locator.addService(TransporterFactory.class, FileTransporterFactory.class);
+    locator.addService(TransporterFactory.class, HttpTransporterFactory.class);
+    locator.addService(RepositorySystem.class, DefaultRepositorySystem.class);
+    locator.addService(VersionResolver.class, DefaultVersionResolver.class);
+    locator.addService(VersionRangeResolver.class, DefaultVersionRangeResolver.class);
+    locator.addService(ArtifactDescriptorReader.class, DefaultArtifactDescriptorReader.class);
+    locator.setErrorHandler(new DefaultServiceLocator.ErrorHandler() {
+
+      @Override
+      public void serviceCreationFailed(Class<?> type, Class<?> impl, Throwable exception) {
+        exception.printStackTrace();
+      }
+    });
+    return locator.getService(RepositorySystem.class);
+  }
 }

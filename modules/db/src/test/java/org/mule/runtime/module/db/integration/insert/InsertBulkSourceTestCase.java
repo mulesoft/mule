@@ -25,43 +25,37 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class InsertBulkSourceTestCase extends AbstractDbIntegrationTestCase
-{
+public class InsertBulkSourceTestCase extends AbstractDbIntegrationTestCase {
 
-    public InsertBulkSourceTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public InsertBulkSourceTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Parameterized.Parameters
-    public static List<Object[]> parameters()
-    {
-        return TestDbConfig.getResources();
-    }
+  @Parameterized.Parameters
+  public static List<Object[]> parameters() {
+    return TestDbConfig.getResources();
+  }
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/insert/insert-bulk-source-config.xml"};
-    }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/insert/insert-bulk-source-config.xml"};
+  }
 
-    @Test
-    public void insertsInBulkModeFromCustomSource() throws Exception
-    {
-        final MuleEvent responseEvent = flowRunner("insertBulkCustomSource").withPayload(TEST_MESSAGE).run();
+  @Test
+  public void insertsInBulkModeFromCustomSource() throws Exception {
+    final MuleEvent responseEvent = flowRunner("insertBulkCustomSource").withPayload(TEST_MESSAGE).run();
 
-        final MuleMessage response = responseEvent.getMessage();
-        assertBulkInsert(response.getPayload());
-    }
+    final MuleMessage response = responseEvent.getMessage();
+    assertBulkInsert(response.getPayload());
+  }
 
-    private void assertBulkInsert(Object payload) throws SQLException
-    {
-        assertTrue(payload instanceof int[]);
-        int[] counters = (int[]) payload;
-        assertEquals(2, counters.length);
-        assertThat(counters[0], anyOf(equalTo(1), equalTo(Statement.SUCCESS_NO_INFO)));
-        assertThat(counters[1], anyOf(equalTo(1), equalTo(Statement.SUCCESS_NO_INFO)));
+  private void assertBulkInsert(Object payload) throws SQLException {
+    assertTrue(payload instanceof int[]);
+    int[] counters = (int[]) payload;
+    assertEquals(2, counters.length);
+    assertThat(counters[0], anyOf(equalTo(1), equalTo(Statement.SUCCESS_NO_INFO)));
+    assertThat(counters[1], anyOf(equalTo(1), equalTo(Statement.SUCCESS_NO_INFO)));
 
-        assertPlanetRecordsFromQuery("Pluto", "Saturn");
-    }
+    assertPlanetRecordsFromQuery("Pluto", "Saturn");
+  }
 }

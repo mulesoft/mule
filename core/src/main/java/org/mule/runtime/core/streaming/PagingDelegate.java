@@ -12,29 +12,25 @@ import org.mule.runtime.core.api.Closeable;
 import java.util.List;
 
 /**
- * A PagingDelegate is a {@link Closeable} capable of consuming a data feed in pages.
- * Implementing this class does not guarantee thread safeness. Check each particular
- * implementation for information about that
+ * A PagingDelegate is a {@link Closeable} capable of consuming a data feed in pages. Implementing this class does not guarantee
+ * thread safeness. Check each particular implementation for information about that
  * 
  * @since 3.5.0
  */
-public abstract class PagingDelegate<T> implements Closeable
-{
+public abstract class PagingDelegate<T> implements Closeable {
 
-    /**
-     * Returns the next page of items. If the return value is <code>null</code> or an
-     * empty list, then it means no more items are available
-     * 
-     * @return a populated list of elements. <code>null</code> or an empty list, then
-     *         it means no more items are available
-     */
-    public abstract List<T> getPage();
+  /**
+   * Returns the next page of items. If the return value is <code>null</code> or an empty list, then it means no more items are
+   * available
+   * 
+   * @return a populated list of elements. <code>null</code> or an empty list, then it means no more items are available
+   */
+  public abstract List<T> getPage();
 
-    /**
-     * returns the total amount of items in the unpaged resultset. In some scenarios,
-     * it might not be possible/convenient to actually retrieve this value. -1 is
-     * returned in such a case.
-     */
-    public abstract int getTotalResults();
+  /**
+   * returns the total amount of items in the unpaged resultset. In some scenarios, it might not be possible/convenient to
+   * actually retrieve this value. -1 is returned in such a case.
+   */
+  public abstract int getTotalResults();
 
 }

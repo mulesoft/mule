@@ -29,60 +29,52 @@ import org.junit.Rule;
 import org.junit.Test;
 
 @Ignore("Session properties are not supported anymore")
-public class SessionPropertiesWithMessageCollectionTestCase extends FunctionalTestCase
-{
-    @Rule
-    public DynamicPort dynamicPort1 = new DynamicPort("port1");
+public class SessionPropertiesWithMessageCollectionTestCase extends FunctionalTestCase {
+
+  @Rule
+  public DynamicPort dynamicPort1 = new DynamicPort("port1");
+
+  @Override
+  protected String getConfigFile() {
+    return "session-properties-with-message-collection.xml";
+  }
+
+  @Test
+  public void sessionPropertyAfterSplitterAndAggregator() throws MuleException {
+    final MuleClient client = muleContext.getClient();
+    MuleMessage response = client.send("http://localhost:" + dynamicPort1.getNumber() + "/test", TEST_MESSAGE, null);
+    assertNotNullAndNotExceptionResponse(response);
+  }
+
+  @Test
+  public void splitterAndAggregatorWithPersistentStore() throws Exception {
+    Flow flow = (Flow) getFlowConstruct("synchronousCollectionAggregatorFlow");
+    List<String> inputData = new ArrayList<>();
+    int numberOfElements = 10;
+    for (int i = 0; i < numberOfElements; i++) {
+      inputData.add(String.valueOf(i));
+    }
+    MuleEvent responseEvent = flow.process(getTestEvent(inputData));
+    assertThat(((List<String>) responseEvent.getSession().<List>getProperty("recordsToUpdate")).size(), is(numberOfElements));
+  }
+
+  private void assertNotNullAndNotExceptionResponse(MuleMessage response) {
+    assertNotNull(response);
+    if (response.getExceptionPayload() != null) {
+      fail(response.getExceptionPayload().getException().getCause().toString());
+    }
+  }
+
+  public static class TestSplitterComponent implements Callable {
 
     @Override
-    protected String getConfigFile()
-    {
-        return "session-properties-with-message-collection.xml";
+    public Object onCall(MuleEventContext eventContext) throws Exception {
+      ArrayList<String> elements = new ArrayList<>();
+      for (int index = 0; index < 5; index++) {
+        elements.add("Element N" + index);
+      }
+      return elements;
     }
-
-    @Test
-    public void sessionPropertyAfterSplitterAndAggregator() throws MuleException
-    {
-        final MuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("http://localhost:" + dynamicPort1.getNumber() + "/test", TEST_MESSAGE, null);
-        assertNotNullAndNotExceptionResponse(response);
-    }
-
-    @Test
-    public void splitterAndAggregatorWithPersistentStore() throws Exception
-    {
-        Flow flow = (Flow) getFlowConstruct("synchronousCollectionAggregatorFlow");
-        List<String> inputData = new ArrayList<>();
-        int numberOfElements = 10;
-        for (int i = 0; i < numberOfElements; i++)
-        {
-            inputData.add(String.valueOf(i));
-        }
-        MuleEvent responseEvent = flow.process(getTestEvent(inputData));
-        assertThat(((List<String>) responseEvent.getSession().<List> getProperty("recordsToUpdate")).size(), is(numberOfElements));
-    }
-
-    private void assertNotNullAndNotExceptionResponse(MuleMessage response)
-    {
-        assertNotNull(response);
-        if (response.getExceptionPayload() != null)
-        {
-            fail(response.getExceptionPayload().getException().getCause().toString());
-        }
-    }
-
-    public static class TestSplitterComponent implements Callable
-    {
-        @Override
-        public Object onCall(MuleEventContext eventContext) throws Exception
-        {
-            ArrayList<String> elements = new ArrayList<>();
-            for(int index = 0; index < 5; index++)
-            {
-                elements.add("Element N" + index);
-            }
-            return elements;
-        }
-    }
+  }
 
 }

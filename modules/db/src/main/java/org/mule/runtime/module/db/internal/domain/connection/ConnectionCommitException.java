@@ -10,11 +10,9 @@ package org.mule.runtime.module.db.internal.domain.connection;
 /**
  * Thrown to indicate an error while committing a connection
  */
-public class ConnectionCommitException extends RuntimeException
-{
+public class ConnectionCommitException extends RuntimeException {
 
-    public ConnectionCommitException(Throwable throwable)
-    {
-        super(throwable);
-    }
+  public ConnectionCommitException(Throwable throwable) {
+    super(throwable);
+  }
 }

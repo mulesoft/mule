@@ -20,41 +20,32 @@ import org.mule.runtime.core.routing.correlation.EventCorrelatorCallback;
 
 import java.util.Iterator;
 
-public class TestAggregator extends AbstractAggregator
-{
-    @Override
-    protected EventCorrelatorCallback getCorrelatorCallback(MuleContext muleContext)
-    {
-        return new CollectionCorrelatorCallback(muleContext, storePrefix)
-        {
-            @Override
-            public MuleEvent aggregateEvents(EventGroup events) throws AggregationException
-            {
-                StringBuilder buffer = new StringBuilder(128);
+public class TestAggregator extends AbstractAggregator {
 
-                try
-                {
-                    for (Iterator<MuleEvent> iterator = events.iterator(); iterator.hasNext();)
-                    {
-                        MuleEvent event = iterator.next();
-                        try
-                        {
-                            buffer.append(event.transformMessageToString());
-                        }
-                        catch (TransformerException e)
-                        {
-                            throw new AggregationException(events, null, e);
-                        }
-                    }
-                }
-                catch (ObjectStoreException e)
-                {
-                    throw new AggregationException(events,null,e);
-                }
+  @Override
+  protected EventCorrelatorCallback getCorrelatorCallback(MuleContext muleContext) {
+    return new CollectionCorrelatorCallback(muleContext, storePrefix) {
 
-                logger.debug("event payload is: " + buffer.toString());
-                return new DefaultMuleEvent(MuleMessage.builder().payload(buffer.toString()).build(), events.getMessageCollectionEvent());
+      @Override
+      public MuleEvent aggregateEvents(EventGroup events) throws AggregationException {
+        StringBuilder buffer = new StringBuilder(128);
+
+        try {
+          for (Iterator<MuleEvent> iterator = events.iterator(); iterator.hasNext();) {
+            MuleEvent event = iterator.next();
+            try {
+              buffer.append(event.transformMessageToString());
+            } catch (TransformerException e) {
+              throw new AggregationException(events, null, e);
             }
-        };
-    }
+          }
+        } catch (ObjectStoreException e) {
+          throw new AggregationException(events, null, e);
+        }
+
+        logger.debug("event payload is: " + buffer.toString());
+        return new DefaultMuleEvent(MuleMessage.builder().payload(buffer.toString()).build(), events.getMessageCollectionEvent());
+      }
+    };
+  }
 }

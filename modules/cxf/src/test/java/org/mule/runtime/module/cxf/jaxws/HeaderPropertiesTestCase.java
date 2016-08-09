@@ -20,51 +20,43 @@ import org.apache.hello_world_soap_http.GreeterImpl;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HeaderPropertiesTestCase extends FunctionalTestCase
-{
+public class HeaderPropertiesTestCase extends FunctionalTestCase {
 
-    @Rule
-    public DynamicPort dynamicPort = new DynamicPort("port1");
+  @Rule
+  public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "header-conf-httpn.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "header-conf-httpn.xml";
+  }
 
-    private GreeterImpl getGreeter() throws Exception
-    {
-        Object instance = getComponent("greeterService");
+  private GreeterImpl getGreeter() throws Exception {
+    Object instance = getComponent("greeterService");
 
-        return (GreeterImpl) instance;
-    }
+    return (GreeterImpl) instance;
+  }
 
-    @Test
-    public void testClientWithMuleClient() throws Exception
-    {
-        FunctionalTestComponent testComponent = getFunctionalTestComponent("testService");
-        assertNotNull(testComponent);
+  @Test
+  public void testClientWithMuleClient() throws Exception {
+    FunctionalTestComponent testComponent = getFunctionalTestComponent("testService");
+    assertNotNull(testComponent);
 
-        EventCallback callback = new EventCallback()
-        {
-            @Override
-            public void eventReceived(final MuleEventContext context, final Object component) throws Exception
-            {
-                MuleMessage msg = context.getMessage();
-                assertEquals("BAR", msg.getInboundProperty("FOO"));
-            }
-        };
-        testComponent.setEventCallback(callback);
+    EventCallback callback = new EventCallback() {
 
-        MuleMessage result = flowRunner("clientFlow").withPayload("Dan")
-                                                     .withOutboundProperty("operation", "greetMe")
-                                                     .withOutboundProperty("FOO", "BAR")
-                                                     .run()
-                                                     .getMessage();
-        
-        assertEquals("Hello Dan Received", result.getPayload());
+      @Override
+      public void eventReceived(final MuleEventContext context, final Object component) throws Exception {
+        MuleMessage msg = context.getMessage();
+        assertEquals("BAR", msg.getInboundProperty("FOO"));
+      }
+    };
+    testComponent.setEventCallback(callback);
 
-        GreeterImpl impl = getGreeter();
-        assertEquals(1, impl.getInvocationCount());
-    }
+    MuleMessage result = flowRunner("clientFlow").withPayload("Dan").withOutboundProperty("operation", "greetMe")
+        .withOutboundProperty("FOO", "BAR").run().getMessage();
+
+    assertEquals("Hello Dan Received", result.getPayload());
+
+    GreeterImpl impl = getGreeter();
+    assertEquals(1, impl.getInvocationCount());
+  }
 }

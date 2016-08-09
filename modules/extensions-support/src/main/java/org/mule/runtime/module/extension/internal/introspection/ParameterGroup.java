@@ -27,134 +27,120 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * A metadata class that groups a set of parameters together.
- * It caches reflection objects necessary for handling those parameters
+ * A metadata class that groups a set of parameters together. It caches reflection objects necessary for handling those parameters
  * so that introspection is not executed every time, resulting in a performance gain.
  * <p>
- * Because groups can be nested, this class also implements {@link EnrichableModel},
- * allowing for this group to have a {@link ParameterGroupModelProperty} which
- * describes the nested group.
+ * Because groups can be nested, this class also implements {@link EnrichableModel}, allowing for this group to have a
+ * {@link ParameterGroupModelProperty} which describes the nested group.
  * <p>
- * To decouple this class from the representation model (which depending on the
- * context could be a {@link ExtensionDeclaration} or an actual {@link ParameterModel}, this class
- * references parameters by name
+ * To decouple this class from the representation model (which depending on the context could be a {@link ExtensionDeclaration} or
+ * an actual {@link ParameterModel}, this class references parameters by name
  *
  * @since 3.7.0
  */
-public class ParameterGroup<T> implements EnrichableModel
-{
+public class ParameterGroup<T> implements EnrichableModel {
 
-    /**
-     * The type of the pojo which implements the group
-     */
-    private final Class<?> type;
+  /**
+   * The type of the pojo which implements the group
+   */
+  private final Class<?> type;
 
-    /**
-     * The member in which the generated value of {@link #type} is to be assigned. For {@link ParameterGroup} used
-     * as fields of a class, this container should be parameterized as a {@link Field}. And if it is used as
-     * an argument of an operation it should the corresponding {@link Method}'s {@link java.lang.reflect.Parameter}.
-     */
-    private final T container;
+  /**
+   * The member in which the generated value of {@link #type} is to be assigned. For {@link ParameterGroup} used as fields of a
+   * class, this container should be parameterized as a {@link Field}. And if it is used as an argument of an operation it should
+   * the corresponding {@link Method}'s {@link java.lang.reflect.Parameter}.
+   */
+  private final T container;
 
-    /**
-     * A {@link Map} in which the keys are parameter names
-     * and the values are their corresponding setter methods
-     */
-    private final Set<Field> parameters = new HashSet<>();
+  /**
+   * A {@link Map} in which the keys are parameter names and the values are their corresponding setter methods
+   */
+  private final Set<Field> parameters = new HashSet<>();
 
-    /**
-     * The model properties per the {@link EnrichableModel} interface
-     */
-    private Map<Class<? extends ModelProperty>, ModelProperty> modelProperties = new HashMap<>();
+  /**
+   * The model properties per the {@link EnrichableModel} interface
+   */
+  private Map<Class<? extends ModelProperty>, ModelProperty> modelProperties = new HashMap<>();
 
 
-    public ParameterGroup(Class<?> type, T container)
-    {
-        checkArgument(type != null, "type cannot be null");
-        checkArgument(container != null, "container cannot be null");
+  public ParameterGroup(Class<?> type, T container) {
+    checkArgument(type != null, "type cannot be null");
+    checkArgument(container != null, "container cannot be null");
 
-        this.type = type;
-        this.container = container;
-    }
+    this.type = type;
+    this.container = container;
+  }
 
-    /**
-     * @return parameterized container of the {@link ParameterGroup}
-     */
-    public T getContainer()
-    {
-        return container;
-    }
+  /**
+   * @return parameterized container of the {@link ParameterGroup}
+   */
+  public T getContainer() {
+    return container;
+  }
 
-    /**
-     * Adds a parameter to the group
-     *
-     * @param field the parameter's {@link Field}
-     * @return {@code this}
-     */
-    public ParameterGroup addParameter(Field field)
-    {
-        field.setAccessible(true);
-        parameters.add(field);
-        return this;
-    }
+  /**
+   * Adds a parameter to the group
+   *
+   * @param field the parameter's {@link Field}
+   * @return {@code this}
+   */
+  public ParameterGroup addParameter(Field field) {
+    field.setAccessible(true);
+    parameters.add(field);
+    return this;
+  }
 
-    public Class<?> getType()
-    {
-        return type;
-    }
+  public Class<?> getType() {
+    return type;
+  }
 
-    public Set<Field> getParameters()
-    {
-        return ImmutableSet.copyOf(parameters);
-    }
+  public Set<Field> getParameters() {
+    return ImmutableSet.copyOf(parameters);
+  }
 
-    /**
-     *
-     * @return set of optional {@link Field}s
-     */
-    public Set<Field> getOptionalParameters()
-    {
-        return parameters.stream().filter(f -> f.getAnnotation(org.mule.runtime.extension.api.annotation.param.Optional.class) != null).collect(Collectors.toSet());
-    }
+  /**
+   *
+   * @return set of optional {@link Field}s
+   */
+  public Set<Field> getOptionalParameters() {
+    return parameters.stream()
+        .filter(f -> f.getAnnotation(org.mule.runtime.extension.api.annotation.param.Optional.class) != null)
+        .collect(Collectors.toSet());
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public <G extends ModelProperty> Optional<G> getModelProperty(Class<G> propertyType)
-    {
-        return Optional.ofNullable((G) modelProperties.get(propertyType));
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public <G extends ModelProperty> Optional<G> getModelProperty(Class<G> propertyType) {
+    return Optional.ofNullable((G) modelProperties.get(propertyType));
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Set<ModelProperty> getModelProperties()
-    {
-        return ImmutableSet.copyOf(modelProperties.values());
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Set<ModelProperty> getModelProperties() {
+    return ImmutableSet.copyOf(modelProperties.values());
+  }
 
-    public void addModelProperty(ModelProperty modelProperty)
-    {
-        checkArgument(modelProperty != null, "Cannot add a null model property");
-        modelProperties.put(modelProperty.getClass(), modelProperty);
-    }
+  public void addModelProperty(ModelProperty modelProperty) {
+    checkArgument(modelProperty != null, "Cannot add a null model property");
+    modelProperties.put(modelProperty.getClass(), modelProperty);
+  }
 
-    /**
-     * Whether the class is annotated with {@link ExclusiveOptionals} or not
-     */
-    public boolean hasExclusiveOptionals()
-    {
-        return getAnnotation(type, ExclusiveOptionals.class) != null;
-    }
+  /**
+   * Whether the class is annotated with {@link ExclusiveOptionals} or not
+   */
+  public boolean hasExclusiveOptionals() {
+    return getAnnotation(type, ExclusiveOptionals.class) != null;
+  }
 
-    /**
-     * Whether the class is annotated with {@link ExclusiveOptionals} and {@link ExclusiveOptionals#isOneRequired()} ()} is set
-     */
-    public boolean isOneRequired()
-    {
-        ExclusiveOptionals annotation = getAnnotation(type, ExclusiveOptionals.class);
-        return annotation != null ? annotation.isOneRequired() : false;
-    }
+  /**
+   * Whether the class is annotated with {@link ExclusiveOptionals} and {@link ExclusiveOptionals#isOneRequired()} ()} is set
+   */
+  public boolean isOneRequired() {
+    ExclusiveOptionals annotation = getAnnotation(type, ExclusiveOptionals.class);
+    return annotation != null ? annotation.isOneRequired() : false;
+  }
 }

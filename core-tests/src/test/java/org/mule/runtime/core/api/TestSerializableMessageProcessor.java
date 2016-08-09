@@ -9,24 +9,21 @@ package org.mule.runtime.core.api;
 
 import java.io.Serializable;
 
-public class TestSerializableMessageProcessor extends TestNotSerializableMessageProcessor implements Serializable
-{
-    private static final long serialVersionUID = -6309566893615114065L;
+public class TestSerializableMessageProcessor extends TestNotSerializableMessageProcessor implements Serializable {
 
-    private String value;
+  private static final long serialVersionUID = -6309566893615114065L;
 
-    public TestSerializableMessageProcessor()
-    {
-        super();
-    }
+  private String value;
 
-    public String getValue()
-    {
-        return value;
-    }
+  public TestSerializableMessageProcessor() {
+    super();
+  }
 
-    public void setValue(String value)
-    {
-        this.value = value;
-    }
+  public String getValue() {
+    return value;
+  }
+
+  public void setValue(String value) {
+    this.value = value;
+  }
 }

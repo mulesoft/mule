@@ -43,197 +43,160 @@ import org.slf4j.LoggerFactory;
  *
  * @since 3.5.0
  */
-public class CronScheduler extends PollScheduler<PollingWorker> implements MuleContextAware
-{
+public class CronScheduler extends PollScheduler<PollingWorker> implements MuleContextAware {
 
-    protected transient Logger logger = LoggerFactory.getLogger(getClass());
+  protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
-    public static final String THREAD_POLL_CLASS_PROPERTY = "org.quartz.threadPool.class";
-    public static final String THREAD_POLL_CLASS = "org.quartz.simpl.SimpleThreadPool";
-    public static final String THREAD_POOL_COUNT_PROPERTY = "org.quartz.threadPool.threadCount";
-    public static final String POLL_CRON_SCHEDULER_JOB = "poll.scheduler.job";
-    public static final String QUARTZ_INSTANCE_NAME_PROPERTY = "org.quartz.scheduler.instanceName";
+  public static final String THREAD_POLL_CLASS_PROPERTY = "org.quartz.threadPool.class";
+  public static final String THREAD_POLL_CLASS = "org.quartz.simpl.SimpleThreadPool";
+  public static final String THREAD_POOL_COUNT_PROPERTY = "org.quartz.threadPool.threadCount";
+  public static final String POLL_CRON_SCHEDULER_JOB = "poll.scheduler.job";
+  public static final String QUARTZ_INSTANCE_NAME_PROPERTY = "org.quartz.scheduler.instanceName";
 
-    /**
-     * <p>
-     * The Quartz scheduler. The {@link CronScheduler} is a wrapper of this instance.
-     * </p>
-     */
-    private org.quartz.Scheduler quartzScheduler;
+  /**
+   * <p>
+   * The Quartz scheduler. The {@link CronScheduler} is a wrapper of this instance.
+   * </p>
+   */
+  private org.quartz.Scheduler quartzScheduler;
 
-    /**
-     * <p>
-     * {@link MuleContext} used to define the thread poll size of the quartz scheduler
-     * </p>
-     */
-    private MuleContext context;
+  /**
+   * <p>
+   * {@link MuleContext} used to define the thread poll size of the quartz scheduler
+   * </p>
+   */
+  private MuleContext context;
 
-    /**
-     * <p>
-     * The quartz expression written in the scheduler configuration
-     * </p>
-     */
-    private String cronExpression;
+  /**
+   * <p>
+   * The quartz expression written in the scheduler configuration
+   * </p>
+   */
+  private String cronExpression;
 
-    /**
-     * <p>
-     * The {@link TimeZone} in which the {@code cronExpression} will be based
-     * </p>
-     */
-    private TimeZone timeZone;
+  /**
+   * <p>
+   * The {@link TimeZone} in which the {@code cronExpression} will be based
+   * </p>
+   */
+  private TimeZone timeZone;
 
-    /**
-     * <p>
-     * The poll job name created in the initialization phase. (This is used to tell quartz which is the job that we are
-     * managing)
-     * </p>
-     */
-    private String jobName;
+  /**
+   * <p>
+   * The poll job name created in the initialization phase. (This is used to tell quartz which is the job that we are managing)
+   * </p>
+   */
+  private String jobName;
 
-    /**
-     * <p>
-     * The poll job name created in the initialization phase. (This is used to tell quartz which is the job that
-     * we are managing)
-     * </p>
-     */
-    private String groupName;
+  /**
+   * <p>
+   * The poll job name created in the initialization phase. (This is used to tell quartz which is the job that we are managing)
+   * </p>
+   */
+  private String groupName;
 
-    public CronScheduler(String name, PollingWorker job, String cronExpression, TimeZone timeZone)
-    {
-        super(name, job);
+  public CronScheduler(String name, PollingWorker job, String cronExpression, TimeZone timeZone) {
+    super(name, job);
 
-        this.cronExpression = cronExpression;
-        this.timeZone = timeZone;
+    this.cronExpression = cronExpression;
+    this.timeZone = timeZone;
+  }
+
+  @Override
+  public void schedule() throws Exception {
+    quartzScheduler.triggerJob(JobKey.jobKey(jobName, groupName));
+  }
+
+  @Override
+  public void dispose() {
+    try {
+      quartzScheduler.shutdown();
+    } catch (SchedulerException e) {
+      logger.error(couldNotShutdownScheduler().toString(), e);
+    }
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    try {
+      quartzScheduler = createScheduler();
+
+      jobName = name;
+      groupName = "pollSource";
+
+      quartzScheduler.addJob(jobDetail(jobName, groupName, job), true);
+
+      quartzScheduler.start();
+    } catch (SchedulerException e) {
+      throw new InitialisationException(couldNotCreateScheduler(), e, this);
     }
 
-    @Override
-    public void schedule() throws Exception
-    {
-        quartzScheduler.triggerJob(JobKey.jobKey(jobName, groupName));
-    }
+  }
 
-    @Override
-    public void dispose()
-    {
-        try
-        {
-            quartzScheduler.shutdown();
+  @Override
+  public void start() throws MuleException {
+    try {
+      if (quartzScheduler.isStarted()) {
+        if (quartzScheduler.getTrigger(TriggerKey.triggerKey(getName(), groupName)) == null) {
+          CronTrigger cronTrigger = newTrigger().withIdentity(getName(), groupName).forJob(jobName, groupName)
+              .withSchedule(cronSchedule(cronExpression).inTimeZone(timeZone)).build();
+          quartzScheduler.scheduleJob(cronTrigger);
+        } else {
+          quartzScheduler.resumeAll();
         }
-        catch (SchedulerException e)
-        {
-            logger.error(couldNotShutdownScheduler().toString(), e);
-        }
+      }
+
+    } catch (SchedulerException e) {
+      throw new DefaultMuleException(couldNotScheduleJob(), e);
     }
+  }
 
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        try
-        {
-            quartzScheduler = createScheduler();
-
-            jobName = name;
-            groupName = "pollSource";
-
-            quartzScheduler.addJob(jobDetail(jobName, groupName, job), true);
-
-            quartzScheduler.start();
-        }
-        catch (SchedulerException e)
-        {
-            throw new InitialisationException(couldNotCreateScheduler(), e, this);
-        }
-
+  @Override
+  public void stop() throws MuleException {
+    try {
+      quartzScheduler.pauseAll();
+    } catch (SchedulerException e) {
+      throw new DefaultMuleException(couldNotPauseSchedulers(), e);
     }
+  }
 
-    @Override
-    public void start() throws MuleException
-    {
-        try
-        {
-            if (quartzScheduler.isStarted())
-            {
-                if (quartzScheduler.getTrigger(TriggerKey.triggerKey(getName(), groupName)) == null)
-                {
-                    CronTrigger cronTrigger = newTrigger()
-                        .withIdentity(getName(), groupName)
-                        .forJob(jobName, groupName)
-                        .withSchedule(cronSchedule(cronExpression).inTimeZone(timeZone))
-                        .build();
-                    quartzScheduler.scheduleJob(cronTrigger);
-                }
-                else
-                {
-                    quartzScheduler.resumeAll();
-                }
-            }
+  public String getCronExpression() {
+    return cronExpression;
+  }
 
-        }
-        catch (SchedulerException e)
-        {
-            throw new DefaultMuleException(couldNotScheduleJob(), e);
-        }
-    }
+  /**
+   * @return the {@link TimeZone} in which the {@code cronExpression} will be based.
+   */
+  public TimeZone getTimeZone() {
+    return timeZone;
+  }
 
-    @Override
-    public void stop() throws MuleException
-    {
-        try
-        {
-            quartzScheduler.pauseAll();
-        }
-        catch (SchedulerException e)
-        {
-            throw new DefaultMuleException(couldNotPauseSchedulers(), e);
-        }
-    }
+  @Override
+  public void setMuleContext(MuleContext context) {
+    this.context = context;
+  }
 
-    public String getCronExpression()
-    {
-        return cronExpression;
-    }
-
-    /**
-     * @return the {@link TimeZone} in which the {@code cronExpression} will be based.
-     */
-    public TimeZone getTimeZone()
-    {
-        return timeZone;
-    }
-
-    @Override
-    public void setMuleContext(MuleContext context)
-    {
-        this.context = context;
-    }
-
-    private JobDetail jobDetail(String jobName, String groupName, PollingWorker job)
-    {
-        JobDataMap jobDataMap = new JobDataMap();
-        jobDataMap.put(POLL_CRON_SCHEDULER_JOB, job);
-        return newJob(CronJob.class)
-                .storeDurably()
-                .withIdentity(jobName, groupName)
-                .usingJobData(jobDataMap)
-                .build();
-    }
+  private JobDetail jobDetail(String jobName, String groupName, PollingWorker job) {
+    JobDataMap jobDataMap = new JobDataMap();
+    jobDataMap.put(POLL_CRON_SCHEDULER_JOB, job);
+    return newJob(CronJob.class).storeDurably().withIdentity(jobName, groupName).usingJobData(jobDataMap).build();
+  }
 
 
-    private Scheduler createScheduler() throws SchedulerException
-    {
-        SchedulerFactory factory = new StdSchedulerFactory(withFactoryProperties());
+  private Scheduler createScheduler() throws SchedulerException {
+    SchedulerFactory factory = new StdSchedulerFactory(withFactoryProperties());
 
-        return factory.getScheduler();
-    }
+    return factory.getScheduler();
+  }
 
-    private Properties withFactoryProperties()
-    {
-        Properties factoryProperties = new Properties();
+  private Properties withFactoryProperties() {
+    Properties factoryProperties = new Properties();
 
-        factoryProperties.setProperty(QUARTZ_INSTANCE_NAME_PROPERTY, context.getConfiguration().getId() + "-" + name);
-        factoryProperties.setProperty(THREAD_POLL_CLASS_PROPERTY, THREAD_POLL_CLASS);
-        factoryProperties.setProperty(THREAD_POOL_COUNT_PROPERTY, String.valueOf(context.getDefaultMessageReceiverThreadingProfile().getMaxThreadsActive()));
-        return factoryProperties;
-    }
+    factoryProperties.setProperty(QUARTZ_INSTANCE_NAME_PROPERTY, context.getConfiguration().getId() + "-" + name);
+    factoryProperties.setProperty(THREAD_POLL_CLASS_PROPERTY, THREAD_POLL_CLASS);
+    factoryProperties.setProperty(THREAD_POOL_COUNT_PROPERTY,
+                                  String.valueOf(context.getDefaultMessageReceiverThreadingProfile().getMaxThreadsActive()));
+    return factoryProperties;
+  }
 
 }

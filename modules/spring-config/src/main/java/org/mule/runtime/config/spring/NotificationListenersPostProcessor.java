@@ -13,40 +13,33 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 
 /**
- * Responsible for passing in the MuleContext instance for all objects in the
- * registry that want it. For an object to get an instance of the MuleContext it must
- * implement MuleContextAware.
+ * Responsible for passing in the MuleContext instance for all objects in the registry that want it. For an object to get an
+ * instance of the MuleContext it must implement MuleContextAware.
  * 
  * @see org.mule.runtime.core.api.context.MuleContextAware
  * @see org.mule.runtime.core.api.MuleContext
  * @deprecated as of 3.7.0 because it's not being used. Will be removed in Mule 4.0
  */
 @Deprecated
-public class NotificationListenersPostProcessor implements BeanPostProcessor
-{
+public class NotificationListenersPostProcessor implements BeanPostProcessor {
 
-    private final MuleContext muleContext;
+  private final MuleContext muleContext;
 
-    public NotificationListenersPostProcessor(MuleContext muleContext)
-    {
-        this.muleContext = muleContext;
+  public NotificationListenersPostProcessor(MuleContext muleContext) {
+    this.muleContext = muleContext;
+  }
+
+  public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+    if (bean instanceof ServerNotificationListener) {
+      if (!muleContext.getNotificationManager().isListenerRegistered((ServerNotificationListener) bean)) {
+        muleContext.getNotificationManager().addListener((ServerNotificationListener) bean);
+      }
     }
+    return bean;
+  }
 
-    public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException
-    {
-        if (bean instanceof ServerNotificationListener)
-        {
-            if (!muleContext.getNotificationManager().isListenerRegistered((ServerNotificationListener) bean))
-            {
-                muleContext.getNotificationManager().addListener((ServerNotificationListener) bean);
-            }
-        }
-        return bean;
-    }
-
-    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException
-    {
-        return bean;
-    }
+  public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+    return bean;
+  }
 
 }

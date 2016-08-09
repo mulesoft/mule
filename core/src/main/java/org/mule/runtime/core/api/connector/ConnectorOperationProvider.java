@@ -14,29 +14,29 @@ import org.mule.runtime.core.api.processor.MessageProcessor;
 /**
  * Provider of operation for a Mule connector.
  *
- * A Mule connector can provide an implementation of this interface in the registry and mule
- * will use it to create operations using an URL and later executed them.
+ * A Mule connector can provide an implementation of this interface in the registry and mule will use it to create operations
+ * using an URL and later executed them.
  *
  * The implementation must be located in the mule registry before the start phase.
  */
-public interface ConnectorOperationProvider
-{
+public interface ConnectorOperationProvider {
 
-    /**
-     * @param url an URL for creating an operation
-     * @return true if the provider can handle the URL, false otherwise
-     */
-    boolean supportsUrl(String url);
+  /**
+   * @param url an URL for creating an operation
+   * @return true if the provider can handle the URL, false otherwise
+   */
+  boolean supportsUrl(String url);
 
-    /**
-     * A {@link org.mule.runtime.core.api.processor.MessageProcessor} that contains the behaviour for the URL
-     *
-     * @param url an URL for creating an operation
-     * @param operationOptions the operation options
-     * @param exchangePattern exchange pattern to use to execute the request.
-     * @return a {@link org.mule.runtime.core.api.processor.MessageProcessor} that fulfills the operation
-     * @throws MuleException
-     */
-    MessageProcessor getMessageProcessor(String url, OperationOptions operationOptions, MessageExchangePattern exchangePattern) throws MuleException;
+  /**
+   * A {@link org.mule.runtime.core.api.processor.MessageProcessor} that contains the behaviour for the URL
+   *
+   * @param url an URL for creating an operation
+   * @param operationOptions the operation options
+   * @param exchangePattern exchange pattern to use to execute the request.
+   * @return a {@link org.mule.runtime.core.api.processor.MessageProcessor} that fulfills the operation
+   * @throws MuleException
+   */
+  MessageProcessor getMessageProcessor(String url, OperationOptions operationOptions, MessageExchangePattern exchangePattern)
+      throws MuleException;
 
 }

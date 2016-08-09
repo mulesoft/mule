@@ -28,187 +28,168 @@ import org.junit.ClassRule;
 import org.junit.Test;
 
 /**
- * Tests to validate that MuleClient can be used from JavaComponent/MessageProcessor in order to dispatch an event to
- * a sub-flow and if the component/processor throws an exception afterwards the main-flow exception strategy handles
- * it.
+ * Tests to validate that MuleClient can be used from JavaComponent/MessageProcessor in order to dispatch an event to a sub-flow
+ * and if the component/processor throws an exception afterwards the main-flow exception strategy handles it.
  */
-public class MuleClientDispatchExceptionHandlingTestCase extends AbstractIntegrationTestCase
-{
-    @ClassRule
-    public static DynamicPort port = new DynamicPort("port");
+public class MuleClientDispatchExceptionHandlingTestCase extends AbstractIntegrationTestCase {
 
-    // These attributes need to be accessed from JavaComponent and MessageProcessor static classes therefore
-    // they are declared as static
-    private static Latch innerFlowLatch;
-    private static Latch exceptionLatch;
-    private static MuleEvent eventFromMainFlow;
-    private static MuleMessage messageFromMainFlow;
-    private static boolean eventPropagated;
-    private static boolean isSameMessage;
+  @ClassRule
+  public static DynamicPort port = new DynamicPort("port");
+
+  // These attributes need to be accessed from JavaComponent and MessageProcessor static classes therefore
+  // they are declared as static
+  private static Latch innerFlowLatch;
+  private static Latch exceptionLatch;
+  private static MuleEvent eventFromMainFlow;
+  private static MuleMessage messageFromMainFlow;
+  private static boolean eventPropagated;
+  private static boolean isSameMessage;
+
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/integration/client/client-dispatch-catch-exception-flow.xml";
+  }
+
+  /**
+   * Validates that a JavaComponent after doing a dispatch to a sub-flow using MuleClient throws an exception and the
+   * catch-exception-strategy defined in main-flow is called. It also validates that original event passed to JavaComponent is
+   * later propagated to the JavaComponent defined in catch-exception-strategy block.
+   *
+   * @throws Exception
+   */
+  @Test
+  public void testCatchExceptionThrowFromJavaComponentToJavaComponent() throws Exception {
+    doSendMessageToEndpoint("catchExceptionJavaComponentToJavaComponent");
+  }
+
+  @Test
+  public void tesCatchExceptionThrowFromJavaComponentToMessageProcessor() throws Exception {
+    doSendMessageToEndpoint("catchExceptionJavaComponentToMessageProcessor");
+  }
+
+  @Test
+  public void testCatchExceptionThrowFromMessageProcessorToJavaComponent() throws Exception {
+    doSendMessageToEndpoint("catchExceptionMessageProcessorToJavaComponent");
+  }
+
+  @Test
+  public void tesCatchExceptionThrowFromMessageProcessorToMessageProcessor() throws Exception {
+    doSendMessageToEndpoint("catchExceptionMessageProcessorToMessageProcessor");
+  }
+
+  @Test
+  public void testCatchExceptionJavaComponentToJavaComponentRequestResponseInnerFlow() throws Exception {
+    doSendMessageToEndpoint("catchExceptionJavaComponentToJavaComponentRequestResponseInnerFlow");
+  }
+
+  private void doSendMessageToEndpoint(String endpoint) throws Exception {
+    innerFlowLatch = new Latch();
+    exceptionLatch = new Latch();
+    eventPropagated = true;
+    isSameMessage = true;
+
+    MuleClient client = muleContext.getClient();
+    MuleMessage result = client.send(getUrl(endpoint), getTestMuleMessage("Original Message"));
+
+    boolean innerFlowCalled = innerFlowLatch.await(3, TimeUnit.SECONDS);
+    assertThat(innerFlowCalled, is(true));
+    boolean exceptionHandled = exceptionLatch.await(3, TimeUnit.SECONDS);
+    assertThat(exceptionHandled, is(true));
+
+    assertThat(isSameMessage, is(true));
+    assertThat(eventPropagated, is(true));
+
+    assertThat(result, notNullValue(MuleMessage.class));
+  }
+
+  private static String getUrl(String endpoint) {
+    return String.format("http://localhost:%s/%s", port.getValue(), endpoint);
+  }
+
+  // Just a simple JavaComponent used in catch-exception-strategy block
+  // in order to check that RequestContext has the correct event and message references
+  public static class AssertEventComponent implements Callable {
 
     @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/integration/client/client-dispatch-catch-exception-flow.xml";
+    public Object onCall(MuleEventContext eventContext) throws Exception {
+      // Validates that if another Component access to the RequestContext.getEvent() the one returned
+      // is the correct, in this case it should be the same that it was set before doing the
+      // eventContext.dispatchEvent() on main-flow java component where the exception happened right after
+      // that invocatioeventPropagated = RequestContext.getEvent().equals(eventFromMainFlow);
+      // Checking if message is still the same on catch-exception-strategy
+      isSameMessage = RequestContext.getEvent().getMessage().equals(messageFromMainFlow);
+      return eventContext.getMessage();
     }
+  }
 
-    /**
-     * Validates that a JavaComponent after doing a dispatch to a sub-flow using MuleClient
-     * throws an exception and the catch-exception-strategy defined in main-flow is called.
-     * It also validates that original event passed to JavaComponent is later propagated
-     * to the JavaComponent defined in catch-exception-strategy block.
-     *
-     * @throws Exception
-     */
-    @Test
-    public void testCatchExceptionThrowFromJavaComponentToJavaComponent() throws Exception
-    {
-        doSendMessageToEndpoint("catchExceptionJavaComponentToJavaComponent");
+  public static class AssertEventProcessor implements MessageProcessor {
+
+    @Override
+    public MuleEvent process(MuleEvent event) throws MuleException {
+      // Validates that if another Component access to the RequestContext.getEvent() the one returned
+      // is the correct, in this case it should be the same that it was set before doing the
+      // eventContext.dispatchEvent() on main-flow java component where the exception happened right after
+      // that invocatioeventPropagated = RequestContext.getEvent().equals(eventFromMainFlow);
+      // Checking if message is still the same on catch-exception-strategy
+      isSameMessage = RequestContext.getEvent().getMessage().equals(messageFromMainFlow);
+      return event;
     }
+  }
 
-    @Test
-    public void tesCatchExceptionThrowFromJavaComponentToMessageProcessor() throws Exception
-    {
-        doSendMessageToEndpoint("catchExceptionJavaComponentToMessageProcessor");
+  public static class DispatchInnerFlowThrowExceptionJavaComponent implements Callable {
+
+    @Override
+    public Object onCall(MuleEventContext eventContext) throws Exception {
+      eventFromMainFlow = RequestContext.getEvent();
+      messageFromMainFlow = eventFromMainFlow.getMessage();
+
+      eventContext.getMuleContext().getClient().dispatch(getUrl("innertest"), MuleMessage.builder().payload("payload").build());
+
+      throw new Exception("expected exception!");
     }
+  }
 
-    @Test
-    public void testCatchExceptionThrowFromMessageProcessorToJavaComponent() throws Exception
-    {
-        doSendMessageToEndpoint("catchExceptionMessageProcessorToJavaComponent");
+  public static class SendInnerFlowThrowExceptionJavaComponent implements Callable {
+
+    @Override
+    public Object onCall(MuleEventContext eventContext) throws Exception {
+      eventFromMainFlow = RequestContext.getEvent();
+      messageFromMainFlow = eventFromMainFlow.getMessage();
+
+      eventContext.sendEvent(MuleMessage.builder().payload("payload").build(), getUrl("innerrequestresponsetest"));
+
+      throw new Exception("expected exception!");
     }
+  }
 
-    @Test
-    public void tesCatchExceptionThrowFromMessageProcessorToMessageProcessor() throws Exception
-    {
-        doSendMessageToEndpoint("catchExceptionMessageProcessorToMessageProcessor");
+  public static class DispatchInnerFlowThrowExceptionMessageProcessor implements MessageProcessor {
+
+    @Override
+    public MuleEvent process(MuleEvent event) throws MuleException {
+      eventFromMainFlow = RequestContext.getEvent();
+      messageFromMainFlow = eventFromMainFlow.getMessage();
+
+      event.getMuleContext().getClient().dispatch(getUrl("innertest"), MuleMessage.builder().payload("payload").build());
+
+      throw new DefaultMuleException("expected exception!");
     }
+  }
 
-    @Test
-    public void testCatchExceptionJavaComponentToJavaComponentRequestResponseInnerFlow() throws Exception
-    {
-        doSendMessageToEndpoint("catchExceptionJavaComponentToJavaComponentRequestResponseInnerFlow");
+  public static class ExecutionCountDownProcessor implements MessageProcessor {
+
+    @Override
+    public synchronized MuleEvent process(MuleEvent event) throws MuleException {
+      exceptionLatch.countDown();
+      return event;
     }
+  }
 
-    private void doSendMessageToEndpoint(String endpoint) throws Exception
-    {
-        innerFlowLatch = new Latch();
-        exceptionLatch = new Latch();
-        eventPropagated = true;
-        isSameMessage = true;
+  public static class InnerFlowCountDownProcessor implements MessageProcessor {
 
-        MuleClient client = muleContext.getClient();
-        MuleMessage result = client.send(getUrl(endpoint), getTestMuleMessage("Original Message"));
-
-        boolean innerFlowCalled = innerFlowLatch.await(3, TimeUnit.SECONDS);
-        assertThat(innerFlowCalled, is(true));
-        boolean exceptionHandled = exceptionLatch.await(3, TimeUnit.SECONDS);
-        assertThat(exceptionHandled, is(true));
-
-        assertThat(isSameMessage, is(true));
-        assertThat(eventPropagated, is(true));
-
-        assertThat(result, notNullValue(MuleMessage.class));
+    @Override
+    public synchronized MuleEvent process(MuleEvent event) throws MuleException {
+      innerFlowLatch.countDown();
+      return event;
     }
-
-    private static String getUrl(String endpoint)
-    {
-        return String.format("http://localhost:%s/%s", port.getValue(), endpoint);
-    }
-
-    // Just a simple JavaComponent used in catch-exception-strategy block
-    // in order to check that RequestContext has the correct event and message references
-    public static class AssertEventComponent implements Callable
-    {
-        @Override
-        public Object onCall(MuleEventContext eventContext) throws Exception
-        {
-            // Validates that if another Component access to the RequestContext.getEvent() the one returned
-            // is the correct, in this case it should be the same that it was set before doing the
-            // eventContext.dispatchEvent() on main-flow java component where the exception happened right after
-            // that invocatioeventPropagated = RequestContext.getEvent().equals(eventFromMainFlow);
-            // Checking if message is still the same on catch-exception-strategy
-            isSameMessage = RequestContext.getEvent().getMessage().equals(messageFromMainFlow);
-            return eventContext.getMessage();
-        }
-    }
-
-    public static class AssertEventProcessor implements MessageProcessor
-    {
-        @Override
-        public MuleEvent process(MuleEvent event) throws MuleException
-        {
-            // Validates that if another Component access to the RequestContext.getEvent() the one returned
-            // is the correct, in this case it should be the same that it was set before doing the
-            // eventContext.dispatchEvent() on main-flow java component where the exception happened right after
-            // that invocatioeventPropagated = RequestContext.getEvent().equals(eventFromMainFlow);
-            // Checking if message is still the same on catch-exception-strategy
-            isSameMessage = RequestContext.getEvent().getMessage().equals(messageFromMainFlow);
-            return event;
-        }
-    }
-
-    public static class DispatchInnerFlowThrowExceptionJavaComponent implements Callable
-    {
-        @Override
-        public Object onCall(MuleEventContext eventContext) throws Exception
-        {
-            eventFromMainFlow = RequestContext.getEvent();
-            messageFromMainFlow = eventFromMainFlow.getMessage();
-
-            eventContext.getMuleContext().getClient().dispatch(getUrl("innertest"), MuleMessage.builder().payload("payload").build());
-
-            throw new Exception("expected exception!");
-        }
-    }
-
-    public static class SendInnerFlowThrowExceptionJavaComponent implements Callable
-    {
-        @Override
-        public Object onCall(MuleEventContext eventContext) throws Exception
-        {
-            eventFromMainFlow = RequestContext.getEvent();
-            messageFromMainFlow = eventFromMainFlow.getMessage();
-
-            eventContext.sendEvent(MuleMessage.builder().payload("payload").build(),
-                                   getUrl("innerrequestresponsetest"));
-
-            throw new Exception("expected exception!");
-        }
-    }
-
-    public static class DispatchInnerFlowThrowExceptionMessageProcessor implements MessageProcessor
-    {
-        @Override
-        public MuleEvent process(MuleEvent event) throws MuleException
-        {
-            eventFromMainFlow = RequestContext.getEvent();
-            messageFromMainFlow = eventFromMainFlow.getMessage();
-
-            event.getMuleContext().getClient().dispatch(getUrl("innertest"),
-                    MuleMessage.builder().payload("payload").build());
-
-            throw new DefaultMuleException("expected exception!");
-        }
-    }
-
-    public static class ExecutionCountDownProcessor implements MessageProcessor
-    {
-        @Override
-        public synchronized MuleEvent process(MuleEvent event) throws MuleException
-        {
-            exceptionLatch.countDown();
-            return event;
-        }
-    }
-
-    public static class InnerFlowCountDownProcessor implements MessageProcessor
-    {
-        @Override
-        public synchronized MuleEvent process(MuleEvent event) throws MuleException
-        {
-            innerFlowLatch.countDown();
-            return event;
-        }
-    }
+  }
 }

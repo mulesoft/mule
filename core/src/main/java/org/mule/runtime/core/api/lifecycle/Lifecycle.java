@@ -7,10 +7,8 @@
 package org.mule.runtime.core.api.lifecycle;
 
 /**
- * <code>DefaultLifecyclePhase</code> adds lifecycle methods <code>start</code>,
- * <code>stop</code> and <code>dispose</code>.
+ * <code>DefaultLifecyclePhase</code> adds lifecycle methods <code>start</code>, <code>stop</code> and <code>dispose</code>.
  */
-public interface Lifecycle extends Initialisable, Startable, Stoppable, Disposable
-{
-    // empty
+public interface Lifecycle extends Initialisable, Startable, Stoppable, Disposable {
+  // empty
 }

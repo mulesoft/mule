@@ -21,36 +21,29 @@ import java.util.Map;
 /**
  * Generates location info to augment MessagingExceptions with.
  */
-public class MessagingExceptionLocationProvider extends LocationExecutionContextProvider
-{
+public class MessagingExceptionLocationProvider extends LocationExecutionContextProvider {
 
-    @Override
-    public Map<String, Object> getContextInfo(MuleEvent event, MessageProcessor lastProcessed)
-    {
-        Map<String, Object> contextInfo = new HashMap<String, Object>();
+  @Override
+  public Map<String, Object> getContextInfo(MuleEvent event, MessageProcessor lastProcessed) {
+    Map<String, Object> contextInfo = new HashMap<String, Object>();
 
-        contextInfo.put(INFO_LOCATION_KEY, resolveProcessorRepresentation(event.getMuleContext().getConfiguration().getId(), getProcessorPath(event, lastProcessed), lastProcessed));
-        if (lastProcessed instanceof AnnotatedObject)
-        {
-            String sourceXML = getSourceXML((AnnotatedObject) lastProcessed);
-            if (sourceXML != null)
-            {
-                contextInfo.put(INFO_SOURCE_XML_KEY, sourceXML);
-            }
-        }
-
-        return contextInfo;
+    contextInfo.put(INFO_LOCATION_KEY, resolveProcessorRepresentation(event.getMuleContext().getConfiguration().getId(),
+                                                                      getProcessorPath(event, lastProcessed), lastProcessed));
+    if (lastProcessed instanceof AnnotatedObject) {
+      String sourceXML = getSourceXML((AnnotatedObject) lastProcessed);
+      if (sourceXML != null) {
+        contextInfo.put(INFO_SOURCE_XML_KEY, sourceXML);
+      }
     }
 
-    protected String getProcessorPath(MuleEvent event, MessageProcessor lastProcessed)
-    {
-        if (event.getFlowConstruct() != null && event.getFlowConstruct() instanceof MessageProcessorPathResolver)
-        {
-            return ((MessageProcessorPathResolver) event.getFlowConstruct()).getProcessorPath(lastProcessed);
-        }
-        else
-        {
-            return lastProcessed.toString();
-        }
+    return contextInfo;
+  }
+
+  protected String getProcessorPath(MuleEvent event, MessageProcessor lastProcessed) {
+    if (event.getFlowConstruct() != null && event.getFlowConstruct() instanceof MessageProcessorPathResolver) {
+      return ((MessageProcessorPathResolver) event.getFlowConstruct()).getProcessorPath(lastProcessed);
+    } else {
+      return lastProcessed.toString();
     }
+  }
 }

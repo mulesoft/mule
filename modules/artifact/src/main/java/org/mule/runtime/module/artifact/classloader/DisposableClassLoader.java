@@ -7,11 +7,11 @@
 package org.mule.runtime.module.artifact.classloader;
 
 
-public interface DisposableClassLoader
-{
-    /**
-     * Gets rid of the class loader resources.
-     */
-    void dispose();
+public interface DisposableClassLoader {
+
+  /**
+   * Gets rid of the class loader resources.
+   */
+  void dispose();
 
 }

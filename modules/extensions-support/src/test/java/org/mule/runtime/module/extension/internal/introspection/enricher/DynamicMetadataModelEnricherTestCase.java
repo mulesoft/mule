@@ -40,125 +40,113 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 
-public class DynamicMetadataModelEnricherTestCase
-{
+public class DynamicMetadataModelEnricherTestCase {
 
-    private static final String CONTENT_METADATA_WITH_KEY_ID = "contentMetadataWithKeyId";
-    private ExtensionDeclaration declaration;
+  private static final String CONTENT_METADATA_WITH_KEY_ID = "contentMetadataWithKeyId";
+  private ExtensionDeclaration declaration;
 
-    @Before
-    public void setUp()
-    {
-        final AnnotationsBasedDescriber basedDescriber = new AnnotationsBasedDescriber(MetadataExtension.class, new StaticVersionResolver(getProductVersion()));
-        ExtensionDeclarer declarer = basedDescriber.describe(new DefaultDescribingContext(getClass().getClassLoader()));
-        new DynamicMetadataModelEnricher().enrich(new DefaultDescribingContext(declarer, this.getClass().getClassLoader()));
-        declaration = declarer.getDeclaration();
-    }
+  @Before
+  public void setUp() {
+    final AnnotationsBasedDescriber basedDescriber =
+        new AnnotationsBasedDescriber(MetadataExtension.class, new StaticVersionResolver(getProductVersion()));
+    ExtensionDeclarer declarer = basedDescriber.describe(new DefaultDescribingContext(getClass().getClassLoader()));
+    new DynamicMetadataModelEnricher().enrich(new DefaultDescribingContext(declarer, this.getClass().getClassLoader()));
+    declaration = declarer.getDeclaration();
+  }
 
-    @Test
-    public void parseMetadataAnnotationsOnParameter()
-    {
-        final OperationDeclaration operationDeclaration = getDeclaration(declaration.getOperations(), CONTENT_METADATA_WITH_KEY_ID);
-        final List<ParameterDeclaration> parameters = operationDeclaration.getParameters();
+  @Test
+  public void parseMetadataAnnotationsOnParameter() {
+    final OperationDeclaration operationDeclaration = getDeclaration(declaration.getOperations(), CONTENT_METADATA_WITH_KEY_ID);
+    final List<ParameterDeclaration> parameters = operationDeclaration.getParameters();
 
-        assertParameterIsMetadataKeyPart(getDeclaration(parameters, "type"));
-        assertParameterIsMetadataContent(getDeclaration(parameters, "content"));
-    }
+    assertParameterIsMetadataKeyPart(getDeclaration(parameters, "type"));
+    assertParameterIsMetadataContent(getDeclaration(parameters, "content"));
+  }
 
-    @Test
-    public void declareStaticAndDynamicTypesInOperation()
-    {
-        List<ParameterDeclaration> params;
-        final List<OperationDeclaration> operations = declaration.getOperations();
+  @Test
+  public void declareStaticAndDynamicTypesInOperation() {
+    List<ParameterDeclaration> params;
+    final List<OperationDeclaration> operations = declaration.getOperations();
 
-        OperationDeclaration dynamicContent = getDeclaration(operations, "contentMetadataWithKeyId");
-        assertOutputType(dynamicContent.getOutput(), toMetadataType(Object.class), true);
-        assertOutputType(dynamicContent.getOutputAttributes(), toMetadataType(void.class), false);
-        params = dynamicContent.getParameters();
-        assertParameterType(getDeclaration(params, "type"), toMetadataType(String.class), false);
-        assertParameterType(getDeclaration(params, "content"), toMetadataType(Object.class), true);
+    OperationDeclaration dynamicContent = getDeclaration(operations, "contentMetadataWithKeyId");
+    assertOutputType(dynamicContent.getOutput(), toMetadataType(Object.class), true);
+    assertOutputType(dynamicContent.getOutputAttributes(), toMetadataType(void.class), false);
+    params = dynamicContent.getParameters();
+    assertParameterType(getDeclaration(params, "type"), toMetadataType(String.class), false);
+    assertParameterType(getDeclaration(params, "content"), toMetadataType(Object.class), true);
 
-        OperationDeclaration dynamicOutput = getDeclaration(operations, "outputMetadataWithKeyId");
-        assertOutputType(dynamicOutput.getOutput(), toMetadataType(Object.class), true);
-        assertOutputType(dynamicOutput.getOutputAttributes(), toMetadataType(void.class), false);
-        params = dynamicOutput.getParameters();
-        assertParameterType(getDeclaration(params, "type"), toMetadataType(String.class), false);
-        assertParameterType(getDeclaration(params, "content"), toMetadataType(Object.class), true);
+    OperationDeclaration dynamicOutput = getDeclaration(operations, "outputMetadataWithKeyId");
+    assertOutputType(dynamicOutput.getOutput(), toMetadataType(Object.class), true);
+    assertOutputType(dynamicOutput.getOutputAttributes(), toMetadataType(void.class), false);
+    params = dynamicOutput.getParameters();
+    assertParameterType(getDeclaration(params, "type"), toMetadataType(String.class), false);
+    assertParameterType(getDeclaration(params, "content"), toMetadataType(Object.class), true);
 
-        OperationDeclaration dynaimcContentAndOutput = getDeclaration(operations, "contentAndOutputMetadataWithKeyId");
-        assertOutputType(dynaimcContentAndOutput.getOutput(), toMetadataType(Object.class), true);
-        assertOutputType(dynaimcContentAndOutput.getOutputAttributes(), toMetadataType(void.class), false);
-        params = dynaimcContentAndOutput.getParameters();
-        assertParameterType(getDeclaration(params, "type"), toMetadataType(String.class), false);
-        assertParameterType(getDeclaration(params, "content"), toMetadataType(Object.class), true);
+    OperationDeclaration dynaimcContentAndOutput = getDeclaration(operations, "contentAndOutputMetadataWithKeyId");
+    assertOutputType(dynaimcContentAndOutput.getOutput(), toMetadataType(Object.class), true);
+    assertOutputType(dynaimcContentAndOutput.getOutputAttributes(), toMetadataType(void.class), false);
+    params = dynaimcContentAndOutput.getParameters();
+    assertParameterType(getDeclaration(params, "type"), toMetadataType(String.class), false);
+    assertParameterType(getDeclaration(params, "content"), toMetadataType(Object.class), true);
 
-        OperationDeclaration dynamicOutputAndAttributes = getDeclaration(operations, "outputAttributesWithDynamicMetadata");
-        assertOutputType(dynamicOutputAndAttributes.getOutput(), toMetadataType(Object.class), true);
-        assertOutputType(dynamicOutputAndAttributes.getOutputAttributes(), toMetadataType(AbstractOutputAttributes.class), true);
-        params = dynamicOutputAndAttributes.getParameters();
-        assertParameterType(getDeclaration(params, "type"), toMetadataType(String.class), false);
+    OperationDeclaration dynamicOutputAndAttributes = getDeclaration(operations, "outputAttributesWithDynamicMetadata");
+    assertOutputType(dynamicOutputAndAttributes.getOutput(), toMetadataType(Object.class), true);
+    assertOutputType(dynamicOutputAndAttributes.getOutputAttributes(), toMetadataType(AbstractOutputAttributes.class), true);
+    params = dynamicOutputAndAttributes.getParameters();
+    assertParameterType(getDeclaration(params, "type"), toMetadataType(String.class), false);
 
-        OperationDeclaration staticOutputOnly = getDeclaration(operations, "typeWithDeclaredSubtypesMetadata");
-        assertOutputType(staticOutputOnly.getOutput(), toMetadataType(boolean.class), false);
-        assertOutputType(staticOutputOnly.getOutputAttributes(), toMetadataType(void.class), false);
+    OperationDeclaration staticOutputOnly = getDeclaration(operations, "typeWithDeclaredSubtypesMetadata");
+    assertOutputType(staticOutputOnly.getOutput(), toMetadataType(boolean.class), false);
+    assertOutputType(staticOutputOnly.getOutputAttributes(), toMetadataType(void.class), false);
 
-        OperationDeclaration staticOutputAndAttributes = getDeclaration(operations, "outputAttributesWithDeclaredSubtypesMetadata");
-        assertOutputType(staticOutputAndAttributes.getOutput(), toMetadataType(Shape.class), false);
-        assertOutputType(staticOutputAndAttributes.getOutputAttributes(), toMetadataType(AbstractOutputAttributes.class), false);
-    }
+    OperationDeclaration staticOutputAndAttributes = getDeclaration(operations, "outputAttributesWithDeclaredSubtypesMetadata");
+    assertOutputType(staticOutputAndAttributes.getOutput(), toMetadataType(Shape.class), false);
+    assertOutputType(staticOutputAndAttributes.getOutputAttributes(), toMetadataType(AbstractOutputAttributes.class), false);
+  }
 
-    @Test
-    public void declareStaticAndDynamicTypesInSource()
-    {
+  @Test
+  public void declareStaticAndDynamicTypesInSource() {
 
-        final List<SourceDeclaration> messageSources = declaration.getMessageSources();
-        SourceDeclaration sourceDynamicAttributes = getDeclaration(messageSources, "MetadataSource");
+    final List<SourceDeclaration> messageSources = declaration.getMessageSources();
+    SourceDeclaration sourceDynamicAttributes = getDeclaration(messageSources, "MetadataSource");
 
-        assertOutputType(sourceDynamicAttributes.getOutput(), TYPE_BUILDER.dictionaryType().id(Map.class.getName())
-                .ofKey(TYPE_BUILDER.stringType().id(String.class.getName()))
-                .ofValue(TYPE_BUILDER.objectType().id("java.lang.Object")
-                                 .with(new ClassInformationAnnotation(Object.class, null))
-                                 .with(new TypeAliasAnnotation(Object.class.getSimpleName())))
-                .build(), true);
-        assertOutputType(sourceDynamicAttributes.getOutputAttributes(), toMetadataType(StringAttributes.class), true);
-        assertParameterType(getDeclaration(sourceDynamicAttributes.getParameters(), "type"), toMetadataType(String.class), false);
+    assertOutputType(sourceDynamicAttributes.getOutput(), TYPE_BUILDER.dictionaryType().id(Map.class.getName())
+        .ofKey(TYPE_BUILDER.stringType().id(String.class.getName())).ofValue(TYPE_BUILDER.objectType().id("java.lang.Object")
+            .with(new ClassInformationAnnotation(Object.class, null)).with(new TypeAliasAnnotation(Object.class.getSimpleName())))
+        .build(), true);
+    assertOutputType(sourceDynamicAttributes.getOutputAttributes(), toMetadataType(StringAttributes.class), true);
+    assertParameterType(getDeclaration(sourceDynamicAttributes.getParameters(), "type"), toMetadataType(String.class), false);
 
-        SourceDeclaration sourceStaticAttributes = getDeclaration(messageSources, "MetadataSourceWithMultilevel");
+    SourceDeclaration sourceStaticAttributes = getDeclaration(messageSources, "MetadataSourceWithMultilevel");
 
-        assertOutputType(sourceStaticAttributes.getOutput(), TYPE_BUILDER.dictionaryType().id(Map.class.getName())
-                .ofKey(TYPE_BUILDER.stringType().id(String.class.getName()))
-                .ofValue(TYPE_BUILDER.objectType().id("java.lang.Object")
-                                 .with(new ClassInformationAnnotation(Object.class, null))
-                                 .with(new TypeAliasAnnotation(Object.class.getSimpleName())))
-                .build(), true);
-        assertOutputType(sourceStaticAttributes.getOutputAttributes(), toMetadataType(StringAttributes.class), false);
+    assertOutputType(sourceStaticAttributes.getOutput(), TYPE_BUILDER.dictionaryType().id(Map.class.getName())
+        .ofKey(TYPE_BUILDER.stringType().id(String.class.getName())).ofValue(TYPE_BUILDER.objectType().id("java.lang.Object")
+            .with(new ClassInformationAnnotation(Object.class, null)).with(new TypeAliasAnnotation(Object.class.getSimpleName())))
+        .build(), true);
+    assertOutputType(sourceStaticAttributes.getOutputAttributes(), toMetadataType(StringAttributes.class), false);
 
-        List<ParameterDeclaration> locationKey = sourceStaticAttributes.getParameters();
-        assertParameterType(getDeclaration(locationKey, "continent"), toMetadataType(String.class), false);
-        assertParameterType(getDeclaration(locationKey, "country"), toMetadataType(String.class), false);
-        assertParameterType(getDeclaration(locationKey, "city"), toMetadataType(String.class), false);
+    List<ParameterDeclaration> locationKey = sourceStaticAttributes.getParameters();
+    assertParameterType(getDeclaration(locationKey, "continent"), toMetadataType(String.class), false);
+    assertParameterType(getDeclaration(locationKey, "country"), toMetadataType(String.class), false);
+    assertParameterType(getDeclaration(locationKey, "city"), toMetadataType(String.class), false);
 
-    }
+  }
 
-    private void assertParameterIsMetadataKeyPart(ParameterDeclaration param)
-    {
-        checkIsPresent(param, MetadataKeyPartModelProperty.class);
-    }
+  private void assertParameterIsMetadataKeyPart(ParameterDeclaration param) {
+    checkIsPresent(param, MetadataKeyPartModelProperty.class);
+  }
 
-    private void assertParameterIsMetadataContent(ParameterDeclaration param)
-    {
-        checkIsPresent(param, MetadataContentModelProperty.class);
-    }
+  private void assertParameterIsMetadataContent(ParameterDeclaration param) {
+    checkIsPresent(param, MetadataContentModelProperty.class);
+  }
 
-    private void assertParameterType(ParameterDeclaration param, MetadataType type, boolean isDynamic)
-    {
-        assertThat(param.getType(), equalTo(type));
-        assertThat(param.hasDynamicType(), is(isDynamic));
-    }
+  private void assertParameterType(ParameterDeclaration param, MetadataType type, boolean isDynamic) {
+    assertThat(param.getType(), equalTo(type));
+    assertThat(param.hasDynamicType(), is(isDynamic));
+  }
 
-    private void assertOutputType(OutputDeclaration output, MetadataType type, boolean isDynamic)
-    {
-        assertThat(output.getType(), equalTo(type));
-        assertThat(output.hasDynamicType(), is(isDynamic));
-    }
+  private void assertOutputType(OutputDeclaration output, MetadataType type, boolean isDynamic) {
+    assertThat(output.getType(), equalTo(type));
+    assertThat(output.hasDynamicType(), is(isDynamic));
+  }
 }

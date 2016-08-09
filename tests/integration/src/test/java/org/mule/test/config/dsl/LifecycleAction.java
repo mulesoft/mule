@@ -6,13 +6,8 @@
  */
 package org.mule.test.config.dsl;
 
-public enum LifecycleAction
-{
+public enum LifecycleAction {
 
-    GET_OBJECT,
-    INITIALISE,
-    START,
-    STOP,
-    DISPOSE
+  GET_OBJECT, INITIALISE, START, STOP, DISPOSE
 
 }

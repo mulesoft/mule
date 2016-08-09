@@ -18,27 +18,23 @@ import javax.xml.namespace.QName;
 /**
  * Base implementation for {@link AnnotatedObject}
  */
-public abstract class AbstractAnnotatedObject implements AnnotatedObject
-{
+public abstract class AbstractAnnotatedObject implements AnnotatedObject {
 
-    private final Map<QName, Object> annotations = new ConcurrentHashMap<>();
+  private final Map<QName, Object> annotations = new ConcurrentHashMap<>();
 
-    @Override
-    public final Object getAnnotation(QName qName)
-    {
-        return annotations.get(qName);
-    }
+  @Override
+  public final Object getAnnotation(QName qName) {
+    return annotations.get(qName);
+  }
 
-    @Override
-    public final Map<QName, Object> getAnnotations()
-    {
-        return Collections.unmodifiableMap(annotations);
-    }
+  @Override
+  public final Map<QName, Object> getAnnotations() {
+    return Collections.unmodifiableMap(annotations);
+  }
 
-    @Override
-    public synchronized void setAnnotations(Map<QName, Object> newAnnotations)
-    {
-        annotations.clear();
-        annotations.putAll(newAnnotations);
-    }
+  @Override
+  public synchronized void setAnnotations(Map<QName, Object> newAnnotations) {
+    annotations.clear();
+    annotations.putAll(newAnnotations);
+  }
 }

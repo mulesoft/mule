@@ -24,85 +24,74 @@ import java.util.Map;
 import javax.xml.namespace.QName;
 
 /**
- * {@link org.mule.runtime.config.spring.dsl.api.ObjectFactory} to create a {@link org.mule.runtime.core.enricher.MessageEnricher}.
+ * {@link org.mule.runtime.config.spring.dsl.api.ObjectFactory} to create a
+ * {@link org.mule.runtime.core.enricher.MessageEnricher}.
  */
-public class MessageEnricherObjectFactory implements ObjectFactory<MessageEnricher>, MuleContextAware, FlowConstructAware, AnnotatedObject
-{
+public class MessageEnricherObjectFactory
+    implements ObjectFactory<MessageEnricher>, MuleContextAware, FlowConstructAware, AnnotatedObject {
 
-    private MessageProcessor messageProcessor;
-    private String source;
-    private String target;
-    private List<MessageEnricher.EnrichExpressionPair> enrichExpressionPairs = new ArrayList<>();
-    private FlowConstruct flowConstruct;
-    private MuleContext muleContext;
-    private Map<QName, Object> annotations;
+  private MessageProcessor messageProcessor;
+  private String source;
+  private String target;
+  private List<MessageEnricher.EnrichExpressionPair> enrichExpressionPairs = new ArrayList<>();
+  private FlowConstruct flowConstruct;
+  private MuleContext muleContext;
+  private Map<QName, Object> annotations;
 
-    public void setMessageProcessor(MessageProcessor messageProcessor)
-    {
-        this.messageProcessor = messageProcessor;
+  public void setMessageProcessor(MessageProcessor messageProcessor) {
+    this.messageProcessor = messageProcessor;
+  }
+
+  public void setSource(String source) {
+    this.source = source;
+  }
+
+  public void setTarget(String target) {
+    this.target = target;
+  }
+
+  public void setEnrichExpressionPairs(List<MessageEnricher.EnrichExpressionPair> enrichExpressionPairs) {
+    this.enrichExpressionPairs = enrichExpressionPairs;
+  }
+
+  @Override
+  public MessageEnricher getObject() {
+    MessageEnricher messageEnricher = new MessageEnricher();
+    if (target != null || source != null) {
+      messageEnricher.addEnrichExpressionPair(new MessageEnricher.EnrichExpressionPair(source, target));
     }
-
-    public void setSource(String source)
-    {
-        this.source = source;
+    for (MessageEnricher.EnrichExpressionPair enrichExpressionPair : enrichExpressionPairs) {
+      messageEnricher.addEnrichExpressionPair(enrichExpressionPair);
     }
+    messageEnricher.setFlowConstruct(flowConstruct);
+    messageEnricher.setMuleContext(muleContext);
+    messageEnricher.setMessageProcessor(messageProcessor);
+    messageEnricher.setAnnotations(annotations);
+    return messageEnricher;
+  }
 
-    public void setTarget(String target)
-    {
-        this.target = target;
-    }
+  @Override
+  public void setFlowConstruct(FlowConstruct flowConstruct) {
+    this.flowConstruct = flowConstruct;
+  }
 
-    public void setEnrichExpressionPairs(List<MessageEnricher.EnrichExpressionPair> enrichExpressionPairs)
-    {
-        this.enrichExpressionPairs = enrichExpressionPairs;
-    }
+  @Override
+  public void setMuleContext(MuleContext context) {
+    this.muleContext = context;
+  }
 
-    @Override
-    public MessageEnricher getObject()
-    {
-        MessageEnricher messageEnricher = new MessageEnricher();
-        if (target != null || source != null)
-        {
-            messageEnricher.addEnrichExpressionPair(new MessageEnricher.EnrichExpressionPair(source, target));
-        }
-        for (MessageEnricher.EnrichExpressionPair enrichExpressionPair : enrichExpressionPairs)
-        {
-            messageEnricher.addEnrichExpressionPair(enrichExpressionPair);
-        }
-        messageEnricher.setFlowConstruct(flowConstruct);
-        messageEnricher.setMuleContext(muleContext);
-        messageEnricher.setMessageProcessor(messageProcessor);
-        messageEnricher.setAnnotations(annotations);
-        return messageEnricher;
-    }
+  @Override
+  public Object getAnnotation(QName name) {
+    return annotations.get(name);
+  }
 
-    @Override
-    public void setFlowConstruct(FlowConstruct flowConstruct)
-    {
-        this.flowConstruct = flowConstruct;
-    }
+  @Override
+  public Map<QName, Object> getAnnotations() {
+    return annotations;
+  }
 
-    @Override
-    public void setMuleContext(MuleContext context)
-    {
-        this.muleContext = context;
-    }
-
-    @Override
-    public Object getAnnotation(QName name)
-    {
-        return annotations.get(name);
-    }
-
-    @Override
-    public Map<QName, Object> getAnnotations()
-    {
-        return annotations;
-    }
-
-    @Override
-    public void setAnnotations(Map<QName, Object> annotations)
-    {
-        this.annotations = annotations;
-    }
+  @Override
+  public void setAnnotations(Map<QName, Object> annotations) {
+    this.annotations = annotations;
+  }
 }

@@ -23,24 +23,22 @@ import org.junit.Rule;
 import org.junit.Test;
 
 @SmallTest
-public class EmptyApplicationDescriptorTestCase extends AbstractMuleTestCase
-{
+public class EmptyApplicationDescriptorTestCase extends AbstractMuleTestCase {
 
-    public static final String APP_NAME = "test-app";
-    public static final String MULE_HOME_DIR = "home";
-    @Rule
-    public SystemProperty muleHome = new SystemProperty(MuleProperties.MULE_HOME_DIRECTORY_PROPERTY, MULE_HOME_DIR);
+  public static final String APP_NAME = "test-app";
+  public static final String MULE_HOME_DIR = "home";
+  @Rule
+  public SystemProperty muleHome = new SystemProperty(MuleProperties.MULE_HOME_DIRECTORY_PROPERTY, MULE_HOME_DIR);
 
-    @Test
-    public void defaultValuesAreCorrect() throws IOException
-    {
-        EmptyApplicationDescriptor applicationDescriptor = new EmptyApplicationDescriptor(APP_NAME);
-        assertThat(applicationDescriptor.getName(), is(APP_NAME));
-        assertThat(applicationDescriptor.getConfigResources()[0], is(MuleServer.DEFAULT_CONFIGURATION));
-        String absolutePathForConfigResource = MuleContainerBootstrapUtils.getMuleAppDefaultConfigFile(APP_NAME).getAbsolutePath();
-        assertThat(applicationDescriptor.getAbsoluteResourcePaths()[0], is(absolutePathForConfigResource));
-        assertThat(applicationDescriptor.getConfigResourcesFile()[0].getAbsolutePath(), is(absolutePathForConfigResource));
-        assertThat(applicationDescriptor.getLogConfigFile(), is(nullValue()));
-    }
+  @Test
+  public void defaultValuesAreCorrect() throws IOException {
+    EmptyApplicationDescriptor applicationDescriptor = new EmptyApplicationDescriptor(APP_NAME);
+    assertThat(applicationDescriptor.getName(), is(APP_NAME));
+    assertThat(applicationDescriptor.getConfigResources()[0], is(MuleServer.DEFAULT_CONFIGURATION));
+    String absolutePathForConfigResource = MuleContainerBootstrapUtils.getMuleAppDefaultConfigFile(APP_NAME).getAbsolutePath();
+    assertThat(applicationDescriptor.getAbsoluteResourcePaths()[0], is(absolutePathForConfigResource));
+    assertThat(applicationDescriptor.getConfigResourcesFile()[0].getAbsolutePath(), is(absolutePathForConfigResource));
+    assertThat(applicationDescriptor.getLogConfigFile(), is(nullValue()));
+  }
 
 }

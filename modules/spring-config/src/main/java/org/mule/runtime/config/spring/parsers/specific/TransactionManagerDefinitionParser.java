@@ -9,24 +9,20 @@ package org.mule.runtime.config.spring.parsers.specific;
 import org.mule.runtime.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 import org.mule.runtime.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 
-public class TransactionManagerDefinitionParser extends MuleOrphanDefinitionParser
-{
+public class TransactionManagerDefinitionParser extends MuleOrphanDefinitionParser {
 
-    public TransactionManagerDefinitionParser()
-    {
-        super(true);
-        setConstraints();
-    }
+  public TransactionManagerDefinitionParser() {
+    super(true);
+    setConstraints();
+  }
 
-    public TransactionManagerDefinitionParser(Class clazz)
-    {
-        super(clazz, true);
-        setConstraints();
-    }
+  public TransactionManagerDefinitionParser(Class clazz) {
+    super(clazz, true);
+    setConstraints();
+  }
 
-    protected void setConstraints()
-    {
-        addIgnored(AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME);
-    }
+  protected void setConstraints() {
+    addIgnored(AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME);
+  }
 
 }

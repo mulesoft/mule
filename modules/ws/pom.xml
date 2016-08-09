@@ -12,6 +12,10 @@
     <name>Web Services</name>
     <description>Provides components for working with Web Services.</description>
 
+    <properties>
+        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.mule</groupId>

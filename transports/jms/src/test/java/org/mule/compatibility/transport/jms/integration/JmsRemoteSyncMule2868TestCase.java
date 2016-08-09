@@ -14,19 +14,17 @@ import org.mule.runtime.core.api.client.MuleClient;
 
 import org.junit.Test;
 
-public class JmsRemoteSyncMule2868TestCase extends AbstractJmsFunctionalTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "integration/jms-remote-sync-mule2868.xml";
-    }
+public class JmsRemoteSyncMule2868TestCase extends AbstractJmsFunctionalTestCase {
 
-    @Test
-    public void testMule2868() throws MuleException
-    {
-        MuleClient muleClient = muleContext.getClient();
-        MuleMessage response = muleClient.send("vm://in", "test", null);
-        assertEquals("test Received", response.getPayload());
-    }
+  @Override
+  protected String getConfigFile() {
+    return "integration/jms-remote-sync-mule2868.xml";
+  }
+
+  @Test
+  public void testMule2868() throws MuleException {
+    MuleClient muleClient = muleContext.getClient();
+    MuleMessage response = muleClient.send("vm://in", "test", null);
+    assertEquals("test Received", response.getPayload());
+  }
 }

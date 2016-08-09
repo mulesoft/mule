@@ -10,25 +10,22 @@ import org.mule.runtime.core.api.retry.RetryPolicy;
 import org.mule.runtime.core.retry.PolicyStatus;
 
 /**
- * This policy is basically a placeholder.  It does not attempt to retry at all.
+ * This policy is basically a placeholder. It does not attempt to retry at all.
  */
-public class NoRetryPolicyTemplate extends AbstractPolicyTemplate
-{
-    public RetryPolicy createRetryInstance()
-    {
-        return new NoRetryPolicy();
-    }
+public class NoRetryPolicyTemplate extends AbstractPolicyTemplate {
 
-    protected static class NoRetryPolicy implements RetryPolicy
-    {
-        public PolicyStatus applyPolicy(Throwable cause)
-        {
-            return PolicyStatus.policyExhausted(cause);
-        }
-    }
+  public RetryPolicy createRetryInstance() {
+    return new NoRetryPolicy();
+  }
 
-    public String toString()
-    {
-        return "NoRetryPolicy{}";
+  protected static class NoRetryPolicy implements RetryPolicy {
+
+    public PolicyStatus applyPolicy(Throwable cause) {
+      return PolicyStatus.policyExhausted(cause);
     }
+  }
+
+  public String toString() {
+    return "NoRetryPolicy{}";
+  }
 }

@@ -11,65 +11,52 @@ import org.mule.runtime.core.message.OutputHandler;
 import java.io.InputStream;
 
 /**
- * Implementation of the visitor pattern meant to operate over the
- * type of a file's content.
+ * Implementation of the visitor pattern meant to operate over the type of a file's content.
  * <p>
- * This interface includes default implementations of all the visit
- * methods so that that implementors can implement only he methods
- * that result meaningful on each particular use case.
+ * This interface includes default implementations of all the visit methods so that that implementors can implement only he
+ * methods that result meaningful on each particular use case.
  *
  * @since 4.0
  */
-public interface FileContentVisitor
-{
+public interface FileContentVisitor {
 
-    /**
-     * Invoked when the file has {@link String} content
-     *
-     * @param content the file's content
-     * @throws Exception
-     */
-    default void visit(String content) throws Exception
-    {
-    }
+  /**
+   * Invoked when the file has {@link String} content
+   *
+   * @param content the file's content
+   * @throws Exception
+   */
+  default void visit(String content) throws Exception {}
 
-    /**
-     * Invoked when the file has one single {@code byte} as content
-     *
-     * @param content the file's content
-     * @throws Exception
-     */
-    default void visit(byte content) throws Exception
-    {
-    }
+  /**
+   * Invoked when the file has one single {@code byte} as content
+   *
+   * @param content the file's content
+   * @throws Exception
+   */
+  default void visit(byte content) throws Exception {}
 
-    /**
-     * Invoked when the file has one single {@code byte[]} as content
-     *
-     * @param content the file's content
-     * @throws Exception
-     */
-    default void visit(byte[] content) throws Exception
-    {
-    }
+  /**
+   * Invoked when the file has one single {@code byte[]} as content
+   *
+   * @param content the file's content
+   * @throws Exception
+   */
+  default void visit(byte[] content) throws Exception {}
 
-    /**
-     * Invoked when the file has an {@link OutputHandler} as content
-     *
-     * @param handler the file's content
-     * @throws Exception
-     */
-    default void visit(OutputHandler handler) throws Exception
-    {
-    }
+  /**
+   * Invoked when the file has an {@link OutputHandler} as content
+   *
+   * @param handler the file's content
+   * @throws Exception
+   */
+  default void visit(OutputHandler handler) throws Exception {}
 
-    /**
-     * Invoked when the file has an {@link InputStream} as content
-     *
-     * @param content the file's content
-     * @throws Exception
-     */
-    default void visit(InputStream content) throws Exception
-    {
-    }
+  /**
+   * Invoked when the file has an {@link InputStream} as content
+   *
+   * @param content the file's content
+   * @throws Exception
+   */
+  default void visit(InputStream content) throws Exception {}
 }

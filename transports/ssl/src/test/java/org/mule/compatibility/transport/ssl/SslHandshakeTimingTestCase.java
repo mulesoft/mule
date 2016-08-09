@@ -26,68 +26,60 @@ import java.util.Map;
 import org.junit.Test;
 
 /**
- * Whitebox test for the SSL latch in SslMessageReceiver. The use of reflection here is hacky
- * but the alternative would be stubbing large parts of the JSSE classes in order to influence
- * timing while establishing the SSL handshake (wich sounds even hackier than this test).
+ * Whitebox test for the SSL latch in SslMessageReceiver. The use of reflection here is hacky but the alternative would be
+ * stubbing large parts of the JSSE classes in order to influence timing while establishing the SSL handshake (wich sounds even
+ * hackier than this test).
  */
-public class SslHandshakeTimingTestCase extends AbstractMuleContextEndpointTestCase
-{
+public class SslHandshakeTimingTestCase extends AbstractMuleContextEndpointTestCase {
 
-    @Test
-    public void testSslHandshakeTimeout() throws Exception
-    {
-        SslMessageReceiver receiver = setupMockSslMessageReciever();
+  @Test
+  public void testSslHandshakeTimeout() throws Exception {
+    SslMessageReceiver receiver = setupMockSslMessageReciever();
 
-        // note how we call preRoute without a prior handshakeCompleted ... this must
-        // run into a timeout
-        try
-        {
-            MuleMessage message = MuleMessage.builder().payload(TEST_MESSAGE).build();
-            callPreRoute(receiver, message);
-            fail();
-        }
-        catch (InvocationTargetException ite)
-        {
-            Throwable cause = ite.getCause();
-            assertTrue(cause instanceof IllegalStateException);
-        }
+    // note how we call preRoute without a prior handshakeCompleted ... this must
+    // run into a timeout
+    try {
+      MuleMessage message = MuleMessage.builder().payload(TEST_MESSAGE).build();
+      callPreRoute(receiver, message);
+      fail();
+    } catch (InvocationTargetException ite) {
+      Throwable cause = ite.getCause();
+      assertTrue(cause instanceof IllegalStateException);
     }
+  }
 
-    @Test
-    public void testSslHandshakeSuccessful() throws Exception
-    {
-        SslMessageReceiver receiver = setupMockSslMessageReciever();
+  @Test
+  public void testSslHandshakeSuccessful() throws Exception {
+    SslMessageReceiver receiver = setupMockSslMessageReciever();
 
-        MuleMessage message = MuleMessage.builder().payload(TEST_MESSAGE).build();
-        receiver.handshakeCompleted(new MockHandshakeCompletedEvent());
-        message = callPreRoute(receiver, message);
+    MuleMessage message = MuleMessage.builder().payload(TEST_MESSAGE).build();
+    receiver.handshakeCompleted(new MockHandshakeCompletedEvent());
+    message = callPreRoute(receiver, message);
 
-        assertNotNull(message.getOutboundProperty(SslConnector.PEER_CERTIFICATES));
-        assertNotNull(message.getOutboundProperty(SslConnector.LOCAL_CERTIFICATES));
-    }
+    assertNotNull(message.getOutboundProperty(SslConnector.PEER_CERTIFICATES));
+    assertNotNull(message.getOutboundProperty(SslConnector.LOCAL_CERTIFICATES));
+  }
 
-    private SslMessageReceiver setupMockSslMessageReciever() throws Exception
-    {
-        SslConnector connector = new SslConnector(muleContext);
-        connector.setSslHandshakeTimeout(1000);
+  private SslMessageReceiver setupMockSslMessageReciever() throws Exception {
+    SslConnector connector = new SslConnector(muleContext);
+    connector.setSslHandshakeTimeout(1000);
 
-        Map<String, Serializable> properties = Collections.emptyMap();
+    Map<String, Serializable> properties = Collections.emptyMap();
 
-        InboundEndpoint endpoint = mock(InboundEndpoint.class);
-        when(endpoint.getProperties()).thenReturn(properties);
-        when(endpoint.getConnector()).thenReturn(connector);
-        when(endpoint.getEncoding()).thenReturn(getDefaultEncoding(muleContext));
-        when(endpoint.getMuleContext()).thenReturn(muleContext);
+    InboundEndpoint endpoint = mock(InboundEndpoint.class);
+    when(endpoint.getProperties()).thenReturn(properties);
+    when(endpoint.getConnector()).thenReturn(connector);
+    when(endpoint.getEncoding()).thenReturn(getDefaultEncoding(muleContext));
+    when(endpoint.getMuleContext()).thenReturn(muleContext);
 
-        return new SslMessageReceiver(connector, mock(Flow.class), endpoint);
-    }
+    return new SslMessageReceiver(connector, mock(Flow.class), endpoint);
+  }
 
-    private MuleMessage callPreRoute(SslMessageReceiver receiver, MuleMessage message) throws Exception
-    {
-        Method preRouteMessage = receiver.getClass().getDeclaredMethod("preRoute", MuleMessage.class);
-        assertNotNull(preRouteMessage);
-        preRouteMessage.setAccessible(true);
+  private MuleMessage callPreRoute(SslMessageReceiver receiver, MuleMessage message) throws Exception {
+    Method preRouteMessage = receiver.getClass().getDeclaredMethod("preRoute", MuleMessage.class);
+    assertNotNull(preRouteMessage);
+    preRouteMessage.setAccessible(true);
 
-        return (MuleMessage) preRouteMessage.invoke(receiver, new Object[] { message });
-    }
+    return (MuleMessage) preRouteMessage.invoke(receiver, new Object[] {message});
+  }
 }

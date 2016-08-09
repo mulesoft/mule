@@ -11,35 +11,31 @@ import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.MessageHandler;
 import org.mule.runtime.extension.api.runtime.source.SourceContext;
 
-final class ImmutableSourceContext implements SourceContext
-{
+final class ImmutableSourceContext implements SourceContext {
 
-    private final MessageHandler messageHandler;
-    private final ExceptionCallback<Void, Throwable> exceptionCallback;
-    private final ConfigurationInstance<Object> configurationInstance;
+  private final MessageHandler messageHandler;
+  private final ExceptionCallback<Void, Throwable> exceptionCallback;
+  private final ConfigurationInstance<Object> configurationInstance;
 
-    ImmutableSourceContext(MessageHandler messageHandler, ExceptionCallback<Void, Throwable> exceptionCallback, ConfigurationInstance<Object> configurationInstance)
-    {
-        this.messageHandler = messageHandler;
-        this.exceptionCallback = exceptionCallback;
-        this.configurationInstance = configurationInstance;
-    }
+  ImmutableSourceContext(MessageHandler messageHandler, ExceptionCallback<Void, Throwable> exceptionCallback,
+                         ConfigurationInstance<Object> configurationInstance) {
+    this.messageHandler = messageHandler;
+    this.exceptionCallback = exceptionCallback;
+    this.configurationInstance = configurationInstance;
+  }
 
-    @Override
-    public MessageHandler getMessageHandler()
-    {
-        return messageHandler;
-    }
+  @Override
+  public MessageHandler getMessageHandler() {
+    return messageHandler;
+  }
 
-    @Override
-    public ExceptionCallback<Void, Throwable> getExceptionCallback()
-    {
-        return exceptionCallback;
-    }
+  @Override
+  public ExceptionCallback<Void, Throwable> getExceptionCallback() {
+    return exceptionCallback;
+  }
 
-    @Override
-    public ConfigurationInstance<Object> getConfigurationInstance()
-    {
-        return configurationInstance;
-    }
+  @Override
+  public ConfigurationInstance<Object> getConfigurationInstance() {
+    return configurationInstance;
+  }
 }

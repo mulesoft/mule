@@ -18,11 +18,10 @@ import java.lang.annotation.Target;
  */
 @Target({METHOD, TYPE})
 @Retention(RUNTIME)
-public @interface FlakyTest
-{
+public @interface FlakyTest {
 
-    /**
-     * Indicate th number of times a flaky test must be executed.
-     */
-    int times() default 50;
+  /**
+   * Indicate th number of times a flaky test must be executed.
+   */
+  int times() default 50;
 }

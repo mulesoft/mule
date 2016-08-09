@@ -37,147 +37,126 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * Base class for {@link ObjectFactory} implementation which create
- * extension components.
+ * Base class for {@link ObjectFactory} implementation which create extension components.
  * <p>
  * Contains behavior to obtain and manage components parameters.
  *
  * @param <T> the generic type of the instances to be built
  * @since 4.0
  */
-public abstract class AbstractExtensionObjectFactory<T> implements ObjectFactory<T>
-{
+public abstract class AbstractExtensionObjectFactory<T> implements ObjectFactory<T> {
 
-    private Map<String, Object> parameters = new HashMap<>();
+  private Map<String, Object> parameters = new HashMap<>();
 
-    /**
-     * @return the components parameters as {@link Map} which key is the
-     * parameter name and the value is the actual thingy
-     */
-    protected Map<String, Object> getParameters()
-    {
-        return parameters;
+  /**
+   * @return the components parameters as {@link Map} which key is the parameter name and the value is the actual thingy
+   */
+  protected Map<String, Object> getParameters() {
+    return parameters;
+  }
+
+  public void setParameters(Map<String, Object> parameters) {
+    this.parameters = normalize(parameters);
+  }
+
+  /**
+   * Constructs a {@link ResolverSet} from the output of {@link #getParameters()}, using {@link #toValueResolver(Object)} to
+   * process the values.
+   *
+   * @return a {@link ResolverSet}
+   * @throws {@link ConfigurationException} if the exclusiveness condition between parameters is not honored
+   */
+  protected ResolverSet getParametersAsResolverSet(EnrichableModel model) throws ConfigurationException {
+    ResolverSet resolverSet = new ResolverSet();
+    getParameters().forEach((key, value) -> resolverSet.add(key, toValueResolver(value)));
+    checkParameterGroupExclusivenessForModel(model, getParameters().keySet());
+    return resolverSet;
+  }
+
+  /**
+   * Wraps the {@code value} into a {@link ValueResolver} of the proper type. For example, {@link Collection} and {@link Map}
+   * instances are exposed as {@link CollectionValueResolver} and {@link MapValueResolver} respectively.
+   * <p>
+   * If {@code value} is already a {@link ValueResolver} then it's returned as is.
+   * <p>
+   * Other values (including {@code null}) are wrapped in a {@link StaticValueResolver}.
+   *
+   * @param value the value to expose
+   * @return a {@link ValueResolver}
+   */
+  protected ValueResolver<?> toValueResolver(Object value) {
+    ValueResolver<?> resolver;
+    if (value instanceof ValueResolver) {
+      resolver = (ValueResolver<?>) value;
+    } else if (value instanceof Collection) {
+      resolver = CollectionValueResolver
+          .of((Class<? extends Collection>) value.getClass(),
+              (List) ((Collection) value).stream().map(this::toValueResolver).collect(new ImmutableListCollector()));
+    } else if (value instanceof Map) {
+      Map<Object, Object> map = (Map<Object, Object>) value;
+      Map<ValueResolver<Object>, ValueResolver<Object>> normalizedMap = new LinkedHashMap<>(map.size());
+      map.forEach((key, entryValue) -> normalizedMap.put((ValueResolver<Object>) toValueResolver(key),
+                                                         (ValueResolver<Object>) toValueResolver(entryValue)));
+      resolver = MapValueResolver.of(map.getClass(), copyOf(normalizedMap.keySet()), copyOf(normalizedMap.values()));
+    } else {
+      resolver = new StaticValueResolver<>(value);
     }
+    return resolver;
+  }
 
-    public void setParameters(Map<String, Object> parameters)
-    {
-        this.parameters = normalize(parameters);
-    }
+  private Map<String, Object> normalize(Map<String, Object> parameters) {
+    Map<String, Object> normalized = new HashMap<>();
 
-    /**
-     * Constructs a {@link ResolverSet} from the output of {@link #getParameters()},
-     * using {@link #toValueResolver(Object)} to process the values.
-     *
-     * @return a {@link ResolverSet}
-     * @throws {@link ConfigurationException} if the exclusiveness condition between parameters is not honored
-     */
-    protected ResolverSet getParametersAsResolverSet(EnrichableModel model) throws ConfigurationException
-    {
-        ResolverSet resolverSet = new ResolverSet();
-        getParameters().forEach((key, value) -> resolverSet.add(key, toValueResolver(value)));
-        checkParameterGroupExclusivenessForModel(model, getParameters().keySet());
-        return resolverSet;
-    }
+    parameters.forEach((key, value) -> {
+      String normalizedKey = key;
 
-    /**
-     * Wraps the {@code value} into a {@link ValueResolver} of the proper type.
-     * For example, {@link Collection} and {@link Map} instances are exposed as
-     * {@link CollectionValueResolver} and {@link MapValueResolver} respectively.
-     * <p>
-     * If {@code value} is already a {@link ValueResolver} then it's returned as is.
-     * <p>
-     * Other values (including {@code null}) are wrapped in a {@link StaticValueResolver}.
-     *
-     * @param value the value to expose
-     * @return a {@link ValueResolver}
-     */
-    protected ValueResolver<?> toValueResolver(Object value)
-    {
-        ValueResolver<?> resolver;
-        if (value instanceof ValueResolver)
-        {
-            resolver = (ValueResolver<?>) value;
+      if (isChildKey(key)) {
+        normalizedKey = unwrapChildKey(key);
+        normalized.put(normalizedKey, value);
+      } else {
+        if (!normalized.containsKey(normalizedKey)) {
+          normalized.put(normalizedKey, value);
         }
-        else if (value instanceof Collection)
-        {
-            resolver = CollectionValueResolver.of((Class<? extends Collection>) value.getClass(), (List) ((Collection) value).stream().map(this::toValueResolver).collect(new ImmutableListCollector()));
-        }
-        else if (value instanceof Map)
-        {
-            Map<Object, Object> map = (Map<Object, Object>) value;
-            Map<ValueResolver<Object>, ValueResolver<Object>> normalizedMap = new LinkedHashMap<>(map.size());
-            map.forEach((key, entryValue) -> normalizedMap.put((ValueResolver<Object>) toValueResolver(key), (ValueResolver<Object>) toValueResolver(entryValue)));
-            resolver = MapValueResolver.of(map.getClass(), copyOf(normalizedMap.keySet()), copyOf(normalizedMap.values()));
-        }
-        else
-        {
-            resolver = new StaticValueResolver<>(value);
-        }
-        return resolver;
+      }
+    });
+
+    return normalized;
+  }
+
+  private boolean isChildKey(String key) {
+    return key.startsWith(CHILD_ELEMENT_KEY_PREFIX) && key.endsWith(CHILD_ELEMENT_KEY_SUFFIX);
+  }
+
+  private String unwrapChildKey(String key) {
+    return key.replaceAll(CHILD_ELEMENT_KEY_PREFIX, "").replaceAll(CHILD_ELEMENT_KEY_SUFFIX, "");
+  }
+
+  private void checkParameterGroupExclusivenessForModel(EnrichableModel model, Set<String> resolverKeys)
+      throws ConfigurationException {
+    Optional<ParameterGroupModelProperty> parameterGroupModelProperty =
+        model.getModelProperty(ParameterGroupModelProperty.class).filter(mp -> mp.hasExclusiveOptionals());
+    if (parameterGroupModelProperty.isPresent()) {
+      checkParameterGroupExclusiveness(model, parameterGroupModelProperty.get(), resolverKeys);
     }
+  }
 
-    private Map<String, Object> normalize(Map<String, Object> parameters)
-    {
-        Map<String, Object> normalized = new HashMap<>();
+  private void checkParameterGroupExclusiveness(EnrichableModel model, ParameterGroupModelProperty parameterGroupModelProperty,
+                                                Set<String> resolverKeys)
+      throws ConfigurationException {
+    for (ParameterGroup<?> group : parameterGroupModelProperty.getGroups()) {
+      Set<String> parametersFromGroup = group.getOptionalParameters().stream().map(p -> p.getName())
+          .filter(name -> resolverKeys.contains(name)).collect(toSet());
 
-        parameters.forEach((key, value) -> {
-            String normalizedKey = key;
+      if (parametersFromGroup.size() > 1) {
+        throw new ConfigurationException(createStaticMessage(format("In %s '%s', the following parameters cannot be set at the same: [%s]",
+                                                                    getComponentModelTypeName(model), getModelName(model),
+                                                                    Joiner.on(", ").join(parametersFromGroup))));
+      }
 
-            if (isChildKey(key))
-            {
-                normalizedKey = unwrapChildKey(key);
-                normalized.put(normalizedKey, value);
-            }
-            else
-            {
-                if (!normalized.containsKey(normalizedKey))
-                {
-                    normalized.put(normalizedKey, value);
-                }
-            }
-        });
-
-        return normalized;
+      if (group.isOneRequired() && parametersFromGroup.isEmpty()) {
+        throw new ConfigurationException((createStaticMessage(format("Parameter group '%s' requires that one of its optional parameters should be set but all of them are missing",
+                                                                     group.getType().getName()))));
+      }
     }
-
-    private boolean isChildKey(String key)
-    {
-        return key.startsWith(CHILD_ELEMENT_KEY_PREFIX) && key.endsWith(CHILD_ELEMENT_KEY_SUFFIX);
-    }
-
-    private String unwrapChildKey(String key)
-    {
-        return key.replaceAll(CHILD_ELEMENT_KEY_PREFIX, "").replaceAll(CHILD_ELEMENT_KEY_SUFFIX, "");
-    }
-
-    private void checkParameterGroupExclusivenessForModel(EnrichableModel model, Set<String> resolverKeys) throws ConfigurationException
-    {
-        Optional<ParameterGroupModelProperty> parameterGroupModelProperty = model.getModelProperty(ParameterGroupModelProperty.class).filter(mp -> mp.hasExclusiveOptionals());
-        if (parameterGroupModelProperty.isPresent())
-        {
-            checkParameterGroupExclusiveness(model, parameterGroupModelProperty.get(), resolverKeys);
-        }
-    }
-
-    private void checkParameterGroupExclusiveness(EnrichableModel model, ParameterGroupModelProperty parameterGroupModelProperty, Set<String> resolverKeys) throws ConfigurationException
-    {
-        for (ParameterGroup<?> group : parameterGroupModelProperty.getGroups())
-        {
-            Set<String> parametersFromGroup = group.getOptionalParameters().stream()
-                    .map(p -> p.getName())
-                    .filter(name -> resolverKeys.contains(name))
-                    .collect(toSet());
-
-            if (parametersFromGroup.size() > 1)
-            {
-                throw new ConfigurationException(createStaticMessage(format("In %s '%s', the following parameters cannot be set at the same: [%s]",
-                                                                            getComponentModelTypeName(model), getModelName(model), Joiner.on(", ").join(parametersFromGroup))));
-            }
-
-            if (group.isOneRequired() && parametersFromGroup.isEmpty())
-            {
-                throw new ConfigurationException((createStaticMessage(format("Parameter group '%s' requires that one of its optional parameters should be set but all of them are missing", group.getType().getName()))));
-            }
-        }
-    }
+  }
 }

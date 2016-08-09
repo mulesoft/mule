@@ -10,15 +10,14 @@ import org.mule.runtime.config.spring.parsers.MuleDefinitionParser;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 
-public interface DynamicAttributeDefinitionParser extends MuleDefinitionParser
-{
+public interface DynamicAttributeDefinitionParser extends MuleDefinitionParser {
 
-    void setAttributeName(String attributeName);
+  void setAttributeName(String attributeName);
 
-    /**
-     * This is implemented in {@link org.mule.runtime.config.spring.parsers.AbstractHierarchicalDefinitionParser}
-     * and allows us to "fake" a parent when processing the same element.
-     */
-    void forceParent(BeanDefinition parent);
+  /**
+   * This is implemented in {@link org.mule.runtime.config.spring.parsers.AbstractHierarchicalDefinitionParser} and allows us to
+   * "fake" a parent when processing the same element.
+   */
+  void forceParent(BeanDefinition parent);
 
 }

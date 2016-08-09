@@ -26,116 +26,88 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Base class for RetryPolicyTemplate implementations.  Uses ConnectNotifier as RetryNotifier
- * by default.
+ * Base class for RetryPolicyTemplate implementations. Uses ConnectNotifier as RetryNotifier by default.
  */
-public abstract class AbstractPolicyTemplate implements RetryPolicyTemplate, MuleContextAware
-{
-    protected RetryNotifier notifier = new ConnectNotifier();
-    
-    /** This data will be made available to the RetryPolicy via the RetryContext. */
-    private Map<Object, Object> metaInfo;
+public abstract class AbstractPolicyTemplate implements RetryPolicyTemplate, MuleContextAware {
 
-    private MuleContext muleContext;
+  protected RetryNotifier notifier = new ConnectNotifier();
 
-    protected transient final Logger logger = LoggerFactory.getLogger(getClass());
+  /** This data will be made available to the RetryPolicy via the RetryContext. */
+  private Map<Object, Object> metaInfo;
 
-    public void setMuleContext(MuleContext context)
-    {
-        this.muleContext = context;
-    }
+  private MuleContext muleContext;
 
-    public RetryContext execute(RetryCallback callback, WorkManager workManager) throws Exception
-    {
-        PolicyStatus status = null;
-        RetryPolicy policy = createRetryInstance();
-        DefaultRetryContext context = new DefaultRetryContext(callback.getWorkDescription(), 
-            metaInfo);
-        context.setMuleContext(muleContext);
+  protected transient final Logger logger = LoggerFactory.getLogger(getClass());
 
-        try
-        {
-            Exception cause = null;
-            do
-            {
-                try
-                {
-                    callback.doWork(context);
-                    if (notifier != null)
-                    {
-                        notifier.onSuccess(context);
-                    }
-                    break;
-                }
-                catch (Exception e)
-                {
-                    cause = e;
-                    if (logger.isDebugEnabled())
-                    {
-                        logger.debug("Error executing policy", cause);
-                    }
-                    if (notifier != null)
-                    {
-                        notifier.onFailure(context, cause);
-                    }
-                    if (cause instanceof InterruptedException || cause instanceof InterruptedIOException)
-                    {
-                        logger.error("Process was interrupted (InterruptedException), ceasing process");
-                        break;
-                    }
-                    else
-                    {
-                        status = policy.applyPolicy(cause);
-                    }
-                }
-            }
-            while (status.isOk());
+  public void setMuleContext(MuleContext context) {
+    this.muleContext = context;
+  }
 
-            if (status == null || status.isOk())
-            {
-                return context;
-            }
-            else
-            {
-                context.setFailed(cause);
-                throw new RetryPolicyExhaustedException(cause, callback.getWorkOwner());
-            }
+  public RetryContext execute(RetryCallback callback, WorkManager workManager) throws Exception {
+    PolicyStatus status = null;
+    RetryPolicy policy = createRetryInstance();
+    DefaultRetryContext context = new DefaultRetryContext(callback.getWorkDescription(), metaInfo);
+    context.setMuleContext(muleContext);
+
+    try {
+      Exception cause = null;
+      do {
+        try {
+          callback.doWork(context);
+          if (notifier != null) {
+            notifier.onSuccess(context);
+          }
+          break;
+        } catch (Exception e) {
+          cause = e;
+          if (logger.isDebugEnabled()) {
+            logger.debug("Error executing policy", cause);
+          }
+          if (notifier != null) {
+            notifier.onFailure(context, cause);
+          }
+          if (cause instanceof InterruptedException || cause instanceof InterruptedIOException) {
+            logger.error("Process was interrupted (InterruptedException), ceasing process");
+            break;
+          } else {
+            status = policy.applyPolicy(cause);
+          }
         }
-        finally
-        {
-            if (status != null && status.getThrowable() != null)
-            {
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("Error executing policy", status.getThrowable());
-                }
-            }
+      } while (status.isOk());
+
+      if (status == null || status.isOk()) {
+        return context;
+      } else {
+        context.setFailed(cause);
+        throw new RetryPolicyExhaustedException(cause, callback.getWorkOwner());
+      }
+    } finally {
+      if (status != null && status.getThrowable() != null) {
+        if (logger.isDebugEnabled()) {
+          logger.debug("Error executing policy", status.getThrowable());
         }
+      }
     }
-    
-    public RetryNotifier getNotifier()
-    {
-        return notifier;
-    }
+  }
 
-    public void setNotifier(RetryNotifier retryNotifier)
-    {
-        this.notifier = retryNotifier;
-    }
+  public RetryNotifier getNotifier() {
+    return notifier;
+  }
 
-    public Map<Object, Object> getMetaInfo()
-    {
-        return metaInfo;
-    }
+  public void setNotifier(RetryNotifier retryNotifier) {
+    this.notifier = retryNotifier;
+  }
 
-    public void setMetaInfo(Map<Object, Object> metaInfo)
-    {
-        this.metaInfo = metaInfo;
-    }
+  public Map<Object, Object> getMetaInfo() {
+    return metaInfo;
+  }
 
-    // For Spring IoC only
-    public void setId(String id)
-    {
-        // ignore
-    }
+  public void setMetaInfo(Map<Object, Object> metaInfo) {
+    this.metaInfo = metaInfo;
+  }
+
+  // For Spring IoC only
+  public void setId(String id) {
+    // ignore
+  }
 }

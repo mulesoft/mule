@@ -7,40 +7,35 @@
 package org.mule.runtime.module.spring.security.config;
 
 /**
- * Holder for the values configured in a security property within a
- * security manager.
+ * Holder for the values configured in a security property within a security manager.
  *
  * @since 4.0
  */
-public class SecurityProperty
-{
+public class SecurityProperty {
 
-    private String name;
-    private String value;
+  private String name;
+  private String value;
 
-    /**
-     * @param name property name
-     * @param value property value
-     */
-    public SecurityProperty(String name, String value)
-    {
-        this.name = name;
-        this.value = value;
-    }
+  /**
+   * @param name property name
+   * @param value property value
+   */
+  public SecurityProperty(String name, String value) {
+    this.name = name;
+    this.value = value;
+  }
 
-    /**
-     * @return property name
-     */
-    public String getName()
-    {
-        return name;
-    }
+  /**
+   * @return property name
+   */
+  public String getName() {
+    return name;
+  }
 
-    /**
-     * @return property value
-     */
-    public String getValue()
-    {
-        return value;
-    }
+  /**
+   * @return property value
+   */
+  public String getValue() {
+    return value;
+  }
 }

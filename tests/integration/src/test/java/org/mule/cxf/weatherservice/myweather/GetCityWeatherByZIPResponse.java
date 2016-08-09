@@ -14,9 +14,11 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for anonymous complex type.
+ * <p>
+ * Java class for anonymous complex type.
  *
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>
+ * The following schema fragment specifies the expected content contained within this class.
  *
  * <pre>
  * &lt;complexType>
@@ -33,37 +35,31 @@ import javax.xml.bind.annotation.XmlType;
  *
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = {
-    "getCityWeatherByZIPResult"
-})
+@XmlType(name = "", propOrder = {"getCityWeatherByZIPResult"})
 @XmlRootElement(name = "GetCityWeatherByZIPResponse", namespace = "http://ws.cdyne.com/WeatherWS/")
 public class GetCityWeatherByZIPResponse {
 
-    @XmlElement(name = "GetCityWeatherByZIPResult", namespace = "http://ws.cdyne.com/WeatherWS/", required = true)
-    protected WeatherReturn getCityWeatherByZIPResult;
+  @XmlElement(name = "GetCityWeatherByZIPResult", namespace = "http://ws.cdyne.com/WeatherWS/", required = true)
+  protected WeatherReturn getCityWeatherByZIPResult;
 
-    /**
-     * Gets the value of the getCityWeatherByZIPResult property.
-     *
-     * @return
-     *     possible object is
-     *     {@link WeatherReturn }
-     *
-     */
-    public WeatherReturn getGetCityWeatherByZIPResult() {
-        return getCityWeatherByZIPResult;
-    }
+  /**
+   * Gets the value of the getCityWeatherByZIPResult property.
+   *
+   * @return possible object is {@link WeatherReturn }
+   *
+   */
+  public WeatherReturn getGetCityWeatherByZIPResult() {
+    return getCityWeatherByZIPResult;
+  }
 
-    /**
-     * Sets the value of the getCityWeatherByZIPResult property.
-     *
-     * @param value
-     *     allowed object is
-     *     {@link WeatherReturn }
-     *
-     */
-    public void setGetCityWeatherByZIPResult(WeatherReturn value) {
-        this.getCityWeatherByZIPResult = value;
-    }
+  /**
+   * Sets the value of the getCityWeatherByZIPResult property.
+   *
+   * @param value allowed object is {@link WeatherReturn }
+   *
+   */
+  public void setGetCityWeatherByZIPResult(WeatherReturn value) {
+    this.getCityWeatherByZIPResult = value;
+  }
 
 }

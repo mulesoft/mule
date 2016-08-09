@@ -13,35 +13,30 @@ import org.mule.runtime.core.api.MuleEvent;
 
 import org.junit.Test;
 
-public class NoParamsFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase
-{
+public class NoParamsFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "no-params-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "no-params-config.xml";
+  }
 
-    @Test
-    public void payloadIsIgnoredOperationNoParams() throws Exception
-    {
-        MuleEvent event = flowRunner("noParams").withPayload(TEST_MESSAGE).run();
-        String expectedResponse = "<ns:noParamsResponse xmlns:ns=\"http://consumer.ws.module.runtime.mule.org/\">" +
-                                  "<text>TEST</text></ns:noParamsResponse>";
-        assertXMLEqual(expectedResponse, getPayloadAsString(event.getMessage()));
-    }
+  @Test
+  public void payloadIsIgnoredOperationNoParams() throws Exception {
+    MuleEvent event = flowRunner("noParams").withPayload(TEST_MESSAGE).run();
+    String expectedResponse = "<ns:noParamsResponse xmlns:ns=\"http://consumer.ws.module.runtime.mule.org/\">"
+        + "<text>TEST</text></ns:noParamsResponse>";
+    assertXMLEqual(expectedResponse, getPayloadAsString(event.getMessage()));
+  }
 
-    @Test
-    public void payloadIsIgnoredOperationNoParamsWithHeaders() throws Exception
-    {
-        String header = "<header xmlns=\"http://consumer.ws.module.runtime.mule.org/\">HEADER_VALUE</header>";
-        MuleEvent event = flowRunner("noParamsWithHeader").withPayload(TEST_MESSAGE)
-                                                          .withOutboundProperty("soap.header", header)
-                                                          .run();
+  @Test
+  public void payloadIsIgnoredOperationNoParamsWithHeaders() throws Exception {
+    String header = "<header xmlns=\"http://consumer.ws.module.runtime.mule.org/\">HEADER_VALUE</header>";
+    MuleEvent event =
+        flowRunner("noParamsWithHeader").withPayload(TEST_MESSAGE).withOutboundProperty("soap.header", header).run();
 
-        String expectedResponse = "<ns2:noParamsWithHeaderResponse xmlns:ns2=\"http://consumer.ws.module.runtime.mule.org/\">" +
-                                  "<text>HEADER_VALUE</text></ns2:noParamsWithHeaderResponse>";
-        assertXMLEqual(expectedResponse, getPayloadAsString(event.getMessage()));
-    }
+    String expectedResponse = "<ns2:noParamsWithHeaderResponse xmlns:ns2=\"http://consumer.ws.module.runtime.mule.org/\">"
+        + "<text>HEADER_VALUE</text></ns2:noParamsWithHeaderResponse>";
+    assertXMLEqual(expectedResponse, getPayloadAsString(event.getMessage()));
+  }
 
 }

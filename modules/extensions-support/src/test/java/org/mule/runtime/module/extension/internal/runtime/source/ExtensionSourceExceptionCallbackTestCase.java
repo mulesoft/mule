@@ -20,28 +20,25 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class ExtensionSourceExceptionCallbackTestCase extends AbstractMuleTestCase
-{
+public class ExtensionSourceExceptionCallbackTestCase extends AbstractMuleTestCase {
 
-    @Mock
-    private MuleEvent event;
+  @Mock
+  private MuleEvent event;
 
-    @Mock
-    private ResponseCompletionCallback responseCallback;
+  @Mock
+  private ResponseCompletionCallback responseCallback;
 
-    private ExtensionSourceExceptionCallback callback;
+  private ExtensionSourceExceptionCallback callback;
 
-    @Before
-    public void before()
-    {
-        callback = new ExtensionSourceExceptionCallback(responseCallback, event);
-    }
+  @Before
+  public void before() {
+    callback = new ExtensionSourceExceptionCallback(responseCallback, event);
+  }
 
-    @Test
-    public void onException()
-    {
-        final Exception exception = new Exception();
-        callback.onException(exception);
-        verify(responseCallback).responseSentWithFailure(exception, event);
-    }
+  @Test
+  public void onException() {
+    final Exception exception = new Exception();
+    callback.onException(exception);
+    verify(responseCallback).responseSentWithFailure(exception, event);
+  }
 }

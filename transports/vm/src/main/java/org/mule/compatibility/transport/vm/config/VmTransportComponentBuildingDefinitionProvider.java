@@ -30,41 +30,37 @@ import java.util.List;
  *
  * @since 4.0
  */
-public class VmTransportComponentBuildingDefinitionProvider extends TransportComponentBuildingDefinitionProvider
-{
+public class VmTransportComponentBuildingDefinitionProvider extends TransportComponentBuildingDefinitionProvider {
 
-    private ComponentBuildingDefinition.Builder baseDefinition;
+  private ComponentBuildingDefinition.Builder baseDefinition;
 
-    @Override
-    public void init(MuleContext muleContext)
-    {
-        baseDefinition = new ComponentBuildingDefinition.Builder().withNamespace(VM_TRANSPORT_NAMESPACE);
-    }
+  @Override
+  public void init(MuleContext muleContext) {
+    baseDefinition = new ComponentBuildingDefinition.Builder().withNamespace(VM_TRANSPORT_NAMESPACE);
+  }
 
-    @Override
-    public List<ComponentBuildingDefinition> getComponentBuildingDefinitions()
-    {
-        List<ComponentBuildingDefinition> componentBuildingDefinitions = new ArrayList<>();
-        componentBuildingDefinitions.add(getOutboundEndpointBuildingDefinitionBuilder().withNamespace(VM_TRANSPORT_NAMESPACE).build());
-        componentBuildingDefinitions.add(getInboundEndpointBuildingDefinitionBuilder().withNamespace(VM_TRANSPORT_NAMESPACE).build());
-        componentBuildingDefinitions.add(getEndpointBuildingDefinitionBuilder().withNamespace(VM_TRANSPORT_NAMESPACE).build());
-        componentBuildingDefinitions.add(getBaseTransactionDefinitionBuilder().withNamespace(VM_TRANSPORT_NAMESPACE)
-                                                 .withSetterParameterDefinition("factory", fromFixedValue(new VMTransactionFactory()).build()).build());
-        componentBuildingDefinitions.add(getBaseConnector()
-                                                 .withTypeDefinition(fromType(VMConnector.class)).withNamespace(VM_TRANSPORT_NAMESPACE)
-                                                 .withSetterParameterDefinition("queueProfile", fromChildConfiguration(QueueProfile.class).build())
-                                                 .withSetterParameterDefinition("queueTimeout", fromSimpleParameter("queueTimeout").build())
-                                                 .build());
+  @Override
+  public List<ComponentBuildingDefinition> getComponentBuildingDefinitions() {
+    List<ComponentBuildingDefinition> componentBuildingDefinitions = new ArrayList<>();
+    componentBuildingDefinitions
+        .add(getOutboundEndpointBuildingDefinitionBuilder().withNamespace(VM_TRANSPORT_NAMESPACE).build());
+    componentBuildingDefinitions.add(getInboundEndpointBuildingDefinitionBuilder().withNamespace(VM_TRANSPORT_NAMESPACE).build());
+    componentBuildingDefinitions.add(getEndpointBuildingDefinitionBuilder().withNamespace(VM_TRANSPORT_NAMESPACE).build());
+    componentBuildingDefinitions.add(getBaseTransactionDefinitionBuilder().withNamespace(VM_TRANSPORT_NAMESPACE)
+        .withSetterParameterDefinition("factory", fromFixedValue(new VMTransactionFactory()).build()).build());
+    componentBuildingDefinitions
+        .add(getBaseConnector().withTypeDefinition(fromType(VMConnector.class)).withNamespace(VM_TRANSPORT_NAMESPACE)
+            .withSetterParameterDefinition("queueProfile", fromChildConfiguration(QueueProfile.class).build())
+            .withSetterParameterDefinition("queueTimeout", fromSimpleParameter("queueTimeout").build()).build());
 
-        ComponentBuildingDefinition.Builder baseQueueProfileBuilder = baseDefinition.copy()
-                .withTypeDefinition(fromType(QueueProfile.class))
-                .withObjectFactoryType(QueueProfileFactoryBean.class)
-                .withSetterParameterDefinition("maxOutstandingMessages", fromSimpleParameter("maxOutstandingMessages").build())
-                .withSetterParameterDefinition("muleContext", fromReferenceObject(MuleContext.class).build())
-                .withSetterParameterDefinition("queueStore", fromChildConfiguration(ObjectStore.class).build());
-        componentBuildingDefinitions.add(baseQueueProfileBuilder.copy().withIdentifier("queueProfile").build());
-        componentBuildingDefinitions.add(baseQueueProfileBuilder.copy().withIdentifier("queue-profile").build());
+    ComponentBuildingDefinition.Builder baseQueueProfileBuilder = baseDefinition.copy()
+        .withTypeDefinition(fromType(QueueProfile.class)).withObjectFactoryType(QueueProfileFactoryBean.class)
+        .withSetterParameterDefinition("maxOutstandingMessages", fromSimpleParameter("maxOutstandingMessages").build())
+        .withSetterParameterDefinition("muleContext", fromReferenceObject(MuleContext.class).build())
+        .withSetterParameterDefinition("queueStore", fromChildConfiguration(ObjectStore.class).build());
+    componentBuildingDefinitions.add(baseQueueProfileBuilder.copy().withIdentifier("queueProfile").build());
+    componentBuildingDefinitions.add(baseQueueProfileBuilder.copy().withIdentifier("queue-profile").build());
 
-        return componentBuildingDefinitions;
-    }
+    return componentBuildingDefinitions;
+  }
 }

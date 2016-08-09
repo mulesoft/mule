@@ -21,10 +21,13 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for namedGroup complex type.
+ * <p>
+ * Java class for namedGroup complex type.
  * <p/>
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>
+ * The following schema fragment specifies the expected content contained within this class.
  * <p/>
+ * 
  * <pre>
  * &lt;complexType name="namedGroup">
  *   &lt;complexContent>
@@ -55,35 +58,29 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "namedGroup")
-public class NamedGroup extends RealGroup
-{
+public class NamedGroup extends RealGroup {
 
-    protected ExplicitGroup choice;
+  protected ExplicitGroup choice;
 
 
-    /**
-     * Gets the value of the choice property.
-     *
-     * @return possible object is
-     * {@link ExplicitGroup }
-     */
-    public ExplicitGroup getChoice()
-    {
-        if (choice == null)
-        {
-            choice = new ExplicitGroup();
-        }
-        return choice;
+  /**
+   * Gets the value of the choice property.
+   *
+   * @return possible object is {@link ExplicitGroup }
+   */
+  public ExplicitGroup getChoice() {
+    if (choice == null) {
+      choice = new ExplicitGroup();
     }
+    return choice;
+  }
 
-    /**
-     * Sets the value of the choice property.
-     *
-     * @param value allowed object is
-     *              {@link ExplicitGroup }
-     */
-    public void setChoice(ExplicitGroup value)
-    {
-        this.choice = value;
-    }
+  /**
+   * Sets the value of the choice property.
+   *
+   * @param value allowed object is {@link ExplicitGroup }
+   */
+  public void setChoice(ExplicitGroup value) {
+    this.choice = value;
+  }
 }

@@ -7,22 +7,20 @@
 package org.mule.runtime.core.api.processor;
 
 /**
- * A component capable of generating names for staged queues.
- * Subsequent invocations to {@link #getName()} are not required to consistently
- * return the same value. On the contrary, there cases in which implementations will need not to do that.
+ * A component capable of generating names for staged queues. Subsequent invocations to {@link #getName()} are not required to
+ * consistently return the same value. On the contrary, there cases in which implementations will need not to do that.
  * Implementations of this interface should be thread-safe
  *
  * @since 3.5.0
  */
-public interface StageNameSource
-{
+public interface StageNameSource {
 
-    /**
-     * Generates the name for a staged queue. Subsequent invocations
-     * to this method are not required to consistently return the same value
-     *
-     * @return a {@link java.lang.String}
-     */
-    public String getName();
+  /**
+   * Generates the name for a staged queue. Subsequent invocations to this method are not required to consistently return the same
+   * value
+   *
+   * @return a {@link java.lang.String}
+   */
+  public String getName();
 
 }

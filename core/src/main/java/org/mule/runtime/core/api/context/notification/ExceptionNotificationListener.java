@@ -10,11 +10,10 @@ import org.mule.runtime.core.context.notification.ExceptionNotification;
 
 
 /**
- * <code>ExceptionNotificationListener</code> is an observer interface that
- * objects can implement and then register themselves with the Mule manager to be
- * notified when a Exception event occurs.
+ * <code>ExceptionNotificationListener</code> is an observer interface that objects can implement and then register themselves
+ * with the Mule manager to be notified when a Exception event occurs.
  */
-public interface ExceptionNotificationListener<T extends ExceptionNotification> extends ServerNotificationListener<ExceptionNotification>
-{
-    // no methods
+public interface ExceptionNotificationListener<T extends ExceptionNotification>
+    extends ServerNotificationListener<ExceptionNotification> {
+  // no methods
 }

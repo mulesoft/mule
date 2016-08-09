@@ -18,117 +18,89 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class CommandServer
-{
+public class CommandServer {
 
-    public static final String MULE_CONTEXT_STARTED_COMMAND = "MuleContext:started";
-    private final Logger logger = LoggerFactory.getLogger(CommandServer.class);
-    private final int serverPort;
+  public static final String MULE_CONTEXT_STARTED_COMMAND = "MuleContext:started";
+  private final Logger logger = LoggerFactory.getLogger(CommandServer.class);
+  private final int serverPort;
 
-    private ServerSocket commandSocket;
-    private List<String> pendingCommands = new ArrayList<String>();
-    private CommandListener commandListener;
-    private Thread commandServerThread;
+  private ServerSocket commandSocket;
+  private List<String> pendingCommands = new ArrayList<String>();
+  private CommandListener commandListener;
+  private Thread commandServerThread;
 
-    public CommandServer(int serverPort)
-    {
-        this.serverPort = serverPort;
+  public CommandServer(int serverPort) {
+    this.serverPort = serverPort;
+  }
+
+  public synchronized void setCommandListener(CommandListener commandListener) {
+    this.commandListener = commandListener;
+    for (String command : pendingCommands) {
+      this.commandListener.commandReceived(command);
     }
+  }
 
-    public synchronized void setCommandListener(CommandListener commandListener)
-    {
-        this.commandListener = commandListener;
-        for (String command : pendingCommands)
-        {
-            this.commandListener.commandReceived(command);
-        }
-    }
+  public void start() throws IOException {
+    logger.debug("Trying to create server socket for command service to port: " + serverPort);
+    commandSocket = new ServerSocket(serverPort, 0, InetAddress.getByName("localhost"));
+    commandServerThread = new Thread("Command-Server") {
 
-    public void start() throws IOException
-    {
-        logger.debug("Trying to create server socket for command service to port: " + serverPort);
-        commandSocket = new ServerSocket(serverPort, 0, InetAddress.getByName("localhost"));
-        commandServerThread = new Thread("Command-Server")
-        {
-            @Override
-            public void run()
-            {
-                try
-                {
-                    Socket processClientConnection = commandSocket.accept();
-                    BufferedReader processClientLogEntriesInputStream = new BufferedReader(new InputStreamReader(processClientConnection.getInputStream()));
-                    while (!Thread.interrupted())
-                    {
-                        String commandLine = processClientLogEntriesInputStream.readLine();
-                        if (commandLine == null)
-                        {
-                            try
-                            {
-                                Thread.sleep(200);
-                            }
-                            catch (InterruptedException e)
-                            {
-                                return;
-                            }
-                        }
-                        else
-                        {
-                            logger.info("Command from external process received: " + commandLine);
-                            synchronized (this)
-                            {
-                                if (commandListener == null)
-                                {
-                                    pendingCommands.add(commandLine);
-                                }
-                                else
-                                {
-                                    commandListener.commandReceived(commandLine);
-                                }
-                            }
-                        }
-                    }
+      @Override
+      public void run() {
+        try {
+          Socket processClientConnection = commandSocket.accept();
+          BufferedReader processClientLogEntriesInputStream =
+              new BufferedReader(new InputStreamReader(processClientConnection.getInputStream()));
+          while (!Thread.interrupted()) {
+            String commandLine = processClientLogEntriesInputStream.readLine();
+            if (commandLine == null) {
+              try {
+                Thread.sleep(200);
+              } catch (InterruptedException e) {
+                return;
+              }
+            } else {
+              logger.info("Command from external process received: " + commandLine);
+              synchronized (this) {
+                if (commandListener == null) {
+                  pendingCommands.add(commandLine);
+                } else {
+                  commandListener.commandReceived(commandLine);
                 }
-                catch (IOException e)
-                {
-                    throw new RuntimeException(e);
-                }
-                finally
-                {
-                    closeQuietly(commandSocket);
-                }
+              }
             }
-        };
-        commandServerThread.setDaemon(true);
-        commandServerThread.start();
-    }
-
-    private void closeQuietly(ServerSocket loggerSocket)
-    {
-        try
-        {
-            if (loggerSocket != null)
-            {
-                loggerSocket.close();
-            }
+          }
+        } catch (IOException e) {
+          throw new RuntimeException(e);
+        } finally {
+          closeQuietly(commandSocket);
         }
-        catch (Exception e)
-        {
-            //Do nothing.
-        }
+      }
+    };
+    commandServerThread.setDaemon(true);
+    commandServerThread.start();
+  }
+
+  private void closeQuietly(ServerSocket loggerSocket) {
+    try {
+      if (loggerSocket != null) {
+        loggerSocket.close();
+      }
+    } catch (Exception e) {
+      // Do nothing.
     }
+  }
 
-    public void stop()
-    {
-        closeQuietly(commandSocket);
-        if (commandServerThread != null)
-        {
-            commandServerThread.interrupt();
-        }
+  public void stop() {
+    closeQuietly(commandSocket);
+    if (commandServerThread != null) {
+      commandServerThread.interrupt();
     }
+  }
 
-    public interface CommandListener {
+  public interface CommandListener {
 
-        void commandReceived(String command);
+    void commandReceived(String command);
 
-    }
+  }
 }

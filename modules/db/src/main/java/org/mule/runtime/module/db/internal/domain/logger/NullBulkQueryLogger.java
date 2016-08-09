@@ -10,12 +10,10 @@ package org.mule.runtime.module.db.internal.domain.logger;
 /**
  * Null implementation of {@link BulkQueryLogger}
  */
-public class NullBulkQueryLogger extends AbstractNullQueryLogger implements BulkQueryLogger
-{
+public class NullBulkQueryLogger extends AbstractNullQueryLogger implements BulkQueryLogger {
 
-    @Override
-    public void addQuery(String query)
-    {
-        // Do nothing
-    }
+  @Override
+  public void addQuery(String query) {
+    // Do nothing
+  }
 }

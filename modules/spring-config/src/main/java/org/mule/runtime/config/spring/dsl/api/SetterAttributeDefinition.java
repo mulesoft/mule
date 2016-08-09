@@ -13,36 +13,32 @@ package org.mule.runtime.config.spring.dsl.api;
  *
  * @since 4.0
  */
-public class SetterAttributeDefinition
-{
+public class SetterAttributeDefinition {
 
-    private String attributeName;
-    private AttributeDefinition attributeDefinition;
+  private String attributeName;
+  private AttributeDefinition attributeDefinition;
 
-    /**
-     * @param attributeName name of the attribute to be set
-     * @param attributeDefinition definition of the attribute to be set
-     */
-    public SetterAttributeDefinition(String attributeName, AttributeDefinition attributeDefinition)
-    {
-        this.attributeName = attributeName;
-        this.attributeDefinition = attributeDefinition;
-    }
+  /**
+   * @param attributeName name of the attribute to be set
+   * @param attributeDefinition definition of the attribute to be set
+   */
+  public SetterAttributeDefinition(String attributeName, AttributeDefinition attributeDefinition) {
+    this.attributeName = attributeName;
+    this.attributeDefinition = attributeDefinition;
+  }
 
-    /**
-     * @return the object attribute name
-     */
-    public String getAttributeName()
-    {
-        return attributeName;
-    }
+  /**
+   * @return the object attribute name
+   */
+  public String getAttributeName() {
+    return attributeName;
+  }
 
-    /**
-     * @return the object attribute definition
-     */
-    public AttributeDefinition getAttributeDefinition()
-    {
-        return attributeDefinition;
-    }
+  /**
+   * @return the object attribute definition
+   */
+  public AttributeDefinition getAttributeDefinition() {
+    return attributeDefinition;
+  }
 
 }

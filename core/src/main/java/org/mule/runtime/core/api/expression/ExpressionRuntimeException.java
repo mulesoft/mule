@@ -10,26 +10,23 @@ import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.config.i18n.Message;
 
 /**
- * If thrown by the {@link org.mule.runtime.core.expression.DefaultExpressionManager} if an expression returns null
- * and failIfNull was set when {@link ExpressionManager#evaluate(String,org.mule.runtime.core.api.MuleMessage,boolean)}
- * was called.
+ * If thrown by the {@link org.mule.runtime.core.expression.DefaultExpressionManager} if an expression returns null and failIfNull
+ * was set when {@link ExpressionManager#evaluate(String,org.mule.runtime.core.api.MuleMessage,boolean)} was called.
  */
-public class ExpressionRuntimeException extends MuleRuntimeException
-{
-    /**
-     * @param message the exception message
-     */
-    public ExpressionRuntimeException(Message message)
-    {
-        super(message);
-    }
+public class ExpressionRuntimeException extends MuleRuntimeException {
 
-    /**
-     * @param message the exception message
-     * @param cause   the exception that triggered this exception
-     */
-    public ExpressionRuntimeException(Message message, Throwable cause)
-    {
-        super(message, cause);
-    }
+  /**
+   * @param message the exception message
+   */
+  public ExpressionRuntimeException(Message message) {
+    super(message);
+  }
+
+  /**
+   * @param message the exception message
+   * @param cause the exception that triggered this exception
+   */
+  public ExpressionRuntimeException(Message message, Throwable cause) {
+    super(message, cause);
+  }
 }

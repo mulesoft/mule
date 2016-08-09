@@ -9,18 +9,15 @@ package org.mule.runtime.module.db.integration.update;
 
 import org.mule.runtime.module.db.integration.model.AbstractTestDatabase;
 
-public class UpdateNamedParamBulkTestCase extends UpdateBulkTestCase
-{
+public class UpdateNamedParamBulkTestCase extends UpdateBulkTestCase {
 
-    public UpdateNamedParamBulkTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public UpdateNamedParamBulkTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/update/update-named-param-bulk-config.xml"};
-    }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/update/update-named-param-bulk-config.xml"};
+  }
 }

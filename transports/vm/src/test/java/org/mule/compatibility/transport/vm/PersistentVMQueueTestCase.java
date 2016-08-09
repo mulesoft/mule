@@ -16,54 +16,48 @@ import org.mule.runtime.core.api.client.MuleClient;
 
 import org.junit.Test;
 
-public class PersistentVMQueueTestCase extends FunctionalTestCase
-{
+public class PersistentVMQueueTestCase extends FunctionalTestCase {
 
-    private static final int RECEIVE_TIMEOUT = 5000;
+  private static final int RECEIVE_TIMEOUT = 5000;
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "vm/persistent-vmqueue-test-flow.xml";
+  @Override
+  protected String getConfigFile() {
+    return "vm/persistent-vmqueue-test-flow.xml";
+  }
+
+  @Test
+  public void testAsynchronousDispatching() throws Exception {
+    String input = "Test message";
+    String[] output = {"Test", "message"};
+
+    MuleClient client = muleContext.getClient();
+    client.dispatch("vm://receiver", input, null);
+    MuleMessage result = client.request("vm://out", RECEIVE_TIMEOUT);
+    assertNotNull(result);
+    assertNotNull(result.getPayload());
+    assertNull(result.getExceptionPayload());
+    String[] payload = (String[]) result.getPayload();
+    assertEquals(output.length, payload.length);
+    for (int i = 0; i < output.length; i++) {
+      assertEquals(output[i], payload[i]);
     }
+  }
 
-    @Test
-    public void testAsynchronousDispatching() throws Exception
-    {
-        String input = "Test message";
-        String[] output = {"Test", "message"};
+  @Test
+  public void testAsynchronousDispatchingInFlow() throws Exception {
+    String input = "Test message";
+    String[] output = {"Test", "message"};
 
-        MuleClient client = muleContext.getClient();
-        client.dispatch("vm://receiver", input, null);
-        MuleMessage result = client.request("vm://out", RECEIVE_TIMEOUT);
-        assertNotNull(result);
-        assertNotNull(result.getPayload());
-        assertNull(result.getExceptionPayload());
-        String[] payload = (String[]) result.getPayload();
-        assertEquals(output.length, payload.length);
-        for (int i = 0; i < output.length; i++)
-        {
-            assertEquals(output[i], payload[i]);
-        }
+    MuleClient client = muleContext.getClient();
+    client.dispatch("vm://flowReceiver", input, null);
+    MuleMessage result = client.request("vm://flowOut", RECEIVE_TIMEOUT);
+    assertNotNull(result);
+    assertNotNull(result.getPayload());
+    assertNull(result.getExceptionPayload());
+    String[] payload = (String[]) result.getPayload();
+    assertEquals(output.length, payload.length);
+    for (int i = 0; i < output.length; i++) {
+      assertEquals(output[i], payload[i]);
     }
-
-    @Test
-    public void testAsynchronousDispatchingInFlow() throws Exception
-    {
-        String input = "Test message";
-        String[] output = {"Test", "message"};
-
-        MuleClient client = muleContext.getClient();
-        client.dispatch("vm://flowReceiver", input, null);
-        MuleMessage result = client.request("vm://flowOut", RECEIVE_TIMEOUT);
-        assertNotNull(result);
-        assertNotNull(result.getPayload());
-        assertNull(result.getExceptionPayload());
-        String[] payload = (String[]) result.getPayload();
-        assertEquals(output.length, payload.length);
-        for (int i = 0; i < output.length; i++)
-        {
-            assertEquals(output[i], payload[i]);
-        }
-    }
+  }
 }

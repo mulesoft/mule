@@ -15,40 +15,32 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 @Ignore("Parameter override has to fail when a parameter name does not exist")
-public class InvalidParamOverrideTestCase extends FunctionalTestCase
-{
+public class InvalidParamOverrideTestCase extends FunctionalTestCase {
 
-    private boolean errorDetected;
+  private boolean errorDetected;
 
-    public InvalidParamOverrideTestCase()
-    {
-        setStartContext(false);
+  public InvalidParamOverrideTestCase() {
+    setStartContext(false);
+  }
+
+  @Override
+  protected String getConfigFile() {
+    return "integration/select/invalid-param-override-query-config.xml";
+  }
+
+  @Override
+  protected MuleContext createMuleContext() throws Exception {
+    try {
+      return super.createMuleContext();
+    } catch (Exception e) {
+      errorDetected = true;
+      return null;
     }
+  }
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "integration/select/invalid-param-override-query-config.xml";
-    }
-
-    @Override
-    protected MuleContext createMuleContext() throws Exception
-    {
-        try
-        {
-            return super.createMuleContext();
-        }
-        catch (Exception e)
-        {
-            errorDetected = true;
-            return null;
-        }
-    }
-
-    @Test
-    public void validatesInvalidParamOverride() throws Exception
-    {
-        assertTrue("Invalid parameter override should not be valid", errorDetected);
-    }
+  @Test
+  public void validatesInvalidParamOverride() throws Exception {
+    assertTrue("Invalid parameter override should not be valid", errorDetected);
+  }
 }
 

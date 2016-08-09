@@ -17,21 +17,19 @@ import org.mule.runtime.core.api.client.MuleClient;
 
 import org.junit.Test;
 
-public abstract class AbstractStreamingDownloadMule1389TestCase extends FunctionalTestCase
-{
+public abstract class AbstractStreamingDownloadMule1389TestCase extends FunctionalTestCase {
 
-    @Test
-    public void testDownloadSpeed() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        long now = System.currentTimeMillis();
-        MuleMessage result = client.send(((InboundEndpoint) muleContext.getRegistry().lookupObject("inTestComponent")).getAddress(),
-            "request", null);
-        assertNotNull(result);
-        assertNotNull(result.getPayload());
-        assertEquals(InputStreamSource.SIZE, getPayloadAsBytes(result).length);
-        long then = System.currentTimeMillis();
-        double speed = InputStreamSource.SIZE / (double) (then - now) * 1000 / AbstractStreamingCapacityTestCase.ONE_MB;
-        logger.info("Transfer speed " + speed + " MB/s (" + InputStreamSource.SIZE + " B in " + (then - now) + " ms)");
-    }
+  @Test
+  public void testDownloadSpeed() throws Exception {
+    MuleClient client = muleContext.getClient();
+    long now = System.currentTimeMillis();
+    MuleMessage result =
+        client.send(((InboundEndpoint) muleContext.getRegistry().lookupObject("inTestComponent")).getAddress(), "request", null);
+    assertNotNull(result);
+    assertNotNull(result.getPayload());
+    assertEquals(InputStreamSource.SIZE, getPayloadAsBytes(result).length);
+    long then = System.currentTimeMillis();
+    double speed = InputStreamSource.SIZE / (double) (then - now) * 1000 / AbstractStreamingCapacityTestCase.ONE_MB;
+    logger.info("Transfer speed " + speed + " MB/s (" + InputStreamSource.SIZE + " B in " + (then - now) + " ms)");
+  }
 }

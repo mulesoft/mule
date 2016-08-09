@@ -20,29 +20,25 @@ import org.mule.tck.size.SmallTest;
 
 @SmallTest
 @Ignore("MULE-9072 - Remove MuleSession")
-public class RemoveSessionVariableTransformerTestCase extends AbstractRemoveVariablePropertyTransformerTestCase
-{
-    public RemoveSessionVariableTransformerTestCase()
-    {
-        super(new RemoveSessionVariableTransformer());
-    }
+public class RemoveSessionVariableTransformerTestCase extends AbstractRemoveVariablePropertyTransformerTestCase {
 
-    @Override
-    protected void addMockedPropeerties(MuleEvent mockEvent, HashSet properties)
-    {
-        MuleSession mockSession = mockEvent.getSession();
-        when(mockSession.getPropertyNamesAsSet()).thenReturn(properties);
-    }
+  public RemoveSessionVariableTransformerTestCase() {
+    super(new RemoveSessionVariableTransformer());
+  }
 
-    @Override
-    protected void verifyRemoved(MuleEvent mockEvent, String key)
-    {
-        verify(mockEvent.getSession()).removeProperty(key);
-    }
+  @Override
+  protected void addMockedPropeerties(MuleEvent mockEvent, HashSet properties) {
+    MuleSession mockSession = mockEvent.getSession();
+    when(mockSession.getPropertyNamesAsSet()).thenReturn(properties);
+  }
 
-    @Override
-    protected void verifyNotRemoved(MuleEvent mockEvent, String key)
-    {
-        verify(mockEvent.getSession(), times(0)).removeProperty(key);
-    }
+  @Override
+  protected void verifyRemoved(MuleEvent mockEvent, String key) {
+    verify(mockEvent.getSession()).removeProperty(key);
+  }
+
+  @Override
+  protected void verifyNotRemoved(MuleEvent mockEvent, String key) {
+    verify(mockEvent.getSession(), times(0)).removeProperty(key);
+  }
 }

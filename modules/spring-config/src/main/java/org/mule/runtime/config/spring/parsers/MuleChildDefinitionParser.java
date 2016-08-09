@@ -13,11 +13,10 @@ import org.springframework.beans.factory.config.BeanDefinition;
 /**
  * Extra functionality exposed by child parsers
  */
-public interface MuleChildDefinitionParser extends MuleDefinitionParser
-{
+public interface MuleChildDefinitionParser extends MuleDefinitionParser {
 
-    public void forceParent(BeanDefinition parent);
+  public void forceParent(BeanDefinition parent);
 
-    public PropertyConfiguration getTargetPropertyConfiguration();
+  public PropertyConfiguration getTargetPropertyConfiguration();
 
 }

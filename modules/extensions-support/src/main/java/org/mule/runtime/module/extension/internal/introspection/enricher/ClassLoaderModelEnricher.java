@@ -16,27 +16,22 @@ import org.mule.runtime.extension.api.introspection.property.ClassLoaderModelPro
 import org.mule.runtime.module.extension.internal.ExtensionProperties;
 
 /**
- * If the {@link ExtensionProperties#EXTENSION_CLASSLOADER} parameter is set on
- * the {@link DescribingContext}, then a {@link ClassLoaderModelProperty} is added
- * at the {@link ExtensionModel} level, pointing to such property's value.
+ * If the {@link ExtensionProperties#EXTENSION_CLASSLOADER} parameter is set on the {@link DescribingContext}, then a
+ * {@link ClassLoaderModelProperty} is added at the {@link ExtensionModel} level, pointing to such property's value.
  *
- * If the parameter is not set, then an {@link IllegalModelDefinitionException}
- * is thrown.
+ * If the parameter is not set, then an {@link IllegalModelDefinitionException} is thrown.
  *
  * @since 4.0
  */
-public class ClassLoaderModelEnricher implements ModelEnricher
-{
+public class ClassLoaderModelEnricher implements ModelEnricher {
 
-    @Override
-    public void enrich(DescribingContext describingContext)
-    {
-        ClassLoader classLoader = describingContext.getParameter(EXTENSION_CLASSLOADER, ClassLoader.class);
-        if (classLoader == null)
-        {
-            throw noClassLoaderException(describingContext.getExtensionDeclarer().getDeclaration().getName());
-        }
-
-        describingContext.getExtensionDeclarer().withModelProperty(new ClassLoaderModelProperty(classLoader));
+  @Override
+  public void enrich(DescribingContext describingContext) {
+    ClassLoader classLoader = describingContext.getParameter(EXTENSION_CLASSLOADER, ClassLoader.class);
+    if (classLoader == null) {
+      throw noClassLoaderException(describingContext.getExtensionDeclarer().getDeclaration().getName());
     }
+
+    describingContext.getExtensionDeclarer().withModelProperty(new ClassLoaderModelProperty(classLoader));
+  }
 }

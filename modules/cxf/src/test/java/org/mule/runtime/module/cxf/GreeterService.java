@@ -7,10 +7,9 @@
 
 package org.mule.runtime.module.cxf;
 
-public class GreeterService implements Greeter
-{
-    public String greet(String name)
-    {
-        return "Hello " + name;
-    }
+public class GreeterService implements Greeter {
+
+  public String greet(String name) {
+    return "Hello " + name;
+  }
 }

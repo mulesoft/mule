@@ -44,115 +44,103 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class DynamicConfigurationProviderTestCase extends AbstractConfigurationProviderTestCase<HeisenbergExtension>
-{
+public class DynamicConfigurationProviderTestCase extends AbstractConfigurationProviderTestCase<HeisenbergExtension> {
 
-    private static final Class MODULE_CLASS = HeisenbergExtension.class;
+  private static final Class MODULE_CLASS = HeisenbergExtension.class;
 
-    @Mock
-    private ResolverSet resolverSet;
+  @Mock
+  private ResolverSet resolverSet;
 
-    @Mock(answer = RETURNS_DEEP_STUBS)
-    private ResolverSetResult resolverSetResult;
+  @Mock(answer = RETURNS_DEEP_STUBS)
+  private ResolverSetResult resolverSetResult;
 
-    private ExpirationPolicy expirationPolicy;
+  private ExpirationPolicy expirationPolicy;
 
-    @Before
-    public void before() throws Exception
-    {
-        when(configurationModel.getConfigurationFactory().getObjectType()).thenReturn(MODULE_CLASS);
-        when(configurationModel.getConfigurationFactory().newInstance()).thenAnswer(invocation -> MODULE_CLASS.newInstance());
-        when(configurationModel.getModelProperty(any())).thenReturn(Optional.empty());
-        when(configurationModel.getInterceptorFactories()).thenReturn(ImmutableList.of());
-        when(configurationModel.getOperationModels()).thenReturn(ImmutableList.of());
-        when(configurationModel.getSourceModels()).thenReturn(ImmutableList.of());
-        when(configurationModel.getExtensionModel()).thenReturn(extensionModel);
+  @Before
+  public void before() throws Exception {
+    when(configurationModel.getConfigurationFactory().getObjectType()).thenReturn(MODULE_CLASS);
+    when(configurationModel.getConfigurationFactory().newInstance()).thenAnswer(invocation -> MODULE_CLASS.newInstance());
+    when(configurationModel.getModelProperty(any())).thenReturn(Optional.empty());
+    when(configurationModel.getInterceptorFactories()).thenReturn(ImmutableList.of());
+    when(configurationModel.getOperationModels()).thenReturn(ImmutableList.of());
+    when(configurationModel.getSourceModels()).thenReturn(ImmutableList.of());
+    when(configurationModel.getExtensionModel()).thenReturn(extensionModel);
 
-        mockClassLoaderModelProperty(extensionModel, getClass().getClassLoader());
-        when(extensionModel.getSourceModels()).thenReturn(ImmutableList.of());
-        when(extensionModel.getOperationModels()).thenReturn(ImmutableList.of());
+    mockClassLoaderModelProperty(extensionModel, getClass().getClassLoader());
+    when(extensionModel.getSourceModels()).thenReturn(ImmutableList.of());
+    when(extensionModel.getOperationModels()).thenReturn(ImmutableList.of());
 
-        when(resolverSet.resolve(event)).thenReturn(resolverSetResult);
+    when(resolverSet.resolve(event)).thenReturn(resolverSetResult);
 
 
-        expirationPolicy = new ImmutableExpirationPolicy(5, TimeUnit.MINUTES, timeSupplier);
+    expirationPolicy = new ImmutableExpirationPolicy(5, TimeUnit.MINUTES, timeSupplier);
 
-        provider = new DynamicConfigurationProvider(CONFIG_NAME,
-                                                    configurationModel,
-                                                    resolverSet,
-                                                    new StaticValueResolver<>(null),
-                                                    expirationPolicy);
+    provider = new DynamicConfigurationProvider(CONFIG_NAME, configurationModel, resolverSet, new StaticValueResolver<>(null),
+                                                expirationPolicy);
 
-        super.before();
-        provider.initialise();
-        provider.start();
+    super.before();
+    provider.initialise();
+    provider.start();
+  }
+
+  @Test
+  public void resolveCached() throws Exception {
+    final int count = 10;
+    HeisenbergExtension config = provider.get(event).getValue();
+    for (int i = 1; i < count; i++) {
+      assertThat(provider.get(event).getValue(), is(sameInstance(config)));
     }
 
-    @Test
-    public void resolveCached() throws Exception
-    {
-        final int count = 10;
-        HeisenbergExtension config = provider.get(event).getValue();
-        for (int i = 1; i < count; i++)
-        {
-            assertThat(provider.get(event).getValue(), is(sameInstance(config)));
-        }
+    verify(resolverSet, times(count)).resolve(event);
+  }
 
-        verify(resolverSet, times(count)).resolve(event);
-    }
+  @Test
+  public void resolveDifferentInstances() throws Exception {
+    HeisenbergExtension instance1 = provider.get(event).getValue();
+    HeisenbergExtension instance2 = makeAlternateInstance();
 
-    @Test
-    public void resolveDifferentInstances() throws Exception
-    {
-        HeisenbergExtension instance1 = provider.get(event).getValue();
-        HeisenbergExtension instance2 = makeAlternateInstance();
+    assertThat(instance2, is(not(sameInstance(instance1))));
+  }
 
-        assertThat(instance2, is(not(sameInstance(instance1))));
-    }
+  @Test
+  public void getExpired() throws Exception {
+    HeisenbergExtension instance1 = provider.get(event).getValue();
+    HeisenbergExtension instance2 = makeAlternateInstance();
 
-    @Test
-    public void getExpired() throws Exception
-    {
-        HeisenbergExtension instance1 = provider.get(event).getValue();
-        HeisenbergExtension instance2 = makeAlternateInstance();
+    DynamicConfigurationProvider provider = (DynamicConfigurationProvider) this.provider;
+    timeSupplier.move(1, TimeUnit.MINUTES);
 
-        DynamicConfigurationProvider provider = (DynamicConfigurationProvider) this.provider;
-        timeSupplier.move(1, TimeUnit.MINUTES);
+    List<ConfigurationInstance<Object>> expired = provider.getExpired();
+    assertThat(expired.isEmpty(), is(true));
 
-        List<ConfigurationInstance<Object>> expired = provider.getExpired();
-        assertThat(expired.isEmpty(), is(true));
+    timeSupplier.move(10, TimeUnit.MINUTES);
 
-        timeSupplier.move(10, TimeUnit.MINUTES);
+    expired = provider.getExpired();
+    assertThat(expired.isEmpty(), is(false));
 
-        expired = provider.getExpired();
-        assertThat(expired.isEmpty(), is(false));
+    List<Object> configs = expired.stream().map(config -> config.getValue()).collect(new ImmutableListCollector<>());
+    assertThat(configs, containsInAnyOrder(instance1, instance2));
+  }
 
-        List<Object> configs = expired.stream().map(config -> config.getValue()).collect(new ImmutableListCollector<>());
-        assertThat(configs, containsInAnyOrder(instance1, instance2));
-    }
+  private HeisenbergExtension makeAlternateInstance() throws MuleException {
+    ResolverSetResult alternateResult = mock(ResolverSetResult.class, Mockito.RETURNS_DEEP_STUBS);
+    when(resolverSet.resolve(event)).thenReturn(alternateResult);
 
-    private HeisenbergExtension makeAlternateInstance() throws MuleException
-    {
-        ResolverSetResult alternateResult = mock(ResolverSetResult.class, Mockito.RETURNS_DEEP_STUBS);
-        when(resolverSet.resolve(event)).thenReturn(alternateResult);
+    return provider.get(event).getValue();
+  }
 
-        return provider.get(event).getValue();
-    }
+  @Test
+  public void resolveDynamicConfigWithEquivalentEvent() throws Exception {
+    assertSameInstancesResolved();
+  }
 
-    @Test
-    public void resolveDynamicConfigWithEquivalentEvent() throws Exception
-    {
-        assertSameInstancesResolved();
-    }
+  @Test
+  public void resolveDynamicConfigWithDifferentEvent() throws Exception {
+    Object config1 = provider.get(event);
 
-    @Test
-    public void resolveDynamicConfigWithDifferentEvent() throws Exception
-    {
-        Object config1 = provider.get(event);
+    when(resolverSet.resolve(event)).thenReturn(mock(ResolverSetResult.class));
+    Object config2 = provider.get(event);
 
-        when(resolverSet.resolve(event)).thenReturn(mock(ResolverSetResult.class));
-        Object config2 = provider.get(event);
-
-        assertThat(config1, is(not(sameInstance(config2))));
-    }
+    assertThat(config1, is(not(sameInstance(config2))));
+  }
 }

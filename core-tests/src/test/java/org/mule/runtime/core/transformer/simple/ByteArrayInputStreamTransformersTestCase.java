@@ -11,27 +11,22 @@ import org.mule.runtime.core.transformer.AbstractTransformerTestCase;
 
 import java.io.ByteArrayInputStream;
 
-public class ByteArrayInputStreamTransformersTestCase extends AbstractTransformerTestCase
-{
+public class ByteArrayInputStreamTransformersTestCase extends AbstractTransformerTestCase {
 
-    public Transformer getTransformer() throws Exception
-    {
-        return new ObjectToInputStream();
-    }
+  public Transformer getTransformer() throws Exception {
+    return new ObjectToInputStream();
+  }
 
-    public Transformer getRoundTripTransformer() throws Exception
-    {
-        return new ObjectToByteArray();
-    }
+  public Transformer getRoundTripTransformer() throws Exception {
+    return new ObjectToByteArray();
+  }
 
-    public Object getTestData()
-    {
-        return TEST_MESSAGE.getBytes();
-    }
+  public Object getTestData() {
+    return TEST_MESSAGE.getBytes();
+  }
 
-    public Object getResultData()
-    {
-        return new ByteArrayInputStream(TEST_MESSAGE.getBytes());
-    }
+  public Object getResultData() {
+    return new ByteArrayInputStream(TEST_MESSAGE.getBytes());
+  }
 
 }

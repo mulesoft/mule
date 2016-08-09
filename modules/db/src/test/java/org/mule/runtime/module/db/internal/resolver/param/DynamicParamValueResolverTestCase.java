@@ -24,61 +24,56 @@ import java.util.List;
 import org.junit.Test;
 
 @SmallTest
-public class DynamicParamValueResolverTestCase extends AbstractQueryParamResolverTestCase
-{
+public class DynamicParamValueResolverTestCase extends AbstractQueryParamResolverTestCase {
 
-    private final ExpressionManager expressionManager = mock(ExpressionManager.class);
-    private final DynamicParamValueResolver paramResolver = new DynamicParamValueResolver(expressionManager);
+  private final ExpressionManager expressionManager = mock(ExpressionManager.class);
+  private final DynamicParamValueResolver paramResolver = new DynamicParamValueResolver(expressionManager);
 
-    @Test
-    public void resolvesStaticParam() throws Exception
-    {
-        final String expectedValue = "test";
-        List<QueryParamValue> templateParams = getQueryParamValues(expectedValue);
+  @Test
+  public void resolvesStaticParam() throws Exception {
+    final String expectedValue = "test";
+    List<QueryParamValue> templateParams = getQueryParamValues(expectedValue);
 
-        List<QueryParamValue> resolvedParams = paramResolver.resolveParams(muleEvent, templateParams);
+    List<QueryParamValue> resolvedParams = paramResolver.resolveParams(muleEvent, templateParams);
 
-        assertThat(resolvedParams.size(), equalTo(1));
-        assertThat((String) resolvedParams.get(0).getValue(), equalTo(expectedValue));
-        verify(expressionManager, times(0)).evaluate(anyString(), eq(muleEvent));
-    }
+    assertThat(resolvedParams.size(), equalTo(1));
+    assertThat((String) resolvedParams.get(0).getValue(), equalTo(expectedValue));
+    verify(expressionManager, times(0)).evaluate(anyString(), eq(muleEvent));
+  }
 
-    @Test
-    public void resolvesExpressionParam() throws Exception
-    {
-        final String expectedParamValue = "foo";
-        String paramExpressionValue = "#[payload]";
-        addResolvableExpression(expectedParamValue, paramExpressionValue);
+  @Test
+  public void resolvesExpressionParam() throws Exception {
+    final String expectedParamValue = "foo";
+    String paramExpressionValue = "#[payload]";
+    addResolvableExpression(expectedParamValue, paramExpressionValue);
 
-        List<QueryParamValue> templateParams = getQueryParamValues(paramExpressionValue);
+    List<QueryParamValue> templateParams = getQueryParamValues(paramExpressionValue);
 
-        List<QueryParamValue> resolvedParams = paramResolver.resolveParams(muleEvent, templateParams);
+    List<QueryParamValue> resolvedParams = paramResolver.resolveParams(muleEvent, templateParams);
 
-        assertThat(resolvedParams.size(), equalTo(1));
-        assertThat((String) resolvedParams.get(0).getValue(), equalTo(expectedParamValue));
-    }
+    assertThat(resolvedParams.size(), equalTo(1));
+    assertThat((String) resolvedParams.get(0).getValue(), equalTo(expectedParamValue));
+  }
 
-    @Test
-    public void resolvesMultipleParams() throws Exception
-    {
-        final String expectedParamValue1 = "foo";
-        String expectedParamValue2 = "bar";
+  @Test
+  public void resolvesMultipleParams() throws Exception {
+    final String expectedParamValue1 = "foo";
+    String expectedParamValue2 = "bar";
 
-        String paramExpressionValue = "#[payload]";
-        addResolvableExpression(expectedParamValue1, paramExpressionValue);
-        List<QueryParamValue> templateParams = getQueryParamValues(paramExpressionValue, expectedParamValue2);
+    String paramExpressionValue = "#[payload]";
+    addResolvableExpression(expectedParamValue1, paramExpressionValue);
+    List<QueryParamValue> templateParams = getQueryParamValues(paramExpressionValue, expectedParamValue2);
 
-        List<QueryParamValue> resolvedParams = paramResolver.resolveParams(muleEvent, templateParams);
+    List<QueryParamValue> resolvedParams = paramResolver.resolveParams(muleEvent, templateParams);
 
-        assertThat(resolvedParams.size(), equalTo(2));
-        assertThat((String) resolvedParams.get(0).getValue(), equalTo(expectedParamValue1));
-        assertThat((String) resolvedParams.get(1).getValue(), equalTo(expectedParamValue2));
-    }
+    assertThat(resolvedParams.size(), equalTo(2));
+    assertThat((String) resolvedParams.get(0).getValue(), equalTo(expectedParamValue1));
+    assertThat((String) resolvedParams.get(1).getValue(), equalTo(expectedParamValue2));
+  }
 
-    protected void addResolvableExpression(String expectedParamValue, String paramExpressionValue)
-    {
-        when(expressionManager.isExpression(paramExpressionValue)).thenReturn(true);
-        when(expressionManager.evaluate(paramExpressionValue, muleEvent)).thenReturn(expectedParamValue);
-    }
+  protected void addResolvableExpression(String expectedParamValue, String paramExpressionValue) {
+    when(expressionManager.isExpression(paramExpressionValue)).thenReturn(true);
+    when(expressionManager.evaluate(paramExpressionValue, muleEvent)).thenReturn(expectedParamValue);
+  }
 
 }

@@ -14,40 +14,34 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * <code>LoggingInterceptor</code> is a simple interceptor that logs a message before
- * and after the event processing.
+ * <code>LoggingInterceptor</code> is a simple interceptor that logs a message before and after the event processing.
  */
-public class LoggingInterceptor extends AbstractEnvelopeInterceptor
-{
-    /**
-     * logger used by this class
-     */
-    private static Logger logger = LoggerFactory.getLogger(LoggingInterceptor.class);
+public class LoggingInterceptor extends AbstractEnvelopeInterceptor {
 
-    @Override
-    public MuleEvent before(MuleEvent event)
-    {
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Started event processing for " + event.getFlowConstruct().getName());
-        }
-        return event;
+  /**
+   * logger used by this class
+   */
+  private static Logger logger = LoggerFactory.getLogger(LoggingInterceptor.class);
 
+  @Override
+  public MuleEvent before(MuleEvent event) {
+    if (logger.isDebugEnabled()) {
+      logger.debug("Started event processing for " + event.getFlowConstruct().getName());
     }
+    return event;
 
-    @Override
-    public MuleEvent after(MuleEvent event)
-    {
-        if (logger.isDebugEnabled() && event != null)
-        {
-            logger.debug("Finished event processing for " + event.getFlowConstruct().getName());
-        }
-        return event;
-    }
+  }
 
-    @Override
-    public MuleEvent last(MuleEvent event, ProcessingTime time, long startTime, boolean exceptionWasThrown) throws MuleException
-    {
-        return event;
+  @Override
+  public MuleEvent after(MuleEvent event) {
+    if (logger.isDebugEnabled() && event != null) {
+      logger.debug("Finished event processing for " + event.getFlowConstruct().getName());
     }
+    return event;
+  }
+
+  @Override
+  public MuleEvent last(MuleEvent event, ProcessingTime time, long startTime, boolean exceptionWasThrown) throws MuleException {
+    return event;
+  }
 }

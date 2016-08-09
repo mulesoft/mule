@@ -27,42 +27,37 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class SelectStoredProcedureMetadata extends AbstractDbIntegrationTestCase
-{
+public class SelectStoredProcedureMetadata extends AbstractDbIntegrationTestCase {
 
-    public SelectStoredProcedureMetadata(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public SelectStoredProcedureMetadata(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Parameterized.Parameters
-    public static List<Object[]> parameters()
-    {
-        return TestDbConfig.getResources();
-    }
+  @Parameterized.Parameters
+  public static List<Object[]> parameters() {
+    return TestDbConfig.getResources();
+  }
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/select/select-stored-procedure-metadata-config.xml"};
-    }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/select/select-stored-procedure-metadata-config.xml"};
+  }
 
-    @Test
-    public void returnsStoredProcedureMetadata() throws Exception
-    {
-        Flow flowConstruct = (Flow) muleContext.getRegistry().lookupFlowConstruct("queryStoredProcedureMetadata");
+  @Test
+  public void returnsStoredProcedureMetadata() throws Exception {
+    Flow flowConstruct = (Flow) muleContext.getRegistry().lookupFlowConstruct("queryStoredProcedureMetadata");
 
-        List<MessageProcessor> messageProcessors = flowConstruct.getMessageProcessors();
-        AbstractSingleQueryDbMessageProcessor queryMessageProcessor = (AbstractSingleQueryDbMessageProcessor) messageProcessors.get(0);
-        Result<MetaData> outputMetaData = queryMessageProcessor.getOutputMetaData(null);
+    List<MessageProcessor> messageProcessors = flowConstruct.getMessageProcessors();
+    AbstractSingleQueryDbMessageProcessor queryMessageProcessor =
+        (AbstractSingleQueryDbMessageProcessor) messageProcessors.get(0);
+    Result<MetaData> outputMetaData = queryMessageProcessor.getOutputMetaData(null);
 
-        assertThat(outputMetaData.getFailureType(), equalTo(FailureType.UNSPECIFIED));
-    }
+    assertThat(outputMetaData.getFailureType(), equalTo(FailureType.UNSPECIFIED));
+  }
 
-    @Before
-    public void setupStoredProcedure() throws Exception
-    {
-        assumeThat(getDefaultDataSource(), new SupportsStoredFunctionsUsingCallSyntax());
-        testDatabase.createStoredProcedureGetRecords(getDefaultDataSource());
-    }
+  @Before
+  public void setupStoredProcedure() throws Exception {
+    assumeThat(getDefaultDataSource(), new SupportsStoredFunctionsUsingCallSyntax());
+    testDatabase.createStoredProcedureGetRecords(getDefaultDataSource());
+  }
 }

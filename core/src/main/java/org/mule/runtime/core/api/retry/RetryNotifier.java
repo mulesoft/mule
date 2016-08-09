@@ -7,14 +7,14 @@
 package org.mule.runtime.core.api.retry;
 
 /**
- * This interface is a callback that allows actions to be performed after each retry attempt, 
- * such as firing notifications, logging, etc.
+ * This interface is a callback that allows actions to be performed after each retry attempt, such as firing notifications,
+ * logging, etc.
  */
-public interface RetryNotifier
-{
-    /** Called each time a retry attempt fails. */
-    public void onFailure(RetryContext context, Throwable e);
+public interface RetryNotifier {
 
-    /** Called when a retry attempt finally suceeds. */
-    public void onSuccess(RetryContext context);
+  /** Called each time a retry attempt fails. */
+  public void onFailure(RetryContext context, Throwable e);
+
+  /** Called when a retry attempt finally suceeds. */
+  public void onSuccess(RetryContext context);
 }

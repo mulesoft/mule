@@ -21,43 +21,38 @@ import org.apache.ws.security.WSPasswordCallback;
 /**
  * Decrypts an encrypted SOAP response, using the private key of the key-store in the provided TLS context.
  */
-public class WssDecryptSecurityStrategy extends AbstractSecurityStrategy
-{
+public class WssDecryptSecurityStrategy extends AbstractSecurityStrategy {
 
-    private static final String WS_DECRYPT_PROPERTIES_KEY = "decryptProperties";
+  private static final String WS_DECRYPT_PROPERTIES_KEY = "decryptProperties";
 
-    private TlsContextFactory tlsContextFactory;
+  private TlsContextFactory tlsContextFactory;
 
-    @Override
-    public void apply(Map<String, Object> outConfigProperties, Map<String, Object> inConfigProperties)
-    {
-        final TlsContextKeyStoreConfiguration keyStoreConfig = tlsContextFactory.getKeyStoreConfiguration();
+  @Override
+  public void apply(Map<String, Object> outConfigProperties, Map<String, Object> inConfigProperties) {
+    final TlsContextKeyStoreConfiguration keyStoreConfig = tlsContextFactory.getKeyStoreConfiguration();
 
-        appendAction(inConfigProperties, ENCRYPT);
+    appendAction(inConfigProperties, ENCRYPT);
 
-        Properties decryptionProperties = createKeyStoreProperties(keyStoreConfig);
+    Properties decryptionProperties = createKeyStoreProperties(keyStoreConfig);
 
-        inConfigProperties.put(DEC_PROP_REF_ID, WS_DECRYPT_PROPERTIES_KEY);
-        inConfigProperties.put(WS_DECRYPT_PROPERTIES_KEY, decryptionProperties);
+    inConfigProperties.put(DEC_PROP_REF_ID, WS_DECRYPT_PROPERTIES_KEY);
+    inConfigProperties.put(WS_DECRYPT_PROPERTIES_KEY, decryptionProperties);
 
-        addPasswordCallbackHandler(inConfigProperties, new WSPasswordCallbackHandler(DECRYPT)
-        {
-            @Override
-            public void handle(WSPasswordCallback passwordCallback)
-            {
-                passwordCallback.setPassword(keyStoreConfig.getKeyPassword());
-            }
-        });
-    }
+    addPasswordCallbackHandler(inConfigProperties, new WSPasswordCallbackHandler(DECRYPT) {
 
-    public TlsContextFactory getTlsContext()
-    {
-        return tlsContextFactory;
-    }
+      @Override
+      public void handle(WSPasswordCallback passwordCallback) {
+        passwordCallback.setPassword(keyStoreConfig.getKeyPassword());
+      }
+    });
+  }
 
-    public void setTlsContext(TlsContextFactory tlsContextFactory)
-    {
-        this.tlsContextFactory = tlsContextFactory;
-    }
+  public TlsContextFactory getTlsContext() {
+    return tlsContextFactory;
+  }
+
+  public void setTlsContext(TlsContextFactory tlsContextFactory) {
+    this.tlsContextFactory = tlsContextFactory;
+  }
 
 }

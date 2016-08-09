@@ -45,93 +45,93 @@ import org.hamcrest.Matchers;
 import org.junit.Test;
 
 @SmallTest
-public class BulkExecuteMessageProcessorDebugInfoTestCase extends AbstractMuleTestCase
-{
+public class BulkExecuteMessageProcessorDebugInfoTestCase extends AbstractMuleTestCase {
 
-    public static final String DELETE_QUERY = "DELETE FROM PLANET";
-    public static final QueryTemplate QUERY_TEMPLATE1 = new QueryTemplate(DELETE_QUERY, DELETE, Collections.<QueryParam>emptyList());
-    public static final String INSERT_QUERY = "INSERT INTO PLANET(POSITION, NAME) VALUES (6, 'Saturn')";
-    public static final QueryTemplate QUERY_TEMPLATE2 = new QueryTemplate(INSERT_QUERY, INSERT, Collections.<QueryParam>emptyList());
-    public static final String QUERY1 = DbDebugInfoUtils.QUERY_DEBUG_FIELD + 1;
-    public static final String QUERY2 = DbDebugInfoUtils.QUERY_DEBUG_FIELD + 2;
+  public static final String DELETE_QUERY = "DELETE FROM PLANET";
+  public static final QueryTemplate QUERY_TEMPLATE1 =
+      new QueryTemplate(DELETE_QUERY, DELETE, Collections.<QueryParam>emptyList());
+  public static final String INSERT_QUERY = "INSERT INTO PLANET(POSITION, NAME) VALUES (6, 'Saturn')";
+  public static final QueryTemplate QUERY_TEMPLATE2 =
+      new QueryTemplate(INSERT_QUERY, INSERT, Collections.<QueryParam>emptyList());
+  public static final String QUERY1 = DbDebugInfoUtils.QUERY_DEBUG_FIELD + 1;
+  public static final String QUERY2 = DbDebugInfoUtils.QUERY_DEBUG_FIELD + 2;
 
-    private final MuleEvent event = mock(MuleEvent.class);
-    private final DbConnection connection = mock(DbConnection.class);
-    private final DbConnectionFactory dbConnectionFactory = mock(DbConnectionFactory.class);
-    private final DbConfigResolver dbConfigResolver = mock(DbConfigResolver.class);
-    private final DbConfig dbConfig = mock(DbConfig.class);
-    private final BulkQueryResolver bulkQueryResolver = mock(BulkQueryResolver.class);
+  private final MuleEvent event = mock(MuleEvent.class);
+  private final DbConnection connection = mock(DbConnection.class);
+  private final DbConnectionFactory dbConnectionFactory = mock(DbConnectionFactory.class);
+  private final DbConfigResolver dbConfigResolver = mock(DbConfigResolver.class);
+  private final DbConfig dbConfig = mock(DbConfig.class);
+  private final BulkQueryResolver bulkQueryResolver = mock(BulkQueryResolver.class);
 
-    @Test
-    public void returnsDebugInfo() throws Exception
-    {
-        when(dbConnectionFactory.createConnection(TransactionalAction.NOT_SUPPORTED)).thenReturn(connection);
+  @Test
+  public void returnsDebugInfo() throws Exception {
+    when(dbConnectionFactory.createConnection(TransactionalAction.NOT_SUPPORTED)).thenReturn(connection);
 
-        when(dbConfigResolver.resolve(event)).thenReturn(dbConfig);
-        when(dbConfig.getConnectionFactory()).thenReturn(dbConnectionFactory);
+    when(dbConfigResolver.resolve(event)).thenReturn(dbConfig);
+    when(dbConfig.getConnectionFactory()).thenReturn(dbConnectionFactory);
 
-        final BulkQuery bulkQuery = new BulkQuery();
-        bulkQuery.add(new QueryTemplate(DELETE_QUERY, DELETE, Collections.<QueryParam>emptyList()));
-        bulkQuery.add(new QueryTemplate(INSERT_QUERY, QueryType.INSERT, Collections.<QueryParam>emptyList()));
-        when(bulkQueryResolver.resolve(event)).thenReturn(bulkQuery);
+    final BulkQuery bulkQuery = new BulkQuery();
+    bulkQuery.add(new QueryTemplate(DELETE_QUERY, DELETE, Collections.<QueryParam>emptyList()));
+    bulkQuery.add(new QueryTemplate(INSERT_QUERY, QueryType.INSERT, Collections.<QueryParam>emptyList()));
+    when(bulkQueryResolver.resolve(event)).thenReturn(bulkQuery);
 
-        final BulkExecuteMessageProcessor bulkExecuteMessageProcessor = new BulkExecuteMessageProcessor(dbConfigResolver, bulkQueryResolver, null, NOT_SUPPORTED);
+    final BulkExecuteMessageProcessor bulkExecuteMessageProcessor =
+        new BulkExecuteMessageProcessor(dbConfigResolver, bulkQueryResolver, null, NOT_SUPPORTED);
 
-        final List<FieldDebugInfo<?>> debugInfo = bulkExecuteMessageProcessor.getDebugInfo(event);
+    final List<FieldDebugInfo<?>> debugInfo = bulkExecuteMessageProcessor.getDebugInfo(event);
 
-        assertThat(debugInfo.size(), equalTo(1));
-        assertThat(debugInfo, hasItem(objectLike(QUERIES_DEBUG_FIELD, List.class, createExpectedQueryMatchers())));
-    }
+    assertThat(debugInfo.size(), equalTo(1));
+    assertThat(debugInfo, hasItem(objectLike(QUERIES_DEBUG_FIELD, List.class, createExpectedQueryMatchers())));
+  }
 
-    @Test
-    public void returnsErrorDebugInfoWhenCannotResolveQueries() throws Exception
-    {
-        when(dbConnectionFactory.createConnection(TransactionalAction.NOT_SUPPORTED)).thenReturn(connection);
+  @Test
+  public void returnsErrorDebugInfoWhenCannotResolveQueries() throws Exception {
+    when(dbConnectionFactory.createConnection(TransactionalAction.NOT_SUPPORTED)).thenReturn(connection);
 
-        when(dbConfigResolver.resolve(event)).thenReturn(dbConfig);
-        when(dbConfig.getConnectionFactory()).thenReturn(dbConnectionFactory);
+    when(dbConfigResolver.resolve(event)).thenReturn(dbConfig);
+    when(dbConfig.getConnectionFactory()).thenReturn(dbConnectionFactory);
 
-        final QueryResolutionException queryResolutionException = new QueryResolutionException("Error");
-        when(bulkQueryResolver.resolve(event)).thenThrow(queryResolutionException);
+    final QueryResolutionException queryResolutionException = new QueryResolutionException("Error");
+    when(bulkQueryResolver.resolve(event)).thenThrow(queryResolutionException);
 
-        final BulkExecuteMessageProcessor bulkExecuteMessageProcessor = new BulkExecuteMessageProcessor(dbConfigResolver, bulkQueryResolver, null, NOT_SUPPORTED);
+    final BulkExecuteMessageProcessor bulkExecuteMessageProcessor =
+        new BulkExecuteMessageProcessor(dbConfigResolver, bulkQueryResolver, null, NOT_SUPPORTED);
 
-        final List<FieldDebugInfo<?>> debugInfo = bulkExecuteMessageProcessor.getDebugInfo(event);
+    final List<FieldDebugInfo<?>> debugInfo = bulkExecuteMessageProcessor.getDebugInfo(event);
 
-        assertThat(debugInfo.size(), equalTo(1));
-        assertThat(debugInfo, hasItem(fieldLike(QUERIES_DEBUG_FIELD, List.class, queryResolutionException)));
-    }
+    assertThat(debugInfo.size(), equalTo(1));
+    assertThat(debugInfo, hasItem(fieldLike(QUERIES_DEBUG_FIELD, List.class, queryResolutionException)));
+  }
 
-    @Test
-    public void returnsErrorDebugInfoOnInvalidResolvedQuery() throws Exception
-    {
-        when(dbConnectionFactory.createConnection(TransactionalAction.NOT_SUPPORTED)).thenReturn(connection);
+  @Test
+  public void returnsErrorDebugInfoOnInvalidResolvedQuery() throws Exception {
+    when(dbConnectionFactory.createConnection(TransactionalAction.NOT_SUPPORTED)).thenReturn(connection);
 
-        when(dbConfigResolver.resolve(event)).thenReturn(dbConfig);
-        when(dbConfig.getConnectionFactory()).thenReturn(dbConnectionFactory);
+    when(dbConfigResolver.resolve(event)).thenReturn(dbConfig);
+    when(dbConfig.getConnectionFactory()).thenReturn(dbConnectionFactory);
 
-        final BulkQuery bulkQuery = new BulkQuery();
-        bulkQuery.add(new QueryTemplate(DELETE_QUERY, QueryType.SELECT, Collections.<QueryParam>emptyList()));
-        bulkQuery.add(new QueryTemplate(INSERT_QUERY, QueryType.INSERT, Collections.<QueryParam>emptyList()));
-        when(bulkQueryResolver.resolve(event)).thenReturn(bulkQuery);
+    final BulkQuery bulkQuery = new BulkQuery();
+    bulkQuery.add(new QueryTemplate(DELETE_QUERY, QueryType.SELECT, Collections.<QueryParam>emptyList()));
+    bulkQuery.add(new QueryTemplate(INSERT_QUERY, QueryType.INSERT, Collections.<QueryParam>emptyList()));
+    when(bulkQueryResolver.resolve(event)).thenReturn(bulkQuery);
 
-        final BulkExecuteMessageProcessor bulkExecuteMessageProcessor = new BulkExecuteMessageProcessor(dbConfigResolver, bulkQueryResolver, null, NOT_SUPPORTED);
+    final BulkExecuteMessageProcessor bulkExecuteMessageProcessor =
+        new BulkExecuteMessageProcessor(dbConfigResolver, bulkQueryResolver, null, NOT_SUPPORTED);
 
-        final List<FieldDebugInfo<?>> debugInfo = bulkExecuteMessageProcessor.getDebugInfo(event);
+    final List<FieldDebugInfo<?>> debugInfo = bulkExecuteMessageProcessor.getDebugInfo(event);
 
-        assertThat(debugInfo.size(), equalTo(1));
-        final FieldDebugInfo<?> fieldDebugInfo = debugInfo.get(0);
-        assertThat(fieldDebugInfo.getName(), equalTo(QUERIES_DEBUG_FIELD));
-        assertThat(fieldDebugInfo.getType(), equalTo(List.class.getName()));
-        assertThat(fieldDebugInfo.getValue(), instanceOf(IllegalArgumentException.class));
-    }
+    assertThat(debugInfo.size(), equalTo(1));
+    final FieldDebugInfo<?> fieldDebugInfo = debugInfo.get(0);
+    assertThat(fieldDebugInfo.getName(), equalTo(QUERIES_DEBUG_FIELD));
+    assertThat(fieldDebugInfo.getType(), equalTo(List.class.getName()));
+    assertThat(fieldDebugInfo.getValue(), instanceOf(IllegalArgumentException.class));
+  }
 
-    private List<Matcher<FieldDebugInfo<?>>> createExpectedQueryMatchers()
-    {
-        final List<Matcher<FieldDebugInfo<?>>> queriesDebugInfo = new ArrayList<>();
-        queriesDebugInfo.add(createQueryFieldDebugInfoMatcher(QUERY1, QUERY_TEMPLATE1));
-        queriesDebugInfo.add(createQueryFieldDebugInfoMatcher(QUERY2, QUERY_TEMPLATE2));
+  private List<Matcher<FieldDebugInfo<?>>> createExpectedQueryMatchers() {
+    final List<Matcher<FieldDebugInfo<?>>> queriesDebugInfo = new ArrayList<>();
+    queriesDebugInfo.add(createQueryFieldDebugInfoMatcher(QUERY1, QUERY_TEMPLATE1));
+    queriesDebugInfo.add(createQueryFieldDebugInfoMatcher(QUERY2, QUERY_TEMPLATE2));
 
-        return queriesDebugInfo;
-    }
+    return queriesDebugInfo;
+  }
 }

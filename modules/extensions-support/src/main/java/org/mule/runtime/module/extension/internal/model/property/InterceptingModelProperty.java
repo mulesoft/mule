@@ -10,29 +10,25 @@ import org.mule.runtime.extension.api.introspection.ModelProperty;
 import org.mule.runtime.extension.api.introspection.operation.OperationModel;
 
 /**
- * A marker {@link ModelProperty} to signal that the owning
- * {@link OperationModel} is intercepting
+ * A marker {@link ModelProperty} to signal that the owning {@link OperationModel} is intercepting
  *
  * @since 4.0
  */
-public class InterceptingModelProperty implements ModelProperty
-{
+public class InterceptingModelProperty implements ModelProperty {
 
-    /**
-     * @return {@code intercepting}
-     */
-    @Override
-    public String getName()
-    {
-        return "intercepting";
-    }
+  /**
+   * @return {@code intercepting}
+   */
+  @Override
+  public String getName() {
+    return "intercepting";
+  }
 
-    /**
-     * @return {@code false}
-     */
-    @Override
-    public boolean isExternalizable()
-    {
-        return false;
-    }
+  /**
+   * @return {@code false}
+   */
+  @Override
+  public boolean isExternalizable() {
+    return false;
+  }
 }

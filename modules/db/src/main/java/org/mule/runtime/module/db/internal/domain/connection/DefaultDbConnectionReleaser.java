@@ -7,19 +7,16 @@
 
 package org.mule.runtime.module.db.internal.domain.connection;
 
-public class DefaultDbConnectionReleaser implements DbConnectionReleaser
-{
+public class DefaultDbConnectionReleaser implements DbConnectionReleaser {
 
-    private final DbConnectionFactory dbConnectionFactory;
+  private final DbConnectionFactory dbConnectionFactory;
 
-    public DefaultDbConnectionReleaser(DbConnectionFactory dbConnectionFactory)
-    {
-        this.dbConnectionFactory = dbConnectionFactory;
-    }
+  public DefaultDbConnectionReleaser(DbConnectionFactory dbConnectionFactory) {
+    this.dbConnectionFactory = dbConnectionFactory;
+  }
 
-    @Override
-    public void release(DbConnection connection)
-    {
-        dbConnectionFactory.releaseConnection(connection);
-    }
+  @Override
+  public void release(DbConnection connection) {
+    dbConnectionFactory.releaseConnection(connection);
+  }
 }

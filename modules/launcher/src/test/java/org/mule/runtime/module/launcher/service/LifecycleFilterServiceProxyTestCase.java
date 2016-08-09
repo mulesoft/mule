@@ -17,42 +17,37 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-public class LifecycleFilterServiceProxyTestCase extends AbstractMuleTestCase
-{
+public class LifecycleFilterServiceProxyTestCase extends AbstractMuleTestCase {
 
-    @Rule
-    public ExpectedException expected = ExpectedException.none();
+  @Rule
+  public ExpectedException expected = ExpectedException.none();
 
-    @Test
-    public void avoidsStartExecution() throws Exception
-    {
+  @Test
+  public void avoidsStartExecution() throws Exception {
 
-        StartableService service = mock(StartableService.class);
+    StartableService service = mock(StartableService.class);
 
-        final Startable serviceProxy = (Startable) LifecycleFilterServiceProxy.createServiceProxy(service);
+    final Startable serviceProxy = (Startable) LifecycleFilterServiceProxy.createServiceProxy(service);
 
-        expected.expect(UnsupportedOperationException.class);
-        serviceProxy.start();
-    }
+    expected.expect(UnsupportedOperationException.class);
+    serviceProxy.start();
+  }
 
-    @Test
-    public void avoidsStopExecution() throws Exception
-    {
-        StoppableService service = mock(StoppableService.class);
+  @Test
+  public void avoidsStopExecution() throws Exception {
+    StoppableService service = mock(StoppableService.class);
 
-        final Stoppable serviceProxy = (Stoppable) LifecycleFilterServiceProxy.createServiceProxy(service);
+    final Stoppable serviceProxy = (Stoppable) LifecycleFilterServiceProxy.createServiceProxy(service);
 
-        expected.expect(UnsupportedOperationException.class);
-        serviceProxy.stop();
-    }
+    expected.expect(UnsupportedOperationException.class);
+    serviceProxy.stop();
+  }
 
-    public interface StartableService extends Service, Startable
-    {
+  public interface StartableService extends Service, Startable {
 
-    }
+  }
 
-    public interface StoppableService extends Service, Stoppable
-    {
+  public interface StoppableService extends Service, Stoppable {
 
-    }
+  }
 }

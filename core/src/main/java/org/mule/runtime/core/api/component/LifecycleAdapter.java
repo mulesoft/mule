@@ -11,15 +11,14 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
 
 /**
- * <code>LifecycleAdapter</code> is a wrapper around a pojo service that adds
- * Lifecycle methods to the pojo.
+ * <code>LifecycleAdapter</code> is a wrapper around a pojo service that adds Lifecycle methods to the pojo.
  */
-public interface LifecycleAdapter extends Lifecycle
-{
-    boolean isStarted();
+public interface LifecycleAdapter extends Lifecycle {
 
-    boolean isDisposed();
+  boolean isStarted();
 
-    Object invoke(MuleEvent message) throws MuleException;
+  boolean isDisposed();
+
+  Object invoke(MuleEvent message) throws MuleException;
 
 }

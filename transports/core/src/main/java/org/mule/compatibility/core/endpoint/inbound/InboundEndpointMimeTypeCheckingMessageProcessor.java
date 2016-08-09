@@ -19,43 +19,36 @@ import org.mule.runtime.core.util.ObjectUtils;
 /**
  * Verify that the inbound mime type is acceptable by this endpoint.
  */
-public class InboundEndpointMimeTypeCheckingMessageProcessor implements MessageProcessor
-{
-    private InboundEndpoint endpoint;
+public class InboundEndpointMimeTypeCheckingMessageProcessor implements MessageProcessor {
 
-    public InboundEndpointMimeTypeCheckingMessageProcessor(InboundEndpoint endpoint)
-    {
-        this.endpoint = endpoint;
-    }
+  private InboundEndpoint endpoint;
 
-    @Override
-    public MuleEvent process(MuleEvent event) throws MessagingException
-    {
-        MediaType endpointMimeType = endpoint.getMimeType();
-        if (endpointMimeType != null)
-        {
-            MuleMessage message = event.getMessage();
-            final DataType dataType = message.getDataType();
-            if (DataType.OBJECT.getMediaType().matches(dataType.getMediaType()))
-            {
-                event.setMessage(MuleMessage.builder(event.getMessage()).mediaType(endpointMimeType).build());
-            }
-            else
-            {
-                if (!dataType.getMediaType().matches(endpointMimeType))
-                {
-                    throw new MessagingException(
-                            CoreMessages.unexpectedMIMEType(dataType.getMediaType().toRfcString(), endpointMimeType.toRfcString()), event, this);
-                }
-            }
+  public InboundEndpointMimeTypeCheckingMessageProcessor(InboundEndpoint endpoint) {
+    this.endpoint = endpoint;
+  }
+
+  @Override
+  public MuleEvent process(MuleEvent event) throws MessagingException {
+    MediaType endpointMimeType = endpoint.getMimeType();
+    if (endpointMimeType != null) {
+      MuleMessage message = event.getMessage();
+      final DataType dataType = message.getDataType();
+      if (DataType.OBJECT.getMediaType().matches(dataType.getMediaType())) {
+        event.setMessage(MuleMessage.builder(event.getMessage()).mediaType(endpointMimeType).build());
+      } else {
+        if (!dataType.getMediaType().matches(endpointMimeType)) {
+          throw new MessagingException(CoreMessages.unexpectedMIMEType(dataType.getMediaType().toRfcString(),
+                                                                       endpointMimeType.toRfcString()),
+                                       event, this);
         }
-
-        return event;
+      }
     }
 
-    @Override
-    public String toString()
-    {
-        return ObjectUtils.toString(this);
-    }
+    return event;
+  }
+
+  @Override
+  public String toString() {
+    return ObjectUtils.toString(this);
+  }
 }

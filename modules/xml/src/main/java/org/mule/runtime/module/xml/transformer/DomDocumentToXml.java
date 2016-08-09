@@ -16,47 +16,37 @@ import java.nio.charset.Charset;
 /**
  * <code>DomDocumentToXml</code> Transform a org.w3c.dom.Document to XML String
  */
-public class DomDocumentToXml extends AbstractXmlTransformer implements DiscoverableTransformer
-{
-    private int priorityWeighting = DiscoverableTransformer.DEFAULT_PRIORITY_WEIGHTING;
+public class DomDocumentToXml extends AbstractXmlTransformer implements DiscoverableTransformer {
 
-    public DomDocumentToXml()
-    {
-        setReturnDataType(DataType.XML_STRING);
-    }
+  private int priorityWeighting = DiscoverableTransformer.DEFAULT_PRIORITY_WEIGHTING;
 
-    @Override
-    public Object transformMessage(MuleEvent event, Charset encoding) throws TransformerException
-    {
-        Object src = event.getMessage().getPayload();
-        try
-        {
-            // We now offer XML in byte OR String form.
-            // String remains the default like before.
-            if (byte[].class.equals(getReturnDataType().getType()))
-            {
-                return convertToBytes(src, encoding);
-            }
-            else
-            {
-                return convertToText(src, encoding);
-            }
-        }
-        catch (Exception e)
-        {
-            throw new TransformerException(this, e);
-        }
-    }
+  public DomDocumentToXml() {
+    setReturnDataType(DataType.XML_STRING);
+  }
 
-    @Override
-    public int getPriorityWeighting()
-    {
-        return priorityWeighting;
+  @Override
+  public Object transformMessage(MuleEvent event, Charset encoding) throws TransformerException {
+    Object src = event.getMessage().getPayload();
+    try {
+      // We now offer XML in byte OR String form.
+      // String remains the default like before.
+      if (byte[].class.equals(getReturnDataType().getType())) {
+        return convertToBytes(src, encoding);
+      } else {
+        return convertToText(src, encoding);
+      }
+    } catch (Exception e) {
+      throw new TransformerException(this, e);
     }
+  }
 
-    @Override
-    public void setPriorityWeighting(int priorityWeighting)
-    {
-        this.priorityWeighting = priorityWeighting;
-    }
+  @Override
+  public int getPriorityWeighting() {
+    return priorityWeighting;
+  }
+
+  @Override
+  public void setPriorityWeighting(int priorityWeighting) {
+    this.priorityWeighting = priorityWeighting;
+  }
 }

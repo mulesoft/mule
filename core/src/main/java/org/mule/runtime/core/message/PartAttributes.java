@@ -21,79 +21,70 @@ import java.util.Map;
  *
  * @since 4.0
  */
-public class PartAttributes extends BaseAttributes
-{
-    private static final long serialVersionUID = -4718443205714605260L;
+public class PartAttributes extends BaseAttributes {
 
-    private Map<String, LinkedList<String>> headers;
+  private static final long serialVersionUID = -4718443205714605260L;
 
-    private String name;
+  private Map<String, LinkedList<String>> headers;
 
-    private String fileName;
+  private String name;
 
-    private long size;
+  private String fileName;
 
-    /**
-     * Builds a new instance of this attributes with the given parameters.
-     * 
-     * @param name The name of the part.
-     * @param fileName The name of the file of the attachment, or {@code null} if it wasn't provided.
-     * @param size The size in bytes of the attachment, or -1 if unknown or undetermined.
-     * @param headers The headers relative to the attachment part.
-     */
-    public PartAttributes(String name,
-            String fileName,
-            long size,
-            Map<String, LinkedList<String>> headers)
-    {
-        this.name = requireNonNull(name);
-        this.fileName = fileName;
-        this.size = size;
-        this.headers = ImmutableMap.copyOf(headers);
-    }
+  private long size;
 
-    /**
-     * Builds a new instance of this attributes with the given name.
-     * 
-     * @param name The name of the part.
-     */
-    public PartAttributes(String name)
-    {
-        this(name, null, -1, emptyMap());
-    }
+  /**
+   * Builds a new instance of this attributes with the given parameters.
+   * 
+   * @param name The name of the part.
+   * @param fileName The name of the file of the attachment, or {@code null} if it wasn't provided.
+   * @param size The size in bytes of the attachment, or -1 if unknown or undetermined.
+   * @param headers The headers relative to the attachment part.
+   */
+  public PartAttributes(String name, String fileName, long size, Map<String, LinkedList<String>> headers) {
+    this.name = requireNonNull(name);
+    this.fileName = fileName;
+    this.size = size;
+    this.headers = ImmutableMap.copyOf(headers);
+  }
 
-    /**
-     * @return The name of the part.
-     */
-    public String getName()
-    {
-        return name;
-    }
+  /**
+   * Builds a new instance of this attributes with the given name.
+   * 
+   * @param name The name of the part.
+   */
+  public PartAttributes(String name) {
+    this(name, null, -1, emptyMap());
+  }
 
-    /**
-     * @return The name of the file of the attachment, or {@code null} if it wasn't provided.
-     */
-    public String getFileName()
-    {
-        return fileName;
-    }
+  /**
+   * @return The name of the part.
+   */
+  public String getName() {
+    return name;
+  }
 
-    /**
-     * @return The size in bytes of the attachment, as provided by the source. In case it is unknown or cannot be
-     *         determined, -1 will be returned.
-     */
-    public long getSize()
-    {
-        return size;
-    }
+  /**
+   * @return The name of the file of the attachment, or {@code null} if it wasn't provided.
+   */
+  public String getFileName() {
+    return fileName;
+  }
 
-    /**
-     * TODO Replace with ParameterMap
-     * 
-     * @return The headers relative to the attachment part.
-     */
-    public Map<String, LinkedList<String>> getHeaders()
-    {
-        return headers;
-    }
+  /**
+   * @return The size in bytes of the attachment, as provided by the source. In case it is unknown or cannot be determined, -1
+   *         will be returned.
+   */
+  public long getSize() {
+    return size;
+  }
+
+  /**
+   * TODO Replace with ParameterMap
+   * 
+   * @return The headers relative to the attachment part.
+   */
+  public Map<String, LinkedList<String>> getHeaders() {
+    return headers;
+  }
 }

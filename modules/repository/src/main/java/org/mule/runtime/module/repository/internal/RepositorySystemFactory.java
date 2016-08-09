@@ -13,12 +13,11 @@ import org.eclipse.aether.RepositorySystem;
  *
  * @since 4.0
  */
-public interface RepositorySystemFactory
-{
+public interface RepositorySystemFactory {
 
-    /**
-     * @return the {@code RepositorySystem} created by the factory.
-     */
-    RepositorySystem createRepositorySystem();
+  /**
+   * @return the {@code RepositorySystem} created by the factory.
+   */
+  RepositorySystem createRepositorySystem();
 
 }

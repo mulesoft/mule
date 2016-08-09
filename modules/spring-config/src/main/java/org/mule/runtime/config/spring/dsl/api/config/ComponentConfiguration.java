@@ -17,125 +17,113 @@ import java.util.Map;
 /**
  * Defines a mule component configuration content.
  * <p>
- * A {@code ComponentConfiguration} allows to define a mule component configuration programmatically
- * by defining the component namespace, identifier and the set of simple attributes or complex nested attributes
- * required by the component.
+ * A {@code ComponentConfiguration} allows to define a mule component configuration programmatically by defining the component
+ * namespace, identifier and the set of simple attributes or complex nested attributes required by the component.
  *
  * @since 4.0
  */
-public class ComponentConfiguration
-{
+public class ComponentConfiguration {
 
-    private String namespace;
-    private String identifier;
-    private Map<String, String> parameters = new HashMap<>();
-    private List<ComponentConfiguration> nestedComponentConfiguration = new ArrayList<>();
+  private String namespace;
+  private String identifier;
+  private Map<String, String> parameters = new HashMap<>();
+  private List<ComponentConfiguration> nestedComponentConfiguration = new ArrayList<>();
+
+  /**
+   * @return the namespace where the component is located. i.e.: In file:read the namespace is file.
+   */
+  public String getNamespace() {
+    return namespace;
+  }
+
+  /**
+   * @return the identifier of the component. i.e.: In file:read the identifier is read.
+   */
+  public String getIdentifier() {
+    return identifier;
+  }
+
+  /**
+   * @return a map with the configuration parameters of the component where the key is the parameter name and the value is the
+   *         parameter value.
+   */
+  public Map<String, String> getParameters() {
+    return unmodifiableMap(parameters);
+  }
+
+  /**
+   * @return a collection of the complex child configuration components.
+   */
+  public List<ComponentConfiguration> getNestedComponentConfiguration() {
+    return unmodifiableList(nestedComponentConfiguration);
+  }
+
+  private ComponentConfiguration() {}
+
+  /**
+   * Builder for creating {@code ComponentConfiguration} instances.
+   */
+  public static class Builder {
+
+    private ComponentConfiguration componentConfiguration = new ComponentConfiguration();
 
     /**
-     * @return the namespace where the component is located. i.e.: In file:read the namespace is file.
+     * @param namespace the namespace where the component is located. i.e.: In file:read the namespace is file
+     * @return the builder
      */
-    public String getNamespace()
-    {
-        return namespace;
+    public Builder setNamespace(String namespace) {
+      componentConfiguration.namespace = namespace;
+      return this;
     }
 
     /**
-     * @return the identifier of the component. i.e.: In file:read the identifier is read.
+     * @param identifier the identifier of the component. i.e.: In file:read the identifier is read.
+     * @return the builder
      */
-    public String getIdentifier()
-    {
-        return identifier;
+    public Builder setIdentifier(String identifier) {
+      componentConfiguration.identifier = identifier;
+      return this;
     }
 
     /**
-     * @return a map with the configuration parameters of the component where the key is the parameter name and the value is the parameter value.
+     * Adds a configuration parameter to the component
+     *
+     * @param name configuration attribute name
+     * @param value configuration attribute value
+     * @return the builder
      */
-    public Map<String, String> getParameters()
-    {
-        return unmodifiableMap(parameters);
+    public Builder addParameter(String name, String value) {
+      componentConfiguration.parameters.put(name, value);
+      return this;
     }
 
     /**
-     * @return a collection of the complex child configuration components.
+     * Adds a complex configuration parameter to the component.
+     * <p>
+     * For instance, to define a file:matcher for a file:read component: *
+     * 
+     * <pre>
+     * {@code
+     * <file:read>
+     *   <file:matcher regex="XYZ"/>
+     * </file:read>
+     * }
+     * </pre>
+     *
+     * @param componentConfiguration
+     * @return
      */
-    public List<ComponentConfiguration> getNestedComponentConfiguration()
-    {
-        return unmodifiableList(nestedComponentConfiguration);
-    }
-
-    private ComponentConfiguration()
-    {
+    public Builder addNestedConfiguration(ComponentConfiguration componentConfiguration) {
+      componentConfiguration.nestedComponentConfiguration.add(componentConfiguration);
+      return this;
     }
 
     /**
-     * Builder for creating  {@code ComponentConfiguration} instances.
+     * @return a {@code ComponentConfiguration} with the provided configuration
      */
-    public static class Builder
-    {
-
-        private ComponentConfiguration componentConfiguration = new ComponentConfiguration();
-
-        /**
-         * @param namespace the namespace where the component is located. i.e.: In file:read the namespace is file
-         * @return the builder
-         */
-        public Builder setNamespace(String namespace)
-        {
-            componentConfiguration.namespace = namespace;
-            return this;
-        }
-
-        /**
-         * @param identifier the identifier of the component. i.e.: In file:read the identifier is read.
-         * @return the builder
-         */
-        public Builder setIdentifier(String identifier)
-        {
-            componentConfiguration.identifier = identifier;
-            return this;
-        }
-
-        /**
-         * Adds a configuration parameter to the component
-         *
-         * @param name  configuration attribute name
-         * @param value configuration attribute value
-         * @return the builder
-         */
-        public Builder addParameter(String name, String value)
-        {
-            componentConfiguration.parameters.put(name, value);
-            return this;
-        }
-
-        /**
-         * Adds a complex configuration parameter to the component.
-         * <p>
-         * For instance, to define a file:matcher for a file:read component:
-         * * <pre>
-         * {@code
-         * <file:read>
-         *   <file:matcher regex="XYZ"/>
-         * </file:read>
-         * }
-         * </pre>
-         *
-         * @param componentConfiguration
-         * @return
-         */
-        public Builder addNestedConfiguration(ComponentConfiguration componentConfiguration)
-        {
-            componentConfiguration.nestedComponentConfiguration.add(componentConfiguration);
-            return this;
-        }
-
-        /**
-         * @return a {@code ComponentConfiguration} with the provided configuration
-         */
-        public ComponentConfiguration build()
-        {
-            return componentConfiguration;
-        }
+    public ComponentConfiguration build() {
+      return componentConfiguration;
     }
+  }
 
 }

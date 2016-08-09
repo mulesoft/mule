@@ -13,29 +13,26 @@ import java.io.File;
 import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
 
-public abstract class AbstractFileMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTestCase
-{
-    @Rule
-    public TemporaryFolder tempFolder = new TemporaryFolder();
-    
-    protected File tempFile;
+public abstract class AbstractFileMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTestCase {
 
-    @Override
-    protected void doSetUp() throws Exception
-    {
-        super.doSetUp();
-        tempFile = tempFolder.newFile("simple.mule");
-    }
-    
-    @Override
-    protected Object getValidTransportMessage()
-    {
-        return tempFile;
-    }
+  @Rule
+  public TemporaryFolder tempFolder = new TemporaryFolder();
 
-    @Override
-    protected Object getUnsupportedTransportMessage()
-    {
-        return "this is an invalid payload for " + getClass().getSimpleName();
-    }
+  protected File tempFile;
+
+  @Override
+  protected void doSetUp() throws Exception {
+    super.doSetUp();
+    tempFile = tempFolder.newFile("simple.mule");
+  }
+
+  @Override
+  protected Object getValidTransportMessage() {
+    return tempFile;
+  }
+
+  @Override
+  protected Object getUnsupportedTransportMessage() {
+    return "this is an invalid payload for " + getClass().getSimpleName();
+  }
 }

@@ -17,25 +17,23 @@ import org.mule.runtime.core.processor.NullMessageProcessor;
 
 import org.junit.Test;
 
-public class CompositeMessageProcessorDefinitionParserTestCase extends FunctionalTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/config/spring/parsers/specific/composite-message-processor.xml";
-    }
+public class CompositeMessageProcessorDefinitionParserTestCase extends FunctionalTestCase {
 
-    @Test
-    public void testInterceptingCompositeOnEndpoint() throws Exception
-    {
-        EndpointBuilder endpointBuilder = lookupEndpointBuilder(muleContext.getRegistry(), "endpoint");
-        InboundEndpoint endpoint = endpointBuilder.buildInboundEndpoint();
-        assertEquals(2, endpoint.getMessageProcessors().size());
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/config/spring/parsers/specific/composite-message-processor.xml";
+  }
 
-        MessageProcessor endpointProcessor = endpoint.getMessageProcessorsFactory()
-            .createInboundMessageProcessorChain(endpoint, null, new NullMessageProcessor());
+  @Test
+  public void testInterceptingCompositeOnEndpoint() throws Exception {
+    EndpointBuilder endpointBuilder = lookupEndpointBuilder(muleContext.getRegistry(), "endpoint");
+    InboundEndpoint endpoint = endpointBuilder.buildInboundEndpoint();
+    assertEquals(2, endpoint.getMessageProcessors().size());
 
-        assertEquals("01231abc2", endpointProcessor.process(getTestEvent("0")).getMessageAsString());
-    }
+    MessageProcessor endpointProcessor =
+        endpoint.getMessageProcessorsFactory().createInboundMessageProcessorChain(endpoint, null, new NullMessageProcessor());
+
+    assertEquals("01231abc2", endpointProcessor.process(getTestEvent("0")).getMessageAsString());
+  }
 
 }

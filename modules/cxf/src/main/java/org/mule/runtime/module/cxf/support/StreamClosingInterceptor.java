@@ -21,38 +21,31 @@ import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 
 /**
- * Replaces the original XMLStreamReader with another one which
- * closes the underlying InputStream.
+ * Replaces the original XMLStreamReader with another one which closes the underlying InputStream.
  */
-public class StreamClosingInterceptor extends AbstractPhaseInterceptor<Message>
-{
-    public StreamClosingInterceptor()
-    {
-        super(Phase.POST_STREAM);
-        addAfter(StaxInInterceptor.class.getName());
-    }
+public class StreamClosingInterceptor extends AbstractPhaseInterceptor<Message> {
 
-    public void handleMessage(final Message message) throws Fault
-    {
-        XMLStreamReader xsr = message.getContent(XMLStreamReader.class);
-        final InputStream is = message.getContent(InputStream.class);
-        DelegateXMLStreamReader xsr2 = new DelegateXMLStreamReader(xsr) {
+  public StreamClosingInterceptor() {
+    super(Phase.POST_STREAM);
+    addAfter(StaxInInterceptor.class.getName());
+  }
 
-            @Override
-            public void close() throws XMLStreamException
-            {
-                super.close();
-                try
-                {
-                    is.close();
-                }
-                catch (IOException e)
-                {
-                    throw new XMLStreamException(e);
-                }
-            }
-        };
-        message.setContent(XMLStreamReader.class, xsr2);
-    }
+  public void handleMessage(final Message message) throws Fault {
+    XMLStreamReader xsr = message.getContent(XMLStreamReader.class);
+    final InputStream is = message.getContent(InputStream.class);
+    DelegateXMLStreamReader xsr2 = new DelegateXMLStreamReader(xsr) {
+
+      @Override
+      public void close() throws XMLStreamException {
+        super.close();
+        try {
+          is.close();
+        } catch (IOException e) {
+          throw new XMLStreamException(e);
+        }
+      }
+    };
+    message.setContent(XMLStreamReader.class, xsr2);
+  }
 }
 

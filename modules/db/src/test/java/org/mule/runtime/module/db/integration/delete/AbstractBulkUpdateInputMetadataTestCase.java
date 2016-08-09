@@ -23,28 +23,25 @@ import org.mule.runtime.module.db.internal.processor.AbstractDbMessageProcessor;
 
 import java.util.List;
 
-public abstract class AbstractBulkUpdateInputMetadataTestCase extends AbstractDbIntegrationTestCase
-{
+public abstract class AbstractBulkUpdateInputMetadataTestCase extends AbstractDbIntegrationTestCase {
 
-    public AbstractBulkUpdateInputMetadataTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public AbstractBulkUpdateInputMetadataTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    protected void doResolvedMetadataTest(String flowName)
-    {
-        Flow flowConstruct = (Flow) muleContext.getRegistry().lookupFlowConstruct(flowName);
+  protected void doResolvedMetadataTest(String flowName) {
+    Flow flowConstruct = (Flow) muleContext.getRegistry().lookupFlowConstruct(flowName);
 
-        List<MessageProcessor> messageProcessors = flowConstruct.getMessageProcessors();
-        AbstractDbMessageProcessor messageProcessor = (AbstractDbMessageProcessor) messageProcessors.get(0);
-        Result<MetaData> inputMetaData = messageProcessor.getInputMetaData();
+    List<MessageProcessor> messageProcessors = flowConstruct.getMessageProcessors();
+    AbstractDbMessageProcessor messageProcessor = (AbstractDbMessageProcessor) messageProcessors.get(0);
+    Result<MetaData> inputMetaData = messageProcessor.getInputMetaData();
 
-        DefaultListMetaDataModel listMetaDataModel = (DefaultListMetaDataModel) inputMetaData.get().getPayload();
-        DefinedMapMetaDataModel mapDataModel = (DefinedMapMetaDataModel) listMetaDataModel.getElementModel();
-        assertThat(mapDataModel.getKeys().size(), equalTo(2));
-        MetaDataModel id = mapDataModel.getValueMetaDataModel("position");
-        assertThat(id.getDataType(), equalTo(testDatabase.getIdFieldInputMetaDataType()));
-        MetaDataModel data = mapDataModel.getValueMetaDataModel("name");
-        assertThat(data.getDataType(), equalTo(DataType.STRING));
-    }
+    DefaultListMetaDataModel listMetaDataModel = (DefaultListMetaDataModel) inputMetaData.get().getPayload();
+    DefinedMapMetaDataModel mapDataModel = (DefinedMapMetaDataModel) listMetaDataModel.getElementModel();
+    assertThat(mapDataModel.getKeys().size(), equalTo(2));
+    MetaDataModel id = mapDataModel.getValueMetaDataModel("position");
+    assertThat(id.getDataType(), equalTo(testDatabase.getIdFieldInputMetaDataType()));
+    MetaDataModel data = mapDataModel.getValueMetaDataModel("name");
+    assertThat(data.getDataType(), equalTo(DataType.STRING));
+  }
 }

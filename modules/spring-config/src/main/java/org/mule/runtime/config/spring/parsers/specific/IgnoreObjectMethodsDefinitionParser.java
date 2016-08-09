@@ -9,19 +9,17 @@ package org.mule.runtime.config.spring.parsers.specific;
 import org.mule.runtime.config.spring.parsers.generic.ParentDefinitionParser;
 import org.mule.runtime.config.spring.parsers.processors.ExtendTarget;
 
-public class IgnoreObjectMethodsDefinitionParser extends ParentDefinitionParser
-{
+public class IgnoreObjectMethodsDefinitionParser extends ParentDefinitionParser {
 
-    public static final String IGNORED_METHOD = "ignoredMethod";
+  public static final String IGNORED_METHOD = "ignoredMethod";
 
-    public IgnoreObjectMethodsDefinitionParser()
-    {
-        registerPostProcessor(new ExtendTarget(IGNORED_METHOD, "toString"));
-        registerPostProcessor(new ExtendTarget(IGNORED_METHOD, "hashCode"));
-        registerPostProcessor(new ExtendTarget(IGNORED_METHOD, "wait"));
-        registerPostProcessor(new ExtendTarget(IGNORED_METHOD, "notify"));
-        registerPostProcessor(new ExtendTarget(IGNORED_METHOD, "notifyAll"));
-        registerPostProcessor(new ExtendTarget(IGNORED_METHOD, "getClass"));
-    }
+  public IgnoreObjectMethodsDefinitionParser() {
+    registerPostProcessor(new ExtendTarget(IGNORED_METHOD, "toString"));
+    registerPostProcessor(new ExtendTarget(IGNORED_METHOD, "hashCode"));
+    registerPostProcessor(new ExtendTarget(IGNORED_METHOD, "wait"));
+    registerPostProcessor(new ExtendTarget(IGNORED_METHOD, "notify"));
+    registerPostProcessor(new ExtendTarget(IGNORED_METHOD, "notifyAll"));
+    registerPostProcessor(new ExtendTarget(IGNORED_METHOD, "getClass"));
+  }
 
 }

@@ -32,210 +32,160 @@ import javax.transaction.xa.XAResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SessionInvocationHandler implements TargetInvocationHandler
-{
-    protected static final transient Logger logger = LoggerFactory.getLogger(SessionInvocationHandler.class);
+public class SessionInvocationHandler implements TargetInvocationHandler {
 
-    private XASession xaSession;
-    private XAResource xaResource;
-    private volatile boolean enlisted = false;
-    private volatile boolean reuseObject = false;
-    private final Session session;
+  protected static final transient Logger logger = LoggerFactory.getLogger(SessionInvocationHandler.class);
 
-    private SessionInvocationHandler(XASession xaSession, Session session, Boolean sameRMOverrideValue)
-    {
-        super();
-        this.xaSession = xaSession;
-        this.session = session;
-        this.xaResource = new XAResourceWrapper(xaSession.getXAResource(), this, sameRMOverrideValue);
-    }
-    
-    public SessionInvocationHandler(XASession xaSession, Boolean sameRMOverrideValue) throws JMSException
-    {
-        this(xaSession, xaSession.getSession(), sameRMOverrideValue);
-    }
+  private XASession xaSession;
+  private XAResource xaResource;
+  private volatile boolean enlisted = false;
+  private volatile boolean reuseObject = false;
+  private final Session session;
 
-    public SessionInvocationHandler(XAQueueSession xaSession, Boolean sameRMOverrideValue) throws JMSException
-    {
-        this(xaSession, xaSession.getQueueSession(), sameRMOverrideValue);
-    }
+  private SessionInvocationHandler(XASession xaSession, Session session, Boolean sameRMOverrideValue) {
+    super();
+    this.xaSession = xaSession;
+    this.session = session;
+    this.xaResource = new XAResourceWrapper(xaSession.getXAResource(), this, sameRMOverrideValue);
+  }
 
-    public SessionInvocationHandler(XATopicSession xaSession, Boolean sameRMOverrideValue) throws JMSException
-    {
-        this(xaSession, xaSession.getTopicSession(), sameRMOverrideValue);
-    }
+  public SessionInvocationHandler(XASession xaSession, Boolean sameRMOverrideValue) throws JMSException {
+    this(xaSession, xaSession.getSession(), sameRMOverrideValue);
+  }
 
-    @Override
-    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
-    {
-        if (logger.isDebugEnabled())
-        {
-            logger.debug(this + " Invoking " + method);
-        }
+  public SessionInvocationHandler(XAQueueSession xaSession, Boolean sameRMOverrideValue) throws JMSException {
+    this(xaSession, xaSession.getQueueSession(), sameRMOverrideValue);
+  }
 
-        // processing method from MuleXaObject
-        if (XaTransaction.MuleXaObject.DELIST_METHOD_NAME.equals(method.getName()))
-        {
-            return delist();
-        }
-        else if (XaTransaction.MuleXaObject.ENLIST_METHOD_NAME.equals(method.getName()))
-        {
-            return enlist();
-        }
-        else if (XaTransaction.MuleXaObject.SET_REUSE_OBJECT_METHOD_NAME.equals(method.getName()))
-        {
-            reuseObject = (Boolean) args[0];
-            return null;
-        }
-        else if (XaTransaction.MuleXaObject.IS_REUSE_OBJECT_METHOD_NAME.equals(method.getName()))
-        {
-            return reuseObject;
-        }
-        else if (XaTransaction.MuleXaObject.GET_TARGET_OBJECT_METHOD_NAME.equals(method.getName()))
-        {
-            return getTargetObject();
-        }
-        else if (XaTransaction.MuleXaObject.CLOSE_METHOD_NAME.equals(method.getName()))
-        {
-            // some jms implementation need both sessions closed, some not
-            try
-            {
-                session.close();
-                xaSession.close();
-            }
-            catch (Exception ex)
-            {
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("Closing the session and the xaSession failed", ex);
-                }
-            }
-            return null;
-        }
-        
-        Object result = method.invoke(session, args);
+  public SessionInvocationHandler(XATopicSession xaSession, Boolean sameRMOverrideValue) throws JMSException {
+    this(xaSession, xaSession.getTopicSession(), sameRMOverrideValue);
+  }
 
-        if (result instanceof TopicSubscriber)
-        {
-            result = Proxy.newProxyInstance(Session.class.getClassLoader(),
-                                            new Class[]{TopicSubscriber.class}, new ConsumerProducerInvocationHandler(this, result));
-        }
-        else if (result instanceof QueueReceiver)
-        {
-            result = Proxy.newProxyInstance(Session.class.getClassLoader(),
-                                            new Class[]{QueueReceiver.class}, new ConsumerProducerInvocationHandler(this, result));
-        }
-        else if (result instanceof MessageConsumer)
-        {
-            result = Proxy.newProxyInstance(Session.class.getClassLoader(),
-                                            new Class[]{MessageConsumer.class}, new ConsumerProducerInvocationHandler(this, result));
-        }
-        else if (result instanceof TopicPublisher)
-        {
-            result = Proxy.newProxyInstance(Session.class.getClassLoader(),
-                                            new Class[]{TopicPublisher.class}, new ConsumerProducerInvocationHandler(this, result));
-        }
-        else if (result instanceof QueueSender)
-        {
-            result = Proxy.newProxyInstance(Session.class.getClassLoader(),
-                                            new Class[]{QueueSender.class}, new ConsumerProducerInvocationHandler(this, result));
-        }
-        else if (result instanceof MessageProducer)
-        {
-            result = Proxy.newProxyInstance(Session.class.getClassLoader(),
-                                            new Class[]{MessageProducer.class}, new ConsumerProducerInvocationHandler(this, result));
-        }
-        return result;
+  @Override
+  public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+    if (logger.isDebugEnabled()) {
+      logger.debug(this + " Invoking " + method);
     }
 
-    public boolean enlist() throws Exception
-    {
-        if (isEnlisted())
-        {
-            return false;
+    // processing method from MuleXaObject
+    if (XaTransaction.MuleXaObject.DELIST_METHOD_NAME.equals(method.getName())) {
+      return delist();
+    } else if (XaTransaction.MuleXaObject.ENLIST_METHOD_NAME.equals(method.getName())) {
+      return enlist();
+    } else if (XaTransaction.MuleXaObject.SET_REUSE_OBJECT_METHOD_NAME.equals(method.getName())) {
+      reuseObject = (Boolean) args[0];
+      return null;
+    } else if (XaTransaction.MuleXaObject.IS_REUSE_OBJECT_METHOD_NAME.equals(method.getName())) {
+      return reuseObject;
+    } else if (XaTransaction.MuleXaObject.GET_TARGET_OBJECT_METHOD_NAME.equals(method.getName())) {
+      return getTargetObject();
+    } else if (XaTransaction.MuleXaObject.CLOSE_METHOD_NAME.equals(method.getName())) {
+      // some jms implementation need both sessions closed, some not
+      try {
+        session.close();
+        xaSession.close();
+      } catch (Exception ex) {
+        if (logger.isDebugEnabled()) {
+          logger.debug("Closing the session and the xaSession failed", ex);
         }
-
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Enlistment request: " + this);
-        }
-
-        Transaction transaction = TransactionCoordination.getInstance().getTransaction();
-        if (transaction == null)
-        {
-            throw new IllegalTransactionStateException(CoreMessages.noMuleTransactionAvailable());
-        }
-        if (!(transaction instanceof XaTransaction))
-        {
-            throw new IllegalTransactionStateException(CoreMessages.notMuleXaTransaction(transaction));
-        }
-
-        if (!isEnlisted())
-        {
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Enlisting resource " + xaResource + " in xa transaction " + transaction);
-            }
-
-            enlisted = ((XaTransaction) transaction).enlistResource(xaResource);
-        }
-        
-        return enlisted;
+      }
+      return null;
     }
 
-    public boolean delist() throws Exception
-    {
-        if (!isEnlisted())
-        {
-            return false;
-        }
+    Object result = method.invoke(session, args);
 
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Delistment request: " + this);
-        }
+    if (result instanceof TopicSubscriber) {
+      result = Proxy.newProxyInstance(Session.class.getClassLoader(), new Class[] {TopicSubscriber.class},
+                                      new ConsumerProducerInvocationHandler(this, result));
+    } else if (result instanceof QueueReceiver) {
+      result = Proxy.newProxyInstance(Session.class.getClassLoader(), new Class[] {QueueReceiver.class},
+                                      new ConsumerProducerInvocationHandler(this, result));
+    } else if (result instanceof MessageConsumer) {
+      result = Proxy.newProxyInstance(Session.class.getClassLoader(), new Class[] {MessageConsumer.class},
+                                      new ConsumerProducerInvocationHandler(this, result));
+    } else if (result instanceof TopicPublisher) {
+      result = Proxy.newProxyInstance(Session.class.getClassLoader(), new Class[] {TopicPublisher.class},
+                                      new ConsumerProducerInvocationHandler(this, result));
+    } else if (result instanceof QueueSender) {
+      result = Proxy.newProxyInstance(Session.class.getClassLoader(), new Class[] {QueueSender.class},
+                                      new ConsumerProducerInvocationHandler(this, result));
+    } else if (result instanceof MessageProducer) {
+      result = Proxy.newProxyInstance(Session.class.getClassLoader(), new Class[] {MessageProducer.class},
+                                      new ConsumerProducerInvocationHandler(this, result));
+    }
+    return result;
+  }
 
-        Transaction transaction = TransactionCoordination.getInstance().getTransaction();
-        if (transaction == null)
-        {
-            throw new IllegalTransactionStateException(CoreMessages.noMuleTransactionAvailable());
-        }
-        if (!(transaction instanceof XaTransaction))
-        {
-            throw new IllegalTransactionStateException(CoreMessages.notMuleXaTransaction(transaction));
-        }
-
-        if (isEnlisted())
-        {
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Delisting resource " + xaResource + " in xa transaction " + transaction);
-            }
-
-            enlisted = !((XaTransaction) transaction).delistResource(xaResource, XAResource.TMSUCCESS);
-        }
-        return !isEnlisted();
+  public boolean enlist() throws Exception {
+    if (isEnlisted()) {
+      return false;
     }
 
-    public boolean isEnlisted()
-    {
-        return enlisted;
+    if (logger.isDebugEnabled()) {
+      logger.debug("Enlistment request: " + this);
     }
 
-    public void setEnlisted(boolean enlisted)
-    {
-        this.enlisted = enlisted;
+    Transaction transaction = TransactionCoordination.getInstance().getTransaction();
+    if (transaction == null) {
+      throw new IllegalTransactionStateException(CoreMessages.noMuleTransactionAvailable());
+    }
+    if (!(transaction instanceof XaTransaction)) {
+      throw new IllegalTransactionStateException(CoreMessages.notMuleXaTransaction(transaction));
     }
 
-    @Override
-    public Object getTargetObject()
-    {
-        return xaSession;
+    if (!isEnlisted()) {
+      if (logger.isDebugEnabled()) {
+        logger.debug("Enlisting resource " + xaResource + " in xa transaction " + transaction);
+      }
+
+      enlisted = ((XaTransaction) transaction).enlistResource(xaResource);
     }
 
-    public XAResource getXAResource()
-    {
-        return xaResource;
+    return enlisted;
+  }
+
+  public boolean delist() throws Exception {
+    if (!isEnlisted()) {
+      return false;
     }
+
+    if (logger.isDebugEnabled()) {
+      logger.debug("Delistment request: " + this);
+    }
+
+    Transaction transaction = TransactionCoordination.getInstance().getTransaction();
+    if (transaction == null) {
+      throw new IllegalTransactionStateException(CoreMessages.noMuleTransactionAvailable());
+    }
+    if (!(transaction instanceof XaTransaction)) {
+      throw new IllegalTransactionStateException(CoreMessages.notMuleXaTransaction(transaction));
+    }
+
+    if (isEnlisted()) {
+      if (logger.isDebugEnabled()) {
+        logger.debug("Delisting resource " + xaResource + " in xa transaction " + transaction);
+      }
+
+      enlisted = !((XaTransaction) transaction).delistResource(xaResource, XAResource.TMSUCCESS);
+    }
+    return !isEnlisted();
+  }
+
+  public boolean isEnlisted() {
+    return enlisted;
+  }
+
+  public void setEnlisted(boolean enlisted) {
+    this.enlisted = enlisted;
+  }
+
+  @Override
+  public Object getTargetObject() {
+    return xaSession;
+  }
+
+  public XAResource getXAResource() {
+    return xaResource;
+  }
 
 }

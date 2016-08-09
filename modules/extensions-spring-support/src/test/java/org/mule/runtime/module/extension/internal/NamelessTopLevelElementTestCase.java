@@ -10,25 +10,21 @@ import org.mule.functional.junit4.InvalidExtensionConfigTestCase;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 
-public class NamelessTopLevelElementTestCase extends InvalidExtensionConfigTestCase
-{
+public class NamelessTopLevelElementTestCase extends InvalidExtensionConfigTestCase {
 
-    @Override
-    protected void doSetUpBeforeMuleContextCreation() throws Exception
-    {
-        expectedException.expect(ConfigurationException.class);
-        expectedException.expectMessage("Global element heisenberg:door does not provide a name attribute.");
-    }
+  @Override
+  protected void doSetUpBeforeMuleContextCreation() throws Exception {
+    expectedException.expect(ConfigurationException.class);
+    expectedException.expectMessage("Global element heisenberg:door does not provide a name attribute.");
+  }
 
-    @Override
-    protected Class<?>[] getAnnotatedExtensionClasses()
-    {
-        return new Class[] {HeisenbergExtension.class};
-    }
+  @Override
+  protected Class<?>[] getAnnotatedExtensionClasses() {
+    return new Class[] {HeisenbergExtension.class};
+  }
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "heisenberg-nameless-top-level-element-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "heisenberg-nameless-top-level-element-config.xml";
+  }
 }

@@ -9,21 +9,17 @@ package org.mule.extension.file.api;
 import org.mule.runtime.module.extension.file.api.FileAttributes;
 
 /**
- * A specialization of {@link FileAttributes} which is associated
- * to a {@link FileEventType}.
+ * A specialization of {@link FileAttributes} which is associated to a {@link FileEventType}.
  * <p>
- * Because a {@link FileAttributes} is a snapshot of a file's
- * attributes at a specific point of time, the purpose of this
- * class is to associate such state to a particular event
- * type which took it into that state
+ * Because a {@link FileAttributes} is a snapshot of a file's attributes at a specific point of time, the purpose of this class is
+ * to associate such state to a particular event type which took it into that state
  *
  * @since 4.0
  */
-public interface EventedFileAttributes extends FileAttributes
-{
+public interface EventedFileAttributes extends FileAttributes {
 
-    /**
-     * @return The name of the {@link FileEventType} upon which {@code this} instance was created
-     */
-    String getEventType();
+  /**
+   * @return The name of the {@link FileEventType} upon which {@code this} instance was created
+   */
+  String getEventType();
 }

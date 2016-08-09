@@ -23,93 +23,79 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 /**
- * Assert that flows do not propagate exceptions via runFlow or use of flow-ref. Also
- * assert that a sub-flow/processor-chain does not handle it's own exception but they are rather handled by
- * calling flow.
+ * Assert that flows do not propagate exceptions via runFlow or use of flow-ref. Also assert that a sub-flow/processor-chain does
+ * not handle it's own exception but they are rather handled by calling flow.
  */
-public class ExceptionPropagationMule5737TestCase extends AbstractIntegrationTestCase
-{
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
+public class ExceptionPropagationMule5737TestCase extends AbstractIntegrationTestCase {
+
+  @Rule
+  public ExpectedException expectedException = ExpectedException.none();
+
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/integration/exceptions/exception-propagation-mule-5737-config.xml";
+  }
+
+  @Test
+  public void testRequestResponseEndpointExceptionPropagation() throws Exception {
+    expectedException.expect(ComponentException.class);
+    expectedException.expectCause(instanceOf(FunctionalTestException.class));
+    runFlow("flow");
+  }
+
+  @Test
+  public void testFlowWithChildFlowExceptionPropagation() throws Exception {
+    FlowConstruct flow = muleContext.getRegistry().lookupFlowConstruct("flowWithChildFlow");
+    FlowConstruct childFlow = muleContext.getRegistry().lookupFlowConstruct("childFlow");
+    SensingExceptionStrategy parentES = (SensingExceptionStrategy) flow.getExceptionListener();
+    SensingExceptionStrategy childFlowES = (SensingExceptionStrategy) childFlow.getExceptionListener();
+
+    runFlow("flowWithChildFlow");
+
+    assertFalse(parentES.caught);
+    assertTrue(childFlowES.caught);
+  }
+
+  @Test
+  public void testFlowWithSubFlowExceptionPropagation() throws Exception {
+    SensingExceptionStrategy parentES =
+        (SensingExceptionStrategy) muleContext.getRegistry().lookupFlowConstruct("flowWithSubFlow").getExceptionListener();
+
+    runFlow("flowWithSubFlow");
+
+    assertTrue(parentES.caught);
+  }
+
+  @Test
+  public void testFlowWithChildServiceExceptionPropagation() throws Exception {
+    SensingExceptionStrategy parentES =
+        (SensingExceptionStrategy) muleContext.getRegistry().lookupFlowConstruct("flowWithChildService").getExceptionListener();
+    SensingExceptionStrategy childServiceES =
+        (SensingExceptionStrategy) muleContext.getRegistry().lookupFlowConstruct("childService").getExceptionListener();
+
+    runFlow("flowWithChildService");
+
+    assertFalse(parentES.caught);
+    assertTrue(childServiceES.caught);
+  }
+
+  public static class SensingExceptionStrategy extends AbstractMessagingExceptionStrategy {
+
+    public SensingExceptionStrategy() {
+      super(null);
+    }
+
+    boolean caught;
 
     @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/integration/exceptions/exception-propagation-mule-5737-config.xml";
+    public MuleEvent handleException(Exception e, MuleEvent event) {
+      caught = true;
+      MuleEvent resultEvent = super.handleException(e, event);
+      event.setMessage(MuleMessage.builder(event.getMessage()).exceptionPayload(null).build());
+      ((MessagingException) e).setHandled(true);
+      return resultEvent;
     }
 
-    @Test
-    public void testRequestResponseEndpointExceptionPropagation() throws Exception
-    {
-        expectedException.expect(ComponentException.class);
-        expectedException.expectCause(instanceOf(FunctionalTestException.class));
-        runFlow("flow");
-    }
-
-    @Test
-    public void testFlowWithChildFlowExceptionPropagation() throws Exception
-    {
-        FlowConstruct flow = muleContext.getRegistry().lookupFlowConstruct("flowWithChildFlow");
-        FlowConstruct childFlow = muleContext.getRegistry().lookupFlowConstruct("childFlow");
-        SensingExceptionStrategy parentES = (SensingExceptionStrategy) flow.getExceptionListener();
-        SensingExceptionStrategy childFlowES = (SensingExceptionStrategy) childFlow.getExceptionListener();
-
-        runFlow("flowWithChildFlow");
-
-        assertFalse(parentES.caught);
-        assertTrue(childFlowES.caught);
-    }
-
-    @Test
-    public void testFlowWithSubFlowExceptionPropagation() throws Exception
-    {
-        SensingExceptionStrategy parentES = (SensingExceptionStrategy) muleContext.getRegistry()
-            .lookupFlowConstruct("flowWithSubFlow")
-            .getExceptionListener();
-
-        runFlow("flowWithSubFlow");
-
-        assertTrue(parentES.caught);
-    }
-
-    @Test
-    public void testFlowWithChildServiceExceptionPropagation() throws Exception
-    {
-        SensingExceptionStrategy parentES = (SensingExceptionStrategy) muleContext.getRegistry()
-            .lookupFlowConstruct("flowWithChildService")
-            .getExceptionListener();
-        SensingExceptionStrategy childServiceES = (SensingExceptionStrategy) muleContext.getRegistry()
-            .lookupFlowConstruct("childService")
-            .getExceptionListener();
-
-        runFlow("flowWithChildService");
-
-        assertFalse(parentES.caught);
-        assertTrue(childServiceES.caught);
-    }
-
-    public static class SensingExceptionStrategy extends AbstractMessagingExceptionStrategy
-    {
-
-        public SensingExceptionStrategy()
-        {
-            super(null);
-        }
-
-        boolean caught;
-
-        @Override
-        public MuleEvent handleException(Exception e, MuleEvent event)
-        {
-            caught = true;
-            MuleEvent resultEvent = super.handleException(e, event);
-            event.setMessage(MuleMessage.builder(event.getMessage())
-                                        .exceptionPayload(null)
-                                        .build());
-            ((MessagingException)e).setHandled(true);
-            return resultEvent;
-        }
-
-    }
+  }
 
 }

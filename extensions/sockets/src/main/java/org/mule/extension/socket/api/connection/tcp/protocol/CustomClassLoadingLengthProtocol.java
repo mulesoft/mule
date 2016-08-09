@@ -17,30 +17,25 @@ import org.apache.log4j.Logger;
  *
  * @since 2.2.6
  */
-public class CustomClassLoadingLengthProtocol extends LengthProtocol
-{
+public class CustomClassLoadingLengthProtocol extends LengthProtocol {
 
-    private final Logger logger = Logger.getLogger(this.getClass());
+  private final Logger logger = Logger.getLogger(this.getClass());
 
-    private ClassLoader classLoader;
+  private ClassLoader classLoader;
 
-    @Override
-    public InputStream read(InputStream is) throws IOException
-    {
-        return new ClassLoaderObjectInputStream(this.getClassLoader(), is);
+  @Override
+  public InputStream read(InputStream is) throws IOException {
+    return new ClassLoaderObjectInputStream(this.getClassLoader(), is);
+  }
+
+  public ClassLoader getClassLoader() {
+    if (this.classLoader == null) {
+      this.classLoader = this.getClass().getClassLoader();
     }
+    return classLoader;
+  }
 
-    public ClassLoader getClassLoader()
-    {
-        if (this.classLoader == null)
-        {
-            this.classLoader = this.getClass().getClassLoader();
-        }
-        return classLoader;
-    }
-
-    public void setClassLoader(ClassLoader classLoader)
-    {
-        this.classLoader = classLoader;
-    }
+  public void setClassLoader(ClassLoader classLoader) {
+    this.classLoader = classLoader;
+  }
 }

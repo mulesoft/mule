@@ -31,165 +31,131 @@ import org.slf4j.LoggerFactory;
  * @param <C> the generic type of the connections to be managed
  * @since 4.0
  */
-final class PoolingConnectionManagementStrategy<C> extends ConnectionManagementStrategy<C>
-{
+final class PoolingConnectionManagementStrategy<C> extends ConnectionManagementStrategy<C> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PoolingConnectionManagementStrategy.class);
-    private static final String NULL_VALIDATION_RESULT_ERROR_MESSAGE = "Error validating connection. ConnectionValidationResult can not be null";
+  private static final Logger LOGGER = LoggerFactory.getLogger(PoolingConnectionManagementStrategy.class);
+  private static final String NULL_VALIDATION_RESULT_ERROR_MESSAGE =
+      "Error validating connection. ConnectionValidationResult can not be null";
 
-    private final PoolingProfile poolingProfile;
-    private final ObjectPool<C> pool;
-    private final PoolingListener<C> poolingListener;
+  private final PoolingProfile poolingProfile;
+  private final ObjectPool<C> pool;
+  private final PoolingListener<C> poolingListener;
 
-    /**
-     * Creates a new instance
-     *
-     * @param connectionProvider the {@link ConnectionProvider} used to manage the connections
-     * @param poolingProfile     the {@link PoolingProfile} which configures the {@link #pool}
-     * @param poolingListener    a {@link PoolingListener}
-     * @param muleContext        the application's {@link MuleContext}
-     */
-    PoolingConnectionManagementStrategy(ConnectionProvider<C> connectionProvider,
-                                        PoolingProfile poolingProfile,
-                                        PoolingListener<C> poolingListener,
-                                        MuleContext muleContext)
-    {
-        super(connectionProvider, muleContext);
-        this.poolingProfile = poolingProfile;
-        this.poolingListener = poolingListener;
-        pool = createPool();
+  /**
+   * Creates a new instance
+   *
+   * @param connectionProvider the {@link ConnectionProvider} used to manage the connections
+   * @param poolingProfile the {@link PoolingProfile} which configures the {@link #pool}
+   * @param poolingListener a {@link PoolingListener}
+   * @param muleContext the application's {@link MuleContext}
+   */
+  PoolingConnectionManagementStrategy(ConnectionProvider<C> connectionProvider, PoolingProfile poolingProfile,
+                                      PoolingListener<C> poolingListener, MuleContext muleContext) {
+    super(connectionProvider, muleContext);
+    this.poolingProfile = poolingProfile;
+    this.poolingListener = poolingListener;
+    pool = createPool();
+  }
+
+  /**
+   * Returns a {@link ConnectionHandler} which wraps a connection obtained from the {@link #pool}
+   *
+   * @return a {@link ConnectionHandler}
+   * @throws ConnectionException if the connection could not be obtained
+   */
+  @Override
+  public ConnectionHandler<C> getConnectionHandler() throws ConnectionException {
+    try {
+      C connection = borrowConnection();
+      ConnectionValidationResult validationResult = connectionProvider.validate(connection);
+
+      if (validationResult == null) {
+        LOGGER.debug(NULL_VALIDATION_RESULT_ERROR_MESSAGE);
+        pool.invalidateObject(connection);
+        throw new ConnectionException(NULL_VALIDATION_RESULT_ERROR_MESSAGE);
+      } else if (!validationResult.isValid()) {
+        pool.invalidateObject(connection);
+        if (LOGGER.isDebugEnabled()) {
+          LOGGER.debug("Error validating connection: {}. Invalidating connection.", validationResult.getMessage());
+        }
+        throw new ConnectionException(validationResult.getMessage(), validationResult.getException());
+      }
+
+      return new PoolingConnectionHandler<>(connection, pool, poolingListener);
+    } catch (ConnectionException e) {
+      throw e;
+    } catch (NoSuchElementException e) {
+      throw new ConnectionException("Connection pool is exhausted");
+    } catch (Exception e) {
+      throw new ConnectionException("An exception was found trying to obtain a connection", e);
+    }
+  }
+
+  private C borrowConnection() throws Exception {
+    C connection = pool.borrowObject();
+    try {
+      poolingListener.onBorrow(connection);
+    } catch (Exception e) {
+      pool.invalidateObject(connection);
+      throw e;
     }
 
-    /**
-     * Returns a {@link ConnectionHandler} which wraps a connection obtained from the
-     * {@link #pool}
-     *
-     * @return a {@link ConnectionHandler}
-     * @throws ConnectionException if the connection could not be obtained
-     */
+    return connection;
+  }
+
+  /**
+   * Closes the pool, causing the contained connections to be closed as well.
+   *
+   * @throws MuleException
+   */
+  // TODO: MULE-9082 - pool.close() doesn't destroy unreturned connections
+  @Override
+  public void close() throws MuleException {
+    try {
+      pool.close();
+    } catch (Exception e) {
+      throw new DefaultMuleException(createStaticMessage("Could not close connection pool"), e);
+    }
+  }
+
+  private ObjectPool<C> createPool() {
+    GenericObjectPool.Config config = new GenericObjectPool.Config();
+    config.maxIdle = poolingProfile.getMaxIdle();
+    config.maxActive = poolingProfile.getMaxActive();
+    config.maxWait = poolingProfile.getMaxWait();
+    config.whenExhaustedAction = (byte) poolingProfile.getExhaustedAction();
+    config.minEvictableIdleTimeMillis = poolingProfile.getMinEvictionMillis();
+    config.timeBetweenEvictionRunsMillis = poolingProfile.getEvictionCheckIntervalMillis();
+    GenericObjectPool genericPool = new GenericObjectPool(new ObjectFactoryAdapter(), config);
+
+    return genericPool;
+  }
+
+  public PoolingProfile getPoolingProfile() {
+    return poolingProfile;
+  }
+
+  private class ObjectFactoryAdapter implements PoolableObjectFactory<C> {
+
     @Override
-    public ConnectionHandler<C> getConnectionHandler() throws ConnectionException
-    {
-        try
-        {
-            C connection = borrowConnection();
-            ConnectionValidationResult validationResult = connectionProvider.validate(connection);
-
-            if (validationResult == null)
-            {
-                LOGGER.debug(NULL_VALIDATION_RESULT_ERROR_MESSAGE);
-                pool.invalidateObject(connection);
-                throw new ConnectionException(NULL_VALIDATION_RESULT_ERROR_MESSAGE);
-            }
-            else if (!validationResult.isValid())
-            {
-                pool.invalidateObject(connection);
-                if (LOGGER.isDebugEnabled())
-                {
-                    LOGGER.debug("Error validating connection: {}. Invalidating connection.", validationResult.getMessage());
-                }
-                throw new ConnectionException(validationResult.getMessage(), validationResult.getException());
-            }
-
-            return new PoolingConnectionHandler<>(connection, pool, poolingListener);
-        }
-        catch (ConnectionException e)
-        {
-            throw e;
-        }
-        catch (NoSuchElementException e)
-        {
-            throw new ConnectionException("Connection pool is exhausted");
-        }
-        catch (Exception e)
-        {
-            throw new ConnectionException("An exception was found trying to obtain a connection", e);
-        }
+    public C makeObject() throws Exception {
+      return connectionProvider.connect();
     }
 
-    private C borrowConnection() throws Exception
-    {
-        C connection = pool.borrowObject();
-        try
-        {
-            poolingListener.onBorrow(connection);
-        }
-        catch (Exception e)
-        {
-            pool.invalidateObject(connection);
-            throw e;
-        }
-
-        return connection;
-    }
-
-    /**
-     * Closes the pool, causing the contained connections to be closed as well.
-     *
-     * @throws MuleException
-     */
-    //TODO: MULE-9082 - pool.close() doesn't destroy unreturned connections
     @Override
-    public void close() throws MuleException
-    {
-        try
-        {
-            pool.close();
-        }
-        catch (Exception e)
-        {
-            throw new DefaultMuleException(createStaticMessage("Could not close connection pool"), e);
-        }
+    public void destroyObject(C connection) throws Exception {
+      connectionProvider.disconnect(connection);
     }
 
-    private ObjectPool<C> createPool()
-    {
-        GenericObjectPool.Config config = new GenericObjectPool.Config();
-        config.maxIdle = poolingProfile.getMaxIdle();
-        config.maxActive = poolingProfile.getMaxActive();
-        config.maxWait = poolingProfile.getMaxWait();
-        config.whenExhaustedAction = (byte) poolingProfile.getExhaustedAction();
-        config.minEvictableIdleTimeMillis = poolingProfile.getMinEvictionMillis();
-        config.timeBetweenEvictionRunsMillis = poolingProfile.getEvictionCheckIntervalMillis();
-        GenericObjectPool genericPool = new GenericObjectPool(new ObjectFactoryAdapter(), config);
-
-        return genericPool;
+    @Override
+    public boolean validateObject(C obj) {
+      return false;
     }
 
-    public PoolingProfile getPoolingProfile()
-    {
-        return poolingProfile;
-    }
+    @Override
+    public void activateObject(C connection) throws Exception {}
 
-    private class ObjectFactoryAdapter implements PoolableObjectFactory<C>
-    {
-
-        @Override
-        public C makeObject() throws Exception
-        {
-            return connectionProvider.connect();
-        }
-
-        @Override
-        public void destroyObject(C connection) throws Exception
-        {
-            connectionProvider.disconnect(connection);
-        }
-
-        @Override
-        public boolean validateObject(C obj)
-        {
-            return false;
-        }
-
-        @Override
-        public void activateObject(C connection) throws Exception
-        {
-        }
-
-        @Override
-        public void passivateObject(C connection) throws Exception
-        {
-        }
-    }
+    @Override
+    public void passivateObject(C connection) throws Exception {}
+  }
 }

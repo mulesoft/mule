@@ -20,36 +20,33 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-public class WsCustomValidatorTestCase extends FunctionalTestCase
-{
-    @Rule
-    public DynamicPort dynamicPort = new DynamicPort("port1");
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
+public class WsCustomValidatorTestCase extends FunctionalTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/runtime/module/cxf/wssec/ws-custom-validator-config-httpn.xml";
-    }
+  @Rule
+  public DynamicPort dynamicPort = new DynamicPort("port1");
+  @Rule
+  public ExpectedException expectedException = ExpectedException.none();
 
-    @Test
-    public void testSuccessfulAuthentication() throws Exception
-    {
-        ClientPasswordCallback.setPassword("secret");
-        MuleMessage received = flowRunner("cxfClient").withPayload("me").run().getMessage();
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/runtime/module/cxf/wssec/ws-custom-validator-config-httpn.xml";
+  }
 
-        assertNotNull(received);
-        assertEquals("Hello me", getPayloadAsString(received));
+  @Test
+  public void testSuccessfulAuthentication() throws Exception {
+    ClientPasswordCallback.setPassword("secret");
+    MuleMessage received = flowRunner("cxfClient").withPayload("me").run().getMessage();
 
-    }
+    assertNotNull(received);
+    assertEquals("Hello me", getPayloadAsString(received));
 
-    @Test
-    public void testFailAuthentication() throws Exception
-    {
-        ClientPasswordCallback.setPassword("wrongPassword");
-        expectedException.expectCause(instanceOf(SOAPFaultException.class));
-        expectedException.expectMessage("The security token could not be authenticated");
-        flowRunner("cxfClient").withPayload("hello").run();
-    }
+  }
+
+  @Test
+  public void testFailAuthentication() throws Exception {
+    ClientPasswordCallback.setPassword("wrongPassword");
+    expectedException.expectCause(instanceOf(SOAPFaultException.class));
+    expectedException.expectMessage("The security token could not be authenticated");
+    flowRunner("cxfClient").withPayload("hello").run();
+  }
 }

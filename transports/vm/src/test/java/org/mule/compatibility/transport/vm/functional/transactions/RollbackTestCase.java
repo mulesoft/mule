@@ -19,53 +19,47 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class RollbackTestCase extends FunctionalTestCase
-{
-    static Latch latch;
-    static AtomicInteger totalSeen;
-    static AtomicInteger totalAccepted;
+public class RollbackTestCase extends FunctionalTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/config/rollback-config.xml";
+  static Latch latch;
+  static AtomicInteger totalSeen;
+  static AtomicInteger totalAccepted;
+
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/config/rollback-config.xml";
+  }
+
+  @Test
+  public void testRollback() throws Exception {
+    totalSeen = new AtomicInteger(0);
+    totalAccepted = new AtomicInteger(0);
+    latch = new Latch();
+    MuleClient client = muleContext.getClient();
+    Map<String, Serializable> props = new HashMap<>();
+    for (int i = 0; i < 100; i++) {
+      client.dispatch("vm://async", "Hello " + i, props);
     }
+    latch.await();
+    Assert.assertEquals(100, totalAccepted.get());
+    Assert.assertTrue(totalSeen.get() >= 100);
+  }
 
-    @Test
-    public void testRollback() throws Exception
-    {
-        totalSeen = new AtomicInteger(0);
-        totalAccepted = new AtomicInteger(0);
-        latch = new Latch();
-        MuleClient client = muleContext.getClient();
-        Map<String, Serializable> props = new HashMap<>();
-        for (int i = 0; i < 100; i++)
-        {
-            client.dispatch("vm://async", "Hello " + i, props);
-        }
-        latch.await();
-        Assert.assertEquals(100, totalAccepted.get());
-        Assert.assertTrue(totalSeen.get() >= 100);
+  public static class AggregatingComponent {
+
+    private Random r = new Random(System.currentTimeMillis());
+
+    public void process(String s) {
+      totalSeen.incrementAndGet();
+      int random = r.nextInt(10);
+      if (random > 8) {
+        // Fail and roll the tx back 10% of them
+        throw new RuntimeException();
+      }
+      totalAccepted.incrementAndGet();
+      if (totalAccepted.get() == 100) {
+        latch.countDown();
+      }
     }
-
-    public static class AggregatingComponent
-    {
-        private Random r = new Random(System.currentTimeMillis());
-
-        public void process(String s)
-        {
-            totalSeen.incrementAndGet();
-            int random = r.nextInt(10);
-            if (random > 8)
-            {
-                // Fail and roll the tx back 10% of them
-                throw new RuntimeException();
-            }
-            totalAccepted.incrementAndGet();
-            if (totalAccepted.get() == 100)
-            {
-                latch.countDown();
-            }
-        }
-    }
+  }
 }

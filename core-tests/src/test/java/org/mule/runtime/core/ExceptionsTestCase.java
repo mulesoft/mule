@@ -20,29 +20,26 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Test;
 
-public class ExceptionsTestCase extends AbstractMuleTestCase
-{
+public class ExceptionsTestCase extends AbstractMuleTestCase {
 
-    @Test
-    public void testExceptionChaining()
-    {
-        String rootMsg = "Root Test Exception Message";
-        String msg = "Test Exception Message";
+  @Test
+  public void testExceptionChaining() {
+    String rootMsg = "Root Test Exception Message";
+    String msg = "Test Exception Message";
 
-        Exception e = new MuleContextException(MessageFactory.createStaticMessage(msg), new DefaultMuleException(
-                MessageFactory.createStaticMessage(rootMsg)));
+    Exception e = new MuleContextException(MessageFactory.createStaticMessage(msg),
+                                           new DefaultMuleException(MessageFactory.createStaticMessage(rootMsg)));
 
-        assertEquals(rootMsg, e.getCause().getMessage());
-        assertEquals(msg, e.getMessage());
-        assertEquals(e.getClass().getName() + ": " + msg, e.toString());
-    }
+    assertEquals(rootMsg, e.getCause().getMessage());
+    assertEquals(msg, e.getMessage());
+    assertEquals(e.getClass().getName() + ": " + msg, e.toString());
+  }
 
-    @Test
-    public final void testRoutingExceptionNullMessageValidProcessor() throws MuleException
-    {
-        MessageProcessor processor = mock(MessageProcessor.class);
-        RoutingException rex = new RoutingException(mock(DefaultMuleEvent.class), processor);
-        assertSame(processor, rex.getRoute());
-    }
+  @Test
+  public final void testRoutingExceptionNullMessageValidProcessor() throws MuleException {
+    MessageProcessor processor = mock(MessageProcessor.class);
+    RoutingException rex = new RoutingException(mock(DefaultMuleEvent.class), processor);
+    assertSame(processor, rex.getRoute());
+  }
 
 }

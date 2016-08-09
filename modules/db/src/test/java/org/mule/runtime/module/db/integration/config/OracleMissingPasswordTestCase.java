@@ -10,18 +10,15 @@ package org.mule.runtime.module.db.integration.config;
 
 import org.junit.Test;
 
-public class OracleMissingPasswordTestCase extends AbstractConfigurationErrorTestCase
-{
+public class OracleMissingPasswordTestCase extends AbstractConfigurationErrorTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "integration/config/oracle-missing-password-db-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "integration/config/oracle-missing-password-db-config.xml";
+  }
 
-    @Test
-    public void requiresUserAttribute() throws Exception
-    {
-        assertConfigurationError("Able to define an Oracle config without password attribute", "password");
-    }
+  @Test
+  public void requiresUserAttribute() throws Exception {
+    assertConfigurationError("Able to define an Oracle config without password attribute", "password");
+  }
 }

@@ -23,58 +23,50 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class UsernameTokenProxyTestCase extends FunctionalTestCase
-{
+public class UsernameTokenProxyTestCase extends FunctionalTestCase {
 
-    private static final HttpRequestOptions HTTP_REQUEST_OPTIONS = newOptions().method(POST.name()).disableStatusCodeValidation().build();
+  private static final HttpRequestOptions HTTP_REQUEST_OPTIONS =
+      newOptions().method(POST.name()).disableStatusCodeValidation().build();
 
-    @Rule
-    public DynamicPort dynamicPort = new DynamicPort("port1");
+  @Rule
+  public DynamicPort dynamicPort = new DynamicPort("port1");
 
-    @Override
-    protected String[] getConfigFiles()
-    {
-        return new String[] {
-                             "org/mule/runtime/module/cxf/wssec/username-token-conf.xml"
-        };
-    }
+  @Override
+  protected String[] getConfigFiles() {
+    return new String[] {"org/mule/runtime/module/cxf/wssec/username-token-conf.xml"};
+  }
 
-    @Override
-    protected void doSetUp() throws Exception
-    {
-        ClientPasswordCallback.setPassword("secret");
-        super.doSetUp();
-    }
+  @Override
+  protected void doSetUp() throws Exception {
+    ClientPasswordCallback.setPassword("secret");
+    super.doSetUp();
+  }
 
-    @Ignore("MULE-6926: Flaky Test")
-    @Test
-    public void testProxyEnvelope() throws Exception
-    {
-        MuleMessage result = sendRequest("http://localhost:" + dynamicPort.getNumber() + "/proxy-envelope");
-        assertFalse(getPayloadAsString(result).contains("Fault"));
-        assertTrue(getPayloadAsString(result).contains("joe"));
-    }
+  @Ignore("MULE-6926: Flaky Test")
+  @Test
+  public void testProxyEnvelope() throws Exception {
+    MuleMessage result = sendRequest("http://localhost:" + dynamicPort.getNumber() + "/proxy-envelope");
+    assertFalse(getPayloadAsString(result).contains("Fault"));
+    assertTrue(getPayloadAsString(result).contains("joe"));
+  }
 
-    @Ignore("MULE-6926: Flaky Test")
-    @Test
-    public void testProxyBody() throws Exception
-    {
-        MuleMessage result = sendRequest("http://localhost:" + dynamicPort.getNumber() + "/proxy-body");
+  @Ignore("MULE-6926: Flaky Test")
+  @Test
+  public void testProxyBody() throws Exception {
+    MuleMessage result = sendRequest("http://localhost:" + dynamicPort.getNumber() + "/proxy-body");
 
-        assertFalse(getPayloadAsString(result).contains("Fault"));
-        assertFalse(getPayloadAsString(result).contains("joe"));
-    }
+    assertFalse(getPayloadAsString(result).contains("Fault"));
+    assertFalse(getPayloadAsString(result).contains("joe"));
+  }
 
-    protected MuleMessage sendRequest(String url) throws MuleException
-    {
-        InputStream stream = getClass().getResourceAsStream(getMessageResource());
-        assertNotNull(stream);
+  protected MuleMessage sendRequest(String url) throws MuleException {
+    InputStream stream = getClass().getResourceAsStream(getMessageResource());
+    assertNotNull(stream);
 
-        return muleContext.getClient().send(url, MuleMessage.builder().payload(stream).build(), HTTP_REQUEST_OPTIONS);
-    }
+    return muleContext.getClient().send(url, MuleMessage.builder().payload(stream).build(), HTTP_REQUEST_OPTIONS);
+  }
 
-    protected String getMessageResource()
-    {
-        return "/org/mule/runtime/module/cxf/wssec/in-message.xml";
-    }
+  protected String getMessageResource() {
+    return "/org/mule/runtime/module/cxf/wssec/in-message.xml";
+  }
 }

@@ -9,26 +9,25 @@ package org.mule.compatibility.module.management.agent.mbean;
 import org.mule.runtime.core.MessageExchangePattern;
 
 /**
- * The EndpointServiceMBean allows you to check the confiugration of an endpoint and
- * conect/disconnect endpoints manually.
+ * The EndpointServiceMBean allows you to check the confiugration of an endpoint and conect/disconnect endpoints manually.
  */
-public interface EndpointServiceMBean
-{
-    String getAddress();
+public interface EndpointServiceMBean {
 
-    String getName();
+  String getAddress();
 
-    boolean isConnected();
+  String getName();
 
-    void connect() throws Exception;
+  boolean isConnected();
 
-    void disconnect() throws Exception;
+  void connect() throws Exception;
 
-    boolean isInbound();
+  void disconnect() throws Exception;
 
-    boolean isOutbound();
+  boolean isInbound();
 
-    MessageExchangePattern getMessageExchangePattern();
+  boolean isOutbound();
 
-    String getComponentName();
+  MessageExchangePattern getMessageExchangePattern();
+
+  String getComponentName();
 }

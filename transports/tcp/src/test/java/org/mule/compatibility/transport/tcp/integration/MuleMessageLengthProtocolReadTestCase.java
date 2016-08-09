@@ -9,17 +9,15 @@ package org.mule.compatibility.transport.tcp.integration;
 import org.mule.compatibility.transport.tcp.TcpProtocol;
 import org.mule.compatibility.transport.tcp.protocols.LengthProtocol;
 
-public class MuleMessageLengthProtocolReadTestCase extends AbstractMuleMessageProtocolReadTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "mule-message-length-protocol-read-config.xml";
-    }
+public class MuleMessageLengthProtocolReadTestCase extends AbstractMuleMessageProtocolReadTestCase {
 
-    @Override
-    protected TcpProtocol createMuleMessageProtocol()
-    {
-        return new LengthProtocol();
-    }
+  @Override
+  protected String getConfigFile() {
+    return "mule-message-length-protocol-read-config.xml";
+  }
+
+  @Override
+  protected TcpProtocol createMuleMessageProtocol() {
+    return new LengthProtocol();
+  }
 }

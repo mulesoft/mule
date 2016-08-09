@@ -25,57 +25,48 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.server.Request;
 import org.junit.Test;
 
-public class HttpRequestMultipartTestCase extends AbstractHttpRequestTestCase
-{
+public class HttpRequestMultipartTestCase extends AbstractHttpRequestTestCase {
 
-    private static final String BOUNDARY =  "bec89590-35fe-11e5-a966-de100cec9c0d";
-    private static final String CONTENT_DISPOSITION_HEADER = "Content-Disposition: form-data; name=\"partName\"\r\n";
-    private static final String MULTIPART_FORMAT = "--%1$s\r\n %2$sContent-Type: text/plain\n\r\ntest\r\n--%1$s--\r\n";
-    private static final String CONTENT_DISPOSITION_PATH = "/contentDisposition";
+  private static final String BOUNDARY = "bec89590-35fe-11e5-a966-de100cec9c0d";
+  private static final String CONTENT_DISPOSITION_HEADER = "Content-Disposition: form-data; name=\"partName\"\r\n";
+  private static final String MULTIPART_FORMAT = "--%1$s\r\n %2$sContent-Type: text/plain\n\r\ntest\r\n--%1$s--\r\n";
+  private static final String CONTENT_DISPOSITION_PATH = "/contentDisposition";
 
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "http-request-multipart-config.xml";
+  @Override
+  protected String getConfigFile() {
+    return "http-request-multipart-config.xml";
+  }
+
+  @Override
+  protected void handleRequest(Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException {
+    response.setHeader(CONTENT_TYPE, String.format("multipart/form-data; boundary=%s", BOUNDARY));
+    response.setStatus(SC_OK);
+    extractBaseRequestParts(baseRequest);
+    String contentDispositionHeader;
+    if (baseRequest.getUri().getPath().equals(CONTENT_DISPOSITION_PATH)) {
+      contentDispositionHeader = CONTENT_DISPOSITION_HEADER;
+    } else {
+      contentDispositionHeader = "";
     }
+    response.getWriter().print(String.format(MULTIPART_FORMAT, BOUNDARY, contentDispositionHeader));
+    baseRequest.setHandled(true);
+  }
 
-    @Override
-    protected void handleRequest(Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException
-    {
-        response.setHeader(CONTENT_TYPE, String.format("multipart/form-data; boundary=%s", BOUNDARY));
-        response.setStatus(SC_OK);
-        extractBaseRequestParts(baseRequest);
-        String contentDispositionHeader;
-        if (baseRequest.getUri().getPath().equals(CONTENT_DISPOSITION_PATH))
-        {
-            contentDispositionHeader = CONTENT_DISPOSITION_HEADER;
-        }
-        else
-        {
-            contentDispositionHeader = "";
-        }
-        response.getWriter().print(String.format(MULTIPART_FORMAT, BOUNDARY, contentDispositionHeader));
-        baseRequest.setHandled(true);
-    }
+  @Test
+  public void getMultipartContentWithContentDisposition() throws Exception {
+    testWithPath(CONTENT_DISPOSITION_PATH);
+  }
 
-    @Test
-    public void getMultipartContentWithContentDisposition() throws Exception
-    {
-        testWithPath(CONTENT_DISPOSITION_PATH);
-    }
+  @Test
+  public void getMultipartContentWithoutContentDisposition() throws Exception {
+    testWithPath("/");
+  }
 
-    @Test
-    public void getMultipartContentWithoutContentDisposition() throws Exception
-    {
-        testWithPath("/");
-    }
-
-    private void testWithPath(String path) throws Exception
-    {
-        MuleEvent response = flowRunner("requestFlow").withFlowVariable("requestPath", path).run();
-        Serializable attributes = response.getMessage().getAttributes();
-        assertThat(attributes, instanceOf(HttpResponseAttributes.class));
-        assertThat(((MultiPartPayload) response.getMessage().getPayload()).getParts(), hasSize(1));
-    }
+  private void testWithPath(String path) throws Exception {
+    MuleEvent response = flowRunner("requestFlow").withFlowVariable("requestPath", path).run();
+    Serializable attributes = response.getMessage().getAttributes();
+    assertThat(attributes, instanceOf(HttpResponseAttributes.class));
+    assertThat(((MultiPartPayload) response.getMessage().getPayload()).getParts(), hasSize(1));
+  }
 }

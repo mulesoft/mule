@@ -10,25 +10,22 @@ import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.core.transport.AbstractConnectorTestCase;
 import org.mule.compatibility.transport.vm.VMConnector;
 
-public class VMConnectorTestCase extends AbstractConnectorTestCase
-{
-    @Override
-    public Connector createConnector() throws Exception
-    {
-        VMConnector conn = new VMConnector(muleContext);
-        conn.setName("TestVM");
-        return conn;
-    }
+public class VMConnectorTestCase extends AbstractConnectorTestCase {
 
-    @Override
-    public String getTestEndpointURI()
-    {
-        return "vm://test.queue";
-    }
+  @Override
+  public Connector createConnector() throws Exception {
+    VMConnector conn = new VMConnector(muleContext);
+    conn.setName("TestVM");
+    return conn;
+  }
 
-    @Override
-    public Object getValidMessage() throws Exception
-    {
-        return TEST_MESSAGE;
-    }
+  @Override
+  public String getTestEndpointURI() {
+    return "vm://test.queue";
+  }
+
+  @Override
+  public Object getValidMessage() throws Exception {
+    return TEST_MESSAGE;
+  }
 }

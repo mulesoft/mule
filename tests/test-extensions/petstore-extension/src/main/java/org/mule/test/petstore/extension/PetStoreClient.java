@@ -15,76 +15,65 @@ import org.mule.runtime.core.api.config.ThreadingProfile;
 import java.util.Date;
 import java.util.List;
 
-public class PetStoreClient
-{
+public class PetStoreClient {
 
-    private String username;
-    private String password;
-    private TlsContextFactory tlsContext;
-    private String configName;
-    private ThreadingProfile threadingProfile;
-    private int disconnectCount;
-    private Date openingDate;
+  private String username;
+  private String password;
+  private TlsContextFactory tlsContext;
+  private String configName;
+  private ThreadingProfile threadingProfile;
+  private int disconnectCount;
+  private Date openingDate;
 
-    public PetStoreClient(String username, String password, TlsContextFactory tlsContextFactory, ThreadingProfile threadingProfile, String configName, Date openingDate)
-    {
-        this.username = username;
-        this.password = password;
-        this.tlsContext = tlsContextFactory;
-        this.threadingProfile = threadingProfile;
-        this.configName = configName;
-        this.openingDate = openingDate;
-    }
+  public PetStoreClient(String username, String password, TlsContextFactory tlsContextFactory, ThreadingProfile threadingProfile,
+                        String configName, Date openingDate) {
+    this.username = username;
+    this.password = password;
+    this.tlsContext = tlsContextFactory;
+    this.threadingProfile = threadingProfile;
+    this.configName = configName;
+    this.openingDate = openingDate;
+  }
 
-    public List<String> getPets(String ownerName, PetStoreConnector config)
-    {
-        checkArgument(ownerName.equals(username), "config doesn't match");
-        return config.getPets();
-    }
+  public List<String> getPets(String ownerName, PetStoreConnector config) {
+    checkArgument(ownerName.equals(username), "config doesn't match");
+    return config.getPets();
+  }
 
-    public String getUsername()
-    {
-        return username;
-    }
+  public String getUsername() {
+    return username;
+  }
 
-    public String getPassword()
-    {
-        return password;
-    }
+  public String getPassword() {
+    return password;
+  }
 
-    public void disconnect()
-    {
-        disconnectCount++;
-    }
+  public void disconnect() {
+    disconnectCount++;
+  }
 
-    public int getDisconnectCount()
-    {
-        return disconnectCount;
-    }
+  public int getDisconnectCount() {
+    return disconnectCount;
+  }
 
-    public boolean isConnected()
-    {
-        checkState(disconnectCount >= 0, "negative disconnectCount");
-        return disconnectCount == 0;
-    }
+  public boolean isConnected() {
+    checkState(disconnectCount >= 0, "negative disconnectCount");
+    return disconnectCount == 0;
+  }
 
-    public TlsContextFactory getTlsContext()
-    {
-        return tlsContext;
-    }
+  public TlsContextFactory getTlsContext() {
+    return tlsContext;
+  }
 
-    public ThreadingProfile getThreadingProfile()
-    {
-        return threadingProfile;
-    }
+  public ThreadingProfile getThreadingProfile() {
+    return threadingProfile;
+  }
 
-    public String getConfigName()
-    {
-        return configName;
-    }
+  public String getConfigName() {
+    return configName;
+  }
 
-    public Date getOpeningDate()
-    {
-        return openingDate;
-    }
+  public Date getOpeningDate() {
+    return openingDate;
+  }
 }

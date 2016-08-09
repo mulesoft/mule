@@ -11,22 +11,19 @@ import org.mule.runtime.core.api.source.MessageSource;
 
 /**
  * <p>
- * Processes {@link MuleEvent}'s intercepting another listener
- * {@link MessageProcessor}. It is the InterceptingMessageProcessor's responsibility
- * to invoke the next {@link MessageProcessor}.
+ * Processes {@link MuleEvent}'s intercepting another listener {@link MessageProcessor}. It is the InterceptingMessageProcessor's
+ * responsibility to invoke the next {@link MessageProcessor}.
  * </p>
- * Although not normal, it is valid for the <i>listener</i> MessageProcessor to be
- * <i>null</i> and implementations should handle this case.
+ * Although not normal, it is valid for the <i>listener</i> MessageProcessor to be <i>null</i> and implementations should handle
+ * this case.
  * 
  * @since 3.0
  */
-public interface InterceptingMessageProcessor extends MessageProcessor
-{
+public interface InterceptingMessageProcessor extends MessageProcessor {
 
-    /**
-     * Set the MessageProcessor listener that will be invoked
-     * when a message is received or generated.
-     */
-    void setListener(MessageProcessor listener);
+  /**
+   * Set the MessageProcessor listener that will be invoked when a message is received or generated.
+   */
+  void setListener(MessageProcessor listener);
 
 }

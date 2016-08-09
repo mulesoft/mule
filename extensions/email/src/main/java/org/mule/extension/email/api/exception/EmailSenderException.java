@@ -7,34 +7,30 @@
 package org.mule.extension.email.api.exception;
 
 /**
- * This {@link EmailSenderException} is the base {@link RuntimeException} type for operations that
- * sends emails any other exceptions thrown by operations that sends emails will be wrapped into
- * one of this.
+ * This {@link EmailSenderException} is the base {@link RuntimeException} type for operations that sends emails any other
+ * exceptions thrown by operations that sends emails will be wrapped into one of this.
  *
  * @since 4.0
  */
-public class EmailSenderException extends EmailException
-{
+public class EmailSenderException extends EmailException {
 
-    private static final String ERROR = "Error while sending email: ";
+  private static final String ERROR = "Error while sending email: ";
 
-    /**
-     * Creates a new instance with the specified detail {@code message}.
-     *
-     * @param message the detail message
-     */
-    public EmailSenderException(String message)
-    {
-        super(ERROR + message);
-    }
+  /**
+   * Creates a new instance with the specified detail {@code message}.
+   *
+   * @param message the detail message
+   */
+  public EmailSenderException(String message) {
+    super(ERROR + message);
+  }
 
-    /**
-     * Creates a new instance with the {@code cause}.
-     *
-     * @param cause the exception's cause
-     */
-    public EmailSenderException(Throwable cause)
-    {
-        super(ERROR + cause.getMessage(), cause);
-    }
+  /**
+   * Creates a new instance with the {@code cause}.
+   *
+   * @param cause the exception's cause
+   */
+  public EmailSenderException(Throwable cause) {
+    super(ERROR + cause.getMessage(), cause);
+  }
 }

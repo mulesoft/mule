@@ -20,37 +20,33 @@ import org.mule.test.config.dsl.LifecycleSensingObjectFactory;
 
 import org.junit.Test;
 
-public class ComponentLifecycleTestCase extends AbstractIntegrationTestCase
-{
+public class ComponentLifecycleTestCase extends AbstractIntegrationTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/spring/component-lifecycle-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/spring/component-lifecycle-config.xml";
+  }
 
-    @Test
-    public void globalElementLifecycle()
-    {
-        LifecycleSensingMessageProcessor lifecycleSensingMessageProcessor = muleContext.getRegistry().get("globalElement");
-        assertObjectFactoryAndMessageProcessorLifecycle(lifecycleSensingMessageProcessor);
-    }
+  @Test
+  public void globalElementLifecycle() {
+    LifecycleSensingMessageProcessor lifecycleSensingMessageProcessor = muleContext.getRegistry().get("globalElement");
+    assertObjectFactoryAndMessageProcessorLifecycle(lifecycleSensingMessageProcessor);
+  }
 
-    @Test
-    public void innerElementLifecycle()
-    {
-        Flow flow = muleContext.getRegistry().get("flow");
-        LifecycleSensingMessageProcessor lifecycleSensingMessageProcessor = (LifecycleSensingMessageProcessor) flow.getMessageProcessors().get(0);
-        assertObjectFactoryAndMessageProcessorLifecycle(lifecycleSensingMessageProcessor);
-    }
+  @Test
+  public void innerElementLifecycle() {
+    Flow flow = muleContext.getRegistry().get("flow");
+    LifecycleSensingMessageProcessor lifecycleSensingMessageProcessor =
+        (LifecycleSensingMessageProcessor) flow.getMessageProcessors().get(0);
+    assertObjectFactoryAndMessageProcessorLifecycle(lifecycleSensingMessageProcessor);
+  }
 
-    private void assertObjectFactoryAndMessageProcessorLifecycle(LifecycleSensingMessageProcessor lifecycleSensingMessageProcessor)
-    {
-        LifecycleSensingObjectFactory lifecycleSensingObjectFactory = lifecycleSensingMessageProcessor.getObjectFactory();
-        assertThat(lifecycleSensingObjectFactory.getLifecycleActions(), hasItems(GET_OBJECT));
-        assertThat(lifecycleSensingMessageProcessor.getLifecycleActions(), hasItems(INITIALISE, START));
-        muleContext.dispose();
-        assertThat(lifecycleSensingObjectFactory.getLifecycleActions(), hasItems(GET_OBJECT));
-        assertThat(lifecycleSensingMessageProcessor.getLifecycleActions(), hasItems(INITIALISE, START, STOP, DISPOSE));
-    }
+  private void assertObjectFactoryAndMessageProcessorLifecycle(LifecycleSensingMessageProcessor lifecycleSensingMessageProcessor) {
+    LifecycleSensingObjectFactory lifecycleSensingObjectFactory = lifecycleSensingMessageProcessor.getObjectFactory();
+    assertThat(lifecycleSensingObjectFactory.getLifecycleActions(), hasItems(GET_OBJECT));
+    assertThat(lifecycleSensingMessageProcessor.getLifecycleActions(), hasItems(INITIALISE, START));
+    muleContext.dispose();
+    assertThat(lifecycleSensingObjectFactory.getLifecycleActions(), hasItems(GET_OBJECT));
+    assertThat(lifecycleSensingMessageProcessor.getLifecycleActions(), hasItems(INITIALISE, START, STOP, DISPOSE));
+  }
 }

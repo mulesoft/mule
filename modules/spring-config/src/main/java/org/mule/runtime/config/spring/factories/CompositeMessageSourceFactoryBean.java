@@ -15,34 +15,28 @@ import java.util.List;
 
 import org.springframework.beans.factory.FactoryBean;
 
-public class CompositeMessageSourceFactoryBean implements FactoryBean
-{
+public class CompositeMessageSourceFactoryBean implements FactoryBean {
 
-    protected List<MessageSource> sources = Collections.<MessageSource> emptyList();
+  protected List<MessageSource> sources = Collections.<MessageSource>emptyList();
 
-    public Class getObjectType()
-    {
-        return MessageSource.class;
+  public Class getObjectType() {
+    return MessageSource.class;
+  }
+
+  public void setMessageSources(List<MessageSource> sources) {
+    this.sources = sources;
+  }
+
+  public Object getObject() throws Exception {
+    CompositeMessageSource composite = new StartableCompositeMessageSource();
+    for (MessageSource source : sources) {
+      composite.addSource(source);
     }
+    return composite;
+  }
 
-    public void setMessageSources(List<MessageSource> sources)
-    {
-        this.sources = sources;
-    }
-
-    public Object getObject() throws Exception
-    {
-        CompositeMessageSource composite = new StartableCompositeMessageSource();
-        for (MessageSource source : sources)
-        {
-            composite.addSource(source);
-        }
-        return composite;
-    }
-
-    public boolean isSingleton()
-    {
-        return false;
-    }
+  public boolean isSingleton() {
+    return false;
+  }
 
 }

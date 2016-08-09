@@ -19,37 +19,33 @@ import java.io.InputStream;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpRequestAttachmentsTestCase extends AbstractHttpTestCase
-{
+public class HttpRequestAttachmentsTestCase extends AbstractHttpTestCase {
 
-    @Rule
-    public DynamicPort listenPort = new DynamicPort("port");
+  @Rule
+  public DynamicPort listenPort = new DynamicPort("port");
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "http-request-attachment-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "http-request-attachment-config.xml";
+  }
 
-    /**
-     * "Unsupported content type" means one that is not out of the box supported by javax.activation.
-     */
-    @Test
-    public void inputStreamAttachmentWithUnsupportedContentType() throws Exception
-    {
-        final MuleEvent result = runFlow("attachmentFromBytes");
-        assertThat(IOUtils.toString((InputStream) result.getMessage().getPayload()), is("OK"));
-        FlowAssert.verify("reqWithAttachment");
-    }
+  /**
+   * "Unsupported content type" means one that is not out of the box supported by javax.activation.
+   */
+  @Test
+  public void inputStreamAttachmentWithUnsupportedContentType() throws Exception {
+    final MuleEvent result = runFlow("attachmentFromBytes");
+    assertThat(IOUtils.toString((InputStream) result.getMessage().getPayload()), is("OK"));
+    FlowAssert.verify("reqWithAttachment");
+  }
 
-    /**
-     * "Unsupported content type" means one that is not out of the box supported by javax.activation.
-     */
-    @Test
-    public void byteArrayAttachmentWithUnsupportedContentType() throws Exception
-    {
-        final MuleEvent result = runFlow("attachmentFromStream");
-        assertThat(IOUtils.toString((InputStream) result.getMessage().getPayload()), is("OK"));
-        FlowAssert.verify("reqWithAttachment");
-    }
+  /**
+   * "Unsupported content type" means one that is not out of the box supported by javax.activation.
+   */
+  @Test
+  public void byteArrayAttachmentWithUnsupportedContentType() throws Exception {
+    final MuleEvent result = runFlow("attachmentFromStream");
+    assertThat(IOUtils.toString((InputStream) result.getMessage().getPayload()), is("OK"));
+    FlowAssert.verify("reqWithAttachment");
+  }
 }

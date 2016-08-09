@@ -9,35 +9,29 @@ package org.mule.runtime.modules.schedulers.i18n;
 import org.mule.runtime.core.config.i18n.Message;
 import org.mule.runtime.core.config.i18n.MessageFactory;
 
-public class SchedulerMessages extends MessageFactory
-{
+public class SchedulerMessages extends MessageFactory {
 
-    private static final SchedulerMessages factory = new SchedulerMessages();
+  private static final SchedulerMessages factory = new SchedulerMessages();
 
-    private static final String BUNDLE_PATH = getBundlePath("schedulers");
+  private static final String BUNDLE_PATH = getBundlePath("schedulers");
 
-    public static Message couldNotCreateScheduler()
-    {
-        return factory.createMessage(BUNDLE_PATH, 1);
-    }
+  public static Message couldNotCreateScheduler() {
+    return factory.createMessage(BUNDLE_PATH, 1);
+  }
 
-    public static Message invalidCronExpression()
-    {
-        return factory.createMessage(BUNDLE_PATH, 2);
-    }
+  public static Message invalidCronExpression() {
+    return factory.createMessage(BUNDLE_PATH, 2);
+  }
 
-    public static Message couldNotScheduleJob()
-    {
-        return factory.createMessage(BUNDLE_PATH, 3);
-    }
+  public static Message couldNotScheduleJob() {
+    return factory.createMessage(BUNDLE_PATH, 3);
+  }
 
-    public static Message couldNotPauseSchedulers()
-    {
-        return factory.createMessage(BUNDLE_PATH, 4);
-    }
+  public static Message couldNotPauseSchedulers() {
+    return factory.createMessage(BUNDLE_PATH, 4);
+  }
 
-    public static Message couldNotShutdownScheduler()
-    {
-        return factory.createMessage(BUNDLE_PATH, 5);
-    }
+  public static Message couldNotShutdownScheduler() {
+    return factory.createMessage(BUNDLE_PATH, 5);
+  }
 }

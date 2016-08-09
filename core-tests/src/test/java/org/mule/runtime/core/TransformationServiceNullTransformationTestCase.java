@@ -25,34 +25,32 @@ import org.mule.tck.size.SmallTest;
 import org.junit.Test;
 
 @SmallTest
-public class TransformationServiceNullTransformationTestCase extends AbstractMuleTestCase
-{
+public class TransformationServiceNullTransformationTestCase extends AbstractMuleTestCase {
 
-    @Test
-    public void transformerIsNeverCalledWithANullValue() throws MuleException
-    {
-        MuleContext muleContext = mock(MuleContext.class);
-        MuleConfiguration muleConfiguration = mock(MuleConfiguration.class);
-        when(muleContext.getConfiguration()).thenReturn(muleConfiguration);
-        TransformationService transformationService = new TransformationService(muleContext);
+  @Test
+  public void transformerIsNeverCalledWithANullValue() throws MuleException {
+    MuleContext muleContext = mock(MuleContext.class);
+    MuleConfiguration muleConfiguration = mock(MuleConfiguration.class);
+    when(muleContext.getConfiguration()).thenReturn(muleConfiguration);
+    TransformationService transformationService = new TransformationService(muleContext);
 
-        Transformer transformer1 = mock(Transformer.class);
-        when(transformer1.transform(any(Object.class))).thenReturn(null);
-        when(transformer1.isSourceDataTypeSupported(any(DataType.class))).thenReturn(true);
-        when(transformer1.getReturnDataType()).thenReturn((DataType) DataType.OBJECT);
+    Transformer transformer1 = mock(Transformer.class);
+    when(transformer1.transform(any(Object.class))).thenReturn(null);
+    when(transformer1.isSourceDataTypeSupported(any(DataType.class))).thenReturn(true);
+    when(transformer1.getReturnDataType()).thenReturn((DataType) DataType.OBJECT);
 
-        Transformer transformer2 = mock(Transformer.class);
-        when(transformer2.transform(any(Object.class))).thenReturn("foo");
-        when(transformer2.isSourceDataTypeSupported(any(DataType.class))).thenReturn(true);
-        when(transformer2.getReturnDataType()).thenReturn((DataType) DataType.OBJECT);
+    Transformer transformer2 = mock(Transformer.class);
+    when(transformer2.transform(any(Object.class))).thenReturn("foo");
+    when(transformer2.isSourceDataTypeSupported(any(DataType.class))).thenReturn(true);
+    when(transformer2.getReturnDataType()).thenReturn((DataType) DataType.OBJECT);
 
-        MuleMessage message = MuleMessage.builder().payload("").build();
-        message = transformationService.applyTransformers(message, null, transformer1, transformer2);
+    MuleMessage message = MuleMessage.builder().payload("").build();
+    message = transformationService.applyTransformers(message, null, transformer1, transformer2);
 
-        assertEquals("foo", message.getPayload());
-        verify(transformer1, never()).transform(null);
-        verify(transformer1, never()).isAcceptNull();
-        verify(transformer2, never()).transform(null);
-        verify(transformer2, never()).isAcceptNull();
-    }
+    assertEquals("foo", message.getPayload());
+    verify(transformer1, never()).transform(null);
+    verify(transformer1, never()).isAcceptNull();
+    verify(transformer2, never()).transform(null);
+    verify(transformer2, never()).isAcceptNull();
+  }
 }

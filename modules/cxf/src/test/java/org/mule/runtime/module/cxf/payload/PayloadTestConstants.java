@@ -6,18 +6,18 @@
  */
 package org.mule.runtime.module.cxf.payload;
 
-public interface PayloadTestConstants
-{
-    public static final Object objectPayload = new Object();
-    public static final String strPayload = "some message";
-    public static final String[] strArrayPayload = new String[]{"some message"};
-    public static final Object[] emptyOjbectArrayPayload = new Object[]{};
+public interface PayloadTestConstants {
 
-    public static final String strPayloadResult = "Hello " + strPayload;
-    public static final String strArrayPayloadResult = "Hello " + strArrayPayload[0];
+  public static final Object objectPayload = new Object();
+  public static final String strPayload = "some message";
+  public static final String[] strArrayPayload = new String[] {"some message"};
+  public static final Object[] emptyOjbectArrayPayload = new Object[] {};
 
-    public static final String greetMeOutEndpointName = "greetMeOutboundEndpoint";
-    public static final String sayHiOutEndpointName = "sayHiOutboundEndpoint";
+  public static final String strPayloadResult = "Hello " + strPayload;
+  public static final String strArrayPayloadResult = "Hello " + strArrayPayload[0];
+
+  public static final String greetMeOutEndpointName = "greetMeOutboundEndpoint";
+  public static final String sayHiOutEndpointName = "sayHiOutboundEndpoint";
 }
 
 

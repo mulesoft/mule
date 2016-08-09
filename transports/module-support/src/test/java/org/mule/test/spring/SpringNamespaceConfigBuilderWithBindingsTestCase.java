@@ -8,19 +8,16 @@ package org.mule.test.spring;
 
 import org.mule.functional.AbstractConfigBuilderWithBindingsTestCase;
 
-public class SpringNamespaceConfigBuilderWithBindingsTestCase extends AbstractConfigBuilderWithBindingsTestCase
-{
-    public SpringNamespaceConfigBuilderWithBindingsTestCase()
-    {
-        super(false);
-        setDisposeContextPerClass(true);
-    }
+public class SpringNamespaceConfigBuilderWithBindingsTestCase extends AbstractConfigBuilderWithBindingsTestCase {
 
-    @Override
-    public String[] getConfigFiles()
-    {
-        return new String[] {"org/mule/test/spring/config1/test-xml-mule2-config.xml",
-                             "org/mule/test/spring/config1/test-xml-mule2-config-split.xml"
-        };
-    }
+  public SpringNamespaceConfigBuilderWithBindingsTestCase() {
+    super(false);
+    setDisposeContextPerClass(true);
+  }
+
+  @Override
+  public String[] getConfigFiles() {
+    return new String[] {"org/mule/test/spring/config1/test-xml-mule2-config.xml",
+        "org/mule/test/spring/config1/test-xml-mule2-config-split.xml"};
+  }
 }

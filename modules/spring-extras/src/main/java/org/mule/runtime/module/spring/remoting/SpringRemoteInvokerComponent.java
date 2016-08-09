@@ -19,136 +19,108 @@ import org.springframework.remoting.support.RemoteInvocationBasedExporter;
 import org.springframework.remoting.support.RemoteInvocationExecutor;
 import org.springframework.remoting.support.RemoteInvocationResult;
 
-public class SpringRemoteInvokerComponent implements Initialisable, Callable
-{
-    private Delegate delegate;
-    private Class serviceClass;
-    private Class serviceInterface;
-    private Object serviceBean;
-    private boolean registerTraceInterceptor = false;
-    private RemoteInvocationExecutor remoteInvocationExecutor;
+public class SpringRemoteInvokerComponent implements Initialisable, Callable {
 
-    private class Delegate extends RemoteInvocationBasedExporter implements InitializingBean
-    {
-        private Object proxy;
+  private Delegate delegate;
+  private Class serviceClass;
+  private Class serviceInterface;
+  private Object serviceBean;
+  private boolean registerTraceInterceptor = false;
+  private RemoteInvocationExecutor remoteInvocationExecutor;
 
-        public void afterPropertiesSet()
-        {
-            this.proxy = getProxyForService();
-        }
+  private class Delegate extends RemoteInvocationBasedExporter implements InitializingBean {
 
-        public Object execute(RemoteInvocation invocation)
-        {
-            try
-            {
-                Object value = invoke(invocation, proxy);
-                return value;
-            }
-            catch (Throwable ex)
-            {
-                return new RemoteInvocationResult(ex);
-            }
-        }
+    private Object proxy;
+
+    public void afterPropertiesSet() {
+      this.proxy = getProxyForService();
     }
 
-    public SpringRemoteInvokerComponent()
-    {
-        delegate = new Delegate();
+    public Object execute(RemoteInvocation invocation) {
+      try {
+        Object value = invoke(invocation, proxy);
+        return value;
+      } catch (Throwable ex) {
+        return new RemoteInvocationResult(ex);
+      }
+    }
+  }
+
+  public SpringRemoteInvokerComponent() {
+    delegate = new Delegate();
+  }
+
+  public void initialise() throws InitialisationException {
+    if (serviceClass == null && serviceBean == null) {
+      throw new InitialisationException(CoreMessages.propertiesNotSet("serviceClass or serviceBean"), this);
+    }
+    if (serviceInterface == null) {
+      throw new InitialisationException(CoreMessages.propertiesNotSet("serviceInterface"), this);
     }
 
-    public void initialise() throws InitialisationException
-    {
-        if (serviceClass == null && serviceBean == null)
-        {
-            throw new InitialisationException(CoreMessages.propertiesNotSet("serviceClass or serviceBean"),
-                this);
-        }
-        if (serviceInterface == null)
-        {
-            throw new InitialisationException(CoreMessages.propertiesNotSet("serviceInterface"), this);
-        }
-
-        if (serviceClass != null)
-        {
-            Object service = null;
-            try
-            {
-                service = ClassUtils.instanciateClass(serviceClass, (Object[]) null);
-            }
-            catch (Exception e)
-            {
-                throw new InitialisationException(e, this);
-            }
-            delegate.setService(service);
-        }
-        else if (serviceBean != null)
-        {
-            delegate.setService(serviceBean);
-        }
-        delegate.setServiceInterface(serviceInterface);
-        delegate.setRegisterTraceInterceptor(registerTraceInterceptor);
-        if (remoteInvocationExecutor != null)
-        {
-            delegate.setRemoteInvocationExecutor(remoteInvocationExecutor);
-        }
-        delegate.afterPropertiesSet();
+    if (serviceClass != null) {
+      Object service = null;
+      try {
+        service = ClassUtils.instanciateClass(serviceClass, (Object[]) null);
+      } catch (Exception e) {
+        throw new InitialisationException(e, this);
+      }
+      delegate.setService(service);
+    } else if (serviceBean != null) {
+      delegate.setService(serviceBean);
     }
-
-    public Class getServiceClass()
-    {
-        return serviceClass;
+    delegate.setServiceInterface(serviceInterface);
+    delegate.setRegisterTraceInterceptor(registerTraceInterceptor);
+    if (remoteInvocationExecutor != null) {
+      delegate.setRemoteInvocationExecutor(remoteInvocationExecutor);
     }
+    delegate.afterPropertiesSet();
+  }
 
-    public void setServiceClass(Class serviceClass)
-    {
-        this.serviceClass = serviceClass;
-    }
+  public Class getServiceClass() {
+    return serviceClass;
+  }
 
-    public Object getServiceBean()
-    {
-        return serviceBean;
-    }
+  public void setServiceClass(Class serviceClass) {
+    this.serviceClass = serviceClass;
+  }
 
-    public void setServiceBean(Object serviceBean)
-    {
-        this.serviceBean = serviceBean;
-    }
+  public Object getServiceBean() {
+    return serviceBean;
+  }
 
-    public Class getServiceInterface()
-    {
-        return serviceInterface;
-    }
+  public void setServiceBean(Object serviceBean) {
+    this.serviceBean = serviceBean;
+  }
 
-    public void setServiceInterface(Class serviceInterface)
-    {
-        this.serviceInterface = serviceInterface;
-    }
+  public Class getServiceInterface() {
+    return serviceInterface;
+  }
 
-    public boolean isRegisterTraceInterceptor()
-    {
-        return registerTraceInterceptor;
-    }
+  public void setServiceInterface(Class serviceInterface) {
+    this.serviceInterface = serviceInterface;
+  }
 
-    public void setRegisterTraceInterceptor(boolean registerTraceInterceptor)
-    {
-        this.registerTraceInterceptor = registerTraceInterceptor;
-    }
+  public boolean isRegisterTraceInterceptor() {
+    return registerTraceInterceptor;
+  }
 
-    public RemoteInvocationExecutor getRemoteInvocationExecutor()
-    {
-        return remoteInvocationExecutor;
-    }
+  public void setRegisterTraceInterceptor(boolean registerTraceInterceptor) {
+    this.registerTraceInterceptor = registerTraceInterceptor;
+  }
 
-    public void setRemoteInvocationExecutor(RemoteInvocationExecutor remoteInvocationExecutor)
-    {
-        this.remoteInvocationExecutor = remoteInvocationExecutor;
-    }
+  public RemoteInvocationExecutor getRemoteInvocationExecutor() {
+    return remoteInvocationExecutor;
+  }
 
-    public Object onCall(MuleEventContext eventContext) throws Exception
-    {
-        Object payload = eventContext.getMessage().getPayload();
-        RemoteInvocation ri = (RemoteInvocation) payload;
-        Object rval = delegate.execute(ri);
-        return rval;
-    }
+  public void setRemoteInvocationExecutor(RemoteInvocationExecutor remoteInvocationExecutor) {
+    this.remoteInvocationExecutor = remoteInvocationExecutor;
+  }
+
+  public Object onCall(MuleEventContext eventContext) throws Exception {
+    Object payload = eventContext.getMessage().getPayload();
+    RemoteInvocation ri = (RemoteInvocation) payload;
+    Object rval = delegate.execute(ri);
+    return rval;
+  }
 }

@@ -26,87 +26,75 @@ import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-public class XmlNamespaceTestCase extends FunctionalTestCase
-{
-    public XmlNamespaceTestCase()
-    {
-        setDisposeContextPerClass(true);
+public class XmlNamespaceTestCase extends FunctionalTestCase {
+
+  public XmlNamespaceTestCase() {
+    setDisposeContextPerClass(true);
+  }
+
+  @Override
+  protected String getConfigFile() {
+    return "xml-namespace-config.xml";
+  }
+
+  @Test
+  public void testGlobalNamespaces() throws Exception {
+    NamespaceManager manager = muleContext.getRegistry().lookupObject(NamespaceManager.class);
+    assertNotNull(manager);
+    assertTrue(manager.isIncludeConfigNamespaces());
+    assertEquals(5, manager.getNamespaces().size());
+  }
+
+  @Test
+  public void testJaxbConfig() throws Exception {
+    JAXBMarshallerTransformer t = (JAXBMarshallerTransformer) lookupTransformer("ObjectToXml");
+    assertNotNull(t.getJaxbContext());
+
+    JAXBUnmarshallerTransformer t2 = (JAXBUnmarshallerTransformer) lookupTransformer("XmlToObject");
+    assertEquals(Person.class, t2.getReturnDataType().getType());
+    assertNotNull(t2.getJaxbContext());
+  }
+
+  @Test
+  public void testSchemaValidationFilterWithCustomResourceResolver() {
+    SchemaValidationFilter filter = (SchemaValidationFilter) lookupFilter("SchemaValidationWithResourceResolver");
+    assertEquals("schema1.xsd", filter.getSchemaLocations());
+    assertTrue(filter.getResourceResolver() instanceof MockResourceResolver);
+    assertTrue(filter.getErrorHandler() instanceof MockErrorHandler);
+    assertFalse(filter.isReturnResult());
+  }
+
+  private Transformer lookupTransformer(String name) {
+    Transformer transformer = muleContext.getRegistry().lookupTransformer(name);
+    assertNotNull(transformer);
+    return transformer;
+  }
+
+  private Filter lookupFilter(String name) {
+    Filter filter = muleContext.getRegistry().lookupObject(name);
+    assertNotNull(filter);
+    return filter;
+  }
+
+  private static class MockResourceResolver implements LSResourceResolver {
+
+    public LSInput resolveResource(String type, String namespaceURI, String publicId, String systemId, String baseURI) {
+      return null;
+    }
+  }
+
+  private static class MockErrorHandler implements ErrorHandler {
+
+    public void error(SAXParseException exception) throws SAXException {
+      // does nothing
     }
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "xml-namespace-config.xml";
+    public void fatalError(SAXParseException exception) throws SAXException {
+      // does nothing
     }
 
-    @Test
-    public void testGlobalNamespaces() throws Exception
-    {
-        NamespaceManager manager = muleContext.getRegistry().lookupObject(NamespaceManager.class);
-        assertNotNull(manager);
-        assertTrue(manager.isIncludeConfigNamespaces());
-        assertEquals(5, manager.getNamespaces().size());
+    public void warning(SAXParseException exception) throws SAXException {
+      // does nothing
     }
-
-    @Test
-    public void testJaxbConfig() throws Exception
-    {
-        JAXBMarshallerTransformer t = (JAXBMarshallerTransformer) lookupTransformer("ObjectToXml");
-        assertNotNull(t.getJaxbContext());
-
-        JAXBUnmarshallerTransformer t2 = (JAXBUnmarshallerTransformer) lookupTransformer("XmlToObject");
-        assertEquals(Person.class, t2.getReturnDataType().getType());
-        assertNotNull(t2.getJaxbContext());
-    }
-    
-    @Test
-    public void testSchemaValidationFilterWithCustomResourceResolver()
-    {
-        SchemaValidationFilter filter = (SchemaValidationFilter) lookupFilter("SchemaValidationWithResourceResolver");
-        assertEquals("schema1.xsd", filter.getSchemaLocations());
-        assertTrue(filter.getResourceResolver() instanceof MockResourceResolver);
-        assertTrue(filter.getErrorHandler() instanceof MockErrorHandler);
-        assertFalse(filter.isReturnResult());
-    }
-    
-    private Transformer lookupTransformer(String name)
-    {
-        Transformer transformer = muleContext.getRegistry().lookupTransformer(name);
-        assertNotNull(transformer);
-        return transformer;
-    }
-    
-    private Filter lookupFilter(String name)
-    {
-        Filter filter = muleContext.getRegistry().lookupObject(name);
-        assertNotNull(filter);
-        return filter;
-    }
-    
-    private static class MockResourceResolver implements LSResourceResolver
-    {
-        public LSInput resolveResource(String type, String namespaceURI, String publicId,
-            String systemId, String baseURI)
-        {
-            return null;
-        }
-    }
-    
-    private static class MockErrorHandler implements ErrorHandler
-    {
-        public void error(SAXParseException exception) throws SAXException
-        {
-            // does nothing
-        }
-
-        public void fatalError(SAXParseException exception) throws SAXException
-        {
-            // does nothing
-        }
-
-        public void warning(SAXParseException exception) throws SAXException
-        {
-            // does nothing
-        }
-    }
+  }
 }

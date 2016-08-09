@@ -41,323 +41,264 @@ import org.w3c.dom.Node;
 
 
 /**
- * This Namespace handler extends the default Spring {@link org.springframework.beans.factory.xml.NamespaceHandlerSupport}
- * to allow certain elements in document to be ignored by the handler.
+ * This Namespace handler extends the default Spring {@link org.springframework.beans.factory.xml.NamespaceHandlerSupport} to
+ * allow certain elements in document to be ignored by the handler.
  */
-public abstract class AbstractMuleNamespaceHandler extends NamespaceHandlerSupport
-{
-    public static final String GLOBAL_ENDPOINT = "endpoint";
-    public static final String INBOUND_ENDPOINT = "inbound-endpoint";
-    public static final String OUTBOUND_ENDPOINT = "outbound-endpoint";
+public abstract class AbstractMuleNamespaceHandler extends NamespaceHandlerSupport {
 
-    protected transient final Logger logger = LoggerFactory.getLogger(getClass());
+  public static final String GLOBAL_ENDPOINT = "endpoint";
+  public static final String INBOUND_ENDPOINT = "inbound-endpoint";
+  public static final String OUTBOUND_ENDPOINT = "outbound-endpoint";
 
-    protected AbstractMuleNamespaceHandler()
-    {
-        registerBeanDefinitionParser("annotations", new AnnotationsBeanDefintionParser());
+  protected transient final Logger logger = LoggerFactory.getLogger(getClass());
+
+  protected AbstractMuleNamespaceHandler() {
+    registerBeanDefinitionParser("annotations", new AnnotationsBeanDefintionParser());
+  }
+
+  /**
+   * @param name The name of the element to be ignored.
+   */
+  protected final void registerIgnoredElement(String name) {
+    registerBeanDefinitionParser(name, new IgnoredDefinitionParser());
+  }
+
+  protected MuleDefinitionParserConfiguration registerConnectorDefinitionParser(Class connectorClass, String transportName) {
+    return registerConnectorDefinitionParser(findConnectorClass(connectorClass, transportName));
+  }
+
+  protected MuleDefinitionParserConfiguration registerConnectorDefinitionParser(Class connectorClass) {
+    return registerConnectorDefinitionParser(new MuleOrphanDefinitionParser(connectorClass, true));
+  }
+
+  protected MuleDefinitionParserConfiguration registerConnectorDefinitionParser(MuleDefinitionParser parser) {
+    registerBeanDefinitionParser("connector", parser);
+    return parser;
+  }
+
+  protected MuleDefinitionParserConfiguration registerMuleBeanDefinitionParser(String name, MuleDefinitionParser parser) {
+    registerBeanDefinitionParser(name, parser);
+    return parser;
+  }
+
+  protected MuleDefinitionParserConfiguration registerStandardTransportEndpoints(String protocol, String[] requiredAttributes) {
+    return new RegisteredMdps();
+  }
+
+  protected MuleDefinitionParserConfiguration registerMetaTransportEndpoints(String protocol) {
+    return new RegisteredMdps();
+  }
+
+  public static class IgnoredDefinitionParser implements BeanDefinitionParser {
+
+    public IgnoredDefinitionParser() {
+      super();
     }
 
-    /**
-     * @param name The name of the element to be ignored.
-     */
-    protected final void registerIgnoredElement(String name)
-    {
-        registerBeanDefinitionParser(name, new IgnoredDefinitionParser());
+    @Override
+    public BeanDefinition parse(Element element, ParserContext parserContext) {
+      return null;
+    }
+  }
+
+  protected class RegisteredMdps implements MuleDefinitionParserConfiguration {
+
+    private Set bdps = new HashSet();
+
+    protected MuleDefinitionParser add(MuleDefinitionParser bdp) {
+      bdps.add(bdp);
+      return bdp;
     }
 
-    protected MuleDefinitionParserConfiguration registerConnectorDefinitionParser(Class connectorClass, String transportName)
-    {
-        return registerConnectorDefinitionParser(findConnectorClass(connectorClass, transportName));
+    @Override
+    public MuleDefinitionParserConfiguration registerPreProcessor(PreProcessor preProcessor) {
+      for (Iterator bdp = bdps.iterator(); bdp.hasNext();) {
+        ((MuleDefinitionParserConfiguration) bdp.next()).registerPreProcessor(preProcessor);
+      }
+      return this;
     }
 
-    protected MuleDefinitionParserConfiguration registerConnectorDefinitionParser(Class connectorClass)
-    {
-        return registerConnectorDefinitionParser(new MuleOrphanDefinitionParser(connectorClass, true));
+    @Override
+    public MuleDefinitionParserConfiguration registerPostProcessor(PostProcessor postProcessor) {
+      for (Iterator bdp = bdps.iterator(); bdp.hasNext();) {
+        ((MuleDefinitionParserConfiguration) bdp.next()).registerPostProcessor(postProcessor);
+      }
+      return this;
     }
 
-    protected MuleDefinitionParserConfiguration registerConnectorDefinitionParser(MuleDefinitionParser parser)
-    {
-        registerBeanDefinitionParser("connector", parser);
-        return parser;
+    @Override
+    public MuleDefinitionParserConfiguration addReference(String propertyName) {
+      for (Iterator bdp = bdps.iterator(); bdp.hasNext();) {
+        ((MuleDefinitionParserConfiguration) bdp.next()).addReference(propertyName);
+      }
+      return this;
     }
 
-    protected MuleDefinitionParserConfiguration registerMuleBeanDefinitionParser(String name, MuleDefinitionParser parser)
-    {
-        registerBeanDefinitionParser(name, parser);
-        return parser;
+    @Override
+    public MuleDefinitionParserConfiguration addMapping(String propertyName, Map mappings) {
+      for (Iterator bdp = bdps.iterator(); bdp.hasNext();) {
+        ((MuleDefinitionParserConfiguration) bdp.next()).addMapping(propertyName, mappings);
+      }
+      return this;
     }
 
-    protected MuleDefinitionParserConfiguration registerStandardTransportEndpoints(String protocol, String[] requiredAttributes)
-    {
-        return new RegisteredMdps();
+    @Override
+    public MuleDefinitionParserConfiguration addMapping(String propertyName, String mappings) {
+      for (Iterator bdp = bdps.iterator(); bdp.hasNext();) {
+        ((MuleDefinitionParserConfiguration) bdp.next()).addMapping(propertyName, mappings);
+      }
+      return this;
     }
 
-    protected MuleDefinitionParserConfiguration registerMetaTransportEndpoints(String protocol)
-    {
-        return new RegisteredMdps();
+    @Override
+    public MuleDefinitionParserConfiguration addMapping(String propertyName, ValueMap mappings) {
+      for (Iterator bdp = bdps.iterator(); bdp.hasNext();) {
+        ((MuleDefinitionParserConfiguration) bdp.next()).addMapping(propertyName, mappings);
+      }
+      return this;
     }
 
-    public static class IgnoredDefinitionParser implements BeanDefinitionParser
-    {
-        public IgnoredDefinitionParser()
-        {
-            super();
-        }
-
-        @Override
-        public BeanDefinition parse(Element element, ParserContext parserContext)
-        {
-            return null;
-        }
+    @Override
+    public MuleDefinitionParserConfiguration addAlias(String alias, String propertyName) {
+      for (Iterator bdp = bdps.iterator(); bdp.hasNext();) {
+        ((MuleDefinitionParserConfiguration) bdp.next()).addAlias(alias, propertyName);
+      }
+      return this;
     }
 
-    protected class RegisteredMdps implements MuleDefinitionParserConfiguration
-    {
-        private Set bdps = new HashSet();
-
-        protected MuleDefinitionParser add(MuleDefinitionParser bdp)
-        {
-            bdps.add(bdp);
-            return bdp;
-        }
-
-        @Override
-        public MuleDefinitionParserConfiguration registerPreProcessor(PreProcessor preProcessor)
-        {
-            for (Iterator bdp = bdps.iterator(); bdp.hasNext();)
-            {
-                ((MuleDefinitionParserConfiguration) bdp.next()).registerPreProcessor(preProcessor);
-            }
-            return this;
-        }
-
-        @Override
-        public MuleDefinitionParserConfiguration registerPostProcessor(PostProcessor postProcessor)
-        {
-            for (Iterator bdp = bdps.iterator(); bdp.hasNext();)
-            {
-                ((MuleDefinitionParserConfiguration) bdp.next()).registerPostProcessor(postProcessor);
-            }
-            return this;
-        }
-
-        @Override
-        public MuleDefinitionParserConfiguration addReference(String propertyName)
-        {
-            for (Iterator bdp = bdps.iterator(); bdp.hasNext();)
-            {
-                ((MuleDefinitionParserConfiguration) bdp.next()).addReference(propertyName);
-            }
-            return this;
-        }
-
-        @Override
-        public MuleDefinitionParserConfiguration addMapping(String propertyName, Map mappings)
-        {
-            for (Iterator bdp = bdps.iterator(); bdp.hasNext();)
-            {
-                ((MuleDefinitionParserConfiguration) bdp.next()).addMapping(propertyName, mappings);
-            }
-            return this;
-        }
-
-        @Override
-        public MuleDefinitionParserConfiguration addMapping(String propertyName, String mappings)
-        {
-            for (Iterator bdp = bdps.iterator(); bdp.hasNext();)
-            {
-                ((MuleDefinitionParserConfiguration) bdp.next()).addMapping(propertyName, mappings);
-            }
-            return this;
-        }
-
-        @Override
-        public MuleDefinitionParserConfiguration addMapping(String propertyName, ValueMap mappings)
-        {
-            for (Iterator bdp = bdps.iterator(); bdp.hasNext();)
-            {
-                ((MuleDefinitionParserConfiguration) bdp.next()).addMapping(propertyName, mappings);
-            }
-            return this;
-        }
-
-        @Override
-        public MuleDefinitionParserConfiguration addAlias(String alias, String propertyName)
-        {
-            for (Iterator bdp = bdps.iterator(); bdp.hasNext();)
-            {
-                ((MuleDefinitionParserConfiguration) bdp.next()).addAlias(alias, propertyName);
-            }
-            return this;
-        }
-
-        @Override
-        public MuleDefinitionParserConfiguration addCollection(String propertyName)
-        {
-            for (Iterator bdp = bdps.iterator(); bdp.hasNext();)
-            {
-                ((MuleDefinitionParserConfiguration) bdp.next()).addCollection(propertyName);
-            }
-            return this;
-        }
-
-        @Override
-        public MuleDefinitionParserConfiguration addIgnored(String propertyName)
-        {
-            for (Iterator bdp = bdps.iterator(); bdp.hasNext();)
-            {
-                ((MuleDefinitionParserConfiguration) bdp.next()).addIgnored(propertyName);
-            }
-            return this;
-        }
-
-        @Override
-        public MuleDefinitionParserConfiguration removeIgnored(String propertyName)
-        {
-            for (Iterator bdp = bdps.iterator(); bdp.hasNext();)
-            {
-                ((MuleDefinitionParserConfiguration) bdp.next()).removeIgnored(propertyName);
-            }
-            return this;
-        }
-
-        @Override
-        public MuleDefinitionParserConfiguration setIgnoredDefault(boolean ignoreAll)
-        {
-            for (Iterator bdp = bdps.iterator(); bdp.hasNext();)
-            {
-                ((MuleDefinitionParserConfiguration) bdp.next()).setIgnoredDefault(ignoreAll);
-            }
-            return this;
-        }
-
-        @Override
-        public MuleDefinitionParserConfiguration addBeanFlag(String flag)
-        {
-            for (Iterator bdp = bdps.iterator(); bdp.hasNext();)
-            {
-                ((MuleDefinitionParserConfiguration) bdp.next()).addBeanFlag(flag);
-            }
-            return this;
-        }
+    @Override
+    public MuleDefinitionParserConfiguration addCollection(String propertyName) {
+      for (Iterator bdp = bdps.iterator(); bdp.hasNext();) {
+        ((MuleDefinitionParserConfiguration) bdp.next()).addCollection(propertyName);
+      }
+      return this;
     }
 
-    static class AnnotationsBeanDefintionParser extends AbstractChildDefinitionParser
-    {
-        AnnotationsBeanDefintionParser()
-        {
-            super();
+    @Override
+    public MuleDefinitionParserConfiguration addIgnored(String propertyName) {
+      for (Iterator bdp = bdps.iterator(); bdp.hasNext();) {
+        ((MuleDefinitionParserConfiguration) bdp.next()).addIgnored(propertyName);
+      }
+      return this;
+    }
+
+    @Override
+    public MuleDefinitionParserConfiguration removeIgnored(String propertyName) {
+      for (Iterator bdp = bdps.iterator(); bdp.hasNext();) {
+        ((MuleDefinitionParserConfiguration) bdp.next()).removeIgnored(propertyName);
+      }
+      return this;
+    }
+
+    @Override
+    public MuleDefinitionParserConfiguration setIgnoredDefault(boolean ignoreAll) {
+      for (Iterator bdp = bdps.iterator(); bdp.hasNext();) {
+        ((MuleDefinitionParserConfiguration) bdp.next()).setIgnoredDefault(ignoreAll);
+      }
+      return this;
+    }
+
+    @Override
+    public MuleDefinitionParserConfiguration addBeanFlag(String flag) {
+      for (Iterator bdp = bdps.iterator(); bdp.hasNext();) {
+        ((MuleDefinitionParserConfiguration) bdp.next()).addBeanFlag(flag);
+      }
+      return this;
+    }
+  }
+
+  static class AnnotationsBeanDefintionParser extends AbstractChildDefinitionParser {
+
+    AnnotationsBeanDefintionParser() {
+      super();
+    }
+
+    @Override
+    protected AbstractBeanDefinition parseInternal(Element element, ParserContext context) {
+      AbstractBeanDefinition beanDef = super.parseInternal(element, context);
+      beanDef.setAttribute(MuleHierarchicalBeanDefinitionParserDelegate.MULE_NO_RECURSE, true);
+      beanDef.setAttribute(MuleHierarchicalBeanDefinitionParserDelegate.MULE_NO_REGISTRATION, true);
+      return beanDef;
+    }
+
+    @Override
+    public String getPropertyName(Element element) {
+      return "annotation";
+    }
+
+    @Override
+    protected Class<?> getBeanClass(Element element) {
+      return Map.class;
+    }
+
+    @Override
+    protected void postProcess(ParserContext context, BeanAssembler beanAssembler, Element element) {
+      if (beanAssembler instanceof DefaultBeanAssembler) {
+        DefaultBeanAssembler assembler = (DefaultBeanAssembler) beanAssembler;
+
+        if (assembler.getTarget() == null) {
+          // TODO MULE-9638 - This is possible when the parent node is parsed by the new mechanism
+          return;
         }
-
-        @Override
-        protected AbstractBeanDefinition parseInternal(Element element, ParserContext context)
-        {
-            AbstractBeanDefinition beanDef = super.parseInternal(element, context);
-            beanDef.setAttribute(MuleHierarchicalBeanDefinitionParserDelegate.MULE_NO_RECURSE, true);
-            beanDef.setAttribute(MuleHierarchicalBeanDefinitionParserDelegate.MULE_NO_REGISTRATION, true);
-            return beanDef;
-        }
-
-        @Override
-        public String getPropertyName(Element element)
-        {
-            return "annotation";
-        }
-
-        @Override
-        protected Class<?> getBeanClass(Element element)
-        {
-            return Map.class;
-        }
-
-        @Override
-        protected void postProcess(ParserContext context, BeanAssembler beanAssembler, Element element)
-        {
-            if (beanAssembler instanceof DefaultBeanAssembler)
-            {
-                DefaultBeanAssembler assembler = (DefaultBeanAssembler) beanAssembler;
-
-                if (assembler.getTarget() == null)
-                {
-                    //TODO MULE-9638 - This is possible when the parent node is parsed by the new mechanism
-                    return;
+        if (assembler.isAnnotationsPropertyAvailable(assembler.getTarget().getBeanClassName())) {
+          for (Node node = element.getFirstChild(); node != null; node = node.getNextSibling()) {
+            if (node.getNodeType() == Node.ELEMENT_NODE) {
+              StringBuilder builder = new StringBuilder();
+              for (Node child = node.getFirstChild(); child != null; child = child.getNextSibling()) {
+                switch (child.getNodeType()) {
+                  case Node.TEXT_NODE:
+                  case Node.CDATA_SECTION_NODE:
+                    builder.append(child.getNodeValue());
                 }
-                if (assembler.isAnnotationsPropertyAvailable(assembler.getTarget().getBeanClassName()))
-                {
-                    for (Node node = element.getFirstChild(); node != null; node = node.getNextSibling())
-                    {
-                        if (node.getNodeType() == Node.ELEMENT_NODE)
-                        {
-                            StringBuilder builder = new StringBuilder();
-                            for (Node child = node.getFirstChild(); child != null; child = child.getNextSibling())
-                            {
-                                switch (child.getNodeType())
-                                {
-                                    case Node.TEXT_NODE:
-                                    case Node.CDATA_SECTION_NODE:
-                                        builder.append(child.getNodeValue());
-                                }
-                            }
-                            assembler.addAnnotationValue(context.getContainingBeanDefinition().getPropertyValues(),
-                                                         new QName(node.getNamespaceURI(), node.getLocalName()),
-                                                         builder.toString());
-                        }
-                    }
-                }
+              }
+              assembler.addAnnotationValue(context.getContainingBeanDefinition().getPropertyValues(),
+                                           new QName(node.getNamespaceURI(), node.getLocalName()), builder.toString());
             }
+          }
         }
+      }
     }
+  }
 
-    /**
-     * See if there's a preferred connector class
-     */
-    protected Class findConnectorClass(Class basicConnector, String transportName)
-    {
-        String preferredPropertiesURL = "META-INF/services/org/mule/transport/preferred-" +transportName + ".properties";
-        InputStream stream = AbstractMuleNamespaceHandler.class.getClassLoader().getResourceAsStream(preferredPropertiesURL);
-        if (stream != null)
-        {
-            try
-            {
-                Properties preferredProperties = new Properties();
-                preferredProperties.load(stream);
-                String preferredConnectorName = preferredProperties.getProperty("connector");
-                if (preferredConnectorName != null)
-                {
-                    logger.debug("Found preferred connector class " + preferredConnectorName);
-                    return ClassUtils.getClass(preferredConnectorName);
-                }
-            }
-            catch (Exception e)
-            {
-                logger.debug("Error processing preferred properties", e);
-            }
-            finally
-            {
-                IOUtils.closeQuietly(stream);
-            }
+  /**
+   * See if there's a preferred connector class
+   */
+  protected Class findConnectorClass(Class basicConnector, String transportName) {
+    String preferredPropertiesURL = "META-INF/services/org/mule/transport/preferred-" + transportName + ".properties";
+    InputStream stream = AbstractMuleNamespaceHandler.class.getClassLoader().getResourceAsStream(preferredPropertiesURL);
+    if (stream != null) {
+      try {
+        Properties preferredProperties = new Properties();
+        preferredProperties.load(stream);
+        String preferredConnectorName = preferredProperties.getProperty("connector");
+        if (preferredConnectorName != null) {
+          logger.debug("Found preferred connector class " + preferredConnectorName);
+          return ClassUtils.getClass(preferredConnectorName);
         }
-        return basicConnector;
+      } catch (Exception e) {
+        logger.debug("Error processing preferred properties", e);
+      } finally {
+        IOUtils.closeQuietly(stream);
+      }
     }
+    return basicConnector;
+  }
 
-    protected void registerDeprecatedBeanDefinitionParser(String elementName, BeanDefinitionParser parser, String message)
-    {
-        registerBeanDefinitionParser(elementName, new DeprecatedBeanDefinitionParser(
-                parser,
-                String.format("Schema warning: Use of element <%s> is deprecated.  %s.", elementName, message)));
-    }
+  protected void registerDeprecatedBeanDefinitionParser(String elementName, BeanDefinitionParser parser, String message) {
+    registerBeanDefinitionParser(elementName, new DeprecatedBeanDefinitionParser(parser, String
+        .format("Schema warning: Use of element <%s> is deprecated.  %s.", elementName, message)));
+  }
 
-    protected MuleDefinitionParserConfiguration registerDeprecatedMuleBeanDefinitionParser(String name, MuleDefinitionParser parser, String message)
-    {
-        registerDeprecatedBeanDefinitionParser(name, parser, message);
-        return parser;
-    }
+  protected MuleDefinitionParserConfiguration registerDeprecatedMuleBeanDefinitionParser(String name, MuleDefinitionParser parser,
+                                                                                         String message) {
+    registerDeprecatedBeanDefinitionParser(name, parser, message);
+    return parser;
+  }
 
-    protected MuleDefinitionParserConfiguration registerDeprecatedConnectorDefinitionParser(Class connectorClass, String message)
-    {
-        MuleOrphanDefinitionParser parser = new MuleOrphanDefinitionParser(connectorClass, true);
-        registerDeprecatedBeanDefinitionParser("connector", parser, message);
-        return parser;
-    }
+  protected MuleDefinitionParserConfiguration registerDeprecatedConnectorDefinitionParser(Class connectorClass, String message) {
+    MuleOrphanDefinitionParser parser = new MuleOrphanDefinitionParser(connectorClass, true);
+    registerDeprecatedBeanDefinitionParser("connector", parser, message);
+    return parser;
+  }
 
 }

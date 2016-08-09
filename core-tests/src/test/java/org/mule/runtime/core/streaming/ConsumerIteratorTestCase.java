@@ -18,96 +18,82 @@ import org.junit.Assert;
 import org.junit.Test;
 
 @SmallTest
-public class ConsumerIteratorTestCase
-{
+public class ConsumerIteratorTestCase {
 
-    private static final int PAGE_SIZE = 100;
-    private static final int TOP = 3000;
+  private static final int PAGE_SIZE = 100;
+  private static final int TOP = 3000;
 
-    private PagingDelegate<String> delegate = new PagingDelegate<String>()
-    {
+  private PagingDelegate<String> delegate = new PagingDelegate<String>() {
 
-        long counter = 0;
+    long counter = 0;
 
-        public List<String> getPage()
-        {
-            if (counter < TOP)
-            {
-                List<String> page = new ArrayList<String>(100);
-                for (int i = 0; i < PAGE_SIZE; i++)
-                {
-                    counter++;
-                    String value = RandomStringUtils.randomAlphabetic(5000);
-                    page.add(value);
-                }
-
-                return page;
-            }
-
-            return null;
-        };
-
-        public void close() throws MuleException
-        {
-        };
-
-        @Override
-        public int getTotalResults()
-        {
-            return TOP;
+    public List<String> getPage() {
+      if (counter < TOP) {
+        List<String> page = new ArrayList<String>(100);
+        for (int i = 0; i < PAGE_SIZE; i++) {
+          counter++;
+          String value = RandomStringUtils.randomAlphabetic(5000);
+          page.add(value);
         }
+
+        return page;
+      }
+
+      return null;
     };
 
-    @Test
-    public void iterateStreaming() throws Exception
-    {
-        ConsumerIterator<String> it = this.newIterator();
+    public void close() throws MuleException {};
 
-        int count = 0;
-        while (it.hasNext())
-        {
-            it.next();
-            count++;
-        }
+    @Override
+    public int getTotalResults() {
+      return TOP;
+    }
+  };
 
-        Assert.assertEquals(count, TOP);
-        it.close();
+  @Test
+  public void iterateStreaming() throws Exception {
+    ConsumerIterator<String> it = this.newIterator();
+
+    int count = 0;
+    while (it.hasNext()) {
+      it.next();
+      count++;
     }
 
-    @Test
-    public void closedIterator() throws Exception
-    {
-        ConsumerIterator<String> it = this.newIterator();
-        it.close();
-        Assert.assertFalse(it.hasNext());
-    }
+    Assert.assertEquals(count, TOP);
+    it.close();
+  }
 
-    @Test
-    public void closedConsumer() throws Exception
-    {
-        Producer<List<String>> producer = new PagingDelegateProducer<String>(this.delegate);
-        Consumer<String> consumer = new ListConsumer<String>(producer);
+  @Test
+  public void closedIterator() throws Exception {
+    ConsumerIterator<String> it = this.newIterator();
+    it.close();
+    Assert.assertFalse(it.hasNext());
+  }
 
-        ConsumerIterator<String> it = new ConsumerIterator<String>(consumer);
+  @Test
+  public void closedConsumer() throws Exception {
+    Producer<List<String>> producer = new PagingDelegateProducer<String>(this.delegate);
+    Consumer<String> consumer = new ListConsumer<String>(producer);
 
-        consumer.close();
-        Assert.assertFalse(it.hasNext());
-    }
+    ConsumerIterator<String> it = new ConsumerIterator<String>(consumer);
 
-    @Test
-    public void size() throws Exception
-    {
-        ConsumerIterator<String> it = this.newIterator();
-        Assert.assertEquals(it.size(), TOP);
-    }
+    consumer.close();
+    Assert.assertFalse(it.hasNext());
+  }
 
-    private ConsumerIterator<String> newIterator()
-    {
-        Producer<List<String>> producer = new PagingDelegateProducer<String>(this.delegate);
-        Consumer<String> consumer = new ListConsumer<String>(producer);
+  @Test
+  public void size() throws Exception {
+    ConsumerIterator<String> it = this.newIterator();
+    Assert.assertEquals(it.size(), TOP);
+  }
 
-        ConsumerIterator<String> it = new ConsumerIterator<String>(consumer);
-        return it;
-    }
+  private ConsumerIterator<String> newIterator() {
+    Producer<List<String>> producer = new PagingDelegateProducer<String>(this.delegate);
+    Consumer<String> consumer = new ListConsumer<String>(producer);
+
+    ConsumerIterator<String> it = new ConsumerIterator<String>(consumer);
+    return it;
+  }
 
 }

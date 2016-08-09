@@ -11,30 +11,24 @@ import org.mule.runtime.core.api.el.ExpressionLanguageContext;
 import org.mule.runtime.core.api.el.ExpressionLanguageExtension;
 
 /**
- * A {@link ExpressionLanguageExtension} which adds a
- * {@link ValidatorElContext} to the {@link ExpressionLanguageContext}
- * as a variable named {@code validator}.
+ * A {@link ExpressionLanguageExtension} which adds a {@link ValidatorElContext} to the {@link ExpressionLanguageContext} as a
+ * variable named {@code validator}.
  * <p/>
- * The {@code validator} variable is actually an alias which
- * creates a new {@link ValidatorElContext} each time a
- * {@link ExpressionLanguageContext} is configured. This is necessary
- * because the {@link ValidatorElContext} needs to receive the current
- * {@link MuleEvent} in its constructor.
+ * The {@code validator} variable is actually an alias which creates a new {@link ValidatorElContext} each time a
+ * {@link ExpressionLanguageContext} is configured. This is necessary because the {@link ValidatorElContext} needs to receive the
+ * current {@link MuleEvent} in its constructor.
  *
  * @since 3.7.0
  */
-public final class ValidationElExtension implements ExpressionLanguageExtension
-{
+public final class ValidationElExtension implements ExpressionLanguageExtension {
 
-    /**
-     * Registers an alias for a new {@link ValidatorElContext}
-     * under the name {@code validator}
-     *
-     * @param context a new {@link ExpressionLanguageContext} which is being configured
-     */
-    @Override
-    public void configureContext(ExpressionLanguageContext context)
-    {
-        context.addFinalVariable("validator", new ValidatorElContext());
-    }
+  /**
+   * Registers an alias for a new {@link ValidatorElContext} under the name {@code validator}
+   *
+   * @param context a new {@link ExpressionLanguageContext} which is being configured
+   */
+  @Override
+  public void configureContext(ExpressionLanguageContext context) {
+    context.addFinalVariable("validator", new ValidatorElContext());
+  }
 }

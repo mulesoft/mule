@@ -29,180 +29,154 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Experimental implementation that supports a single dynamic pipeline due to restrictions
- * imposed by intercepting message processors and their lifecycle.
+ * Experimental implementation that supports a single dynamic pipeline due to restrictions imposed by intercepting message
+ * processors and their lifecycle.
  *
- * If more than one client tries to use the functionality the 2nd one will fail due to
- * pipeline ID verification.
+ * If more than one client tries to use the functionality the 2nd one will fail due to pipeline ID verification.
  */
-public class DynamicPipelineMessageProcessor extends AbstractInterceptingMessageProcessor implements DynamicPipeline, NonBlockingSupported
-{
+public class DynamicPipelineMessageProcessor extends AbstractInterceptingMessageProcessor
+    implements DynamicPipeline, NonBlockingSupported {
 
-    private String pipelineId;
-    private AbstractMessageProcessorChain preChain;
-    private AbstractMessageProcessorChain postChain;
-    private MessageProcessor staticChain;
-    private Flow flow;
+  private String pipelineId;
+  private AbstractMessageProcessorChain preChain;
+  private AbstractMessageProcessorChain postChain;
+  private MessageProcessor staticChain;
+  private Flow flow;
 
-    public DynamicPipelineMessageProcessor(Flow flow)
-    {
-        this.flow = flow;
+  public DynamicPipelineMessageProcessor(Flow flow) {
+    this.flow = flow;
+  }
+
+  @Override
+  public MuleEvent process(MuleEvent event) throws MuleException {
+    return processNext(event);
+  }
+
+  @Override
+  public void setListener(MessageProcessor next) {
+    if (staticChain == null) {
+      if (next instanceof InterceptingMessageProcessor) {
+        // wrap with chain to avoid intercepting the postChain
+        staticChain = new SimpleMessageProcessorChain(next);
+      } else {
+        staticChain = next;
+      }
+    }
+    super.setListener(next);
+  }
+
+  private String resetAndUpdatePipeline(String id, List<MessageProcessor> preMessageProcessors,
+                                        List<MessageProcessor> postMessageProcessors)
+      throws MuleException {
+    checkPipelineId(id);
+
+    // build new dynamic chains
+    DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder(flow);
+    builder.chain(preMessageProcessors);
+
+    builder.chain(staticChain);
+    builder.chain(postMessageProcessors);
+    MessageProcessorChain newChain = builder.build();
+
+    Lifecycle preChainOld = preChain;
+    Lifecycle postChainOld = postChain;
+    preChain = new SimpleMessageProcessorChain(preMessageProcessors);
+    postChain = new SimpleMessageProcessorChain(postMessageProcessors);
+    initDynamicChains();
+
+    // hook chain as last step to avoid synchronization
+    super.setListener(newChain);
+
+    // dispose old dynamic chains
+    disposeDynamicChains(preChainOld, postChainOld);
+
+    return getPipelineId();
+  }
+
+  private synchronized void checkPipelineId(String id) throws DynamicPipelineException {
+    if (!StringUtils.equals(pipelineId, id)) {
+      throw new DynamicPipelineException(CoreMessages.createStaticMessage("Invalid Dynamic Pipeline ID"));
+    }
+    if (pipelineId == null && id == null) {
+      pipelineId = UUID.getUUID();
+    }
+  }
+
+  private synchronized String getPipelineId() {
+    return pipelineId;
+  }
+
+  private String resetPipeline(String id) throws MuleException {
+    List<MessageProcessor> emptyList = new ArrayList<MessageProcessor>();
+    return resetAndUpdatePipeline(id, emptyList, emptyList);
+  }
+
+  private void initDynamicChains() throws MuleException {
+    for (Lifecycle chain : new Lifecycle[] {preChain, postChain}) {
+      if (chain != null) {
+        flow.injectFlowConstructMuleContext(chain);
+        flow.injectExceptionHandler(chain);
+        flow.initialiseIfInitialisable(chain);
+        flow.startIfStartable(chain);
+      }
+    }
+  }
+
+  private void disposeDynamicChains(Lifecycle... chains) throws MuleException {
+    for (Lifecycle chain : chains) {
+      if (chain != null) {
+        chain.stop();
+        chain.dispose();
+      }
+    }
+  }
+
+  @Override
+  public DynamicPipelineBuilder dynamicPipeline(String id) throws DynamicPipelineException {
+    checkPipelineId(id);
+    return new Builder();
+  }
+
+  private class Builder implements DynamicPipelineBuilder {
+
+    private List<MessageProcessor> preList = new ArrayList<MessageProcessor>();
+    private List<MessageProcessor> postList = new ArrayList<MessageProcessor>();
+
+    @Override
+    public DynamicPipelineBuilder injectBefore(MessageProcessor... messageProcessors) {
+      Collections.addAll(preList, messageProcessors);
+      return this;
     }
 
     @Override
-    public MuleEvent process(MuleEvent event) throws MuleException
-    {
-        return processNext(event);
+    public DynamicPipelineBuilder injectBefore(List<MessageProcessor> messageProcessors) {
+      return injectBefore(messageProcessors.toArray(new MessageProcessor[messageProcessors.size()]));
     }
 
     @Override
-    public void setListener(MessageProcessor next)
-    {
-        if (staticChain == null)
-        {
-            if (next instanceof InterceptingMessageProcessor)
-            {
-                //wrap with chain to avoid intercepting the postChain
-                staticChain = new SimpleMessageProcessorChain(next);
-            }
-            else
-            {
-                staticChain = next;
-            }
-        }
-        super.setListener(next);
-    }
-
-    private String resetAndUpdatePipeline(String id, List<MessageProcessor> preMessageProcessors, List<MessageProcessor> postMessageProcessors) throws MuleException
-    {
-        checkPipelineId(id);
-
-        //build new dynamic chains
-        DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder(flow);
-        builder.chain(preMessageProcessors);
-
-        builder.chain(staticChain);
-        builder.chain(postMessageProcessors);
-        MessageProcessorChain newChain = builder.build();
-
-        Lifecycle preChainOld = preChain;
-        Lifecycle postChainOld = postChain;
-        preChain = new SimpleMessageProcessorChain(preMessageProcessors);
-        postChain = new SimpleMessageProcessorChain(postMessageProcessors);
-        initDynamicChains();
-
-        //hook chain as last step to avoid synchronization
-        super.setListener(newChain);
-
-        //dispose old dynamic chains
-        disposeDynamicChains(preChainOld, postChainOld);
-
-        return getPipelineId();
-    }
-
-    private synchronized void checkPipelineId(String id) throws DynamicPipelineException
-    {
-        if (!StringUtils.equals(pipelineId, id))
-        {
-            throw new DynamicPipelineException(CoreMessages.createStaticMessage("Invalid Dynamic Pipeline ID"));
-        }
-        if (pipelineId == null && id == null)
-        {
-            pipelineId = UUID.getUUID();
-        }
-    }
-
-    private synchronized String getPipelineId()
-    {
-        return pipelineId;
-    }
-
-    private String resetPipeline(String id) throws MuleException
-    {
-        List<MessageProcessor> emptyList = new ArrayList<MessageProcessor>();
-        return resetAndUpdatePipeline(id, emptyList, emptyList);
-    }
-
-    private void initDynamicChains() throws MuleException
-    {
-        for (Lifecycle chain : new Lifecycle[] {preChain, postChain})
-        {
-            if (chain != null)
-            {
-                flow.injectFlowConstructMuleContext(chain);
-                flow.injectExceptionHandler(chain);
-                flow.initialiseIfInitialisable(chain);
-                flow.startIfStartable(chain);
-            }
-        }
-    }
-
-    private void disposeDynamicChains(Lifecycle... chains) throws MuleException
-    {
-        for (Lifecycle chain : chains)
-        {
-            if (chain != null)
-            {
-                chain.stop();
-                chain.dispose();
-            }
-        }
+    public DynamicPipelineBuilder injectAfter(MessageProcessor... messageProcessors) {
+      Collections.addAll(postList, messageProcessors);
+      return this;
     }
 
     @Override
-    public DynamicPipelineBuilder dynamicPipeline(String id) throws DynamicPipelineException
-    {
-        checkPipelineId(id);
-        return new Builder();
+    public DynamicPipelineBuilder injectAfter(List<MessageProcessor> messageProcessors) {
+      return injectAfter(messageProcessors.toArray(new MessageProcessor[messageProcessors.size()]));
     }
 
-    private class Builder implements DynamicPipelineBuilder
-    {
-        private List<MessageProcessor> preList = new ArrayList<MessageProcessor>();
-        private List<MessageProcessor> postList = new ArrayList<MessageProcessor>();
-
-        @Override
-        public DynamicPipelineBuilder injectBefore(MessageProcessor... messageProcessors)
-        {
-            Collections.addAll(preList, messageProcessors);
-            return this;
-        }
-
-        @Override
-        public DynamicPipelineBuilder injectBefore(List<MessageProcessor> messageProcessors)
-        {
-            return injectBefore(messageProcessors.toArray(new MessageProcessor[messageProcessors.size()]));
-        }
-
-        @Override
-        public DynamicPipelineBuilder injectAfter(MessageProcessor... messageProcessors)
-        {
-            Collections.addAll(postList, messageProcessors);
-            return this;
-        }
-
-        @Override
-        public DynamicPipelineBuilder injectAfter(List<MessageProcessor> messageProcessors)
-        {
-            return injectAfter(messageProcessors.toArray(new MessageProcessor[messageProcessors.size()]));
-        }
-
-        @Override
-        public String resetAndUpdate() throws MuleException
-        {
-            return pipeline().resetAndUpdatePipeline(pipeline().getPipelineId(), preList, postList);
-        }
-
-        @Override
-        public String reset() throws MuleException
-        {
-            return pipeline().resetPipeline(pipeline().getPipelineId());
-        }
-
-        private DynamicPipelineMessageProcessor pipeline()
-        {
-            return DynamicPipelineMessageProcessor.this;
-        }
-
+    @Override
+    public String resetAndUpdate() throws MuleException {
+      return pipeline().resetAndUpdatePipeline(pipeline().getPipelineId(), preList, postList);
     }
+
+    @Override
+    public String reset() throws MuleException {
+      return pipeline().resetPipeline(pipeline().getPipelineId());
+    }
+
+    private DynamicPipelineMessageProcessor pipeline() {
+      return DynamicPipelineMessageProcessor.this;
+    }
+
+  }
 }

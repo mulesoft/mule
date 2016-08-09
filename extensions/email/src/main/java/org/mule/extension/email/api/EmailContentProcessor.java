@@ -34,175 +34,143 @@ import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.Part;
 
-public class EmailContentProcessor
-{
+public class EmailContentProcessor {
 
-    private static final String ERROR_PROCESSING_MESSAGE = "Error while processing message content.";
+  private static final String ERROR_PROCESSING_MESSAGE = "Error while processing message content.";
 
-    private final List<MuleMessage> attachmentParts = new LinkedList<>();
-    private final StringJoiner body = new StringJoiner("\n");
+  private final List<MuleMessage> attachmentParts = new LinkedList<>();
+  private final StringJoiner body = new StringJoiner("\n");
 
-    /**
-     * Creates an instance and process the message content.
-     * <p>
-     * Hided constructor, can only get a new instance out of this class
-     * using the factory method {@link EmailContentProcessor#process(Message)}.
-     *
-     * @param message the {@link Message} to be processed.
-     */
-    private EmailContentProcessor(Message message)
-    {
-        processPart(message);
+  /**
+   * Creates an instance and process the message content.
+   * <p>
+   * Hided constructor, can only get a new instance out of this class using the factory method
+   * {@link EmailContentProcessor#process(Message)}.
+   *
+   * @param message the {@link Message} to be processed.
+   */
+  private EmailContentProcessor(Message message) {
+    processPart(message);
+  }
+
+  /**
+   * Factory method to get a new instance of {@link EmailContentProcessor} and process a {@link Message}.
+   *
+   * @param message the {@link Message} to be processed.
+   * @return a new {@link EmailContentProcessor} instance.
+   */
+  public static EmailContentProcessor process(Message message) {
+    return new EmailContentProcessor(message);
+  }
+
+  /**
+   * @return the text body of the message.
+   */
+  public String getBody() {
+    return body.toString().trim();
+  }
+
+  /**
+   * @return an {@link ImmutableMap} with the attachments of an email message.
+   */
+  public List<MuleMessage> getAttachments() {
+    return ImmutableList.copyOf(attachmentParts);
+  }
+
+  /**
+   * Processes a {@link Multipart} which may contain INLINE content and ATTACHMENTS.
+   *
+   * @param part the part to be processed
+   */
+  private void processMultipartPart(Part part) {
+    try {
+      Multipart mp = (Multipart) part.getContent();
+      for (int i = 0; i < mp.getCount(); i++) {
+        processPart(mp.getBodyPart(i));
+      }
+    } catch (MessagingException | IOException e) {
+      throw new EmailException(ERROR_PROCESSING_MESSAGE, e);
     }
+  }
 
-    /**
-     * Factory method to get a new instance of {@link EmailContentProcessor}
-     * and process a {@link Message}.
-     *
-     * @param message the {@link Message} to be processed.
-     * @return a new {@link EmailContentProcessor} instance.
-     */
-    public static EmailContentProcessor process(Message message)
-    {
-        return new EmailContentProcessor(message);
-    }
+  /**
+   * Processes a single {@link Part} and adds it to the body of the message or as a new attachment depending on it's disposition
+   * type.
+   *
+   * @param part the part to be processed
+   */
+  private void processPart(Part part) {
+    try {
+      Object content = part.getContent();
+      if (isMultipart(content)) {
+        processMultipartPart(part);
+      }
 
-    /**
-     * @return the text body of the message.
-     */
-    public String getBody()
-    {
-        return body.toString().trim();
-    }
-
-    /**
-     * @return an {@link ImmutableMap} with the attachments of an email message.
-     */
-    public List<MuleMessage> getAttachments()
-    {
-        return ImmutableList.copyOf(attachmentParts);
-    }
-
-    /**
-     * Processes a {@link Multipart} which may contain INLINE content
-     * and ATTACHMENTS.
-     *
-     * @param part the part to be processed
-     */
-    private void processMultipartPart(Part part)
-    {
-        try
-        {
-            Multipart mp = (Multipart) part.getContent();
-            for (int i = 0; i < mp.getCount(); i++)
-            {
-                processPart(mp.getBodyPart(i));
-            }
+      if (isAttachment(part)) {
+        Map<String, LinkedList<String>> headers = new HashMap<>();
+        final Enumeration allHeaders = part.getAllHeaders();
+        while (allHeaders.hasMoreElements()) {
+          Header h = (Header) allHeaders.nextElement();
+          headers.put(h.getName(), new LinkedList<>(singletonList(h.getValue())));
         }
-        catch (MessagingException | IOException e)
-        {
-            throw new EmailException(ERROR_PROCESSING_MESSAGE, e);
+
+        attachmentParts.add(MuleMessage.builder().payload(part.getInputStream()).mediaType(MediaType.parse(part.getContentType()))
+            .attributes(new PartAttributes(part.getFileName(), part.getFileName(), part.getSize(), headers)).build());
+      } else {
+        if (isText(content)) {
+          body.add((String) content);
         }
-    }
 
-    /**
-     * Processes a single {@link Part} and adds it to the body of the message or
-     * as a new attachment depending on it's disposition type.
-     *
-     * @param part the part to be processed
-     */
-    private void processPart(Part part)
-    {
-        try
-        {
-            Object content = part.getContent();
-            if (isMultipart(content))
-            {
-                processMultipartPart(part);
-            }
-
-            if (isAttachment(part))
-            {
-                Map<String, LinkedList<String>> headers = new HashMap<>();
-                final Enumeration allHeaders = part.getAllHeaders();
-                while (allHeaders.hasMoreElements())
-                {
-                    Header h = (Header) allHeaders.nextElement();
-                    headers.put(h.getName(), new LinkedList<>(singletonList(h.getValue())));
-                }
-
-                attachmentParts.add(MuleMessage.builder()
-                                               .payload(part.getInputStream())
-                                               .mediaType(MediaType.parse(part.getContentType()))
-                                               .attributes(new PartAttributes(part.getFileName(), part.getFileName(), part.getSize(), headers))
-                                               .build());
-            }
-            else
-            {
-                if (isText(content))
-                {
-                    body.add((String) content);
-                }
-
-                if (content instanceof InputStream
-                    && isInline(part)
-                    && part.isMimeType(TEXT))
-                {
-                    String inline = IOUtils.toString((InputStream) content);
-                    body.add(inline);
-                }
-            }
+        if (content instanceof InputStream && isInline(part) && part.isMimeType(TEXT)) {
+          String inline = IOUtils.toString((InputStream) content);
+          body.add(inline);
         }
-        catch (MessagingException | IOException e)
-        {
-            throw new EmailException(ERROR_PROCESSING_MESSAGE, e);
-        }
+      }
+    } catch (MessagingException | IOException e) {
+      throw new EmailException(ERROR_PROCESSING_MESSAGE, e);
     }
+  }
 
-    /**
-     * Evaluates whether the disposition of the {@link Part} is INLINE or not.
-     *
-     * @param part the part to be validated.
-     * @return true is the part is dispositioned as inline, false otherwise
-     * @throws MessagingException
-     */
-    private boolean isInline(Part part) throws MessagingException
-    {
-        return part.getDisposition().equalsIgnoreCase(Part.INLINE);
-    }
+  /**
+   * Evaluates whether the disposition of the {@link Part} is INLINE or not.
+   *
+   * @param part the part to be validated.
+   * @return true is the part is dispositioned as inline, false otherwise
+   * @throws MessagingException
+   */
+  private boolean isInline(Part part) throws MessagingException {
+    return part.getDisposition().equalsIgnoreCase(Part.INLINE);
+  }
 
 
-    /**
-     * Evaluates whether a {@link Part} is an attachment or not.
-     *
-     * @param part the part to be validated.
-     * @return true is the part is dispositioned as an attachment, false otherwise
-     * @throws MessagingException
-     */
-    private boolean isAttachment(Part part) throws MessagingException
-    {
-        return part.getFileName() != null && (part.getDisposition() == null || part.getDisposition().equals(ATTACHMENT));
-    }
+  /**
+   * Evaluates whether a {@link Part} is an attachment or not.
+   *
+   * @param part the part to be validated.
+   * @return true is the part is dispositioned as an attachment, false otherwise
+   * @throws MessagingException
+   */
+  private boolean isAttachment(Part part) throws MessagingException {
+    return part.getFileName() != null && (part.getDisposition() == null || part.getDisposition().equals(ATTACHMENT));
+  }
 
-    /**
-     * Evaluates whether a content is multipart or not.
-     *
-     * @param content the content to be evaluated.
-     * @return true if is multipart, false otherwise
-     */
-    private boolean isMultipart(Object content)
-    {
-        return content instanceof Multipart;
-    }
+  /**
+   * Evaluates whether a content is multipart or not.
+   *
+   * @param content the content to be evaluated.
+   * @return true if is multipart, false otherwise
+   */
+  private boolean isMultipart(Object content) {
+    return content instanceof Multipart;
+  }
 
-    /**
-     * Evaluates whether a content is text or not.
-     *
-     * @param content the content to be evaluated.
-     * @return true if is text, false otherwise
-     */
-    private boolean isText(Object content)
-    {
-        return content instanceof String;
-    }
+  /**
+   * Evaluates whether a content is text or not.
+   *
+   * @param content the content to be evaluated.
+   * @return true if is text, false otherwise
+   */
+  private boolean isText(Object content) {
+    return content instanceof String;
+  }
 }

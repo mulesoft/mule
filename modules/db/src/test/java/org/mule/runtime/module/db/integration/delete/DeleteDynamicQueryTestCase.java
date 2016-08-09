@@ -21,33 +21,28 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class DeleteDynamicQueryTestCase extends AbstractDbIntegrationTestCase
-{
+public class DeleteDynamicQueryTestCase extends AbstractDbIntegrationTestCase {
 
-    public DeleteDynamicQueryTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public DeleteDynamicQueryTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Parameterized.Parameters
-    public static List<Object[]> parameters()
-    {
-        return TestDbConfig.getResources();
-    }
+  @Parameterized.Parameters
+  public static List<Object[]> parameters() {
+    return TestDbConfig.getResources();
+  }
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/delete/delete-dynamic-query-config.xml"};
-    }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/delete/delete-dynamic-query-config.xml"};
+  }
 
-    @Test
-    public void usesDynamicQuery() throws Exception
-    {
-        final MuleEvent responseEvent = flowRunner("deleteDynamicQuery").withPayload(VENUS.getName()).run();
+  @Test
+  public void usesDynamicQuery() throws Exception {
+    final MuleEvent responseEvent = flowRunner("deleteDynamicQuery").withPayload(VENUS.getName()).run();
 
-        final MuleMessage response = responseEvent.getMessage();
-        assertThat(response.getPayload(), equalTo(1));
-        assertDeletedPlanetRecords(VENUS.getName());
-    }
+    final MuleMessage response = responseEvent.getMessage();
+    assertThat(response.getPayload(), equalTo(1));
+    assertDeletedPlanetRecords(VENUS.getName());
+  }
 }

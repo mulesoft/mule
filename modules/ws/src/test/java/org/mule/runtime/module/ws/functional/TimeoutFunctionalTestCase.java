@@ -18,32 +18,29 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class TimeoutFunctionalTestCase extends FunctionalTestCase
-{
+public class TimeoutFunctionalTestCase extends FunctionalTestCase {
 
-    @Rule
-    public DynamicPort dynamicPort = new DynamicPort("port");
+  @Rule
+  public DynamicPort dynamicPort = new DynamicPort("port");
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "timeout-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "timeout-config.xml";
+  }
 
-    @Test
-    public void flowAndSessionVarsAreNotRemovedAfterTimeout() throws Exception
-    {
-        final Latch serverLatch = new Latch();
+  @Test
+  public void flowAndSessionVarsAreNotRemovedAfterTimeout() throws Exception {
+    final Latch serverLatch = new Latch();
 
-        getFunctionalTestComponent("server").setEventCallback((context, component) -> serverLatch.await());
+    getFunctionalTestComponent("server").setEventCallback((context, component) -> serverLatch.await());
 
-        FlowRunner runner = flowRunner("client").withPayload("<echo/>");
-        runner.buildEvent().setTimeout(1);
-        runner.run();
-        serverLatch.release();
+    FlowRunner runner = flowRunner("client").withPayload("<echo/>");
+    runner.buildEvent().setTimeout(1);
+    runner.run();
+    serverLatch.release();
 
-        MuleMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT);
+    MuleMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT);
 
-        assertThat(message.<String>getOutboundProperty("flowVar"), equalTo("testFlowVar"));
-    }
+    assertThat(message.<String>getOutboundProperty("flowVar"), equalTo("testFlowVar"));
+  }
 }

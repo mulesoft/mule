@@ -65,233 +65,210 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 /**
- * A generic {@link ComponentBuildingDefinitionProvider} which provides
- * definitions capable of handling all extensions registered on the {@link ExtensionManager}.
+ * A generic {@link ComponentBuildingDefinitionProvider} which provides definitions capable of handling all extensions registered
+ * on the {@link ExtensionManager}.
  * <p>
  * It also provides static definitions for the config elements in the {@link ExtensionXmlNamespaceInfo#EXTENSION_NAMESPACE}
  * namespace, which are used for cross extension configuration
  *
  * @since 4.0
  */
-public class ExtensionBuildingDefinitionProvider implements ComponentBuildingDefinitionProvider
-{
+public class ExtensionBuildingDefinitionProvider implements ComponentBuildingDefinitionProvider {
 
-    private final List<ComponentBuildingDefinition> definitions = new LinkedList<>();
-    private ExtensionManager extensionManager;
-    private MuleContext muleContext;
+  private final List<ComponentBuildingDefinition> definitions = new LinkedList<>();
+  private ExtensionManager extensionManager;
+  private MuleContext muleContext;
 
-    /**
-     * Gets a hold on a {@link ExtensionManager} instance and generates the definitions.
-     *
-     * @throws java.lang.IllegalStateException if no extension manager could be found
-     */
-    @Override
-    public void init(MuleContext muleContext)
-    {
-        this.muleContext = muleContext;
-        extensionManager = muleContext.getExtensionManager();
-        if (extensionManager != null)
-        {
-            extensionManager.getExtensions().forEach(this::registerExtensionParsers);
-        }
+  /**
+   * Gets a hold on a {@link ExtensionManager} instance and generates the definitions.
+   *
+   * @throws java.lang.IllegalStateException if no extension manager could be found
+   */
+  @Override
+  public void init(MuleContext muleContext) {
+    this.muleContext = muleContext;
+    extensionManager = muleContext.getExtensionManager();
+    if (extensionManager != null) {
+      extensionManager.getExtensions().forEach(this::registerExtensionParsers);
+    }
+  }
+
+  /**
+   * Returns the {@link ComponentBuildingDefinition}s for all the extensions plus for the elements in the
+   * {@link ExtensionXmlNamespaceInfo#EXTENSION_NAMESPACE}
+   */
+  @Override
+  public List<ComponentBuildingDefinition> getComponentBuildingDefinitions() {
+    Builder baseDefinition = new Builder().withNamespace(EXTENSION_NAMESPACE);
+    definitions.add(
+                    baseDefinition.copy().withIdentifier("extensions-config").withTypeDefinition(fromType(ExtensionConfig.class))
+                        .withObjectFactoryType(ExtensionConfigObjectFactory.class)
+                        .withSetterParameterDefinition("dynamicConfigurationExpiration",
+                                                       fromChildConfiguration(DynamicConfigurationExpiration.class).build())
+                        .build());
+    definitions.add(baseDefinition.copy().withIdentifier("dynamic-configuration-expiration")
+        .withTypeDefinition(fromType(DynamicConfigurationExpiration.class))
+        .withObjectFactoryType(DynamicConfigurationExpirationObjectFactory.class)
+        .withConstructorParameterDefinition(fromSimpleParameter("frequency").build())
+        .withConstructorParameterDefinition(fromSimpleParameter("timeUnit", value -> TimeUnit.valueOf((String) value)).build())
+        .build());
+
+    definitions.add(baseDefinition.copy().withIdentifier("dynamic-config-policy")
+        .withTypeDefinition(fromType(DynamicConfigPolicy.class)).withObjectFactoryType(DynamicConfigPolicyObjectFactory.class)
+        .withSetterParameterDefinition("expirationPolicy", fromChildConfiguration(ExpirationPolicy.class).build()).build());
+
+    definitions.add(baseDefinition.copy().withIdentifier("expiration-policy").withTypeDefinition(fromType(ExpirationPolicy.class))
+        .withObjectFactoryType(ExpirationPolicyObjectFactory.class)
+        .withSetterParameterDefinition("maxIdleTime", fromSimpleParameter("maxIdleTime").build())
+        .withSetterParameterDefinition("timeUnit",
+                                       fromSimpleParameter("timeUnit", value -> TimeUnit.valueOf((String) value)).build())
+        .build());
+
+    return definitions;
+  }
+
+  private void registerExtensionParsers(ExtensionModel extensionModel) {
+
+    Optional<XmlModelProperty> xmlModelProperty = extensionModel.getModelProperty(XmlModelProperty.class);
+    if (!xmlModelProperty.isPresent()) {
+      return;
     }
 
-    /**
-     * Returns the {@link ComponentBuildingDefinition}s for all the extensions
-     * plus for the elements in the {@link ExtensionXmlNamespaceInfo#EXTENSION_NAMESPACE}
-     */
-    @Override
-    public List<ComponentBuildingDefinition> getComponentBuildingDefinitions()
-    {
-        Builder baseDefinition = new Builder().withNamespace(EXTENSION_NAMESPACE);
-        definitions.add(baseDefinition.copy()
-                                .withIdentifier("extensions-config")
-                                .withTypeDefinition(fromType(ExtensionConfig.class))
-                                .withObjectFactoryType(ExtensionConfigObjectFactory.class)
-                                .withSetterParameterDefinition("dynamicConfigurationExpiration", fromChildConfiguration(DynamicConfigurationExpiration.class).build())
-                                .build());
-        definitions.add(baseDefinition.copy()
-                                .withIdentifier("dynamic-configuration-expiration")
-                                .withTypeDefinition(fromType(DynamicConfigurationExpiration.class))
-                                .withObjectFactoryType(DynamicConfigurationExpirationObjectFactory.class)
-                                .withConstructorParameterDefinition(fromSimpleParameter("frequency").build())
-                                .withConstructorParameterDefinition(fromSimpleParameter("timeUnit", value -> TimeUnit.valueOf((String) value)).build())
-                                .build());
+    final ExtensionParsingContext parsingContext = new ExtensionParsingContext();
+    final Builder definitionBuilder = new Builder().withNamespace(xmlModelProperty.get().getNamespace());
+    Optional<SubTypesModelProperty> subTypesProperty = extensionModel.getModelProperty(SubTypesModelProperty.class);
+    final SubTypesMappingContainer typeMapping =
+        new SubTypesMappingContainer(subTypesProperty.isPresent() ? subTypesProperty.get().getSubTypesMapping() : emptyMap());
+    final DslSyntaxResolver dslSyntaxResolver = new DslSyntaxResolver(extensionModel);
 
-        definitions.add(baseDefinition.copy()
-                                .withIdentifier("dynamic-config-policy")
-                                .withTypeDefinition(fromType(DynamicConfigPolicy.class))
-                                .withObjectFactoryType(DynamicConfigPolicyObjectFactory.class)
-                                .withSetterParameterDefinition("expirationPolicy", fromChildConfiguration(ExpirationPolicy.class).build())
-                                .build());
+    final ClassLoader extensionClassLoader = getClassLoader(extensionModel);
+    withContextClassLoader(extensionClassLoader, () -> {
+      new IdempotentExtensionWalker() {
 
-        definitions.add(baseDefinition.copy()
-                                .withIdentifier("expiration-policy")
-                                .withTypeDefinition(fromType(ExpirationPolicy.class))
-                                .withObjectFactoryType(ExpirationPolicyObjectFactory.class)
-                                .withSetterParameterDefinition("maxIdleTime", fromSimpleParameter("maxIdleTime").build())
-                                .withSetterParameterDefinition("timeUnit", fromSimpleParameter("timeUnit", value -> TimeUnit.valueOf((String) value)).build())
-                                .build());
-
-        return definitions;
-    }
-
-    private void registerExtensionParsers(ExtensionModel extensionModel)
-    {
-
-        Optional<XmlModelProperty> xmlModelProperty = extensionModel.getModelProperty(XmlModelProperty.class);
-        if (!xmlModelProperty.isPresent())
-        {
-            return;
-        }
-
-        final ExtensionParsingContext parsingContext = new ExtensionParsingContext();
-        final Builder definitionBuilder = new Builder().withNamespace(xmlModelProperty.get().getNamespace());
-        Optional<SubTypesModelProperty> subTypesProperty = extensionModel.getModelProperty(SubTypesModelProperty.class);
-        final SubTypesMappingContainer typeMapping = new SubTypesMappingContainer(subTypesProperty.isPresent() ? subTypesProperty.get().getSubTypesMapping() : emptyMap());
-        final DslSyntaxResolver dslSyntaxResolver = new DslSyntaxResolver(extensionModel);
-
-        final ClassLoader extensionClassLoader = getClassLoader(extensionModel);
-        withContextClassLoader(extensionClassLoader, () ->
-        {
-            new IdempotentExtensionWalker()
-            {
-                @Override
-                public void onConfiguration(ConfigurationModel model)
-                {
-                    parseWith(new ConfigurationDefinitionParser(definitionBuilder, (RuntimeConfigurationModel) model,
-                                                                dslSyntaxResolver, muleContext, parsingContext));
-                }
-
-                @Override
-                public void onOperation(OperationModel model)
-                {
-                    parseWith(new OperationDefinitionParser(definitionBuilder, (RuntimeExtensionModel) extensionModel,
-                                                            (RuntimeOperationModel) model, dslSyntaxResolver, muleContext, parsingContext));
-                }
-
-                @Override
-                public void onConnectionProvider(ConnectionProviderModel model)
-                {
-                    parseWith(new ConnectionProviderDefinitionParser(definitionBuilder, model, dslSyntaxResolver, muleContext, parsingContext));
-                }
-
-                @Override
-                public void onSource(SourceModel model)
-                {
-                    parseWith(new SourceDefinitionParser(definitionBuilder, (RuntimeExtensionModel) extensionModel,
-                                                         (RuntimeSourceModel) model, dslSyntaxResolver, muleContext, parsingContext));
-                }
-
-                @Override
-                public void onParameter(ParameterModel model)
-                {
-                    registerSubTypes(typeMapping, model.getType(), definitionBuilder, extensionClassLoader, dslSyntaxResolver, parsingContext);
-                    registerTopLevelParameter(model.getType(), definitionBuilder, extensionClassLoader, dslSyntaxResolver, parsingContext);
-                }
-
-
-            }.walk(extensionModel);
-
-            registerExportedTypesTopLevelParsers(extensionModel, definitionBuilder, extensionClassLoader, dslSyntaxResolver, parsingContext);
-        });
-    }
-
-    private void registerSubTypes(SubTypesMappingContainer typeMapping, MetadataType type, Builder definitionBuilder, ClassLoader extensionClassLoader, DslSyntaxResolver dslSyntaxResolver, ExtensionParsingContext parsingContext)
-    {
-        type.accept(new MetadataTypeVisitor()
-        {
-            @Override
-            public void visitUnion(UnionType unionType)
-            {
-                unionType.getTypes().forEach(type -> type.accept(this));
-            }
-
-            @Override
-            public void visitArrayType(ArrayType arrayType)
-            {
-                arrayType.getType().accept(this);
-            }
-
-            @Override
-            public void visitObject(ObjectType objectType)
-            {
-                typeMapping.getSubTypes(objectType)
-                        .forEach(subtype -> registerTopLevelParameter(subtype, definitionBuilder, extensionClassLoader, dslSyntaxResolver, parsingContext));
-            }
-
-            @Override
-            public void visitDictionary(DictionaryType dictionaryType)
-            {
-                dictionaryType.getValueType().accept(this);
-            }
-        });
-    }
-
-    private void parseWith(ExtensionDefinitionParser parser)
-    {
-        try
-        {
-            definitions.addAll(parser.parse());
-        }
-        catch (ConfigurationException e)
-        {
-            throw new MuleRuntimeException(e);
-        }
-    }
-
-    private void registerTopLevelParameter(final MetadataType parameterType, Builder definitionBuilder, ClassLoader extensionClassLoader,
-                                           DslSyntaxResolver dslSyntaxResolver, ExtensionParsingContext parsingContext)
-    {
-        DslElementSyntax elementDsl = dslSyntaxResolver.resolve(parameterType);
-        if (parsingContext.isRegistered(elementDsl.getElementName(), elementDsl.getNamespace()))
-        {
-            return;
+        @Override
+        public void onConfiguration(ConfigurationModel model) {
+          parseWith(new ConfigurationDefinitionParser(definitionBuilder, (RuntimeConfigurationModel) model, dslSyntaxResolver,
+                                                      muleContext, parsingContext));
         }
 
-        parameterType.accept(new MetadataTypeVisitor()
-        {
-            @Override
-            public void visitObject(ObjectType objectType)
-            {
-                if (isInstantiable(objectType))
-                {
-                    parseWith(new ObjectTypeParameterParser(definitionBuilder, objectType, extensionClassLoader, dslSyntaxResolver, parsingContext));
-                }
-            }
+        @Override
+        public void onOperation(OperationModel model) {
+          parseWith(new OperationDefinitionParser(definitionBuilder, (RuntimeExtensionModel) extensionModel,
+                                                  (RuntimeOperationModel) model, dslSyntaxResolver, muleContext, parsingContext));
+        }
 
-            @Override
-            public void visitArrayType(ArrayType arrayType)
-            {
-                registerTopLevelParameter(arrayType.getType(), definitionBuilder.copy(), extensionClassLoader, dslSyntaxResolver, parsingContext);
-            }
+        @Override
+        public void onConnectionProvider(ConnectionProviderModel model) {
+          parseWith(new ConnectionProviderDefinitionParser(definitionBuilder, model, dslSyntaxResolver, muleContext,
+                                                           parsingContext));
+        }
 
-            @Override
-            public void visitDictionary(DictionaryType dictionaryType)
-            {
-                MetadataType keyType = dictionaryType.getKeyType();
-                keyType.accept(this);
-                registerTopLevelParameter(keyType, definitionBuilder.copy(), extensionClassLoader, dslSyntaxResolver, parsingContext);
-            }
+        @Override
+        public void onSource(SourceModel model) {
+          parseWith(new SourceDefinitionParser(definitionBuilder, (RuntimeExtensionModel) extensionModel,
+                                               (RuntimeSourceModel) model, dslSyntaxResolver, muleContext, parsingContext));
+        }
 
-            @Override
-            public void visitUnion(UnionType unionType)
-            {
-                unionType.getTypes().forEach(type -> type.accept(this));
-            }
+        @Override
+        public void onParameter(ParameterModel model) {
+          registerSubTypes(typeMapping, model.getType(), definitionBuilder, extensionClassLoader, dslSyntaxResolver,
+                           parsingContext);
+          registerTopLevelParameter(model.getType(), definitionBuilder, extensionClassLoader, dslSyntaxResolver, parsingContext);
+        }
 
-        });
+
+      }.walk(extensionModel);
+
+      registerExportedTypesTopLevelParsers(extensionModel, definitionBuilder, extensionClassLoader, dslSyntaxResolver,
+                                           parsingContext);
+    });
+  }
+
+  private void registerSubTypes(SubTypesMappingContainer typeMapping, MetadataType type, Builder definitionBuilder,
+                                ClassLoader extensionClassLoader, DslSyntaxResolver dslSyntaxResolver,
+                                ExtensionParsingContext parsingContext) {
+    type.accept(new MetadataTypeVisitor() {
+
+      @Override
+      public void visitUnion(UnionType unionType) {
+        unionType.getTypes().forEach(type -> type.accept(this));
+      }
+
+      @Override
+      public void visitArrayType(ArrayType arrayType) {
+        arrayType.getType().accept(this);
+      }
+
+      @Override
+      public void visitObject(ObjectType objectType) {
+        typeMapping.getSubTypes(objectType)
+            .forEach(subtype -> registerTopLevelParameter(subtype, definitionBuilder, extensionClassLoader, dslSyntaxResolver,
+                                                          parsingContext));
+      }
+
+      @Override
+      public void visitDictionary(DictionaryType dictionaryType) {
+        dictionaryType.getValueType().accept(this);
+      }
+    });
+  }
+
+  private void parseWith(ExtensionDefinitionParser parser) {
+    try {
+      definitions.addAll(parser.parse());
+    } catch (ConfigurationException e) {
+      throw new MuleRuntimeException(e);
+    }
+  }
+
+  private void registerTopLevelParameter(final MetadataType parameterType, Builder definitionBuilder,
+                                         ClassLoader extensionClassLoader, DslSyntaxResolver dslSyntaxResolver,
+                                         ExtensionParsingContext parsingContext) {
+    DslElementSyntax elementDsl = dslSyntaxResolver.resolve(parameterType);
+    if (parsingContext.isRegistered(elementDsl.getElementName(), elementDsl.getNamespace())) {
+      return;
     }
 
-    private void registerExportedTypesTopLevelParsers(ExtensionModel extensionModel, Builder definitionBuilder, ClassLoader extensionClassLoader,
-                                                      DslSyntaxResolver dslSyntaxResolver, ExtensionParsingContext parsingContext)
-    {
-        extensionModel.getModelProperty(ExportModelProperty.class)
-                .map(ExportModelProperty::getExportedTypes)
-                .ifPresent(exportedTypes -> exportedTypes.stream()
-                        .filter(MetadataTypeUtils::isInstantiable)
-                        .filter(MetadataTypeUtils::hasExposedFields)
-                        .forEach(exportedType -> registerTopLevelParameter(exportedType, definitionBuilder, extensionClassLoader,
-                                                                           dslSyntaxResolver, parsingContext)));
-    }
+    parameterType.accept(new MetadataTypeVisitor() {
+
+      @Override
+      public void visitObject(ObjectType objectType) {
+        if (isInstantiable(objectType)) {
+          parseWith(new ObjectTypeParameterParser(definitionBuilder, objectType, extensionClassLoader, dslSyntaxResolver,
+                                                  parsingContext));
+        }
+      }
+
+      @Override
+      public void visitArrayType(ArrayType arrayType) {
+        registerTopLevelParameter(arrayType.getType(), definitionBuilder.copy(), extensionClassLoader, dslSyntaxResolver,
+                                  parsingContext);
+      }
+
+      @Override
+      public void visitDictionary(DictionaryType dictionaryType) {
+        MetadataType keyType = dictionaryType.getKeyType();
+        keyType.accept(this);
+        registerTopLevelParameter(keyType, definitionBuilder.copy(), extensionClassLoader, dslSyntaxResolver, parsingContext);
+      }
+
+      @Override
+      public void visitUnion(UnionType unionType) {
+        unionType.getTypes().forEach(type -> type.accept(this));
+      }
+
+    });
+  }
+
+  private void registerExportedTypesTopLevelParsers(ExtensionModel extensionModel, Builder definitionBuilder,
+                                                    ClassLoader extensionClassLoader, DslSyntaxResolver dslSyntaxResolver,
+                                                    ExtensionParsingContext parsingContext) {
+    extensionModel.getModelProperty(ExportModelProperty.class).map(ExportModelProperty::getExportedTypes)
+        .ifPresent(exportedTypes -> exportedTypes.stream().filter(MetadataTypeUtils::isInstantiable)
+            .filter(MetadataTypeUtils::hasExposedFields).forEach(exportedType -> registerTopLevelParameter(exportedType,
+                                                                                                           definitionBuilder,
+                                                                                                           extensionClassLoader,
+                                                                                                           dslSyntaxResolver,
+                                                                                                           parsingContext)));
+  }
 }

@@ -19,20 +19,18 @@ import org.mule.runtime.module.tls.internal.config.TrustStoreTlsContextDefinitio
 /**
  * Reigsters a Bean Definition Parser for handling <code><tls:connector></code> elements.
  */
-public class TlsNamespaceHandler extends AbstractMuleTransportsNamespaceHandler
-{
-    
-    @Override
-    public void init()
-    {
-        registerStandardTransportEndpoints(TlsConnector.TLS, URIBuilder.SOCKET_ATTRIBUTES);
-        registerConnectorDefinitionParser(TlsConnector.class);
-        registerBeanDefinitionParser("key-store", new KeyStoreParentContextDefinitionParser());
-        registerBeanDefinitionParser("client", new ClientKeyStoreDefinitionParser());
-        registerBeanDefinitionParser("server", new TrustStoreDefinitionParser());
-        registerBeanDefinitionParser("protocol-handler", new ProtocolHandlerDefinitionParser());
-        registerBeanDefinitionParser("context", new TlsContextDefinitionParser());
-        registerBeanDefinitionParser("trust-store", new TrustStoreTlsContextDefinitionParser());
-    }
+public class TlsNamespaceHandler extends AbstractMuleTransportsNamespaceHandler {
+
+  @Override
+  public void init() {
+    registerStandardTransportEndpoints(TlsConnector.TLS, URIBuilder.SOCKET_ATTRIBUTES);
+    registerConnectorDefinitionParser(TlsConnector.class);
+    registerBeanDefinitionParser("key-store", new KeyStoreParentContextDefinitionParser());
+    registerBeanDefinitionParser("client", new ClientKeyStoreDefinitionParser());
+    registerBeanDefinitionParser("server", new TrustStoreDefinitionParser());
+    registerBeanDefinitionParser("protocol-handler", new ProtocolHandlerDefinitionParser());
+    registerBeanDefinitionParser("context", new TlsContextDefinitionParser());
+    registerBeanDefinitionParser("trust-store", new TrustStoreTlsContextDefinitionParser());
+  }
 
 }

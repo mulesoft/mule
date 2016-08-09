@@ -13,32 +13,27 @@ import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 
-public class PGPIntegrationTestCase extends FunctionalTestCase
-{
+public class PGPIntegrationTestCase extends FunctionalTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "pgp-integration-mule-config-flow.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "pgp-integration-mule-config-flow.xml";
+  }
 
-    @Test
-    public void testEncryptDecrypt() throws Exception
-    {
-        doEncryptDecryptTest("this is a super simple test. Hope it works!!!");
-    }
+  @Test
+  public void testEncryptDecrypt() throws Exception {
+    doEncryptDecryptTest("this is a super simple test. Hope it works!!!");
+  }
 
-    @Test
-    public void testEncryptDecryptEmptyPayload() throws Exception
-    {
-        doEncryptDecryptTest("");
-    }
+  @Test
+  public void testEncryptDecryptEmptyPayload() throws Exception {
+    doEncryptDecryptTest("");
+  }
 
-    private void doEncryptDecryptTest(String payload) throws Exception
-    {
-        flowRunner("pgpEncryptProcessor").withPayload(payload).run();
-        MuleClient client = muleContext.getClient();
-        MuleMessage message = client.request("test://out", 5000);
-        assertEquals(payload, getPayloadAsString(message));
-    }
+  private void doEncryptDecryptTest(String payload) throws Exception {
+    flowRunner("pgpEncryptProcessor").withPayload(payload).run();
+    MuleClient client = muleContext.getClient();
+    MuleMessage message = client.request("test://out", 5000);
+    assertEquals(payload, getPayloadAsString(message));
+  }
 }

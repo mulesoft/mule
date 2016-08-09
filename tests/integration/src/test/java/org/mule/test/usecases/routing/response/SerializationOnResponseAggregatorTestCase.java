@@ -26,48 +26,45 @@ import java.io.Serializable;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class SerializationOnResponseAggregatorTestCase extends AbstractIntegrationTestCase
-{
-    @Rule
-    public DynamicPort dynamicPort = new DynamicPort("port1");
+public class SerializationOnResponseAggregatorTestCase extends AbstractIntegrationTestCase {
+
+  @Rule
+  public DynamicPort dynamicPort = new DynamicPort("port1");
+
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/usecases/routing/response/serialization-on-response-router-config.xml";
+  }
+
+  @Test
+  public void testSyncResponse() throws Exception {
+    muleContext.getRegistry().registerObject(MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME,
+                                             new TestObjectStore(muleContext));
+    MuleClient client = muleContext.getClient();
+    MuleMessage message = client.send("http://localhost:" + dynamicPort.getNumber(), getTestMuleMessage("request"),
+                                      newOptions().method(POST.name()).build());
+    assertNotNull(message);
+    assertThat(new String(getPayloadAsBytes(message)), is("request processed"));
+  }
+
+  private static class TestObjectStore extends SimpleMemoryObjectStore<Serializable> {
+
+    private ObjectSerializer serializer;
+
+    private TestObjectStore(MuleContext muleContext) {
+      serializer = muleContext.getObjectSerializer();
+    }
 
     @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/usecases/routing/response/serialization-on-response-router-config.xml";
+    protected void doStore(Serializable key, Serializable value) throws ObjectStoreException {
+      byte[] serialized = serializer.serialize(value);
+      super.doStore(key, serialized);
     }
 
-    @Test
-    public void testSyncResponse() throws Exception
-    {
-        muleContext.getRegistry().registerObject(MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME,
-                                                 new TestObjectStore(muleContext));
-        MuleClient client = muleContext.getClient();
-        MuleMessage message = client.send("http://localhost:" + dynamicPort.getNumber() , getTestMuleMessage("request"), newOptions().method(POST.name()).build());
-        assertNotNull(message);
-        assertThat(new String(getPayloadAsBytes(message)), is("request processed"));
+    @Override
+    protected Serializable doRetrieve(Serializable key) {
+      Serializable serialized = super.doRetrieve(key);
+      return serializer.deserialize((byte[]) serialized);
     }
-
-    private static class TestObjectStore extends SimpleMemoryObjectStore<Serializable>
-    {
-        private ObjectSerializer serializer;
-
-        private TestObjectStore(MuleContext muleContext) {
-            serializer = muleContext.getObjectSerializer();
-        }
-
-        @Override
-        protected void doStore(Serializable key, Serializable value) throws ObjectStoreException
-        {
-            byte[] serialized = serializer.serialize(value);
-            super.doStore(key, serialized);
-        }
-
-        @Override
-        protected Serializable doRetrieve(Serializable key)
-        {
-            Serializable serialized = super.doRetrieve(key);
-            return serializer.deserialize((byte[]) serialized);
-        }
-    }
+  }
 }

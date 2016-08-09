@@ -9,11 +9,10 @@ package org.mule.runtime.core.connector;
 /**
  * By default, polling is alwaus enabled.
  */
-public class DefaultPollingController implements PollingController
-{
-    @Override
-    public boolean isPrimaryPollingInstance()
-    {
-        return true;
-    }
+public class DefaultPollingController implements PollingController {
+
+  @Override
+  public boolean isPrimaryPollingInstance() {
+    return true;
+  }
 }

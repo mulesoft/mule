@@ -10,41 +10,39 @@ import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 
 /**
- * Bean definition creation request. Provides all the required content to build a {@link org.springframework.beans.factory.config.BeanDefinition}.
+ * Bean definition creation request. Provides all the required content to build a
+ * {@link org.springframework.beans.factory.config.BeanDefinition}.
  *
  * @since 4.0
  */
-class CreateBeanDefinitionRequest
-{
+class CreateBeanDefinitionRequest {
 
-    private final ComponentModel parentComponentModel;
-    private final ComponentModel componentModel;
-    private final ComponentBuildingDefinition componentBuildingDefinition;
+  private final ComponentModel parentComponentModel;
+  private final ComponentModel componentModel;
+  private final ComponentBuildingDefinition componentBuildingDefinition;
 
-    /**
-     * @param parentComponentModel the parent component model. Some language construct processing depends on the context.
-     * @param componentModel the holder for the configuration attributes defined by the user
-     * @param componentBuildingDefinition the definition to build the domain object that will represent the configuration on runtime
-     */
-    public CreateBeanDefinitionRequest(ComponentModel parentComponentModel, ComponentModel componentModel, ComponentBuildingDefinition componentBuildingDefinition) {
-        this.parentComponentModel = parentComponentModel;
-        this.componentModel = componentModel;
-        this.componentBuildingDefinition = componentBuildingDefinition;
-    }
+  /**
+   * @param parentComponentModel the parent component model. Some language construct processing depends on the context.
+   * @param componentModel the holder for the configuration attributes defined by the user
+   * @param componentBuildingDefinition the definition to build the domain object that will represent the configuration on runtime
+   */
+  public CreateBeanDefinitionRequest(ComponentModel parentComponentModel, ComponentModel componentModel,
+                                     ComponentBuildingDefinition componentBuildingDefinition) {
+    this.parentComponentModel = parentComponentModel;
+    this.componentModel = componentModel;
+    this.componentBuildingDefinition = componentBuildingDefinition;
+  }
 
 
-    public ComponentModel getComponentModel()
-    {
-        return componentModel;
-    }
+  public ComponentModel getComponentModel() {
+    return componentModel;
+  }
 
-    public ComponentBuildingDefinition getComponentBuildingDefinition()
-    {
-        return componentBuildingDefinition;
-    }
+  public ComponentBuildingDefinition getComponentBuildingDefinition() {
+    return componentBuildingDefinition;
+  }
 
-    public ComponentModel getParentComponentModel()
-    {
-        return parentComponentModel;
-    }
+  public ComponentModel getParentComponentModel() {
+    return parentComponentModel;
+  }
 }

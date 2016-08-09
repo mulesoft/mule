@@ -11,53 +11,43 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Enumeration;
 
-public class TestArtifactClassLoader extends TestClassLoader implements ArtifactClassLoader
-{
+public class TestArtifactClassLoader extends TestClassLoader implements ArtifactClassLoader {
 
-    @Override
-    public String getArtifactName()
-    {
-        return null;
-    }
+  @Override
+  public String getArtifactName() {
+    return null;
+  }
 
-    @Override
-    public ClassLoader getClassLoader()
-    {
-        return this;
-    }
+  @Override
+  public ClassLoader getClassLoader() {
+    return this;
+  }
 
-    @Override
-    public void addShutdownListener(ShutdownListener listener)
-    {
+  @Override
+  public void addShutdownListener(ShutdownListener listener) {
 
-    }
+  }
 
-    @Override
-    public ClassLoaderLookupPolicy getClassLoaderLookupPolicy()
-    {
-        return null;
-    }
+  @Override
+  public ClassLoaderLookupPolicy getClassLoaderLookupPolicy() {
+    return null;
+  }
 
-    @Override
-    public void dispose()
-    {
-    }
+  @Override
+  public void dispose() {}
 
-    @Override
-    public URL findLocalResource(String resourceName)
-    {
-        return null;
-    }
+  @Override
+  public URL findLocalResource(String resourceName) {
+    return null;
+  }
 
-    @Override
-    public URL findResource(String s)
-    {
-        return super.findResource(s);
-    }
+  @Override
+  public URL findResource(String s) {
+    return super.findResource(s);
+  }
 
-    @Override
-    public Enumeration<URL> findResources(String name) throws IOException
-    {
-        return super.findResources(name);
-    }
+  @Override
+  public Enumeration<URL> findResources(String name) throws IOException {
+    return super.findResources(name);
+  }
 }

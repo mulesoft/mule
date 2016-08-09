@@ -14,20 +14,17 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
-public class AsyncMessageProcessorsDefinitionParser extends ChildDefinitionParser
-{
-    public AsyncMessageProcessorsDefinitionParser()
-    {
-        super("messageProcessor", AsyncMessageProcessorsFactoryBean.class);
-        addIgnored("processingStrategy");
-    }
+public class AsyncMessageProcessorsDefinitionParser extends ChildDefinitionParser {
 
-    @Override
-    protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
-    {
-        ProcessingStrategyUtils.configureProcessingStrategy(element, builder,
-            ProcessingStrategyUtils.ASYNC_PROCESSING_STRATEGY);
-        super.parseChild(element, parserContext, builder);
-    }
+  public AsyncMessageProcessorsDefinitionParser() {
+    super("messageProcessor", AsyncMessageProcessorsFactoryBean.class);
+    addIgnored("processingStrategy");
+  }
+
+  @Override
+  protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
+    ProcessingStrategyUtils.configureProcessingStrategy(element, builder, ProcessingStrategyUtils.ASYNC_PROCESSING_STRATEGY);
+    super.parseChild(element, parserContext, builder);
+  }
 
 }

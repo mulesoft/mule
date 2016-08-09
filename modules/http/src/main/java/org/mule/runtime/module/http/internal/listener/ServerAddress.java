@@ -8,79 +8,62 @@ package org.mule.runtime.module.http.internal.listener;
 
 import org.mule.runtime.module.http.api.HttpConstants;
 
-public class ServerAddress
-{
+public class ServerAddress {
 
-    private final String ip;
-    private int port;
+  private final String ip;
+  private int port;
 
-    public ServerAddress(String ip, int port)
-    {
-        this.port = port;
-        this.ip = ip;
+  public ServerAddress(String ip, int port) {
+    this.port = port;
+    this.ip = ip;
+  }
+
+  public int getPort() {
+    return port;
+  }
+
+  public String getIp() {
+    return ip;
+  }
+
+  public boolean overlaps(ServerAddress serverAddress) {
+    return (port == serverAddress.getPort()) && (isAllInterfaces() || serverAddress.isAllInterfaces());
+  }
+
+  public boolean isAllInterfaces() {
+    return ip.equals(HttpConstants.ALL_INTERFACES_IP);
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
     }
 
-    public int getPort()
-    {
-        return port;
+    ServerAddress that = (ServerAddress) o;
+
+    if (port != that.port) {
+      return false;
+    }
+    if (!ip.equals(that.ip)) {
+      return false;
     }
 
-    public String getIp()
-    {
-        return ip;
-    }
+    return true;
+  }
 
-    public boolean overlaps(ServerAddress serverAddress)
-    {
-        return (port == serverAddress.getPort()) &&
-               (isAllInterfaces() || serverAddress.isAllInterfaces());
-    }
+  @Override
+  public int hashCode() {
+    int result = ip.hashCode();
+    result = 31 * result + port;
+    return result;
+  }
 
-    public boolean isAllInterfaces()
-    {
-        return ip.equals(HttpConstants.ALL_INTERFACES_IP);
-    }
-
-    @Override
-    public boolean equals(Object o)
-    {
-        if (this == o)
-        {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass())
-        {
-            return false;
-        }
-
-        ServerAddress that = (ServerAddress) o;
-
-        if (port != that.port)
-        {
-            return false;
-        }
-        if (!ip.equals(that.ip))
-        {
-            return false;
-        }
-
-        return true;
-    }
-
-    @Override
-    public int hashCode()
-    {
-        int result = ip.hashCode();
-        result = 31 * result + port;
-        return result;
-    }
-
-    @Override
-    public String toString()
-    {
-        return "ServerAddress{" +
-               "ip='" + ip + '\'' +
-               ", port=" + port +
-               '}';
-    }
+  @Override
+  public String toString() {
+    return "ServerAddress{" + "ip='" + ip + '\'' + ", port=" + port + '}';
+  }
 }

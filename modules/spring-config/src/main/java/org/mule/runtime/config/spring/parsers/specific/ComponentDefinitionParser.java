@@ -11,27 +11,21 @@ import org.mule.runtime.config.spring.parsers.generic.ChildDefinitionParser;
 
 import org.w3c.dom.Element;
 
-public class ComponentDefinitionParser extends ChildDefinitionParser
-{
+public class ComponentDefinitionParser extends ChildDefinitionParser {
 
-    public ComponentDefinitionParser(Class clazz)
-    {
-        super("messageProcessor", clazz);
-        this.singleton = false;
-        addIgnored(AbstractMuleBeanDefinitionParser.ATTRIBUTE_CLASS);
-    }
+  public ComponentDefinitionParser(Class clazz) {
+    super("messageProcessor", clazz);
+    this.singleton = false;
+    addIgnored(AbstractMuleBeanDefinitionParser.ATTRIBUTE_CLASS);
+  }
 
-    @Override
-    public String getPropertyName(Element e)
-    {
-        String parent = e.getParentNode().getLocalName().toLowerCase();
-        if ("service".equals(parent) || "custom-service".equals(parent))
-        {
-            return "component";
-        }
-        else
-        {
-            return super.getPropertyName(e);
-        }
+  @Override
+  public String getPropertyName(Element e) {
+    String parent = e.getParentNode().getLocalName().toLowerCase();
+    if ("service".equals(parent) || "custom-service".equals(parent)) {
+      return "component";
+    } else {
+      return super.getPropertyName(e);
     }
+  }
 }

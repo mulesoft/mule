@@ -15,45 +15,34 @@ import java.util.concurrent.TimeUnit;
 
 import junit.framework.AssertionFailedError;
 
-public class CountdownCallback implements EventCallback
-{
-    private CountDownLatch countDown;
+public class CountdownCallback implements EventCallback {
 
-    public CountdownCallback(int messagesExpected)
-    {
-        this.countDown = new CountDownLatch(messagesExpected);
-    }
+  private CountDownLatch countDown;
 
-    public void eventReceived(MuleEventContext context, Object Component) throws Exception
-    {
-        synchronized (this)
-        {            
-            if (countDown.getCount() > 0)
-            {
-                countDown.countDown();
-            }
-            else
-            {
-                throw new AssertionFailedError("Too many messages received");
-            }
-        }
-    }
+  public CountdownCallback(int messagesExpected) {
+    this.countDown = new CountDownLatch(messagesExpected);
+  }
 
-    public long getCount() throws InitialisationException
-    {
-        if (countDown != null)
-        {
-            return countDown.getCount();
-        }
-        else 
-        {
-            throw new InitialisationException(MessageFactory.createStaticMessage("CountDownLatch has not been initialized."), null);
-        }
+  public void eventReceived(MuleEventContext context, Object Component) throws Exception {
+    synchronized (this) {
+      if (countDown.getCount() > 0) {
+        countDown.countDown();
+      } else {
+        throw new AssertionFailedError("Too many messages received");
+      }
     }
+  }
 
-    public boolean await(long timeout) throws InterruptedException
-    {
-        return countDown.await(timeout, TimeUnit.MILLISECONDS);
+  public long getCount() throws InitialisationException {
+    if (countDown != null) {
+      return countDown.getCount();
+    } else {
+      throw new InitialisationException(MessageFactory.createStaticMessage("CountDownLatch has not been initialized."), null);
     }
-    
+  }
+
+  public boolean await(long timeout) throws InterruptedException {
+    return countDown.await(timeout, TimeUnit.MILLISECONDS);
+  }
+
 }

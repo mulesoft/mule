@@ -11,7 +11,7 @@ import javax.transaction.xa.XAResource;
 /**
  * Factory for XAResource implementations
  */
-public interface XAResourceFactory
-{
-    XAResource create();
+public interface XAResourceFactory {
+
+  XAResource create();
 }

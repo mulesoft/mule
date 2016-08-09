@@ -10,25 +10,21 @@ package org.mule.runtime.module.ws.functional;
 import org.junit.Test;
 
 
-public class SignSecurityFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase
-{
+public class SignSecurityFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "sign-security-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "sign-security-config.xml";
+  }
 
-    @Test
-    public void requestWithSignatureReturnsExpectedResult() throws Exception
-    {
-        assertValidResponse("requestWithSignature");
-    }
+  @Test
+  public void requestWithSignatureReturnsExpectedResult() throws Exception {
+    assertValidResponse("requestWithSignature");
+  }
 
-    @Test
-    public void requestWithoutSignatureFails() throws Exception
-    {
-        assertSoapFault("requestWithoutSignature", "InvalidSecurity");
-    }
+  @Test
+  public void requestWithoutSignatureFails() throws Exception {
+    assertSoapFault("requestWithoutSignature", "InvalidSecurity");
+  }
 
 }

@@ -13,33 +13,28 @@ import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
 
 /**
- * Implementation of {@link DefaultMessageProcessorChainBuilder} that injects the
- * {@link org.mule.api.endpoint.OutboundEndpoint} instance into message processors that implement {@link EndpointAware}
+ * Implementation of {@link DefaultMessageProcessorChainBuilder} that injects the {@link org.mule.api.endpoint.OutboundEndpoint}
+ * instance into message processors that implement {@link EndpointAware}
  */
-public class OutboundEndpointMessageProcessorChainBuilder extends DefaultMessageProcessorChainBuilder
-{
+public class OutboundEndpointMessageProcessorChainBuilder extends DefaultMessageProcessorChainBuilder {
 
-    protected ImmutableEndpoint endpoint;
+  protected ImmutableEndpoint endpoint;
 
-    public OutboundEndpointMessageProcessorChainBuilder(ImmutableEndpoint endpoint, FlowConstruct flowConstruct)
-    {
-        super(flowConstruct);
-        this.endpoint = endpoint;
+  public OutboundEndpointMessageProcessorChainBuilder(ImmutableEndpoint endpoint, FlowConstruct flowConstruct) {
+    super(flowConstruct);
+    this.endpoint = endpoint;
+  }
+
+  public OutboundEndpointMessageProcessorChainBuilder(ImmutableEndpoint endpoint) {
+    this.endpoint = endpoint;
+  }
+
+  @Override
+  protected MessageProcessor initializeMessageProcessor(Object processor) throws MuleException {
+    if (processor instanceof EndpointAware) {
+      ((EndpointAware) processor).setEndpoint(endpoint);
     }
-
-    public OutboundEndpointMessageProcessorChainBuilder(ImmutableEndpoint endpoint)
-    {
-        this.endpoint = endpoint;
-    }
-
-    @Override
-    protected MessageProcessor initializeMessageProcessor(Object processor) throws MuleException
-    {
-        if (processor instanceof EndpointAware)
-        {
-            ((EndpointAware) processor).setEndpoint(endpoint);
-        }
-        return super.initializeMessageProcessor(processor);
-    }
+    return super.initializeMessageProcessor(processor);
+  }
 
 }

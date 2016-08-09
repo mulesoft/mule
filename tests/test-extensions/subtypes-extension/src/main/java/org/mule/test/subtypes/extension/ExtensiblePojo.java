@@ -12,12 +12,12 @@ import org.mule.runtime.extension.api.annotation.Parameter;
 import java.util.List;
 
 @Extensible
-public class ExtensiblePojo
-{
-    @Parameter
-    String myString;
+public class ExtensiblePojo {
 
-    @Parameter
-    List<Integer> numbers;
+  @Parameter
+  String myString;
+
+  @Parameter
+  List<Integer> numbers;
 
 }

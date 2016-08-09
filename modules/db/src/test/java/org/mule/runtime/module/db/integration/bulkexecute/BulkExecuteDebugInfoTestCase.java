@@ -37,51 +37,48 @@ import org.hamcrest.Matcher;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class BulkExecuteDebugInfoTestCase extends AbstractDbIntegrationTestCase
-{
+public class BulkExecuteDebugInfoTestCase extends AbstractDbIntegrationTestCase {
 
-    public static final String QUERY1 = DbDebugInfoUtils.QUERY_DEBUG_FIELD + 1;
-    public static final String QUERY2 = DbDebugInfoUtils.QUERY_DEBUG_FIELD + 2;
-    public static final QueryTemplate QUERY_TEMPLATE1 = new QueryTemplate("update PLANET set NAME='Mercury' where POSITION=0", UPDATE, Collections.<QueryParam>emptyList());
-    public static final QueryTemplate QUERY_TEMPLATE2 = new QueryTemplate("update PLANET set NAME='Mercury' where POSITION=4", UPDATE, Collections.<QueryParam>emptyList());
+  public static final String QUERY1 = DbDebugInfoUtils.QUERY_DEBUG_FIELD + 1;
+  public static final String QUERY2 = DbDebugInfoUtils.QUERY_DEBUG_FIELD + 2;
+  public static final QueryTemplate QUERY_TEMPLATE1 =
+      new QueryTemplate("update PLANET set NAME='Mercury' where POSITION=0", UPDATE, Collections.<QueryParam>emptyList());
+  public static final QueryTemplate QUERY_TEMPLATE2 =
+      new QueryTemplate("update PLANET set NAME='Mercury' where POSITION=4", UPDATE, Collections.<QueryParam>emptyList());
 
-    public BulkExecuteDebugInfoTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public BulkExecuteDebugInfoTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Parameterized.Parameters
-    public static List<Object[]> parameters()
-    {
-        return TestDbConfig.getDerbyResource();
-    }
+  @Parameterized.Parameters
+  public static List<Object[]> parameters() {
+    return TestDbConfig.getDerbyResource();
+  }
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/bulkexecute/bulk-execute-default-config.xml"};
-    }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/bulkexecute/bulk-execute-default-config.xml"};
+  }
 
-    @Test
-    public void returnsDebugInfo() throws Exception
-    {
-        Flow flowConstruct = (Flow) muleContext.getRegistry().lookupFlowConstruct("bulkUpdateRequestResponse");
+  @Test
+  public void returnsDebugInfo() throws Exception {
+    Flow flowConstruct = (Flow) muleContext.getRegistry().lookupFlowConstruct("bulkUpdateRequestResponse");
 
-        List<MessageProcessor> messageProcessors = flowConstruct.getMessageProcessors();
-        AbstractDbMessageProcessor queryMessageProcessor = (AbstractDbMessageProcessor) messageProcessors.get(0);
+    List<MessageProcessor> messageProcessors = flowConstruct.getMessageProcessors();
+    AbstractDbMessageProcessor queryMessageProcessor = (AbstractDbMessageProcessor) messageProcessors.get(0);
 
-        final MuleEvent muleEvent = getTestEvent(TEST_MESSAGE);
+    final MuleEvent muleEvent = getTestEvent(TEST_MESSAGE);
 
-        final List<FieldDebugInfo<?>> debugInfo = queryMessageProcessor.getDebugInfo(muleEvent);
+    final List<FieldDebugInfo<?>> debugInfo = queryMessageProcessor.getDebugInfo(muleEvent);
 
-        assertThat(debugInfo, is(not(nullValue())));
-        assertThat(debugInfo.size(), equalTo(1));
+    assertThat(debugInfo, is(not(nullValue())));
+    assertThat(debugInfo.size(), equalTo(1));
 
-        final List<Matcher<FieldDebugInfo<?>>> queryMatchers = new ArrayList<>();
-        queryMatchers.add(createQueryFieldDebugInfoMatcher(QUERY1, QUERY_TEMPLATE1));
-        queryMatchers.add(createQueryFieldDebugInfoMatcher(QUERY2, QUERY_TEMPLATE2));
+    final List<Matcher<FieldDebugInfo<?>>> queryMatchers = new ArrayList<>();
+    queryMatchers.add(createQueryFieldDebugInfoMatcher(QUERY1, QUERY_TEMPLATE1));
+    queryMatchers.add(createQueryFieldDebugInfoMatcher(QUERY2, QUERY_TEMPLATE2));
 
-        assertThat(debugInfo, hasItem(objectLike(QUERIES_DEBUG_FIELD, List.class, queryMatchers)));
-    }
+    assertThat(debugInfo, hasItem(objectLike(QUERIES_DEBUG_FIELD, List.class, queryMatchers)));
+  }
 
 }

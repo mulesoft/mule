@@ -15,21 +15,18 @@ import org.mule.test.module.http.functional.AbstractHttpTestCase;
 
 import org.junit.Test;
 
-public class HttpRequestApiConfigurationTestCase extends AbstractHttpTestCase
-{
+public class HttpRequestApiConfigurationTestCase extends AbstractHttpTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "http-request-api-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "http-request-api-config.xml";
+  }
 
-    @Test
-    public void parseApiConfigurationFromConfig() throws Exception
-    {
-        HttpRequesterConfig config = getConfigurationFromRegistry("ramlConfig", getTestEvent(TEST_PAYLOAD));
+  @Test
+  public void parseApiConfigurationFromConfig() throws Exception {
+    HttpRequesterConfig config = getConfigurationFromRegistry("ramlConfig", getTestEvent(TEST_PAYLOAD));
 
-        assertNotNull(config.getApiConfiguration());
-        assertThat(config.getApiConfiguration().getLocation(), equalTo("TestFile.raml"));
-    }
+    assertNotNull(config.getApiConfiguration());
+    assertThat(config.getApiConfiguration().getLocation(), equalTo("TestFile.raml"));
+  }
 }

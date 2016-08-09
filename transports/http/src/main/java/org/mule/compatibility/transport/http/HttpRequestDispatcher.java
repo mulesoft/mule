@@ -33,141 +33,113 @@ import org.slf4j.LoggerFactory;
  * <p/>
  * Lookup the right MessageReceiver for each HttpRequest and dispatch the socket to the MessageReceiver for further processing.
  */
-class HttpRequestDispatcher implements Work
-{
+class HttpRequestDispatcher implements Work {
 
-    private static Logger logger = LoggerFactory.getLogger(HttpRequestDispatcher.class);
+  private static Logger logger = LoggerFactory.getLogger(HttpRequestDispatcher.class);
 
-    private ServerSocket serverSocket;
-    private HttpConnector httpConnector;
-    private RetryPolicyTemplate retryTemplate;
-    protected ExecutorService requestHandOffExecutor;
-    private WorkManager workManager;
-    private final AtomicBoolean disconnect = new AtomicBoolean(false);
+  private ServerSocket serverSocket;
+  private HttpConnector httpConnector;
+  private RetryPolicyTemplate retryTemplate;
+  protected ExecutorService requestHandOffExecutor;
+  private WorkManager workManager;
+  private final AtomicBoolean disconnect = new AtomicBoolean(false);
 
-    public HttpRequestDispatcher(final HttpConnector httpConnector, final RetryPolicyTemplate retryPolicyTemplate, final ServerSocket serverSocket, final WorkManager workManager)
-    {
-        if (httpConnector == null)
-        {
-            throw new IllegalArgumentException("HttpConnector can not be null");
-        }
-        if (retryPolicyTemplate == null)
-        {
-            throw new IllegalArgumentException("RetryPolicyTemplate can not be null");
-        }
-        if (serverSocket == null)
-        {
-            throw new IllegalArgumentException("ServerSocket can not be null");
-        }
-        if (workManager == null)
-        {
-            throw new IllegalArgumentException("WorkManager can not be null");
-        }
-        this.httpConnector = httpConnector;
-        this.retryTemplate = retryPolicyTemplate;
-        this.serverSocket = serverSocket;
-        this.workManager = workManager;
-        this.requestHandOffExecutor = createRequestDispatcherThreadPool(httpConnector);
+  public HttpRequestDispatcher(final HttpConnector httpConnector, final RetryPolicyTemplate retryPolicyTemplate,
+                               final ServerSocket serverSocket, final WorkManager workManager) {
+    if (httpConnector == null) {
+      throw new IllegalArgumentException("HttpConnector can not be null");
     }
-
-    private ExecutorService createRequestDispatcherThreadPool(HttpConnector httpConnector)
-    {
-        ThreadingProfile receiverThreadingProfile = httpConnector.getReceiverThreadingProfile();
-        MutableThreadingProfile dispatcherThreadingProfile = new MutableThreadingProfile(receiverThreadingProfile);
-        dispatcherThreadingProfile.setThreadFactory(null);
-        dispatcherThreadingProfile.setMaxThreadsActive(dispatcherThreadingProfile.getMaxThreadsActive() * 2);
-        String threadNamePrefix = ThreadNameHelper.getPrefix(httpConnector.getMuleContext()) + "http.request.dispatch." + serverSocket.getLocalPort();
-        ExecutorService executorService = dispatcherThreadingProfile.createPool(threadNamePrefix);
-        return executorService;
+    if (retryPolicyTemplate == null) {
+      throw new IllegalArgumentException("RetryPolicyTemplate can not be null");
     }
+    if (serverSocket == null) {
+      throw new IllegalArgumentException("ServerSocket can not be null");
+    }
+    if (workManager == null) {
+      throw new IllegalArgumentException("WorkManager can not be null");
+    }
+    this.httpConnector = httpConnector;
+    this.retryTemplate = retryPolicyTemplate;
+    this.serverSocket = serverSocket;
+    this.workManager = workManager;
+    this.requestHandOffExecutor = createRequestDispatcherThreadPool(httpConnector);
+  }
 
-    @Override
-    public void run()
-    {
-        while (!disconnect.get())
-        {
-            if (httpConnector.isStarted() && !disconnect.get())
-            {
-                try
-                {
-                    retryTemplate.execute(new RetryCallback()
-                    {
-                        @Override
-                        public void doWork(RetryContext context) throws Exception
-                        {
-                            Socket socket = null;
-                            try
-                            {
-                                socket = serverSocket.accept();
-                            }
-                            catch (Exception e)
-                            {
-                                if (!httpConnector.isDisposed() && !disconnect.get())
-                                {
-                                    throw new ConnectException(e, null);
-                                }
-                            }
+  private ExecutorService createRequestDispatcherThreadPool(HttpConnector httpConnector) {
+    ThreadingProfile receiverThreadingProfile = httpConnector.getReceiverThreadingProfile();
+    MutableThreadingProfile dispatcherThreadingProfile = new MutableThreadingProfile(receiverThreadingProfile);
+    dispatcherThreadingProfile.setThreadFactory(null);
+    dispatcherThreadingProfile.setMaxThreadsActive(dispatcherThreadingProfile.getMaxThreadsActive() * 2);
+    String threadNamePrefix =
+        ThreadNameHelper.getPrefix(httpConnector.getMuleContext()) + "http.request.dispatch." + serverSocket.getLocalPort();
+    ExecutorService executorService = dispatcherThreadingProfile.createPool(threadNamePrefix);
+    return executorService;
+  }
 
-                            if (socket != null)
-                            {
-                                final Runnable httpRequestDispatcherWork = new HttpRequestDispatcherWork(httpConnector, socket);
-                                // Process each connection in a different thread so we can continue accepting connection right away.
-                                requestHandOffExecutor.execute(httpRequestDispatcherWork);
-                            }
-                        }
+  @Override
+  public void run() {
+    while (!disconnect.get()) {
+      if (httpConnector.isStarted() && !disconnect.get()) {
+        try {
+          retryTemplate.execute(new RetryCallback() {
 
-                        @Override
-                        public String getWorkDescription()
-                        {
-                            String hostName = ((InetSocketAddress) serverSocket.getLocalSocketAddress()).getHostName();
-                            int port = ((InetSocketAddress) serverSocket.getLocalSocketAddress()).getPort();
-                            return String.format("%s://%s:%d", httpConnector.getProtocol(), hostName, port);
-                        }
-
-                        @Override
-                        public Connector getWorkOwner()
-                        {
-                            return httpConnector;
-                        }
-                    }, workManager);
+            @Override
+            public void doWork(RetryContext context) throws Exception {
+              Socket socket = null;
+              try {
+                socket = serverSocket.accept();
+              } catch (Exception e) {
+                if (!httpConnector.isDisposed() && !disconnect.get()) {
+                  throw new ConnectException(e, null);
                 }
-                catch (Exception e)
-                {
-                    httpConnector.getMuleContext().getExceptionListener().handleException(e);
-                }
+              }
+
+              if (socket != null) {
+                final Runnable httpRequestDispatcherWork = new HttpRequestDispatcherWork(httpConnector, socket);
+                // Process each connection in a different thread so we can continue accepting connection right away.
+                requestHandOffExecutor.execute(httpRequestDispatcherWork);
+              }
             }
-        }
-    }
 
-    @Override
-    public void release()
-    {
-
-    }
-
-    void disconnect()
-    {
-        disconnect.set(true);
-        try
-        {
-            if (serverSocket != null)
-            {
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("Closing: " + serverSocket);
-                }
-                serverSocket.close();
+            @Override
+            public String getWorkDescription() {
+              String hostName = ((InetSocketAddress) serverSocket.getLocalSocketAddress()).getHostName();
+              int port = ((InetSocketAddress) serverSocket.getLocalSocketAddress()).getPort();
+              return String.format("%s://%s:%d", httpConnector.getProtocol(), hostName, port);
             }
-        }
-        catch (IOException e)
-        {
-            logger.warn("Failed to close server socket: " + e.getMessage(), e);
-        }
-        finally
-        {
-            requestHandOffExecutor.shutdown();
-        }
 
+            @Override
+            public Connector getWorkOwner() {
+              return httpConnector;
+            }
+          }, workManager);
+        } catch (Exception e) {
+          httpConnector.getMuleContext().getExceptionListener().handleException(e);
+        }
+      }
     }
+  }
+
+  @Override
+  public void release() {
+
+  }
+
+  void disconnect() {
+    disconnect.set(true);
+    try {
+      if (serverSocket != null) {
+        if (logger.isDebugEnabled()) {
+          logger.debug("Closing: " + serverSocket);
+        }
+        serverSocket.close();
+      }
+    } catch (IOException e) {
+      logger.warn("Failed to close server socket: " + e.getMessage(), e);
+    } finally {
+      requestHandOffExecutor.shutdown();
+    }
+
+  }
 
 }

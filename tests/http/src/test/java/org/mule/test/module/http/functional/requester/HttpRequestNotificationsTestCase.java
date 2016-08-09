@@ -27,44 +27,42 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 
-public class HttpRequestNotificationsTestCase extends AbstractHttpRequestTestCase
-{
+public class HttpRequestNotificationsTestCase extends AbstractHttpRequestTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "http-request-notifications-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "http-request-notifications-config.xml";
+  }
 
-    @Override
-    protected void configureMuleContext(MuleContextBuilder contextBuilder)
-    {
-        contextBuilder.setNotificationManager(register(DefaultMuleContextBuilder.createDefaultNotificationManager()));
-        super.configureMuleContext(contextBuilder);
-    }
+  @Override
+  protected void configureMuleContext(MuleContextBuilder contextBuilder) {
+    contextBuilder.setNotificationManager(register(DefaultMuleContextBuilder.createDefaultNotificationManager()));
+    super.configureMuleContext(contextBuilder);
+  }
 
-    @Test
-    public void receiveNotification() throws Exception
-    {
-        CountDownLatch latch = new CountDownLatch(2);
-        TestConnectorMessageNotificationListener listener = new TestConnectorMessageNotificationListener(latch, "http://localhost:" + httpPort.getValue() + "/basePath/requestPath");
-        muleContext.getNotificationManager().addListener(listener);
+  @Test
+  public void receiveNotification() throws Exception {
+    CountDownLatch latch = new CountDownLatch(2);
+    TestConnectorMessageNotificationListener listener =
+        new TestConnectorMessageNotificationListener(latch, "http://localhost:" + httpPort.getValue() + "/basePath/requestPath");
+    muleContext.getNotificationManager().addListener(listener);
 
-        MuleMessage response = flowRunner("requestFlow").withPayload(TEST_MESSAGE).run().getMessage();
+    MuleMessage response = flowRunner("requestFlow").withPayload(TEST_MESSAGE).run().getMessage();
 
-        latch.await(1000, TimeUnit.MILLISECONDS);
+    latch.await(1000, TimeUnit.MILLISECONDS);
 
-        assertThat(listener.getNotificationActionNames(), contains(getActionName(MESSAGE_REQUEST_BEGIN), getActionName(MESSAGE_REQUEST_END)));
+    assertThat(listener.getNotificationActionNames(),
+               contains(getActionName(MESSAGE_REQUEST_BEGIN), getActionName(MESSAGE_REQUEST_END)));
 
-        // End event should have appended http.status and http.reason as inbound properties
-        MuleMessage message = listener.getNotifications(getActionName(MESSAGE_REQUEST_END)).get(0).getSource();
-        // For now, check the response, since we no longer have control over the MuleEvent generated, only the MuleMessage
-        assertThat((HttpResponseAttributes) response.getAttributes(), hasStatusCode(OK.getStatusCode()));
-        assertThat((HttpResponseAttributes) response.getAttributes(), hasReasonPhrase(OK.getReasonPhrase()));
+    // End event should have appended http.status and http.reason as inbound properties
+    MuleMessage message = listener.getNotifications(getActionName(MESSAGE_REQUEST_END)).get(0).getSource();
+    // For now, check the response, since we no longer have control over the MuleEvent generated, only the MuleMessage
+    assertThat((HttpResponseAttributes) response.getAttributes(), hasStatusCode(OK.getStatusCode()));
+    assertThat((HttpResponseAttributes) response.getAttributes(), hasReasonPhrase(OK.getReasonPhrase()));
 
-        MuleMessage requestMessage = listener.getNotifications(getActionName(MESSAGE_REQUEST_BEGIN)).get(0).getSource();
-        assertThat(requestMessage.getUniqueId(), equalTo(message.getUniqueId()));
-        assertThat(requestMessage.getMessageRootId(), equalTo(message.getMessageRootId()));
-    }
+    MuleMessage requestMessage = listener.getNotifications(getActionName(MESSAGE_REQUEST_BEGIN)).get(0).getSource();
+    assertThat(requestMessage.getUniqueId(), equalTo(message.getUniqueId()));
+    assertThat(requestMessage.getMessageRootId(), equalTo(message.getMessageRootId()));
+  }
 
 }

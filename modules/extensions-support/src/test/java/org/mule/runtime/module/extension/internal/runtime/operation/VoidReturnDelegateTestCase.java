@@ -19,17 +19,15 @@ import org.mule.tck.size.SmallTest;
 import org.junit.Test;
 
 @SmallTest
-public class VoidReturnDelegateTestCase extends AbstractMuleTestCase
-{
+public class VoidReturnDelegateTestCase extends AbstractMuleTestCase {
 
-    @Test
-    public void returnsMuleEvent()
-    {
-        MuleEvent event = mock(MuleEvent.class);
-        OperationContextAdapter operationContext = mock(OperationContextAdapter.class);
-        when(operationContext.getEvent()).thenReturn(event);
+  @Test
+  public void returnsMuleEvent() {
+    MuleEvent event = mock(MuleEvent.class);
+    OperationContextAdapter operationContext = mock(OperationContextAdapter.class);
+    when(operationContext.getEvent()).thenReturn(event);
 
-        Object returnValue = VoidReturnDelegate.INSTANCE.asReturnValue(new Object(), operationContext);
-        assertThat(event, is(sameInstance(returnValue)));
-    }
+    Object returnValue = VoidReturnDelegate.INSTANCE.asReturnValue(new Object(), operationContext);
+    assertThat(event, is(sameInstance(returnValue)));
+  }
 }

@@ -25,52 +25,41 @@ import java.util.List;
 import javax.activation.DataHandler;
 
 /**
- * Transforms the message, putting all inbound attachments of the source message as parts in a {@link DefaultMultiPartPayload}
- * of the returning message.
+ * Transforms the message, putting all inbound attachments of the source message as parts in a {@link DefaultMultiPartPayload} of
+ * the returning message.
  *
  * @since 4.0
  */
-public class AttachmentsToMultiPartTransformer extends AbstractMessageTransformer
-{
+public class AttachmentsToMultiPartTransformer extends AbstractMessageTransformer {
 
-    public AttachmentsToMultiPartTransformer()
-    {
-        registerSourceType(DataType.OBJECT);
-        setReturnDataType(DataType.OBJECT);
+  public AttachmentsToMultiPartTransformer() {
+    registerSourceType(DataType.OBJECT);
+    setReturnDataType(DataType.OBJECT);
+  }
+
+  @Override
+  public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException {
+    final MuleMessage message = event.getMessage();
+    try {
+      final Builder builder = MuleMessage.builder(message);
+
+      List<org.mule.runtime.api.message.MuleMessage> parts = new ArrayList<>();
+
+      if (message.getPayload() != null) {
+        parts.add(MuleMessage.builder().payload(message.getPayload()).attributes(BODY_ATTRIBUTES).build());
+      }
+
+      for (String attachmentName : message.getInboundAttachmentNames()) {
+        DataHandler attachment = message.getInboundAttachment(attachmentName);
+
+        parts.add(MuleMessage.builder().payload(attachment.getInputStream())
+            .mediaType(MediaType.parse(attachment.getContentType())).attributes(new PartAttributes(attachmentName)).build());
+      }
+
+      event.setMessage(builder.payload(new DefaultMultiPartPayload(parts)).build());
+    } catch (Exception e) {
+      throw new TransformerException(this, e);
     }
-
-    @Override
-    public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException
-    {
-        final MuleMessage message = event.getMessage();
-        try
-        {
-            final Builder builder = MuleMessage.builder(message);
-
-            List<org.mule.runtime.api.message.MuleMessage> parts = new ArrayList<>();
-
-            if (message.getPayload() != null)
-            {
-                parts.add(MuleMessage.builder().payload(message.getPayload()).attributes(BODY_ATTRIBUTES).build());
-            }
-
-            for (String attachmentName : message.getInboundAttachmentNames())
-            {
-                DataHandler attachment = message.getInboundAttachment(attachmentName);
-
-                parts.add(MuleMessage.builder()
-                                     .payload(attachment.getInputStream())
-                                     .mediaType(MediaType.parse(attachment.getContentType()))
-                                     .attributes(new PartAttributes(attachmentName))
-                                     .build());
-            }
-
-            event.setMessage(builder.payload(new DefaultMultiPartPayload(parts)).build());
-        }
-        catch (Exception e)
-        {
-            throw new TransformerException(this,e);
-        }
-        return event.getMessage();
-    }
+    return event.getMessage();
+  }
 }

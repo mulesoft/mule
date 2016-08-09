@@ -24,100 +24,87 @@ import org.springframework.core.ResolvableType;
  *
  * @since 4.0
  */
-public final class MethodWrapper implements MethodElement
-{
+public final class MethodWrapper implements MethodElement {
 
-    private final Method method;
+  private final Method method;
 
-    public MethodWrapper(Method method)
-    {
-        this.method = method;
+  public MethodWrapper(Method method) {
+    this.method = method;
+  }
+
+  /**
+   * @return The wrapped method
+   */
+  @Override
+  public Method getMethod() {
+    return method;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public List<ExtensionParameter> getParameters() {
+    List<ExtensionParameter> extensionParameters = new ArrayList<>();
+    final Parameter[] parameters = method.getParameters();
+    for (int i = 0; i < parameters.length; i++) {
+      extensionParameters.add(new ParameterWrapper(method, i));
     }
+    return extensionParameters;
+  }
 
-    /**
-     * @return The wrapped method
-     */
-    @Override
-    public Method getMethod()
-    {
-        return method;
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public List<ExtensionParameter> getParameterGroups() {
+    return getParametersAnnotatedWith(ParameterGroup.class);
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public List<ExtensionParameter> getParameters()
-    {
-        List<ExtensionParameter> extensionParameters = new ArrayList<>();
-        final Parameter[] parameters = method.getParameters();
-        for (int i = 0; i < parameters.length; i++)
-        {
-            extensionParameters.add(new ParameterWrapper(method, i));
-        }
-        return extensionParameters;
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public List<ExtensionParameter> getParametersAnnotatedWith(Class<? extends Annotation> annotationClass) {
+    List<ExtensionParameter> extensionParameters = new ArrayList<>();
+    final Parameter[] parameters = method.getParameters();
+    for (int i = 0; i < parameters.length; i++) {
+      if (parameters[i].getAnnotation(annotationClass) != null) {
+        extensionParameters.add(new ParameterWrapper(method, i));
+      }
     }
+    return extensionParameters;
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public List<ExtensionParameter> getParameterGroups()
-    {
-        return getParametersAnnotatedWith(ParameterGroup.class);
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String getName() {
+    return method.getName();
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public List<ExtensionParameter> getParametersAnnotatedWith(Class<? extends Annotation> annotationClass)
-    {
-        List<ExtensionParameter> extensionParameters = new ArrayList<>();
-        final Parameter[] parameters = method.getParameters();
-        for (int i = 0; i < parameters.length; i++)
-        {
-            if (parameters[i].getAnnotation(annotationClass) != null)
-            {
-                extensionParameters.add(new ParameterWrapper(method, i));
-            }
-        }
-        return extensionParameters;
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Annotation[] getAnnotations() {
+    return method.getAnnotations();
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getName()
-    {
-        return method.getName();
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public <A extends Annotation> Optional<A> getAnnotation(Class<A> annotationClass) {
+    return Optional.ofNullable(method.getAnnotation(annotationClass));
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Annotation[] getAnnotations()
-    {
-        return method.getAnnotations();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public <A extends Annotation> Optional<A> getAnnotation(Class<A> annotationClass)
-    {
-        return Optional.ofNullable(method.getAnnotation(annotationClass));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Class<?> getReturnType()
-    {
-        return ResolvableType.forMethodReturnType(method).getRawClass();
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Class<?> getReturnType() {
+    return ResolvableType.forMethodReturnType(method).getRawClass();
+  }
 }

@@ -7,18 +7,15 @@
 package org.mule.test.subtypes.extension;
 
 
-public class Square extends ParentShape
-{
+public class Square extends ParentShape {
 
-    private Integer side;
+  private Integer side;
 
-    public Integer getSide()
-    {
-        return side;
-    }
+  public Integer getSide() {
+    return side;
+  }
 
-    public void setSide(Integer side)
-    {
-        this.side = side;
-    }
+  public void setSide(Integer side) {
+    this.side = side;
+  }
 }

@@ -35,109 +35,97 @@ import org.eclipse.jetty.server.Request;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpRequestFunctionalTestCase extends AbstractHttpRequestTestCase
-{
+public class HttpRequestFunctionalTestCase extends AbstractHttpRequestTestCase {
 
-    private static final String TEST_HEADER_NAME = "TestHeaderName";
-    private static final String TEST_HEADER_VALUE = "TestHeaderValue";
-    private static final String DEFAULT_PORT_HTTP_REQUEST_CONFIG_NAME = "requestConfigHttp";
-    private static final String DEFAULT_PORT_HTTPS_REQUEST_CONFIG_NAME = "requestConfigHttps";
+  private static final String TEST_HEADER_NAME = "TestHeaderName";
+  private static final String TEST_HEADER_VALUE = "TestHeaderValue";
+  private static final String DEFAULT_PORT_HTTP_REQUEST_CONFIG_NAME = "requestConfigHttp";
+  private static final String DEFAULT_PORT_HTTPS_REQUEST_CONFIG_NAME = "requestConfigHttps";
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "http-request-functional-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "http-request-functional-config.xml";
+  }
 
-    @Test
-    public void requestConfigDefaultPortHttp() throws Exception
-    {
-        MuleEvent testEvent = getTestEvent(TEST_PAYLOAD);
-        ConfigurationInstance config = getConfigurationInstanceFromRegistry(DEFAULT_PORT_HTTP_REQUEST_CONFIG_NAME, testEvent);
-        ConnectionProviderWrapper providerWrapper = (ConnectionProviderWrapper) config.getConnectionProvider().get();
-        HttpRequesterProvider provider = (HttpRequesterProvider) providerWrapper.getDelegate();
-        assertThat(provider.getPort().apply(testEvent), is(HTTP.getDefaultPort()));
-    }
+  @Test
+  public void requestConfigDefaultPortHttp() throws Exception {
+    MuleEvent testEvent = getTestEvent(TEST_PAYLOAD);
+    ConfigurationInstance config = getConfigurationInstanceFromRegistry(DEFAULT_PORT_HTTP_REQUEST_CONFIG_NAME, testEvent);
+    ConnectionProviderWrapper providerWrapper = (ConnectionProviderWrapper) config.getConnectionProvider().get();
+    HttpRequesterProvider provider = (HttpRequesterProvider) providerWrapper.getDelegate();
+    assertThat(provider.getPort().apply(testEvent), is(HTTP.getDefaultPort()));
+  }
 
-    @Test
-    public void requestConfigDefaultPortHttps() throws Exception
-    {
-        MuleEvent testEvent = getTestEvent(TEST_PAYLOAD);
-        ConfigurationInstance config = getConfigurationInstanceFromRegistry(DEFAULT_PORT_HTTPS_REQUEST_CONFIG_NAME, testEvent);
-        ConnectionProviderWrapper providerWrapper = (ConnectionProviderWrapper) config.getConnectionProvider().get();
-        HttpRequesterProvider provider = (HttpRequesterProvider) providerWrapper.getDelegate();
-        assertThat(provider.getPort().apply(testEvent), is(HTTPS.getDefaultPort()));
-    }
+  @Test
+  public void requestConfigDefaultPortHttps() throws Exception {
+    MuleEvent testEvent = getTestEvent(TEST_PAYLOAD);
+    ConfigurationInstance config = getConfigurationInstanceFromRegistry(DEFAULT_PORT_HTTPS_REQUEST_CONFIG_NAME, testEvent);
+    ConnectionProviderWrapper providerWrapper = (ConnectionProviderWrapper) config.getConnectionProvider().get();
+    HttpRequesterProvider provider = (HttpRequesterProvider) providerWrapper.getDelegate();
+    assertThat(provider.getPort().apply(testEvent), is(HTTPS.getDefaultPort()));
+  }
 
-    @Test
-    public void requestConfigDefaultTlsContextHttps() throws Exception
-    {
-        MuleEvent testEvent = getTestEvent(TEST_PAYLOAD);
-        ConfigurationInstance config = getConfigurationInstanceFromRegistry(DEFAULT_PORT_HTTPS_REQUEST_CONFIG_NAME, testEvent);
-        ConnectionProviderWrapper providerWrapper = (ConnectionProviderWrapper) config.getConnectionProvider().get();
-        HttpRequesterProvider provider = (HttpRequesterProvider) providerWrapper.getDelegate();
-        assertThat(provider.getTlsContext(), notNullValue());
-    }
+  @Test
+  public void requestConfigDefaultTlsContextHttps() throws Exception {
+    MuleEvent testEvent = getTestEvent(TEST_PAYLOAD);
+    ConfigurationInstance config = getConfigurationInstanceFromRegistry(DEFAULT_PORT_HTTPS_REQUEST_CONFIG_NAME, testEvent);
+    ConnectionProviderWrapper providerWrapper = (ConnectionProviderWrapper) config.getConnectionProvider().get();
+    HttpRequesterProvider provider = (HttpRequesterProvider) providerWrapper.getDelegate();
+    assertThat(provider.getTlsContext(), notNullValue());
+  }
 
-    @Test
-    public void payloadIsSentAsRequestBody() throws Exception
-    {
-        flowRunner("requestFlow").withPayload(TEST_MESSAGE).run();
-        assertThat(body, equalTo(TEST_MESSAGE));
-    }
+  @Test
+  public void payloadIsSentAsRequestBody() throws Exception {
+    flowRunner("requestFlow").withPayload(TEST_MESSAGE).run();
+    assertThat(body, equalTo(TEST_MESSAGE));
+  }
 
-    @Test
-    public void responseBodyIsMappedToPayload() throws Exception
-    {
-        MuleEvent event = flowRunner("requestFlow").withPayload(TEST_MESSAGE).run();
-        assertTrue(event.getMessage().getPayload() instanceof InputStream);
-        assertThat(getPayloadAsString(event.getMessage()), equalTo(DEFAULT_RESPONSE));
-    }
+  @Test
+  public void responseBodyIsMappedToPayload() throws Exception {
+    MuleEvent event = flowRunner("requestFlow").withPayload(TEST_MESSAGE).run();
+    assertTrue(event.getMessage().getPayload() instanceof InputStream);
+    assertThat(getPayloadAsString(event.getMessage()), equalTo(DEFAULT_RESPONSE));
+  }
 
-    @Rule
-    public DynamicPort blockingHttpPort = new DynamicPort("blockingHttpPort");
+  @Rule
+  public DynamicPort blockingHttpPort = new DynamicPort("blockingHttpPort");
 
-    @Test
-    public void blockingResponseBodyIsMappedToPayload() throws Exception
-    {
-        MuleEvent event = flowRunner("blockingRequestFlow").withPayload(TEST_MESSAGE).run();
-        assertTrue(event.getMessage().getPayload() instanceof String);
-        assertThat(getPayloadAsString(event.getMessage()), equalTo("value"));
-    }
+  @Test
+  public void blockingResponseBodyIsMappedToPayload() throws Exception {
+    MuleEvent event = flowRunner("blockingRequestFlow").withPayload(TEST_MESSAGE).run();
+    assertTrue(event.getMessage().getPayload() instanceof String);
+    assertThat(getPayloadAsString(event.getMessage()), equalTo("value"));
+  }
 
-    @Test
-    public void responseStatusCodeIsSetAsInboundProperty() throws Exception
-    {
-        MuleEvent event = flowRunner("requestFlow").withPayload(TEST_MESSAGE).run();
-        assertThat((HttpResponseAttributes) event.getMessage().getAttributes(), hasStatusCode(OK.getStatusCode()));
-    }
+  @Test
+  public void responseStatusCodeIsSetAsInboundProperty() throws Exception {
+    MuleEvent event = flowRunner("requestFlow").withPayload(TEST_MESSAGE).run();
+    assertThat((HttpResponseAttributes) event.getMessage().getAttributes(), hasStatusCode(OK.getStatusCode()));
+  }
 
-    @Test
-    public void responseHeadersAreMappedInAttributes() throws Exception
-    {
-        MuleEvent event = flowRunner("requestFlow").withPayload(TEST_MESSAGE).run();
-        HttpResponseAttributes responseAttributes = (HttpResponseAttributes) event.getMessage().getAttributes();
-        assertThat(responseAttributes.getHeaders(), hasEntry(TEST_HEADER_NAME.toLowerCase(), TEST_HEADER_VALUE));
-    }
+  @Test
+  public void responseHeadersAreMappedInAttributes() throws Exception {
+    MuleEvent event = flowRunner("requestFlow").withPayload(TEST_MESSAGE).run();
+    HttpResponseAttributes responseAttributes = (HttpResponseAttributes) event.getMessage().getAttributes();
+    assertThat(responseAttributes.getHeaders(), hasEntry(TEST_HEADER_NAME.toLowerCase(), TEST_HEADER_VALUE));
+  }
 
-    @Test
-    public void basePathFromConfigIsUsedInRequest() throws Exception
-    {
-        flowRunner("requestFlow").withPayload(TEST_MESSAGE).run();
-        assertThat(uri, equalTo("/basePath/requestPath"));
-    }
+  @Test
+  public void basePathFromConfigIsUsedInRequest() throws Exception {
+    flowRunner("requestFlow").withPayload(TEST_MESSAGE).run();
+    assertThat(uri, equalTo("/basePath/requestPath"));
+  }
 
-    @Test
-    public void previousInboundPropertiesAreCleared() throws Exception
-    {
-        MuleEvent event = flowRunner("requestFlow").withPayload(TEST_MESSAGE).withInboundProperty("TestInboundProperty", "TestValue").run();
-        assertThat(event.getMessage().getInboundProperty("TestInboundProperty"), nullValue());
-    }
+  @Test
+  public void previousInboundPropertiesAreCleared() throws Exception {
+    MuleEvent event =
+        flowRunner("requestFlow").withPayload(TEST_MESSAGE).withInboundProperty("TestInboundProperty", "TestValue").run();
+    assertThat(event.getMessage().getInboundProperty("TestInboundProperty"), nullValue());
+  }
 
-    @Override
-    protected void handleRequest(Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException
-    {
-        response.addHeader(TEST_HEADER_NAME, TEST_HEADER_VALUE);
-        super.handleRequest(baseRequest, request, response);
-    }
+  @Override
+  protected void handleRequest(Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException {
+    response.addHeader(TEST_HEADER_NAME, TEST_HEADER_VALUE);
+    super.handleRequest(baseRequest, request, response);
+  }
 }

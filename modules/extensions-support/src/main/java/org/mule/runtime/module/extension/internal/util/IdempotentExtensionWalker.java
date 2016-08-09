@@ -22,109 +22,85 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 /**
- * A {@link ExtensionWalker} which assures that each component
- * is visited only once, making it easy to handle the fact
- * that some components such as {@link OperationModel},
- * {@link SourceModel}, {@link ConnectionProviderModel},
- * etc, implement the flyweight pattern, which means that the same
- * instance might be present at different levels.
+ * A {@link ExtensionWalker} which assures that each component is visited only once, making it easy to handle the fact that some
+ * components such as {@link OperationModel}, {@link SourceModel}, {@link ConnectionProviderModel}, etc, implement the flyweight
+ * pattern, which means that the same instance might be present at different levels.
  * <p>
- * The use of this walker makes it unnecessary to manually control
- * if a given component has already been seen.
+ * The use of this walker makes it unnecessary to manually control if a given component has already been seen.
  *
  * @since 4.0
  */
-public abstract class IdempotentExtensionWalker extends ExtensionWalker
-{
+public abstract class IdempotentExtensionWalker extends ExtensionWalker {
 
-    private Set<Reference<SourceModel>> sources = new HashSet<>();
-    private Set<Reference<ParameterModel>> parameters = new HashSet<>();
-    private Set<Reference<OperationModel>> operations = new HashSet<>();
-    private Set<Reference<ConnectionProviderModel>> connectionProviders = new HashSet<>();
+  private Set<Reference<SourceModel>> sources = new HashSet<>();
+  private Set<Reference<ParameterModel>> parameters = new HashSet<>();
+  private Set<Reference<OperationModel>> operations = new HashSet<>();
+  private Set<Reference<ConnectionProviderModel>> connectionProviders = new HashSet<>();
 
-    private <T> boolean isFirstAppearance(Set<Reference<T>> accumulator, T item)
-    {
-        return accumulator.add(new Reference<>(item));
+  private <T> boolean isFirstAppearance(Set<Reference<T>> accumulator, T item) {
+    return accumulator.add(new Reference<>(item));
+  }
+
+  @Override
+  public final void onSource(HasSourceModels owner, SourceModel model) {
+    doOnce(sources, model, this::onSource);
+  }
+
+  @Override
+  public final void onParameter(ParameterizedModel owner, ParameterModel model) {
+    doOnce(parameters, model, this::onParameter);
+  }
+
+  @Override
+  public final void onOperation(HasOperationModels owner, OperationModel model) {
+    doOnce(operations, model, this::onOperation);
+  }
+
+  @Override
+  public final void onConnectionProvider(HasConnectionProviderModels owner, ConnectionProviderModel model) {
+    doOnce(connectionProviders, model, this::onConnectionProvider);
+  }
+
+  private <T> void doOnce(Set<Reference<T>> accumulator, T item, Consumer<T> delegate) {
+    if (isFirstAppearance(accumulator, item)) {
+      delegate.accept(item);
     }
+  }
 
-    @Override
-    public final void onSource(HasSourceModels owner, SourceModel model)
-    {
-        doOnce(sources, model, this::onSource);
-    }
+  /**
+   * Invoked when an {@link ConnectionProviderModel} is found in the traversed {@code extensionModel}.
+   * <p>
+   * This method will only be invoked once per each found instance
+   *
+   * @param model the {@link ConnectionProviderModel}
+   */
+  protected void onConnectionProvider(ConnectionProviderModel model) {}
 
-    @Override
-    public final void onParameter(ParameterizedModel owner, ParameterModel model)
-    {
-        doOnce(parameters, model, this::onParameter);
-    }
+  /**
+   * Invoked when an {@link SourceModel} is found in the traversed {@code extensionModel}.
+   * <p>
+   * This method will only be invoked once per each found instance
+   *
+   * @param model the {@link SourceModel}
+   */
+  protected void onSource(SourceModel model) {}
 
-    @Override
-    public final void onOperation(HasOperationModels owner, OperationModel model)
-    {
-        doOnce(operations, model, this::onOperation);
-    }
+  /**
+   * Invoked when an {@link ParameterModel} is found in the traversed {@code extensionModel}.
+   * <p>
+   * This method will only be invoked once per each found instance
+   *
+   * @param model the {@link ParameterModel}
+   */
+  protected void onParameter(ParameterModel model) {}
 
-    @Override
-    public final void onConnectionProvider(HasConnectionProviderModels owner, ConnectionProviderModel model)
-    {
-        doOnce(connectionProviders, model, this::onConnectionProvider);
-    }
-
-    private <T> void doOnce(Set<Reference<T>> accumulator, T item, Consumer<T> delegate)
-    {
-        if (isFirstAppearance(accumulator, item))
-        {
-            delegate.accept(item);
-        }
-    }
-
-    /**
-     * Invoked when an {@link ConnectionProviderModel} is found in the
-     * traversed {@code extensionModel}.
-     * <p>
-     * This method will only be invoked once per each found instance
-     *
-     * @param model the {@link ConnectionProviderModel}
-     */
-    protected void onConnectionProvider(ConnectionProviderModel model)
-    {
-    }
-
-    /**
-     * Invoked when an {@link SourceModel} is found in the
-     * traversed {@code extensionModel}.
-     * <p>
-     * This method will only be invoked once per each found instance
-     *
-     * @param model the {@link SourceModel}
-     */
-    protected void onSource(SourceModel model)
-    {
-    }
-
-    /**
-     * Invoked when an {@link ParameterModel} is found in the
-     * traversed {@code extensionModel}.
-     * <p>
-     * This method will only be invoked once per each found instance
-     *
-     * @param model the {@link ParameterModel}
-     */
-    protected void onParameter(ParameterModel model)
-    {
-    }
-
-    /**
-     * Invoked when an {@link OperationModel} is found in the
-     * traversed {@code extensionModel}.
-     * <p>
-     * This method will only be invoked once per each found instance
-     *
-     * @param model the {@link OperationModel}
-     */
-    protected void onOperation(OperationModel model)
-    {
-    }
+  /**
+   * Invoked when an {@link OperationModel} is found in the traversed {@code extensionModel}.
+   * <p>
+   * This method will only be invoked once per each found instance
+   *
+   * @param model the {@link OperationModel}
+   */
+  protected void onOperation(OperationModel model) {}
 
 }

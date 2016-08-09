@@ -15,54 +15,47 @@ import java.util.List;
 /**
  * Represents an instantiation of a {@link QueryTemplate} with parameter values
  */
-public class Query
-{
+public class Query {
 
-    private final QueryTemplate queryTemplate;
-    private final List<QueryParamValue> paramValues;
+  private final QueryTemplate queryTemplate;
+  private final List<QueryParamValue> paramValues;
 
-    /**
-     * Creates a query from a template and a set of parameter values
-     *
-     * @param queryTemplate template describing the query
-     * @param paramValues parameter values for the query
-     */
-    public Query(QueryTemplate queryTemplate, List<QueryParamValue> paramValues)
-    {
-        this.paramValues = paramValues;
-        this.queryTemplate = queryTemplate;
+  /**
+   * Creates a query from a template and a set of parameter values
+   *
+   * @param queryTemplate template describing the query
+   * @param paramValues parameter values for the query
+   */
+  public Query(QueryTemplate queryTemplate, List<QueryParamValue> paramValues) {
+    this.paramValues = paramValues;
+    this.queryTemplate = queryTemplate;
+  }
+
+  /**
+   * Creates a query from a template
+   *
+   * @param queryTemplate template describing the query and parameter values
+   */
+  public Query(QueryTemplate queryTemplate) {
+    this.queryTemplate = queryTemplate;
+
+    paramValues = new LinkedList<QueryParamValue>();
+    for (InputQueryParam inputParam : queryTemplate.getInputParams()) {
+      QueryParamValue paramValue = new QueryParamValue(inputParam.getName(), inputParam.getValue());
+
+      paramValues.add(paramValue);
     }
+  }
 
-    /**
-     * Creates a query from a template
-     *
-     * @param queryTemplate template describing the query and parameter values
-     */
-    public Query(QueryTemplate queryTemplate)
-    {
-        this.queryTemplate = queryTemplate;
+  public QueryTemplate getQueryTemplate() {
+    return queryTemplate;
+  }
 
-        paramValues = new LinkedList<QueryParamValue>();
-        for (InputQueryParam inputParam : queryTemplate.getInputParams())
-        {
-            QueryParamValue paramValue = new QueryParamValue(inputParam.getName(), inputParam.getValue());
+  public List<QueryParamValue> getParamValues() {
+    return paramValues;
+  }
 
-            paramValues.add(paramValue);
-        }
-    }
-
-    public QueryTemplate getQueryTemplate()
-    {
-        return queryTemplate;
-    }
-
-    public List<QueryParamValue> getParamValues()
-    {
-        return paramValues;
-    }
-
-    public boolean isDynamic()
-    {
-        return queryTemplate.isDynamic();
-    }
+  public boolean isDynamic() {
+    return queryTemplate.isDynamic();
+  }
 }

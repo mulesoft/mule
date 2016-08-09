@@ -21,44 +21,35 @@ import java.util.List;
 /**
  * Load $MULE_HOME/lib/shared/<domain> libraries.
  */
-public class MuleSharedDomainClassLoader extends MuleArtifactClassLoader implements ArtifactClassLoader
-{
+public class MuleSharedDomainClassLoader extends MuleArtifactClassLoader implements ArtifactClassLoader {
 
-    static
-    {
-        registerAsParallelCapable();
-    }
+  static {
+    registerAsParallelCapable();
+  }
 
-    public MuleSharedDomainClassLoader(String domain, ClassLoader parent, ClassLoaderLookupPolicy lookupPolicy, List<URL> urls)
-    {
-        super(domain, urls.toArray(new URL[0]), parent, lookupPolicy);
-    }
+  public MuleSharedDomainClassLoader(String domain, ClassLoader parent, ClassLoaderLookupPolicy lookupPolicy, List<URL> urls) {
+    super(domain, urls.toArray(new URL[0]), parent, lookupPolicy);
+  }
 
-    @Override
-    public URL findResource(String name)
-    {
-        URL resource = super.findResource(name);
-        if (resource == null)
-        {
-            File file = new File(getDomainFolder(getArtifactName()) + File.separator + name);
-            if (file.exists())
-            {
-                try
-                {
-                    resource = file.toURI().toURL();
-                }
-                catch (MalformedURLException e)
-                {
-                    logger.debug("Failure looking for resource", e);
-                }
-            }
+  @Override
+  public URL findResource(String name) {
+    URL resource = super.findResource(name);
+    if (resource == null) {
+      File file = new File(getDomainFolder(getArtifactName()) + File.separator + name);
+      if (file.exists()) {
+        try {
+          resource = file.toURI().toURL();
+        } catch (MalformedURLException e) {
+          logger.debug("Failure looking for resource", e);
         }
-        return resource;
+      }
     }
+    return resource;
+  }
 
-    @Override
-    protected String[] getLocalResourceLocations()
-    {
-        return new String[] {getDomainFolder(getArtifactName()).getAbsolutePath(), MuleContainerBootstrapUtils.getMuleConfDir().getAbsolutePath()};
-    }
+  @Override
+  protected String[] getLocalResourceLocations() {
+    return new String[] {getDomainFolder(getArtifactName()).getAbsolutePath(),
+        MuleContainerBootstrapUtils.getMuleConfDir().getAbsolutePath()};
+  }
 }

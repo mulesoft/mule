@@ -21,114 +21,89 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 
 /**
- * <code>EncryptionTransformer</code> will transform an array of bytes or string
- * into an encrypted array of bytes
+ * <code>EncryptionTransformer</code> will transform an array of bytes or string into an encrypted array of bytes
  *
  */
-public abstract class AbstractEncryptionTransformer extends AbstractTransformer implements MuleContextAware
-{
-    private EncryptionStrategy strategy = null;
-    private String strategyName = null;
+public abstract class AbstractEncryptionTransformer extends AbstractTransformer implements MuleContextAware {
 
-    public AbstractEncryptionTransformer()
-    {
-        registerSourceType(DataType.BYTE_ARRAY);
-        registerSourceType(DataType.STRING);
-        registerSourceType(DataType.INPUT_STREAM);
-        setReturnDataType(DataType.INPUT_STREAM);
-    }
+  private EncryptionStrategy strategy = null;
+  private String strategyName = null;
 
-    @Override
-    public Object clone() throws CloneNotSupportedException
-    {
-        AbstractEncryptionTransformer clone = (AbstractEncryptionTransformer) super.clone();
-        /*
-         * The actual strategy is *shared* - not sure if this is right? both shallow
-         * and deep copy make sense - think about security, passwords, required
-         * external authentication dependencies etc. :(
-         */
-        clone.setStrategy(strategy);
-        clone.setStrategyName(strategyName);
-        return clone;
-    }
+  public AbstractEncryptionTransformer() {
+    registerSourceType(DataType.BYTE_ARRAY);
+    registerSourceType(DataType.STRING);
+    registerSourceType(DataType.INPUT_STREAM);
+    setReturnDataType(DataType.INPUT_STREAM);
+  }
 
-    @Override
-    public Object doTransform(Object src, Charset outputEncoding) throws TransformerException
-    {
-        InputStream input;
-        if (src instanceof String)
-        {
-            input = new ByteArrayInputStream(src.toString().getBytes());
-        }
-        else if (src instanceof InputStream)
-        {
-            input = (InputStream) src;
-        }
-        else
-        {
-            input = new ByteArrayInputStream((byte[]) src);
-        }
-        try
-        {
-            return this.primTransform(input);
-        }
-        catch (CryptoFailureException e)
-        {
-            throw new TransformerException(this, e);
-        }
-    }
-
-    protected abstract InputStream primTransform(InputStream stream) throws CryptoFailureException;
-
-    /**
-     * Template method were deriving classes can do any initialisation after the
-     * properties have been set on this transformer
-     * 
-     * @throws org.mule.runtime.core.api.lifecycle.InitialisationException
+  @Override
+  public Object clone() throws CloneNotSupportedException {
+    AbstractEncryptionTransformer clone = (AbstractEncryptionTransformer) super.clone();
+    /*
+     * The actual strategy is *shared* - not sure if this is right? both shallow and deep copy make sense - think about security,
+     * passwords, required external authentication dependencies etc. :(
      */
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        if (strategyName != null)
-        {
-            if (muleContext.getSecurityManager() == null)
-            {
-                if (strategy == null)
-                {
-                    throw new InitialisationException(CoreMessages.authSecurityManagerNotSet(), this);
-                }
-            }
-            else
-            {
-                strategy = muleContext.getSecurityManager().getEncryptionStrategy(strategyName);
-            }
+    clone.setStrategy(strategy);
+    clone.setStrategyName(strategyName);
+    return clone;
+  }
+
+  @Override
+  public Object doTransform(Object src, Charset outputEncoding) throws TransformerException {
+    InputStream input;
+    if (src instanceof String) {
+      input = new ByteArrayInputStream(src.toString().getBytes());
+    } else if (src instanceof InputStream) {
+      input = (InputStream) src;
+    } else {
+      input = new ByteArrayInputStream((byte[]) src);
+    }
+    try {
+      return this.primTransform(input);
+    } catch (CryptoFailureException e) {
+      throw new TransformerException(this, e);
+    }
+  }
+
+  protected abstract InputStream primTransform(InputStream stream) throws CryptoFailureException;
+
+  /**
+   * Template method were deriving classes can do any initialisation after the properties have been set on this transformer
+   * 
+   * @throws org.mule.runtime.core.api.lifecycle.InitialisationException
+   */
+  @Override
+  public void initialise() throws InitialisationException {
+    if (strategyName != null) {
+      if (muleContext.getSecurityManager() == null) {
+        if (strategy == null) {
+          throw new InitialisationException(CoreMessages.authSecurityManagerNotSet(), this);
         }
-        if (strategy == null)
-        {
-            throw new InitialisationException(CoreMessages.encryptionStrategyNotSet(), this);
-        }
-
-        LifecycleUtils.initialiseIfNeeded(strategy);
+      } else {
+        strategy = muleContext.getSecurityManager().getEncryptionStrategy(strategyName);
+      }
+    }
+    if (strategy == null) {
+      throw new InitialisationException(CoreMessages.encryptionStrategyNotSet(), this);
     }
 
-    public EncryptionStrategy getStrategy()
-    {
-        return strategy;
-    }
+    LifecycleUtils.initialiseIfNeeded(strategy);
+  }
 
-    public void setStrategy(EncryptionStrategy strategy)
-    {
-        this.strategy = strategy;
-    }
+  public EncryptionStrategy getStrategy() {
+    return strategy;
+  }
 
-    public String getStrategyName()
-    {
-        return strategyName;
-    }
+  public void setStrategy(EncryptionStrategy strategy) {
+    this.strategy = strategy;
+  }
 
-    public void setStrategyName(String strategyName)
-    {
-        this.strategyName = strategyName;
-    }
+  public String getStrategyName() {
+    return strategyName;
+  }
+
+  public void setStrategyName(String strategyName) {
+    this.strategyName = strategyName;
+  }
 
 }

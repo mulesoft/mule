@@ -12,16 +12,13 @@ import org.mule.compatibility.core.transport.AbstractMessageDispatcherFactory;
 import org.mule.runtime.core.api.MuleException;
 
 /**
- * <code>JmsMessageDispatcherFactory</code> creates a message adapter that will
- * send JMS messages
+ * <code>JmsMessageDispatcherFactory</code> creates a message adapter that will send JMS messages
  */
-public class JmsMessageDispatcherFactory extends AbstractMessageDispatcherFactory
-{
+public class JmsMessageDispatcherFactory extends AbstractMessageDispatcherFactory {
 
-    @Override
-    public MessageDispatcher create(OutboundEndpoint endpoint) throws MuleException
-    {
-        return new JmsMessageDispatcher(endpoint);
-    }
+  @Override
+  public MessageDispatcher create(OutboundEndpoint endpoint) throws MuleException {
+    return new JmsMessageDispatcher(endpoint);
+  }
 
 }

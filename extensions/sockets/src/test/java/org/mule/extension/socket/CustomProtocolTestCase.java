@@ -13,19 +13,17 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 @Ignore("MULE-9738: It is not supported yet to application access classes from extensions")
-public class CustomProtocolTestCase extends SocketExtensionTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "custom-protocol-config.xml";
-    }
+public class CustomProtocolTestCase extends SocketExtensionTestCase {
 
-    @Test
-    public void useCustomProtocolClass() throws Exception
-    {
-        expectedException.expect(MessagingException.class);
-        expectedException.expectCause(instanceOf(UnsupportedOperationException.class));
-        flowRunner("tcp-send").withPayload(TEST_STRING).run();
-    }
+  @Override
+  protected String getConfigFile() {
+    return "custom-protocol-config.xml";
+  }
+
+  @Test
+  public void useCustomProtocolClass() throws Exception {
+    expectedException.expect(MessagingException.class);
+    expectedException.expectCause(instanceOf(UnsupportedOperationException.class));
+    flowRunner("tcp-send").withPayload(TEST_STRING).run();
+  }
 }

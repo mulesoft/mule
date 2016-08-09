@@ -15,32 +15,27 @@ import java.sql.Types;
 /**
  * Represents a data type for a template, which real type is unknown until it is instantiated
  */
-public class UnknownDbType extends AbstractDbType
-{
+public class UnknownDbType extends AbstractDbType {
 
-    public static final String UNKNOWN_TYPE_NAME = "UNKNOWN";
+  public static final String UNKNOWN_TYPE_NAME = "UNKNOWN";
 
-    private static final UnknownDbType instance = new UnknownDbType();
+  private static final UnknownDbType instance = new UnknownDbType();
 
-    private UnknownDbType()
-    {
-        super(Types.OTHER, UNKNOWN_TYPE_NAME);
-    }
+  private UnknownDbType() {
+    super(Types.OTHER, UNKNOWN_TYPE_NAME);
+  }
 
-    @Override
-    public void setParameterValue(PreparedStatement statement, int index, Object value) throws SQLException
-    {
-        statement.setObject(index, value);
-    }
+  @Override
+  public void setParameterValue(PreparedStatement statement, int index, Object value) throws SQLException {
+    statement.setObject(index, value);
+  }
 
-    @Override
-    public Object getParameterValue(CallableStatement statement, int index) throws SQLException
-    {
-        return statement.getObject(index);
-    }
+  @Override
+  public Object getParameterValue(CallableStatement statement, int index) throws SQLException {
+    return statement.getObject(index);
+  }
 
-    public static DbType getInstance()
-    {
-        return instance;
-    }
+  public static DbType getInstance() {
+    return instance;
+  }
 }

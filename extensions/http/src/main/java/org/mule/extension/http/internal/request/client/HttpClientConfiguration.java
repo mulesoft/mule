@@ -17,147 +17,129 @@ import org.mule.runtime.api.tls.TlsContextFactory;
  *
  * @since 4.0
  */
-public class HttpClientConfiguration
-{
-    private final UriParameters uriParameters;
-    private final TlsContextFactory tlsContextFactory;
-    private final ProxyConfig proxyConfig;
-    private final TcpClientSocketProperties clientSocketProperties;
-    private final int maxConnections;
-    private final boolean usePersistentConnections;
-    private final int connectionIdleTimeout;
-    private final String threadNamePrefix;
-    private final String ownerName;
+public class HttpClientConfiguration {
 
-    private HttpClientConfiguration(UriParameters uriParameters, TlsContextFactory tlsContextFactory, ProxyConfig proxyConfig, TcpClientSocketProperties clientSocketProperties,
-                                    int maxConnections, boolean usePersistentConnections, int connectionIdleTimeout, String threadNamePrefix, String ownerName)
-    {
-        this.uriParameters = uriParameters;
-        this.tlsContextFactory = tlsContextFactory;
-        this.proxyConfig = proxyConfig;
-        this.clientSocketProperties = clientSocketProperties;
-        this.maxConnections = maxConnections;
-        this.usePersistentConnections = usePersistentConnections;
-        this.connectionIdleTimeout = connectionIdleTimeout;
-        this.threadNamePrefix = threadNamePrefix;
-        this.ownerName = ownerName;
+  private final UriParameters uriParameters;
+  private final TlsContextFactory tlsContextFactory;
+  private final ProxyConfig proxyConfig;
+  private final TcpClientSocketProperties clientSocketProperties;
+  private final int maxConnections;
+  private final boolean usePersistentConnections;
+  private final int connectionIdleTimeout;
+  private final String threadNamePrefix;
+  private final String ownerName;
+
+  private HttpClientConfiguration(UriParameters uriParameters, TlsContextFactory tlsContextFactory, ProxyConfig proxyConfig,
+                                  TcpClientSocketProperties clientSocketProperties, int maxConnections,
+                                  boolean usePersistentConnections, int connectionIdleTimeout, String threadNamePrefix,
+                                  String ownerName) {
+    this.uriParameters = uriParameters;
+    this.tlsContextFactory = tlsContextFactory;
+    this.proxyConfig = proxyConfig;
+    this.clientSocketProperties = clientSocketProperties;
+    this.maxConnections = maxConnections;
+    this.usePersistentConnections = usePersistentConnections;
+    this.connectionIdleTimeout = connectionIdleTimeout;
+    this.threadNamePrefix = threadNamePrefix;
+    this.ownerName = ownerName;
+  }
+
+  public UriParameters getUriParameters() {
+    return uriParameters;
+  }
+
+  public TlsContextFactory getTlsContextFactory() {
+    return tlsContextFactory;
+  }
+
+  public ProxyConfig getProxyConfig() {
+    return proxyConfig;
+  }
+
+  public TcpClientSocketProperties getClientSocketProperties() {
+    return clientSocketProperties;
+  }
+
+  public int getMaxConnections() {
+    return maxConnections;
+  }
+
+  public boolean isUsePersistentConnections() {
+    return usePersistentConnections;
+  }
+
+  public int getConnectionIdleTimeout() {
+    return connectionIdleTimeout;
+  }
+
+  public String getThreadNamePrefix() {
+    return threadNamePrefix;
+  }
+
+  public String getOwnerName() {
+    return ownerName;
+  }
+
+  public static class Builder {
+
+    private UriParameters uriParameters;
+    private TlsContextFactory tlsContextFactory;
+    private ProxyConfig proxyConfig;
+    private TcpClientSocketProperties clientSocketProperties;
+    private int maxConnections;
+    private boolean usePersistentConnections;
+    private int connectionIdleTimeout;
+    private String threadNamePrefix;
+    private String ownerName;
+
+    public Builder setUriParameters(UriParameters uriParameters) {
+      this.uriParameters = uriParameters;
+      return this;
     }
 
-    public UriParameters getUriParameters()
-    {
-        return uriParameters;
+    public Builder setTlsContextFactory(TlsContextFactory tlsContextFactory) {
+      this.tlsContextFactory = tlsContextFactory;
+      return this;
     }
 
-    public TlsContextFactory getTlsContextFactory()
-    {
-        return tlsContextFactory;
+    public Builder setProxyConfig(ProxyConfig proxyConfig) {
+      this.proxyConfig = proxyConfig;
+      return this;
     }
 
-    public ProxyConfig getProxyConfig()
-    {
-        return proxyConfig;
+    public Builder setClientSocketProperties(TcpClientSocketProperties clientSocketProperties) {
+      this.clientSocketProperties = clientSocketProperties;
+      return this;
     }
 
-    public TcpClientSocketProperties getClientSocketProperties()
-    {
-        return clientSocketProperties;
+    public Builder setMaxConnections(int maxConnections) {
+      this.maxConnections = maxConnections;
+      return this;
     }
 
-    public int getMaxConnections()
-    {
-        return maxConnections;
+    public Builder setUsePersistentConnections(boolean usePersistentConnections) {
+      this.usePersistentConnections = usePersistentConnections;
+      return this;
     }
 
-    public boolean isUsePersistentConnections()
-    {
-        return usePersistentConnections;
+    public Builder setConnectionIdleTimeout(int connectionIdleTimeout) {
+      this.connectionIdleTimeout = connectionIdleTimeout;
+      return this;
     }
 
-    public int getConnectionIdleTimeout()
-    {
-        return connectionIdleTimeout;
+    public Builder setThreadNamePrefix(String threadNamePrefix) {
+      this.threadNamePrefix = threadNamePrefix;
+      return this;
     }
 
-    public String getThreadNamePrefix()
-    {
-        return threadNamePrefix;
+    public Builder setOwnerName(String ownerName) {
+      this.ownerName = ownerName;
+      return this;
     }
 
-    public String getOwnerName()
-    {
-        return ownerName;
+    public HttpClientConfiguration build() {
+      return new HttpClientConfiguration(uriParameters, tlsContextFactory, proxyConfig, clientSocketProperties, maxConnections,
+                                         usePersistentConnections, connectionIdleTimeout, threadNamePrefix, ownerName);
     }
-
-    public static class Builder
-    {
-        private UriParameters uriParameters;
-        private TlsContextFactory tlsContextFactory;
-        private ProxyConfig proxyConfig;
-        private TcpClientSocketProperties clientSocketProperties;
-        private int maxConnections;
-        private boolean usePersistentConnections;
-        private int connectionIdleTimeout;
-        private String threadNamePrefix;
-        private String ownerName;
-
-        public Builder setUriParameters(UriParameters uriParameters)
-        {
-            this.uriParameters = uriParameters;
-            return this;
-        }
-
-        public Builder setTlsContextFactory(TlsContextFactory tlsContextFactory)
-        {
-            this.tlsContextFactory = tlsContextFactory;
-            return this;
-        }
-
-        public Builder setProxyConfig(ProxyConfig proxyConfig)
-        {
-            this.proxyConfig = proxyConfig;
-            return this;
-        }
-
-        public Builder setClientSocketProperties(TcpClientSocketProperties clientSocketProperties)
-        {
-            this.clientSocketProperties = clientSocketProperties;
-            return this;
-        }
-
-        public Builder setMaxConnections(int maxConnections)
-        {
-            this.maxConnections = maxConnections;
-            return this;
-        }
-
-        public Builder setUsePersistentConnections(boolean usePersistentConnections)
-        {
-            this.usePersistentConnections = usePersistentConnections;
-            return this;
-        }
-
-        public Builder setConnectionIdleTimeout(int connectionIdleTimeout)
-        {
-            this.connectionIdleTimeout = connectionIdleTimeout;
-            return this;
-        }
-
-        public Builder setThreadNamePrefix(String threadNamePrefix)
-        {
-            this.threadNamePrefix = threadNamePrefix;
-            return this;
-        }
-
-        public Builder setOwnerName(String ownerName)
-        {
-            this.ownerName = ownerName;
-            return this;
-        }
-
-        public HttpClientConfiguration build()
-        {
-            return new HttpClientConfiguration(uriParameters, tlsContextFactory, proxyConfig, clientSocketProperties, maxConnections,
-                                                      usePersistentConnections, connectionIdleTimeout, threadNamePrefix, ownerName);
-        }
-    }
+  }
 }

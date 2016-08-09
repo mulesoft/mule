@@ -30,68 +30,63 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class CachedConnectionManagementStrategyTestCase extends AbstractMuleTestCase
-{
+public class CachedConnectionManagementStrategyTestCase extends AbstractMuleTestCase {
 
-    private Banana connection = new Banana();
+  private Banana connection = new Banana();
 
-    @Mock
-    private ConnectionProvider<Banana> connectionProvider;
+  @Mock
+  private ConnectionProvider<Banana> connectionProvider;
 
-    @Mock
-    private MuleContext muleContext;
+  @Mock
+  private MuleContext muleContext;
 
-    private CachedConnectionManagementStrategy<Banana> connectionStrategy;
+  private CachedConnectionManagementStrategy<Banana> connectionStrategy;
 
-    @Before
-    public void before() throws Exception
-    {
-        when(connectionProvider.connect()).thenReturn(connection);
-        connectionStrategy = new CachedConnectionManagementStrategy<>(connectionProvider, muleContext);
-        when(connectionProvider.validate(connection)).thenReturn(ConnectionValidationResult.success());
-    }
+  @Before
+  public void before() throws Exception {
+    when(connectionProvider.connect()).thenReturn(connection);
+    connectionStrategy = new CachedConnectionManagementStrategy<>(connectionProvider, muleContext);
+    when(connectionProvider.validate(connection)).thenReturn(ConnectionValidationResult.success());
+  }
 
-    @Test
-    public void getConnection() throws Exception
-    {
-        ConnectionHandler<Banana> connectionHandler = connectionStrategy.getConnectionHandler();
+  @Test
+  public void getConnection() throws Exception {
+    ConnectionHandler<Banana> connectionHandler = connectionStrategy.getConnectionHandler();
 
-        // verify lazy behavior
-        verify(connectionProvider, never()).connect();
+    // verify lazy behavior
+    verify(connectionProvider, never()).connect();
 
-        Banana connection = connectionHandler.getConnection();
-        verify(connectionProvider).connect();
-        assertThat(connection, is(sameInstance(this.connection)));
-    }
+    Banana connection = connectionHandler.getConnection();
+    verify(connectionProvider).connect();
+    assertThat(connection, is(sameInstance(this.connection)));
+  }
 
-    @Test
-    public void close() throws Exception
-    {
-        connectionStrategy.getConnectionHandler().getConnection();
-        connectionStrategy.close();
-        verify(connectionProvider).disconnect(connection);
+  @Test
+  public void close() throws Exception {
+    connectionStrategy.getConnectionHandler().getConnection();
+    connectionStrategy.close();
+    verify(connectionProvider).disconnect(connection);
 
-    }
+  }
 
-    @Test
-    public void failDueToInvalidConnection() throws ConnectionException
-    {
-        String errorMessage = "Invalid username or password";
-        when(connectionProvider.validate(connection)).thenReturn(ConnectionValidationResult.failure(errorMessage, ConnectionExceptionCode.INCORRECT_CREDENTIALS, new Exception("401: UNAUTHORIZED")));
-        CachedConnectionHandler connectionHandler = (CachedConnectionHandler) connectionStrategy.getConnectionHandler();
-        ConnectionValidationResult validationResult = connectionHandler.validateConnection(connection);
+  @Test
+  public void failDueToInvalidConnection() throws ConnectionException {
+    String errorMessage = "Invalid username or password";
+    when(connectionProvider.validate(connection)).thenReturn(ConnectionValidationResult
+        .failure(errorMessage, ConnectionExceptionCode.INCORRECT_CREDENTIALS, new Exception("401: UNAUTHORIZED")));
+    CachedConnectionHandler connectionHandler = (CachedConnectionHandler) connectionStrategy.getConnectionHandler();
+    ConnectionValidationResult validationResult = connectionHandler.validateConnection(connection);
 
-        assertThat(validationResult.isValid(), is(false));
-        assertThat(validationResult.getMessage(), is(errorMessage));
-    }
+    assertThat(validationResult.isValid(), is(false));
+    assertThat(validationResult.getMessage(), is(errorMessage));
+  }
 
-    @Test
-    public void failDueToNullConnectionValidationResult() throws ConnectionException
-    {
-        when(connectionProvider.validate(connection)).thenReturn(null);
-        CachedConnectionHandler connectionHandler = (CachedConnectionHandler) connectionStrategy.getConnectionHandler();
-        ConnectionValidationResult validationResult = connectionHandler.validateConnection(connection);
+  @Test
+  public void failDueToNullConnectionValidationResult() throws ConnectionException {
+    when(connectionProvider.validate(connection)).thenReturn(null);
+    CachedConnectionHandler connectionHandler = (CachedConnectionHandler) connectionStrategy.getConnectionHandler();
+    ConnectionValidationResult validationResult = connectionHandler.validateConnection(connection);
 
-        assertThat(validationResult.isValid(), is(false));
-    }
+    assertThat(validationResult.isValid(), is(false));
+  }
 }

@@ -17,70 +17,64 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Test;
 
-public class WireTapTestCase extends AbstractMuleContextTestCase
-{
+public class WireTapTestCase extends AbstractMuleContextTestCase {
 
-    protected SensingNullMessageProcessor tapListener;
-    protected WireTap wireTap;
+  protected SensingNullMessageProcessor tapListener;
+  protected WireTap wireTap;
 
-    @Override
-    protected void doSetUp() throws Exception
-    {
-        super.doSetUp();
+  @Override
+  protected void doSetUp() throws Exception {
+    super.doSetUp();
 
-        wireTap = new WireTap();
-        tapListener = getSensingNullMessageProcessor();
-        wireTap.setTap(tapListener);
-    }
+    wireTap = new WireTap();
+    tapListener = getSensingNullMessageProcessor();
+    wireTap.setTap(tapListener);
+  }
 
-    @Test
-    public void testWireTapNoFilter() throws Exception
-    {
-        MuleEvent event = getTestEvent("data");
-        MuleEvent primaryOutput = wireTap.process(event);
+  @Test
+  public void testWireTapNoFilter() throws Exception {
+    MuleEvent event = getTestEvent("data");
+    MuleEvent primaryOutput = wireTap.process(event);
 
-        assertSame(event, primaryOutput);
+    assertSame(event, primaryOutput);
 
-        assertNotNull(tapListener.event);
-        assertThat(tapListener.event.getMessage().getPayload(), equalTo(event.getMessage().getPayload()));
-    }
+    assertNotNull(tapListener.event);
+    assertThat(tapListener.event.getMessage().getPayload(), equalTo(event.getMessage().getPayload()));
+  }
 
-    @Test
-    public void testWireTapFilterAccepted() throws Exception
-    {
-        wireTap.setFilter(message -> true);
+  @Test
+  public void testWireTapFilterAccepted() throws Exception {
+    wireTap.setFilter(message -> true);
 
-        MuleEvent event = getTestEvent("data");
-        MuleEvent primaryOutput = wireTap.process(event);
+    MuleEvent event = getTestEvent("data");
+    MuleEvent primaryOutput = wireTap.process(event);
 
-        assertSame(event, primaryOutput);
+    assertSame(event, primaryOutput);
 
-        assertNotNull(tapListener.event);
-        assertThat(tapListener.event.getMessage().getPayload(), equalTo(event.getMessage().getPayload()));
-    }
+    assertNotNull(tapListener.event);
+    assertThat(tapListener.event.getMessage().getPayload(), equalTo(event.getMessage().getPayload()));
+  }
 
-    @Test
-    public void testWireTapFilterUnaccepted() throws Exception
-    {
-        wireTap.setFilter(message -> false);
+  @Test
+  public void testWireTapFilterUnaccepted() throws Exception {
+    wireTap.setFilter(message -> false);
 
-        MuleEvent event = getTestEvent("data");
-        MuleEvent primaryOutput = wireTap.process(event);
+    MuleEvent event = getTestEvent("data");
+    MuleEvent primaryOutput = wireTap.process(event);
 
-        assertSame(event, primaryOutput);
+    assertSame(event, primaryOutput);
 
-        assertNull(tapListener.event);
-    }
+    assertNull(tapListener.event);
+  }
 
-    @Test
-    public void testWireTapNullTap() throws Exception
-    {
-        wireTap.setTap(null);
+  @Test
+  public void testWireTapNullTap() throws Exception {
+    wireTap.setTap(null);
 
-        MuleEvent event = getTestEvent("data");
-        MuleEvent primaryOutput = wireTap.process(event);
+    MuleEvent event = getTestEvent("data");
+    MuleEvent primaryOutput = wireTap.process(event);
 
-        assertSame(event, primaryOutput);
-    }
+    assertSame(event, primaryOutput);
+  }
 
 }

@@ -11,8 +11,8 @@ import org.mule.runtime.module.cxf.testmodels.CxfEnabledFaultMessage;
 import javax.jws.WebService;
 
 @WebService
-public interface TestServiceFault
-{
-    String sayHi(String text) throws CxfEnabledFaultMessage;
+public interface TestServiceFault {
+
+  String sayHi(String text) throws CxfEnabledFaultMessage;
 }
 

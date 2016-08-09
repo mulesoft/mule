@@ -73,333 +73,306 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase
-{
+public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
 
-    private static final String MULESOFT = "MuleSoft";
-    private static final String OTHER_VENDOR = "OtherVendor";
-    private ExtensionManagerAdapter extensionsManager;
+  private static final String MULESOFT = "MuleSoft";
+  private static final String OTHER_VENDOR = "OtherVendor";
+  private ExtensionManagerAdapter extensionsManager;
 
-    private static final String EXTENSION1_NAME = "extension1";
-    private static final String EXTENSION1_CONFIG_NAME = "extension1Config";
-    private static final String EXTENSION1_CONFIG_INSTANCE_NAME = "extension1ConfigInstanceName";
-    private static final String EXTENSION1_OPERATION_NAME = "extension1OperationName";
-    private static final String EXTENSION2_NAME = "extension2";
-    private static final String EXTENSION1_VERSION = "3.6.0";
-    private static final String EXTENSION2_VERSION = "3.6.0";
+  private static final String EXTENSION1_NAME = "extension1";
+  private static final String EXTENSION1_CONFIG_NAME = "extension1Config";
+  private static final String EXTENSION1_CONFIG_INSTANCE_NAME = "extension1ConfigInstanceName";
+  private static final String EXTENSION1_OPERATION_NAME = "extension1OperationName";
+  private static final String EXTENSION2_NAME = "extension2";
+  private static final String EXTENSION1_VERSION = "3.6.0";
+  private static final String EXTENSION2_VERSION = "3.6.0";
 
-    @Mock
-    private RuntimeExtensionModel extensionModel1;
+  @Mock
+  private RuntimeExtensionModel extensionModel1;
 
-    @Mock
-    private RuntimeExtensionModel extensionModel2;
+  @Mock
+  private RuntimeExtensionModel extensionModel2;
 
-    @Mock
-    private RuntimeExtensionModel extensionModel3WithRepeatedName;
+  @Mock
+  private RuntimeExtensionModel extensionModel3WithRepeatedName;
 
-    @Mock(answer = RETURNS_DEEP_STUBS)
-    private MuleContext muleContext;
+  @Mock(answer = RETURNS_DEEP_STUBS)
+  private MuleContext muleContext;
 
-    @Mock(answer = RETURNS_DEEP_STUBS)
-    private RuntimeConfigurationModel extension1ConfigurationModel;
+  @Mock(answer = RETURNS_DEEP_STUBS)
+  private RuntimeConfigurationModel extension1ConfigurationModel;
 
-    @Mock
-    private RuntimeOperationModel extension1OperationModel;
+  @Mock
+  private RuntimeOperationModel extension1OperationModel;
 
-    @Mock
-    private OperationContextAdapter extension1OperationContext;
+  @Mock
+  private OperationContextAdapter extension1OperationContext;
 
-    @Mock
-    private ConfigurationProvider<Object> extension1ConfigurationProvider;
+  @Mock
+  private ConfigurationProvider<Object> extension1ConfigurationProvider;
 
-    @Mock(answer = RETURNS_DEEP_STUBS)
-    private ConfigurationInstance<Object> extension1ConfigurationInstance = mock(ConfigurationInstance.class);
+  @Mock(answer = RETURNS_DEEP_STUBS)
+  private ConfigurationInstance<Object> extension1ConfigurationInstance = mock(ConfigurationInstance.class);
 
-    @Mock
-    private OperationExecutorFactory executorFactory;
+  @Mock
+  private OperationExecutorFactory executorFactory;
 
-    @Mock
-    private OperationExecutor executor;
+  @Mock
+  private OperationExecutor executor;
 
-    @Mock(answer = RETURNS_DEEP_STUBS)
-    private MuleEvent event;
+  @Mock(answer = RETURNS_DEEP_STUBS)
+  private MuleEvent event;
 
-    private ClassLoader classLoader;
+  private ClassLoader classLoader;
 
-    private final Object configInstance = new Object();
+  private final Object configInstance = new Object();
 
-    @Before
-    public void before() throws InitialisationException
-    {
-        DefaultExtensionManager extensionsManager = new DefaultExtensionManager();
-        extensionsManager.setMuleContext(muleContext);
+  @Before
+  public void before() throws InitialisationException {
+    DefaultExtensionManager extensionsManager = new DefaultExtensionManager();
+    extensionsManager.setMuleContext(muleContext);
 
-        when(muleContext.getConfiguration().getExtension(ExtensionConfig.class)).thenReturn(null);
-        extensionsManager.initialise();
-        this.extensionsManager = extensionsManager;
+    when(muleContext.getConfiguration().getExtension(ExtensionConfig.class)).thenReturn(null);
+    extensionsManager.initialise();
+    this.extensionsManager = extensionsManager;
 
-        when(extensionModel1.getName()).thenReturn(EXTENSION1_NAME);
-        mockClassLoaderModelProperty(extensionModel1, getClass().getClassLoader());
+    when(extensionModel1.getName()).thenReturn(EXTENSION1_NAME);
+    mockClassLoaderModelProperty(extensionModel1, getClass().getClassLoader());
 
-        when(extensionModel1.getConfigurationModels()).thenReturn(asList(extension1ConfigurationModel));
-        when(extensionModel2.getName()).thenReturn(EXTENSION2_NAME);
-        when(extensionModel3WithRepeatedName.getName()).thenReturn(EXTENSION2_NAME);
+    when(extensionModel1.getConfigurationModels()).thenReturn(asList(extension1ConfigurationModel));
+    when(extensionModel2.getName()).thenReturn(EXTENSION2_NAME);
+    when(extensionModel3WithRepeatedName.getName()).thenReturn(EXTENSION2_NAME);
 
-        when(extensionModel1.getVendor()).thenReturn(MULESOFT);
-        when(extensionModel2.getVendor()).thenReturn(MULESOFT);
-        when(extensionModel3WithRepeatedName.getVendor()).thenReturn(OTHER_VENDOR);
+    when(extensionModel1.getVendor()).thenReturn(MULESOFT);
+    when(extensionModel2.getVendor()).thenReturn(MULESOFT);
+    when(extensionModel3WithRepeatedName.getVendor()).thenReturn(OTHER_VENDOR);
 
-        when(extensionModel1.getVersion()).thenReturn(EXTENSION1_VERSION);
-        when(extensionModel2.getVersion()).thenReturn(EXTENSION2_VERSION);
-        mockClassLoaderModelProperty(extensionModel1, getClass().getClassLoader());
-        when(extensionModel3WithRepeatedName.getVersion()).thenReturn(EXTENSION2_VERSION);
+    when(extensionModel1.getVersion()).thenReturn(EXTENSION1_VERSION);
+    when(extensionModel2.getVersion()).thenReturn(EXTENSION2_VERSION);
+    mockClassLoaderModelProperty(extensionModel1, getClass().getClassLoader());
+    when(extensionModel3WithRepeatedName.getVersion()).thenReturn(EXTENSION2_VERSION);
 
-        when(extension1ConfigurationModel.getName()).thenReturn(EXTENSION1_CONFIG_NAME);
-        when(extension1ConfigurationModel.getConfigurationFactory().newInstance()).thenReturn(configInstance);
-        when(extension1ConfigurationModel.getConfigurationFactory().getObjectType()).thenReturn((Class) configInstance.getClass());
-        when(extension1ConfigurationModel.getExtensionModel()).thenReturn(extensionModel1);
-        when(extension1ConfigurationModel.getInterceptorFactories()).thenReturn(emptyList());
-        when(extension1ConfigurationModel.getOperationModels()).thenReturn(ImmutableList.of());
-        when(extension1ConfigurationModel.getSourceModels()).thenReturn(ImmutableList.of());
-        when(extension1ConfigurationModel.getParameterModels()).thenReturn(ImmutableList.of());
-        when(extension1ConfigurationModel.getModelProperty(any())).thenReturn(Optional.empty());
+    when(extension1ConfigurationModel.getName()).thenReturn(EXTENSION1_CONFIG_NAME);
+    when(extension1ConfigurationModel.getConfigurationFactory().newInstance()).thenReturn(configInstance);
+    when(extension1ConfigurationModel.getConfigurationFactory().getObjectType()).thenReturn((Class) configInstance.getClass());
+    when(extension1ConfigurationModel.getExtensionModel()).thenReturn(extensionModel1);
+    when(extension1ConfigurationModel.getInterceptorFactories()).thenReturn(emptyList());
+    when(extension1ConfigurationModel.getOperationModels()).thenReturn(ImmutableList.of());
+    when(extension1ConfigurationModel.getSourceModels()).thenReturn(ImmutableList.of());
+    when(extension1ConfigurationModel.getParameterModels()).thenReturn(ImmutableList.of());
+    when(extension1ConfigurationModel.getModelProperty(any())).thenReturn(Optional.empty());
 
-        when(extensionModel1.getConfigurationModel(EXTENSION1_CONFIG_NAME)).thenReturn(Optional.of(extension1ConfigurationModel));
-        when(extensionModel1.getOperationModel(EXTENSION1_OPERATION_NAME)).thenReturn(Optional.of(extension1OperationModel));
-        when(extension1OperationModel.getName()).thenReturn(EXTENSION1_OPERATION_NAME);
+    when(extensionModel1.getConfigurationModel(EXTENSION1_CONFIG_NAME)).thenReturn(Optional.of(extension1ConfigurationModel));
+    when(extensionModel1.getOperationModel(EXTENSION1_OPERATION_NAME)).thenReturn(Optional.of(extension1OperationModel));
+    when(extension1OperationModel.getName()).thenReturn(EXTENSION1_OPERATION_NAME);
 
-        when(extension1ConfigurationInstance.getValue()).thenReturn(configInstance);
-        when(extension1ConfigurationInstance.getModel()).thenReturn(extension1ConfigurationModel);
-        when(extension1ConfigurationInstance.getName()).thenReturn(EXTENSION1_CONFIG_INSTANCE_NAME);
+    when(extension1ConfigurationInstance.getValue()).thenReturn(configInstance);
+    when(extension1ConfigurationInstance.getModel()).thenReturn(extension1ConfigurationModel);
+    when(extension1ConfigurationInstance.getName()).thenReturn(EXTENSION1_CONFIG_INSTANCE_NAME);
 
-        when(extension1ConfigurationProvider.get(event)).thenReturn(extension1ConfigurationInstance);
+    when(extension1ConfigurationProvider.get(event)).thenReturn(extension1ConfigurationInstance);
 
-        when(extension1ConfigurationProvider.getModel()).thenReturn(extension1ConfigurationModel);
-        when(extension1ConfigurationProvider.getName()).thenReturn(EXTENSION1_CONFIG_INSTANCE_NAME);
+    when(extension1ConfigurationProvider.getModel()).thenReturn(extension1ConfigurationModel);
+    when(extension1ConfigurationProvider.getName()).thenReturn(EXTENSION1_CONFIG_INSTANCE_NAME);
 
 
-        when(extension1OperationModel.getExecutor()).thenReturn(executorFactory);
-        when(executorFactory.createExecutor(extension1OperationModel)).thenReturn(executor);
+    when(extension1OperationModel.getExecutor()).thenReturn(executorFactory);
+    when(executorFactory.createExecutor(extension1OperationModel)).thenReturn(executor);
 
-        classLoader = getClass().getClassLoader();
-        registerExtensions(extensionModel1, extensionModel2, extensionModel3WithRepeatedName);
+    classLoader = getClass().getClassLoader();
+    registerExtensions(extensionModel1, extensionModel2, extensionModel3WithRepeatedName);
 
-        stubRegistryKeys(muleContext, EXTENSION1_CONFIG_INSTANCE_NAME, EXTENSION1_OPERATION_NAME, EXTENSION1_NAME);
+    stubRegistryKeys(muleContext, EXTENSION1_CONFIG_INSTANCE_NAME, EXTENSION1_OPERATION_NAME, EXTENSION1_NAME);
+  }
+
+  private void registerExtensions(RuntimeExtensionModel... extensionModels) {
+    Arrays.stream(extensionModels).forEach(extensionsManager::registerExtension);
+  }
+
+  @Test
+  public void getExtensions() {
+    testEquals(getTestExtensions(), extensionsManager.getExtensions());
+  }
+
+  @Test
+  public void getExtensionByNameAndVendor() {
+    assertThat(extensionsManager.getExtension(EXTENSION2_NAME, MULESOFT).get(), is(sameInstance(extensionModel2)));
+    assertThat(extensionsManager.getExtension(EXTENSION2_NAME, OTHER_VENDOR).get(),
+               is(sameInstance(extensionModel3WithRepeatedName)));
+    assertThat(extensionsManager.getExtension(EXTENSION1_NAME, OTHER_VENDOR).isPresent(), is(false));
+  }
+
+  @Test
+  public void getExtensionsByName() {
+    Set<RuntimeExtensionModel> extensions = extensionsManager.getExtensions(EXTENSION1_NAME);
+    assertThat(extensions, hasSize(1));
+    assertThat(extensions.iterator().next(), is(sameInstance(extensionModel1)));
+  }
+
+  @Test
+  public void contextClassLoaderKept() {
+    assertThat(classLoader, sameInstance(Thread.currentThread().getContextClassLoader()));
+  }
+
+  @Test
+  public void contextClassLoaderKeptAfterException() {
+    RuntimeExtensionModel extensionModel = mock(RuntimeExtensionModel.class);
+    when(extensionModel.getName()).thenThrow(new RuntimeException());
+    try {
+      extensionsManager.registerExtension(extensionModel);
+      fail("was expecting an exception");
+    } catch (RuntimeException e) {
+      assertThat(classLoader, sameInstance(Thread.currentThread().getContextClassLoader()));
     }
+  }
 
-    private void registerExtensions(RuntimeExtensionModel... extensionModels)
-    {
-        Arrays.stream(extensionModels).forEach(extensionsManager::registerExtension);
+  @Test
+  public void getConfigurationByName() throws Exception {
+    registerConfigurationProvider();
+
+    ConfigurationInstance<Object> configurationInstance =
+        extensionsManager.getConfiguration(EXTENSION1_CONFIG_INSTANCE_NAME, event);
+    assertThat(configurationInstance.getValue(), is(sameInstance(configInstance)));
+  }
+
+  @Test
+  public void getConfigurationThroughDefaultConfig() throws Exception {
+    registerConfigurationProvider();
+
+    ConfigurationInstance<Object> configInstance = extensionsManager.getConfiguration(extensionModel1, event);
+    assertThat(configInstance.getValue(), is(sameInstance(this.configInstance)));
+  }
+
+  @Test
+  public void getConfigurationThroughImplicitConfiguration() throws Exception {
+    when(extension1ConfigurationModel.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(Optional.empty());
+    registerConfigurationProvider();
+    ConfigurationInstance<Object> configInstance = extensionsManager.getConfiguration(extensionModel1, event);
+    assertThat(configInstance.getValue(), is(sameInstance(this.configInstance)));
+  }
+
+  @Test
+  public void getOperationExecutorThroughImplicitConfigurationConcurrently() throws Exception {
+    final int threadCount = 2;
+    final CountDownLatch joinerLatch = new CountDownLatch(threadCount);
+
+    MuleRegistry registry = muleContext.getRegistry();
+    when(extension1ConfigurationModel.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(Optional.empty());
+    when(registry.lookupObjects(ConfigurationProvider.class)).thenReturn(emptyList());
+
+    doAnswer(invocation -> {
+      when(muleContext.getRegistry().lookupObjects(ConfigurationProvider.class))
+          .thenReturn(asList((ConfigurationProvider) invocation.getArguments()[1]));
+      new Thread(() -> extensionsManager.getConfiguration(extensionModel1, event)).start();
+      joinerLatch.countDown();
+
+      return null;
+    }).when(registry).registerObject(anyString(), anyObject());
+
+    ConfigurationInstance<Object> configurationInstance = extensionsManager.getConfiguration(extensionModel1, event);
+    joinerLatch.countDown();
+    assertThat(joinerLatch.await(5, TimeUnit.SECONDS), is(true));
+    assertThat(configurationInstance.getValue(), is(sameInstance(configInstance)));
+  }
+
+  @Test(expected = IllegalStateException.class)
+  public void getOperationExecutorWithNotImplicitConfig() {
+    when(muleContext.getRegistry().lookupObjects(ConfigurationProvider.class)).thenReturn(emptyList());
+    makeExtension1ConfigurationNotImplicit();
+
+    extensionsManager.getConfiguration(extensionModel1, event);
+  }
+
+  @Test
+  public void registerTwoExtensionsWithTheSameNameButDifferentVendor() {
+    registerExtensions(extensionModel2, extensionModel3WithRepeatedName);
+    List<RuntimeExtensionModel> extensionModels = new ArrayList<>(extensionsManager.getExtensions());
+    List<String> extensionNameList =
+        extensionModels.stream().map(ExtensionModel::getName).distinct().collect(Collectors.toList());
+    List<String> extensionVendorList =
+        extensionModels.stream().map(ExtensionModel::getVendor).distinct().collect(Collectors.toList());
+
+    assertThat(extensionModels.size(), is(3));
+    assertThat(extensionNameList.size(), is(2));
+    assertThat(extensionVendorList.size(), is(2));
+  }
+
+  @Test
+  public void ignoresRegisteringAlreadyRegisteredExtensions() {
+    final int registeredExtensionsCount = extensionsManager.getExtensions().size();
+    registerExtensions(extensionModel1, extensionModel1, extensionModel1);
+    assertThat(extensionsManager.getExtensions(), hasSize(registeredExtensionsCount));
+  }
+
+  @Test
+  public void registerFromManifest() throws Exception {
+    final String version = "4.0.0";
+    ExtensionManifestBuilder builder =
+        new ExtensionManifestBuilder().setName(HEISENBERG).setDescription(EXTENSION_DESCRIPTION).setVersion(version);
+    builder.withDescriber().setId(DESCRIBER_ID).addProperty(TYPE_PROPERTY_NAME, HeisenbergExtension.class.getName());
+
+    extensionsManager.registerExtension(builder.build(), getClass().getClassLoader());
+
+    Set<RuntimeExtensionModel> registered = extensionsManager.getExtensions(HEISENBERG);
+    assertThat(registered, hasSize(1));
+
+    final ExtensionModel registeredExtension = registered.iterator().next();
+    assertThat(registeredExtension.getName(), is(HEISENBERG));
+    assertThat(registeredExtension.getVersion(), is(version));
+  }
+
+  @Test
+  public void enumTransformer() throws Exception {
+    DefaultExtensionManager extensionsManager = new DefaultExtensionManager();
+    extensionsManager.setMuleContext(muleContext);
+    extensionsManager.initialise();
+
+    ParameterModel parameter = mock(ParameterModel.class);
+    when(parameter.getType()).thenReturn(toMetadataType(TimeUnit.class));
+
+    ParameterModel parameterOfRepeatedEnumType = mock(ParameterModel.class);
+    when(parameterOfRepeatedEnumType.getType()).thenReturn(toMetadataType(TimeUnit.class));
+
+    when(extension1ConfigurationModel.getParameterModels()).thenReturn(asList(parameter, parameterOfRepeatedEnumType));
+    extensionsManager.registerExtension(extensionModel1);
+
+    verify(muleContext.getRegistry()).registerTransformer(any(StringToEnum.class));
+  }
+
+  private void makeExtension1ConfigurationNotImplicit() {
+    ParameterModel parameterModel1 = mock(ParameterModel.class);
+    when(parameterModel1.isRequired()).thenReturn(true);
+
+    when(extension1ConfigurationModel.getParameterModels()).thenReturn(asList(parameterModel1, parameterModel1));
+    when(extension1ConfigurationModel.getConfigurationFactory().newInstance()).thenReturn(configInstance);
+  }
+
+  private List<RuntimeExtensionModel> getTestExtensions() {
+    return ImmutableList.<RuntimeExtensionModel>builder().add(extensionModel1).add(extensionModel2)
+        .add(extensionModel3WithRepeatedName).build();
+  }
+
+  private void testEquals(Collection<RuntimeExtensionModel> expected, Collection<RuntimeExtensionModel> obtained) {
+    assertThat(obtained.size(), is(expected.size()));
+    Iterator<RuntimeExtensionModel> expectedIterator = expected.iterator();
+    Iterator<RuntimeExtensionModel> obtainedIterator = expected.iterator();
+
+    while (expectedIterator.hasNext()) {
+      assertThat(obtainedIterator.hasNext(), is(true));
+      testEquals(expectedIterator.next(), obtainedIterator.next());
     }
+  }
 
-    @Test
-    public void getExtensions()
-    {
-        testEquals(getTestExtensions(), extensionsManager.getExtensions());
-    }
+  private void testEquals(ExtensionModel expected, ExtensionModel obtained) {
+    assertThat(obtained.getName(), equalTo(expected.getName()));
+    assertThat(obtained.getVersion(), equalTo(expected.getVersion()));
+  }
 
-    @Test
-    public void getExtensionByNameAndVendor()
-    {
-        assertThat(extensionsManager.getExtension(EXTENSION2_NAME, MULESOFT).get(), is(sameInstance(extensionModel2)));
-        assertThat(extensionsManager.getExtension(EXTENSION2_NAME, OTHER_VENDOR).get(), is(sameInstance(extensionModel3WithRepeatedName)));
-        assertThat(extensionsManager.getExtension(EXTENSION1_NAME, OTHER_VENDOR).isPresent(), is(false));
-    }
-
-    @Test
-    public void getExtensionsByName()
-    {
-        Set<RuntimeExtensionModel> extensions = extensionsManager.getExtensions(EXTENSION1_NAME);
-        assertThat(extensions, hasSize(1));
-        assertThat(extensions.iterator().next(), is(sameInstance(extensionModel1)));
-    }
-
-    @Test
-    public void contextClassLoaderKept()
-    {
-        assertThat(classLoader, sameInstance(Thread.currentThread().getContextClassLoader()));
-    }
-
-    @Test
-    public void contextClassLoaderKeptAfterException()
-    {
-        RuntimeExtensionModel extensionModel = mock(RuntimeExtensionModel.class);
-        when(extensionModel.getName()).thenThrow(new RuntimeException());
-        try
-        {
-            extensionsManager.registerExtension(extensionModel);
-            fail("was expecting an exception");
-        }
-        catch (RuntimeException e)
-        {
-            assertThat(classLoader, sameInstance(Thread.currentThread().getContextClassLoader()));
-        }
-    }
-
-    @Test
-    public void getConfigurationByName() throws Exception
-    {
-        registerConfigurationProvider();
-
-        ConfigurationInstance<Object> configurationInstance = extensionsManager.getConfiguration(EXTENSION1_CONFIG_INSTANCE_NAME, event);
-        assertThat(configurationInstance.getValue(), is(sameInstance(configInstance)));
-    }
-
-    @Test
-    public void getConfigurationThroughDefaultConfig() throws Exception
-    {
-        registerConfigurationProvider();
-
-        ConfigurationInstance<Object> configInstance = extensionsManager.getConfiguration(extensionModel1, event);
-        assertThat(configInstance.getValue(), is(sameInstance(this.configInstance)));
-    }
-
-    @Test
-    public void getConfigurationThroughImplicitConfiguration() throws Exception
-    {
-        when(extension1ConfigurationModel.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(Optional.empty());
-        registerConfigurationProvider();
-        ConfigurationInstance<Object> configInstance = extensionsManager.getConfiguration(extensionModel1, event);
-        assertThat(configInstance.getValue(), is(sameInstance(this.configInstance)));
-    }
-
-    @Test
-    public void getOperationExecutorThroughImplicitConfigurationConcurrently() throws Exception
-    {
-        final int threadCount = 2;
-        final CountDownLatch joinerLatch = new CountDownLatch(threadCount);
-
-        MuleRegistry registry = muleContext.getRegistry();
-        when(extension1ConfigurationModel.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(Optional.empty());
-        when(registry.lookupObjects(ConfigurationProvider.class)).thenReturn(emptyList());
-
-        doAnswer(invocation -> {
-            when(muleContext.getRegistry().lookupObjects(ConfigurationProvider.class)).thenReturn(asList((ConfigurationProvider) invocation.getArguments()[1]));
-            new Thread(() -> extensionsManager.getConfiguration(extensionModel1, event)).start();
-            joinerLatch.countDown();
-
-            return null;
-        }).when(registry).registerObject(anyString(), anyObject());
-
-        ConfigurationInstance<Object> configurationInstance = extensionsManager.getConfiguration(extensionModel1, event);
-        joinerLatch.countDown();
-        assertThat(joinerLatch.await(5, TimeUnit.SECONDS), is(true));
-        assertThat(configurationInstance.getValue(), is(sameInstance(configInstance)));
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void getOperationExecutorWithNotImplicitConfig()
-    {
-        when(muleContext.getRegistry().lookupObjects(ConfigurationProvider.class)).thenReturn(emptyList());
-        makeExtension1ConfigurationNotImplicit();
-
-        extensionsManager.getConfiguration(extensionModel1, event);
-    }
-
-    @Test
-    public void registerTwoExtensionsWithTheSameNameButDifferentVendor()
-    {
-        registerExtensions(extensionModel2, extensionModel3WithRepeatedName);
-        List<RuntimeExtensionModel> extensionModels = new ArrayList<>(extensionsManager.getExtensions());
-        List<String> extensionNameList = extensionModels.stream().map(ExtensionModel::getName).distinct().collect(Collectors.toList());
-        List<String> extensionVendorList = extensionModels.stream().map(ExtensionModel::getVendor).distinct().collect(Collectors.toList());
-
-        assertThat(extensionModels.size(), is(3));
-        assertThat(extensionNameList.size(), is(2));
-        assertThat(extensionVendorList.size(), is(2));
-    }
-
-    @Test
-    public void ignoresRegisteringAlreadyRegisteredExtensions()
-    {
-        final int registeredExtensionsCount = extensionsManager.getExtensions().size();
-        registerExtensions(extensionModel1, extensionModel1, extensionModel1);
-        assertThat(extensionsManager.getExtensions(), hasSize(registeredExtensionsCount));
-    }
-
-    @Test
-    public void registerFromManifest() throws Exception
-    {
-        final String version = "4.0.0";
-        ExtensionManifestBuilder builder = new ExtensionManifestBuilder()
-                .setName(HEISENBERG)
-                .setDescription(EXTENSION_DESCRIPTION)
-                .setVersion(version);
-        builder.withDescriber()
-                .setId(DESCRIBER_ID)
-                .addProperty(TYPE_PROPERTY_NAME, HeisenbergExtension.class.getName());
-
-        extensionsManager.registerExtension(builder.build(), getClass().getClassLoader());
-
-        Set<RuntimeExtensionModel> registered = extensionsManager.getExtensions(HEISENBERG);
-        assertThat(registered, hasSize(1));
-
-        final ExtensionModel registeredExtension = registered.iterator().next();
-        assertThat(registeredExtension.getName(), is(HEISENBERG));
-        assertThat(registeredExtension.getVersion(), is(version));
-    }
-
-    @Test
-    public void enumTransformer() throws Exception
-    {
-        DefaultExtensionManager extensionsManager = new DefaultExtensionManager();
-        extensionsManager.setMuleContext(muleContext);
-        extensionsManager.initialise();
-
-        ParameterModel parameter = mock(ParameterModel.class);
-        when(parameter.getType()).thenReturn(toMetadataType(TimeUnit.class));
-
-        ParameterModel parameterOfRepeatedEnumType = mock(ParameterModel.class);
-        when(parameterOfRepeatedEnumType.getType()).thenReturn(toMetadataType(TimeUnit.class));
-
-        when(extension1ConfigurationModel.getParameterModels()).thenReturn(asList(parameter, parameterOfRepeatedEnumType));
-        extensionsManager.registerExtension(extensionModel1);
-
-        verify(muleContext.getRegistry()).registerTransformer(any(StringToEnum.class));
-    }
-
-    private void makeExtension1ConfigurationNotImplicit()
-    {
-        ParameterModel parameterModel1 = mock(ParameterModel.class);
-        when(parameterModel1.isRequired()).thenReturn(true);
-
-        when(extension1ConfigurationModel.getParameterModels()).thenReturn(asList(parameterModel1, parameterModel1));
-        when(extension1ConfigurationModel.getConfigurationFactory().newInstance()).thenReturn(configInstance);
-    }
-
-    private List<RuntimeExtensionModel> getTestExtensions()
-    {
-        return ImmutableList.<RuntimeExtensionModel>builder()
-                .add(extensionModel1)
-                .add(extensionModel2)
-                .add(extensionModel3WithRepeatedName)
-                .build();
-    }
-
-    private void testEquals(Collection<RuntimeExtensionModel> expected, Collection<RuntimeExtensionModel> obtained)
-    {
-        assertThat(obtained.size(), is(expected.size()));
-        Iterator<RuntimeExtensionModel> expectedIterator = expected.iterator();
-        Iterator<RuntimeExtensionModel> obtainedIterator = expected.iterator();
-
-        while (expectedIterator.hasNext())
-        {
-            assertThat(obtainedIterator.hasNext(), is(true));
-            testEquals(expectedIterator.next(), obtainedIterator.next());
-        }
-    }
-
-    private void testEquals(ExtensionModel expected, ExtensionModel obtained)
-    {
-        assertThat(obtained.getName(), equalTo(expected.getName()));
-        assertThat(obtained.getVersion(), equalTo(expected.getVersion()));
-    }
-
-    private void registerConfigurationProvider() throws RegistrationException
-    {
-        extensionsManager.registerConfigurationProvider(extension1ConfigurationProvider);
-        verify(muleContext.getRegistry()).registerObject(extension1ConfigurationProvider.getName(), extension1ConfigurationProvider);
-        when(muleContext.getRegistry().lookupObjects(ConfigurationProvider.class)).thenReturn(asList(extension1ConfigurationProvider));
-        when(muleContext.getRegistry().get(extension1ConfigurationProvider.getName())).thenReturn(extension1ConfigurationProvider);
-    }
+  private void registerConfigurationProvider() throws RegistrationException {
+    extensionsManager.registerConfigurationProvider(extension1ConfigurationProvider);
+    verify(muleContext.getRegistry()).registerObject(extension1ConfigurationProvider.getName(), extension1ConfigurationProvider);
+    when(muleContext.getRegistry().lookupObjects(ConfigurationProvider.class))
+        .thenReturn(asList(extension1ConfigurationProvider));
+    when(muleContext.getRegistry().get(extension1ConfigurationProvider.getName())).thenReturn(extension1ConfigurationProvider);
+  }
 }

@@ -15,14 +15,14 @@ import java.util.concurrent.locks.Lock;
  *
  * Lock implementation can be changed by replacing the LockProvider in the mule registry.
  */
-public interface LockProvider
-{
-    /**
-     * Returns an instance of a {@link Lock}.
-     * 
-     * @param lockId id that identifies the {@link Lock} instance
-     * @return a {@link Lock} instance related to the lockId
-     */
-    Lock createLock(String lockId);
+public interface LockProvider {
+
+  /**
+   * Returns an instance of a {@link Lock}.
+   * 
+   * @param lockId id that identifies the {@link Lock} instance
+   * @return a {@link Lock} instance related to the lockId
+   */
+  Lock createLock(String lockId);
 
 }

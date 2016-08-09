@@ -37,117 +37,97 @@ import java.nio.file.OpenOption;
 import java.nio.file.Path;
 
 /**
- * Implementation of {@link FileSystem} for file systems
- * mounted on the host operating system.
+ * Implementation of {@link FileSystem} for file systems mounted on the host operating system.
  * <p>
- * Whenever the {@link FileSystem} contract refers to locking,
- * this implementation will resolve through a {@link LocalPathLock},
- * which produces file system level locks which rely on the host
- * operating system.
+ * Whenever the {@link FileSystem} contract refers to locking, this implementation will resolve through a {@link LocalPathLock},
+ * which produces file system level locks which rely on the host operating system.
  * <p>
- * Also, for any method returning {@link FileAttributes} instances,
- * a {@link LocalFileAttributes} will be used.
+ * Also, for any method returning {@link FileAttributes} instances, a {@link LocalFileAttributes} will be used.
  *
  * @since 4.0
  */
-public final class LocalFileSystem extends AbstractFileSystem
-{
+public final class LocalFileSystem extends AbstractFileSystem {
 
-    private final CopyCommand copyCommand;
-    private final CreateDirectoryCommand createDirectoryCommand;
-    private final DeleteCommand deleteCommand;
-    private final ListCommand listCommand;
-    private final MoveCommand moveCommand;
-    private final ReadCommand readCommand;
-    private final RenameCommand renameCommand;
-    private final WriteCommand writeCommand;
+  private final CopyCommand copyCommand;
+  private final CreateDirectoryCommand createDirectoryCommand;
+  private final DeleteCommand deleteCommand;
+  private final ListCommand listCommand;
+  private final MoveCommand moveCommand;
+  private final ReadCommand readCommand;
+  private final RenameCommand renameCommand;
+  private final WriteCommand writeCommand;
 
-    /**
-     * Creates a new instance
-     */
-    public LocalFileSystem(MuleContext muleContext)
-    {
-        copyCommand = new LocalCopyCommand(this);
-        createDirectoryCommand = new LocalCreateDirectoryCommand(this);
-        deleteCommand = new LocalDeleteCommand(this);
-        listCommand = new LocalListCommand(this);
-        moveCommand = new LocalMoveCommand(this);
-        readCommand = new LocalReadCommand(this);
-        renameCommand = new LocalRenameCommand(this);
-        writeCommand = new LocalWriteCommand(this, muleContext);
-    }
+  /**
+   * Creates a new instance
+   */
+  public LocalFileSystem(MuleContext muleContext) {
+    copyCommand = new LocalCopyCommand(this);
+    createDirectoryCommand = new LocalCreateDirectoryCommand(this);
+    deleteCommand = new LocalDeleteCommand(this);
+    listCommand = new LocalListCommand(this);
+    moveCommand = new LocalMoveCommand(this);
+    readCommand = new LocalReadCommand(this);
+    renameCommand = new LocalRenameCommand(this);
+    writeCommand = new LocalWriteCommand(this, muleContext);
+  }
 
-    @Override
-    protected CopyCommand getCopyCommand()
-    {
-        return copyCommand;
-    }
+  @Override
+  protected CopyCommand getCopyCommand() {
+    return copyCommand;
+  }
 
-    @Override
-    public CreateDirectoryCommand getCreateDirectoryCommand()
-    {
-        return createDirectoryCommand;
-    }
+  @Override
+  public CreateDirectoryCommand getCreateDirectoryCommand() {
+    return createDirectoryCommand;
+  }
 
-    @Override
-    protected DeleteCommand getDeleteCommand()
-    {
-        return deleteCommand;
-    }
+  @Override
+  protected DeleteCommand getDeleteCommand() {
+    return deleteCommand;
+  }
 
-    @Override
-    protected ListCommand getListCommand()
-    {
-        return listCommand;
-    }
+  @Override
+  protected ListCommand getListCommand() {
+    return listCommand;
+  }
 
-    @Override
-    protected MoveCommand getMoveCommand()
-    {
-        return moveCommand;
-    }
+  @Override
+  protected MoveCommand getMoveCommand() {
+    return moveCommand;
+  }
 
-    @Override
-    protected ReadCommand getReadCommand()
-    {
-        return readCommand;
-    }
+  @Override
+  protected ReadCommand getReadCommand() {
+    return readCommand;
+  }
 
-    @Override
-    protected RenameCommand getRenameCommand()
-    {
-        return renameCommand;
-    }
+  @Override
+  protected RenameCommand getRenameCommand() {
+    return renameCommand;
+  }
 
-    @Override
-    protected WriteCommand getWriteCommand()
-    {
-        return writeCommand;
-    }
+  @Override
+  protected WriteCommand getWriteCommand() {
+    return writeCommand;
+  }
 
-    @Override
-    protected PathLock createLock(Path path, Object... params)
-    {
-        return new LocalPathLock(path, ArrayUtils.isEmpty(params)
-                                       ? new OpenOption[] {WRITE}
-                                       : (OpenOption[]) params);
-    }
+  @Override
+  protected PathLock createLock(Path path, Object... params) {
+    return new LocalPathLock(path, ArrayUtils.isEmpty(params) ? new OpenOption[] {WRITE} : (OpenOption[]) params);
+  }
 
-    /**
-     * No-op implementation.
-     */
-    @Override
-    public void changeToBaseDir(FileConnectorConfig config)
-    {
-    }
+  /**
+   * No-op implementation.
+   */
+  @Override
+  public void changeToBaseDir(FileConnectorConfig config) {}
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Class<? extends FileAttributes> getAttributesType()
-    {
-        return LocalFileAttributes.class;
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Class<? extends FileAttributes> getAttributesType() {
+    return LocalFileAttributes.class;
+  }
 
 }

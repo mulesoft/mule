@@ -17,19 +17,17 @@ import java.util.List;
 /**
  * Creates {@link DbConfig} instances for Oracle databases
  */
-public class OracleDbConfigFactory extends GenericDbConfigFactory
-{
+public class OracleDbConfigFactory extends GenericDbConfigFactory {
 
-    private static final int CURSOR_TYPE_ID = -10;
-    private static final String CURSOR_TYPE_NAME = "CURSOR";
+  private static final int CURSOR_TYPE_ID = -10;
+  private static final String CURSOR_TYPE_NAME = "CURSOR";
 
-    @Override
-    protected List<DbType> getVendorDataTypes()
-    {
-        List<DbType> dbTypes = new ArrayList<DbType>();
-        dbTypes.add(new ResolvedDbType(CURSOR_TYPE_ID, CURSOR_TYPE_NAME));
-        dbTypes.add(new OracleXmlType());
+  @Override
+  protected List<DbType> getVendorDataTypes() {
+    List<DbType> dbTypes = new ArrayList<DbType>();
+    dbTypes.add(new ResolvedDbType(CURSOR_TYPE_ID, CURSOR_TYPE_NAME));
+    dbTypes.add(new OracleXmlType());
 
-        return dbTypes;
-    }
+    return dbTypes;
+  }
 }

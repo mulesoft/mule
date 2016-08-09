@@ -11,17 +11,14 @@ import static org.mule.runtime.core.el.mvel.MessageVariableResolverFactory.FLOW_
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.api.metadata.DataType;
 
-public class FlowVarExpressionDataTypeResolverTestCase extends AbstractVarExpressionDataTypeResolverTestCase
-{
+public class FlowVarExpressionDataTypeResolverTestCase extends AbstractVarExpressionDataTypeResolverTestCase {
 
-    public FlowVarExpressionDataTypeResolverTestCase()
-    {
-        super(new FlowVarExpressionDataTypeResolver(), FLOW_VARS);
-    }
+  public FlowVarExpressionDataTypeResolverTestCase() {
+    super(new FlowVarExpressionDataTypeResolver(), FLOW_VARS);
+  }
 
-    @Override
-    protected void setVariable(MuleEvent event, Object propertyValue, DataType dataType)
-    {
-        event.setFlowVariable(PROPERTY_NAME, propertyValue, dataType);
-    }
+  @Override
+  protected void setVariable(MuleEvent event, Object propertyValue, DataType dataType) {
+    event.setFlowVariable(PROPERTY_NAME, propertyValue, dataType);
+  }
 }

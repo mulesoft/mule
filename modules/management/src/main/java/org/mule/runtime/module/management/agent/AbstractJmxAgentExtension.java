@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.management.agent;
 
-public interface AbstractJmxAgentExtension
-{
+public interface AbstractJmxAgentExtension {
 
 }

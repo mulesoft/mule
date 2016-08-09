@@ -8,19 +8,16 @@ package org.mule.runtime.core.transformer.simple;
 
 import org.mule.runtime.core.api.transformer.Transformer;
 
-public class ObjectByteArrayTransformersWithObjectsTestCase extends SerialisedObjectTransformersTestCase
-{
+public class ObjectByteArrayTransformersWithObjectsTestCase extends SerialisedObjectTransformersTestCase {
 
-    @Override
-    public Transformer getTransformer() throws Exception
-    {
-        return createObject(ObjectToByteArray.class);
-    }
+  @Override
+  public Transformer getTransformer() throws Exception {
+    return createObject(ObjectToByteArray.class);
+  }
 
-    @Override
-    public Transformer getRoundTripTransformer() throws Exception
-    {
-        return createObject(ByteArrayToObject.class);
-    }
+  @Override
+  public Transformer getRoundTripTransformer() throws Exception {
+    return createObject(ByteArrayToObject.class);
+  }
 
 }

@@ -16,29 +16,26 @@ import org.slf4j.LoggerFactory;
  *
  * @since 4.0
  */
-public abstract class AbstractSocketConnection implements SocketConnection
-{
+public abstract class AbstractSocketConnection implements SocketConnection {
 
-    protected final Logger LOGGER = LoggerFactory.getLogger(getClass());
-    protected final ConnectionSettings connectionSettings;
-    protected boolean wasDisconnected = false;
+  protected final Logger LOGGER = LoggerFactory.getLogger(getClass());
+  protected final ConnectionSettings connectionSettings;
+  protected boolean wasDisconnected = false;
 
-    protected AbstractSocketConnection(ConnectionSettings connectionSettings)
-    {
-        this.connectionSettings = connectionSettings;
-    }
+  protected AbstractSocketConnection(ConnectionSettings connectionSettings) {
+    this.connectionSettings = connectionSettings;
+  }
 
-    @Override
-    public final void disconnect()
-    {
-        LOGGER.debug("Closing socket");
-        doDisconnect();
-        wasDisconnected = true;
-        LOGGER.debug("Socket was closed");
-    }
+  @Override
+  public final void disconnect() {
+    LOGGER.debug("Closing socket");
+    doDisconnect();
+    wasDisconnected = true;
+    LOGGER.debug("Socket was closed");
+  }
 
-    /**
-     * Template method that does the concrete disconnection for the socket
-     */
-    protected abstract void doDisconnect();
+  /**
+   * Template method that does the concrete disconnection for the socket
+   */
+  protected abstract void doDisconnect();
 }

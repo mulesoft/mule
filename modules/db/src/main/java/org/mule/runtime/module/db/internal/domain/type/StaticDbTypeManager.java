@@ -14,38 +14,29 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Provides a way to statically resolve {@link DbType} using a predefined
- * set of types.
+ * Provides a way to statically resolve {@link DbType} using a predefined set of types.
  */
-public class StaticDbTypeManager implements DbTypeManager
-{
+public class StaticDbTypeManager implements DbTypeManager {
 
-    private Map<String, DbType> vendorTypes = new HashMap<String, DbType>();
+  private Map<String, DbType> vendorTypes = new HashMap<String, DbType>();
 
-    public StaticDbTypeManager(List<DbType> vendorTypes)
-    {
-        for (DbType vendorType : vendorTypes)
-        {
-            this.vendorTypes.put(vendorType.getName(), vendorType);
-        }
+  public StaticDbTypeManager(List<DbType> vendorTypes) {
+    for (DbType vendorType : vendorTypes) {
+      this.vendorTypes.put(vendorType.getName(), vendorType);
     }
+  }
 
-    @Override
-    public DbType lookup(DbConnection connection, int id, String name) throws UnknownDbTypeException
-    {
-        throw new UnknownDbTypeException(id, name);
-    }
+  @Override
+  public DbType lookup(DbConnection connection, int id, String name) throws UnknownDbTypeException {
+    throw new UnknownDbTypeException(id, name);
+  }
 
-    @Override
-    public DbType lookup(DbConnection connection, String name) throws UnknownDbTypeException
-    {
-        if (vendorTypes.containsKey(name))
-        {
-            return vendorTypes.get(name);
-        }
-        else
-        {
-            throw new UnknownDbTypeException(name);
-        }
+  @Override
+  public DbType lookup(DbConnection connection, String name) throws UnknownDbTypeException {
+    if (vendorTypes.containsKey(name)) {
+      return vendorTypes.get(name);
+    } else {
+      throw new UnknownDbTypeException(name);
     }
+  }
 }

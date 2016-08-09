@@ -10,11 +10,10 @@ import org.mule.runtime.core.context.notification.RegistryNotification;
 
 
 /**
- * <code>RegistryNotificationListener</code> is an observer interface that objects
- * can implement and then register themselves with the MuleContext to be notified
- * when a Registry event occurs.
+ * <code>RegistryNotificationListener</code> is an observer interface that objects can implement and then register themselves with
+ * the MuleContext to be notified when a Registry event occurs.
  */
-public interface RegistryNotificationListener<T extends RegistryNotification> extends ServerNotificationListener<RegistryNotification>
-{
-    // no methods
+public interface RegistryNotificationListener<T extends RegistryNotification>
+    extends ServerNotificationListener<RegistryNotification> {
+  // no methods
 }

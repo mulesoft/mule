@@ -9,15 +9,13 @@ package org.mule.runtime.module.pgp;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.config.i18n.Message;
 
-public class InvalidPublicKeyException extends MuleRuntimeException
-{
+public class InvalidPublicKeyException extends MuleRuntimeException {
 
-    private static final long serialVersionUID = -6015475303289155166L;
+  private static final long serialVersionUID = -6015475303289155166L;
 
-    public InvalidPublicKeyException(Message message)
-    {
-        super(message);
-    }
+  public InvalidPublicKeyException(Message message) {
+    super(message);
+  }
 }
 
 

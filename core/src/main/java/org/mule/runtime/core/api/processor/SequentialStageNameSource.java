@@ -11,20 +11,17 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * @since 3.5.0
  */
-public class SequentialStageNameSource implements StageNameSource
-{
+public class SequentialStageNameSource implements StageNameSource {
 
-    private final String ownerName;
-    private final AtomicInteger asyncCount = new AtomicInteger(0);
+  private final String ownerName;
+  private final AtomicInteger asyncCount = new AtomicInteger(0);
 
-    public SequentialStageNameSource(String ownerName)
-    {
-        this.ownerName = ownerName;
-    }
+  public SequentialStageNameSource(String ownerName) {
+    this.ownerName = ownerName;
+  }
 
-    @Override
-    public String getName()
-    {
-        return String.format("%s.%s", this.ownerName, this.asyncCount.addAndGet(1));
-    }
+  @Override
+  public String getName() {
+    return String.format("%s.%s", this.ownerName, this.asyncCount.addAndGet(1));
+  }
 }

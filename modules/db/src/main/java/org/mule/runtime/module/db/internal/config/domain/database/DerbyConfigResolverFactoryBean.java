@@ -12,13 +12,11 @@ import org.mule.runtime.module.db.internal.resolver.database.DbConfigResolver;
 /**
  * Creates {@link DbConfigResolver} for Derby databases
  */
-public class DerbyConfigResolverFactoryBean extends DbConfigResolverFactoryBean
-{
+public class DerbyConfigResolverFactoryBean extends DbConfigResolverFactoryBean {
 
-    private static final String DRIVER_CLASS_NAME = "org.apache.derby.jdbc.EmbeddedDriver";
+  private static final String DRIVER_CLASS_NAME = "org.apache.derby.jdbc.EmbeddedDriver";
 
-    public DerbyConfigResolverFactoryBean()
-    {
-        setDriverClassName(DRIVER_CLASS_NAME);
-    }
+  public DerbyConfigResolverFactoryBean() {
+    setDriverClassName(DRIVER_CLASS_NAME);
+  }
 }

@@ -7,41 +7,35 @@
 package org.mule.runtime.module.extension.file.api.lock;
 
 /**
- * Implementation of the Null Object design pattern
- * for the {@link PathLock} interface
+ * Implementation of the Null Object design pattern for the {@link PathLock} interface
  *
  * @since 4.0
  */
-public final class NullPathLock implements PathLock
-{
+public final class NullPathLock implements PathLock {
 
-    /**
-     * Does nothing and always returns {@code true}
-     *
-     * @return {@code true}
-     */
-    @Override
-    public boolean tryLock()
-    {
-        return true;
-    }
+  /**
+   * Does nothing and always returns {@code true}
+   *
+   * @return {@code true}
+   */
+  @Override
+  public boolean tryLock() {
+    return true;
+  }
 
-    /**
-     * @return {@code false}
-     */
-    @Override
-    public boolean isLocked()
-    {
-        return false;
-    }
+  /**
+   * @return {@code false}
+   */
+  @Override
+  public boolean isLocked() {
+    return false;
+  }
 
-    /**
-     * Does nothing regardless of how many invokations
-     * the {@link #tryLock()} method has received
-     */
-    @Override
-    public void release()
-    {
-        // no-op
-    }
+  /**
+   * Does nothing regardless of how many invokations the {@link #tryLock()} method has received
+   */
+  @Override
+  public void release() {
+    // no-op
+  }
 }

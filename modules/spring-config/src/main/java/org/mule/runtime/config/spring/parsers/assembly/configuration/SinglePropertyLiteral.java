@@ -6,58 +6,48 @@
  */
 package org.mule.runtime.config.spring.parsers.assembly.configuration;
 
-public class SinglePropertyLiteral implements SingleProperty
-{
+public class SinglePropertyLiteral implements SingleProperty {
 
-    private boolean isCollection;
-    private boolean isIgnored;
-    private boolean isReference;
+  private boolean isCollection;
+  private boolean isIgnored;
+  private boolean isReference;
 
-    public SinglePropertyLiteral(boolean isCollection, boolean isIgnored, boolean isReference)
-    {
-        this.isCollection = isCollection;
-        this.isIgnored = isIgnored;
-        this.isReference = isReference;
-    }
+  public SinglePropertyLiteral(boolean isCollection, boolean isIgnored, boolean isReference) {
+    this.isCollection = isCollection;
+    this.isIgnored = isIgnored;
+    this.isReference = isReference;
+  }
 
-    public SinglePropertyLiteral(boolean isReference)
-    {
-        this(false, false, isReference);
-    }
+  public SinglePropertyLiteral(boolean isReference) {
+    this(false, false, isReference);
+  }
 
-    public SinglePropertyLiteral()
-    {
-        this(false, false, false);
-    }
+  public SinglePropertyLiteral() {
+    this(false, false, false);
+  }
 
-    public boolean isCollection()
-    {
-        return isCollection;
-    }
+  public boolean isCollection() {
+    return isCollection;
+  }
 
-    public void setCollection()
-    {
-        this.isCollection = true;
-    }
+  public void setCollection() {
+    this.isCollection = true;
+  }
 
-    public boolean isIgnored()
-    {
-        return isIgnored;
-    }
+  public boolean isIgnored() {
+    return isIgnored;
+  }
 
-    public void setIgnored()
-    {
-        this.isIgnored = true;
-    }
+  public void setIgnored() {
+    this.isIgnored = true;
+  }
 
-    public boolean isReference()
-    {
-        return isReference;
-    }
+  public boolean isReference() {
+    return isReference;
+  }
 
-    public void setReference()
-    {
-        this.isReference = true;
-    }
+  public void setReference() {
+    this.isReference = true;
+  }
 
 }

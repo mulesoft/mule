@@ -27,100 +27,86 @@ import java.nio.charset.StandardCharsets;
 import org.junit.Before;
 import org.junit.Test;
 
-public class TransformerContentTypeTestCase extends FunctionalTestCase
-{
-    private MuleClient client;
+public class TransformerContentTypeTestCase extends FunctionalTestCase {
+
+  private MuleClient client;
+
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/config/content-type-setting-transform-configs-flow.xml";
+  }
+
+  @Before
+  public void before() {
+    client = muleContext.getClient();
+  }
+
+  @Test
+  public void testContentTypesPlainXmlXml() throws Exception {
+    EchoComponent.setExpectedMimeType("text/xml");
+    MuleMessage response =
+        client.send("vm://in1?connector=vm-in1", MuleMessage.builder().payload("OK").mediaType(MediaType.TEXT).build());
+    assertNotNull(response);
+    assertEquals("OK", response.getPayload());
+  }
+
+  @Test
+  public void testContentTypesAnyXmlXml() throws Exception {
+    EchoComponent.setExpectedMimeType("text/xml");
+    MuleMessage response = client.send("vm://in1?connector=vm-in1", MuleMessage.builder().payload("OK").build());
+    assertNotNull(response);
+    assertEquals("OK", response.getPayload());
+  }
+
+  @Test
+  public void testContentTypesXmlPlainPlain() throws Exception {
+    EchoComponent.setExpectedMimeType("text/plain");
+    MuleMessage response =
+        client.send("vm://in2?connector=vm-in2", MuleMessage.builder().payload("OK").mediaType(MediaType.XML).build());
+    assertNotNull(response);
+    assertEquals("OK", response.getPayload());
+  }
+
+  @Test
+  public void testContentTypesAnyPlainPlain() throws Exception {
+    EchoComponent.setExpectedMimeType("text/plain");
+    MuleMessage response = client.send("vm://in2?connector=vm-in2", MuleMessage.builder().payload("OK").build());
+    assertNotNull(response);
+    assertEquals("OK", response.getPayload());
+  }
+
+  public static class EchoComponent implements Callable {
+
+    static String expectedMimeType;
 
     @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/config/content-type-setting-transform-configs-flow.xml";
+    public Object onCall(MuleEventContext eventContext) throws Exception {
+      MuleMessage message = eventContext.getMessage();
+      String contentType = message.getDataType().getMediaType().withoutParameters().toRfcString();
+      assertThat(contentType, is(expectedMimeType));
+      return message;
     }
 
-    @Before
-    public void before()
-    {
-        client = muleContext.getClient();
+    public static void setExpectedMimeType(String expectedContentType) {
+      EchoComponent.expectedMimeType = expectedContentType;
+    }
+  }
+
+  public static class SetTextMediaTypeTransformer extends AbstractMessageTransformer {
+
+    @Override
+    public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException {
+      return MuleMessage.builder(event.getMessage()).mediaType(MediaType.TEXT.withCharset(StandardCharsets.UTF_8)).build();
     }
 
-    @Test
-    public void testContentTypesPlainXmlXml() throws Exception
-    {
-        EchoComponent.setExpectedMimeType("text/xml");
-        MuleMessage response = client.send("vm://in1?connector=vm-in1", MuleMessage.builder().payload("OK").mediaType(MediaType.TEXT).build());
-        assertNotNull(response);
-        assertEquals("OK", response.getPayload());
+  }
+
+  public static class SetXmlMediaTypeTransformer extends AbstractMessageTransformer {
+
+    @Override
+    public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException {
+      return MuleMessage.builder(event.getMessage()).mediaType(MediaType.XML.withCharset(StandardCharsets.UTF_8)).build();
     }
 
-    @Test
-    public void testContentTypesAnyXmlXml() throws Exception
-    {
-        EchoComponent.setExpectedMimeType("text/xml");
-        MuleMessage response = client.send("vm://in1?connector=vm-in1", MuleMessage.builder().payload("OK").build());
-        assertNotNull(response);
-        assertEquals("OK", response.getPayload());
-    }
-
-    @Test
-    public void testContentTypesXmlPlainPlain() throws Exception
-    {
-        EchoComponent.setExpectedMimeType("text/plain");
-        MuleMessage response = client.send("vm://in2?connector=vm-in2", MuleMessage.builder().payload("OK").mediaType(MediaType.XML).build());
-        assertNotNull(response);
-        assertEquals("OK", response.getPayload());
-    }
-
-    @Test
-    public void testContentTypesAnyPlainPlain() throws Exception
-    {
-        EchoComponent.setExpectedMimeType("text/plain");
-        MuleMessage response = client.send("vm://in2?connector=vm-in2", MuleMessage.builder().payload("OK").build());
-        assertNotNull(response);
-        assertEquals("OK", response.getPayload());
-    }
-
-    public static class EchoComponent implements Callable
-    {
-        static String expectedMimeType;
-
-        @Override
-        public Object onCall(MuleEventContext eventContext) throws Exception
-        {
-            MuleMessage message = eventContext.getMessage();
-            String contentType = message.getDataType().getMediaType().withoutParameters().toRfcString();
-            assertThat(contentType, is(expectedMimeType));
-            return message;
-        }
-
-        public static void setExpectedMimeType(String expectedContentType)
-        {
-            EchoComponent.expectedMimeType = expectedContentType;
-        }
-    }
-
-    public static class SetTextMediaTypeTransformer extends AbstractMessageTransformer
-    {
-
-        @Override
-        public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException
-        {
-            return MuleMessage.builder(event.getMessage())
-                              .mediaType(MediaType.TEXT.withCharset(StandardCharsets.UTF_8))
-                              .build();
-        }
-
-    }
-
-    public static class SetXmlMediaTypeTransformer extends AbstractMessageTransformer
-    {
-
-        @Override
-        public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException
-        {
-            return MuleMessage.builder(event.getMessage())
-                              .mediaType(MediaType.XML.withCharset(StandardCharsets.UTF_8))
-                              .build();
-        }
-
-    }
+  }
 }

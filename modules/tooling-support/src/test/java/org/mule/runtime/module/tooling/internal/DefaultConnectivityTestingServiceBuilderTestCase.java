@@ -26,66 +26,58 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-public class DefaultConnectivityTestingServiceBuilderTestCase extends AbstractMuleTestCase
-{
+public class DefaultConnectivityTestingServiceBuilderTestCase extends AbstractMuleTestCase {
 
-    @Rule
-    public ExpectedException expectedException = none();
+  @Rule
+  public ExpectedException expectedException = none();
 
-    private RepositoryService mockRepositoryService = mock(RepositoryService.class, RETURNS_DEEP_STUBS);
-    private TemporaryArtifactBuilderFactory mockArtifactBuilderFactory = mock(TemporaryArtifactBuilderFactory.class, RETURNS_DEEP_STUBS);
-    private ServiceRegistry mockServiceRegistry = mock(ServiceRegistry.class);
-    private DefaultConnectivityTestingServiceBuilder builder;
+  private RepositoryService mockRepositoryService = mock(RepositoryService.class, RETURNS_DEEP_STUBS);
+  private TemporaryArtifactBuilderFactory mockArtifactBuilderFactory =
+      mock(TemporaryArtifactBuilderFactory.class, RETURNS_DEEP_STUBS);
+  private ServiceRegistry mockServiceRegistry = mock(ServiceRegistry.class);
+  private DefaultConnectivityTestingServiceBuilder builder;
 
-    @Before
-    public void createConnectivityTestingBuilder()
-    {
-        builder = new DefaultConnectivityTestingServiceBuilder(mockRepositoryService, mockArtifactBuilderFactory, mockServiceRegistry);
-    }
+  @Before
+  public void createConnectivityTestingBuilder() {
+    builder =
+        new DefaultConnectivityTestingServiceBuilder(mockRepositoryService, mockArtifactBuilderFactory, mockServiceRegistry);
+  }
 
-    @Test(expected = IllegalStateException.class)
-    public void noExtensionConfigured()
-    {
-        builder
-                .setArtifactConfiguration(getArtifactConfiguration())
-                .build();
-    }
+  @Test(expected = IllegalStateException.class)
+  public void noExtensionConfigured() {
+    builder.setArtifactConfiguration(getArtifactConfiguration()).build();
+  }
 
-    @Test(expected = IllegalStateException.class)
-    public void noArtifactConfiguration()
-    {
-        addExtension().build();
-    }
+  @Test(expected = IllegalStateException.class)
+  public void noArtifactConfiguration() {
+    addExtension().build();
+  }
 
-    @Test
-    public void buildArtifactNoConnectivityStrategies()
-    {
-        addExtension().setArtifactConfiguration(getArtifactConfiguration());
+  @Test
+  public void buildArtifactNoConnectivityStrategies() {
+    addExtension().setArtifactConfiguration(getArtifactConfiguration());
 
-        expectedException.expectMessage(is(NO_CONNECTIVITY_TESTING_STRATEGY_FOUND));
-        builder.build();
-    }
+    expectedException.expectMessage(is(NO_CONNECTIVITY_TESTING_STRATEGY_FOUND));
+    builder.build();
+  }
 
-    @Test
-    public void buildArtifact()
-    {
-        when(mockServiceRegistry.lookupProviders(ConnectivityTestingStrategy.class)).thenReturn(asList(mock(ConnectivityTestingStrategy.class)));
-        addExtension().setArtifactConfiguration(getArtifactConfiguration());
+  @Test
+  public void buildArtifact() {
+    when(mockServiceRegistry.lookupProviders(ConnectivityTestingStrategy.class))
+        .thenReturn(asList(mock(ConnectivityTestingStrategy.class)));
+    addExtension().setArtifactConfiguration(getArtifactConfiguration());
 
-        builder.build();
-    }
-    private DefaultConnectivityTestingServiceBuilder addExtension()
-    {
-        builder.addExtension("groupId", "artifactId", "version");
-        return builder;
-    }
+    builder.build();
+  }
 
-    private ArtifactConfiguration getArtifactConfiguration()
-    {
-        return new ArtifactConfiguration(asList(new ComponentConfiguration
-                .Builder()
-                                                        .setIdentifier("identifier")
-                                                        .setNamespace("namespace").build()));
-    }
+  private DefaultConnectivityTestingServiceBuilder addExtension() {
+    builder.addExtension("groupId", "artifactId", "version");
+    return builder;
+  }
+
+  private ArtifactConfiguration getArtifactConfiguration() {
+    return new ArtifactConfiguration(asList(new ComponentConfiguration.Builder().setIdentifier("identifier")
+        .setNamespace("namespace").build()));
+  }
 
 }

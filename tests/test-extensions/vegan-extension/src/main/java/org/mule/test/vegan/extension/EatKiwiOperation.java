@@ -10,17 +10,14 @@ import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.tck.testmodels.fruit.Kiwi;
 import org.mule.tck.testmodels.fruit.WaterMelon;
 
-public class EatKiwiOperation
-{
+public class EatKiwiOperation {
 
-    public Kiwi eatKiwi(@Connection Kiwi kiwi)
-    {
-        kiwi.bite();
-        return kiwi;
-    }
+  public Kiwi eatKiwi(@Connection Kiwi kiwi) {
+    kiwi.bite();
+    return kiwi;
+  }
 
-    public WaterMelon eatWatermelon(WaterMelon fruit)
-    {
-        throw new IllegalArgumentException("Unlike popular belief, a Kiwi is not a small water melon");
-    }
+  public WaterMelon eatWatermelon(WaterMelon fruit) {
+    throw new IllegalArgumentException("Unlike popular belief, a Kiwi is not a small water melon");
+  }
 }

@@ -31,49 +31,42 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class StoredProcedureTargetTestCase extends AbstractDbIntegrationTestCase
-{
+public class StoredProcedureTargetTestCase extends AbstractDbIntegrationTestCase {
 
-    public StoredProcedureTargetTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public StoredProcedureTargetTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Parameterized.Parameters
-    public static List<Object[]> parameters()
-    {
-        return TestDbConfig.getDerbyResource();
-    }
+  @Parameterized.Parameters
+  public static List<Object[]> parameters() {
+    return TestDbConfig.getDerbyResource();
+  }
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/storedprocedure/stored-procedure-target-config.xml"};
-    }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/storedprocedure/stored-procedure-target-config.xml"};
+  }
 
-    @Test
-    public void usesCustomTarget() throws Exception
-    {
-        final MuleEvent responseEvent = flowRunner("storedProcedureCustomTarget").withPayload(TEST_MESSAGE).run();
+  @Test
+  public void usesCustomTarget() throws Exception {
+    final MuleEvent responseEvent = flowRunner("storedProcedureCustomTarget").withPayload(TEST_MESSAGE).run();
 
-        final MuleMessage response = responseEvent.getMessage();
-        assertThat(response.getPayload(), equalTo(TEST_MESSAGE));
-        assertThat(response.getOutboundProperty("statementResult"), is(instanceOf(Map.class)));
+    final MuleMessage response = responseEvent.getMessage();
+    assertThat(response.getPayload(), equalTo(TEST_MESSAGE));
+    assertThat(response.getOutboundProperty("statementResult"), is(instanceOf(Map.class)));
 
-        verifyUpdatedRecord();
-    }
+    verifyUpdatedRecord();
+  }
 
-    private void verifyUpdatedRecord() throws SQLException
-    {
-        List<Map<String, String>> result = selectData("select * from PLANET where POSITION=4", getDefaultDataSource());
-        assertRecords(result, new Record(new Field("NAME", "Mercury"), new Field("POSITION", 4)));
-    }
+  private void verifyUpdatedRecord() throws SQLException {
+    List<Map<String, String>> result = selectData("select * from PLANET where POSITION=4", getDefaultDataSource());
+    assertRecords(result, new Record(new Field("NAME", "Mercury"), new Field("POSITION", 4)));
+  }
 
-    @Before
-    public void setupStoredProcedure() throws Exception
-    {
-        assumeThat(getDefaultDataSource(), new SupportsReturningStoredProcedureResultsWithoutParameters());
-        testDatabase.createStoredProcedureUpdateTestType1(getDefaultDataSource());
-    }
+  @Before
+  public void setupStoredProcedure() throws Exception {
+    assumeThat(getDefaultDataSource(), new SupportsReturningStoredProcedureResultsWithoutParameters());
+    testDatabase.createStoredProcedureUpdateTestType1(getDefaultDataSource());
+  }
 
 }

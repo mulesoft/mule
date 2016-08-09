@@ -33,49 +33,45 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class MuleLoggerContextFactoryTestCase
-{
-    private static final File CONFIG_LOCATION = new File("my/local/log4j2.xml");
+public class MuleLoggerContextFactoryTestCase {
 
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private CompositeApplicationClassLoader classLoader;
+  private static final File CONFIG_LOCATION = new File("my/local/log4j2.xml");
 
-    @Before
-    public void before() throws Exception
-    {
-        when(classLoader.getArtifactName()).thenReturn(getClass().getName());
-        when(classLoader.findLocalResource("log4j2.xml")).thenReturn(CONFIG_LOCATION.toURI().toURL());
-    }
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  private CompositeApplicationClassLoader classLoader;
 
-    @Test
-    public void externalConf() throws IOException
-    {
-        File customLogConfig = new File("src/test/resources/log4j2-test-custom.xml");
-        assertThat(customLogConfig.exists(), is(true));
-        final MuleLoggerContextFactory loggerCtxFactory = mockLoggerContextFactory(customLogConfig);
+  @Before
+  public void before() throws Exception {
+    when(classLoader.getArtifactName()).thenReturn(getClass().getName());
+    when(classLoader.findLocalResource("log4j2.xml")).thenReturn(CONFIG_LOCATION.toURI().toURL());
+  }
 
-        final LoggerContext ctx = loggerCtxFactory.build(classLoader, mock(ArtifactAwareContextSelector.class));
-        assertThat(ctx.getConfigLocation(), equalTo(customLogConfig.toURI()));
-    }
+  @Test
+  public void externalConf() throws IOException {
+    File customLogConfig = new File("src/test/resources/log4j2-test-custom.xml");
+    assertThat(customLogConfig.exists(), is(true));
+    final MuleLoggerContextFactory loggerCtxFactory = mockLoggerContextFactory(customLogConfig);
 
-    @Test
-    public void externalConfInvalid() throws IOException
-    {
-        File customLogConfig = new File("src/test/resources/log4j2-test-custom-invalid.xml");
-        assertThat(customLogConfig.exists(), is(false));
-        final MuleLoggerContextFactory loggerCtxFactory = mockLoggerContextFactory(customLogConfig);
+    final LoggerContext ctx = loggerCtxFactory.build(classLoader, mock(ArtifactAwareContextSelector.class));
+    assertThat(ctx.getConfigLocation(), equalTo(customLogConfig.toURI()));
+  }
 
-        final LoggerContext ctx = loggerCtxFactory.build(classLoader, mock(ArtifactAwareContextSelector.class));
-        assertThat(ctx.getConfigLocation(), equalTo(CONFIG_LOCATION.toURI()));
-    }
+  @Test
+  public void externalConfInvalid() throws IOException {
+    File customLogConfig = new File("src/test/resources/log4j2-test-custom-invalid.xml");
+    assertThat(customLogConfig.exists(), is(false));
+    final MuleLoggerContextFactory loggerCtxFactory = mockLoggerContextFactory(customLogConfig);
 
-    protected MuleLoggerContextFactory mockLoggerContextFactory(File customLogConfig) throws IOException
-    {
-        final ApplicationDescriptor appDescriptor = mock(ApplicationDescriptor.class);
-        when(appDescriptor.getLogConfigFile()).thenReturn(customLogConfig);
+    final LoggerContext ctx = loggerCtxFactory.build(classLoader, mock(ArtifactAwareContextSelector.class));
+    assertThat(ctx.getConfigLocation(), equalTo(CONFIG_LOCATION.toURI()));
+  }
 
-        final MuleLoggerContextFactory loggerCtxFactory = spy(new MuleLoggerContextFactory());
-        doReturn(appDescriptor).when(loggerCtxFactory).fetchApplicationDescriptor(any(ArtifactClassLoader.class));
-        return loggerCtxFactory;
-    }
+  protected MuleLoggerContextFactory mockLoggerContextFactory(File customLogConfig) throws IOException {
+    final ApplicationDescriptor appDescriptor = mock(ApplicationDescriptor.class);
+    when(appDescriptor.getLogConfigFile()).thenReturn(customLogConfig);
+
+    final MuleLoggerContextFactory loggerCtxFactory = spy(new MuleLoggerContextFactory());
+    doReturn(appDescriptor).when(loggerCtxFactory).fetchApplicationDescriptor(any(ArtifactClassLoader.class));
+    return loggerCtxFactory;
+  }
 }

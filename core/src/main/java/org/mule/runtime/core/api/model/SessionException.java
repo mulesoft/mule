@@ -10,30 +10,27 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.config.i18n.Message;
 
 /**
- * <code>SessionException</code> is thrown when errors occur in the DefaultMuleSession or
- * Seession Manager
+ * <code>SessionException</code> is thrown when errors occur in the DefaultMuleSession or Seession Manager
  */
-public class SessionException extends MuleException
-{
-    /**
-     * Serial version
-     */
-    private static final long serialVersionUID = -6751481096543965553L;
+public class SessionException extends MuleException {
 
-    /**
-     * @param message the exception message
-     */
-    public SessionException(Message message)
-    {
-        super(message);
-    }
+  /**
+   * Serial version
+   */
+  private static final long serialVersionUID = -6751481096543965553L;
 
-    /**
-     * @param message the exception message
-     * @param cause the exception that cause this exception to be thrown
-     */
-    public SessionException(Message message, Throwable cause)
-    {
-        super(message, cause);
-    }
+  /**
+   * @param message the exception message
+   */
+  public SessionException(Message message) {
+    super(message);
+  }
+
+  /**
+   * @param message the exception message
+   * @param cause the exception that cause this exception to be thrown
+   */
+  public SessionException(Message message, Throwable cause) {
+    super(message, cause);
+  }
 }

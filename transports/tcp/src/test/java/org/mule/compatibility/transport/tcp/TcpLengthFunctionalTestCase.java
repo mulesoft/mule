@@ -17,61 +17,55 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.junit.ClassRule;
 import org.junit.Test;
 
-public class TcpLengthFunctionalTestCase extends FunctionalTestCase
-{
+public class TcpLengthFunctionalTestCase extends FunctionalTestCase {
 
-    protected static String TEST_MESSAGE = "Test TCP Request";
-    private int timeout = 60 * 1000 / 20;
+  protected static String TEST_MESSAGE = "Test TCP Request";
+  private int timeout = 60 * 1000 / 20;
 
-    @ClassRule
-    public static DynamicPort dynamicPort1 = new DynamicPort("port1");
+  @ClassRule
+  public static DynamicPort dynamicPort1 = new DynamicPort("port1");
 
-    @ClassRule
-    public static DynamicPort dynamicPort2 = new DynamicPort("port2");
+  @ClassRule
+  public static DynamicPort dynamicPort2 = new DynamicPort("port2");
 
-    @ClassRule
-    public static DynamicPort dynamicPort3 = new DynamicPort("port3");
+  @ClassRule
+  public static DynamicPort dynamicPort3 = new DynamicPort("port3");
 
-    public TcpLengthFunctionalTestCase()
-    {
-        setDisposeContextPerClass(true);
-    }
+  public TcpLengthFunctionalTestCase() {
+    setDisposeContextPerClass(true);
+  }
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "tcp-length-functional-test-flow.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "tcp-length-functional-test-flow.xml";
+  }
 
-    @Test
-    public void testSend() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        MuleMessage result = client.send("clientEndpoint", TEST_MESSAGE, null);
-        assertEquals(TEST_MESSAGE + " Received", getPayloadAsString(result));
-    }
+  @Test
+  public void testSend() throws Exception {
+    MuleClient client = muleContext.getClient();
+    MuleMessage result = client.send("clientEndpoint", TEST_MESSAGE, null);
+    assertEquals(TEST_MESSAGE + " Received", getPayloadAsString(result));
+  }
 
-    @Test
-    public void testDispatchAndReplyViaStream() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        client.dispatch("asyncClientEndpoint1", TEST_MESSAGE, null);
-        // MULE-2754
-        Thread.sleep(200);
-        MuleMessage result =  client.request("asyncClientEndpoint1", timeout);
-        // expect failure - streaming not supported
-        assertNull(result);
-    }
+  @Test
+  public void testDispatchAndReplyViaStream() throws Exception {
+    MuleClient client = muleContext.getClient();
+    client.dispatch("asyncClientEndpoint1", TEST_MESSAGE, null);
+    // MULE-2754
+    Thread.sleep(200);
+    MuleMessage result = client.request("asyncClientEndpoint1", timeout);
+    // expect failure - streaming not supported
+    assertNull(result);
+  }
 
-    @Test
-    public void testDispatchAndReply() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        client.dispatch("asyncClientEndpoint2", TEST_MESSAGE, null);
-        // MULE-2754
-        Thread.sleep(200);
-        MuleMessage result =  client.request("asyncClientEndpoint2", timeout);
-        // expect failure - TCP simply can't work like this
-        assertNull(result);
-    }
+  @Test
+  public void testDispatchAndReply() throws Exception {
+    MuleClient client = muleContext.getClient();
+    client.dispatch("asyncClientEndpoint2", TEST_MESSAGE, null);
+    // MULE-2754
+    Thread.sleep(200);
+    MuleMessage result = client.request("asyncClientEndpoint2", timeout);
+    // expect failure - TCP simply can't work like this
+    assertNull(result);
+  }
 }

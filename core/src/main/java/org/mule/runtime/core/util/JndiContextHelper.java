@@ -16,35 +16,29 @@ import javax.naming.NamingException;
 /**
  * Common code for initialising the JNDI context.
  */
-public final class JndiContextHelper
-{
-    /** Do not instanciate. */
-    private JndiContextHelper ()
-    {
-        // no-op
+public final class JndiContextHelper {
+
+  /** Do not instanciate. */
+  private JndiContextHelper() {
+    // no-op
+  }
+
+  /**
+   * Create a new initial context.
+   * 
+   * @param environment JNDI properties or <code>null</code>. In the latter case a default constructor of
+   *        <code>InitialContext</code> will be called with standard JNDI lookup properties semantics.
+   * @return jndi context
+   * @throws NamingException if there was a JNDI error
+   */
+  public static Context initialise(final Map environment) throws NamingException {
+    Context context;
+    if (environment != null && environment.size() > 0) {
+      context = new InitialContext(new Hashtable(environment));
+    } else {
+      context = new InitialContext();
     }
 
-    /**
-     * Create a new initial context.
-     * 
-     * @param environment JNDI properties or <code>null</code>. In the latter case
-     *            a default constructor of <code>InitialContext</code> will be
-     *            called with standard JNDI lookup properties semantics.
-     * @return jndi context
-     * @throws NamingException if there was a JNDI error
-     */
-    public static Context initialise(final Map environment) throws NamingException
-    {
-        Context context;
-        if (environment != null && environment.size() > 0)
-        {
-            context = new InitialContext(new Hashtable(environment));
-        }
-        else
-        {
-            context = new InitialContext();
-        }
-
-        return context;
-    }
+    return context;
+  }
 }

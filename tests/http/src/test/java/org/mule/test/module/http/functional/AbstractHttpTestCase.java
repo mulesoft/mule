@@ -12,7 +12,7 @@ import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.functional.junit4.runners.ArtifactClassLoaderRunnerConfig;
 
 @ArtifactClassLoaderRunnerConfig(exportClasses = {HttpRequesterProvider.class, HttpRequesterConfig.class})
-public abstract class AbstractHttpTestCase extends MuleArtifactFunctionalTestCase
-{
-    protected static final int DEFAULT_TIMEOUT = 1000;
+public abstract class AbstractHttpTestCase extends MuleArtifactFunctionalTestCase {
+
+  protected static final int DEFAULT_TIMEOUT = 1000;
 }

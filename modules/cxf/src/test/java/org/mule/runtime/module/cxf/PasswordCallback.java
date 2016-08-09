@@ -17,22 +17,17 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 
 //import org.apache.ws.security.WSPasswordCallback;
 
-public class PasswordCallback implements CallbackHandler
-{
-    public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException
-    {
-        WSPasswordCallback pc = (WSPasswordCallback) callbacks[0];
+public class PasswordCallback implements CallbackHandler {
 
-        if (pc.getIdentifier().equals("joe"))
-        {
-            pc.setPassword("secret");
-        }
-        else if (pc.getIdentifier().equals("stan"))
-        {
-            pc.setPassword("elephant");
-        }
+  public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
+    WSPasswordCallback pc = (WSPasswordCallback) callbacks[0];
+
+    if (pc.getIdentifier().equals("joe")) {
+      pc.setPassword("secret");
+    } else if (pc.getIdentifier().equals("stan")) {
+      pc.setPassword("elephant");
     }
+  }
 }
-
 
 

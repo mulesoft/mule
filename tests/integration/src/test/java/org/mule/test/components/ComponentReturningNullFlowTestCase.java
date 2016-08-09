@@ -16,31 +16,27 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
-public class ComponentReturningNullFlowTestCase extends AbstractIntegrationTestCase
-{
+public class ComponentReturningNullFlowTestCase extends AbstractIntegrationTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/components/component-returned-null-flow.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/components/component-returned-null-flow.xml";
+  }
 
-    @Test
-    public void testNullReturnStopsFlow() throws Exception
-    {
-        MuleMessage msg = flowRunner("StopFlowService").withPayload(TEST_PAYLOAD).run().getMessage();
-        assertNotNull(msg);
-        final String payload = getPayloadAsString(msg);
-        assertNotNull(payload);
-        assertFalse("ERROR".equals(payload));
-        assertThat(msg.getPayload(), is(nullValue()));
-    }
+  @Test
+  public void testNullReturnStopsFlow() throws Exception {
+    MuleMessage msg = flowRunner("StopFlowService").withPayload(TEST_PAYLOAD).run().getMessage();
+    assertNotNull(msg);
+    final String payload = getPayloadAsString(msg);
+    assertNotNull(payload);
+    assertFalse("ERROR".equals(payload));
+    assertThat(msg.getPayload(), is(nullValue()));
+  }
 
-    public static final class ComponentReturningNull
-    {
-        public String process(String input)
-        {
-            return null;
-        }
+  public static final class ComponentReturningNull {
+
+    public String process(String input) {
+      return null;
     }
+  }
 }

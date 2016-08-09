@@ -12,13 +12,11 @@ import org.mule.tck.probe.file.FileExists;
 
 import java.io.File;
 
-public class DeploymentTestUtils
-{
+public class DeploymentTestUtils {
 
-    public static void assertFileExists(File pluginsDir, String filePath)
-    {
-        Prober prober = new PollingProber(5000, 100);
-        File marker = new File(pluginsDir, filePath);
-        prober.check(new FileExists(marker));
-    }
+  public static void assertFileExists(File pluginsDir, String filePath) {
+    Prober prober = new PollingProber(5000, 100);
+    File marker = new File(pluginsDir, filePath);
+    prober.check(new FileExists(marker));
+  }
 }

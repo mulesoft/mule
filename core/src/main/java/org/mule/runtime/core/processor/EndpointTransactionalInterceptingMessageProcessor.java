@@ -18,51 +18,40 @@ import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.execution.TransactionalExecutionTemplate;
 
 /**
- * Wraps the invocation of the next {@link MessageProcessor} with a transaction. If
- * the {@link TransactionConfig} is null then no transaction is used and the next
- * {@link MessageProcessor} is invoked directly.
+ * Wraps the invocation of the next {@link MessageProcessor} with a transaction. If the {@link TransactionConfig} is null then no
+ * transaction is used and the next {@link MessageProcessor} is invoked directly.
  */
-public class EndpointTransactionalInterceptingMessageProcessor extends AbstractInterceptingMessageProcessor implements NonBlockingSupported
-{
-    protected TransactionConfig transactionConfig;
+public class EndpointTransactionalInterceptingMessageProcessor extends AbstractInterceptingMessageProcessor
+    implements NonBlockingSupported {
 
-    public EndpointTransactionalInterceptingMessageProcessor(TransactionConfig transactionConfig)
-    {
-        this.transactionConfig = transactionConfig;
-    }
+  protected TransactionConfig transactionConfig;
 
-    @Override
-    public MuleEvent process(final MuleEvent event) throws MuleException
-    {
-        if (next == null)
-        {
-            return event;
+  public EndpointTransactionalInterceptingMessageProcessor(TransactionConfig transactionConfig) {
+    this.transactionConfig = transactionConfig;
+  }
+
+  @Override
+  public MuleEvent process(final MuleEvent event) throws MuleException {
+    if (next == null) {
+      return event;
+    } else {
+      ExecutionTemplate<MuleEvent> executionTemplate =
+          TransactionalExecutionTemplate.createTransactionalExecutionTemplate(muleContext, transactionConfig);
+      ExecutionCallback<MuleEvent> processingCallback = new ExecutionCallback<MuleEvent>() {
+
+        @Override
+        public MuleEvent process() throws Exception {
+          return processNext(event);
         }
-        else
-        {
-            ExecutionTemplate<MuleEvent> executionTemplate = TransactionalExecutionTemplate.createTransactionalExecutionTemplate(muleContext, transactionConfig);
-            ExecutionCallback<MuleEvent> processingCallback = new ExecutionCallback<MuleEvent>()
-            {
-                @Override
-                public MuleEvent process() throws Exception
-                {
-                    return processNext(event);
-                }
-            };
+      };
 
-            try
-            {
-                return executionTemplate.execute(processingCallback);
-            }
-            catch (MuleException e)
-            {
-                throw e;
-            }
-            catch (Exception e)
-            {
-                throw new DefaultMuleException(CoreMessages.errorInvokingMessageProcessorWithinTransaction(
-                    next, transactionConfig), e);
-            }
-        }
+      try {
+        return executionTemplate.execute(processingCallback);
+      } catch (MuleException e) {
+        throw e;
+      } catch (Exception e) {
+        throw new DefaultMuleException(CoreMessages.errorInvokingMessageProcessorWithinTransaction(next, transactionConfig), e);
+      }
     }
+  }
 }

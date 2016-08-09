@@ -14,25 +14,23 @@ import org.mule.runtime.api.connection.ConnectionValidationResult;
  *
  * @since 4.0
  */
-public interface SocketConnection
-{
+public interface SocketConnection {
 
-    /**
-     * Disconnects the connection.
-     * Does nothing if the connection was not previously connected.
-     * If an error occur while disconnecting, it will be logged with an ERROR level and the disconnection will continue.
-     */
-    void disconnect();
+  /**
+   * Disconnects the connection. Does nothing if the connection was not previously connected. If an error occur while
+   * disconnecting, it will be logged with an ERROR level and the disconnection will continue.
+   */
+  void disconnect();
 
-    /**
-     * Establish a connection ready to be used.
-     *
-     * @throws ConnectionException if the connection couldn't be established
-     */
-    void connect() throws ConnectionException;
+  /**
+   * Establish a connection ready to be used.
+   *
+   * @throws ConnectionException if the connection couldn't be established
+   */
+  void connect() throws ConnectionException;
 
-    /**
-     * Validates socket's connection
-     */
-    ConnectionValidationResult validate();
+  /**
+   * Validates socket's connection
+   */
+  ConnectionValidationResult validate();
 }

@@ -15,22 +15,20 @@ import org.mule.runtime.core.message.SessionHandler;
 
 import org.junit.Test;
 
-public class HttpServiceOverridesTestCase extends FunctionalTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "http-service-overrides.xml";
-    }
+public class HttpServiceOverridesTestCase extends FunctionalTestCase {
 
-    @Test
-    public void testSessionHandler()
-    {
-        Connector connector = muleContext.getRegistry().lookupObject("httpConnector");
-        assertTrue(connector instanceof HttpConnector);
-        
-        HttpConnector httpConnector = (HttpConnector) connector;
-        SessionHandler sessionHandler = httpConnector.getSessionHandler();
-        assertTrue(sessionHandler instanceof TestSessionHandler);
-    }
+  @Override
+  protected String getConfigFile() {
+    return "http-service-overrides.xml";
+  }
+
+  @Test
+  public void testSessionHandler() {
+    Connector connector = muleContext.getRegistry().lookupObject("httpConnector");
+    assertTrue(connector instanceof HttpConnector);
+
+    HttpConnector httpConnector = (HttpConnector) connector;
+    SessionHandler sessionHandler = httpConnector.getSessionHandler();
+    assertTrue(sessionHandler instanceof TestSessionHandler);
+  }
 }

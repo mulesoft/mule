@@ -13,93 +13,82 @@ import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.support.ManagedMap;
 
 /**
- * Helper for {@link org.springframework.beans.factory.support.BeanDefinitionBuilder} to use the proper methods
- * to populate a reference or value to a constructor or setter.
+ * Helper for {@link org.springframework.beans.factory.support.BeanDefinitionBuilder} to use the proper methods to populate a
+ * reference or value to a constructor or setter.
  *
  * @since 4.0
  */
-class BeanDefinitionBuilderHelper
-{
+class BeanDefinitionBuilderHelper {
 
-    public BeanDefinitionBuilder beanDefinitionBuilder;
+  public BeanDefinitionBuilder beanDefinitionBuilder;
 
-    public BeanDefinitionBuilderHelper(BeanDefinitionBuilder beanDefinitionBuilder)
-    {
-        this.beanDefinitionBuilder = beanDefinitionBuilder;
+  public BeanDefinitionBuilderHelper(BeanDefinitionBuilder beanDefinitionBuilder) {
+    this.beanDefinitionBuilder = beanDefinitionBuilder;
+  }
+
+  /**
+   * @param reference adds a constructor parameter which is a reference to another bean
+   */
+  public void addConstructorReference(String reference) {
+    this.beanDefinitionBuilder.addConstructorArgReference(reference);
+  }
+
+  /**
+   * @param value adds a constructor value
+   */
+  public void addConstructorValue(Object value) {
+    this.beanDefinitionBuilder.addConstructorArgValue(value);
+  }
+
+  /**
+   * @param propertyName name of the object property to use to populate values
+   * @return a helper that allows to populate values for the specified property
+   */
+  public BeanDefinitionPropertyHelper forProperty(String propertyName) {
+    return new BeanDefinitionPropertyHelper(propertyName);
+  }
+
+  /**
+   * @param propertyName name of a bean property
+   * @return true if the bean already has a value set for that property, false otherwise
+   */
+  public boolean hasValueForProperty(String propertyName) {
+    return this.beanDefinitionBuilder.getBeanDefinition().getPropertyValues().contains(propertyName);
+  }
+
+  class BeanDefinitionPropertyHelper {
+
+    private String propertyName;
+
+    private BeanDefinitionPropertyHelper(String propertyName) {
+      checkArgument(propertyName != null, "propertyName must be not null");
+      this.propertyName = propertyName;
+    }
+
+    @Override
+    public int hashCode() {
+      return super.hashCode();
     }
 
     /**
-     * @param reference adds a constructor parameter which is a reference to another bean
+     * @param reference sets a reference value to the property
      */
-    public void addConstructorReference(String reference)
-    {
-        this.beanDefinitionBuilder.addConstructorArgReference(reference);
+    public void addReference(String reference) {
+      beanDefinitionBuilder.addPropertyReference(propertyName, reference);
     }
 
     /**
-     * @param value adds a constructor value
+     * @param value sets a value to the property
      */
-    public void addConstructorValue(Object value)
-    {
-        this.beanDefinitionBuilder.addConstructorArgValue(value);
+    public void addValue(Object value) {
+      if (!isEmpty(value)) {
+        beanDefinitionBuilder.addPropertyValue(propertyName, value);
+      }
     }
 
-    /**
-     * @param propertyName name of the object property to use to populate values
-     * @return a helper that allows to populate values for the specified property
-     */
-    public BeanDefinitionPropertyHelper forProperty(String propertyName)
-    {
-        return new BeanDefinitionPropertyHelper(propertyName);
+    private boolean isEmpty(Object value) {
+      return value == null || (value instanceof ManagedList && ((ManagedList) value).isEmpty())
+          || (value instanceof ManagedMap && ((ManagedMap) value).isEmpty());
     }
-
-    /**
-     * @param propertyName name of a bean property
-     * @return true if the bean already has a value set for that property, false otherwise
-     */
-    public boolean hasValueForProperty(String propertyName)
-    {
-        return this.beanDefinitionBuilder.getBeanDefinition().getPropertyValues().contains(propertyName);
-    }
-
-    class BeanDefinitionPropertyHelper
-    {
-
-        private String propertyName;
-
-        private BeanDefinitionPropertyHelper(String propertyName)
-        {
-            checkArgument(propertyName != null, "propertyName must be not null");
-            this.propertyName = propertyName;
-        }
-
-        @Override
-        public int hashCode()
-        {
-            return super.hashCode();
-        }
-
-        /**
-         * @param reference sets a reference value to the property
-         */
-        public void addReference(String reference)
-        {
-            beanDefinitionBuilder.addPropertyReference(propertyName, reference);
-        }
-
-        /**
-         * @param value sets a value to the property
-         */
-        public void addValue(Object value)
-        {
-            if (!isEmpty(value)) {
-                beanDefinitionBuilder.addPropertyValue(propertyName, value);
-            }
-        }
-
-        private boolean isEmpty(Object value)
-        {
-            return value == null || (value instanceof ManagedList && ((ManagedList) value).isEmpty()) || (value instanceof ManagedMap && ((ManagedMap) value).isEmpty());
-        }
-    }
+  }
 }

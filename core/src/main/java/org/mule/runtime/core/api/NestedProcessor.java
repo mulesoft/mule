@@ -9,42 +9,41 @@ package org.mule.runtime.core.api;
 import java.util.Map;
 
 /**
- * Callback interface used by message processors methods. <p/>
- * The method parameters of type {@link NestedProcessor} will be able to receive other
- * message processors.
+ * Callback interface used by message processors methods.
+ * <p/>
+ * The method parameters of type {@link NestedProcessor} will be able to receive other message processors.
  */
-public interface NestedProcessor
-{
+public interface NestedProcessor {
 
-    /**
-     * Dispatch original message to the processor chain
-     *
-     * @param invocationProperties Additional invocation properties
-     * @return The return payload for the processor chain
-     */
-    Object processWithExtraProperties(Map<String, Object> invocationProperties) throws Exception;
+  /**
+   * Dispatch original message to the processor chain
+   *
+   * @param invocationProperties Additional invocation properties
+   * @return The return payload for the processor chain
+   */
+  Object processWithExtraProperties(Map<String, Object> invocationProperties) throws Exception;
 
-    /**
-     * Dispatch message to the processor chain
-     *
-     * @param payload              The payload of the message
-     * @param invocationProperties Additional invocation properties
-     * @return The return payload for the processor chain
-     */
-    Object process(Object payload, Map<String, Object> invocationProperties) throws Exception;
+  /**
+   * Dispatch message to the processor chain
+   *
+   * @param payload The payload of the message
+   * @param invocationProperties Additional invocation properties
+   * @return The return payload for the processor chain
+   */
+  Object process(Object payload, Map<String, Object> invocationProperties) throws Exception;
 
-    /**
-     * Dispatch message to the processor chain
-     *
-     * @param payload The payload of the message
-     * @return The return payload for the processor chain
-     */
-    Object process(Object payload) throws Exception;
+  /**
+   * Dispatch message to the processor chain
+   *
+   * @param payload The payload of the message
+   * @return The return payload for the processor chain
+   */
+  Object process(Object payload) throws Exception;
 
-    /**
-     * Dispatch original message to the processor chain
-     *
-     * @return The return payload for the processor chain
-     */
-    Object process() throws Exception;
+  /**
+   * Dispatch original message to the processor chain
+   *
+   * @return The return payload for the processor chain
+   */
+  Object process() throws Exception;
 }

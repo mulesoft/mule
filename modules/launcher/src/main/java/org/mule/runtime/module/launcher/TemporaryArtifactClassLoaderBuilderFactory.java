@@ -14,32 +14,30 @@ import org.mule.runtime.module.launcher.plugin.ArtifactPluginRepository;
  *
  * @since 4.0
  */
-public class TemporaryArtifactClassLoaderBuilderFactory
-{
+public class TemporaryArtifactClassLoaderBuilderFactory {
 
-    private ArtifactPluginRepository applicationPluginRepository;
-    private ArtifactPluginFactory artifactPluginFactory;
+  private ArtifactPluginRepository applicationPluginRepository;
+  private ArtifactPluginFactory artifactPluginFactory;
 
-    /**
-     * Creates an {@code ArtifactClassLoaderBuilderFactory} to create instances of {@code ArtifactClassLoaderBuilder}.
-     *
-     * @param applicationPluginRepository repository for artifacts plugins that are provided by default by the runtime
-     * @param artifactPluginFactory factory for creating an artifact plugin from it's descriptor
-     */
-    public TemporaryArtifactClassLoaderBuilderFactory(ArtifactPluginRepository applicationPluginRepository, ArtifactPluginFactory artifactPluginFactory)
-    {
-        this.applicationPluginRepository = applicationPluginRepository;
-        this.artifactPluginFactory = artifactPluginFactory;
-    }
+  /**
+   * Creates an {@code ArtifactClassLoaderBuilderFactory} to create instances of {@code ArtifactClassLoaderBuilder}.
+   *
+   * @param applicationPluginRepository repository for artifacts plugins that are provided by default by the runtime
+   * @param artifactPluginFactory factory for creating an artifact plugin from it's descriptor
+   */
+  public TemporaryArtifactClassLoaderBuilderFactory(ArtifactPluginRepository applicationPluginRepository,
+                                                    ArtifactPluginFactory artifactPluginFactory) {
+    this.applicationPluginRepository = applicationPluginRepository;
+    this.artifactPluginFactory = artifactPluginFactory;
+  }
 
-    /**
-     * Create a new instance of a builder to create an artifact class loader.
-     *
-     * @return a new instance of {@code ArtifactClassLoaderBuilder}
-     */
-    public TemporaryArtifactClassLoaderBuilder createArtifactClassLoaderBuilder()
-    {
-        return new TemporaryArtifactClassLoaderBuilder(applicationPluginRepository, artifactPluginFactory);
-    }
+  /**
+   * Create a new instance of a builder to create an artifact class loader.
+   *
+   * @return a new instance of {@code ArtifactClassLoaderBuilder}
+   */
+  public TemporaryArtifactClassLoaderBuilder createArtifactClassLoaderBuilder() {
+    return new TemporaryArtifactClassLoaderBuilder(applicationPluginRepository, artifactPluginFactory);
+  }
 
 }

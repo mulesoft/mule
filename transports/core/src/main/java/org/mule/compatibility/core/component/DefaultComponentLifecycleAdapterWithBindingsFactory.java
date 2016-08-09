@@ -15,26 +15,22 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.model.EntryPointResolverSet;
 
 /**
- * <code>DefaultComponentLifecycleAdapterFactory</code> creates a DefaultComponentLifecycleAdapter.  Users can
- * implement their own LifeCycleAdapter factories to control lifecycle events on their services such
- * as introduce other lifecycle events that are controlled by external changes.
+ * <code>DefaultComponentLifecycleAdapterFactory</code> creates a DefaultComponentLifecycleAdapter. Users can implement their own
+ * LifeCycleAdapter factories to control lifecycle events on their services such as introduce other lifecycle events that are
+ * controlled by external changes.
  *
  * @see org.mule.compatibility.core.api.component.LifecycleAdapter
  * @see org.mule.compatibility.core.api.component.LifecycleAdapterFactory
  * @see org.mule.compatibility.core.component.DefaultComponentLifecycleAdapter
  * @see org.mule.compatibility.core.component.DefaultComponentLifecycleAdapterWithBindingsFactory
  */
-public class DefaultComponentLifecycleAdapterWithBindingsFactory implements LifecycleAdapterFactory<JavaWithBindingsComponent>
-{
+public class DefaultComponentLifecycleAdapterWithBindingsFactory implements LifecycleAdapterFactory<JavaWithBindingsComponent> {
 
-    @Override
-    public LifecycleAdapter create(Object pojoService,
-                                   JavaWithBindingsComponent component,
-                                   FlowConstruct flowConstruct,
-                                   EntryPointResolverSet resolver,
-                                   MuleContext muleContext) throws MuleException
-    {
-        return new DefaultComponentLifecycleAdapterWithBindings(pojoService, component, flowConstruct, resolver, muleContext);
-    }
+  @Override
+  public LifecycleAdapter create(Object pojoService, JavaWithBindingsComponent component, FlowConstruct flowConstruct,
+                                 EntryPointResolverSet resolver, MuleContext muleContext)
+      throws MuleException {
+    return new DefaultComponentLifecycleAdapterWithBindings(pojoService, component, flowConstruct, resolver, muleContext);
+  }
 
 }

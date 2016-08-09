@@ -37,310 +37,253 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.junit.Test;
 
-public class RequestContextTestCase extends AbstractMuleTestCase
-{
+public class RequestContextTestCase extends AbstractMuleTestCase {
 
-    private boolean threadSafeEvent;
+  private boolean threadSafeEvent;
 
-    @Test
-    public void testSetExceptionPayloadAcrossThreads() throws InterruptedException
-    {
-        threadSafeEvent = true;
-        MuleEvent event = new DummyEvent();
-        runThread(event, false);
-        runThread(event, true);
+  @Test
+  public void testSetExceptionPayloadAcrossThreads() throws InterruptedException {
+    threadSafeEvent = true;
+    MuleEvent event = new DummyEvent();
+    runThread(event, false);
+    runThread(event, true);
+  }
+
+  @Test
+  public void testFailureWithoutThreadSafeEvent() throws InterruptedException {
+    threadSafeEvent = false;
+    MuleEvent event = new DummyEvent();
+    runThread(event, false);
+    runThread(event, true);
+  }
+
+  protected void runThread(MuleEvent event, boolean doTest) throws InterruptedException {
+    AtomicBoolean success = new AtomicBoolean(false);
+    Thread thread = new Thread(new SetExceptionPayload(event, success));
+    thread.start();
+    thread.join();
+    if (doTest) {
+      // Since events are now immutable, there should be no failures due to this!
+      assertEquals(true, success.get());
+    }
+  }
+
+  private class SetExceptionPayload implements Runnable {
+
+    private MuleEvent event;
+    private AtomicBoolean success;
+
+    public SetExceptionPayload(MuleEvent event, AtomicBoolean success) {
+      this.event = event;
+      this.success = success;
     }
 
-    @Test
-    public void testFailureWithoutThreadSafeEvent() throws InterruptedException
-    {
-        threadSafeEvent = false;
-        MuleEvent event = new DummyEvent();
-        runThread(event, false);
-        runThread(event, true);
+    @Override
+    public void run() {
+      try {
+        OptimizedRequestContext.unsafeSetEvent(event);
+        RequestContext.setExceptionPayload(new DefaultExceptionPayload(new Exception()));
+        success.set(true);
+      } catch (RuntimeException e) {
+        logger.error("error in thread", e);
+      }
     }
 
-    protected void runThread(MuleEvent event, boolean doTest) throws InterruptedException
-    {
-        AtomicBoolean success = new AtomicBoolean(false);
-        Thread thread = new Thread(new SetExceptionPayload(event, success));
-        thread.start();
-        thread.join();
-        if (doTest)
-        {
-            // Since events are now immutable, there should be no failures due to this!
-            assertEquals(true, success.get());
-        }
+  }
+
+  private class DummyEvent implements MuleEvent {
+
+    private MuleMessage message = MuleMessage.builder().payload("").build();
+
+    @Override
+    public MuleMessage getMessage() {
+      return message;
     }
 
-    private class SetExceptionPayload implements Runnable
-    {
+    @Override
+    public Credentials getCredentials() {
+      return null;
+    }
 
-        private MuleEvent event;
-        private AtomicBoolean success;
+    @Override
+    public byte[] getMessageAsBytes() throws MuleException {
+      return new byte[0];
+    }
 
-        public SetExceptionPayload(MuleEvent event, AtomicBoolean success)
-        {
-            this.event = event;
-            this.success = success;
-        }
+    @Override
+    public Object transformMessage(Class outputType) throws TransformerException {
+      return null;
+    }
 
-        @Override
-        public void run()
-        {
-            try
-            {
-                OptimizedRequestContext.unsafeSetEvent(event);
-                RequestContext.setExceptionPayload(new DefaultExceptionPayload(new Exception()));
-                success.set(true);
-            }
-            catch (RuntimeException e)
-            {
-                logger.error("error in thread", e);
-            }
-        }
+    @Override
+    public String transformMessageToString() throws TransformerException {
+      return null;
+    }
+
+    @Override
+    public String getMessageAsString() throws MuleException {
+      return null;
+    }
+
+    @Override
+    public Object transformMessage(DataType outputType) throws TransformerException {
+      return null;
+    }
+
+    @Override
+    public String getMessageAsString(Charset encoding) throws MuleException {
+      return null;
+    }
+
+    @Override
+    public String getId() {
+      return null;
+    }
+
+    @Override
+    public MuleSession getSession() {
+      return null;
+    }
+
+    @Override
+    public FlowConstruct getFlowConstruct() {
+      return null;
+    }
+
+    @Override
+    public boolean isStopFurtherProcessing() {
+      return false;
+    }
+
+    @Override
+    public void setStopFurtherProcessing(boolean stopFurtherProcessing) {
+      // no action
+    }
+
+    @Override
+    public int getTimeout() {
+      return 0;
+    }
+
+    @Override
+    public void setTimeout(int timeout) {
+      // no action
+    }
+
+    @Override
+    public OutputStream getOutputStream() {
+      return null;
+    }
+
+    @Override
+    public MuleContext getMuleContext() {
+      return null;
+    }
+
+    @Override
+    public ProcessingTime getProcessingTime() {
+      return null;
+    }
+
+    @Override
+    public MessageExchangePattern getExchangePattern() {
+      return null;
+    }
+
+    @Override
+    public boolean isTransacted() {
+      return false;
+    }
+
+    @Override
+    public URI getMessageSourceURI() {
+      return URI.create("test://test");
+    }
+
+    @Override
+    public String getMessageSourceName() {
+      return "test";
+    }
+
+    @Override
+    public ReplyToHandler getReplyToHandler() {
+      return null;
+    }
+
+    @Override
+    public Object getReplyToDestination() {
+      return null;
+    }
+
+    @Override
+    public boolean isSynchronous() {
+      return false;
+    }
+
+    @Override
+    public void setMessage(MuleMessage message) {}
+
+    @Override
+    public DataType getFlowVariableDataType(String key) {
+      return null;
+    }
+
+    @Override
+    public void clearFlowVariables() {}
+
+    @Override
+    public Object getFlowVariable(String key) {
+      return null;
+    }
+
+    @Override
+    public void setFlowVariable(String key, Object value) {}
+
+    @Override
+    public void setFlowVariable(String key, Object value, DataType dataType) {
 
     }
 
-    private class DummyEvent implements MuleEvent
-    {
+    @Override
+    public void removeFlowVariable(String key) {}
 
-        private MuleMessage message = MuleMessage.builder().payload("").build();
-
-        @Override
-        public MuleMessage getMessage()
-        {
-            return message;
-        }
-
-        @Override
-        public Credentials getCredentials()
-        {
-            return null;
-        }
-
-        @Override
-        public byte[] getMessageAsBytes() throws MuleException
-        {
-            return new byte[0];
-        }
-
-        @Override
-        public Object transformMessage(Class outputType) throws TransformerException
-        {
-            return null;
-        }
-
-        @Override
-        public String transformMessageToString() throws TransformerException
-        {
-            return null;
-        }
-
-        @Override
-        public String getMessageAsString() throws MuleException
-        {
-            return null;
-        }
-
-        @Override
-        public Object transformMessage(DataType outputType) throws TransformerException
-        {
-            return null;
-        }
-
-        @Override
-        public String getMessageAsString(Charset encoding) throws MuleException
-        {
-            return null;
-        }
-
-        @Override
-        public String getId()
-        {
-            return null;
-        }
-
-        @Override
-        public MuleSession getSession()
-        {
-            return null;
-        }
-
-        @Override
-        public FlowConstruct getFlowConstruct()
-        {
-            return null;
-        }
-
-        @Override
-        public boolean isStopFurtherProcessing()
-        {
-            return false;
-        }
-
-        @Override
-        public void setStopFurtherProcessing(boolean stopFurtherProcessing)
-        {
-            // no action
-        }
-
-        @Override
-        public int getTimeout()
-        {
-            return 0;
-        }
-
-        @Override
-        public void setTimeout(int timeout)
-        {
-            // no action
-        }
-
-        @Override
-        public OutputStream getOutputStream()
-        {
-            return null;
-        }
-
-        @Override
-        public MuleContext getMuleContext()
-        {
-            return null;
-        }
-
-        @Override
-        public ProcessingTime getProcessingTime()
-        {
-            return null;
-        }
-
-        @Override
-        public MessageExchangePattern getExchangePattern()
-        {
-            return null;
-        }
-
-        @Override
-        public boolean isTransacted()
-        {
-            return false;
-        }
-
-        @Override
-        public URI getMessageSourceURI()
-        {
-            return URI.create("test://test");
-        }
-
-        @Override
-        public String getMessageSourceName()
-        {
-            return "test";
-        }
-
-        @Override
-        public ReplyToHandler getReplyToHandler()
-        {
-            return null;
-        }
-
-        @Override
-        public Object getReplyToDestination()
-        {
-            return null;
-        }
-
-        @Override
-        public boolean isSynchronous()
-        {
-            return false;
-        }
-
-        @Override
-        public void setMessage(MuleMessage message)
-        {
-        }
-
-        @Override
-        public DataType getFlowVariableDataType(String key)
-        {
-            return null;
-        }
-
-        @Override
-        public void clearFlowVariables()
-        {
-        }
-
-        @Override
-        public Object getFlowVariable(String key)
-        {
-            return null;
-        }
-
-        @Override
-        public void setFlowVariable(String key, Object value)
-        {
-        }
-
-        @Override
-        public void setFlowVariable(String key, Object value, DataType dataType)
-        {
-
-        }
-
-        @Override
-        public void removeFlowVariable(String key)
-        {
-        }
-
-        @Override
-        public Set<String> getFlowVariableNames()
-        {
-            return Collections.emptySet();
-        }
-
-        @Override
-        public boolean isNotificationsEnabled()
-        {
-            return true;
-        }
-
-        @Override
-        public void setEnableNotifications(boolean enabled)
-        {
-        }
-
-        @Override
-        public boolean isAllowNonBlocking()
-        {
-            return false;
-        }
-
-        @Override
-        public FlowCallStack getFlowCallStack()
-        {
-            return null;
-        }
-
-        @Override
-        public ProcessorsTrace getProcessorsTrace()
-        {
-            return null;
-        }
-
-        @Override
-        public SecurityContext getSecurityContext()
-        {
-            return null;
-        }
-
-        @Override
-        public void setSecurityContext(SecurityContext context)
-        {
-
-        }
+    @Override
+    public Set<String> getFlowVariableNames() {
+      return Collections.emptySet();
     }
+
+    @Override
+    public boolean isNotificationsEnabled() {
+      return true;
+    }
+
+    @Override
+    public void setEnableNotifications(boolean enabled) {}
+
+    @Override
+    public boolean isAllowNonBlocking() {
+      return false;
+    }
+
+    @Override
+    public FlowCallStack getFlowCallStack() {
+      return null;
+    }
+
+    @Override
+    public ProcessorsTrace getProcessorsTrace() {
+      return null;
+    }
+
+    @Override
+    public SecurityContext getSecurityContext() {
+      return null;
+    }
+
+    @Override
+    public void setSecurityContext(SecurityContext context) {
+
+    }
+  }
 
 }

@@ -11,27 +11,21 @@ import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceFactory;
 import org.mule.runtime.core.util.ClassUtils;
 
-public final class DefaultSourceFactory implements SourceFactory
-{
+public final class DefaultSourceFactory implements SourceFactory {
 
-    private final Class<? extends Source> sourceType;
+  private final Class<? extends Source> sourceType;
 
-    public DefaultSourceFactory(Class<? extends Source> sourceType)
-    {
-        checkInstantiable(sourceType);
-        this.sourceType = sourceType;
+  public DefaultSourceFactory(Class<? extends Source> sourceType) {
+    checkInstantiable(sourceType);
+    this.sourceType = sourceType;
+  }
+
+  @Override
+  public Source createSource() {
+    try {
+      return ClassUtils.instanciateClass(sourceType);
+    } catch (Exception e) {
+      throw new RuntimeException("Exception found trying to instantiate source type " + sourceType.getName(), e);
     }
-
-    @Override
-    public Source createSource()
-    {
-        try
-        {
-            return ClassUtils.instanciateClass(sourceType);
-        }
-        catch (Exception e)
-        {
-            throw new RuntimeException("Exception found trying to instantiate source type " + sourceType.getName(), e);
-        }
-    }
+  }
 }

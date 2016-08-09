@@ -24,73 +24,61 @@ import javax.mail.internet.MimeMultipart;
 /**
  * Creates multipart
  */
-public class HttpMultipartEncoder
-{
+public class HttpMultipartEncoder {
 
-    private static final String FORM_DATA = "form-data";
-    public static final String ATTACHMENT = "attachment";
+  private static final String FORM_DATA = "form-data";
+  public static final String ATTACHMENT = "attachment";
 
-    public static MimeMultipart createMultpartContent(MultipartHttpEntity body, String contentType)
-    {
-        String contentTypeSubType = HttpParser.getContentTypeSubType(contentType);
-        MimeMultipart mimeMultipartContent = new HttpMimeMultipart(contentType, contentTypeSubType);
-        final Collection<HttpPart> parts = body.getParts();
+  public static MimeMultipart createMultpartContent(MultipartHttpEntity body, String contentType) {
+    String contentTypeSubType = HttpParser.getContentTypeSubType(contentType);
+    MimeMultipart mimeMultipartContent = new HttpMimeMultipart(contentType, contentTypeSubType);
+    final Collection<HttpPart> parts = body.getParts();
 
-        for (HttpPart part : parts)
-        {
-            final InternetHeaders internetHeaders = new InternetHeaders();
-            for (String headerName : part.getHeaderNames())
-            {
-                final Collection<String> headerValues = part.getHeaders(headerName);
-                for (String headerValue : headerValues)
-                {
-                    internetHeaders.addHeader(headerName, headerValue);
-                }
-            }
-            if (internetHeaders.getHeader(CONTENT_DISPOSITION) == null)
-            {
-                String partType = contentTypeSubType.equals(FORM_DATA) ? FORM_DATA : ATTACHMENT;
-                internetHeaders.addHeader(CONTENT_DISPOSITION, getContentDisposition(part, partType));
-            }
-            if (internetHeaders.getHeader(CONTENT_TYPE) == null && part.getContentType() != null)
-            {
-                internetHeaders.addHeader(CONTENT_TYPE, part.getContentType());
-            }
-            try
-            {
-                final byte[] partContent = IOUtils.toByteArray(part.getInputStream());
-                mimeMultipartContent.addBodyPart(new MimeBodyPart(internetHeaders, partContent));
-            }
-            catch (Exception e)
-            {
-                throw new RuntimeException(e);
-            }
+    for (HttpPart part : parts) {
+      final InternetHeaders internetHeaders = new InternetHeaders();
+      for (String headerName : part.getHeaderNames()) {
+        final Collection<String> headerValues = part.getHeaders(headerName);
+        for (String headerValue : headerValues) {
+          internetHeaders.addHeader(headerName, headerValue);
         }
-        return mimeMultipartContent;
+      }
+      if (internetHeaders.getHeader(CONTENT_DISPOSITION) == null) {
+        String partType = contentTypeSubType.equals(FORM_DATA) ? FORM_DATA : ATTACHMENT;
+        internetHeaders.addHeader(CONTENT_DISPOSITION, getContentDisposition(part, partType));
+      }
+      if (internetHeaders.getHeader(CONTENT_TYPE) == null && part.getContentType() != null) {
+        internetHeaders.addHeader(CONTENT_TYPE, part.getContentType());
+      }
+      try {
+        final byte[] partContent = IOUtils.toByteArray(part.getInputStream());
+        mimeMultipartContent.addBodyPart(new MimeBodyPart(internetHeaders, partContent));
+      } catch (Exception e) {
+        throw new RuntimeException(e);
+      }
     }
+    return mimeMultipartContent;
+  }
 
-    private static String getContentDisposition(HttpPart part, String partType)
-    {
-        StringBuilder builder = new StringBuilder();
-        builder.append(partType);
-        builder.append("; name=\"");
-        builder.append(part.getName());
-        builder.append("\"");
-        if (part.getFileName() != null)
-        {
-            builder.append("; filename=\"");
-            builder.append(part.getFileName());
-            builder.append("\"");
-        }
-        return builder.toString();
+  private static String getContentDisposition(HttpPart part, String partType) {
+    StringBuilder builder = new StringBuilder();
+    builder.append(partType);
+    builder.append("; name=\"");
+    builder.append(part.getName());
+    builder.append("\"");
+    if (part.getFileName() != null) {
+      builder.append("; filename=\"");
+      builder.append(part.getFileName());
+      builder.append("\"");
     }
+    return builder.toString();
+  }
 
-    public static byte[] createMultipartContent(MultipartHttpEntity multipartEntity, String contentType) throws IOException, MessagingException
-    {
-        MimeMultipart mimeMultipartContent = HttpMultipartEncoder.createMultpartContent(multipartEntity, contentType);
-        final ByteArrayOutputStream byteArrayOutputStream;
-        byteArrayOutputStream = new ByteArrayOutputStream();
-        mimeMultipartContent.writeTo(byteArrayOutputStream);
-        return byteArrayOutputStream.toByteArray();
-    }
+  public static byte[] createMultipartContent(MultipartHttpEntity multipartEntity, String contentType)
+      throws IOException, MessagingException {
+    MimeMultipart mimeMultipartContent = HttpMultipartEncoder.createMultpartContent(multipartEntity, contentType);
+    final ByteArrayOutputStream byteArrayOutputStream;
+    byteArrayOutputStream = new ByteArrayOutputStream();
+    mimeMultipartContent.writeTo(byteArrayOutputStream);
+    return byteArrayOutputStream.toByteArray();
+  }
 }

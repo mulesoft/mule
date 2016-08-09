@@ -17,87 +17,77 @@ import org.junit.Test;
 /**
  * Test to ensure that Mule always uses the real
  */
-public class SpringAOPSpringBeanLookupTestCase extends AbstractIntegrationTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/config/spring/spring-aop-springbeanlookup-config.xml";
-    }
+public class SpringAOPSpringBeanLookupTestCase extends AbstractIntegrationTestCase {
 
-    @Override
-    protected boolean isStartContext()
-    {
-        return false;
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/config/spring/spring-aop-springbeanlookup-config.xml";
+  }
 
-    @Override
-    protected boolean isDisposeContextPerClass()
-    {
-        return false;
-    }
+  @Override
+  protected boolean isStartContext() {
+    return false;
+  }
 
-    @Test
-    public void beanType() throws Exception
-    {
-        ObjectFactory prototype = getPrototypeSpringObjectFactory();
-        ObjectFactory singleton = getSingletonSpringObjectFactory();
+  @Override
+  protected boolean isDisposeContextPerClass() {
+    return false;
+  }
 
-        assertProxy(prototype.getObjectClass());
-        assertProxy(singleton.getObjectClass());
-    }
+  @Test
+  public void beanType() throws Exception {
+    ObjectFactory prototype = getPrototypeSpringObjectFactory();
+    ObjectFactory singleton = getSingletonSpringObjectFactory();
 
-    @Test
-    public void beanTypeAfterInstantiation() throws Exception
-    {
-        ObjectFactory prototype = getPrototypeSpringObjectFactory();
-        ObjectFactory singleton = getSingletonSpringObjectFactory();
-        prototype.getInstance(muleContext);
-        singleton.getInstance(muleContext);
+    assertProxy(prototype.getObjectClass());
+    assertProxy(singleton.getObjectClass());
+  }
 
-        assertProxy(prototype.getObjectClass());
-        assertProxy(singleton.getObjectClass());
-    }
+  @Test
+  public void beanTypeAfterInstantiation() throws Exception {
+    ObjectFactory prototype = getPrototypeSpringObjectFactory();
+    ObjectFactory singleton = getSingletonSpringObjectFactory();
+    prototype.getInstance(muleContext);
+    singleton.getInstance(muleContext);
 
-    @Test
-    public void beanTypeContextStarted() throws Exception
-    {
-        muleContext.start();
+    assertProxy(prototype.getObjectClass());
+    assertProxy(singleton.getObjectClass());
+  }
 
-        ObjectFactory prototype = getPrototypeSpringObjectFactory();
-        ObjectFactory singleton = getSingletonSpringObjectFactory();
+  @Test
+  public void beanTypeContextStarted() throws Exception {
+    muleContext.start();
 
-        assertProxy(prototype.getObjectClass());
-        assertProxy(singleton.getObjectClass());
-    }
+    ObjectFactory prototype = getPrototypeSpringObjectFactory();
+    ObjectFactory singleton = getSingletonSpringObjectFactory();
 
-    @Test
-    public void beanTypeContextStartedAfterInstantiation() throws Exception
-    {
-        muleContext.start();
+    assertProxy(prototype.getObjectClass());
+    assertProxy(singleton.getObjectClass());
+  }
 
-        ObjectFactory prototype = getPrototypeSpringObjectFactory();
-        ObjectFactory singleton = getSingletonSpringObjectFactory();
-        prototype.getInstance(muleContext);
-        singleton.getInstance(muleContext);
+  @Test
+  public void beanTypeContextStartedAfterInstantiation() throws Exception {
+    muleContext.start();
 
-        assertProxy(prototype.getObjectClass());
-        assertProxy(singleton.getObjectClass());
-    }
+    ObjectFactory prototype = getPrototypeSpringObjectFactory();
+    ObjectFactory singleton = getSingletonSpringObjectFactory();
+    prototype.getInstance(muleContext);
+    singleton.getInstance(muleContext);
 
-    private void assertProxy(Class<?> clazz)
-    {
-        assertTrue(clazz.getName().contains("$Proxy"));
-    }
+    assertProxy(prototype.getObjectClass());
+    assertProxy(singleton.getObjectClass());
+  }
 
-    private ObjectFactory getPrototypeSpringObjectFactory() throws Exception
-    {
-        return ((JavaComponent)((Flow)getFlowConstruct("flow")).getMessageProcessors().get(0)).getObjectFactory();
-    }
+  private void assertProxy(Class<?> clazz) {
+    assertTrue(clazz.getName().contains("$Proxy"));
+  }
 
-    private ObjectFactory getSingletonSpringObjectFactory() throws Exception
-    {
-        return ((JavaComponent)((Flow)getFlowConstruct("flow")).getMessageProcessors().get(1)).getObjectFactory();
-    }
+  private ObjectFactory getPrototypeSpringObjectFactory() throws Exception {
+    return ((JavaComponent) ((Flow) getFlowConstruct("flow")).getMessageProcessors().get(0)).getObjectFactory();
+  }
+
+  private ObjectFactory getSingletonSpringObjectFactory() throws Exception {
+    return ((JavaComponent) ((Flow) getFlowConstruct("flow")).getMessageProcessors().get(1)).getObjectFactory();
+  }
 
 }

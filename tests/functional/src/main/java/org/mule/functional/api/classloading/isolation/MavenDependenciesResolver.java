@@ -12,19 +12,18 @@ package org.mule.functional.api.classloading.isolation;
  *
  * @since 4.0
  */
-public interface MavenDependenciesResolver
-{
+public interface MavenDependenciesResolver {
 
-    /**
-     * Creates a dependency graph where with all the transitive dependencies, including duplicates. By duplicates it means that it
-     * is not the dependency tree resolved by maven where it takes the approach of resolving the duplicates dependencies by nearest algorithm.
-     * This case the whole graph of dependencies and duplicates, two artifacts depend on the same third artifact, those dependencies would
-     * appear in graph too.
-     *
-     * @throws IllegalStateException if the dependencies are empty
-     * @return it generates the dependencies for the maven artifact where the resolver is being called.
-     * It returns a {@link DependenciesGraph} that holds the rootArtifact, dependencies and transitive dependencies for each dependency.
-     * The rootArtifact represents the current maven artifact that the test belongs to.
-     */
-    DependenciesGraph buildDependencies();
+  /**
+   * Creates a dependency graph where with all the transitive dependencies, including duplicates. By duplicates it means that it
+   * is not the dependency tree resolved by maven where it takes the approach of resolving the duplicates dependencies by nearest
+   * algorithm. This case the whole graph of dependencies and duplicates, two artifacts depend on the same third artifact, those
+   * dependencies would appear in graph too.
+   *
+   * @throws IllegalStateException if the dependencies are empty
+   * @return it generates the dependencies for the maven artifact where the resolver is being called. It returns a
+   *         {@link DependenciesGraph} that holds the rootArtifact, dependencies and transitive dependencies for each dependency.
+   *         The rootArtifact represents the current maven artifact that the test belongs to.
+   */
+  DependenciesGraph buildDependencies();
 }

@@ -10,29 +10,25 @@ import org.mule.runtime.extension.api.introspection.ModelProperty;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 
 /**
- * A {@link ModelProperty} meant to be applied on {@link ParameterModel}
- * instances which represent an infrastructure parameter
+ * A {@link ModelProperty} meant to be applied on {@link ParameterModel} instances which represent an infrastructure parameter
  *
  * @since 4.0
  */
-public class InfrastructureParameterModelProperty implements ModelProperty
-{
+public class InfrastructureParameterModelProperty implements ModelProperty {
 
-    /**
-     * @return {@code infrastructureParameter}
-     */
-    @Override
-    public String getName()
-    {
-        return "infrastructureParameter";
-    }
+  /**
+   * @return {@code infrastructureParameter}
+   */
+  @Override
+  public String getName() {
+    return "infrastructureParameter";
+  }
 
-    /**
-     * @return {@code false}
-     */
-    @Override
-    public boolean isExternalizable()
-    {
-        return false;
-    }
+  /**
+   * @return {@code false}
+   */
+  @Override
+  public boolean isExternalizable() {
+    return false;
+  }
 }

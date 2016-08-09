@@ -14,9 +14,9 @@ import java.io.OutputStream;
 import java.nio.charset.Charset;
 
 
-public interface WireFormat extends MuleContextAware
-{
-    Object read(InputStream is) throws MuleException;
+public interface WireFormat extends MuleContextAware {
 
-    void write(OutputStream out, Object o, Charset encoding) throws MuleException;
+  Object read(InputStream is) throws MuleException;
+
+  void write(OutputStream out, Object o, Charset encoding) throws MuleException;
 }

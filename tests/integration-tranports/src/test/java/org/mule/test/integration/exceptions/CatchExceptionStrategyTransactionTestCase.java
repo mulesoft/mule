@@ -27,151 +27,134 @@ import org.mule.runtime.core.transaction.TransactionCoordination;
 
 import org.junit.Test;
 
-public class CatchExceptionStrategyTransactionTestCase extends FunctionalTestCase
-{
+public class CatchExceptionStrategyTransactionTestCase extends FunctionalTestCase {
 
-    private static final int TIMEOUT = 5000;
-    private static final int SHORT_TIMEOUT = 100;
-    private static final String MESSAGE = "any message";
-    private static final String SINGLE_TRANSACTION_BEHAVIOR_FLOW = "singleTransactionBehavior";
-    private static final String XA_TRANSACTION_BEHAVIOR_FLOW = "xaTransactionBehavior";
-    private static final String TRANSACTION_COMMIT_FAILS_FLOW = "transactionCommitFails";
-    private static final String IN_2_VM_ENDPOINT = "vm://vmIn2";
-    private static final String IN_3_VM_ENDPOINT = "vm://in3";
-    private static final String IN_1_JMS_ENDPOINT = "jms://in1?connector=activeMq";
-    private static final String IN_2_JMS_ENDPOINT = "jms://in2?connector=activeMq";
-    private static final String OUT_2_JMS_ENDPOINT = "jms://out2?connector=activeMq";
+  private static final int TIMEOUT = 5000;
+  private static final int SHORT_TIMEOUT = 100;
+  private static final String MESSAGE = "any message";
+  private static final String SINGLE_TRANSACTION_BEHAVIOR_FLOW = "singleTransactionBehavior";
+  private static final String XA_TRANSACTION_BEHAVIOR_FLOW = "xaTransactionBehavior";
+  private static final String TRANSACTION_COMMIT_FAILS_FLOW = "transactionCommitFails";
+  private static final String IN_2_VM_ENDPOINT = "vm://vmIn2";
+  private static final String IN_3_VM_ENDPOINT = "vm://in3";
+  private static final String IN_1_JMS_ENDPOINT = "jms://in1?connector=activeMq";
+  private static final String IN_2_JMS_ENDPOINT = "jms://in2?connector=activeMq";
+  private static final String OUT_2_JMS_ENDPOINT = "jms://out2?connector=activeMq";
 
-    private Transaction mockTransaction = mock(Transaction.class);
-    
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/integration/exceptions/catch-exception-strategy-transaction-flow.xml";
-    }
+  private Transaction mockTransaction = mock(Transaction.class);
 
-    @Test
-    public void singleTransactionIsCommittedOnFailure() throws Exception
-    {
-        getFunctionalTestComponent(SINGLE_TRANSACTION_BEHAVIOR_FLOW).setEventCallback(getFailureCallback());
-        MuleClient client = muleContext.getClient();
-        ExceptionListener exceptionListener = new ExceptionListener(muleContext);
-        exceptionListener.setTimeoutInMillis(TIMEOUT);
-        client.dispatch(IN_1_JMS_ENDPOINT, MESSAGE, null);
-        exceptionListener.waitUntilAllNotificationsAreReceived();
-        stopFlowConstruct(SINGLE_TRANSACTION_BEHAVIOR_FLOW);
-        MuleMessage request = client.request(IN_1_JMS_ENDPOINT, SHORT_TIMEOUT);
-        assertThat(request, nullValue());
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/integration/exceptions/catch-exception-strategy-transaction-flow.xml";
+  }
 
-    @Test
-    public void singleTransactionIsCommittedOnFailureButCommitFails() throws Exception
-    {
-        getFunctionalTestComponent(SINGLE_TRANSACTION_BEHAVIOR_FLOW).setEventCallback(replaceTransactionWithMockAndFailComponent());
-        MuleClient client = muleContext.getClient();
-        ExceptionListener exceptionListener = new ExceptionListener(muleContext);
-        exceptionListener.setTimeoutInMillis(TIMEOUT);
-        SystemExceptionListener systemExceptionListener = new SystemExceptionListener(muleContext).setTimeoutInMillis(TIMEOUT);
-        client.dispatch(IN_1_JMS_ENDPOINT, MESSAGE, null);
-        exceptionListener.waitUntilAllNotificationsAreReceived();
-        stopFlowConstruct(SINGLE_TRANSACTION_BEHAVIOR_FLOW);
-        systemExceptionListener.waitUntilAllNotificationsAreReceived();
-        MuleMessage request = client.request(IN_1_JMS_ENDPOINT, SHORT_TIMEOUT);
-        assertThat(request, notNullValue());
-    }
+  @Test
+  public void singleTransactionIsCommittedOnFailure() throws Exception {
+    getFunctionalTestComponent(SINGLE_TRANSACTION_BEHAVIOR_FLOW).setEventCallback(getFailureCallback());
+    MuleClient client = muleContext.getClient();
+    ExceptionListener exceptionListener = new ExceptionListener(muleContext);
+    exceptionListener.setTimeoutInMillis(TIMEOUT);
+    client.dispatch(IN_1_JMS_ENDPOINT, MESSAGE, null);
+    exceptionListener.waitUntilAllNotificationsAreReceived();
+    stopFlowConstruct(SINGLE_TRANSACTION_BEHAVIOR_FLOW);
+    MuleMessage request = client.request(IN_1_JMS_ENDPOINT, SHORT_TIMEOUT);
+    assertThat(request, nullValue());
+  }
 
-    @Test
-    public void xaTransactionIsCommittedOnFailure() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        ExceptionListener exceptionListener = new ExceptionListener(muleContext);
-        exceptionListener.setTimeoutInMillis(TIMEOUT);
-        client.dispatch(IN_2_JMS_ENDPOINT, MESSAGE, null);
-        exceptionListener.waitUntilAllNotificationsAreReceived();
-        stopFlowConstruct(XA_TRANSACTION_BEHAVIOR_FLOW);
-        MuleMessage outMessage = client.request(OUT_2_JMS_ENDPOINT, TIMEOUT);
-        assertThat(outMessage, notNullValue());
-        assertThat(getPayloadAsString(outMessage), is(MESSAGE));
-        MuleMessage inMessage = client.request(IN_2_JMS_ENDPOINT, SHORT_TIMEOUT);
-        assertThat(inMessage, nullValue());
-        MuleMessage inVmMessage = client.request(IN_2_VM_ENDPOINT, TIMEOUT);
-        assertThat(inVmMessage, notNullValue());
-        assertThat(getPayloadAsString(inVmMessage), is(MESSAGE));
-    }
+  @Test
+  public void singleTransactionIsCommittedOnFailureButCommitFails() throws Exception {
+    getFunctionalTestComponent(SINGLE_TRANSACTION_BEHAVIOR_FLOW).setEventCallback(replaceTransactionWithMockAndFailComponent());
+    MuleClient client = muleContext.getClient();
+    ExceptionListener exceptionListener = new ExceptionListener(muleContext);
+    exceptionListener.setTimeoutInMillis(TIMEOUT);
+    SystemExceptionListener systemExceptionListener = new SystemExceptionListener(muleContext).setTimeoutInMillis(TIMEOUT);
+    client.dispatch(IN_1_JMS_ENDPOINT, MESSAGE, null);
+    exceptionListener.waitUntilAllNotificationsAreReceived();
+    stopFlowConstruct(SINGLE_TRANSACTION_BEHAVIOR_FLOW);
+    systemExceptionListener.waitUntilAllNotificationsAreReceived();
+    MuleMessage request = client.request(IN_1_JMS_ENDPOINT, SHORT_TIMEOUT);
+    assertThat(request, notNullValue());
+  }
 
-    @Test
-    public void transactionCommitFailureTriggersExceptionStrategy() throws Exception
-    {
-        transactionCommitFailureExecutesExceptionStrategy(getTestMuleMessage());
-    }
+  @Test
+  public void xaTransactionIsCommittedOnFailure() throws Exception {
+    MuleClient client = muleContext.getClient();
+    ExceptionListener exceptionListener = new ExceptionListener(muleContext);
+    exceptionListener.setTimeoutInMillis(TIMEOUT);
+    client.dispatch(IN_2_JMS_ENDPOINT, MESSAGE, null);
+    exceptionListener.waitUntilAllNotificationsAreReceived();
+    stopFlowConstruct(XA_TRANSACTION_BEHAVIOR_FLOW);
+    MuleMessage outMessage = client.request(OUT_2_JMS_ENDPOINT, TIMEOUT);
+    assertThat(outMessage, notNullValue());
+    assertThat(getPayloadAsString(outMessage), is(MESSAGE));
+    MuleMessage inMessage = client.request(IN_2_JMS_ENDPOINT, SHORT_TIMEOUT);
+    assertThat(inMessage, nullValue());
+    MuleMessage inVmMessage = client.request(IN_2_VM_ENDPOINT, TIMEOUT);
+    assertThat(inVmMessage, notNullValue());
+    assertThat(getPayloadAsString(inVmMessage), is(MESSAGE));
+  }
 
-    @Test
-    public void transactionCommitFailureTriggersExceptionStrategyUsingFilter() throws Exception
-    {
-        final MuleMessage muleMessage = MuleMessage.builder().payload(TEST_PAYLOAD).addOutboundProperty("filterMessage", true).build();
-        transactionCommitFailureExecutesExceptionStrategy(muleMessage);
-    }
+  @Test
+  public void transactionCommitFailureTriggersExceptionStrategy() throws Exception {
+    transactionCommitFailureExecutesExceptionStrategy(getTestMuleMessage());
+  }
 
-    private void transactionCommitFailureExecutesExceptionStrategy(MuleMessage muleMessage) throws Exception
-    {
-        getFunctionalTestComponent(TRANSACTION_COMMIT_FAILS_FLOW).setEventCallback(replaceTransactionWithMock());
-        ExceptionListener exceptionListener = new ExceptionListener(muleContext);
-        muleContext.getClient().dispatch(IN_3_VM_ENDPOINT, muleMessage);
-        exceptionListener.waitUntilAllNotificationsAreReceived();
-        stopFlowConstruct(TRANSACTION_COMMIT_FAILS_FLOW);
-        exceptionListener.assertExpectedException(MessagingException.class);
-    }
+  @Test
+  public void transactionCommitFailureTriggersExceptionStrategyUsingFilter() throws Exception {
+    final MuleMessage muleMessage =
+        MuleMessage.builder().payload(TEST_PAYLOAD).addOutboundProperty("filterMessage", true).build();
+    transactionCommitFailureExecutesExceptionStrategy(muleMessage);
+  }
 
-    @Test
-    public void transactionCommitFailureWithinCatchExceptionStrategy() throws Exception
-    {
-        SystemExceptionListener systemExceptionListener = new SystemExceptionListener(muleContext);
-        getFunctionalTestComponent(TRANSACTION_COMMIT_FAILS_FLOW).setEventCallback(replaceTransactionWithMockAndFailComponent());
-        ExceptionListener exceptionListener = new ExceptionListener(muleContext);
-        muleContext.getClient().dispatch(IN_3_VM_ENDPOINT, getTestMuleMessage());
-        exceptionListener.waitUntilAllNotificationsAreReceived();
-        stopFlowConstruct(TRANSACTION_COMMIT_FAILS_FLOW);
-        systemExceptionListener.waitUntilAllNotificationsAreReceived();
-    }
+  private void transactionCommitFailureExecutesExceptionStrategy(MuleMessage muleMessage) throws Exception {
+    getFunctionalTestComponent(TRANSACTION_COMMIT_FAILS_FLOW).setEventCallback(replaceTransactionWithMock());
+    ExceptionListener exceptionListener = new ExceptionListener(muleContext);
+    muleContext.getClient().dispatch(IN_3_VM_ENDPOINT, muleMessage);
+    exceptionListener.waitUntilAllNotificationsAreReceived();
+    stopFlowConstruct(TRANSACTION_COMMIT_FAILS_FLOW);
+    exceptionListener.assertExpectedException(MessagingException.class);
+  }
 
-    private EventCallback replaceTransactionWithMock(final EventCallback processEventCallback) throws Exception
-    {
-        when(mockTransaction.supports(anyObject(), anyObject())).thenReturn(true);
-        doAnswer(invocationOnMock ->
-        {
-            TransactionCoordination.getInstance().unbindTransaction(mockTransaction);
-            throw new RuntimeException();
-        }).when(mockTransaction).commit();
-        return (context, component) ->
-        {
-            context.getCurrentTransaction().rollback();
-            TransactionCoordination.getInstance().bindTransaction(mockTransaction);
-            processEventCallback.eventReceived(context, component);
-        };
-    }
+  @Test
+  public void transactionCommitFailureWithinCatchExceptionStrategy() throws Exception {
+    SystemExceptionListener systemExceptionListener = new SystemExceptionListener(muleContext);
+    getFunctionalTestComponent(TRANSACTION_COMMIT_FAILS_FLOW).setEventCallback(replaceTransactionWithMockAndFailComponent());
+    ExceptionListener exceptionListener = new ExceptionListener(muleContext);
+    muleContext.getClient().dispatch(IN_3_VM_ENDPOINT, getTestMuleMessage());
+    exceptionListener.waitUntilAllNotificationsAreReceived();
+    stopFlowConstruct(TRANSACTION_COMMIT_FAILS_FLOW);
+    systemExceptionListener.waitUntilAllNotificationsAreReceived();
+  }
 
-    private EventCallback replaceTransactionWithMock() throws Exception
-    {
-        return replaceTransactionWithMock((context, component) ->
-        {
-            //Do nothing
-        });
-    }
+  private EventCallback replaceTransactionWithMock(final EventCallback processEventCallback) throws Exception {
+    when(mockTransaction.supports(anyObject(), anyObject())).thenReturn(true);
+    doAnswer(invocationOnMock -> {
+      TransactionCoordination.getInstance().unbindTransaction(mockTransaction);
+      throw new RuntimeException();
+    }).when(mockTransaction).commit();
+    return (context, component) -> {
+      context.getCurrentTransaction().rollback();
+      TransactionCoordination.getInstance().bindTransaction(mockTransaction);
+      processEventCallback.eventReceived(context, component);
+    };
+  }
 
-    private EventCallback replaceTransactionWithMockAndFailComponent() throws Exception
-    {
-        return replaceTransactionWithMock((context, component) ->
-        {
-            throw new RuntimeException();
-        });
-    }
+  private EventCallback replaceTransactionWithMock() throws Exception {
+    return replaceTransactionWithMock((context, component) -> {
+      // Do nothing
+    });
+  }
 
-    private EventCallback getFailureCallback()
-    {
-        return (context, component) ->
-        {
-            throw new RuntimeException();
-        };
-    }
+  private EventCallback replaceTransactionWithMockAndFailComponent() throws Exception {
+    return replaceTransactionWithMock((context, component) -> {
+      throw new RuntimeException();
+    });
+  }
+
+  private EventCallback getFailureCallback() {
+    return (context, component) -> {
+      throw new RuntimeException();
+    };
+  }
 
 }

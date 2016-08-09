@@ -21,18 +21,16 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * <code>ReflectEntryPointResolver</code> is used to determine the entry point on a service
- * after an event has been received for it. The entrypoint is  discovered using
- * the event payload type(s) as the argument using reflection. An entry point will try and match for
- * different argument types, so it's possible to have multiple entry points on a
- * single service.
+ * <code>ReflectEntryPointResolver</code> is used to determine the entry point on a service after an event has been received for
+ * it. The entrypoint is discovered using the event payload type(s) as the argument using reflection. An entry point will try and
+ * match for different argument types, so it's possible to have multiple entry points on a single service.
  * <p/>
- * For multiple parameters the payload of context.getMessage().getPayload() should be an Array of objects.
- * If the message payload is of type {@link org.mule.runtime.api.message.NullPayload} the resolver will look for a no-argument
- * method to call that doesn't match the set of ignoredMethods on the resolver.
+ * For multiple parameters the payload of context.getMessage().getPayload() should be an Array of objects. If the message payload
+ * is of type {@link org.mule.runtime.api.message.NullPayload} the resolver will look for a no-argument method to call that
+ * doesn't match the set of ignoredMethods on the resolver.
  * <p/>
- * Also a set of 'ignored' methods are available (and the use can add others) to tell the resolver to not
- * resolve to these methods. The default ones are:
+ * Also a set of 'ignored' methods are available (and the use can add others) to tell the resolver to not resolve to these
+ * methods. The default ones are:
  * <ul>
  * <li>{@link #toString()}
  * <li>{@link #getClass()}
@@ -45,139 +43,121 @@ import java.util.Set;
  * <li>'get*'.
  * <li>'set*'.
  * </ul>
- * <p/> Note that wildcard expressions can be used.
+ * <p/>
+ * Note that wildcard expressions can be used.
  */
-public class ReflectionEntryPointResolver extends AbstractEntryPointResolver
-{
-    // we don't want to match these methods when looking for a service method
-    private Set<String> ignoredMethods = new HashSet<String>(Arrays.asList("equals",
-            "getInvocationHandler", "set*", "toString",
-            "getClass", "notify", "notifyAll", "wait", "hashCode", "clone", "is*", "get*"));
+public class ReflectionEntryPointResolver extends AbstractEntryPointResolver {
 
-    protected WildcardFilter filter;
+  // we don't want to match these methods when looking for a service method
+  private Set<String> ignoredMethods =
+      new HashSet<String>(Arrays.asList("equals", "getInvocationHandler", "set*", "toString", "getClass", "notify", "notifyAll",
+                                        "wait", "hashCode", "clone", "is*", "get*"));
 
-    public ReflectionEntryPointResolver()
-    {
-        updateFilter();
+  protected WildcardFilter filter;
+
+  public ReflectionEntryPointResolver() {
+    updateFilter();
+  }
+
+  private void updateFilter() {
+    filter = new WildcardFilter(StringUtils.join(ignoredMethods, ','));
+  }
+
+  /**
+   * Returns an unmodifiable Set of ignoredMethods on this resolver To add method to the resolver use
+   * {@link #addIgnoredMethod(String)}
+   *
+   * @return unmodifiable set of method names set on this resolver
+   */
+  public Set<String> getIgnoredMethods() {
+    return Collections.unmodifiableSet(ignoredMethods);
+  }
+
+  public void setIgnoredMethods(Set<String> methods) {
+    this.ignoredMethods = new HashSet<String>(methods);
+    updateFilter();
+  }
+
+  public void addIgnoredMethod(String name) {
+    this.ignoredMethods.add(name);
+    updateFilter();
+  }
+
+  public boolean removeIgnoredMethod(String name) {
+    boolean result = this.ignoredMethods.remove(name);
+    updateFilter();
+    return result;
+  }
+
+  /**
+   * Will discover the entrypoint on the service using the payload type to figure out the method to call. For multiple parameters
+   * the payload of context.getMessage().geTPayload() should be an Array of objects. If the message payload is of type
+   * {@link org.mule.runtime.api.message.NullPayload} the resolver will look for a no-argument method to call that doesn't match
+   * the set of ignoredMethods on the resover.
+   *
+   * @throws Exception
+   */
+  public InvocationResult invoke(Object component, MuleEventContext context) throws Exception {
+    Object[] payload = getPayloadFromMessage(context);
+
+    Method method;
+    InvocationResult result;
+
+    method = this.getMethodByArguments(component, payload);
+
+    if (method != null) {
+      return invokeMethod(component, method, payload);
     }
 
-    private void updateFilter()
-    {
-        filter = new WildcardFilter(StringUtils.join(ignoredMethods, ','));
-    }
+    Class<?>[] types = ClassUtils.getClassTypes(payload);
 
-    /**
-     * Returns an unmodifiable Set of ignoredMethods on this resolver
-     * To add method to the resolver use {@link #addIgnoredMethod(String)}
-     *
-     * @return unmodifiable set of method names set on this resolver
-     */
-    public Set<String> getIgnoredMethods()
-    {
-        return Collections.unmodifiableSet(ignoredMethods);
-    }
+    // do any methods on the service accept a context?
+    List<Method> methods =
+        ClassUtils.getSatisfiableMethods(component.getClass(), types, isAcceptVoidMethods(), false, ignoredMethods, filter);
 
-    public void setIgnoredMethods(Set<String> methods)
-    {
-        this.ignoredMethods = new HashSet<String>(methods);
-        updateFilter();
-    }
+    int numMethods = methods.size();
+    if (numMethods > 1) {
+      result = new InvocationResult(this, InvocationResult.State.FAILED);
+      // too many methods match the context argument
+      result.setErrorTooManyMatchingMethods(component, types, StringMessageUtils.toString(methods));
+      return result;
 
-    public void addIgnoredMethod(String name)
-    {
-        this.ignoredMethods.add(name);
-        updateFilter();
-    }
+    } else if (numMethods == 1) {
+      // found exact match for method with context argument
+      method = this.addMethodByArguments(component, methods.get(0), payload);
+    } else {
+      methods =
+          ClassUtils.getSatisfiableMethods(component.getClass(), ClassUtils.getClassTypes(payload), true, true, ignoredMethods);
 
-    public boolean removeIgnoredMethod(String name)
-    {
-        boolean result = this.ignoredMethods.remove(name);
-        updateFilter();
+      numMethods = methods.size();
+
+      if (numMethods > 1) {
+        result = new InvocationResult(this, InvocationResult.State.FAILED);
+        // too many methods match the context argument
+        result.setErrorTooManyMatchingMethods(component, types, StringMessageUtils.toString(methods));
         return result;
+      } else if (numMethods == 1) {
+        // found exact match for payload argument
+        method = this.addMethodByArguments(component, methods.get(0), payload);
+      } else {
+        result = new InvocationResult(this, InvocationResult.State.FAILED);
+        // no method for payload argument either - bail out
+        result.setErrorNoMatchingMethods(component, ClassUtils.getClassTypes(payload));
+        return result;
+      }
     }
 
-    /**
-     * Will discover the entrypoint on the service using the payload type to figure out the method to call.
-     * For multiple parameters the payload of context.getMessage().geTPayload() should be an Array of objects.
-     * If the message payload is of type {@link org.mule.runtime.api.message.NullPayload} the resolver will look for a no-argument
-     * method to call that doesn't match the set of ignoredMethods on the resover.
-     *
-     * @throws Exception
-     */
-    public InvocationResult invoke(Object component, MuleEventContext context) throws Exception
-    {
-        Object[] payload = getPayloadFromMessage(context);
-
-        Method method;
-        InvocationResult result;
-
-        method = this.getMethodByArguments(component, payload);
-
-        if (method != null)
-        {
-            return invokeMethod(component, method, payload);
-        }
-
-        Class<?>[] types = ClassUtils.getClassTypes(payload);
-
-        // do any methods on the service accept a context?
-        List<Method> methods = ClassUtils.getSatisfiableMethods(component.getClass(), types,
-                isAcceptVoidMethods(), false, ignoredMethods, filter);
-
-        int numMethods = methods.size();
-        if (numMethods > 1)
-        {
-            result = new InvocationResult(this, InvocationResult.State.FAILED);
-            // too many methods match the context argument
-            result.setErrorTooManyMatchingMethods(component, types, StringMessageUtils.toString(methods));
-            return result;
-
-        }
-        else if (numMethods == 1)
-        {
-            // found exact match for method with context argument
-            method = this.addMethodByArguments(component, methods.get(0), payload);
-        }
-        else
-        {
-            methods = ClassUtils.getSatisfiableMethods(component.getClass(), 
-                ClassUtils.getClassTypes(payload), true, true, ignoredMethods);
-
-            numMethods = methods.size();
-
-            if (numMethods > 1)
-            {
-                result = new InvocationResult(this, InvocationResult.State.FAILED);
-                // too many methods match the context argument
-                result.setErrorTooManyMatchingMethods(component, types, StringMessageUtils.toString(methods));
-                return result;
-            }
-            else if (numMethods == 1)
-            {
-                // found exact match for payload argument
-                method = this.addMethodByArguments(component, methods.get(0), payload);
-            }
-            else
-            {
-                result = new InvocationResult(this, InvocationResult.State.FAILED);
-                // no method for payload argument either - bail out
-                result.setErrorNoMatchingMethods(component, ClassUtils.getClassTypes(payload));
-                return result;
-            }
-        }
-
-        return invokeMethod(component, method, payload);
-    }
+    return invokeMethod(component, method, payload);
+  }
 
 
-    @Override
-    public String toString()
-    {
-        final StringBuilder sb = new StringBuilder();
-        sb.append("ReflectionEntryPointResolver");
-        sb.append("{ignoredMethods=").append(StringMessageUtils.toString(ignoredMethods));
-        sb.append(", acceptVoidMethods=").append(isAcceptVoidMethods());
-        sb.append('}');
-        return sb.toString();
-    }
+  @Override
+  public String toString() {
+    final StringBuilder sb = new StringBuilder();
+    sb.append("ReflectionEntryPointResolver");
+    sb.append("{ignoredMethods=").append(StringMessageUtils.toString(ignoredMethods));
+    sb.append(", acceptVoidMethods=").append(isAcceptVoidMethods());
+    sb.append('}');
+    return sb.toString();
+  }
 }

@@ -19,48 +19,37 @@ import javax.transaction.TransactionManager;
 /**
  * <code>TestTransactionManagerFactory</code> TODO
  */
-public class TestTransactionManagerFactory extends GenericTransactionManagerLookupFactory
-{
-    @Override
-    public TransactionManager create(MuleConfiguration config) throws Exception
-    {
-        return (TransactionManager) Proxy.newProxyInstance(getClass().getClassLoader(),
-                                                           new Class[] {TransactionManager.class},
-                                                           new InternalInvocationHandler());
+public class TestTransactionManagerFactory extends GenericTransactionManagerLookupFactory {
+
+  @Override
+  public TransactionManager create(MuleConfiguration config) throws Exception {
+    return (TransactionManager) Proxy.newProxyInstance(getClass().getClassLoader(), new Class[] {TransactionManager.class},
+                                                       new InternalInvocationHandler());
+  }
+
+  @Override
+  public void initialise() {
+    // shortcut super's implementation
+  }
+
+  public class InternalInvocationHandler implements InvocationHandler {
+
+    public TestTransactionManagerFactory getParent() {
+      return TestTransactionManagerFactory.this;
     }
 
     @Override
-    public void initialise()
-    {
-        // shortcut super's implementation
+    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+      if (Object.class.equals(method.getDeclaringClass())) {
+        try {
+          return method.invoke(this, args);
+        } catch (InvocationTargetException e) {
+          throw e.getCause();
+        }
+      } else {
+        return null;
+      }
     }
 
-    public class InternalInvocationHandler implements InvocationHandler
-    {
-        public TestTransactionManagerFactory getParent()
-        {
-            return TestTransactionManagerFactory.this;
-        }
-
-        @Override
-        public Object invoke (Object proxy, Method method, Object[] args) throws Throwable
-        {
-            if (Object.class.equals(method.getDeclaringClass()))
-            {
-                try
-                {
-                    return method.invoke(this, args);
-                }
-                catch (InvocationTargetException e)
-                {
-                    throw e.getCause();
-                }
-            }
-            else
-            {
-                return null;
-            }
-        }
-
-    }
+  }
 }

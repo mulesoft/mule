@@ -11,13 +11,11 @@ import org.mule.runtime.core.transformer.AbstractTransformer;
 
 import java.nio.charset.Charset;
 
-public class FailingRuntimeTransformer extends AbstractTransformer
-{
+public class FailingRuntimeTransformer extends AbstractTransformer {
 
-    @Override
-    protected Object doTransform(Object src, Charset encoding) throws TransformerException
-    {
-        throw new RuntimeException("test");
-    }
+  @Override
+  protected Object doTransform(Object src, Charset encoding) throws TransformerException {
+    throw new RuntimeException("test");
+  }
 
 }

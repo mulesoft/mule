@@ -27,74 +27,61 @@ import org.xml.sax.ContentHandler;
 /**
  * <code>XmlToDomDocument</code> transforms a XML String to org.w3c.dom.Document.
  */
-public class XmlToDomDocument extends AbstractXmlTransformer implements DiscoverableTransformer
-{
-    private int priorityWeighting = DiscoverableTransformer.DEFAULT_PRIORITY_WEIGHTING;
+public class XmlToDomDocument extends AbstractXmlTransformer implements DiscoverableTransformer {
 
-    @Override
-    public Object transformMessage(MuleEvent event, Charset encoding) throws TransformerException
-    {
-        Object src = event.getMessage().getPayload();
-        try
-        {
-            Source sourceDoc = XMLUtils.toXmlSource(getXMLInputFactory(), isUseStaxSource(), src);
-            if (sourceDoc == null)
-            {
-                return null;
-            }
+  private int priorityWeighting = DiscoverableTransformer.DEFAULT_PRIORITY_WEIGHTING;
 
-            if (XMLStreamReader.class.isAssignableFrom(getReturnDataType().getType()))
-            {
-                return getXMLInputFactory().createXMLStreamReader(sourceDoc);
-            }
-            else if (getReturnDataType().getType().isAssignableFrom(sourceDoc.getClass()))
-            {
-                return sourceDoc;
-            }
+  @Override
+  public Object transformMessage(MuleEvent event, Charset encoding) throws TransformerException {
+    Object src = event.getMessage().getPayload();
+    try {
+      Source sourceDoc = XMLUtils.toXmlSource(getXMLInputFactory(), isUseStaxSource(), src);
+      if (sourceDoc == null) {
+        return null;
+      }
 
-            // If returnClass is not set, assume W3C DOM
-            // This is the original behaviour
-            ResultHolder holder = getResultHolder(getReturnDataType().getType());
-            if (holder == null)
-            {
-                holder = getResultHolder(Document.class);
-            }
+      if (XMLStreamReader.class.isAssignableFrom(getReturnDataType().getType())) {
+        return getXMLInputFactory().createXMLStreamReader(sourceDoc);
+      } else if (getReturnDataType().getType().isAssignableFrom(sourceDoc.getClass())) {
+        return sourceDoc;
+      }
 
-            Result result = holder.getResult();
+      // If returnClass is not set, assume W3C DOM
+      // This is the original behaviour
+      ResultHolder holder = getResultHolder(getReturnDataType().getType());
+      if (holder == null) {
+        holder = getResultHolder(Document.class);
+      }
 
-            if (result instanceof DocumentResult)
-            {
-                DocumentResult dr = (DocumentResult) holder.getResult();
-                ContentHandler contentHandler = dr.getHandler();
-                if (contentHandler instanceof SAXContentHandler)
-                {
-                    //The following code is used to avoid the splitting
-                    //of text inside DOM elements.
-                    ((SAXContentHandler) contentHandler).setMergeAdjacentText(true);
-                }
-            }
+      Result result = holder.getResult();
 
-            Transformer idTransformer = XMLUtils.getTransformer();
-            idTransformer.setOutputProperty(OutputKeys.ENCODING, encoding.name());
-            idTransformer.transform(sourceDoc, holder.getResult());
-
-            return holder.getResultObject();
+      if (result instanceof DocumentResult) {
+        DocumentResult dr = (DocumentResult) holder.getResult();
+        ContentHandler contentHandler = dr.getHandler();
+        if (contentHandler instanceof SAXContentHandler) {
+          // The following code is used to avoid the splitting
+          // of text inside DOM elements.
+          ((SAXContentHandler) contentHandler).setMergeAdjacentText(true);
         }
-        catch (Exception e)
-        {
-            throw new TransformerException(this, e);
-        }
-    }
+      }
 
-    @Override
-    public int getPriorityWeighting()
-    {
-        return priorityWeighting;
-    }
+      Transformer idTransformer = XMLUtils.getTransformer();
+      idTransformer.setOutputProperty(OutputKeys.ENCODING, encoding.name());
+      idTransformer.transform(sourceDoc, holder.getResult());
 
-    @Override
-    public void setPriorityWeighting(int priorityWeighting)
-    {
-        this.priorityWeighting = priorityWeighting;
+      return holder.getResultObject();
+    } catch (Exception e) {
+      throw new TransformerException(this, e);
     }
+  }
+
+  @Override
+  public int getPriorityWeighting() {
+    return priorityWeighting;
+  }
+
+  @Override
+  public void setPriorityWeighting(int priorityWeighting) {
+    this.priorityWeighting = priorityWeighting;
+  }
 }

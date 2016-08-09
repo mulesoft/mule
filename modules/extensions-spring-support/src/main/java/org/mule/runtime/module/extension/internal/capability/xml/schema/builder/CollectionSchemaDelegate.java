@@ -26,63 +26,59 @@ import org.mule.runtime.module.extension.internal.xml.SchemaConstants;
  *
  * @since 4.0.0
  */
-class CollectionSchemaDelegate
-{
+class CollectionSchemaDelegate {
 
-    private final ObjectFactory objectFactory = new ObjectFactory();
-    private final SchemaBuilder builder;
+  private final ObjectFactory objectFactory = new ObjectFactory();
+  private final SchemaBuilder builder;
 
-    CollectionSchemaDelegate(SchemaBuilder builder)
-    {
-        this.builder = builder;
-    }
+  CollectionSchemaDelegate(SchemaBuilder builder) {
+    this.builder = builder;
+  }
 
-    void generateCollectionElement(ArrayType metadataType, DslElementSyntax collectionDsl, String description, boolean required, ExplicitGroup all)
-    {
-        LocalComplexType collectionComplexType = generateCollectionComplexType(collectionDsl, metadataType);
+  void generateCollectionElement(ArrayType metadataType, DslElementSyntax collectionDsl, String description, boolean required,
+                                 ExplicitGroup all) {
+    LocalComplexType collectionComplexType = generateCollectionComplexType(collectionDsl, metadataType);
 
-        TopLevelElement collectionElement = builder.createTopLevelElement(collectionDsl.getElementName(), required ? ONE : ZERO, "1");
-        collectionElement.setAnnotation(builder.createDocAnnotation(description));
-        all.getParticle().add(objectFactory.createElement(collectionElement));
+    TopLevelElement collectionElement = builder.createTopLevelElement(collectionDsl.getElementName(), required ? ONE : ZERO, "1");
+    collectionElement.setAnnotation(builder.createDocAnnotation(description));
+    all.getParticle().add(objectFactory.createElement(collectionElement));
 
-        collectionElement.setComplexType(collectionComplexType);
-    }
+    collectionElement.setComplexType(collectionComplexType);
+  }
 
-    private LocalComplexType generateCollectionComplexType(DslElementSyntax collectionDsl, final ArrayType metadataType)
-    {
-        final LocalComplexType collectionComplexType = new LocalComplexType();
-        final ExplicitGroup sequence = new ExplicitGroup();
+  private LocalComplexType generateCollectionComplexType(DslElementSyntax collectionDsl, final ArrayType metadataType) {
+    final LocalComplexType collectionComplexType = new LocalComplexType();
+    final ExplicitGroup sequence = new ExplicitGroup();
 
-        final MetadataType genericType = metadataType.getType();
-        DslElementSyntax itemDsl = collectionDsl.getGeneric(genericType)
-                .orElseThrow(() -> new IllegalArgumentException(format("Missing item's DSL information for collection [%s]",
-                                                                       collectionDsl.getAttributeName())));
-        genericType.accept(new MetadataTypeVisitor()
-        {
-            @Override
-            public void visitObject(ObjectType objectType)
-            {
-                TopLevelElement collectionItemElement = builder.createTypeRef(objectType, false);
-                collectionItemElement.setMaxOccurs(UNBOUNDED);
-                sequence.getParticle().add(objectFactory.createElement(collectionItemElement));
-            }
+    final MetadataType genericType = metadataType.getType();
+    DslElementSyntax itemDsl = collectionDsl.getGeneric(genericType)
+        .orElseThrow(() -> new IllegalArgumentException(format("Missing item's DSL information for collection [%s]",
+                                                               collectionDsl.getAttributeName())));
+    genericType.accept(new MetadataTypeVisitor() {
 
-            @Override
-            protected void defaultVisit(MetadataType metadataType)
-            {
-                final LocalComplexType complexType = new LocalComplexType();
-                complexType.getAttributeOrAttributeGroup().add(builder.createValueAttribute(genericType));
+      @Override
+      public void visitObject(ObjectType objectType) {
+        TopLevelElement collectionItemElement = builder.createTypeRef(objectType, false);
+        collectionItemElement.setMaxOccurs(UNBOUNDED);
+        sequence.getParticle().add(objectFactory.createElement(collectionItemElement));
+      }
+
+      @Override
+      protected void defaultVisit(MetadataType metadataType) {
+        final LocalComplexType complexType = new LocalComplexType();
+        complexType.getAttributeOrAttributeGroup().add(builder.createValueAttribute(genericType));
 
 
-                TopLevelElement collectionItemElement = builder.createTopLevelElement(itemDsl.getElementName(), ZERO, SchemaConstants.UNBOUNDED);
-                collectionItemElement.setComplexType(complexType);
-                sequence.getParticle().add(objectFactory.createElement(collectionItemElement));
+        TopLevelElement collectionItemElement =
+            builder.createTopLevelElement(itemDsl.getElementName(), ZERO, SchemaConstants.UNBOUNDED);
+        collectionItemElement.setComplexType(complexType);
+        sequence.getParticle().add(objectFactory.createElement(collectionItemElement));
 
-            }
-        });
+      }
+    });
 
-        collectionComplexType.setSequence(sequence);
-        return collectionComplexType;
-    }
+    collectionComplexType.setSequence(sequence);
+    return collectionComplexType;
+  }
 
 }

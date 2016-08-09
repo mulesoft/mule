@@ -10,59 +10,49 @@ import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 
-public final class UnsupportedMessageDispatcher extends AbstractMessageDispatcher
-{
+public final class UnsupportedMessageDispatcher extends AbstractMessageDispatcher {
 
-    public UnsupportedMessageDispatcher(OutboundEndpoint endpoint)
-    {
-        super(endpoint);
-    }
+  public UnsupportedMessageDispatcher(OutboundEndpoint endpoint) {
+    super(endpoint);
+  }
 
-    @Override
-    protected void doDispatch(MuleEvent event) throws Exception
-    {
-        throw new UnsupportedOperationException("Dispatch not supported for this transport.");
-    }
+  @Override
+  protected void doDispatch(MuleEvent event) throws Exception {
+    throw new UnsupportedOperationException("Dispatch not supported for this transport.");
+  }
 
-    @Override
-    protected MuleMessage doSend(MuleEvent event) throws Exception
-    {
-        throw new UnsupportedOperationException("Send not supported for this transport.");
-    }
+  @Override
+  protected MuleMessage doSend(MuleEvent event) throws Exception {
+    throw new UnsupportedOperationException("Send not supported for this transport.");
+  }
 
-    @Override
-    protected void doInitialise()
-    {
-        // empty
-    }
+  @Override
+  protected void doInitialise() {
+    // empty
+  }
 
-    @Override
-    protected void doDispose()
-    {
-        // empty
-    }
+  @Override
+  protected void doDispose() {
+    // empty
+  }
 
-    @Override
-    protected void doConnect() throws Exception
-    {
-        // empty
-    }
+  @Override
+  protected void doConnect() throws Exception {
+    // empty
+  }
 
-    @Override
-    protected void doDisconnect() throws Exception
-    {
-        // empty
-    }
+  @Override
+  protected void doDisconnect() throws Exception {
+    // empty
+  }
 
-    @Override
-    protected void doStart() 
-    {
-        // empty
-    }
+  @Override
+  protected void doStart() {
+    // empty
+  }
 
-    @Override
-    protected void doStop() 
-    {
-        // empty
-    }
+  @Override
+  protected void doStop() {
+    // empty
+  }
 }

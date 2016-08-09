@@ -11,23 +11,20 @@ import org.mule.test.AbstractIntegrationTestCase;
 import org.junit.Test;
 import org.springframework.beans.factory.BeanCreationException;
 
-public class BadTransformationContentTypeTestCase extends AbstractIntegrationTestCase
-{
-    public BadTransformationContentTypeTestCase()
-    {
-        setStartContext(false);
-    }
+public class BadTransformationContentTypeTestCase extends AbstractIntegrationTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "bad-content-type-setting-transformer-configs.xml";
-    }
+  public BadTransformationContentTypeTestCase() {
+    setStartContext(false);
+  }
 
-    @Test(expected = BeanCreationException.class)
-    public void testReturnType() throws Exception
-    {
-        muleContext.start();
-        muleContext.getRegistry().lookupTransformer("testTransformer");
-    }
+  @Override
+  protected String getConfigFile() {
+    return "bad-content-type-setting-transformer-configs.xml";
+  }
+
+  @Test(expected = BeanCreationException.class)
+  public void testReturnType() throws Exception {
+    muleContext.start();
+    muleContext.getRegistry().lookupTransformer("testTransformer");
+  }
 }

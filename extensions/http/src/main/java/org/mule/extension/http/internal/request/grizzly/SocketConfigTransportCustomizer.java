@@ -17,46 +17,38 @@ import org.glassfish.grizzly.nio.transport.TCPNIOTransport;
 /**
  * Transport customizer that configures socket properties.
  */
-public class SocketConfigTransportCustomizer implements TransportCustomizer
-{
+public class SocketConfigTransportCustomizer implements TransportCustomizer {
 
-    private final TcpClientSocketProperties clientSocketProperties;
+  private final TcpClientSocketProperties clientSocketProperties;
 
-    public SocketConfigTransportCustomizer(TcpClientSocketProperties clientSocketProperties)
-    {
-        this.clientSocketProperties = clientSocketProperties;
+  public SocketConfigTransportCustomizer(TcpClientSocketProperties clientSocketProperties) {
+    this.clientSocketProperties = clientSocketProperties;
+  }
+
+
+  @Override
+  public void customize(TCPNIOTransport transport, FilterChainBuilder filterChainBuilder) {
+    if (clientSocketProperties.getKeepAlive() != null) {
+      transport.setKeepAlive(clientSocketProperties.getKeepAlive());
     }
 
-
-    @Override
-    public void customize(TCPNIOTransport transport, FilterChainBuilder filterChainBuilder)
-    {
-        if (clientSocketProperties.getKeepAlive() != null)
-        {
-            transport.setKeepAlive(clientSocketProperties.getKeepAlive());
-        }
-
-        if (clientSocketProperties.getReceiveBufferSize() != null)
-        {
-            transport.setReadBufferSize(clientSocketProperties.getReceiveBufferSize());
-        }
-
-        if (clientSocketProperties.getSendBufferSize() != null)
-        {
-            transport.setWriteBufferSize(clientSocketProperties.getSendBufferSize());
-        }
-
-        if (clientSocketProperties.getClientTimeout() != null)
-        {
-            transport.setClientSocketSoTimeout(clientSocketProperties.getClientTimeout());
-        }
-
-        if (clientSocketProperties.getLinger() != null)
-        {
-            transport.setLinger(clientSocketProperties.getLinger());
-        }
-
-        transport.setTcpNoDelay(clientSocketProperties.getSendTcpNoDelay());
-        transport.setConnectionTimeout(clientSocketProperties.getConnectionTimeout());
+    if (clientSocketProperties.getReceiveBufferSize() != null) {
+      transport.setReadBufferSize(clientSocketProperties.getReceiveBufferSize());
     }
+
+    if (clientSocketProperties.getSendBufferSize() != null) {
+      transport.setWriteBufferSize(clientSocketProperties.getSendBufferSize());
+    }
+
+    if (clientSocketProperties.getClientTimeout() != null) {
+      transport.setClientSocketSoTimeout(clientSocketProperties.getClientTimeout());
+    }
+
+    if (clientSocketProperties.getLinger() != null) {
+      transport.setLinger(clientSocketProperties.getLinger());
+    }
+
+    transport.setTcpNoDelay(clientSocketProperties.getSendTcpNoDelay());
+    transport.setConnectionTimeout(clientSocketProperties.getConnectionTimeout());
+  }
 }

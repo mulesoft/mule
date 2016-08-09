@@ -15,26 +15,24 @@ import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
-public class ShortcutComponentDefinitionParser extends ComponentDefinitionParser
-{
+public class ShortcutComponentDefinitionParser extends ComponentDefinitionParser {
 
-    private static Class OBJECT_FACTORY_TYPE = PrototypeObjectFactory.class;
+  private static Class OBJECT_FACTORY_TYPE = PrototypeObjectFactory.class;
 
-    public ShortcutComponentDefinitionParser(Class clazz)
-    {
-        super(clazz);
-    }
+  public ShortcutComponentDefinitionParser(Class clazz) {
+    super(clazz);
+  }
 
-    @Override
-    protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
-    {
-        String className = element.getAttributeNode(AbstractMuleBeanDefinitionParser.ATTRIBUTE_CLASS).getValue();
+  @Override
+  protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
+    String className = element.getAttributeNode(AbstractMuleBeanDefinitionParser.ATTRIBUTE_CLASS).getValue();
 
-        GenericBeanDefinition objectFactoryBeanDefinition = new GenericBeanDefinition();
-        objectFactoryBeanDefinition.setBeanClass(OBJECT_FACTORY_TYPE);
-        objectFactoryBeanDefinition.getPropertyValues().addPropertyValue(AbstractObjectFactory.ATTRIBUTE_OBJECT_CLASS_NAME, className);
+    GenericBeanDefinition objectFactoryBeanDefinition = new GenericBeanDefinition();
+    objectFactoryBeanDefinition.setBeanClass(OBJECT_FACTORY_TYPE);
+    objectFactoryBeanDefinition.getPropertyValues().addPropertyValue(AbstractObjectFactory.ATTRIBUTE_OBJECT_CLASS_NAME,
+                                                                     className);
 
-        builder.addPropertyValue("objectFactory", objectFactoryBeanDefinition);
-        super.parseChild(element, parserContext, builder);
-    }
+    builder.addPropertyValue("objectFactory", objectFactoryBeanDefinition);
+    super.parseChild(element, parserContext, builder);
+  }
 }

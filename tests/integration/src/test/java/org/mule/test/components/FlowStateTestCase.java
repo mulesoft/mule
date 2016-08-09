@@ -18,74 +18,63 @@ import org.mule.runtime.core.construct.Flow;
 
 import org.junit.Test;
 
-public class FlowStateTestCase extends AbstractIntegrationTestCase
-{
+public class FlowStateTestCase extends AbstractIntegrationTestCase {
+
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/components/flow-initial-state.xml";
+  }
+
+  @Test
+  public void testDefaultInitialstate() throws Exception {
+    doTestStarted("default");
+  }
+
+  @Test
+  public void testStartedInitialstate() throws Exception {
+    doTestStarted("started");
+  }
+
+  protected void doTestStarted(String flowName) throws Exception {
+    Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct(flowName + "Flow");
+    // Flow initially started
+    assertTrue(flow.isStarted());
+    assertFalse(flow.isStopped());
+    assertTrue(((TestMessageSource) flow.getMessageSource()).isStarted());
+  }
+
+  @Test
+  public void testInitialStateStopped() throws Exception {
+    Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct("stoppedFlow");
+    assertEquals("stopped", flow.getInitialState());
+    // Flow initially stopped
+    assertFalse(flow.isStarted());
+    assertTrue(flow.isStopped());
+    assertFalse(((TestMessageSource) flow.getMessageSource()).isStarted());
+
+    flow.start();
+    assertTrue(flow.isStarted());
+    assertFalse(flow.isStopped());
+    assertTrue(((TestMessageSource) flow.getMessageSource()).isStarted());
+  }
+
+  public static class TestMessageSource implements MessageSource, Startable {
+
+    private boolean started;
+
     @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/components/flow-initial-state.xml";
+    public void setListener(MessageProcessor listener) {
+
     }
 
-    @Test
-    public void testDefaultInitialstate() throws Exception
-    {
-        doTestStarted("default");
+    @Override
+    public void start() throws MuleException {
+      started = true;
     }
 
-    @Test
-    public void testStartedInitialstate() throws Exception
-    {
-        doTestStarted("started");
+    public boolean isStarted() {
+      return started;
     }
-
-    protected void doTestStarted(String flowName) throws Exception
-    {
-        Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct(
-            flowName + "Flow");
-        // Flow initially started
-        assertTrue(flow.isStarted());
-        assertFalse(flow.isStopped());
-        assertTrue(((TestMessageSource) flow.getMessageSource()).isStarted());
-    }
-
-    @Test
-    public void testInitialStateStopped() throws Exception
-    {
-        Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct(
-            "stoppedFlow");
-        assertEquals("stopped", flow.getInitialState());
-        // Flow initially stopped
-        assertFalse(flow.isStarted());
-        assertTrue(flow.isStopped());
-        assertFalse(((TestMessageSource) flow.getMessageSource()).isStarted());
-
-        flow.start();
-        assertTrue(flow.isStarted());
-        assertFalse(flow.isStopped());
-        assertTrue(((TestMessageSource) flow.getMessageSource()).isStarted());
-    }
-
-    public static class TestMessageSource implements MessageSource, Startable
-    {
-
-        private boolean started;
-
-        @Override
-        public void setListener(MessageProcessor listener)
-        {
-
-        }
-
-        @Override
-        public void start() throws MuleException
-        {
-            started = true;
-        }
-
-        public boolean isStarted()
-        {
-            return started;
-        }
-    }
+  }
 
 }

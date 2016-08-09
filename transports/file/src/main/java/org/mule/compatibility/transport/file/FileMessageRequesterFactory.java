@@ -14,11 +14,10 @@ import org.mule.runtime.core.api.MuleException;
 /**
  * Creates a requester responsible for reading files from disk
  */
-public class FileMessageRequesterFactory extends AbstractMessageRequesterFactory
-{
-    @Override
-    public MessageRequester create(InboundEndpoint endpoint) throws MuleException
-    {
-        return new FileMessageRequester(endpoint);
-    }
+public class FileMessageRequesterFactory extends AbstractMessageRequesterFactory {
+
+  @Override
+  public MessageRequester create(InboundEndpoint endpoint) throws MuleException {
+    return new FileMessageRequester(endpoint);
+  }
 }

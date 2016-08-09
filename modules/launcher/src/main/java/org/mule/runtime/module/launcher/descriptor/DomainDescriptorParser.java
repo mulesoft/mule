@@ -19,16 +19,15 @@ import org.apache.commons.lang.BooleanUtils;
 /**
  * Descriptor parser exclusive for domains.
  */
-public class DomainDescriptorParser implements DescriptorParser<DomainDescriptor>
-{
+public class DomainDescriptorParser implements DescriptorParser<DomainDescriptor> {
 
-    @Override
-    public DomainDescriptor parse(File descriptor, String artifactName) throws IOException
-    {
-        final Properties properties = loadProperties(new FileInputStream(descriptor));
-        DomainDescriptor domainDescriptor = new DomainDescriptor();
-        domainDescriptor.setName(artifactName);
-        domainDescriptor.setRedeploymentEnabled(BooleanUtils.toBoolean(properties.getProperty(PROPERTY_REDEPLOYMENT_ENABLED, Boolean.TRUE.toString())));
-        return domainDescriptor;
-    }
+  @Override
+  public DomainDescriptor parse(File descriptor, String artifactName) throws IOException {
+    final Properties properties = loadProperties(new FileInputStream(descriptor));
+    DomainDescriptor domainDescriptor = new DomainDescriptor();
+    domainDescriptor.setName(artifactName);
+    domainDescriptor.setRedeploymentEnabled(BooleanUtils
+        .toBoolean(properties.getProperty(PROPERTY_REDEPLOYMENT_ENABLED, Boolean.TRUE.toString())));
+    return domainDescriptor;
+  }
 }

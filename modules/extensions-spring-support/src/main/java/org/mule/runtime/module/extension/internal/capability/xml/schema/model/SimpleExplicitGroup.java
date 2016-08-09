@@ -21,10 +21,13 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for simpleExplicitGroup complex type.
+ * <p>
+ * Java class for simpleExplicitGroup complex type.
  * <p/>
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>
+ * The following schema fragment specifies the expected content contained within this class.
  * <p/>
+ * 
  * <pre>
  * &lt;complexType name="simpleExplicitGroup">
  *   &lt;complexContent>
@@ -41,7 +44,6 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "simpleExplicitGroup")
-public class SimpleExplicitGroup extends ExplicitGroup
-{
+public class SimpleExplicitGroup extends ExplicitGroup {
 
 }

@@ -17,7 +17,7 @@ import javax.naming.NamingException;
  */
 public class DefaultNameParser implements NameParser {
 
-    public Name parse(String name) throws NamingException {
-        return new CompositeName(name);
-    }
+  public Name parse(String name) throws NamingException {
+    return new CompositeName(name);
+  }
 }

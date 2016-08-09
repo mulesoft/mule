@@ -9,7 +9,7 @@ package org.mule.runtime.core.api.store;
 import java.io.Serializable;
 
 public interface PartitionableExpirableObjectStore<T extends Serializable>
-    extends ExpirableObjectStore<T>, PartitionableObjectStore<T>
-{
-    void expire(int entryTTL, int maxEntries, String partitionName) throws ObjectStoreException;
+    extends ExpirableObjectStore<T>, PartitionableObjectStore<T> {
+
+  void expire(int entryTTL, int maxEntries, String partitionName) throws ObjectStoreException;
 }

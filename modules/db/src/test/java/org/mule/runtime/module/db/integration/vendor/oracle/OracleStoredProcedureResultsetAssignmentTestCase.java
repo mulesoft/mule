@@ -15,29 +15,24 @@ import java.util.List;
 
 import org.junit.runners.Parameterized;
 
-public class OracleStoredProcedureResultsetAssignmentTestCase extends AbstractStoredProcedureReturningResultsetTestCase
-{
+public class OracleStoredProcedureResultsetAssignmentTestCase extends AbstractStoredProcedureReturningResultsetTestCase {
 
-    public OracleStoredProcedureResultsetAssignmentTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public OracleStoredProcedureResultsetAssignmentTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Parameterized.Parameters
-    public static List<Object[]> parameters()
-    {
-        return TestDbConfig.getOracleResource();
-    }
+  @Parameterized.Parameters
+  public static List<Object[]> parameters() {
+    return TestDbConfig.getOracleResource();
+  }
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/vendor/oracle/stored-procedure-resultset-assignment-config.xml"};
-    }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/vendor/oracle/stored-procedure-resultset-assignment-config.xml"};
+  }
 
-    @Override
-    public void setupStoredProcedure() throws Exception
-    {
-        testDatabase.createFunctionGetRecords(getDefaultDataSource());
-    }
+  @Override
+  public void setupStoredProcedure() throws Exception {
+    testDatabase.createFunctionGetRecords(getDefaultDataSource());
+  }
 }

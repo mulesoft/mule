@@ -11,21 +11,19 @@ import org.mule.runtime.core.util.ClassUtils;
 
 import javax.jms.ConnectionFactory;
 
-public class ActiveMQXAJmsConnector extends ActiveMQJmsConnector
-{
-    public static final String ACTIVEMQ_XA_CONNECTION_FACTORY_CLASS = "org.apache.activemq.ActiveMQXAConnectionFactory";
+public class ActiveMQXAJmsConnector extends ActiveMQJmsConnector {
 
-    public ActiveMQXAJmsConnector(MuleContext context)
-    {
-        super(context);
-    }
-    
-    @Override
-    protected ConnectionFactory getDefaultConnectionFactory() throws Exception
-    {
-        ConnectionFactory connectionFactory = (ConnectionFactory)
-                ClassUtils.instanciateClass(ACTIVEMQ_XA_CONNECTION_FACTORY_CLASS, getBrokerURL());
-        applyVendorSpecificConnectionFactoryProperties(connectionFactory);
-        return connectionFactory;
-    }
+  public static final String ACTIVEMQ_XA_CONNECTION_FACTORY_CLASS = "org.apache.activemq.ActiveMQXAConnectionFactory";
+
+  public ActiveMQXAJmsConnector(MuleContext context) {
+    super(context);
+  }
+
+  @Override
+  protected ConnectionFactory getDefaultConnectionFactory() throws Exception {
+    ConnectionFactory connectionFactory =
+        (ConnectionFactory) ClassUtils.instanciateClass(ACTIVEMQ_XA_CONNECTION_FACTORY_CLASS, getBrokerURL());
+    applyVendorSpecificConnectionFactoryProperties(connectionFactory);
+    return connectionFactory;
+  }
 }

@@ -17,25 +17,21 @@ import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
  *
  * @since 4.0
  */
-public interface ConnectionManagerAdapter extends ConnectionManager, Stoppable
-{
+public interface ConnectionManagerAdapter extends ConnectionManager, Stoppable {
 
-    /**
-     * When no {@link RetryPolicyTemplate} is specified by the user
-     * the {@link ConnectionManagerAdapter} will provide the
-     * default one to create the required {@link RetryPolicy}s
-     * instances.
-     *
-     * @return a {@link RetryPolicyTemplate}
-     */
-    RetryPolicyTemplate getDefaultRetryPolicyTemplate();
+  /**
+   * When no {@link RetryPolicyTemplate} is specified by the user the {@link ConnectionManagerAdapter} will provide the default
+   * one to create the required {@link RetryPolicy}s instances.
+   *
+   * @return a {@link RetryPolicyTemplate}
+   */
+  RetryPolicyTemplate getDefaultRetryPolicyTemplate();
 
-    /**
-     * When no {@link PoolingProfile} is specified by the user
-     * the {@link ConnectionManagerAdapter} will provide the
-     * default one to configure the pool of connections
-     *
-     * @return a {@link PoolingProfile}
-     */
-    PoolingProfile getDefaultPoolingProfile();
+  /**
+   * When no {@link PoolingProfile} is specified by the user the {@link ConnectionManagerAdapter} will provide the default one to
+   * configure the pool of connections
+   *
+   * @return a {@link PoolingProfile}
+   */
+  PoolingProfile getDefaultPoolingProfile();
 }

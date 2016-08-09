@@ -34,109 +34,95 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-public class PetStoreSourceRetryPolicyTestCase extends ExtensionFunctionalTestCase
-{
+public class PetStoreSourceRetryPolicyTestCase extends ExtensionFunctionalTestCase {
 
-    public static final int TIMEOUT_MILLIS = 1000;
-    public static final int POLL_DELAY_MILLIS = 50;
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
+  public static final int TIMEOUT_MILLIS = 1000;
+  public static final int POLL_DELAY_MILLIS = 50;
+  @Rule
+  public ExpectedException exception = ExpectedException.none();
+
+  @Override
+  protected String getConfigFile() {
+    return "petstore-source-retry-policy.xml";
+  }
+
+  @Override
+  protected Class<?>[] getAnnotatedExtensionClasses() {
+    return new Class<?>[] {PetStoreConnectorWithSource.class};
+  }
+
+  @After
+  public void tearDown() {
+    PetStoreConnectorWithSource.timesStarted = 0;
+  }
+
+  // TODO - MULE-9399 this test case should expect a MuleRuntimeException
+  @Test
+  public void retryPolicySourceFailOnStart() throws Exception {
+    exception.expect(LifecycleException.class);
+    exception.expectCause(is(instanceOf(MuleRuntimeException.class)));
+    try {
+      startFlow("source-fail-on-start");
+    } catch (Exception e) {
+      new PollingProber(TIMEOUT_MILLIS, POLL_DELAY_MILLIS)
+          .check(new JUnitLambdaProbe(() -> PetStoreConnectorWithSource.timesStarted == 2));
+      throw e;
+    }
+  }
+
+  @Test
+  public void retryPolicySourceFailOnException() throws Exception {
+    startFlow("source-fail-on-exception");
+    new PollingProber(TIMEOUT_MILLIS, POLL_DELAY_MILLIS)
+        .check(new JUnitLambdaProbe(() -> PetStoreConnectorWithSource.timesStarted == 3));
+  }
+
+  @Extension(name = "petstore", description = "PetStore Test connector")
+  @Xml(namespaceLocation = "http://www.mulesoft.org/schema/mule/petstore", namespace = "petstore")
+  @Sources(PetStoreSource.class)
+  public static class PetStoreConnectorWithSource extends PetStoreConnector {
+
+    public static int timesStarted;
+  }
+
+  @Alias("source")
+  public static class PetStoreSource extends Source<String, Attributes> {
+
+    @UseConfig
+    PetStoreConnectorWithSource config;
+
+    @Parameter
+    @Optional(defaultValue = "false")
+    boolean failOnStart;
+
+    @Parameter
+    @Optional(defaultValue = "false")
+    boolean failOnException;
+
+    public static boolean failedDueOnException = false;
 
     @Override
-    protected String getConfigFile()
-    {
-        return "petstore-source-retry-policy.xml";
+    public void start() {
+      PetStoreConnectorWithSource.timesStarted++;
+
+      if (failOnStart || failedDueOnException) {
+        throw new RuntimeException(new ConnectionException("ERROR"));
+      }
+
+      if (failOnException) {
+        failedDueOnException = true;
+        Executor executor = Executors.newSingleThreadExecutor();
+        executor.execute(() -> sourceContext.getExceptionCallback().onException(new ConnectionException("ERROR")));
+      }
     }
 
     @Override
-    protected Class<?>[] getAnnotatedExtensionClasses()
-    {
-        return new Class<?>[] {PetStoreConnectorWithSource.class};
+    public void stop() {
+
     }
+  }
 
-    @After
-    public void tearDown()
-    {
-        PetStoreConnectorWithSource.timesStarted = 0;
-    }
-
-    //TODO - MULE-9399 this test case should expect a MuleRuntimeException
-    @Test
-    public void retryPolicySourceFailOnStart() throws Exception
-    {
-        exception.expect(LifecycleException.class);
-        exception.expectCause(is(instanceOf(MuleRuntimeException.class)));
-        try
-        {
-            startFlow("source-fail-on-start");
-        }
-        catch (Exception e)
-        {
-            new PollingProber(TIMEOUT_MILLIS, POLL_DELAY_MILLIS).check(new JUnitLambdaProbe(() -> PetStoreConnectorWithSource.timesStarted == 2));
-            throw e;
-        }
-    }
-
-    @Test
-    public void retryPolicySourceFailOnException() throws Exception
-    {
-        startFlow("source-fail-on-exception");
-        new PollingProber(TIMEOUT_MILLIS, POLL_DELAY_MILLIS).check(new JUnitLambdaProbe(() -> PetStoreConnectorWithSource.timesStarted == 3));
-    }
-
-    @Extension(name = "petstore", description = "PetStore Test connector")
-    @Xml(namespaceLocation = "http://www.mulesoft.org/schema/mule/petstore", namespace = "petstore")
-    @Sources(PetStoreSource.class)
-    public static class PetStoreConnectorWithSource extends PetStoreConnector
-    {
-
-        public static int timesStarted;
-    }
-
-    @Alias("source")
-    public static class PetStoreSource extends Source<String, Attributes>
-    {
-
-        @UseConfig
-        PetStoreConnectorWithSource config;
-
-        @Parameter
-        @Optional(defaultValue = "false")
-        boolean failOnStart;
-
-        @Parameter
-        @Optional(defaultValue = "false")
-        boolean failOnException;
-
-        public static boolean failedDueOnException = false;
-
-        @Override
-        public void start()
-        {
-            PetStoreConnectorWithSource.timesStarted++;
-
-            if (failOnStart || failedDueOnException)
-            {
-                throw new RuntimeException(new ConnectionException("ERROR"));
-            }
-
-            if (failOnException)
-            {
-                failedDueOnException = true;
-                Executor executor = Executors.newSingleThreadExecutor();
-                executor.execute(() -> sourceContext.getExceptionCallback().onException(new ConnectionException("ERROR")));
-            }
-        }
-
-        @Override
-        public void stop()
-        {
-
-        }
-    }
-
-    private void startFlow(String flowName) throws Exception
-    {
-        ((Flow) getFlowConstruct(flowName)).start();
-    }
+  private void startFlow(String flowName) throws Exception {
+    ((Flow) getFlowConstruct(flowName)).start();
+  }
 }

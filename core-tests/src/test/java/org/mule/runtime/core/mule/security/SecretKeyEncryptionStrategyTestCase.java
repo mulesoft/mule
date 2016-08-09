@@ -16,61 +16,57 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.apache.commons.lang.RandomStringUtils;
 import org.junit.Test;
 
-public class SecretKeyEncryptionStrategyTestCase extends AbstractMuleTestCase
-{
+public class SecretKeyEncryptionStrategyTestCase extends AbstractMuleTestCase {
 
-    private static final String TRIPLE_DES_KEY = RandomStringUtils.randomAlphabetic(24);
-    @Test
-    public void testRoundTripEncryptionBlowfish() throws Exception
-    {
-        SecretKeyEncryptionStrategy ske = new SecretKeyEncryptionStrategy();
-        ske.setAlgorithm("Blowfish");
-        ske.setKey("shhhhh");
-        ske.initialise();
+  private static final String TRIPLE_DES_KEY = RandomStringUtils.randomAlphabetic(24);
 
-        byte[] b = ske.encrypt("hello".getBytes(), null);
+  @Test
+  public void testRoundTripEncryptionBlowfish() throws Exception {
+    SecretKeyEncryptionStrategy ske = new SecretKeyEncryptionStrategy();
+    ske.setAlgorithm("Blowfish");
+    ske.setKey("shhhhh");
+    ske.initialise();
 
-        assertNotSame(new String(b), "hello");
-        String s = new String(ske.decrypt(b, null), "UTF-8");
-        assertEquals("hello", s);
-    }
+    byte[] b = ske.encrypt("hello".getBytes(), null);
 
-    @Test
-    public void testRoundTripEncryptionBlowfishWithKeyFactory() throws Exception
-    {
-        SecretKeyEncryptionStrategy ske = new SecretKeyEncryptionStrategy();
-        ske.setAlgorithm("Blowfish");
-        ske.setKeyFactory(new SecretKeyFactory()
-        {
-            @Override
-            public byte[] getKey()
-            {
-                return "shhhh".getBytes();
-            }
-        });
-        ske.initialise();
+    assertNotSame(new String(b), "hello");
+    String s = new String(ske.decrypt(b, null), "UTF-8");
+    assertEquals("hello", s);
+  }
 
-        byte[] b = ske.encrypt("hello".getBytes(), null);
+  @Test
+  public void testRoundTripEncryptionBlowfishWithKeyFactory() throws Exception {
+    SecretKeyEncryptionStrategy ske = new SecretKeyEncryptionStrategy();
+    ske.setAlgorithm("Blowfish");
+    ske.setKeyFactory(new SecretKeyFactory() {
 
-        assertNotSame(new String(b), "hello");
-        String s = new String(ske.decrypt(b, null), "UTF-8");
-        assertEquals("hello", s);
-    }
+      @Override
+      public byte[] getKey() {
+        return "shhhh".getBytes();
+      }
+    });
+    ske.initialise();
 
-    @Test
-    public void testRoundTripEncryptionTripleDES() throws Exception
-    {
-        SecretKeyEncryptionStrategy ske = new SecretKeyEncryptionStrategy();
-        ske.setAlgorithm("TripleDES");
-        ske.setKey(TRIPLE_DES_KEY);
+    byte[] b = ske.encrypt("hello".getBytes(), null);
 
-        ske.initialise();
+    assertNotSame(new String(b), "hello");
+    String s = new String(ske.decrypt(b, null), "UTF-8");
+    assertEquals("hello", s);
+  }
 
-        byte[] b = ske.encrypt("hello".getBytes(), null);
+  @Test
+  public void testRoundTripEncryptionTripleDES() throws Exception {
+    SecretKeyEncryptionStrategy ske = new SecretKeyEncryptionStrategy();
+    ske.setAlgorithm("TripleDES");
+    ske.setKey(TRIPLE_DES_KEY);
 
-        assertNotSame(new String(b), "hello");
-        String s = new String(ske.decrypt(b, null), "UTF-8");
-        assertEquals("hello", s);
-    }
+    ske.initialise();
+
+    byte[] b = ske.encrypt("hello".getBytes(), null);
+
+    assertNotSame(new String(b), "hello");
+    String s = new String(ske.decrypt(b, null), "UTF-8");
+    assertEquals("hello", s);
+  }
 
 }

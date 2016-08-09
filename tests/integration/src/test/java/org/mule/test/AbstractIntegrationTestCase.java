@@ -11,12 +11,11 @@ import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 
 /**
  * Base {@link Class} for functional integration tests, it will run the functional test case with
- * {@link org.mule.functional.junit4.runners.ArtifactClassLoaderRunner} in order to use the hierarchical {@link ClassLoader}'s
- * as standalone mode. Every test on integration module should extend from this base {@link Class}.
+ * {@link org.mule.functional.junit4.runners.ArtifactClassLoaderRunner} in order to use the hierarchical {@link ClassLoader}'s as
+ * standalone mode. Every test on integration module should extend from this base {@link Class}.
  *
  * @since 4.0
  */
-public abstract class AbstractIntegrationTestCase extends MuleArtifactFunctionalTestCase
-{
+public abstract class AbstractIntegrationTestCase extends MuleArtifactFunctionalTestCase {
 
 }

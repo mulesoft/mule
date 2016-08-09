@@ -9,12 +9,10 @@ package org.mule.compatibility.config.spring.parsers.specific.endpoint;
 import org.mule.compatibility.config.spring.parsers.specific.endpoint.support.OrphanEndpointDefinitionParser;
 import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
 
-public class GenericGlobalEndpointDefinitionParser extends OrphanEndpointDefinitionParser
-{
+public class GenericGlobalEndpointDefinitionParser extends OrphanEndpointDefinitionParser {
 
-    public GenericGlobalEndpointDefinitionParser()
-    {
-        super(EndpointURIEndpointBuilder.class);
-    }
+  public GenericGlobalEndpointDefinitionParser() {
+    super(EndpointURIEndpointBuilder.class);
+  }
 
 }

@@ -22,76 +22,67 @@ import org.mule.runtime.module.xml.transformer.XsltTransformer;
 
 import org.junit.Test;
 
-public class XmlTransformerNamespaceHandlerTestCase extends AbstractIntegrationTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/module/xml/xml-transformer-namespace-test.xml";
-    }
+public class XmlTransformerNamespaceHandlerTestCase extends AbstractIntegrationTestCase {
 
-    @Test
-    public void testDomToXml()
-    {
-        getAndTestTransformer("domToXml", DomDocumentToXml.class);
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/module/xml/xml-transformer-namespace-test.xml";
+  }
 
-    @Test
-    public void testObjectToXml()
-    {
-        ObjectToXml objectToXml = (ObjectToXml) getAndTestTransformer("objectToXml", ObjectToXml.class);
-        assertTrue(objectToXml.isAcceptMuleMessage());
-    }
+  @Test
+  public void testDomToXml() {
+    getAndTestTransformer("domToXml", DomDocumentToXml.class);
+  }
 
-    @Test
-    public void testXmlToDom()
-    {
-        getAndTestTransformer("xmlToDom", XmlToDomDocument.class);
-    }
+  @Test
+  public void testObjectToXml() {
+    ObjectToXml objectToXml = (ObjectToXml) getAndTestTransformer("objectToXml", ObjectToXml.class);
+    assertTrue(objectToXml.isAcceptMuleMessage());
+  }
 
-    @Test
-    public void testXmlToObject()
-    {
-        getAndTestTransformer("xmlToObject", XmlToObject.class);
-    }
+  @Test
+  public void testXmlToDom() {
+    getAndTestTransformer("xmlToDom", XmlToDomDocument.class);
+  }
 
-    @Test
-    public void testXslt()
-    {
-        XsltTransformer xslt = (XsltTransformer) getAndTestTransformer("xslt", XsltTransformer.class);
-        assertEquals(10, xslt.getMaxActiveTransformers());
-        assertEquals(10, xslt.getMaxIdleTransformers());
-        assertEquals(CustomXsltTransformerFactory.class.getName(), xslt.getXslTransformerFactory());
-        assertNull(xslt.getXslFile());
-        assertNotNull(xslt.getXslt());
-        String transform = xslt.getXslt();
-        assertTrue(transform.indexOf("test for this string in test") > -1);
+  @Test
+  public void testXmlToObject() {
+    getAndTestTransformer("xmlToObject", XmlToObject.class);
+  }
 
-        assertEquals("#[header:foo]", xslt.getContextProperties().get("bar"));
-    }
+  @Test
+  public void testXslt() {
+    XsltTransformer xslt = (XsltTransformer) getAndTestTransformer("xslt", XsltTransformer.class);
+    assertEquals(10, xslt.getMaxActiveTransformers());
+    assertEquals(10, xslt.getMaxIdleTransformers());
+    assertEquals(CustomXsltTransformerFactory.class.getName(), xslt.getXslTransformerFactory());
+    assertNull(xslt.getXslFile());
+    assertNotNull(xslt.getXslt());
+    String transform = xslt.getXslt();
+    assertTrue(transform.indexOf("test for this string in test") > -1);
 
-    protected AbstractTransformer getAndTestTransformer(String name, Class clazz)
-    {
-        assertTrue(AbstractTransformer.class.isAssignableFrom(clazz));
-        Transformer object= muleContext.getRegistry().lookupTransformer(name);
+    assertEquals("#[header:foo]", xslt.getContextProperties().get("bar"));
+  }
 
-        assertNotNull(object);
-        assertTrue(clazz.isAssignableFrom(object.getClass()));
-        AbstractTransformer transformer = (AbstractTransformer) object;
-        assertAbstractTransformerOk(transformer, name);
-        return transformer;
+  protected AbstractTransformer getAndTestTransformer(String name, Class clazz) {
+    assertTrue(AbstractTransformer.class.isAssignableFrom(clazz));
+    Transformer object = muleContext.getRegistry().lookupTransformer(name);
+
+    assertNotNull(object);
+    assertTrue(clazz.isAssignableFrom(object.getClass()));
+    AbstractTransformer transformer = (AbstractTransformer) object;
+    assertAbstractTransformerOk(transformer, name);
+    return transformer;
+  }
+
+  protected void assertAbstractTransformerOk(AbstractTransformer transformer, String name) {
+    assertTrue(transformer.isIgnoreBadInput());
+    assertEquals(Object.class, transformer.getReturnDataType().getType());
+    assertEquals(name, transformer.getName());
+    // AbstractXmlTransformer instances have an output encoding
+    if (transformer instanceof AbstractXmlTransformer) {
+      assertEquals("foo", ((AbstractXmlTransformer) transformer).getOutputEncoding());
     }
-    
-    protected void assertAbstractTransformerOk(AbstractTransformer transformer, String name)
-    {
-        assertTrue(transformer.isIgnoreBadInput());
-        assertEquals(Object.class, transformer.getReturnDataType().getType());
-        assertEquals(name, transformer.getName());
-        // AbstractXmlTransformer instances have an output encoding
-        if (transformer instanceof AbstractXmlTransformer)
-        {
-            assertEquals("foo", ((AbstractXmlTransformer) transformer).getOutputEncoding());
-        }
-    }
+  }
 
 }

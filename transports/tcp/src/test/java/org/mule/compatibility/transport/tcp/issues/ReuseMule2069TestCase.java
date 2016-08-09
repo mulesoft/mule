@@ -16,19 +16,16 @@ import org.junit.Test;
 /**
  * This is just to check that the Boolean (rather than boolean) doesn't cause any problems
  */
-public class ReuseMule2069TestCase extends TcpFunctionalTestCase
-{
+public class ReuseMule2069TestCase extends TcpFunctionalTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "reuse-mule-2069-flow.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "reuse-mule-2069-flow.xml";
+  }
 
-    @Test
-    public void testReuseSetOnConnector()
-    {
-        assertTrue(((TcpConnector) muleContext.getRegistry().lookupObject(TcpConnector.TCP)).isReuseAddress().booleanValue());
-    }
+  @Test
+  public void testReuseSetOnConnector() {
+    assertTrue(((TcpConnector) muleContext.getRegistry().lookupObject(TcpConnector.TCP)).isReuseAddress().booleanValue());
+  }
 
 }

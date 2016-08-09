@@ -20,66 +20,57 @@ import java.util.List;
 /**
  * Default implementation for {@link MessageProcessingManager}.
  */
-public class MuleMessageProcessingManager implements MessageProcessingManager, MuleContextAware, Initialisable
-{
-    private final EndProcessPhase endProcessPhase = new EndProcessPhase();
-    private MuleContext muleContext;
-    private PhaseExecutionEngine phaseExecutionEngine;
+public class MuleMessageProcessingManager implements MessageProcessingManager, MuleContextAware, Initialisable {
 
-    @Override
-    public void processMessage(MessageProcessTemplate messageProcessTemplate, MessageProcessContext messageProcessContext)
-    {
-        phaseExecutionEngine.process(messageProcessTemplate, messageProcessContext);
+  private final EndProcessPhase endProcessPhase = new EndProcessPhase();
+  private MuleContext muleContext;
+  private PhaseExecutionEngine phaseExecutionEngine;
+
+  @Override
+  public void processMessage(MessageProcessTemplate messageProcessTemplate, MessageProcessContext messageProcessContext) {
+    phaseExecutionEngine.process(messageProcessTemplate, messageProcessContext);
+  }
+
+  @Override
+  public void setMuleContext(MuleContext context) {
+    this.muleContext = context;
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    Collection<MessageProcessPhase> registryMessageProcessPhases =
+        muleContext.getRegistry().lookupObjects(MessageProcessPhase.class);
+    List<MessageProcessPhase> messageProcessPhaseList = new ArrayList<MessageProcessPhase>();
+    if (registryMessageProcessPhases != null) {
+      messageProcessPhaseList.addAll(registryMessageProcessPhases);
     }
+    messageProcessPhaseList.add(new ValidationPhase());
+    messageProcessPhaseList.add(new FlowProcessingPhase());
+    messageProcessPhaseList.add(new AsyncResponseFlowProcessingPhase());
+    Collections.sort(messageProcessPhaseList, new Comparator<MessageProcessPhase>() {
 
-    @Override
-    public void setMuleContext(MuleContext context)
-    {
-        this.muleContext = context;
-    }
-
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        Collection<MessageProcessPhase> registryMessageProcessPhases = muleContext.getRegistry().lookupObjects(MessageProcessPhase.class);
-        List<MessageProcessPhase> messageProcessPhaseList = new ArrayList<MessageProcessPhase>();
-        if (registryMessageProcessPhases != null)
-        {
-            messageProcessPhaseList.addAll(registryMessageProcessPhases);
+      @Override
+      public int compare(MessageProcessPhase messageProcessPhase, MessageProcessPhase messageProcessPhase2) {
+        int compareValue = 0;
+        if (messageProcessPhase instanceof Comparable) {
+          compareValue = ((Comparable) messageProcessPhase).compareTo(messageProcessPhase2);
         }
-        messageProcessPhaseList.add(new ValidationPhase());
-        messageProcessPhaseList.add(new FlowProcessingPhase());
-        messageProcessPhaseList.add(new AsyncResponseFlowProcessingPhase());
-        Collections.sort(messageProcessPhaseList, new Comparator<MessageProcessPhase>()
-        {
-            @Override
-            public int compare(MessageProcessPhase messageProcessPhase, MessageProcessPhase messageProcessPhase2)
-            {
-                int compareValue = 0;
-                if (messageProcessPhase instanceof Comparable)
-                {
-                    compareValue = ((Comparable) messageProcessPhase).compareTo(messageProcessPhase2);
-                }
-                if (compareValue == 0 && messageProcessPhase2 instanceof Comparable)
-                {
-                    compareValue = ((Comparable) messageProcessPhase2).compareTo(messageProcessPhase) * -1;
-                }
-                return compareValue;
-            }
-        });
-
-        for (MessageProcessPhase messageProcessPhase : messageProcessPhaseList)
-        {
-            if (messageProcessPhase instanceof MuleContextAware)
-            {
-                ((MuleContextAware) messageProcessPhase).setMuleContext(muleContext);
-            }
-            if (messageProcessPhase instanceof Initialisable)
-            {
-                ((Initialisable) messageProcessPhase).initialise();
-            }
+        if (compareValue == 0 && messageProcessPhase2 instanceof Comparable) {
+          compareValue = ((Comparable) messageProcessPhase2).compareTo(messageProcessPhase) * -1;
         }
+        return compareValue;
+      }
+    });
 
-        phaseExecutionEngine = new PhaseExecutionEngine(messageProcessPhaseList, muleContext.getExceptionListener(), endProcessPhase);
+    for (MessageProcessPhase messageProcessPhase : messageProcessPhaseList) {
+      if (messageProcessPhase instanceof MuleContextAware) {
+        ((MuleContextAware) messageProcessPhase).setMuleContext(muleContext);
+      }
+      if (messageProcessPhase instanceof Initialisable) {
+        ((Initialisable) messageProcessPhase).initialise();
+      }
     }
+
+    phaseExecutionEngine = new PhaseExecutionEngine(messageProcessPhaseList, muleContext.getExceptionListener(), endProcessPhase);
+  }
 }

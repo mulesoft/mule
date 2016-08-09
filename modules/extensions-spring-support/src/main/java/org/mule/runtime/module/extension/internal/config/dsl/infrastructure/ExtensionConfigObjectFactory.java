@@ -15,25 +15,21 @@ import org.mule.runtime.module.extension.internal.config.ExtensionConfig;
  *
  * @since 4.0
  */
-public class ExtensionConfigObjectFactory implements ObjectFactory<ExtensionConfig>
-{
+public class ExtensionConfigObjectFactory implements ObjectFactory<ExtensionConfig> {
 
-    private DynamicConfigurationExpiration dynamicConfigurationExpiration;
+  private DynamicConfigurationExpiration dynamicConfigurationExpiration;
 
-    @Override
-    public ExtensionConfig getObject() throws Exception
-    {
-        DefaultExtensionConfig config = new DefaultExtensionConfig();
-        if (dynamicConfigurationExpiration != null)
-        {
-            config.setDynamicConfigExpirationFrequency(dynamicConfigurationExpiration.getFrequency());
-        }
-
-        return config;
+  @Override
+  public ExtensionConfig getObject() throws Exception {
+    DefaultExtensionConfig config = new DefaultExtensionConfig();
+    if (dynamicConfigurationExpiration != null) {
+      config.setDynamicConfigExpirationFrequency(dynamicConfigurationExpiration.getFrequency());
     }
 
-    public void setDynamicConfigurationExpiration(DynamicConfigurationExpiration dynamicConfigurationExpiration)
-    {
-        this.dynamicConfigurationExpiration = dynamicConfigurationExpiration;
-    }
+    return config;
+  }
+
+  public void setDynamicConfigurationExpiration(DynamicConfigurationExpiration dynamicConfigurationExpiration) {
+    this.dynamicConfigurationExpiration = dynamicConfigurationExpiration;
+  }
 }

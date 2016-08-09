@@ -23,70 +23,64 @@ import java.util.Optional;
 import javax.inject.Inject;
 
 /**
- * Implements simple connection management by using the {@link #before(OperationContext)} phase to
- * set a connection as parameter value of key {@link ExtensionProperties#CONNECTION_PARAM} into an
- * {@link OperationContext}.
+ * Implements simple connection management by using the {@link #before(OperationContext)} phase to set a connection as parameter
+ * value of key {@link ExtensionProperties#CONNECTION_PARAM} into an {@link OperationContext}.
  *
  * @since 4.0
  */
-public final class ConnectionInterceptor implements Interceptor
-{
+public final class ConnectionInterceptor implements Interceptor {
 
-    @Inject
-    private ExtensionsConnectionAdapter connectionAdapter;
+  @Inject
+  private ExtensionsConnectionAdapter connectionAdapter;
 
-    /**
-     * Adds a {@code Connection} as a parameter in the {@code operationContext}, following the
-     * considerations in this type's javadoc.
-     *
-     * @param operationContext the {@link OperationContext} for the operation to be executed
-     * @throws IllegalArgumentException if the {@code operationContext} already contains a parameter of key {@link ExtensionProperties#CONNECTION_PARAM}
-     */
-    @Override
-    public void before(OperationContext operationContext) throws Exception
-    {
-        OperationContextAdapter context = (OperationContextAdapter) operationContext;
-        checkArgument(context.getVariable(CONNECTION_PARAM) == null, "A connection was already set for this operation context");
-        context.setVariable(CONNECTION_PARAM, getConnection(context));
+  /**
+   * Adds a {@code Connection} as a parameter in the {@code operationContext}, following the considerations in this type's
+   * javadoc.
+   *
+   * @param operationContext the {@link OperationContext} for the operation to be executed
+   * @throws IllegalArgumentException if the {@code operationContext} already contains a parameter of key
+   *         {@link ExtensionProperties#CONNECTION_PARAM}
+   */
+  @Override
+  public void before(OperationContext operationContext) throws Exception {
+    OperationContextAdapter context = (OperationContextAdapter) operationContext;
+    checkArgument(context.getVariable(CONNECTION_PARAM) == null, "A connection was already set for this operation context");
+    context.setVariable(CONNECTION_PARAM, getConnection(context));
+  }
+
+  /**
+   * Sets the {@link ExtensionProperties#CONNECTION_PARAM} parameter on the {@code operationContext} to {@code null}
+   *
+   * @param operationContext the {@link OperationContext} that was used to execute the operation
+   * @param result the operation's result
+   */
+  @Override
+  public void after(OperationContext operationContext, Object result) {
+    ConnectionHandler connection = ((OperationContextAdapter) operationContext).removeVariable(CONNECTION_PARAM);
+    if (connection != null) {
+      connection.release();
     }
+  }
 
-    /**
-     * Sets the {@link ExtensionProperties#CONNECTION_PARAM} parameter on the {@code operationContext} to {@code null}
-     *
-     * @param operationContext the {@link OperationContext} that was used to execute the operation
-     * @param result           the operation's result
-     */
-    @Override
-    public void after(OperationContext operationContext, Object result)
-    {
-        ConnectionHandler connection = ((OperationContextAdapter) operationContext).removeVariable(CONNECTION_PARAM);
-        if (connection != null)
-        {
-            connection.release();
-        }
+  /**
+   * If the {@code exception} is a {@link ConnectionException} a retry of failed request will be asked
+   *
+   * @param operationContext the {@link OperationContext} that was used to execute the operation
+   * @param retryRequest a {@link RetryRequest} in case that the operation should be retried
+   * @param exception the {@link Exception} that was thrown by the failing operation
+   * @return the same {@link Throwable} given in the parameter
+   */
+  @Override
+  public Throwable onError(OperationContext operationContext, RetryRequest retryRequest, Throwable exception) {
+    Optional<ConnectionException> connectionException = extractConnectionException(exception);
+    if (connectionException.isPresent()) {
+      retryRequest.request();
     }
+    return exception;
+  }
 
-    /**
-     * If the {@code exception} is a {@link ConnectionException} a retry of failed request will be asked
-     *
-     * @param operationContext the {@link OperationContext} that was used to execute the operation
-     * @param retryRequest     a {@link RetryRequest} in case that the operation should be retried
-     * @param exception        the {@link Exception} that was thrown by the failing operation
-     * @return the same {@link Throwable} given in the parameter
-     */
-    @Override
-    public Throwable onError(OperationContext operationContext, RetryRequest retryRequest, Throwable exception)
-    {
-        Optional<ConnectionException> connectionException = extractConnectionException(exception);
-        if (connectionException.isPresent())
-        {
-            retryRequest.request();
-        }
-        return exception;
-    }
-
-    private ConnectionHandler<?> getConnection(OperationContextAdapter operationContext) throws ConnectionException, TransactionException
-    {
-        return connectionAdapter.getConnection(operationContext);
-    }
+  private ConnectionHandler<?> getConnection(OperationContextAdapter operationContext)
+      throws ConnectionException, TransactionException {
+    return connectionAdapter.getConnection(operationContext);
+  }
 }

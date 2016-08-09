@@ -26,159 +26,126 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Defines a {@link ClassLoader} that filter which classes and resources can
- * be resolved based on a {@link ClassLoaderFilter}
+ * Defines a {@link ClassLoader} that filter which classes and resources can be resolved based on a {@link ClassLoaderFilter}
  */
-public class FilteringArtifactClassLoader extends ClassLoader implements ArtifactClassLoader
-{
-    static
-    {
-        registerAsParallelCapable();
+public class FilteringArtifactClassLoader extends ClassLoader implements ArtifactClassLoader {
+
+  static {
+    registerAsParallelCapable();
+  }
+
+  protected static final Logger logger = LoggerFactory.getLogger(FilteringArtifactClassLoader.class);
+
+  private final ArtifactClassLoader artifactClassLoader;
+  private final ClassLoaderFilter filter;
+
+  /**
+   * Creates a new filtering classLoader
+   *
+   * @param artifactClassLoader artifact classLoader to filter. Non null
+   * @param filter filters access to classes and resources from the artifact classLoader. Non null
+   */
+  public FilteringArtifactClassLoader(ArtifactClassLoader artifactClassLoader, ClassLoaderFilter filter) {
+    checkArgument(artifactClassLoader != null, "ArtifactClassLoader cannot be null");
+    checkArgument(filter != null, "Filter cannot be null");
+
+    this.artifactClassLoader = artifactClassLoader;
+    this.filter = filter;
+  }
+
+  @Override
+  public Class<?> loadClass(String name) throws ClassNotFoundException {
+    if (filter.exportsClass(name)) {
+      return artifactClassLoader.getClassLoader().loadClass(name);
+    } else {
+      throw new NotExportedClassException(name, getArtifactName(), filter);
     }
+  }
 
-    protected static final Logger logger = LoggerFactory.getLogger(FilteringArtifactClassLoader.class);
-
-    private final ArtifactClassLoader artifactClassLoader;
-    private final ClassLoaderFilter filter;
-
-    /**
-     * Creates a new filtering classLoader
-     *
-     * @param artifactClassLoader artifact classLoader to filter. Non null
-     * @param filter filters access to classes and resources from the artifact classLoader. Non null
-     */
-    public FilteringArtifactClassLoader(ArtifactClassLoader artifactClassLoader, ClassLoaderFilter filter)
-    {
-        checkArgument(artifactClassLoader != null, "ArtifactClassLoader cannot be null");
-        checkArgument(filter!= null, "Filter cannot be null");
-
-        this.artifactClassLoader = artifactClassLoader;
-        this.filter = filter;
+  @Override
+  public URL getResource(String name) {
+    if (filter.exportsResource(name)) {
+      return getResourceFromDelegate(artifactClassLoader, name);
+    } else {
+      logClassloadingTrace(format("Resource '%s' not found in classloader for '%s'.", name, getArtifactName()));
+      logClassloadingTrace(format("Filter applied for resource '%s': %s", name, getArtifactName()));
+      return null;
     }
+  }
 
-    @Override
-    public Class<?> loadClass(String name) throws ClassNotFoundException
-    {
-        if (filter.exportsClass(name))
-        {
-            return artifactClassLoader.getClassLoader().loadClass(name);
-        }
-        else
-        {
-            throw new NotExportedClassException(name, getArtifactName(), filter);
-        }
-    }
+  protected URL getResourceFromDelegate(ArtifactClassLoader artifactClassLoader, String name) {
+    return artifactClassLoader.findResource(name);
+  }
 
-    @Override
-    public URL getResource(String name)
-    {
-        if (filter.exportsResource(name))
-        {
-            return getResourceFromDelegate(artifactClassLoader, name);
-        }
-        else
-        {
-            logClassloadingTrace(format("Resource '%s' not found in classloader for '%s'.", name, getArtifactName()));
-            logClassloadingTrace(format("Filter applied for resource '%s': %s", name, getArtifactName()));
-            return null;
-        }
+  @Override
+  public Enumeration<URL> getResources(String name) throws IOException {
+    if (filter.exportsResource(name)) {
+      return getResourcesFromDelegate(artifactClassLoader, name);
+    } else {
+      logClassloadingTrace(format("Resources '%s' not found in classloader for '%s'.", name, getArtifactName()));
+      logClassloadingTrace(format("Filter applied for resources '%s': %s", name, getArtifactName()));
+      return new EnumerationAdapter<>(emptyList());
     }
+  }
 
-    protected URL getResourceFromDelegate(ArtifactClassLoader artifactClassLoader, String name)
-    {
-        return artifactClassLoader.findResource(name);
+  private void logClassloadingTrace(String message) {
+    if (isVerboseClassLoading()) {
+      logger.info(message);
+    } else if (logger.isTraceEnabled()) {
+      logger.trace(message);
     }
+  }
 
-    @Override
-    public Enumeration<URL> getResources(String name) throws IOException
-    {
-        if (filter.exportsResource(name))
-        {
-            return getResourcesFromDelegate(artifactClassLoader, name);
-        }
-        else
-        {
-            logClassloadingTrace(format("Resources '%s' not found in classloader for '%s'.", name, getArtifactName()));
-            logClassloadingTrace(format("Filter applied for resources '%s': %s", name, getArtifactName()));
-            return new EnumerationAdapter<>(emptyList());
-        }
-    }
+  private Boolean isVerboseClassLoading() {
+    return valueOf(getProperty(MULE_LOG_VERBOSE_CLASSLOADING));
+  }
 
-    private void logClassloadingTrace(String message)
-    {
-        if (isVerboseClassLoading())
-        {
-            logger.info(message);
-        }
-        else if (logger.isTraceEnabled())
-        {
-            logger.trace(message);
-        }
-    }
+  protected Enumeration<URL> getResourcesFromDelegate(ArtifactClassLoader artifactClassLoader, String name) throws IOException {
+    return artifactClassLoader.findResources(name);
+  }
 
-    private Boolean isVerboseClassLoading()
-    {
-        return valueOf(getProperty(MULE_LOG_VERBOSE_CLASSLOADING));
-    }
+  @Override
+  public URL findResource(String name) {
+    return artifactClassLoader.findResource(name);
+  }
 
-    protected Enumeration<URL> getResourcesFromDelegate(ArtifactClassLoader artifactClassLoader, String name) throws IOException
-    {
-        return artifactClassLoader.findResources(name);
-    }
+  @Override
+  public Enumeration<URL> findResources(String name) throws IOException {
+    return artifactClassLoader.findResources(name);
+  }
 
-    @Override
-    public URL findResource(String name)
-    {
-        return artifactClassLoader.findResource(name);
-    }
+  @Override
+  public String toString() {
+    return format("%s[%s]@%s", getClass().getName(), artifactClassLoader.getArtifactName(), toHexString(identityHashCode(this)));
+  }
 
-    @Override
-    public Enumeration<URL> findResources(String name) throws IOException
-    {
-        return artifactClassLoader.findResources(name);
-    }
+  @Override
+  public String getArtifactName() {
+    return artifactClassLoader.getArtifactName();
+  }
 
-    @Override
-    public String toString()
-    {
-        return format("%s[%s]@%s", getClass().getName(),
-                artifactClassLoader.getArtifactName(),
-                toHexString(identityHashCode(this)));
-    }
+  @Override
+  public ClassLoader getClassLoader() {
+    return this;
+  }
 
-    @Override
-    public String getArtifactName()
-    {
-        return artifactClassLoader.getArtifactName();
-    }
+  @Override
+  public void addShutdownListener(ShutdownListener listener) {
+    artifactClassLoader.addShutdownListener(listener);
+  }
 
-    @Override
-    public ClassLoader getClassLoader()
-    {
-        return this;
-    }
+  @Override
+  public ClassLoaderLookupPolicy getClassLoaderLookupPolicy() {
+    return artifactClassLoader.getClassLoaderLookupPolicy();
+  }
 
-    @Override
-    public void addShutdownListener(ShutdownListener listener)
-    {
-        artifactClassLoader.addShutdownListener(listener);
-    }
+  @Override
+  public void dispose() {
+    // Nothing to do here as this is just wrapper for another classLoader
+  }
 
-    @Override
-    public ClassLoaderLookupPolicy getClassLoaderLookupPolicy()
-    {
-        return artifactClassLoader.getClassLoaderLookupPolicy();
-    }
-
-    @Override
-    public void dispose()
-    {
-        // Nothing to do here as this is just wrapper for another classLoader
-    }
-
-    @Override
-    public URL findLocalResource(String resourceName)
-    {
-        return artifactClassLoader.findLocalResource(resourceName);
-    }
+  @Override
+  public URL findLocalResource(String resourceName) {
+    return artifactClassLoader.findLocalResource(resourceName);
+  }
 }

@@ -18,56 +18,48 @@ import java.util.Map;
 
 import org.junit.Test;
 
-public class PetStoreComplexParameterTestCase extends ExtensionFunctionalTestCase
-{
+public class PetStoreComplexParameterTestCase extends ExtensionFunctionalTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "petstore-complex-parameter.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "petstore-complex-parameter.xml";
+  }
 
-    @Override
-    protected Class<?>[] getAnnotatedExtensionClasses()
-    {
-        return new Class<?>[] {PetStoreConnector.class};
-    }
+  @Override
+  protected Class<?>[] getAnnotatedExtensionClasses() {
+    return new Class<?>[] {PetStoreConnector.class};
+  }
 
-    @Test
-    public void configWithConfigReferences() throws Exception
-    {
-        PetCage cage = flowRunner("getCageWithReferences").run().getMessage().getPayload();
-        assertBirds(cage.getBirds());
-        assertAmmenities(cage.getAmmenities());
-    }
+  @Test
+  public void configWithConfigReferences() throws Exception {
+    PetCage cage = flowRunner("getCageWithReferences").run().getMessage().getPayload();
+    assertBirds(cage.getBirds());
+    assertAmmenities(cage.getAmmenities());
+  }
 
-    @Test
-    public void configWithConfigMELReferences() throws Exception
-    {
-        PetCage cage = flowRunner("getCageWithMELReferences").run().getMessage().getPayload();
-        assertBirds(cage.getBirds());
-        assertAmmenities(cage.getAmmenities());
-    }
+  @Test
+  public void configWithConfigMELReferences() throws Exception {
+    PetCage cage = flowRunner("getCageWithMELReferences").run().getMessage().getPayload();
+    assertBirds(cage.getBirds());
+    assertAmmenities(cage.getAmmenities());
+  }
 
-    @Test
-    public void configWithConfigChildElements() throws Exception
-    {
-        PetCage cage = flowRunner("getCageWithChildElements").run().getMessage().getPayload();
-        assertBirds(cage.getBirds());
-        assertAmmenities(cage.getAmmenities());
-    }
+  @Test
+  public void configWithConfigChildElements() throws Exception {
+    PetCage cage = flowRunner("getCageWithChildElements").run().getMessage().getPayload();
+    assertBirds(cage.getBirds());
+    assertAmmenities(cage.getAmmenities());
+  }
 
-    private void assertBirds(Map<String, Integer> birds)
-    {
-        assertNotNull(birds);
-        assertThat(birds.get("mockingjay"), equalTo(15));
-        assertThat(birds.get("mockingbird"), equalTo(10));
-    }
+  private void assertBirds(Map<String, Integer> birds) {
+    assertNotNull(birds);
+    assertThat(birds.get("mockingjay"), equalTo(15));
+    assertThat(birds.get("mockingbird"), equalTo(10));
+  }
 
-    private void assertAmmenities(List<String> ammenities)
-    {
-        assertNotNull(ammenities);
-        assertThat(ammenities.get(0), equalTo("spinning wheel"));
-        assertThat(ammenities.get(1), equalTo("food can"));
-    }
+  private void assertAmmenities(List<String> ammenities) {
+    assertNotNull(ammenities);
+    assertThat(ammenities.get(0), equalTo("spinning wheel"));
+    assertThat(ammenities.get(1), equalTo("food can"));
+  }
 }

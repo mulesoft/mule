@@ -8,36 +8,28 @@ package org.mule.test.subtypes.extension;
 
 import org.mule.runtime.extension.api.annotation.param.Optional;
 
-public class CarDoor implements Door
-{
+public class CarDoor implements Door {
 
-    private String color;
+  private String color;
 
-    @Optional(defaultValue = "button")
-    private String handle;
+  @Optional(defaultValue = "button")
+  private String handle;
 
-    @Override
-    public void open()
-    {
-    }
+  @Override
+  public void open() {}
 
-    public void raiseWindow()
-    {
-    }
+  public void raiseWindow() {}
 
-    public String getColor()
-    {
-        return color;
-    }
+  public String getColor() {
+    return color;
+  }
 
-    public void setColor(String color)
-    {
-        this.color = color;
-    }
+  public void setColor(String color) {
+    this.color = color;
+  }
 
-    @Override
-    public String getHandle()
-    {
-        return this.handle;
-    }
+  @Override
+  public String getHandle() {
+    return this.handle;
+  }
 }

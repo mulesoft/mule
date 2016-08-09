@@ -11,16 +11,13 @@ package org.mule.runtime.module.extension.internal.runtime.exception;
  *
  * @since 4.0
  */
-public class IllegalComponentException extends RuntimeException
-{
+public class IllegalComponentException extends RuntimeException {
 
-    public IllegalComponentException(String message)
-    {
-        super(message);
-    }
+  public IllegalComponentException(String message) {
+    super(message);
+  }
 
-    public IllegalComponentException(String message, Throwable cause)
-    {
-        super(message, cause);
-    }
+  public IllegalComponentException(String message, Throwable cause) {
+    super(message, cause);
+  }
 }

@@ -18,121 +18,98 @@ import java.util.Map;
 
 import javax.servlet.http.Part;
 
-public class HttpPart implements Part
-{
+public class HttpPart implements Part {
 
-    public static final int NO_SIZE = -1;
+  public static final int NO_SIZE = -1;
 
-    private final byte[] content;
-    private final String contentType;
-    private final String partName;
-    private final String fileName;
-    private final int size;
-    private Map<String, Object> headers = new HashMap<>();
+  private final byte[] content;
+  private final String contentType;
+  private final String partName;
+  private final String fileName;
+  private final int size;
+  private Map<String, Object> headers = new HashMap<>();
 
-    public HttpPart(String partName, byte[] content, String contentType, int size)
-    {
-        this(partName, null, content, contentType, size);
+  public HttpPart(String partName, byte[] content, String contentType, int size) {
+    this(partName, null, content, contentType, size);
+  }
+
+  public HttpPart(String partName, String fileName, byte[] content, String contentType, int size) {
+    this.partName = partName;
+    this.fileName = fileName;
+    this.content = content;
+    this.contentType = contentType;
+    this.size = size;
+  }
+
+  @Override
+  public void delete() throws IOException {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public String getContentType() {
+    return contentType;
+  }
+
+  @Override
+  public String getHeader(String headerName) {
+    return (String) headers.get(headerName);
+  }
+
+  @Override
+  public Collection<String> getHeaderNames() {
+    return headers.keySet();
+  }
+
+  @Override
+  public Collection<String> getHeaders(String headerName) {
+    Object headerValue = headers.get(headerName);
+
+    if (headerValue instanceof Collection) {
+      return (Collection<String>) headerValue;
+    } else {
+      return Lists.newArrayList((String) headerValue);
     }
+  }
 
-    public HttpPart(String partName, String fileName, byte[] content, String contentType, int size)
-    {
-        this.partName = partName;
-        this.fileName = fileName;
-        this.content = content;
-        this.contentType = contentType;
-        this.size = size;
+  public void addHeader(String headerName, String headerValue) {
+    final Object value = headers.get(headerName);
+    if (value == null) {
+      headers.put(headerName, headerValue);
+    } else {
+      if (value instanceof Collection) {
+        ((Collection) value).add(headerValue);
+      } else {
+        final ArrayList<String> values = new ArrayList<String>();
+        values.add((String) value);
+        values.add(headerValue);
+        headers.put(headerName, values);
+      }
     }
+  }
 
-    @Override
-    public void delete() throws IOException
-    {
-        throw new UnsupportedOperationException();
-    }
+  @Override
+  public InputStream getInputStream() throws IOException {
+    return new ByteArrayInputStream(content);
+  }
 
-    @Override
-    public String getContentType()
-    {
-        return contentType;
-    }
+  @Override
+  public String getName() {
+    return partName;
+  }
 
-    @Override
-    public String getHeader(String headerName)
-    {
-        return (String) headers.get(headerName);
-    }
+  @Override
+  public long getSize() {
+    return size;
+  }
 
-    @Override
-    public Collection<String> getHeaderNames()
-    {
-        return headers.keySet();
-    }
+  @Override
+  public void write(String fileName) throws IOException {
+    throw new UnsupportedOperationException();
+  }
 
-    @Override
-    public Collection<String> getHeaders(String headerName)
-    {
-        Object headerValue = headers.get(headerName);
-
-        if (headerValue instanceof  Collection)
-        {
-            return (Collection<String>) headerValue;
-        }
-        else
-        {
-            return Lists.newArrayList((String) headerValue);
-        }
-    }
-
-    public void addHeader(String headerName, String headerValue)
-    {
-        final Object value = headers.get(headerName);
-        if (value == null)
-        {
-            headers.put(headerName, headerValue);
-        }
-        else
-        {
-            if (value instanceof Collection)
-            {
-                ((Collection) value).add(headerValue);
-            }
-            else
-            {
-                final ArrayList<String> values = new ArrayList<String>();
-                values.add((String) value);
-                values.add(headerValue);
-                headers.put(headerName, values);
-            }
-        }
-    }
-
-    @Override
-    public InputStream getInputStream() throws IOException
-    {
-        return new ByteArrayInputStream(content);
-    }
-
-    @Override
-    public String getName()
-    {
-        return partName;
-    }
-
-    @Override
-    public long getSize()
-    {
-        return size;
-    }
-
-    @Override
-    public void write(String fileName) throws IOException
-    {
-        throw new UnsupportedOperationException();
-    }
-
-    public String getFileName()
-    {
-        return fileName;
-    }
+  public String getFileName() {
+    return fileName;
+  }
 
 }

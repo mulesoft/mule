@@ -6,11 +6,9 @@
  */
 package org.mule.test.vegan.extension;
 
-public class SpreadVeganismOperation
-{
+public class SpreadVeganismOperation {
 
-    public String spreadTheWord(String theWord)
-    {
-        return theWord;
-    }
+  public String spreadTheWord(String theWord) {
+    return theWord;
+  }
 }

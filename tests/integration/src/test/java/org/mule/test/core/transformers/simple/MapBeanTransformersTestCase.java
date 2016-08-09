@@ -16,38 +16,34 @@ import org.mule.tck.testmodels.fruit.GrapeFruit;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MapBeanTransformersTestCase extends AbstractTransformerTestCase
-{
-    @Override
-    public Transformer getTransformer() throws Exception
-    {
-        return createObject(BeanToMap.class);
-    }
+public class MapBeanTransformersTestCase extends AbstractTransformerTestCase {
 
-    @Override
-    public Transformer getRoundTripTransformer() throws Exception
-    {
-        MapToBean trans = new MapToBean();
-        trans.setReturnDataType(DataType.fromType(GrapeFruit.class));
-        trans.setMuleContext(muleContext);
-        trans.initialise();
-        return trans;
-    }
+  @Override
+  public Transformer getTransformer() throws Exception {
+    return createObject(BeanToMap.class);
+  }
 
-    @Override
-    public Object getTestData()
-    {
-        return new GrapeFruit(new Integer(6), new Double(4.56), "Maximus Juicius", true);
-    }
+  @Override
+  public Transformer getRoundTripTransformer() throws Exception {
+    MapToBean trans = new MapToBean();
+    trans.setReturnDataType(DataType.fromType(GrapeFruit.class));
+    trans.setMuleContext(muleContext);
+    trans.initialise();
+    return trans;
+  }
 
-    @Override
-    public Object getResultData()
-    {
-        Map<String, Object> m = new HashMap<String, Object>(3);
-        m.put("segments", new Integer(6));
-        m.put("radius", new Double(4.56));
-        m.put("brand", "Maximus Juicius");
-        m.put("red", new Boolean(true));
-        return m;
-    }
+  @Override
+  public Object getTestData() {
+    return new GrapeFruit(new Integer(6), new Double(4.56), "Maximus Juicius", true);
+  }
+
+  @Override
+  public Object getResultData() {
+    Map<String, Object> m = new HashMap<String, Object>(3);
+    m.put("segments", new Integer(6));
+    m.put("radius", new Double(4.56));
+    m.put("brand", "Maximus Juicius");
+    m.put("red", new Boolean(true));
+    return m;
+  }
 }

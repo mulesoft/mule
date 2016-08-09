@@ -20,45 +20,44 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class ProxyRPCBindingTestCase extends FunctionalTestCase
-{
-    @Rule
-    public final DynamicPort httpPortProxy = new DynamicPort("port1");
+public class ProxyRPCBindingTestCase extends FunctionalTestCase {
 
-    @Rule
-    public final DynamicPort httpPortService = new DynamicPort("port2");
+  @Rule
+  public final DynamicPort httpPortProxy = new DynamicPort("port1");
 
-    public static final HttpRequestOptions HTTP_REQUEST_OPTIONS = newOptions().method(org.mule.runtime.module.http.api.HttpConstants.Methods.POST.name()).build();
+  @Rule
+  public final DynamicPort httpPortService = new DynamicPort("port2");
 
-    private String getAllRequest;
-    private String getAllResponse;
+  public static final HttpRequestOptions HTTP_REQUEST_OPTIONS =
+      newOptions().method(org.mule.runtime.module.http.api.HttpConstants.Methods.POST.name()).build();
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "proxy-rpc-binding-conf-httpn.xml";
-    }
+  private String getAllRequest;
+  private String getAllResponse;
 
-    @Before
-    public void doSetUp() throws Exception
-    {
-        getAllRequest = IOUtils.getResourceAsString("artistregistry-get-all-request.xml", getClass());
-        getAllResponse = IOUtils.getResourceAsString("artistregistry-get-all-response.xml", getClass());
-        XMLUnit.setIgnoreWhitespace(true);
-    }
+  @Override
+  protected String getConfigFile() {
+    return "proxy-rpc-binding-conf-httpn.xml";
+  }
 
-    @Test
-    public void proxyRPCBodyPayload() throws Exception
-    {
-        MuleMessage response = muleContext.getClient().send("http://localhost:" + httpPortProxy.getNumber() + "/body", getTestMuleMessage(getAllRequest), HTTP_REQUEST_OPTIONS);
-        assertTrue(XMLUnit.compareXML(getAllResponse, getPayloadAsString(response)).identical());
-    }
+  @Before
+  public void doSetUp() throws Exception {
+    getAllRequest = IOUtils.getResourceAsString("artistregistry-get-all-request.xml", getClass());
+    getAllResponse = IOUtils.getResourceAsString("artistregistry-get-all-response.xml", getClass());
+    XMLUnit.setIgnoreWhitespace(true);
+  }
 
-    @Test
-    public void proxyRPCBodyEnvelope() throws Exception
-    {
-        MuleMessage response = muleContext.getClient().send("http://localhost:" + httpPortProxy.getNumber() + "/envelope", getTestMuleMessage(getAllRequest), HTTP_REQUEST_OPTIONS);
-        assertTrue(XMLUnit.compareXML(getAllResponse, getPayloadAsString(response)).identical());
-    }
+  @Test
+  public void proxyRPCBodyPayload() throws Exception {
+    MuleMessage response = muleContext.getClient().send("http://localhost:" + httpPortProxy.getNumber() + "/body",
+                                                        getTestMuleMessage(getAllRequest), HTTP_REQUEST_OPTIONS);
+    assertTrue(XMLUnit.compareXML(getAllResponse, getPayloadAsString(response)).identical());
+  }
+
+  @Test
+  public void proxyRPCBodyEnvelope() throws Exception {
+    MuleMessage response = muleContext.getClient().send("http://localhost:" + httpPortProxy.getNumber() + "/envelope",
+                                                        getTestMuleMessage(getAllRequest), HTTP_REQUEST_OPTIONS);
+    assertTrue(XMLUnit.compareXML(getAllResponse, getPayloadAsString(response)).identical());
+  }
 
 }

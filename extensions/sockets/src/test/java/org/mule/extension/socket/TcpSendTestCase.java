@@ -12,43 +12,32 @@ import org.junit.Test;
 import org.junit.runners.Parameterized;
 
 @RunnerDelegateTo(Parameterized.class)
-public class TcpSendTestCase extends ParameterizedProtocolTestCase
-{
+public class TcpSendTestCase extends ParameterizedProtocolTestCase {
 
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "tcp-send-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "tcp-send-config.xml";
+  }
 
-    @Test
-    public void sendPojo() throws Exception
-    {
-        flowRunner("tcp-send")
-                .withPayload(testPojo)
-                .run();
-        assertPojo(receiveConnection(), testPojo);
-    }
+  @Test
+  public void sendPojo() throws Exception {
+    flowRunner("tcp-send").withPayload(testPojo).run();
+    assertPojo(receiveConnection(), testPojo);
+  }
 
-    @Test
-    public void sendString() throws Exception
-    {
+  @Test
+  public void sendString() throws Exception {
 
-        flowRunner("tcp-send")
-                .withPayload(TEST_STRING)
-                .run();
+    flowRunner("tcp-send").withPayload(TEST_STRING).run();
 
-        assertEvent(receiveConnection(), TEST_STRING);
-    }
+    assertEvent(receiveConnection(), TEST_STRING);
+  }
 
-    @Test
-    public void sendByteArray() throws Exception
-    {
-        flowRunner("tcp-send")
-                .withPayload(testByteArray)
-                .run();
+  @Test
+  public void sendByteArray() throws Exception {
+    flowRunner("tcp-send").withPayload(testByteArray).run();
 
-        assertByteArray(receiveConnection(), testByteArray);
-    }
+    assertByteArray(receiveConnection(), testByteArray);
+  }
 }

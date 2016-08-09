@@ -9,12 +9,11 @@ package org.mule.runtime.core.api.processor;
 /**
  * Provides information about a processing unit represented by this instance
  */
-public interface ProcessingDescriptor
-{
+public interface ProcessingDescriptor {
 
-    /**
-     * Whether the processing represented by this instance is synchronous or not
-     */
-    public boolean isSynchronous();
+  /**
+   * Whether the processing represented by this instance is synchronous or not
+   */
+  public boolean isSynchronous();
 
 }

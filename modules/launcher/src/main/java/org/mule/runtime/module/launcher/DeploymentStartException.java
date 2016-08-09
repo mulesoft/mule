@@ -11,16 +11,13 @@ import org.mule.runtime.core.config.i18n.Message;
 /**
  *
  */
-public class DeploymentStartException extends DeploymentException
-{
+public class DeploymentStartException extends DeploymentException {
 
-    public DeploymentStartException(Message message)
-    {
-        super(message);
-    }
+  public DeploymentStartException(Message message) {
+    super(message);
+  }
 
-    public DeploymentStartException(Message message, Throwable cause)
-    {
-        super(message, cause);
-    }
+  public DeploymentStartException(Message message, Throwable cause) {
+    super(message, cause);
+  }
 }

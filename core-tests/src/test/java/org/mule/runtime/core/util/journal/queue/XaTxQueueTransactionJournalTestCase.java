@@ -29,173 +29,168 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.mockito.Answers;
 
-public class XaTxQueueTransactionJournalTestCase extends AbstractMuleContextTestCase
-{
+public class XaTxQueueTransactionJournalTestCase extends AbstractMuleContextTestCase {
 
-    public static final Xid TX_ID = new MuleXid(9, new byte[]{1,2,3,4}, new byte[]{5,6,7,8});
+  public static final Xid TX_ID = new MuleXid(9, new byte[] {1, 2, 3, 4}, new byte[] {5, 6, 7, 8});
 
-    public static final String QUEUE_NAME = "queueName";
-    public static final String SOME_VALUE = "some value";
+  public static final String QUEUE_NAME = "queueName";
+  public static final String SOME_VALUE = "some value";
 
-    @Rule
-    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+  @Rule
+  public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
-    private DefaultQueueStore mockQueueInfo = mock(DefaultQueueStore.class, Answers.RETURNS_DEEP_STUBS.get());
+  private DefaultQueueStore mockQueueInfo = mock(DefaultQueueStore.class, Answers.RETURNS_DEEP_STUBS.get());
 
 
-    @Before
-    public void setUpMocks()
-    {
-        when(mockQueueInfo.getName()).thenReturn(QUEUE_NAME);
+  @Before
+  public void setUpMocks() {
+    when(mockQueueInfo.getName()).thenReturn(QUEUE_NAME);
+  }
+
+  @Test
+  public void logAddAndRetrieve() throws Exception {
+    MuleEvent muleEvent = getTestEvent(SOME_VALUE);
+    XaTxQueueTransactionJournal transactionJournal =
+        new XaTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
+    transactionJournal.logAdd(TX_ID, mockQueueInfo, muleEvent);
+    transactionJournal.close();
+    transactionJournal = new XaTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
+    Multimap<Xid, XaQueueTxJournalEntry> allEntries = transactionJournal.getAllLogEntries();
+    assertThat(allEntries.size(), is(1));
+    assertThat(allEntries.get(TX_ID).size(), is(1));
+    XaQueueTxJournalEntry logEntry = allEntries.get(TX_ID).iterator().next();
+    assertThat(logEntry.getQueueName(), is(QUEUE_NAME));
+    assertThat(getPayloadAsString(((MuleEvent) logEntry.getValue()).getMessage()), is(SOME_VALUE));
+    assertThat(logEntry.isAdd(), is(true));
+  }
+
+  @Test
+  public void logAddFirstAndRetrieve() throws Exception {
+    MuleEvent muleEvent = getTestEvent(SOME_VALUE);
+    XaTxQueueTransactionJournal transactionJournal =
+        new XaTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
+    transactionJournal.logAddFirst(TX_ID, mockQueueInfo, muleEvent);
+    transactionJournal.close();
+    transactionJournal = new XaTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
+    Multimap<Xid, XaQueueTxJournalEntry> allEntries = transactionJournal.getAllLogEntries();
+    assertThat(allEntries.size(), is(1));
+    assertThat(allEntries.get(TX_ID).size(), is(1));
+    XaQueueTxJournalEntry journalEntry = allEntries.get(TX_ID).iterator().next();
+    assertThat(journalEntry.getQueueName(), is(QUEUE_NAME));
+    assertThat(getPayloadAsString(((MuleEvent) journalEntry.getValue()).getMessage()), is(SOME_VALUE));
+    assertThat(journalEntry.isAddFirst(), is(true));
+  }
+
+  @Test
+  public void logRemoveAndRetrieve() throws Exception {
+    MuleEvent muleEvent = getTestEvent(SOME_VALUE);
+    XaTxQueueTransactionJournal transactionJournal =
+        new XaTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
+    transactionJournal.logRemove(TX_ID, mockQueueInfo, muleEvent);
+    transactionJournal.close();
+    transactionJournal = new XaTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
+    Multimap<Xid, XaQueueTxJournalEntry> allEntries = transactionJournal.getAllLogEntries();
+    assertThat(allEntries.size(), is(1));
+    assertThat(allEntries.get(TX_ID).size(), is(1));
+    XaQueueTxJournalEntry journalEntry = allEntries.get(TX_ID).iterator().next();
+    assertThat(journalEntry.getQueueName(), is(QUEUE_NAME));
+    assertThat(getPayloadAsString(((MuleEvent) journalEntry.getValue()).getMessage()), is(SOME_VALUE));
+    assertThat(journalEntry.isRemove(), is(true));
+  }
+
+  @Test
+  public void logCommitAndRetrieve() {
+    XaTxQueueTransactionJournal transactionJournal =
+        new XaTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
+    transactionJournal.logCommit(TX_ID);
+    transactionJournal.close();
+    transactionJournal = new XaTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
+    Multimap<Xid, XaQueueTxJournalEntry> allEntries = transactionJournal.getAllLogEntries();
+    assertThat(allEntries.size(), is(0));
+  }
+
+  @Test
+  public void logRollbackAndRetrieve() {
+    XaTxQueueTransactionJournal transactionJournal =
+        new XaTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
+    transactionJournal.logRollback(TX_ID);
+    transactionJournal.close();
+    transactionJournal = new XaTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
+    Multimap<Xid, XaQueueTxJournalEntry> allEntries = transactionJournal.getAllLogEntries();
+    assertThat(allEntries.size(), is(0));
+  }
+
+  @Test
+  public void logSeveralAddsThenCommitAndRetrieve() throws Exception {
+    MuleEvent muleEvent = getTestEvent(SOME_VALUE);
+    XaTxQueueTransactionJournal transactionJournal =
+        new XaTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
+    int numberOfOffers = 1000;
+    for (int i = 0; i < numberOfOffers; i++) {
+      transactionJournal.logAdd(TX_ID, mockQueueInfo, muleEvent);
     }
+    transactionJournal.logCommit(TX_ID);
+    transactionJournal.close();
+    transactionJournal = new XaTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
+    Multimap<Xid, XaQueueTxJournalEntry> allEntries = transactionJournal.getAllLogEntries();
+    assertThat(allEntries.size(), is(0));
+  }
 
-    @Test
-    public void logAddAndRetrieve() throws Exception
-    {
-        MuleEvent muleEvent = getTestEvent(SOME_VALUE);
-        XaTxQueueTransactionJournal transactionJournal = new XaTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
-        transactionJournal.logAdd(TX_ID, mockQueueInfo, muleEvent);
-        transactionJournal.close();
-        transactionJournal = new XaTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
-        Multimap<Xid, XaQueueTxJournalEntry> allEntries = transactionJournal.getAllLogEntries();
-        assertThat(allEntries.size(), is(1));
-        assertThat(allEntries.get(TX_ID).size(), is(1));
-        XaQueueTxJournalEntry logEntry = allEntries.get(TX_ID).iterator().next();
-        assertThat(logEntry.getQueueName(), is(QUEUE_NAME));
-        assertThat(getPayloadAsString(((MuleEvent) logEntry.getValue()).getMessage()), is(SOME_VALUE));
-        assertThat(logEntry.isAdd(), is(true));
+  @Test
+  public void logSeveralAddsThenRetrieveAndCommit() throws Exception {
+    MuleEvent muleEvent = getTestEvent(SOME_VALUE);
+    XaTxQueueTransactionJournal transactionJournal =
+        new XaTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
+    int numberOfOffers = 1000;
+    for (int i = 0; i < numberOfOffers; i++) {
+      transactionJournal.logAdd(TX_ID, mockQueueInfo, muleEvent);
     }
+    transactionJournal.close();
+    transactionJournal = new XaTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
+    transactionJournal.logCommit(TX_ID);
+    Multimap<Xid, XaQueueTxJournalEntry> allEntries = transactionJournal.getAllLogEntries();
+    assertThat(allEntries.size(), is(0));
+  }
 
-    @Test
-    public void logAddFirstAndRetrieve() throws Exception
-    {
-        MuleEvent muleEvent = getTestEvent(SOME_VALUE);
-        XaTxQueueTransactionJournal transactionJournal = new XaTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
-        transactionJournal.logAddFirst(TX_ID, mockQueueInfo, muleEvent);
-        transactionJournal.close();
-        transactionJournal = new XaTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
-        Multimap<Xid, XaQueueTxJournalEntry> allEntries = transactionJournal.getAllLogEntries();
-        assertThat(allEntries.size(), is(1));
-        assertThat(allEntries.get(TX_ID).size(), is(1));
-        XaQueueTxJournalEntry journalEntry = allEntries.get(TX_ID).iterator().next();
-        assertThat(journalEntry.getQueueName(), is(QUEUE_NAME));
-        assertThat(getPayloadAsString(((MuleEvent) journalEntry.getValue()).getMessage()), is(SOME_VALUE));
-        assertThat(journalEntry.isAddFirst(), is(true));
+  @Test
+  public void logSeveralAddsAndRetrieve() throws Exception {
+    MuleEvent muleEvent = getTestEvent(SOME_VALUE);
+    XaTxQueueTransactionJournal transactionJournal =
+        new XaTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
+    int numberOfOffers = 1000;
+    for (int i = 0; i < numberOfOffers; i++) {
+      transactionJournal.logAdd(TX_ID, mockQueueInfo, muleEvent);
     }
+    transactionJournal.close();
+    transactionJournal = new XaTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
+    Multimap<Xid, XaQueueTxJournalEntry> allEntries = transactionJournal.getAllLogEntries();
+    assertThat(allEntries.size(), is(numberOfOffers));
+    assertThat(allEntries.get(TX_ID).size(), is(numberOfOffers));
+    XaQueueTxJournalEntry journalEntry = allEntries.get(TX_ID).iterator().next();
+    assertThat(journalEntry.getQueueName(), is(QUEUE_NAME));
+    assertThat(getPayloadAsString(((MuleEvent) journalEntry.getValue()).getMessage()), is(SOME_VALUE));
+    assertThat(journalEntry.isAdd(), is(true));
+  }
 
-    @Test
-    public void logRemoveAndRetrieve() throws Exception
-    {
-        MuleEvent muleEvent = getTestEvent(SOME_VALUE);
-        XaTxQueueTransactionJournal transactionJournal = new XaTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
-        transactionJournal.logRemove(TX_ID, mockQueueInfo, muleEvent);
-        transactionJournal.close();
-        transactionJournal = new XaTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
-        Multimap<Xid, XaQueueTxJournalEntry> allEntries = transactionJournal.getAllLogEntries();
-        assertThat(allEntries.size(), is(1));
-        assertThat(allEntries.get(TX_ID).size(), is(1));
-        XaQueueTxJournalEntry journalEntry = allEntries.get(TX_ID).iterator().next();
-        assertThat(journalEntry.getQueueName(), is(QUEUE_NAME));
-        assertThat(getPayloadAsString(((MuleEvent) journalEntry.getValue()).getMessage()), is(SOME_VALUE));
-        assertThat(journalEntry.isRemove(), is(true));
-    }
-
-    @Test
-    public void logCommitAndRetrieve()
-    {
-        XaTxQueueTransactionJournal transactionJournal = new XaTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
-        transactionJournal.logCommit(TX_ID);
-        transactionJournal.close();
-        transactionJournal = new XaTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
-        Multimap<Xid, XaQueueTxJournalEntry> allEntries = transactionJournal.getAllLogEntries();
-        assertThat(allEntries.size(), is(0));
-    }
-
-    @Test
-    public void logRollbackAndRetrieve()
-    {
-        XaTxQueueTransactionJournal transactionJournal = new XaTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
-        transactionJournal.logRollback(TX_ID);
-        transactionJournal.close();
-        transactionJournal = new XaTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
-        Multimap<Xid, XaQueueTxJournalEntry> allEntries = transactionJournal.getAllLogEntries();
-        assertThat(allEntries.size(), is(0));
-    }
-
-    @Test
-    public void logSeveralAddsThenCommitAndRetrieve() throws Exception
-    {
-        MuleEvent muleEvent = getTestEvent(SOME_VALUE);
-        XaTxQueueTransactionJournal transactionJournal = new XaTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
-        int numberOfOffers = 1000;
-        for (int i = 0; i < numberOfOffers; i++)
-        {
-            transactionJournal.logAdd(TX_ID, mockQueueInfo, muleEvent);
-        }
-        transactionJournal.logCommit(TX_ID);
-        transactionJournal.close();
-        transactionJournal = new XaTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
-        Multimap<Xid, XaQueueTxJournalEntry> allEntries = transactionJournal.getAllLogEntries();
-        assertThat(allEntries.size(), is(0));
-    }
-
-    @Test
-    public void logSeveralAddsThenRetrieveAndCommit() throws Exception
-    {
-        MuleEvent muleEvent = getTestEvent(SOME_VALUE);
-        XaTxQueueTransactionJournal transactionJournal = new XaTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
-        int numberOfOffers = 1000;
-        for (int i = 0; i < numberOfOffers; i++)
-        {
-            transactionJournal.logAdd(TX_ID, mockQueueInfo, muleEvent);
-        }
-        transactionJournal.close();
-        transactionJournal = new XaTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
-        transactionJournal.logCommit(TX_ID);
-        Multimap<Xid, XaQueueTxJournalEntry> allEntries = transactionJournal.getAllLogEntries();
-        assertThat(allEntries.size(), is(0));
-    }
-
-    @Test
-    public void logSeveralAddsAndRetrieve() throws Exception
-    {
-        MuleEvent muleEvent = getTestEvent(SOME_VALUE);
-        XaTxQueueTransactionJournal transactionJournal = new XaTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
-        int numberOfOffers = 1000;
-        for (int i = 0; i < numberOfOffers; i++)
-        {
-            transactionJournal.logAdd(TX_ID, mockQueueInfo, muleEvent);
-        }
-        transactionJournal.close();
-        transactionJournal = new XaTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
-        Multimap<Xid, XaQueueTxJournalEntry> allEntries = transactionJournal.getAllLogEntries();
-        assertThat(allEntries.size(), is(numberOfOffers));
-        assertThat(allEntries.get(TX_ID).size(), is(numberOfOffers));
-        XaQueueTxJournalEntry journalEntry = allEntries.get(TX_ID).iterator().next();
-        assertThat(journalEntry.getQueueName(), is(QUEUE_NAME));
-        assertThat(getPayloadAsString(((MuleEvent) journalEntry.getValue()).getMessage()), is(SOME_VALUE));
-        assertThat(journalEntry.isAdd(), is(true));
-    }
-
-    @Test
-    public void logAddAndPrepare() throws Exception
-    {
-        MuleEvent muleEvent = getTestEvent(SOME_VALUE);
-        XaTxQueueTransactionJournal transactionJournal = new XaTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
-        transactionJournal.logAdd(TX_ID, mockQueueInfo, muleEvent);
-        transactionJournal.logPrepare(TX_ID);
-        transactionJournal.close();
-        transactionJournal = new XaTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
-        Multimap<Xid, XaQueueTxJournalEntry> allEntries = transactionJournal.getAllLogEntries();
-        assertThat(allEntries.size(), is(2));
-        Collection<XaQueueTxJournalEntry> values = allEntries.values();
-        assertThat(values.size(), is(2));
-        Iterator<XaQueueTxJournalEntry> iterator = values.iterator();
-        XaQueueTxJournalEntry addEntry = iterator.next();
-        assertThat(addEntry.isAdd(),is(true));
-        XaQueueTxJournalEntry prepareEntry = iterator.next();
-        assertThat(prepareEntry.isPrepare(), is(true));
-    }
+  @Test
+  public void logAddAndPrepare() throws Exception {
+    MuleEvent muleEvent = getTestEvent(SOME_VALUE);
+    XaTxQueueTransactionJournal transactionJournal =
+        new XaTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
+    transactionJournal.logAdd(TX_ID, mockQueueInfo, muleEvent);
+    transactionJournal.logPrepare(TX_ID);
+    transactionJournal.close();
+    transactionJournal = new XaTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
+    Multimap<Xid, XaQueueTxJournalEntry> allEntries = transactionJournal.getAllLogEntries();
+    assertThat(allEntries.size(), is(2));
+    Collection<XaQueueTxJournalEntry> values = allEntries.values();
+    assertThat(values.size(), is(2));
+    Iterator<XaQueueTxJournalEntry> iterator = values.iterator();
+    XaQueueTxJournalEntry addEntry = iterator.next();
+    assertThat(addEntry.isAdd(), is(true));
+    XaQueueTxJournalEntry prepareEntry = iterator.next();
+    assertThat(prepareEntry.isPrepare(), is(true));
+  }
 
 
 }

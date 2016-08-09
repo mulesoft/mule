@@ -14,22 +14,20 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
-public class HttpAuthenticationDefinitionParser extends ChildDefinitionParser
-{
-    private HttpAuthenticationType httpAuthenticationType;
+public class HttpAuthenticationDefinitionParser extends ChildDefinitionParser {
 
-    public HttpAuthenticationDefinitionParser(HttpAuthenticationType httpAuthenticationType)
-    {
-        super("authentication", DefaultHttpAuthentication.class);
+  private HttpAuthenticationType httpAuthenticationType;
 
-        this.httpAuthenticationType = httpAuthenticationType;
-    }
+  public HttpAuthenticationDefinitionParser(HttpAuthenticationType httpAuthenticationType) {
+    super("authentication", DefaultHttpAuthentication.class);
 
-    @Override
-    protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
-    {
-        builder.addConstructorArgValue(httpAuthenticationType);
-        super.parseChild(element, parserContext, builder);
-    }
+    this.httpAuthenticationType = httpAuthenticationType;
+  }
+
+  @Override
+  protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
+    builder.addConstructorArgValue(httpAuthenticationType);
+    super.parseChild(element, parserContext, builder);
+  }
 
 }

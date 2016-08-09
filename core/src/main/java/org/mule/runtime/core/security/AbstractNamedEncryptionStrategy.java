@@ -15,42 +15,33 @@ import java.io.InputStream;
 
 import org.apache.commons.io.IOUtils;
 
-public abstract class AbstractNamedEncryptionStrategy implements EncryptionStrategy
-{
+public abstract class AbstractNamedEncryptionStrategy implements EncryptionStrategy {
 
-    private String name;
+  private String name;
 
-    public String getName()
-    {
-        return name;
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public byte[] encrypt(byte[] data, Object info) throws CryptoFailureException {
+    InputStream io = this.encrypt(new ByteArrayInputStream(data), info);
+    try {
+      return IOUtils.toByteArray(io);
+    } catch (IOException e) {
+      throw new CryptoFailureException(this, e);
     }
+  }
 
-    public void setName(String name)
-    {
-        this.name = name;
+  public byte[] decrypt(byte[] data, Object info) throws CryptoFailureException {
+    InputStream io = this.decrypt(new ByteArrayInputStream(data), info);
+    try {
+      return IOUtils.toByteArray(io);
+    } catch (IOException e) {
+      throw new CryptoFailureException(this, e);
     }
-
-    public byte[] encrypt(byte[] data, Object info) throws CryptoFailureException {
-        InputStream io = this.encrypt(new ByteArrayInputStream(data), info);
-        try
-        {
-            return IOUtils.toByteArray(io);
-        }
-        catch (IOException e)
-        {
-            throw new CryptoFailureException(this, e);
-        }
-    }
-
-    public byte[] decrypt(byte[] data, Object info) throws CryptoFailureException {
-        InputStream io = this.decrypt(new ByteArrayInputStream(data), info);
-        try
-        {
-            return IOUtils.toByteArray(io);
-        }
-        catch (IOException e)
-        {
-            throw new CryptoFailureException(this, e);
-        }
-    }
+  }
 }

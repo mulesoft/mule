@@ -8,11 +8,10 @@ package org.mule.runtime.core.registry;
 
 import org.mule.runtime.core.api.registry.Registry;
 
-public class CommonBehaviourTransientRegistryTestCase extends AbstractRegistryTestCase
-{
-    @Override
-    public Registry getRegistry()
-    {
-        return new TransientRegistry(null);
-    }
+public class CommonBehaviourTransientRegistryTestCase extends AbstractRegistryTestCase {
+
+  @Override
+  public Registry getRegistry() {
+    return new TransientRegistry(null);
+  }
 }

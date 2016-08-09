@@ -18,76 +18,61 @@ import org.mule.runtime.core.routing.DynamicRouteResolver;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CustomRouteResolver implements DynamicRouteResolver
-{
+public class CustomRouteResolver implements DynamicRouteResolver {
 
-    static List<MessageProcessor> routes = new ArrayList<>();
+  static List<MessageProcessor> routes = new ArrayList<>();
+
+  @Override
+  public List<MessageProcessor> resolveRoutes(MuleEvent event) {
+    return routes;
+  }
+
+  public static class AddLetterMessageProcessor implements MessageProcessor {
+
+    private String letter;
+
+    public AddLetterMessageProcessor(String letter) {
+      this.letter = letter;
+    }
 
     @Override
-    public List<MessageProcessor> resolveRoutes(MuleEvent event)
-    {
-        return routes;
+    public MuleEvent process(MuleEvent event) throws MuleException {
+      try {
+        event.setMessage(MuleMessage.builder(event.getMessage()).payload(letter).build());
+        return event;
+      } catch (Exception e) {
+        throw new DefaultMuleException(e);
+      }
     }
 
-    public static class AddLetterMessageProcessor implements MessageProcessor
-    {
+  }
 
-        private String letter;
+  public static class FailingMessageProcessor implements MessageProcessor {
 
-        public AddLetterMessageProcessor(String letter)
-        {
-            this.letter = letter;
-        }
+    @Override
+    public MuleEvent process(MuleEvent event) throws MuleException {
+      throw new DefaultMuleException(CoreMessages.createStaticMessage(""));
+    }
+  }
 
-        @Override
-        public MuleEvent process(MuleEvent event) throws MuleException
-        {
-            try
-            {
-                event.setMessage(MuleMessage.builder(event.getMessage()).payload(letter).build());
-                return event;
-            }
-            catch (Exception e)
-            {
-                throw new DefaultMuleException(e);
-            }
-        }
+  public static class AddLetterTHenFailsMessageProcessor implements MessageProcessor {
 
+    private String letter;
+
+    public AddLetterTHenFailsMessageProcessor(String letter) {
+      this.letter = letter;
     }
 
-    public static class FailingMessageProcessor implements MessageProcessor
-    {
-
-        @Override
-        public MuleEvent process(MuleEvent event) throws MuleException
-        {
-            throw new DefaultMuleException(CoreMessages.createStaticMessage(""));
-        }
+    @Override
+    public MuleEvent process(MuleEvent event) throws MuleException {
+      try {
+        event.setMessage(MuleMessage.builder(event.getMessage())
+            .payload(event.getMuleContext().getTransformationService().transform(event.getMessage(), DataType.STRING).getPayload()
+                + letter)
+            .build());
+      } catch (Exception e) {
+      }
+      throw new DefaultMuleException(CoreMessages.createStaticMessage(""));
     }
-
-    public static class AddLetterTHenFailsMessageProcessor implements MessageProcessor
-    {
-
-        private String letter;
-
-        public AddLetterTHenFailsMessageProcessor(String letter)
-        {
-            this.letter = letter;
-        }
-
-        @Override
-        public MuleEvent process(MuleEvent event) throws MuleException
-        {
-            try
-            {
-                event.setMessage(MuleMessage.builder(event.getMessage())
-                                            .payload(event.getMuleContext().getTransformationService().transform(event.getMessage(), DataType.STRING).getPayload() + letter)
-                                            .build());
-            }
-            catch (Exception e)
-            {
-            }
-            throw new DefaultMuleException(CoreMessages.createStaticMessage(""));
-        }
-    }
+  }
 }

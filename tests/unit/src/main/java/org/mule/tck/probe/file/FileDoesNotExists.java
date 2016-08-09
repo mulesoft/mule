@@ -13,23 +13,19 @@ import java.io.File;
 /**
  * Checks that a given file is not present in the file system
  */
-public class FileDoesNotExists implements Probe
-{
+public class FileDoesNotExists implements Probe {
 
-    private final File target;
+  private final File target;
 
-    public FileDoesNotExists(File target)
-    {
-        this.target = target;
-    }
+  public FileDoesNotExists(File target) {
+    this.target = target;
+  }
 
-    public boolean isSatisfied()
-    {
-        return !target.exists();
-    }
+  public boolean isSatisfied() {
+    return !target.exists();
+  }
 
-    public String describeFailure()
-    {
-        return String.format("File '%s' was not expected to exist", target.getName());
-    }
+  public String describeFailure() {
+    return String.format("File '%s' was not expected to exist", target.getName());
+  }
 }

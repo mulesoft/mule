@@ -32,118 +32,101 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpListenerResponseStreamingExceptionStrategyTestCase extends AbstractHttpTestCase
-{
+public class HttpListenerResponseStreamingExceptionStrategyTestCase extends AbstractHttpTestCase {
 
-    public static InputStream stream;
+  public static InputStream stream;
 
-    @Rule
-    public DynamicPort listenPort = new DynamicPort("port");
+  @Rule
+  public DynamicPort listenPort = new DynamicPort("port");
+
+  @Override
+  protected String getConfigFile() {
+    return "http-listener-response-streaming-exception-strategy-config.xml";
+  }
+
+  @BeforeClass
+  public static void beforeClass() throws IOException {
+    stream = mock(InputStream.class);
+    when(stream.read()).thenThrow(new RuntimeException("Some exception"));
+    when(stream.read(any(byte[].class))).thenThrow(new RuntimeException("Some exception"));
+    when(stream.read(any(byte[].class), anyInt(), anyInt())).thenThrow(new RuntimeException("Some exception"));
+  }
+
+  @Before
+  public void before() {
+    TrackPassageMessageProcessor.passed = false;
+  }
+
+  protected String getUrl(String path) {
+    return String.format("http://localhost:%s/%s", listenPort.getNumber(), path);
+  }
+
+  @Test
+  public void exceptionHandledWhenBuildingResponse() throws Exception {
+    final Response response =
+        Get(getUrl("exceptionBuildingResponse")).connectTimeout(DEFAULT_TIMEOUT).socketTimeout(DEFAULT_TIMEOUT).execute();
+
+    final HttpResponse httpResponse = response.returnResponse();
+
+    assertExceptionStrategyExecuted(httpResponse);
+  }
+
+  @Test
+  public void exceptionNotHandledWhenSendingResponse() throws Exception {
+    final Response response =
+        Get(getUrl("exceptionSendingResponse")).connectTimeout(DEFAULT_TIMEOUT).socketTimeout(DEFAULT_TIMEOUT).execute();
+
+    final HttpResponse httpResponse = response.returnResponse();
+
+    assertExceptionStrategyNotExecuted(httpResponse);
+  }
+
+  @Test
+  public void exceptionHandledWhenBuildingResponseFailAgain() throws Exception {
+    final Response response = Get(getUrl("exceptionBuildingResponseFailAgain")).connectTimeout(DEFAULT_TIMEOUT)
+        .socketTimeout(DEFAULT_TIMEOUT).execute();
+
+    final HttpResponse httpResponse = response.returnResponse();
+
+    assertExceptionStrategyFailed(httpResponse);
+  }
+
+  @Test
+  public void exceptionNotHandledWhenSendingResponseFailAgain() throws Exception {
+    final Response response =
+        Get(getUrl("exceptionSendingResponseFailAgain")).connectTimeout(DEFAULT_TIMEOUT).socketTimeout(DEFAULT_TIMEOUT).execute();
+
+    final HttpResponse httpResponse = response.returnResponse();
+
+    assertExceptionStrategyNotExecuted(httpResponse);
+  }
+
+  public static class TrackPassageMessageProcessor implements MessageProcessor {
+
+    public static boolean passed = false;
 
     @Override
-    protected String getConfigFile()
-    {
-        return "http-listener-response-streaming-exception-strategy-config.xml";
+    public MuleEvent process(MuleEvent event) throws MuleException {
+      passed = true;
+      return event;
     }
+  }
 
-    @BeforeClass
-    public static void beforeClass() throws IOException
-    {
-        stream = mock(InputStream.class);
-        when(stream.read()).thenThrow(new RuntimeException("Some exception"));
-        when(stream.read(any(byte[].class))).thenThrow(new RuntimeException("Some exception"));
-        when(stream.read(any(byte[].class), anyInt(), anyInt())).thenThrow(new RuntimeException("Some exception"));
-    }
+  protected void assertExceptionStrategyExecuted(final HttpResponse httpResponse) throws IOException {
+    assertThat(httpResponse.getStatusLine().getStatusCode(), is(SC_OK));
+    assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is("Exception Handled"));
+    assertThat(TrackPassageMessageProcessor.passed, is(true));
+  }
 
-    @Before
-    public void before()
-    {
-        TrackPassageMessageProcessor.passed = false;
-    }
+  protected void assertExceptionStrategyFailed(final HttpResponse httpResponse) throws IOException {
+    assertThat(httpResponse.getStatusLine().getStatusCode(), is(SC_INTERNAL_SERVER_ERROR));
+    assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is(""));
+    assertThat(TrackPassageMessageProcessor.passed, is(true));
+  }
 
-    protected String getUrl(String path)
-    {
-        return String.format("http://localhost:%s/%s", listenPort.getNumber(), path);
-    }
-
-    @Test
-    public void exceptionHandledWhenBuildingResponse() throws Exception
-    {
-        final Response response = Get(getUrl("exceptionBuildingResponse")).connectTimeout(DEFAULT_TIMEOUT)
-                                                                          .socketTimeout(DEFAULT_TIMEOUT)
-                                                                          .execute();
-
-        final HttpResponse httpResponse = response.returnResponse();
-
-        assertExceptionStrategyExecuted(httpResponse);
-    }
-
-    @Test
-    public void exceptionNotHandledWhenSendingResponse() throws Exception
-    {
-        final Response response = Get(getUrl("exceptionSendingResponse")).connectTimeout(DEFAULT_TIMEOUT)
-                                                                         .socketTimeout(DEFAULT_TIMEOUT)
-                                                                         .execute();
-        
-        final HttpResponse httpResponse = response.returnResponse();
-        
-        assertExceptionStrategyNotExecuted(httpResponse);
-    }
-
-    @Test
-    public void exceptionHandledWhenBuildingResponseFailAgain() throws Exception
-    {
-        final Response response = Get(getUrl("exceptionBuildingResponseFailAgain")).connectTimeout(DEFAULT_TIMEOUT)
-                                                                                   .socketTimeout(DEFAULT_TIMEOUT)
-                                                                                   .execute();
-
-        final HttpResponse httpResponse = response.returnResponse();
-
-        assertExceptionStrategyFailed(httpResponse);
-    }
-
-    @Test
-    public void exceptionNotHandledWhenSendingResponseFailAgain() throws Exception
-    {
-        final Response response = Get(getUrl("exceptionSendingResponseFailAgain")).connectTimeout(DEFAULT_TIMEOUT)
-                                                                                  .socketTimeout(DEFAULT_TIMEOUT)
-                                                                                  .execute();
-
-        final HttpResponse httpResponse = response.returnResponse();
-
-        assertExceptionStrategyNotExecuted(httpResponse);
-    }
-
-    public static class TrackPassageMessageProcessor implements MessageProcessor
-    {
-        public static boolean passed = false;
-
-        @Override
-        public MuleEvent process(MuleEvent event) throws MuleException
-        {
-            passed = true;
-            return event;
-        }
-    }
-
-    protected void assertExceptionStrategyExecuted(final HttpResponse httpResponse) throws IOException
-    {
-        assertThat(httpResponse.getStatusLine().getStatusCode(), is(SC_OK));
-        assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is("Exception Handled"));
-        assertThat(TrackPassageMessageProcessor.passed, is(true));
-    }
-
-    protected void assertExceptionStrategyFailed(final HttpResponse httpResponse) throws IOException
-    {
-        assertThat(httpResponse.getStatusLine().getStatusCode(), is(SC_INTERNAL_SERVER_ERROR));
-        assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is(""));
-        assertThat(TrackPassageMessageProcessor.passed, is(true));
-    }
-
-    protected void assertExceptionStrategyNotExecuted(final HttpResponse httpResponse) throws IOException
-    {
-        assertThat(httpResponse.getStatusLine().getStatusCode(), is(SC_INTERNAL_SERVER_ERROR));
-        assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is(""));
-        assertThat(TrackPassageMessageProcessor.passed, is(false));
-    }
+  protected void assertExceptionStrategyNotExecuted(final HttpResponse httpResponse) throws IOException {
+    assertThat(httpResponse.getStatusLine().getStatusCode(), is(SC_INTERNAL_SERVER_ERROR));
+    assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is(""));
+    assertThat(TrackPassageMessageProcessor.passed, is(false));
+  }
 }

@@ -12,62 +12,54 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 
 /**
- * A placeholder for a connector that has not been created yet. This used by dynamic endpoints who's actual endpoint is
- * not created until the first message is received for processing. At that point the real endpoint is created and the 'NullEndpoint'
+ * A placeholder for a connector that has not been created yet. This used by dynamic endpoints who's actual endpoint is not
+ * created until the first message is received for processing. At that point the real endpoint is created and the 'NullEndpoint'
  * including this NullConnector is overwritten.
  *
  * @since 3.0
  * @see org.mule.compatibility.core.endpoint.DynamicOutboundEndpoint
  */
-public class NullConnector extends AbstractConnector
-{
-    public NullConnector(MuleContext context) throws MuleException
-    {
-        super(context);
-        //We call Initialise here since this connector will never get added to the registry, but we still need to have
-        //it initialised to avoid NPEs and will be thrown away once the first message is received by a dynamic endpoint
-        initialise();
-    }
+public class NullConnector extends AbstractConnector {
 
-    @Override
-    protected void doInitialise() throws InitialisationException
-    {
-        //do nothing
-    }
+  public NullConnector(MuleContext context) throws MuleException {
+    super(context);
+    // We call Initialise here since this connector will never get added to the registry, but we still need to have
+    // it initialised to avoid NPEs and will be thrown away once the first message is received by a dynamic endpoint
+    initialise();
+  }
 
-    @Override
-    protected void doDispose()
-    {
-        //do nothing
-    }
+  @Override
+  protected void doInitialise() throws InitialisationException {
+    // do nothing
+  }
 
-    @Override
-    protected void doStart() throws MuleException
-    {
-        //do nothing
-    }
+  @Override
+  protected void doDispose() {
+    // do nothing
+  }
 
-    @Override
-    protected void doStop() throws MuleException
-    {
-        //do nothing
-    }
+  @Override
+  protected void doStart() throws MuleException {
+    // do nothing
+  }
 
-    @Override
-    protected void doConnect() throws Exception
-    {
-        //do nothing
-    }
+  @Override
+  protected void doStop() throws MuleException {
+    // do nothing
+  }
 
-    @Override
-    protected void doDisconnect() throws Exception
-    {
-        //do nothing
-    }
+  @Override
+  protected void doConnect() throws Exception {
+    // do nothing
+  }
 
-    @Override
-    public String getProtocol()
-    {
-        return "dynamic";
-    }
+  @Override
+  protected void doDisconnect() throws Exception {
+    // do nothing
+  }
+
+  @Override
+  public String getProtocol() {
+    return "dynamic";
+  }
 }

@@ -12,17 +12,14 @@ import org.mule.runtime.module.db.internal.domain.connection.DbPoolingProfile;
 
 import org.w3c.dom.Element;
 
-public class PoolingProfileBeanDefinitionParser extends ChildDefinitionParser
-{
+public class PoolingProfileBeanDefinitionParser extends ChildDefinitionParser {
 
-    public PoolingProfileBeanDefinitionParser()
-    {
-        super("poolingProfile");
-    }
+  public PoolingProfileBeanDefinitionParser() {
+    super("poolingProfile");
+  }
 
-    @Override
-    protected Class<?> getBeanClass(Element element)
-    {
-        return DbPoolingProfile.class;
-    }
+  @Override
+  protected Class<?> getBeanClass(Element element) {
+    return DbPoolingProfile.class;
+  }
 }

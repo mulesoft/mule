@@ -9,17 +9,14 @@ package org.mule.runtime.module.db.integration.update;
 
 import org.mule.runtime.module.db.integration.model.AbstractTestDatabase;
 
-public class UpdateDynamicBulkTestCase extends UpdateBulkTestCase
-{
+public class UpdateDynamicBulkTestCase extends UpdateBulkTestCase {
 
-    public UpdateDynamicBulkTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public UpdateDynamicBulkTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/update/update-dynamic-bulk-config.xml"};
-    }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/update/update-dynamic-bulk-config.xml"};
+  }
 }

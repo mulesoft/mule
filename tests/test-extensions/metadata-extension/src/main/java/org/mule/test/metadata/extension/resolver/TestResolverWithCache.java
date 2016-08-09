@@ -28,52 +28,49 @@ import java.io.Serializable;
 import java.util.Optional;
 import java.util.Set;
 
-public class TestResolverWithCache implements MetadataContentResolver<String>, MetadataOutputResolver<String>, MetadataKeysResolver
-{
+public class TestResolverWithCache
+    implements MetadataContentResolver<String>, MetadataOutputResolver<String>, MetadataKeysResolver {
 
-    public static final String MISSING_ELEMENT_ERROR_MESSAGE = "Missing element in the cache. There was no element in the cache for the key: " + BRAND;
-    public static final int AGE_VALUE = 16;
-    public static final String NAME_VALUE = "Juan";
-    public static final String BRAND_VALUE = "Nikdidas";
+  public static final String MISSING_ELEMENT_ERROR_MESSAGE =
+      "Missing element in the cache. There was no element in the cache for the key: " + BRAND;
+  public static final int AGE_VALUE = 16;
+  public static final String NAME_VALUE = "Juan";
+  public static final String BRAND_VALUE = "Nikdidas";
 
-    @Override
-    public MetadataType getContentMetadata(MetadataContext context, String key) throws MetadataResolvingException, ConnectionException
-    {
-        MetadataCache cache = context.getCache();
-        Optional<? extends Serializable> element = cache.get(BRAND);
-        if (!element.isPresent())
-        {
-            throw new MetadataResolvingException(MISSING_ELEMENT_ERROR_MESSAGE, FailureCode.RESOURCE_UNAVAILABLE);
-        }
-
-        return buildMetadataType((String) element.get());
+  @Override
+  public MetadataType getContentMetadata(MetadataContext context, String key)
+      throws MetadataResolvingException, ConnectionException {
+    MetadataCache cache = context.getCache();
+    Optional<? extends Serializable> element = cache.get(BRAND);
+    if (!element.isPresent()) {
+      throw new MetadataResolvingException(MISSING_ELEMENT_ERROR_MESSAGE, FailureCode.RESOURCE_UNAVAILABLE);
     }
 
-    @Override
-    public MetadataType getOutputMetadata(MetadataContext context, String key) throws MetadataResolvingException, ConnectionException
-    {
-        MetadataCache cache = context.getCache();
-        Optional<String> brand = cache.get(BRAND);
-        if (brand.isPresent())
-        {
-            String serializable = brand.get();
-            return buildMetadataType(serializable);
-        }
-        String cachedModel = BRAND_VALUE;
-        cache.put(BRAND, cachedModel);
-        return buildMetadataType(cachedModel);
-    }
+    return buildMetadataType((String) element.get());
+  }
 
-    private MetadataType buildMetadataType(String model)
-    {
-        return BaseTypeBuilder.create(new MetadataFormat(model, model, APPLICATION_JAVA_MIME_TYPE)).objectType().build();
+  @Override
+  public MetadataType getOutputMetadata(MetadataContext context, String key)
+      throws MetadataResolvingException, ConnectionException {
+    MetadataCache cache = context.getCache();
+    Optional<String> brand = cache.get(BRAND);
+    if (brand.isPresent()) {
+      String serializable = brand.get();
+      return buildMetadataType(serializable);
     }
+    String cachedModel = BRAND_VALUE;
+    cache.put(BRAND, cachedModel);
+    return buildMetadataType(cachedModel);
+  }
 
-    @Override
-    public Set<MetadataKey> getMetadataKeys(MetadataContext context) throws MetadataResolvingException, ConnectionException
-    {
-        context.getCache().put(AGE, AGE_VALUE);
-        context.getCache().put(NAME, NAME_VALUE);
-        return getKeys(context);
-    }
+  private MetadataType buildMetadataType(String model) {
+    return BaseTypeBuilder.create(new MetadataFormat(model, model, APPLICATION_JAVA_MIME_TYPE)).objectType().build();
+  }
+
+  @Override
+  public Set<MetadataKey> getMetadataKeys(MetadataContext context) throws MetadataResolvingException, ConnectionException {
+    context.getCache().put(AGE, AGE_VALUE);
+    context.getCache().put(NAME, NAME_VALUE);
+    return getKeys(context);
+  }
 }

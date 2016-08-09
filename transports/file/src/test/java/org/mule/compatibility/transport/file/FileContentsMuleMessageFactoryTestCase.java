@@ -22,66 +22,57 @@ import java.util.Arrays;
 
 import org.junit.Test;
 
-public class FileContentsMuleMessageFactoryTestCase extends AbstractFileMuleMessageFactoryTestCase
-{
-    @Override
-    protected void doSetUp() throws Exception
-    {
-        super.doSetUp();
-        fillTempFile();
-    }
+public class FileContentsMuleMessageFactoryTestCase extends AbstractFileMuleMessageFactoryTestCase {
 
-    private void fillTempFile() throws Exception
-    {
-        Writer writer = new FileWriter(tempFile);
-        writer.write(TEST_MESSAGE);
-        writer.close();
-    }
+  @Override
+  protected void doSetUp() throws Exception {
+    super.doSetUp();
+    fillTempFile();
+  }
 
-    @Override
-    protected MuleMessageFactory doCreateMuleMessageFactory()
-    {
-        return new FileContentsMuleMessageFactory();
-    }
+  private void fillTempFile() throws Exception {
+    Writer writer = new FileWriter(tempFile);
+    writer.write(TEST_MESSAGE);
+    writer.close();
+  }
 
-    @Override
-    public void testValidPayload() throws Exception
-    {
-        MuleMessageFactory factory = createMuleMessageFactory();
-        
-        Object payload = getValidTransportMessage();
-        MuleMessage message = factory.create(payload, encoding);
-        assertNotNull(message);
-        assertPayload(message);
-    }
-    
-    @Test
-    public void testPayloadFromInputStream() throws Exception
-    {
-        MuleMessageFactory factory = createMuleMessageFactory();
-        
-        InputStream stream = null;
-        try
-        {
-            stream = new ReceiverFileInputStream(tempFile, false, null);
-            MuleMessage message = factory.create(stream, encoding);
-            assertNotNull(message);
-            
-            // delete the file before accessing the payload to make sure it was properly converted
-            // to byte[] by the message factory
-            assertTrue(tempFile.delete());
-            assertPayload(message);
-        }
-        finally
-        {
-            IOUtils.closeQuietly(stream);
-        }
-    }
+  @Override
+  protected MuleMessageFactory doCreateMuleMessageFactory() {
+    return new FileContentsMuleMessageFactory();
+  }
 
-    private void assertPayload(MuleMessage message)
-    {
-        byte[] expected = TEST_MESSAGE.getBytes();
-        byte[] result = (byte[]) message.getPayload();
-        assertTrue(Arrays.equals(expected, result));
+  @Override
+  public void testValidPayload() throws Exception {
+    MuleMessageFactory factory = createMuleMessageFactory();
+
+    Object payload = getValidTransportMessage();
+    MuleMessage message = factory.create(payload, encoding);
+    assertNotNull(message);
+    assertPayload(message);
+  }
+
+  @Test
+  public void testPayloadFromInputStream() throws Exception {
+    MuleMessageFactory factory = createMuleMessageFactory();
+
+    InputStream stream = null;
+    try {
+      stream = new ReceiverFileInputStream(tempFile, false, null);
+      MuleMessage message = factory.create(stream, encoding);
+      assertNotNull(message);
+
+      // delete the file before accessing the payload to make sure it was properly converted
+      // to byte[] by the message factory
+      assertTrue(tempFile.delete());
+      assertPayload(message);
+    } finally {
+      IOUtils.closeQuietly(stream);
     }
+  }
+
+  private void assertPayload(MuleMessage message) {
+    byte[] expected = TEST_MESSAGE.getBytes();
+    byte[] result = (byte[]) message.getPayload();
+    assertTrue(Arrays.equals(expected, result));
+  }
 }

@@ -10,22 +10,18 @@ import org.mule.runtime.module.cxf.builder.ProxyServiceMessageProcessorBuilder;
 
 import org.springframework.beans.factory.FactoryBean;
 
-public class ProxyServiceFactoryBean extends ProxyServiceMessageProcessorBuilder implements FactoryBean
-{
+public class ProxyServiceFactoryBean extends ProxyServiceMessageProcessorBuilder implements FactoryBean {
 
-    public Object getObject() throws Exception
-    {
-        return new FlowConfiguringMessageProcessor(this);
-    }
+  public Object getObject() throws Exception {
+    return new FlowConfiguringMessageProcessor(this);
+  }
 
-    public Class<?> getObjectType()
-    {
-        return FlowConfiguringMessageProcessor.class;
-    }
+  public Class<?> getObjectType() {
+    return FlowConfiguringMessageProcessor.class;
+  }
 
-    public boolean isSingleton()
-    {
-        return true;
-    }
+  public boolean isSingleton() {
+    return true;
+  }
 
 }

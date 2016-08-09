@@ -11,22 +11,20 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 
 /**
- * <code>Interceptor</code> is based on a similar concept of servlet filters and
- * works much the same way. This method is more commonally known as the interceptor
- * pattern and it allows for pre and processing of invocations on the object being
+ * <code>Interceptor</code> is based on a similar concept of servlet filters and works much the same way. This method is more
+ * commonally known as the interceptor pattern and it allows for pre and processing of invocations on the object being
  * intercepted.
  */
-public interface Interceptor extends InterceptingMessageProcessor
-{
+public interface Interceptor extends InterceptingMessageProcessor {
 
-    /**
-     * Invoked when the component should be called. The implementation can call
-     * next.process(event) to call the component or the next filer in the chain.
-     * 
-     * @param event the event containing info about the current message and service
-     * @return A result message that may have been altered by this invocation
-     * @throws org.mule.runtime.core.api.MuleException if the invocation fails
-     */
-    MuleEvent process(MuleEvent event) throws MuleException;
+  /**
+   * Invoked when the component should be called. The implementation can call next.process(event) to call the component or the
+   * next filer in the chain.
+   * 
+   * @param event the event containing info about the current message and service
+   * @return A result message that may have been altered by this invocation
+   * @throws org.mule.runtime.core.api.MuleException if the invocation fails
+   */
+  MuleEvent process(MuleEvent event) throws MuleException;
 
 }

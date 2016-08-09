@@ -9,11 +9,9 @@ package org.mule.runtime.module.cxf.example;
 import javax.jws.WebService;
 
 @WebService(endpointInterface = "org.mule.runtime.module.cxf.example.HelloWorld", serviceName = "HelloWorld")
-public class HelloWorldImpl implements HelloWorld
-{
+public class HelloWorldImpl implements HelloWorld {
 
-    public String sayHi(String text)
-    {
-        return "Hello\u2297 " + text;
-    }
+  public String sayHi(String text) {
+    return "Hello\u2297 " + text;
+  }
 }

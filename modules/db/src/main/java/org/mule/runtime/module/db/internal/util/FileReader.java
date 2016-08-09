@@ -10,16 +10,14 @@ package org.mule.runtime.module.db.internal.util;
 /**
  * Abstracts file reading operations
  */
-public interface FileReader
-{
+public interface FileReader {
 
-    /**
-     * Attempts to load a resource from the file system, from a URL, or from the
-     * classpath, in that order.
-     *
-     * @param resourceName The name of the resource to load
-     * @return the requested resource as a string
-     * @throws java.io.IOException in case of an IO error
-     */
-    String getResourceAsString(String resourceName) throws java.io.IOException;
+  /**
+   * Attempts to load a resource from the file system, from a URL, or from the classpath, in that order.
+   *
+   * @param resourceName The name of the resource to load
+   * @return the requested resource as a string
+   * @throws java.io.IOException in case of an IO error
+   */
+  String getResourceAsString(String resourceName) throws java.io.IOException;
 }

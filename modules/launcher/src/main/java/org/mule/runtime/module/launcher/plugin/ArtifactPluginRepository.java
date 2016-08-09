@@ -14,13 +14,15 @@ import java.util.List;
 
 /**
  * Repository that defines {@link ArtifactPlugin} bundled with the container
+ * 
  * @since 4.0
  */
-public interface ArtifactPluginRepository
-{
-    /**
-     * @return a non null List of {@link ArtifactPluginDescriptor} corresponding to application plugins already bundled with the container.
-     * @throws ArtifactDescriptorCreateException if an error happens while building the descriptors from application plugins file.
-     */
-    List<ArtifactPluginDescriptor> getContainerArtifactPluginDescriptors();
+public interface ArtifactPluginRepository {
+
+  /**
+   * @return a non null List of {@link ArtifactPluginDescriptor} corresponding to application plugins already bundled with the
+   *         container.
+   * @throws ArtifactDescriptorCreateException if an error happens while building the descriptors from application plugins file.
+   */
+  List<ArtifactPluginDescriptor> getContainerArtifactPluginDescriptors();
 }

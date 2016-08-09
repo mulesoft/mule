@@ -12,12 +12,12 @@ import java.io.IOException;
 /**
  * Interface for listening to disk file changes.
  */
-public interface FileListener
-{
-    /**
-     * Called when one of the monitored files are created, deleted or modified.
-     * 
-     * @param file File which has been changed.
-     */
-    void fileChanged(File file) throws IOException;
+public interface FileListener {
+
+  /**
+   * Called when one of the monitored files are created, deleted or modified.
+   * 
+   * @param file File which has been changed.
+   */
+  void fileChanged(File file) throws IOException;
 }

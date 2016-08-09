@@ -6,8 +6,8 @@
  */
 package org.mule.compatibility.core.api.config;
 
-public class MuleEndpointProperties
-{
-    public static final String OBJECT_MULE_ENDPOINT_FACTORY = "_muleEndpointFactory";
+public class MuleEndpointProperties {
+
+  public static final String OBJECT_MULE_ENDPOINT_FACTORY = "_muleEndpointFactory";
 
 }

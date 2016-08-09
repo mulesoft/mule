@@ -8,45 +8,38 @@ package org.mule.runtime.core.el.mvel;
 
 import org.mule.mvel2.ParserConfiguration;
 
-class MuleAliasVariableResolver extends MuleVariableResolver<Object>
-{
-    private static final long serialVersionUID = -4957789619105599831L;
-    private String expression;
-    private MVELExpressionExecutor executor;
-    private MVELExpressionLanguageContext context;
+class MuleAliasVariableResolver extends MuleVariableResolver<Object> {
 
-    public MuleAliasVariableResolver(String name,
-                                     String expression,
-                                     MVELExpressionLanguageContext context,
-                                     ParserConfiguration parserConfiguration)
-    {
-        super(name, null, null, null);
-        this.expression = expression;
-        this.context = context;
-        this.executor = new MVELExpressionExecutor(context.parserConfiguration);
-    }
+  private static final long serialVersionUID = -4957789619105599831L;
+  private String expression;
+  private MVELExpressionExecutor executor;
+  private MVELExpressionLanguageContext context;
 
-    public MuleAliasVariableResolver(MuleAliasVariableResolver aliasVariableResolver,
-                                     MVELExpressionLanguageContext newContext)
-    {
-        super(aliasVariableResolver.name, null, null, null);
-        this.expression = aliasVariableResolver.expression;
-        // Use single shared executor for all invocation to enable caching of compiled expressions
-        this.executor = aliasVariableResolver.executor;
-        this.context = newContext;
-    }
+  public MuleAliasVariableResolver(String name, String expression, MVELExpressionLanguageContext context,
+                                   ParserConfiguration parserConfiguration) {
+    super(name, null, null, null);
+    this.expression = expression;
+    this.context = context;
+    this.executor = new MVELExpressionExecutor(context.parserConfiguration);
+  }
 
-    @Override
-    public Object getValue()
-    {
-        return executor.execute(expression, context);
-    }
+  public MuleAliasVariableResolver(MuleAliasVariableResolver aliasVariableResolver, MVELExpressionLanguageContext newContext) {
+    super(aliasVariableResolver.name, null, null, null);
+    this.expression = aliasVariableResolver.expression;
+    // Use single shared executor for all invocation to enable caching of compiled expressions
+    this.executor = aliasVariableResolver.executor;
+    this.context = newContext;
+  }
 
-    @Override
-    public void setValue(Object value)
-    {
-        expression = expression + "= ___value";
-        context.addFinalVariable("___value", value);
-        executor.execute(expression, context);
-    }
+  @Override
+  public Object getValue() {
+    return executor.execute(expression, context);
+  }
+
+  @Override
+  public void setValue(Object value) {
+    expression = expression + "= ___value";
+    context.addFinalVariable("___value", value);
+    executor.execute(expression, context);
+  }
 }

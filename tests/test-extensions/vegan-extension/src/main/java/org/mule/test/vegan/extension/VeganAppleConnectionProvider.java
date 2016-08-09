@@ -13,24 +13,20 @@ import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.tck.testmodels.fruit.Apple;
 
 @Alias("apple")
-public class VeganAppleConnectionProvider implements ConnectionProvider<Apple>
-{
+public class VeganAppleConnectionProvider implements ConnectionProvider<Apple> {
 
-    @Override
-    public Apple connect() throws ConnectionException
-    {
-        return new Apple();
-    }
+  @Override
+  public Apple connect() throws ConnectionException {
+    return new Apple();
+  }
 
-    @Override
-    public void disconnect(Apple apple)
-    {
+  @Override
+  public void disconnect(Apple apple) {
 
-    }
+  }
 
-    @Override
-    public ConnectionValidationResult validate(Apple apple)
-    {
-        return ConnectionValidationResult.success();
-    }
+  @Override
+  public ConnectionValidationResult validate(Apple apple) {
+    return ConnectionValidationResult.success();
+  }
 }

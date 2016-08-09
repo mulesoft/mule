@@ -21,24 +21,21 @@ import java.util.List;
 import org.junit.Test;
 
 @SmallTest
-public class ImmutableListCollectorTestCase extends AbstractMuleTestCase
-{
+public class ImmutableListCollectorTestCase extends AbstractMuleTestCase {
 
-    private final String[] items = new String[] {"a", "b", "c"};
+  private final String[] items = new String[] {"a", "b", "c"};
 
-    @Test
-    public void collect()
-    {
-        List<String> collected = Arrays.asList(items).stream().collect(new ImmutableListCollector<>());
-        assertThat(collected, hasSize(items.length));
-        assertThat(collected, contains(items));
-    }
+  @Test
+  public void collect() {
+    List<String> collected = Arrays.asList(items).stream().collect(new ImmutableListCollector<>());
+    assertThat(collected, hasSize(items.length));
+    assertThat(collected, contains(items));
+  }
 
-    @Test
-    public void emptyList()
-    {
-        List<String> collected = new ArrayList<String>().stream().collect(new ImmutableListCollector<>());
-        assertThat(collected, is(notNullValue()));
-        assertThat(collected, hasSize(0));
-    }
+  @Test
+  public void emptyList() {
+    List<String> collected = new ArrayList<String>().stream().collect(new ImmutableListCollector<>());
+    assertThat(collected, is(notNullValue()));
+    assertThat(collected, hasSize(0));
+  }
 }

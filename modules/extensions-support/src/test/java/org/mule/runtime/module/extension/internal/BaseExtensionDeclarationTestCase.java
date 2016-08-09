@@ -37,66 +37,54 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-abstract class BaseExtensionDeclarationTestCase extends AbstractMuleTestCase
-{
+abstract class BaseExtensionDeclarationTestCase extends AbstractMuleTestCase {
 
-    @Mock
-    protected ServiceRegistry serviceRegistry;
+  @Mock
+  protected ServiceRegistry serviceRegistry;
 
-    protected ExtensionDeclarer extensionDeclarer;
-    protected ExtensionModel extensionModel;
-    protected ExtensionFactory factory;
+  protected ExtensionDeclarer extensionDeclarer;
+  protected ExtensionModel extensionModel;
+  protected ExtensionFactory factory;
 
-    @Before
-    public void buildExtension() throws Exception
-    {
-        Collection<ModelEnricher> emptyList = Collections.emptyList();
-        when(serviceRegistry.lookupProviders(same(ModelEnricher.class))).thenReturn(emptyList);
-        when(serviceRegistry.lookupProviders(same(ModelEnricher.class), any(ClassLoader.class))).thenReturn(emptyList);
+  @Before
+  public void buildExtension() throws Exception {
+    Collection<ModelEnricher> emptyList = Collections.emptyList();
+    when(serviceRegistry.lookupProviders(same(ModelEnricher.class))).thenReturn(emptyList);
+    when(serviceRegistry.lookupProviders(same(ModelEnricher.class), any(ClassLoader.class))).thenReturn(emptyList);
 
-        factory = new DefaultExtensionFactory(serviceRegistry, getClass().getClassLoader());
-        extensionDeclarer = createDeclarationDescriptor();
-        extensionModel = factory.createFrom(extensionDeclarer, createDescribingContext());
+    factory = new DefaultExtensionFactory(serviceRegistry, getClass().getClassLoader());
+    extensionDeclarer = createDeclarationDescriptor();
+    extensionModel = factory.createFrom(extensionDeclarer, createDescribingContext());
+  }
+
+  protected DescribingContext createDescribingContext() {
+    return new DefaultDescribingContext(extensionDeclarer, getClass().getClassLoader());
+  }
+
+  protected void assertParameter(ParameterModel parameterModel, String name, String description,
+                                 ExpressionSupport expressionSupport, boolean required, MetadataType metadataType,
+                                 Class<? extends MetadataType> qualifier, Object defaultValue) {
+    assertThat(parameterModel, is(notNullValue()));
+    assertThat(parameterModel.getName(), equalTo(name));
+    assertThat(parameterModel.getDescription(), equalTo(description));
+    assertThat(parameterModel.getExpressionSupport(), is(expressionSupport));
+    assertThat(parameterModel.isRequired(), is(required));
+    assertThat(parameterModel.getType(), equalTo(metadataType));
+    assertThat(parameterModel.getType(), is(instanceOf(qualifier)));
+
+    if (defaultValue != null) {
+      assertThat(parameterModel.getDefaultValue(), equalTo(defaultValue));
+    } else {
+      assertThat(parameterModel.getDefaultValue(), is(nullValue()));
     }
+  }
 
-    protected DescribingContext createDescribingContext()
-    {
-        return new DefaultDescribingContext(extensionDeclarer, getClass().getClassLoader());
-    }
+  protected void assertDataType(MetadataType metadataType, Class<?> expectedRawType,
+                                Class<? extends MetadataType> typeQualifier) {
+    assertThat(metadataType, is(instanceOf(typeQualifier)));
+    assertThat(expectedRawType.isAssignableFrom(getType(metadataType)), is(true));
+  }
 
-    protected void assertParameter(ParameterModel parameterModel,
-                                 String name,
-                                 String description,
-                                 ExpressionSupport expressionSupport,
-                                 boolean required,
-                                 MetadataType metadataType,
-                                 Class<? extends MetadataType> qualifier,
-                                 Object defaultValue)
-    {
-        assertThat(parameterModel, is(notNullValue()));
-        assertThat(parameterModel.getName(), equalTo(name));
-        assertThat(parameterModel.getDescription(), equalTo(description));
-        assertThat(parameterModel.getExpressionSupport(), is(expressionSupport));
-        assertThat(parameterModel.isRequired(), is(required));
-        assertThat(parameterModel.getType(), equalTo(metadataType));
-        assertThat(parameterModel.getType(), is(instanceOf(qualifier)));
-
-        if (defaultValue != null)
-        {
-            assertThat(parameterModel.getDefaultValue(), equalTo(defaultValue));
-        }
-        else
-        {
-            assertThat(parameterModel.getDefaultValue(), is(nullValue()));
-        }
-    }
-
-    protected void assertDataType(MetadataType metadataType, Class<?> expectedRawType, Class<? extends MetadataType> typeQualifier)
-    {
-        assertThat(metadataType, is(instanceOf(typeQualifier)));
-        assertThat(expectedRawType.isAssignableFrom(getType(metadataType)), is(true));
-    }
-
-    protected abstract ExtensionDeclarer createDeclarationDescriptor();
+  protected abstract ExtensionDeclarer createDeclarationDescriptor();
 
 }

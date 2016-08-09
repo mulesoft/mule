@@ -8,20 +8,16 @@ package org.mule.runtime.core.transformer;
 
 import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
 
-public abstract class AbstractDiscoverableTransformer
-        extends AbstractTransformer implements DiscoverableTransformer
-{
+public abstract class AbstractDiscoverableTransformer extends AbstractTransformer implements DiscoverableTransformer {
 
-    private int priorityWeighting = DEFAULT_PRIORITY_WEIGHTING;
+  private int priorityWeighting = DEFAULT_PRIORITY_WEIGHTING;
 
-    public int getPriorityWeighting()
-    {
-        return priorityWeighting;
-    }
+  public int getPriorityWeighting() {
+    return priorityWeighting;
+  }
 
-    public void setPriorityWeighting(int weighting)
-    {
-        priorityWeighting = weighting;
-    }
+  public void setPriorityWeighting(int weighting) {
+    priorityWeighting = weighting;
+  }
 
 }

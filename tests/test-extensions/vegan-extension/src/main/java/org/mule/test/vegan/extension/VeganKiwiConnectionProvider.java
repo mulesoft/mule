@@ -13,24 +13,20 @@ import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.tck.testmodels.fruit.Kiwi;
 
 @Alias("kiwi")
-public class VeganKiwiConnectionProvider implements ConnectionProvider<Kiwi>
-{
+public class VeganKiwiConnectionProvider implements ConnectionProvider<Kiwi> {
 
-    @Override
-    public Kiwi connect() throws ConnectionException
-    {
-        return new Kiwi();
-    }
+  @Override
+  public Kiwi connect() throws ConnectionException {
+    return new Kiwi();
+  }
 
-    @Override
-    public void disconnect(Kiwi kiwi)
-    {
+  @Override
+  public void disconnect(Kiwi kiwi) {
 
-    }
+  }
 
-    @Override
-    public ConnectionValidationResult validate(Kiwi kiwi)
-    {
-        return ConnectionValidationResult.success();
-    }
+  @Override
+  public ConnectionValidationResult validate(Kiwi kiwi) {
+    return ConnectionValidationResult.success();
+  }
 }

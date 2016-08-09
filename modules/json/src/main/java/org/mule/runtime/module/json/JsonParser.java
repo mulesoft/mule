@@ -11,21 +11,18 @@ import com.fasterxml.jackson.databind.JsonNode;
 import java.io.IOException;
 
 /**
- * Parses Json payloads into different representations of a
- * Json. Implementations are to be assumed thread-safe
+ * Parses Json payloads into different representations of a Json. Implementations are to be assumed thread-safe
  *
  * @since 3.6.0
  */
-public interface JsonParser
-{
+public interface JsonParser {
 
-    /**
-     * Parses the given {@code input} into a {@link JsonNode}.
-     *
-     * @param input the input to be transformed into a {@link JsonNode}
-     * @return a {@link JsonNode} if the input could be parsed. {@code null}
-     * if it's not possible to transform
-     * @throws IOException
-     */
-    JsonNode asJsonNode(Object input) throws IOException;
+  /**
+   * Parses the given {@code input} into a {@link JsonNode}.
+   *
+   * @param input the input to be transformed into a {@link JsonNode}
+   * @return a {@link JsonNode} if the input could be parsed. {@code null} if it's not possible to transform
+   * @throws IOException
+   */
+  JsonNode asJsonNode(Object input) throws IOException;
 }

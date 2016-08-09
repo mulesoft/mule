@@ -31,108 +31,87 @@ import javax.net.ssl.SSLSocket;
 import javax.resource.spi.work.Work;
 
 
-public class SslMessageReceiver extends TcpMessageReceiver implements HandshakeCompletedListener
-{
+public class SslMessageReceiver extends TcpMessageReceiver implements HandshakeCompletedListener {
 
-    // We must wait for handshake to complete before sending message, as the callback
-    // sets important properties. The wait period is arbitrary, but the two threads
-    // are approximately synchronized (handshake completes before/at same time as
-    // message is received) so value should not be critical
-    private CountDownLatch handshakeComplete = new CountDownLatch(1);
+  // We must wait for handshake to complete before sending message, as the callback
+  // sets important properties. The wait period is arbitrary, but the two threads
+  // are approximately synchronized (handshake completes before/at same time as
+  // message is received) so value should not be critical
+  private CountDownLatch handshakeComplete = new CountDownLatch(1);
 
-    private Certificate[] peerCertificateChain;
-    private Certificate[] localCertificateChain;
+  private Certificate[] peerCertificateChain;
+  private Certificate[] localCertificateChain;
 
-    public SslMessageReceiver(Connector connector, FlowConstruct flowConstruct, InboundEndpoint endpoint)
-            throws CreateException
-    {
-        super(connector, flowConstruct, endpoint);
+  public SslMessageReceiver(Connector connector, FlowConstruct flowConstruct, InboundEndpoint endpoint) throws CreateException {
+    super(connector, flowConstruct, endpoint);
+  }
+
+  @Override
+  protected void doConnect() throws ConnectException {
+    checkKeyStore();
+    super.doConnect();
+  }
+
+  protected void checkKeyStore() throws ConnectException {
+    SslConnector sslConnector = (SslConnector) connector;
+    String keyStore = sslConnector.getKeyStore();
+    if (StringUtils.isBlank(keyStore)) {
+      throw new EndpointConnectException(CoreMessages.objectIsNull("tls-key-store"), this);
+    }
+  }
+
+  @Override
+  protected Work createWork(Socket socket) throws IOException {
+    return new SslWorker(socket, this);
+  }
+
+  private MuleMessage preRoute(MuleMessage message) throws Exception {
+    long sslHandshakeTimeout = ((SslConnector) getConnector()).getSslHandshakeTimeout();
+    boolean rc = handshakeComplete.await(sslHandshakeTimeout, TimeUnit.MILLISECONDS);
+    if (rc == false) {
+      throw new IllegalStateException("Handshake did not complete");
+    }
+
+    MuleMessage.Builder messageBuilder = MuleMessage.builder(message);
+    if (peerCertificateChain != null) {
+      messageBuilder.addOutboundProperty(SslConnector.PEER_CERTIFICATES, peerCertificateChain);
+    }
+    if (localCertificateChain != null) {
+      messageBuilder.addOutboundProperty(SslConnector.LOCAL_CERTIFICATES, localCertificateChain);
+    }
+    return messageBuilder.build();
+  }
+
+  @Override
+  public void handshakeCompleted(HandshakeCompletedEvent event) {
+    try {
+      localCertificateChain = event.getLocalCertificates();
+      try {
+        peerCertificateChain = event.getPeerCertificates();
+      } catch (SSLPeerUnverifiedException e) {
+        logger.debug("Cannot get peer certificate chain: " + e.getMessage());
+      }
+    } finally {
+      handshakeComplete.countDown();
+    }
+  }
+
+  protected class SslWorker extends TcpWorker {
+
+    public SslWorker(Socket socket, AbstractMessageReceiver receiver) throws IOException {
+      super(socket, receiver);
+      ((SSLSocket) socket).addHandshakeCompletedListener(SslMessageReceiver.this);
     }
 
     @Override
-    protected void doConnect() throws ConnectException
-    {
-        checkKeyStore();
-        super.doConnect();
-    }
-
-    protected void checkKeyStore() throws ConnectException
-    {
-        SslConnector sslConnector = (SslConnector) connector;
-        String keyStore = sslConnector.getKeyStore();
-        if (StringUtils.isBlank(keyStore))
-        {
-            throw new EndpointConnectException(CoreMessages.objectIsNull("tls-key-store"), this);
-        }
+    protected MuleMessage preRouteMuleMessage(MuleMessage message) throws Exception {
+      return preRoute(super.preRouteMuleMessage(message));
     }
 
     @Override
-    protected Work createWork(Socket socket) throws IOException
-    {
-        return new SslWorker(socket, this);
+    protected void shutdownSocket() throws IOException {
+      // SSL Sockets don't support shutdownSocket
     }
-
-    private MuleMessage preRoute(MuleMessage message) throws Exception
-    {
-        long sslHandshakeTimeout = ((SslConnector) getConnector()).getSslHandshakeTimeout();
-        boolean rc = handshakeComplete.await(sslHandshakeTimeout, TimeUnit.MILLISECONDS);
-        if (rc == false)
-        {
-            throw new IllegalStateException("Handshake did not complete");
-        }
-
-        MuleMessage.Builder messageBuilder = MuleMessage.builder(message);
-        if (peerCertificateChain != null)
-        {
-            messageBuilder.addOutboundProperty(SslConnector.PEER_CERTIFICATES, peerCertificateChain);
-        }
-        if (localCertificateChain != null)
-        {
-            messageBuilder.addOutboundProperty(SslConnector.LOCAL_CERTIFICATES, localCertificateChain);
-        }
-        return messageBuilder.build();
-    }
-
-    @Override
-    public void handshakeCompleted(HandshakeCompletedEvent event)
-    {
-        try
-        {
-            localCertificateChain = event.getLocalCertificates();
-            try
-            {
-                peerCertificateChain = event.getPeerCertificates();
-            }
-            catch (SSLPeerUnverifiedException e)
-            {
-                logger.debug("Cannot get peer certificate chain: "+ e.getMessage());
-            }
-        }
-        finally
-        {
-            handshakeComplete.countDown();
-        }
-    }
-
-    protected class SslWorker extends TcpWorker
-    {
-        public SslWorker(Socket socket, AbstractMessageReceiver receiver) throws IOException
-        {
-            super(socket, receiver);
-            ((SSLSocket) socket).addHandshakeCompletedListener(SslMessageReceiver.this);
-        }
-
-        @Override
-        protected MuleMessage preRouteMuleMessage(MuleMessage message) throws Exception
-        {
-            return preRoute(super.preRouteMuleMessage(message));
-        }
-
-        @Override
-        protected void shutdownSocket() throws IOException
-        {
-            // SSL Sockets don't support shutdownSocket
-        }
-    }
+  }
 
 }

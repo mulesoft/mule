@@ -11,28 +11,22 @@ import org.mule.runtime.module.http.internal.domain.request.HttpRequest;
 /**
  * Accepts all the http methods
  */
-public class AcceptsAllMethodsRequestMatcher extends MethodRequestMatcher
-{
+public class AcceptsAllMethodsRequestMatcher extends MethodRequestMatcher {
 
-    private static AcceptsAllMethodsRequestMatcher instance = new AcceptsAllMethodsRequestMatcher();
+  private static AcceptsAllMethodsRequestMatcher instance = new AcceptsAllMethodsRequestMatcher();
 
-    private AcceptsAllMethodsRequestMatcher()
-    {
-    }
+  private AcceptsAllMethodsRequestMatcher() {}
 
-    public boolean matches(HttpRequest httpRequest)
-    {
-        return true;
-    }
+  public boolean matches(HttpRequest httpRequest) {
+    return true;
+  }
 
-    public static AcceptsAllMethodsRequestMatcher instance()
-    {
-        return instance;
-    }
+  public static AcceptsAllMethodsRequestMatcher instance() {
+    return instance;
+  }
 
-    @Override
-    public boolean intersectsWith(MethodRequestMatcher methodRequestMatcher)
-    {
-        return methodRequestMatcher instanceof AcceptsAllMethodsRequestMatcher;
-    }
+  @Override
+  public boolean intersectsWith(MethodRequestMatcher methodRequestMatcher) {
+    return methodRequestMatcher instanceof AcceptsAllMethodsRequestMatcher;
+  }
 }

@@ -16,22 +16,19 @@ import org.mule.runtime.core.api.MuleMessage;
 
 import org.junit.Test;
 
-public class DynamicSubFlowTestCase extends AbstractIntegrationTestCase
-{
+public class DynamicSubFlowTestCase extends AbstractIntegrationTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "dynamic-subflow-test-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "dynamic-subflow-test-config.xml";
+  }
 
-    @Test
-    public void testCofiguration() throws Exception
-    {
-        final MuleEvent muleEvent = flowRunner("ApplicationFlow").withPayload("").run();
-        MuleMessage result = muleEvent.getMessage();
-        assertThat(result, is(notNullValue()));
-        assertThat(result.getExceptionPayload(), is(nullValue()));
-        assertThat(result.getPayload(), is(notNullValue()));
-    }
+  @Test
+  public void testCofiguration() throws Exception {
+    final MuleEvent muleEvent = flowRunner("ApplicationFlow").withPayload("").run();
+    MuleMessage result = muleEvent.getMessage();
+    assertThat(result, is(notNullValue()));
+    assertThat(result.getExceptionPayload(), is(nullValue()));
+    assertThat(result.getPayload(), is(notNullValue()));
+  }
 }

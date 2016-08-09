@@ -10,16 +10,13 @@ package org.mule.runtime.module.db.integration.update;
 import org.mule.runtime.module.db.integration.model.AbstractTestDatabase;
 import org.mule.runtime.module.db.integration.AbstractQueryTimeoutTestCase;
 
-public class UpdateTimeoutTestCase  extends AbstractQueryTimeoutTestCase
-{
+public class UpdateTimeoutTestCase extends AbstractQueryTimeoutTestCase {
 
-    public UpdateTimeoutTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public UpdateTimeoutTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/update/update-timeout-config.xml"};
-    }
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/update/update-timeout-config.xml"};
+  }
 }

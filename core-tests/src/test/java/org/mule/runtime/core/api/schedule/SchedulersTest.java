@@ -14,34 +14,29 @@ import org.mule.runtime.core.util.Predicate;
 
 import org.junit.Test;
 
-public class SchedulersTest extends AbstractMuleTestCase
-{
+public class SchedulersTest extends AbstractMuleTestCase {
 
-    @Test
-    public void validatePollSchedulersPredicates()
-    {
-        Predicate<String> foo = Schedulers.flowConstructPollingSchedulers("foo");
-        assertTrue(foo.evaluate("polling://foo/1234"));
-    }
+  @Test
+  public void validatePollSchedulersPredicates() {
+    Predicate<String> foo = Schedulers.flowConstructPollingSchedulers("foo");
+    assertTrue(foo.evaluate("polling://foo/1234"));
+  }
 
-    @Test
-    public void failingValidatePollSchedulersPredicates()
-    {
-        Predicate<String> foo = Schedulers.flowConstructPollingSchedulers("foo");
-        assertFalse(foo.evaluate("polling://fooFails/1234"));
-    }
+  @Test
+  public void failingValidatePollSchedulersPredicates() {
+    Predicate<String> foo = Schedulers.flowConstructPollingSchedulers("foo");
+    assertFalse(foo.evaluate("polling://fooFails/1234"));
+  }
 
-    @Test
-    public void anyPollSchedulerIsAccepted()
-    {
-        Predicate<String> foo = Schedulers.allPollSchedulers();
-        assertTrue(foo.evaluate("polling://fooFails/1234"));
-    }
+  @Test
+  public void anyPollSchedulerIsAccepted() {
+    Predicate<String> foo = Schedulers.allPollSchedulers();
+    assertTrue(foo.evaluate("polling://fooFails/1234"));
+  }
 
-    @Test
-    public void aNonPollSchedulerIsNotAccepted()
-    {
-        Predicate<String> foo = Schedulers.allPollSchedulers();
-        assertFalse(foo.evaluate("fooFails/1234"));
-    }
+  @Test
+  public void aNonPollSchedulerIsNotAccepted() {
+    Predicate<String> foo = Schedulers.allPollSchedulers();
+    assertFalse(foo.evaluate("fooFails/1234"));
+  }
 }

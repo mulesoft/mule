@@ -9,17 +9,15 @@ package org.mule.runtime.module.db.integration.config;
 
 import org.mule.runtime.module.db.integration.model.AbstractTestDatabase;
 
-public class DynamicDataSourcePoolingLimitTestCase extends DatasourcePoolingLimitTestCase
-{
+public class DynamicDataSourcePoolingLimitTestCase extends DatasourcePoolingLimitTestCase {
 
-    public DynamicDataSourcePoolingLimitTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public DynamicDataSourcePoolingLimitTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Override
-    protected String[] getFlowConfigurationResources()
-    {
-        return new String[] {"integration/config/dynamic-derby-minimum-pooling-db-config.xml", "integration/config/dynamic-connection-pooling-config.xml"};
-    }
+  @Override
+  protected String[] getFlowConfigurationResources() {
+    return new String[] {"integration/config/dynamic-derby-minimum-pooling-db-config.xml",
+        "integration/config/dynamic-connection-pooling-config.xml"};
+  }
 }

@@ -24,23 +24,21 @@ import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 @Providers({IMAPProvider.class, IMAPSProvider.class})
 @Configuration(name = "imap")
 @DisplayName("IMAP")
-public class IMAPConfiguration implements RetrieverConfiguration
-{
+public class IMAPConfiguration implements RetrieverConfiguration {
 
-    /**
-     * Indicates whether the retrieved emails should be opened and read. The default value is "true".
-     */
-    @Parameter
-    @Optional(defaultValue = "true")
-    private boolean eagerlyFetchContent;
+  /**
+   * Indicates whether the retrieved emails should be opened and read. The default value is "true".
+   */
+  @Parameter
+  @Optional(defaultValue = "true")
+  private boolean eagerlyFetchContent;
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean isEagerlyFetchContent()
-    {
-        return eagerlyFetchContent;
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean isEagerlyFetchContent() {
+    return eagerlyFetchContent;
+  }
 
 }

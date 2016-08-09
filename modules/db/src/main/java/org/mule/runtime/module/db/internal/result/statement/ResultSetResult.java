@@ -10,27 +10,23 @@ package org.mule.runtime.module.db.internal.result.statement;
 /**
  * Represents a {@link java.sql.ResultSet} after a {@link java.sql.Statement} execution
  */
-public class ResultSetResult implements StatementResult
-{
+public class ResultSetResult implements StatementResult {
 
-    private final String name;
-    private final Object resultSet;
+  private final String name;
+  private final Object resultSet;
 
-    public ResultSetResult(String name, Object resultSet)
-    {
-        this.name = name;
-        this.resultSet = resultSet;
-    }
+  public ResultSetResult(String name, Object resultSet) {
+    this.name = name;
+    this.resultSet = resultSet;
+  }
 
-    @Override
-    public String getName()
-    {
-        return name;
-    }
+  @Override
+  public String getName() {
+    return name;
+  }
 
-    @Override
-    public Object getResult()
-    {
-        return resultSet;
-    }
+  @Override
+  public Object getResult() {
+    return resultSet;
+  }
 }

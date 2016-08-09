@@ -38,8 +38,8 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * {@link ModelValidator} which applies to {@link ExtensionModel}s which either contains
- * {@link ConnectionProviderModel}s, {@link OperationModel}s which require a connection or both.
+ * {@link ModelValidator} which applies to {@link ExtensionModel}s which either contains {@link ConnectionProviderModel}s,
+ * {@link OperationModel}s which require a connection or both.
  * <p>
  * This validator makes sure that:
  * <ul>
@@ -50,124 +50,101 @@ import java.util.Set;
  *
  * @since 4.0
  */
-public final class ConnectionProviderModelValidator implements ModelValidator
-{
+public final class ConnectionProviderModelValidator implements ModelValidator {
 
-    @Override
-    public void validate(ExtensionModel extensionModel) throws IllegalModelDefinitionException
-    {
-        Set<ConnectionProviderModel> globalConnectionProviders = new HashSet<>();
-        Multimap<ConfigurationModel, ConnectionProviderModel> configLevelConnectionProviders = HashMultimap.create();
+  @Override
+  public void validate(ExtensionModel extensionModel) throws IllegalModelDefinitionException {
+    Set<ConnectionProviderModel> globalConnectionProviders = new HashSet<>();
+    Multimap<ConfigurationModel, ConnectionProviderModel> configLevelConnectionProviders = HashMultimap.create();
 
-        new ExtensionWalker()
-        {
+    new ExtensionWalker() {
 
-            @Override
-            public void onConnectionProvider(HasConnectionProviderModels owner, ConnectionProviderModel model)
-            {
-                validateTransactions(extensionModel, (RuntimeConnectionProviderModel) model);
-                if (owner instanceof ConfigurationModel)
-                {
-                    configLevelConnectionProviders.put((ConfigurationModel) owner, model);
-                }
-                else
-                {
-                    globalConnectionProviders.add(model);
-                }
-            }
-        }.walk(extensionModel);
-
-        validateGlobalConnectionTypes(extensionModel, globalConnectionProviders);
-        validateConfigLevelConnectionTypes(extensionModel, configLevelConnectionProviders);
-    }
-
-    private void validateTransactions(ExtensionModel extensionModel, RuntimeConnectionProviderModel connectionProviderModel)
-    {
-        Class<ConnectionProvider> providerType = (Class<ConnectionProvider>) connectionProviderModel.getModelProperty(ImplementingTypeModelProperty.class)
-                .map(ImplementingTypeModelProperty::getType)
-                .orElse(null);
-
-        if (providerType != null && CachedConnectionProvider.class.isAssignableFrom(providerType) && TransactionalConnection.class.isAssignableFrom(connectionProviderModel.getConnectionType()))
-        {
-            throw new IllegalConnectionProviderModelDefinitionException(format("Extension '%s' contains a cached connection provider of name '%s' which provides connections of " +
-                                                                               "transactional type '%s'. Transactional connections cannot be produced by cached providers, since the " +
-                                                                               "same connection cannot join two different transactions at once",
-                                                                               extensionModel.getName(), connectionProviderModel.getName(), connectionProviderModel.getConnectionType().getName()));
+      @Override
+      public void onConnectionProvider(HasConnectionProviderModels owner, ConnectionProviderModel model) {
+        validateTransactions(extensionModel, (RuntimeConnectionProviderModel) model);
+        if (owner instanceof ConfigurationModel) {
+          configLevelConnectionProviders.put((ConfigurationModel) owner, model);
+        } else {
+          globalConnectionProviders.add(model);
         }
+      }
+    }.walk(extensionModel);
+
+    validateGlobalConnectionTypes(extensionModel, globalConnectionProviders);
+    validateConfigLevelConnectionTypes(extensionModel, configLevelConnectionProviders);
+  }
+
+  private void validateTransactions(ExtensionModel extensionModel, RuntimeConnectionProviderModel connectionProviderModel) {
+    Class<ConnectionProvider> providerType = (Class<ConnectionProvider>) connectionProviderModel
+        .getModelProperty(ImplementingTypeModelProperty.class).map(ImplementingTypeModelProperty::getType).orElse(null);
+
+    if (providerType != null && CachedConnectionProvider.class.isAssignableFrom(providerType)
+        && TransactionalConnection.class.isAssignableFrom(connectionProviderModel.getConnectionType())) {
+      throw new IllegalConnectionProviderModelDefinitionException(format("Extension '%s' contains a cached connection provider of name '%s' which provides connections of "
+          + "transactional type '%s'. Transactional connections cannot be produced by cached providers, since the "
+          + "same connection cannot join two different transactions at once", extensionModel.getName(),
+                                                                         connectionProviderModel.getName(),
+                                                                         connectionProviderModel.getConnectionType().getName()));
+    }
+  }
+
+  private void validateGlobalConnectionTypes(ExtensionModel extensionModel,
+                                             Set<ConnectionProviderModel> globalConnectionProviders) {
+    if (isEmpty(globalConnectionProviders)) {
+      return;
     }
 
-    private void validateGlobalConnectionTypes(ExtensionModel extensionModel, Set<ConnectionProviderModel> globalConnectionProviders)
-    {
-        if (isEmpty(globalConnectionProviders))
-        {
-            return;
-        }
+    for (ConnectionProviderModel model : globalConnectionProviders) {
+      RuntimeConnectionProviderModel connectionProviderModel = (RuntimeConnectionProviderModel) model;
+      final Class<?> connectionType = connectionProviderModel.getConnectionType();
 
-        for (ConnectionProviderModel model : globalConnectionProviders)
-        {
-            RuntimeConnectionProviderModel connectionProviderModel = (RuntimeConnectionProviderModel) model;
-            final Class<?> connectionType = connectionProviderModel.getConnectionType();
+      new IdempotentExtensionWalker() {
 
-            new IdempotentExtensionWalker()
-            {
-                @Override
-                protected void onOperation(OperationModel operationModel)
-                {
-                    validateConnectionTypes(extensionModel, connectionProviderModel, operationModel, connectionType);
-                }
-
-                @Override
-                protected void onSource(SourceModel sourceModel)
-                {
-                    validateConnectionTypes(extensionModel, connectionProviderModel, sourceModel, connectionType);
-                }
-            }.walk(extensionModel);
-
-        }
-    }
-
-    private void validateConfigLevelConnectionTypes(ExtensionModel extensionModel,
-                                                    Multimap<ConfigurationModel, ConnectionProviderModel> configLevelConnectionProviders)
-    {
-        configLevelConnectionProviders.asMap().forEach((configModel, providerModels) ->
-                                                       {
-                                                           for (ConnectionProviderModel providerModel : providerModels)
-                                                           {
-                                                               Class<?> connectionType = ((RuntimeConnectionProviderModel) providerModel).getConnectionType();
-                                                               configModel.getOperationModels().forEach(operationModel -> validateConnectionTypes(extensionModel, providerModel, operationModel, connectionType));
-                                                           }
-                                                       });
-    }
-
-    private <T> Optional<Class<T>> getConnectionType(EnrichableModel model)
-    {
-        Optional<ConnectivityModelProperty> connectivityProperty = model.getModelProperty(ConnectivityModelProperty.class);
-        if (!connectivityProperty.isPresent() && model instanceof ParameterizedModel)
-        {
-            connectivityProperty = ((ParameterizedModel) model).getParameterModels().stream()
-                    .map(p -> p.getModelProperty(ConnectivityModelProperty.class).orElse(null))
-                    .filter(p -> p != null)
-                    .findFirst();
+        @Override
+        protected void onOperation(OperationModel operationModel) {
+          validateConnectionTypes(extensionModel, connectionProviderModel, operationModel, connectionType);
         }
 
-        return connectivityProperty.map(property -> getType(property.getConnectionType()));
-    }
-
-    private void validateConnectionTypes(ExtensionModel extensionModel, ConnectionProviderModel providerModel, ComponentModel componentModel, Class<?> providerConnectionType)
-    {
-        getConnectionType(componentModel).ifPresent(connectionType ->
-                                                    {
-                                                        if (!connectionType.isAssignableFrom(providerConnectionType))
-                                                        {
-                                                            throw new IllegalConnectionProviderModelDefinitionException(format("Extension '%s' defines component '%s' which requires a connection of type '%s'. However, it also defines connection provider " +
-                                                                                                                               "'%s' which yields connections of incompatible type '%s'",
-                                                                                                                               extensionModel.getName(),
-                                                                                                                               componentModel.getName(),
-                                                                                                                               connectionType.getName(),
-                                                                                                                               providerModel.getName(),
-                                                                                                                               providerConnectionType.getName()));
-                                                        }
-                                                    });
+        @Override
+        protected void onSource(SourceModel sourceModel) {
+          validateConnectionTypes(extensionModel, connectionProviderModel, sourceModel, connectionType);
+        }
+      }.walk(extensionModel);
 
     }
+  }
+
+  private void validateConfigLevelConnectionTypes(ExtensionModel extensionModel,
+                                                  Multimap<ConfigurationModel, ConnectionProviderModel> configLevelConnectionProviders) {
+    configLevelConnectionProviders.asMap().forEach((configModel, providerModels) -> {
+      for (ConnectionProviderModel providerModel : providerModels) {
+        Class<?> connectionType = ((RuntimeConnectionProviderModel) providerModel).getConnectionType();
+        configModel.getOperationModels()
+            .forEach(operationModel -> validateConnectionTypes(extensionModel, providerModel, operationModel, connectionType));
+      }
+    });
+  }
+
+  private <T> Optional<Class<T>> getConnectionType(EnrichableModel model) {
+    Optional<ConnectivityModelProperty> connectivityProperty = model.getModelProperty(ConnectivityModelProperty.class);
+    if (!connectivityProperty.isPresent() && model instanceof ParameterizedModel) {
+      connectivityProperty = ((ParameterizedModel) model).getParameterModels().stream()
+          .map(p -> p.getModelProperty(ConnectivityModelProperty.class).orElse(null)).filter(p -> p != null).findFirst();
+    }
+
+    return connectivityProperty.map(property -> getType(property.getConnectionType()));
+  }
+
+  private void validateConnectionTypes(ExtensionModel extensionModel, ConnectionProviderModel providerModel,
+                                       ComponentModel componentModel, Class<?> providerConnectionType) {
+    getConnectionType(componentModel).ifPresent(connectionType -> {
+      if (!connectionType.isAssignableFrom(providerConnectionType)) {
+        throw new IllegalConnectionProviderModelDefinitionException(format("Extension '%s' defines component '%s' which requires a connection of type '%s'. However, it also defines connection provider "
+            + "'%s' which yields connections of incompatible type '%s'", extensionModel.getName(), componentModel.getName(),
+                                                                           connectionType.getName(), providerModel.getName(),
+                                                                           providerConnectionType.getName()));
+      }
+    });
+
+  }
 }

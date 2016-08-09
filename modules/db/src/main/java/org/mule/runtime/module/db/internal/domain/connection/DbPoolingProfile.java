@@ -12,104 +12,85 @@ import java.util.Objects;
 /**
  * Describes a database pooling profile
  */
-public class DbPoolingProfile
-{
+public class DbPoolingProfile {
 
-    private int maxPoolSize = 5;
-    private int minPoolSize = 0;
-    private int acquireIncrement = 1;
-    private int preparedStatementCacheSize = 5;
-    private int maxWaitMillis = 300000;  // 30 seconds
+  private int maxPoolSize = 5;
+  private int minPoolSize = 0;
+  private int acquireIncrement = 1;
+  private int preparedStatementCacheSize = 5;
+  private int maxWaitMillis = 300000; // 30 seconds
 
-    public int getPreparedStatementCacheSize()
-    {
-        return preparedStatementCacheSize;
+  public int getPreparedStatementCacheSize() {
+    return preparedStatementCacheSize;
+  }
+
+  public void setPreparedStatementCacheSize(int preparedStatementCacheSize) {
+    this.preparedStatementCacheSize = preparedStatementCacheSize;
+  }
+
+  public int getMaxPoolSize() {
+    return maxPoolSize;
+  }
+
+  public void setMaxPoolSize(int maxPoolSize) {
+    this.maxPoolSize = maxPoolSize;
+  }
+
+  public int getMinPoolSize() {
+    return minPoolSize;
+  }
+
+  public void setMinPoolSize(int minPoolSize) {
+    this.minPoolSize = minPoolSize;
+  }
+
+  public int getAcquireIncrement() {
+    return acquireIncrement;
+  }
+
+  public void setAcquireIncrement(int acquireIncrement) {
+    this.acquireIncrement = acquireIncrement;
+  }
+
+  public int getMaxWaitMillis() {
+    return maxWaitMillis;
+  }
+
+  public void setMaxWaitMillis(int maxWaitMillis) {
+
+    this.maxWaitMillis = maxWaitMillis;
+  }
+
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(minPoolSize, maxPoolSize, acquireIncrement, preparedStatementCacheSize, maxWaitMillis);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null || getClass() != obj.getClass()) {
+      return false;
     }
 
-    public void setPreparedStatementCacheSize(int preparedStatementCacheSize)
-    {
-        this.preparedStatementCacheSize = preparedStatementCacheSize;
+    DbPoolingProfile that = (DbPoolingProfile) obj;
+
+    if (maxPoolSize != that.maxPoolSize) {
+      return false;
     }
-
-    public int getMaxPoolSize()
-    {
-        return maxPoolSize;
+    if (minPoolSize != that.minPoolSize) {
+      return false;
     }
-
-    public void setMaxPoolSize(int maxPoolSize)
-    {
-        this.maxPoolSize = maxPoolSize;
+    if (acquireIncrement != that.acquireIncrement) {
+      return false;
     }
-
-    public int getMinPoolSize()
-    {
-        return minPoolSize;
+    if (preparedStatementCacheSize != that.preparedStatementCacheSize) {
+      return false;
     }
+    return maxWaitMillis == that.maxWaitMillis;
 
-    public void setMinPoolSize(int minPoolSize)
-    {
-        this.minPoolSize = minPoolSize;
-    }
-
-    public int getAcquireIncrement()
-    {
-        return acquireIncrement;
-    }
-
-    public void setAcquireIncrement(int acquireIncrement)
-    {
-        this.acquireIncrement = acquireIncrement;
-    }
-
-    public int getMaxWaitMillis()
-    {
-        return maxWaitMillis;
-    }
-
-    public void setMaxWaitMillis(int maxWaitMillis)
-    {
-
-        this.maxWaitMillis = maxWaitMillis;
-    }
-
-
-    @Override
-    public int hashCode()
-    {
-        return Objects.hash(minPoolSize, maxPoolSize, acquireIncrement, preparedStatementCacheSize, maxWaitMillis);
-    }
-
-    @Override
-    public boolean equals(Object obj)
-    {
-        if (this == obj)
-        {
-            return true;
-        }
-        if (obj == null || getClass() != obj.getClass())
-        {
-            return false;
-        }
-
-        DbPoolingProfile that = (DbPoolingProfile) obj;
-
-        if (maxPoolSize != that.maxPoolSize)
-        {
-            return false;
-        }
-        if (minPoolSize != that.minPoolSize)
-        {
-            return false;
-        }
-        if (acquireIncrement != that.acquireIncrement)
-        {
-            return false;
-        }
-        if (preparedStatementCacheSize != that.preparedStatementCacheSize)
-        {
-            return false;
-        }
-        return maxWaitMillis == that.maxWaitMillis;
-
-    }
+  }
 }

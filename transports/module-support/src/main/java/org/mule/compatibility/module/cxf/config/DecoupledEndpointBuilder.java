@@ -21,34 +21,31 @@ import java.util.List;
 
 import org.apache.cxf.Bus;
 
-public class DecoupledEndpointBuilder
-{
+public class DecoupledEndpointBuilder {
 
-    public static void build(MuleContext muleContext, String decoupledEndpoint, CxfOutboundMessageProcessor processor, Bus bus) throws MuleException
-    {
-        if (decoupledEndpoint != null)
-        {
-            processor.setDecoupledEndpoint(decoupledEndpoint);
+  public static void build(MuleContext muleContext, String decoupledEndpoint, CxfOutboundMessageProcessor processor, Bus bus)
+      throws MuleException {
+    if (decoupledEndpoint != null) {
+      processor.setDecoupledEndpoint(decoupledEndpoint);
 
-            CxfInboundMessageProcessor cxfInboundMP = new CxfInboundMessageProcessor();
-            cxfInboundMP.setMuleContext(muleContext);
-            cxfInboundMP.setBus(bus);
+      CxfInboundMessageProcessor cxfInboundMP = new CxfInboundMessageProcessor();
+      cxfInboundMP.setMuleContext(muleContext);
+      cxfInboundMP.setBus(bus);
 
-            List<MessageProcessor> mps = new ArrayList<MessageProcessor>();
-            mps.add(cxfInboundMP);
+      List<MessageProcessor> mps = new ArrayList<MessageProcessor>();
+      mps.add(cxfInboundMP);
 
-            EndpointBuilder ep = getEndpointFactory(muleContext).getEndpointBuilder(decoupledEndpoint);
+      EndpointBuilder ep = getEndpointFactory(muleContext).getEndpointBuilder(decoupledEndpoint);
 
-            Flow flow = new Flow("decoupled-" + ep.toString(), muleContext);
-            flow.setMessageProcessors(mps);
-            flow.setMessageSource(ep.buildInboundEndpoint());
-            muleContext.getRegistry().registerObject(flow.getName(), flow);
-        }
-
+      Flow flow = new Flow("decoupled-" + ep.toString(), muleContext);
+      flow.setMessageProcessors(mps);
+      flow.setMessageSource(ep.buildInboundEndpoint());
+      muleContext.getRegistry().registerObject(flow.getName(), flow);
     }
 
-    private static EndpointFactory getEndpointFactory(MuleContext muleContext)
-    {
-        return (EndpointFactory) muleContext.getRegistry().lookupObject(MuleEndpointProperties.OBJECT_MULE_ENDPOINT_FACTORY);
-    }
+  }
+
+  private static EndpointFactory getEndpointFactory(MuleContext muleContext) {
+    return (EndpointFactory) muleContext.getRegistry().lookupObject(MuleEndpointProperties.OBJECT_MULE_ENDPOINT_FACTORY);
+  }
 }

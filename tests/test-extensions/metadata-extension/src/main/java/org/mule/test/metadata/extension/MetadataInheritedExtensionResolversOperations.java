@@ -11,9 +11,8 @@ import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 
-public class MetadataInheritedExtensionResolversOperations
-{
-    public void shouldInheritExtensionResolvers(@Connection MetadataConnection connection, @MetadataKeyId String type, @Optional @Content Object content)
-    {
-    }
+public class MetadataInheritedExtensionResolversOperations {
+
+  public void shouldInheritExtensionResolvers(@Connection MetadataConnection connection, @MetadataKeyId String type,
+                                              @Optional @Content Object content) {}
 }

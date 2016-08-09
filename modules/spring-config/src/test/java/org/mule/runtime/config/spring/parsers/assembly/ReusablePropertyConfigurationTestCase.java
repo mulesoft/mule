@@ -12,34 +12,32 @@ import org.mule.tck.size.SmallTest;
 import org.junit.Test;
 
 @SmallTest
-public class ReusablePropertyConfigurationTestCase extends AbstractBasePropertyConfigurationTestCase
-{
+public class ReusablePropertyConfigurationTestCase extends AbstractBasePropertyConfigurationTestCase {
 
-    public static final String REFERENCE = "reference";
-    public static final String WRAPPER = "wrapper";
+  public static final String REFERENCE = "reference";
+  public static final String WRAPPER = "wrapper";
 
-    @Test
-    public void testReusable()
-    {
-        ReusablePropertyConfiguration config = new ReusablePropertyConfiguration();
-        setTestValues(REFERENCE, config); // as normal
-        verifyTestValues(REFERENCE, config); // transparent wrapper
-        verifyIgnored(REFERENCE, config);
-        config.reset();
-        verifyTestValues(REFERENCE, config); // original values still visible via wrapper
-        setTestValues(WRAPPER, config); // add extra values
-        verifyTestValues(REFERENCE, config); // original values still visible via wrapper
-        verifyTestValues(WRAPPER, config); // new values also visible via wrapper
-        verifyIgnored(WRAPPER, config);
-        config.reset();
-        verifyMissing(WRAPPER, config); // new values deleted
-        verifyTestValues(REFERENCE, config); // original values still visible via wrapper
-        setTestValues(WRAPPER, config); // add extra values
-        verifyTestValues(REFERENCE, config); // original values still visible via wrapper
-        verifyTestValues(WRAPPER, config); // new values also visible via wrapper
-        config.reset();
-        verifyMissing(WRAPPER, config); // new values deleted
-        verifyTestValues(REFERENCE, config); // original values still visible via wrapper
-    }
+  @Test
+  public void testReusable() {
+    ReusablePropertyConfiguration config = new ReusablePropertyConfiguration();
+    setTestValues(REFERENCE, config); // as normal
+    verifyTestValues(REFERENCE, config); // transparent wrapper
+    verifyIgnored(REFERENCE, config);
+    config.reset();
+    verifyTestValues(REFERENCE, config); // original values still visible via wrapper
+    setTestValues(WRAPPER, config); // add extra values
+    verifyTestValues(REFERENCE, config); // original values still visible via wrapper
+    verifyTestValues(WRAPPER, config); // new values also visible via wrapper
+    verifyIgnored(WRAPPER, config);
+    config.reset();
+    verifyMissing(WRAPPER, config); // new values deleted
+    verifyTestValues(REFERENCE, config); // original values still visible via wrapper
+    setTestValues(WRAPPER, config); // add extra values
+    verifyTestValues(REFERENCE, config); // original values still visible via wrapper
+    verifyTestValues(WRAPPER, config); // new values also visible via wrapper
+    config.reset();
+    verifyMissing(WRAPPER, config); // new values deleted
+    verifyTestValues(REFERENCE, config); // original values still visible via wrapper
+  }
 
 }

@@ -11,12 +11,12 @@ import org.mule.runtime.core.api.MuleEvent;
 import java.io.Serializable;
 
 /**
- * <code>CredentialsAccessor</code> is a template for obtaining user credentials
- * from the current message and writing the user credentials to an outbound message
+ * <code>CredentialsAccessor</code> is a template for obtaining user credentials from the current message and writing the user
+ * credentials to an outbound message
  */
-public interface CredentialsAccessor
-{
-    Serializable getCredentials(MuleEvent event);
+public interface CredentialsAccessor {
 
-    void setCredentials(MuleEvent event, Serializable credentials);
+  Serializable getCredentials(MuleEvent event);
+
+  void setCredentials(MuleEvent event, Serializable credentials);
 }

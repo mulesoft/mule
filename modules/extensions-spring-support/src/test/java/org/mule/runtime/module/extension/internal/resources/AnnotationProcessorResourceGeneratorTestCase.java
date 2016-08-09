@@ -28,30 +28,27 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class AnnotationProcessorResourceGeneratorTestCase extends ResourcesGeneratorContractTestCase
-{
+public class AnnotationProcessorResourceGeneratorTestCase extends ResourcesGeneratorContractTestCase {
 
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private ProcessingEnvironment processingEnvironment;
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  private ProcessingEnvironment processingEnvironment;
 
-    @Override
-    protected ResourcesGenerator buildGenerator()
-    {
-        return new AnnotationProcessorResourceGenerator(resourceFactories, processingEnvironment);
-    }
+  @Override
+  protected ResourcesGenerator buildGenerator() {
+    return new AnnotationProcessorResourceGenerator(resourceFactories, processingEnvironment);
+  }
 
-    @Test
-    public void write() throws Exception
-    {
-        FileObject file = mock(FileObject.class);
-        when(processingEnvironment.getFiler().createResource(SOURCE_OUTPUT, EMPTY, RESOURCE_PATH)).thenReturn(file);
+  @Test
+  public void write() throws Exception {
+    FileObject file = mock(FileObject.class);
+    when(processingEnvironment.getFiler().createResource(SOURCE_OUTPUT, EMPTY, RESOURCE_PATH)).thenReturn(file);
 
-        OutputStream out = mock(OutputStream.class, RETURNS_DEEP_STUBS);
-        when(file.openOutputStream()).thenReturn(out);
+    OutputStream out = mock(OutputStream.class, RETURNS_DEEP_STUBS);
+    when(file.openOutputStream()).thenReturn(out);
 
-        generator.generateFor(extensionModel);
+    generator.generateFor(extensionModel);
 
-        verify(out).write(RESOURCE_CONTENT);
-        verify(out).flush();
-    }
+    verify(out).write(RESOURCE_CONTENT);
+    verify(out).flush();
+  }
 }

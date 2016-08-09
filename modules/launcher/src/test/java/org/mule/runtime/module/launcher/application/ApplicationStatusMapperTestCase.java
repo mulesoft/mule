@@ -20,49 +20,41 @@ import org.mule.tck.size.SmallTest;
 import org.junit.Test;
 
 @SmallTest
-public class ApplicationStatusMapperTestCase extends AbstractMuleTestCase
-{
+public class ApplicationStatusMapperTestCase extends AbstractMuleTestCase {
 
-    @Test
-    public void mapsNotInLifeCycle() throws Exception
-    {
-        doMappingTest(NotInLifecyclePhase.PHASE_NAME, ApplicationStatus.CREATED);
-    }
+  @Test
+  public void mapsNotInLifeCycle() throws Exception {
+    doMappingTest(NotInLifecyclePhase.PHASE_NAME, ApplicationStatus.CREATED);
+  }
 
-    @Test
-    public void mapsInitialisable() throws Exception
-    {
-        doMappingTest(Initialisable.PHASE_NAME, ApplicationStatus.INITIALISED);
-    }
+  @Test
+  public void mapsInitialisable() throws Exception {
+    doMappingTest(Initialisable.PHASE_NAME, ApplicationStatus.INITIALISED);
+  }
 
-    @Test
-    public void mapsStoppable() throws Exception
-    {
-        doMappingTest(Stoppable.PHASE_NAME, ApplicationStatus.STOPPED);
-    }
+  @Test
+  public void mapsStoppable() throws Exception {
+    doMappingTest(Stoppable.PHASE_NAME, ApplicationStatus.STOPPED);
+  }
 
-    @Test
-    public void mapsStartable() throws Exception
-    {
-        doMappingTest(Startable.PHASE_NAME, ApplicationStatus.STARTED);
-    }
+  @Test
+  public void mapsStartable() throws Exception {
+    doMappingTest(Startable.PHASE_NAME, ApplicationStatus.STARTED);
+  }
 
-    @Test
-    public void mapsDisposable() throws Exception
-    {
-        doMappingTest(Disposable.PHASE_NAME, ApplicationStatus.DESTROYED);
-    }
+  @Test
+  public void mapsDisposable() throws Exception {
+    doMappingTest(Disposable.PHASE_NAME, ApplicationStatus.DESTROYED);
+  }
 
-    @Test(expected = IllegalStateException.class)
-    public void throwsErrorMappingUnknownPhase() throws Exception
-    {
-        ApplicationStatusMapper.getApplicationStatus("unknown");
-    }
+  @Test(expected = IllegalStateException.class)
+  public void throwsErrorMappingUnknownPhase() throws Exception {
+    ApplicationStatusMapper.getApplicationStatus("unknown");
+  }
 
-    private void doMappingTest(String currentPhaseName, ApplicationStatus expectedApplicationStatus)
-    {
-        final ApplicationStatus applicationStatus = ApplicationStatusMapper.getApplicationStatus(currentPhaseName);
+  private void doMappingTest(String currentPhaseName, ApplicationStatus expectedApplicationStatus) {
+    final ApplicationStatus applicationStatus = ApplicationStatusMapper.getApplicationStatus(currentPhaseName);
 
-        assertThat(applicationStatus, equalTo(expectedApplicationStatus));
-    }
+    assertThat(applicationStatus, equalTo(expectedApplicationStatus));
+  }
 }

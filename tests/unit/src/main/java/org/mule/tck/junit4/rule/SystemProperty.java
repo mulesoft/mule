@@ -9,85 +9,67 @@ package org.mule.tck.junit4.rule;
 import org.junit.rules.ExternalResource;
 
 /**
- * Sets up a system property before a test and guaranties to tear it down
- * afterward.
+ * Sets up a system property before a test and guaranties to tear it down afterward.
  */
-public class SystemProperty extends ExternalResource
-{
+public class SystemProperty extends ExternalResource {
 
-    private final String name;
-    private String value;
-    private boolean initialized;
-    private String oldValue;
+  private final String name;
+  private String value;
+  private boolean initialized;
+  private String oldValue;
 
-    public SystemProperty(String name)
-    {
-        this(name, null);
+  public SystemProperty(String name) {
+    this(name, null);
+  }
+
+  public SystemProperty(String name, String value) {
+    this.name = name;
+    this.value = value;
+  }
+
+  @Override
+  protected void before() throws Throwable {
+    if (initialized) {
+      throw new IllegalArgumentException("System property was already initialized");
     }
 
-    public SystemProperty(String name, String value)
-    {
-        this.name = name;
-        this.value = value;
+    if (getValue() == null) {
+      oldValue = System.clearProperty(name);
+    } else {
+      oldValue = System.setProperty(name, getValue());
+    }
+    initialized = true;
+  }
+
+  @Override
+  protected void after() {
+    if (!initialized) {
+      throw new IllegalArgumentException("System property was not initialized");
     }
 
-    @Override
-    protected void before() throws Throwable
-    {
-        if (initialized)
-        {
-            throw new IllegalArgumentException("System property was already initialized");
-        }
+    doCleanUp();
+    restoreOldValue();
 
-        if (getValue() == null)
-        {
-            oldValue = System.clearProperty(name);
-        }
-        else
-        {
-            oldValue = System.setProperty(name, getValue());
-        }
-        initialized = true;
+    initialized = false;
+  }
+
+  protected void restoreOldValue() {
+    if (oldValue == null) {
+      System.clearProperty(name);
+    } else {
+      System.setProperty(name, oldValue);
     }
+  }
 
-    @Override
-    protected void after()
-    {
-        if (!initialized)
-        {
-            throw new IllegalArgumentException("System property was not initialized");
-        }
+  public String getName() {
+    return name;
+  }
 
-        doCleanUp();
-        restoreOldValue();
+  protected void doCleanUp() {
+    // Nothing to do
+  }
 
-        initialized = false;
-    }
-
-    protected void restoreOldValue()
-    {
-        if (oldValue == null)
-        {
-            System.clearProperty(name);
-        }
-        else
-        {
-            System.setProperty(name, oldValue);
-        }
-    }
-
-    public String getName()
-    {
-        return name;
-    }
-
-    protected void doCleanUp()
-    {
-        // Nothing to do
-    }
-
-    public String getValue()
-    {
-        return value;
-    }
+  public String getValue() {
+    return value;
+  }
 }

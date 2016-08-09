@@ -29,157 +29,118 @@ import java.io.InputStream;
 /**
  * <code>FileMessageDispatcher</code> is used to read/write files to the filesystem
  */
-public class FileMessageDispatcher extends AbstractMessageDispatcher
-{
-    private final FileConnector connector;
+public class FileMessageDispatcher extends AbstractMessageDispatcher {
 
-    public FileMessageDispatcher(OutboundEndpoint endpoint)
-    {
-        super(endpoint);
-        this.connector = (FileConnector) endpoint.getConnector();
+  private final FileConnector connector;
 
-        if (endpoint.getProperty("outputAppend") != null)
-        {
-            throw new IllegalArgumentException("Configuring 'outputAppend' on a file endpoint is no longer supported. You may configure it on a file connector instead.");
+  public FileMessageDispatcher(OutboundEndpoint endpoint) {
+    super(endpoint);
+    this.connector = (FileConnector) endpoint.getConnector();
+
+    if (endpoint.getProperty("outputAppend") != null) {
+      throw new IllegalArgumentException("Configuring 'outputAppend' on a file endpoint is no longer supported. You may configure it on a file connector instead.");
+    }
+  }
+
+  @Override
+  protected void doDispatch(MuleEvent event) throws Exception {
+    Object data = event.getMessage().getPayload();
+    // Wrap the transformed message before passing it to the filename parser
+    MuleMessage.Builder messageBuilder = MuleMessage.builder(event.getMessage()).payload(data);
+
+    FileOutputStream fos = (FileOutputStream) connector.getOutputStream(getEndpoint(), event);
+    try {
+      if (event.getMessage().getOutboundProperty(PROPERTY_FILENAME) == null) {
+        messageBuilder.addOutboundProperty(PROPERTY_FILENAME, event.getMessage().getOutboundProperty(PROPERTY_FILENAME, EMPTY));
+      }
+      event.setMessage(messageBuilder.build());
+
+
+      if (data instanceof byte[]) {
+        fos.write((byte[]) data);
+      } else if (data instanceof String) {
+        fos.write(data.toString().getBytes(resolveEncoding(event)));
+      } else if (data instanceof OutputHandler) {
+        ((OutputHandler) data).write(event, fos);
+      } else {
+        InputStream is = (InputStream) event.transformMessage(DataType.fromType(InputStream.class));
+        IOUtils.copyLarge(is, fos);
+        is.close();
+      }
+    } finally {
+      logger.debug("Closing file");
+      fos.close();
+    }
+  }
+
+  /**
+   * There is no associated session for a file connector
+   *
+   * @throws MuleException
+   */
+  public Object getDelegateSession() throws MuleException {
+    return null;
+  }
+
+  protected static File getNextFile(String dir, Object filter) throws MuleException {
+    File[] files;
+    File file = FileUtils.newFile(dir);
+    File result = null;
+    try {
+      if (file.exists()) {
+        if (file.isFile()) {
+          result = file;
+        } else if (file.isDirectory()) {
+          if (filter != null) {
+            if (filter instanceof FileFilter) {
+              files = file.listFiles((FileFilter) filter);
+            } else if (filter instanceof FilenameFilter) {
+              files = file.listFiles((FilenameFilter) filter);
+            } else {
+              throw new DefaultMuleException(FileMessages.invalidFilter(filter));
+            }
+          } else {
+            files = file.listFiles();
+          }
+          if (files.length > 0) {
+            result = getFirstFile(files);
+          }
         }
+      }
+      return result;
+    } catch (Exception e) {
+      throw new DefaultMuleException(FileMessages.errorWhileListingFiles(), e);
+    }
+  }
+
+  private static File getFirstFile(File[] files) {
+    for (File file : files) {
+      if (file.isFile()) {
+        return file;
+      }
     }
 
-    @Override
-    protected void doDispatch(MuleEvent event) throws Exception
-    {
-        Object data = event.getMessage().getPayload();
-        // Wrap the transformed message before passing it to the filename parser
-        MuleMessage.Builder messageBuilder = MuleMessage.builder(event.getMessage()).payload(data);
+    return null;
+  }
 
-        FileOutputStream fos = (FileOutputStream) connector.getOutputStream(getEndpoint(), event);
-        try
-        {
-            if (event.getMessage().getOutboundProperty(PROPERTY_FILENAME) == null)
-            {
-                messageBuilder.addOutboundProperty(PROPERTY_FILENAME, event.getMessage().getOutboundProperty(PROPERTY_FILENAME, EMPTY));
-            }
-            event.setMessage(messageBuilder.build());
+  @Override
+  protected MuleMessage doSend(MuleEvent event) throws Exception {
+    doDispatch(event);
+    return MuleMessage.builder().nullPayload().build();
+  }
 
+  @Override
+  protected void doDispose() {
+    // no op
+  }
 
-            if (data instanceof byte[])
-            {
-                fos.write((byte[]) data);
-            }
-            else if (data instanceof String)
-            {
-                fos.write(data.toString().getBytes(resolveEncoding(event)));
-            }
-            else if (data instanceof OutputHandler)
-            {
-                ((OutputHandler) data).write(event, fos);
-            }
-            else
-            {
-                InputStream is = (InputStream) event.transformMessage(DataType.fromType(InputStream.class));
-                IOUtils.copyLarge(is, fos);
-                is.close();
-            }
-        }
-        finally
-        {
-            logger.debug("Closing file");
-            fos.close();
-        }
-    }
+  @Override
+  protected void doConnect() throws Exception {
+    // no op
+  }
 
-    /**
-     * There is no associated session for a file connector
-     *
-     * @throws MuleException
-     */
-    public Object getDelegateSession() throws MuleException
-    {
-        return null;
-    }
-
-    protected static File getNextFile(String dir, Object filter) throws MuleException
-    {
-        File[] files;
-        File file = FileUtils.newFile(dir);
-        File result = null;
-        try
-        {
-            if (file.exists())
-            {
-                if (file.isFile())
-                {
-                    result = file;
-                }
-                else if (file.isDirectory())
-                {
-                    if (filter != null)
-                    {
-                        if (filter instanceof FileFilter)
-                        {
-                            files = file.listFiles((FileFilter) filter);
-                        }
-                        else if (filter instanceof FilenameFilter)
-                        {
-                            files = file.listFiles((FilenameFilter) filter);
-                        }
-                        else
-                        {
-                            throw new DefaultMuleException(FileMessages.invalidFilter(filter));
-                        }
-                    }
-                    else
-                    {
-                        files = file.listFiles();
-                    }
-                    if (files.length > 0)
-                    {
-                        result = getFirstFile(files);
-                    }
-                }
-            }
-            return result;
-        }
-        catch (Exception e)
-        {
-            throw new DefaultMuleException(FileMessages.errorWhileListingFiles(), e);
-        }
-    }
-
-    private static File getFirstFile(File[] files)
-    {
-        for (File file : files)
-        {
-            if (file.isFile())
-            {
-                return  file;
-            }
-        }
-
-        return null;
-    }
-
-    @Override
-    protected MuleMessage doSend(MuleEvent event) throws Exception
-    {
-        doDispatch(event);
-        return MuleMessage.builder().nullPayload().build();
-    }
-
-    @Override
-    protected void doDispose()
-    {
-        // no op
-    }
-
-    @Override
-    protected void doConnect() throws Exception
-    {
-        // no op
-    }
-
-    @Override
-    protected void doDisconnect() throws Exception
-    {
-        // no op
-    }
+  @Override
+  protected void doDisconnect() throws Exception {
+    // no op
+  }
 }

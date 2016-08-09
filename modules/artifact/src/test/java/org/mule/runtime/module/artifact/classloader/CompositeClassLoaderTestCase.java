@@ -30,204 +30,192 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-public class CompositeClassLoaderTestCase extends AbstractMuleTestCase
-{
+public class CompositeClassLoaderTestCase extends AbstractMuleTestCase {
 
-    public static final String CLASS_PACKAGE = "java.lang";
-    public static final String CLASS_NAME = "java.lang.Object";
-    public static final Class CLASS_FROM_PARENT = Integer.class;
-    public static final Class CLASS_FROM_CLASSLOADER1 = Object.class;
-    public static final Class CLASS_FROM_CLASSLOADER2 = String.class;
+  public static final String CLASS_PACKAGE = "java.lang";
+  public static final String CLASS_NAME = "java.lang.Object";
+  public static final Class CLASS_FROM_PARENT = Integer.class;
+  public static final Class CLASS_FROM_CLASSLOADER1 = Object.class;
+  public static final Class CLASS_FROM_CLASSLOADER2 = String.class;
 
-    public static final String LIBRARY_NAME = "dummy.so";
-    public static final String LIBRARY_FROM_PARENT = "parent.dummy.so";
-    public static final String LIBRARY_FROM_CLASSLAODER1 = "classloader1.dummy.so";
-    public static final String LIBRARY_FROM_CLASSLAODER2 = "classloader2.dummy.so";
+  public static final String LIBRARY_NAME = "dummy.so";
+  public static final String LIBRARY_FROM_PARENT = "parent.dummy.so";
+  public static final String LIBRARY_FROM_CLASSLAODER1 = "classloader1.dummy.so";
+  public static final String LIBRARY_FROM_CLASSLAODER2 = "classloader2.dummy.so";
 
-    @Rule
-    public ExpectedException expected = ExpectedException.none();
+  @Rule
+  public ExpectedException expected = ExpectedException.none();
 
-    private final TestClassLoader parentClassLoader = new TestClassLoader();
-    private final TestClassLoader classLoader1 = new TestClassLoader();
-    private final TestClassLoader classLoader2 = new SubTestClassLoader();
+  private final TestClassLoader parentClassLoader = new TestClassLoader();
+  private final TestClassLoader classLoader1 = new TestClassLoader();
+  private final TestClassLoader classLoader2 = new SubTestClassLoader();
 
-    @Test
-    public void usesParentOnlyLookup() throws ClassNotFoundException
-    {
-        parentClassLoader.addClass(CLASS_NAME, CLASS_FROM_PARENT);
-        classLoader1.addClass(CLASS_NAME, CLASS_FROM_CLASSLOADER1);
-        classLoader2.addClass(CLASS_NAME, CLASS_FROM_CLASSLOADER2);
+  @Test
+  public void usesParentOnlyLookup() throws ClassNotFoundException {
+    parentClassLoader.addClass(CLASS_NAME, CLASS_FROM_PARENT);
+    classLoader1.addClass(CLASS_NAME, CLASS_FROM_CLASSLOADER1);
+    classLoader2.addClass(CLASS_NAME, CLASS_FROM_CLASSLOADER2);
 
-        final ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
-        when(lookupPolicy.getLookupStrategy(CLASS_NAME)).thenReturn(PARENT_ONLY);
+    final ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
+    when(lookupPolicy.getLookupStrategy(CLASS_NAME)).thenReturn(PARENT_ONLY);
 
-        CompositeClassLoader compositeClassLoader = createCompositeClassLoader(lookupPolicy);
+    CompositeClassLoader compositeClassLoader = createCompositeClassLoader(lookupPolicy);
 
-        Class<?> aClass = compositeClassLoader.loadClass(CLASS_NAME, true);
-        assertThat(aClass, equalTo(CLASS_FROM_PARENT));
-    }
+    Class<?> aClass = compositeClassLoader.loadClass(CLASS_NAME, true);
+    assertThat(aClass, equalTo(CLASS_FROM_PARENT));
+  }
 
-    @Test
-    public void usesParentOnlyLookupAndFails() throws ClassNotFoundException
-    {
-        classLoader1.addClass(CLASS_NAME, CLASS_FROM_CLASSLOADER1);
-        classLoader2.addClass(CLASS_NAME, CLASS_FROM_CLASSLOADER2);
+  @Test
+  public void usesParentOnlyLookupAndFails() throws ClassNotFoundException {
+    classLoader1.addClass(CLASS_NAME, CLASS_FROM_CLASSLOADER1);
+    classLoader2.addClass(CLASS_NAME, CLASS_FROM_CLASSLOADER2);
 
-        expected.expect(ClassNotFoundException.class);
+    expected.expect(ClassNotFoundException.class);
 
-        final ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
-        when(lookupPolicy.getLookupStrategy(CLASS_NAME)).thenReturn(PARENT_ONLY);
-        CompositeClassLoader compositeClassLoader = createCompositeClassLoader(lookupPolicy);
-        compositeClassLoader.loadClass(CLASS_NAME, true);
-    }
+    final ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
+    when(lookupPolicy.getLookupStrategy(CLASS_NAME)).thenReturn(PARENT_ONLY);
+    CompositeClassLoader compositeClassLoader = createCompositeClassLoader(lookupPolicy);
+    compositeClassLoader.loadClass(CLASS_NAME, true);
+  }
 
-    @Test
-    public void usesParentFirstLookup() throws ClassNotFoundException
-    {
-        parentClassLoader.addClass(CLASS_NAME, CLASS_FROM_PARENT);
-        classLoader1.addClass(CLASS_NAME, CLASS_FROM_CLASSLOADER1);
-        classLoader2.addClass(CLASS_NAME, CLASS_FROM_CLASSLOADER2);
+  @Test
+  public void usesParentFirstLookup() throws ClassNotFoundException {
+    parentClassLoader.addClass(CLASS_NAME, CLASS_FROM_PARENT);
+    classLoader1.addClass(CLASS_NAME, CLASS_FROM_CLASSLOADER1);
+    classLoader2.addClass(CLASS_NAME, CLASS_FROM_CLASSLOADER2);
 
-        final ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
-        when(lookupPolicy.getLookupStrategy(CLASS_NAME)).thenReturn(PARENT_FIRST);
-        CompositeClassLoader compositeClassLoader = createCompositeClassLoader(lookupPolicy);
+    final ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
+    when(lookupPolicy.getLookupStrategy(CLASS_NAME)).thenReturn(PARENT_FIRST);
+    CompositeClassLoader compositeClassLoader = createCompositeClassLoader(lookupPolicy);
 
-        Class<?> aClass = compositeClassLoader.loadClass(CLASS_NAME, true);
-        assertThat(aClass, equalTo(CLASS_FROM_PARENT));
-    }
+    Class<?> aClass = compositeClassLoader.loadClass(CLASS_NAME, true);
+    assertThat(aClass, equalTo(CLASS_FROM_PARENT));
+  }
 
-    @Test
-    public void usesParentFirstThenChildLookup() throws ClassNotFoundException
-    {
-        classLoader1.addClass(CLASS_NAME, CLASS_FROM_CLASSLOADER1);
-        classLoader2.addClass(CLASS_NAME, CLASS_FROM_CLASSLOADER2);
+  @Test
+  public void usesParentFirstThenChildLookup() throws ClassNotFoundException {
+    classLoader1.addClass(CLASS_NAME, CLASS_FROM_CLASSLOADER1);
+    classLoader2.addClass(CLASS_NAME, CLASS_FROM_CLASSLOADER2);
 
-        final ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
-        when(lookupPolicy.getLookupStrategy(CLASS_NAME)).thenReturn(PARENT_FIRST);
-        CompositeClassLoader compositeClassLoader = createCompositeClassLoader(lookupPolicy);
+    final ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
+    when(lookupPolicy.getLookupStrategy(CLASS_NAME)).thenReturn(PARENT_FIRST);
+    CompositeClassLoader compositeClassLoader = createCompositeClassLoader(lookupPolicy);
 
-        Class<?> aClass = compositeClassLoader.loadClass(CLASS_NAME, true);
-        assertThat(aClass, equalTo(CLASS_FROM_CLASSLOADER1));
-    }
+    Class<?> aClass = compositeClassLoader.loadClass(CLASS_NAME, true);
+    assertThat(aClass, equalTo(CLASS_FROM_CLASSLOADER1));
+  }
 
-    @Test
-    public void  usesParentFirstAndChildLookupAndFails() throws ClassNotFoundException
-    {
-        expected.expect(CompositeClassNotFoundException.class);
-        expected.expectMessage(startsWith("Cannot load class '" + CLASS_NAME + "': ["));
-        expected.expect(expressionMatches((e) -> ((CompositeClassNotFoundException) e).getExceptions(), contains(
-                expressionMatches((e) -> ((TestClassNotFoundException) e).getClassLoader(), is((ClassLoader) parentClassLoader)),
-                expressionMatches((e) -> ((TestClassNotFoundException) e).getClassLoader(), is((ClassLoader) classLoader1)),
-                expressionMatches((e) -> ((TestClassNotFoundException) e).getClassLoader(), is((ClassLoader) classLoader2)))));
+  @Test
+  public void usesParentFirstAndChildLookupAndFails() throws ClassNotFoundException {
+    expected.expect(CompositeClassNotFoundException.class);
+    expected.expectMessage(startsWith("Cannot load class '" + CLASS_NAME + "': ["));
+    expected.expect(expressionMatches((e) -> ((CompositeClassNotFoundException) e).getExceptions(),
+                                      contains(expressionMatches((e) -> ((TestClassNotFoundException) e).getClassLoader(),
+                                                                 is((ClassLoader) parentClassLoader)),
+                                               expressionMatches((e) -> ((TestClassNotFoundException) e).getClassLoader(),
+                                                                 is((ClassLoader) classLoader1)),
+                                               expressionMatches((e) -> ((TestClassNotFoundException) e).getClassLoader(),
+                                                                 is((ClassLoader) classLoader2)))));
 
-        final ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
-        when(lookupPolicy.getLookupStrategy(CLASS_NAME)).thenReturn(PARENT_FIRST);
-        CompositeClassLoader compositeClassLoader = createCompositeClassLoader(lookupPolicy);
+    final ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
+    when(lookupPolicy.getLookupStrategy(CLASS_NAME)).thenReturn(PARENT_FIRST);
+    CompositeClassLoader compositeClassLoader = createCompositeClassLoader(lookupPolicy);
 
-        compositeClassLoader.loadClass(CLASS_NAME, true);
-    }
+    compositeClassLoader.loadClass(CLASS_NAME, true);
+  }
 
-    @Test
-    public void usesChildFirstLookupFromFirstClassLoader() throws ClassNotFoundException
-    {
-        parentClassLoader.addClass(CLASS_NAME, CLASS_FROM_PARENT);
-        classLoader1.addClass(CLASS_NAME, CLASS_FROM_CLASSLOADER1);
-        classLoader2.addClass(CLASS_NAME, CLASS_FROM_CLASSLOADER2);
+  @Test
+  public void usesChildFirstLookupFromFirstClassLoader() throws ClassNotFoundException {
+    parentClassLoader.addClass(CLASS_NAME, CLASS_FROM_PARENT);
+    classLoader1.addClass(CLASS_NAME, CLASS_FROM_CLASSLOADER1);
+    classLoader2.addClass(CLASS_NAME, CLASS_FROM_CLASSLOADER2);
 
-        final ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
-        CompositeClassLoader compositeClassLoader = createCompositeClassLoader(lookupPolicy);
+    final ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
+    CompositeClassLoader compositeClassLoader = createCompositeClassLoader(lookupPolicy);
 
-        Class<?> aClass = compositeClassLoader.loadClass(CLASS_NAME, true);
-        assertThat(aClass, equalTo(CLASS_FROM_CLASSLOADER1));
-    }
+    Class<?> aClass = compositeClassLoader.loadClass(CLASS_NAME, true);
+    assertThat(aClass, equalTo(CLASS_FROM_CLASSLOADER1));
+  }
 
-    @Test
-    public void usesChildFirstLookupFromSecondClasLoader() throws ClassNotFoundException
-    {
-        parentClassLoader.addClass(CLASS_NAME, CLASS_FROM_PARENT);
-        classLoader2.addClass(CLASS_NAME, CLASS_FROM_CLASSLOADER2);
+  @Test
+  public void usesChildFirstLookupFromSecondClasLoader() throws ClassNotFoundException {
+    parentClassLoader.addClass(CLASS_NAME, CLASS_FROM_PARENT);
+    classLoader2.addClass(CLASS_NAME, CLASS_FROM_CLASSLOADER2);
 
-        final ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
-        CompositeClassLoader compositeClassLoader = createCompositeClassLoader(lookupPolicy);
+    final ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
+    CompositeClassLoader compositeClassLoader = createCompositeClassLoader(lookupPolicy);
 
-        Class<?> aClass = compositeClassLoader.loadClass(CLASS_NAME, true);
-        assertThat(aClass, equalTo(CLASS_FROM_CLASSLOADER2));
-    }
+    Class<?> aClass = compositeClassLoader.loadClass(CLASS_NAME, true);
+    assertThat(aClass, equalTo(CLASS_FROM_CLASSLOADER2));
+  }
 
-    @Test
-    public void usesChildFirstThenParentLookup() throws ClassNotFoundException
-    {
-        parentClassLoader.addClass(CLASS_NAME, CLASS_FROM_PARENT);
-        classLoader1.addClass(CLASS_NAME, CLASS_FROM_CLASSLOADER1);
+  @Test
+  public void usesChildFirstThenParentLookup() throws ClassNotFoundException {
+    parentClassLoader.addClass(CLASS_NAME, CLASS_FROM_PARENT);
+    classLoader1.addClass(CLASS_NAME, CLASS_FROM_CLASSLOADER1);
 
-        final ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
-        CompositeClassLoader compositeClassLoader = createCompositeClassLoader(lookupPolicy);
+    final ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
+    CompositeClassLoader compositeClassLoader = createCompositeClassLoader(lookupPolicy);
 
-        Class<?> aClass = compositeClassLoader.loadClass(CLASS_NAME, true);
-        assertThat(aClass, equalTo(CLASS_FROM_CLASSLOADER1));
-    }
+    Class<?> aClass = compositeClassLoader.loadClass(CLASS_NAME, true);
+    assertThat(aClass, equalTo(CLASS_FROM_CLASSLOADER1));
+  }
 
-    @Test
-    public void usesChildFirstThenParentLookupAndFails() throws ClassNotFoundException
-    {
-        expected.expect(ClassNotFoundException.class);
+  @Test
+  public void usesChildFirstThenParentLookupAndFails() throws ClassNotFoundException {
+    expected.expect(ClassNotFoundException.class);
 
-        final ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
-        CompositeClassLoader compositeClassLoader = createCompositeClassLoader(lookupPolicy);
+    final ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
+    CompositeClassLoader compositeClassLoader = createCompositeClassLoader(lookupPolicy);
 
-        compositeClassLoader.loadClass(CLASS_NAME, true);
-    }
+    compositeClassLoader.loadClass(CLASS_NAME, true);
+  }
 
-    @Test
-    public void loadsLibraryFromFirstClassLoader() throws Exception
-    {
-        classLoader1.addLibrary(LIBRARY_NAME, LIBRARY_FROM_CLASSLAODER1);
-        classLoader2.addLibrary(LIBRARY_NAME, LIBRARY_FROM_CLASSLAODER2);
+  @Test
+  public void loadsLibraryFromFirstClassLoader() throws Exception {
+    classLoader1.addLibrary(LIBRARY_NAME, LIBRARY_FROM_CLASSLAODER1);
+    classLoader2.addLibrary(LIBRARY_NAME, LIBRARY_FROM_CLASSLAODER2);
 
-        final ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
-        CompositeClassLoader compositeClassLoader = createCompositeClassLoader(lookupPolicy);
+    final ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
+    CompositeClassLoader compositeClassLoader = createCompositeClassLoader(lookupPolicy);
 
-        String library = compositeClassLoader.findLibrary(LIBRARY_NAME);
+    String library = compositeClassLoader.findLibrary(LIBRARY_NAME);
 
-        assertThat(library, equalTo(LIBRARY_FROM_CLASSLAODER1));
-    }
+    assertThat(library, equalTo(LIBRARY_FROM_CLASSLAODER1));
+  }
 
-    @Test
-    public void loadsLibraryFromSecondClassLoaderWhenIsNotDefinedOnTheFirstOne() throws Exception
-    {
-        classLoader2.addLibrary(LIBRARY_NAME, LIBRARY_FROM_CLASSLAODER2);
+  @Test
+  public void loadsLibraryFromSecondClassLoaderWhenIsNotDefinedOnTheFirstOne() throws Exception {
+    classLoader2.addLibrary(LIBRARY_NAME, LIBRARY_FROM_CLASSLAODER2);
 
-        final ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
-        CompositeClassLoader compositeClassLoader = createCompositeClassLoader(lookupPolicy);
+    final ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
+    CompositeClassLoader compositeClassLoader = createCompositeClassLoader(lookupPolicy);
 
-        String library = compositeClassLoader.findLibrary(LIBRARY_NAME);
+    String library = compositeClassLoader.findLibrary(LIBRARY_NAME);
 
-        assertThat(library, equalTo(LIBRARY_FROM_CLASSLAODER2));
-    }
+    assertThat(library, equalTo(LIBRARY_FROM_CLASSLAODER2));
+  }
 
-    @Test
-    public void returnsNullWhenLibraryIsNotDefinedInAnyClassLoader() throws Exception
-    {
-        final ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
-        CompositeClassLoader compositeClassLoader = createCompositeClassLoader(lookupPolicy);
+  @Test
+  public void returnsNullWhenLibraryIsNotDefinedInAnyClassLoader() throws Exception {
+    final ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
+    CompositeClassLoader compositeClassLoader = createCompositeClassLoader(lookupPolicy);
 
-        String library = compositeClassLoader.findLibrary(LIBRARY_NAME);
+    String library = compositeClassLoader.findLibrary(LIBRARY_NAME);
 
-        assertThat(library, equalTo(null));
-    }
+    assertThat(library, equalTo(null));
+  }
 
-    private CompositeClassLoader createCompositeClassLoader(ClassLoaderLookupPolicy lookupPolicy)
-    {
-        List<ClassLoader> classLoaders = new LinkedList<>();
-        Collections.addAll(classLoaders, classLoader1, classLoader2);
+  private CompositeClassLoader createCompositeClassLoader(ClassLoaderLookupPolicy lookupPolicy) {
+    List<ClassLoader> classLoaders = new LinkedList<>();
+    Collections.addAll(classLoaders, classLoader1, classLoader2);
 
-        return new CompositeClassLoader(parentClassLoader, classLoaders, lookupPolicy);
-    }
+    return new CompositeClassLoader(parentClassLoader, classLoaders, lookupPolicy);
+  }
 
-    // Used to ensure that the composite classloader is able to access
-    // protected methods in subclasses by reflection
-    public static class SubTestClassLoader extends TestClassLoader
-    {
+  // Used to ensure that the composite classloader is able to access
+  // protected methods in subclasses by reflection
+  public static class SubTestClassLoader extends TestClassLoader {
 
-    }
+  }
 }

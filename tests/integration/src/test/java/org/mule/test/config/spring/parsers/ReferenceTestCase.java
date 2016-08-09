@@ -13,36 +13,31 @@ import org.mule.test.config.spring.parsers.beans.OrphanBean;
 
 import org.junit.Test;
 
-public class ReferenceTestCase extends AbstractNamespaceTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/config/spring/parsers/reference-test.xml";
-    }
+public class ReferenceTestCase extends AbstractNamespaceTestCase {
 
-    protected void testChildRef(int index)
-    {
-        OrphanBean orphan = (OrphanBean) assertBeanExists("orphan" + index, OrphanBean.class);
-        ChildBean child = (ChildBean) assertContentExists(orphan.getChild(), ChildBean.class);
-        assertEquals("child" + index, child.getName());
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/config/spring/parsers/reference-test.xml";
+  }
 
-    @Test
-    public void testNamed()
-    {
-        testChildRef(1);
-    }
+  protected void testChildRef(int index) {
+    OrphanBean orphan = (OrphanBean) assertBeanExists("orphan" + index, OrphanBean.class);
+    ChildBean child = (ChildBean) assertContentExists(orphan.getChild(), ChildBean.class);
+    assertEquals("child" + index, child.getName());
+  }
 
-    @Test
-    public void testOrphan()
-    {
-        testChildRef(2);
-    }
+  @Test
+  public void testNamed() {
+    testChildRef(1);
+  }
 
-    @Test
-    public void testParent()
-    {
-        testChildRef(3);
-    }
+  @Test
+  public void testOrphan() {
+    testChildRef(2);
+  }
+
+  @Test
+  public void testParent() {
+    testChildRef(3);
+  }
 }

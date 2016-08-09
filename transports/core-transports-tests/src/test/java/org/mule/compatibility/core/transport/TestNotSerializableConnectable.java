@@ -12,54 +12,38 @@ import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.retry.RetryContext;
 import org.mule.runtime.core.api.connector.Connectable;
 
-public class TestNotSerializableConnectable implements Connectable
-{
+public class TestNotSerializableConnectable implements Connectable {
 
-    @Override
-    public void initialise() throws InitialisationException
-    {
-    }
+  @Override
+  public void initialise() throws InitialisationException {}
 
-    @Override
-    public void start() throws MuleException
-    {
-    }
+  @Override
+  public void start() throws MuleException {}
 
-    @Override
-    public void stop() throws MuleException
-    {
-    }
+  @Override
+  public void stop() throws MuleException {}
 
-    @Override
-    public void dispose()
-    {
-    }
+  @Override
+  public void dispose() {}
 
-    @Override
-    public void connect() throws Exception
-    {
-    }
+  @Override
+  public void connect() throws Exception {}
 
-    @Override
-    public void disconnect() throws Exception
-    {
-    }
+  @Override
+  public void disconnect() throws Exception {}
 
-    @Override
-    public boolean isConnected()
-    {
-        return false;
-    }
+  @Override
+  public boolean isConnected() {
+    return false;
+  }
 
-    @Override
-    public String getConnectionDescription()
-    {
-        return null;
-    }
+  @Override
+  public String getConnectionDescription() {
+    return null;
+  }
 
-    @Override
-    public RetryContext validateConnection(RetryContext retryContext)
-    {
-        return null;
-    }
+  @Override
+  public RetryContext validateConnection(RetryContext retryContext) {
+    return null;
+  }
 }

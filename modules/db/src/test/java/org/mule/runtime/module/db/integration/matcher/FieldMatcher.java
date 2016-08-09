@@ -16,36 +16,31 @@ import org.hamcrest.Factory;
 import org.hamcrest.Matcher;
 import org.junit.internal.matchers.TypeSafeMatcher;
 
-public class FieldMatcher extends TypeSafeMatcher<Record>
-{
+public class FieldMatcher extends TypeSafeMatcher<Record> {
 
-    private final Field field;
+  private final Field field;
 
-    public FieldMatcher(Field field)
-    {
-        this.field = field;
-    }
+  public FieldMatcher(Field field) {
+    this.field = field;
+  }
 
-    @Override
-    public boolean matchesSafely(Record item)
-    {
-        return item.getFields().contains(field);
-    }
+  @Override
+  public boolean matchesSafely(Record item) {
+    return item.getFields().contains(field);
+  }
 
-    public void describeTo(Description description)
-    {
-        description.appendText("Does not contains a field with name = " + field.getName() + " with value = " + getValueAsString(field.getValue()));
-    }
+  public void describeTo(Description description) {
+    description.appendText("Does not contains a field with name = " + field.getName() + " with value = "
+        + getValueAsString(field.getValue()));
+  }
 
-    @Factory
-    public static Matcher<Record> containsField(Field field)
-    {
-        return new FieldMatcher(field);
-    }
+  @Factory
+  public static Matcher<Record> containsField(Field field) {
+    return new FieldMatcher(field);
+  }
 
-    @Override
-    public void describeMismatch(Object item, Description description)
-    {
-        description.appendText("was ").appendValue(getValueAsString(item));
-    }
+  @Override
+  public void describeMismatch(Object item, Description description) {
+    description.appendText("was ").appendValue(getValueAsString(item));
+  }
 }

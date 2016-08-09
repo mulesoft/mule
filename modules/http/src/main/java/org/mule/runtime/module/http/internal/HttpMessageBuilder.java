@@ -17,64 +17,53 @@ import com.google.common.collect.Multimap;
 
 import java.util.List;
 
-public class HttpMessageBuilder implements Initialisable
-{
+public class HttpMessageBuilder implements Initialisable {
 
-    private String name;
-    protected Multimap<HttpParamType, HttpParam> params = ArrayListMultimap.create();
+  private String name;
+  protected Multimap<HttpParamType, HttpParam> params = ArrayListMultimap.create();
 
-    public void setParams(List<HttpParam> httpParams)
-    {
-        for (HttpParam httpParam : httpParams)
-        {
-            params.put(httpParam.getType(), httpParam);
-        }
+  public void setParams(List<HttpParam> httpParams) {
+    for (HttpParam httpParam : httpParams) {
+      params.put(httpParam.getType(), httpParam);
+    }
+  }
+
+
+  @Override
+  public void initialise() throws InitialisationException {
+    LifecycleUtils.initialiseIfNeeded(params.values());
+  }
+
+  public ParameterMap resolveParams(MuleEvent muleEvent, HttpParamType httpParamType) {
+    Iterable<HttpParam> paramList = params.get(httpParamType);
+    ParameterMap httpParams = new ParameterMap();
+
+    for (HttpParam httpParam : paramList) {
+      httpParam.resolve(httpParams, muleEvent);
     }
 
+    return httpParams;
+  }
 
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        LifecycleUtils.initialiseIfNeeded(params.values());
+  public void setBuilders(List<HttpMessageBuilderRef> httpBuilderRefs) {
+    for (HttpMessageBuilderRef httpBuilderRef : httpBuilderRefs) {
+      setParams(Lists.newArrayList(httpBuilderRef.getRef().params.values()));
     }
+  }
 
-    public ParameterMap resolveParams(MuleEvent muleEvent, HttpParamType httpParamType)
-    {
-        Iterable<HttpParam> paramList = params.get(httpParamType);
-        ParameterMap httpParams = new ParameterMap();
+  public String getName() {
+    return name;
+  }
 
-        for (HttpParam httpParam : paramList)
-        {
-            httpParam.resolve(httpParams, muleEvent);
-        }
+  public void setName(String name) {
+    this.name = name;
+  }
 
-        return httpParams;
-    }
-
-    public void setBuilders(List<HttpMessageBuilderRef> httpBuilderRefs)
-    {
-        for (HttpMessageBuilderRef httpBuilderRef : httpBuilderRefs)
-        {
-            setParams(Lists.newArrayList(httpBuilderRef.getRef().params.values()));
-        }
-    }
-
-    public String getName()
-    {
-        return name;
-    }
-
-    public void setName(String name)
-    {
-        this.name = name;
-    }
-
-    public void addHeader(String headerName, String headerValue)
-    {
-        final HttpSingleParam httpSingleParam = new HttpSingleParam(HttpParamType.HEADER);
-        httpSingleParam.setName(headerName);
-        httpSingleParam.setValue(headerValue);
-        this.params.put(HttpParamType.HEADER, httpSingleParam);
-    }
+  public void addHeader(String headerName, String headerValue) {
+    final HttpSingleParam httpSingleParam = new HttpSingleParam(HttpParamType.HEADER);
+    httpSingleParam.setName(headerName);
+    httpSingleParam.setValue(headerValue);
+    this.params.put(HttpParamType.HEADER, httpSingleParam);
+  }
 
 }

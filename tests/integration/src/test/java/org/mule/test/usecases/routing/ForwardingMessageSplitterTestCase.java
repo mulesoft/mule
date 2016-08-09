@@ -18,34 +18,31 @@ import java.util.List;
 
 import org.junit.Test;
 
-public class ForwardingMessageSplitterTestCase extends AbstractIntegrationTestCase
-{
+public class ForwardingMessageSplitterTestCase extends AbstractIntegrationTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/test/usecases/routing/forwarding-message-splitter-flow.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/test/usecases/routing/forwarding-message-splitter-flow.xml";
+  }
 
-    @Test
-    public void testSyncResponse() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
+  @Test
+  public void testSyncResponse() throws Exception {
+    MuleClient client = muleContext.getClient();
 
-        List<Object> payload = new ArrayList<Object>();
-        payload.add("hello");
-        payload.add(new Integer(3));
-        payload.add(new Exception());
-        flowRunner("forwardingSplitter").withPayload(payload).asynchronously().run();
-        MuleMessage m = client.request("test://component.1", RECEIVE_TIMEOUT);
-        assertNotNull(m);
-        assertThat(m.getPayload(), instanceOf(String.class));
-        m = client.request("test://component.2", RECEIVE_TIMEOUT);
-        assertNotNull(m);
-        assertThat(m.getPayload(), instanceOf(Integer.class));
+    List<Object> payload = new ArrayList<Object>();
+    payload.add("hello");
+    payload.add(new Integer(3));
+    payload.add(new Exception());
+    flowRunner("forwardingSplitter").withPayload(payload).asynchronously().run();
+    MuleMessage m = client.request("test://component.1", RECEIVE_TIMEOUT);
+    assertNotNull(m);
+    assertThat(m.getPayload(), instanceOf(String.class));
+    m = client.request("test://component.2", RECEIVE_TIMEOUT);
+    assertNotNull(m);
+    assertThat(m.getPayload(), instanceOf(Integer.class));
 
-        m = client.request("test://error.queue", RECEIVE_TIMEOUT);
-        assertNotNull(m);
-        assertThat(m.getPayload(), instanceOf(Exception.class));
-    }
+    m = client.request("test://error.queue", RECEIVE_TIMEOUT);
+    assertNotNull(m);
+    assertThat(m.getPayload(), instanceOf(Exception.class));
+  }
 }

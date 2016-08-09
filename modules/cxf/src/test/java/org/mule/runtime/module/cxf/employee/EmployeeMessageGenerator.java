@@ -11,14 +11,13 @@ import org.mule.example.employee.Employee;
 import javax.activation.DataHandler;
 import javax.activation.FileDataSource;
 
-public class EmployeeMessageGenerator
-{
-    public Employee submitEmployee(Object payload) throws Exception
-    {
-        Employee employee = new Employee();
-        employee.setName("Albert Einstein");
-        employee.setDivision("Theoretical Physics");
-        employee.setPicture(new DataHandler(new FileDataSource("src/test/resources/albert_einstein.jpg")));
-        return employee;
-    }
+public class EmployeeMessageGenerator {
+
+  public Employee submitEmployee(Object payload) throws Exception {
+    Employee employee = new Employee();
+    employee.setName("Albert Einstein");
+    employee.setDivision("Theoretical Physics");
+    employee.setPicture(new DataHandler(new FileDataSource("src/test/resources/albert_einstein.jpg")));
+    return employee;
+  }
 }

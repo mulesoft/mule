@@ -42,105 +42,89 @@ import javax.tools.Diagnostic;
 
 
 /**
- * Annotation processor that picks up all the extensions annotated with
- * {@link ExtensionModel} and use a
- * {@link ResourcesGenerator} to generated
- * the required resources.
+ * Annotation processor that picks up all the extensions annotated with {@link ExtensionModel} and use a
+ * {@link ResourcesGenerator} to generated the required resources.
  * <p>
- * This annotation processor will automatically generate and package into the output jar
- * the XSD schema, spring bundles and extension registration files
- * necessary for mule to work with this extension.
+ * This annotation processor will automatically generate and package into the output jar the XSD schema, spring bundles and
+ * extension registration files necessary for mule to work with this extension.
  * <p>
- * Depending on the model properties declared by each extension, some of those resources
- * might or might not be generated
+ * Depending on the model properties declared by each extension, some of those resources might or might not be generated
  *
  * @since 3.7.0
  */
 @SupportedAnnotationTypes(value = {"org.mule.runtime.extension.api.annotation.Extension"})
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
-public class ExtensionResourcesGeneratorAnnotationProcessor extends AbstractProcessor
-{
+public class ExtensionResourcesGeneratorAnnotationProcessor extends AbstractProcessor {
 
-    public static final String PROCESSING_ENVIRONMENT = "PROCESSING_ENVIRONMENT";
-    public static final String EXTENSION_ELEMENT = "EXTENSION_ELEMENT";
-    public static final String ROUND_ENVIRONMENT = "ROUND_ENVIRONMENT";
+  public static final String PROCESSING_ENVIRONMENT = "PROCESSING_ENVIRONMENT";
+  public static final String EXTENSION_ELEMENT = "EXTENSION_ELEMENT";
+  public static final String ROUND_ENVIRONMENT = "ROUND_ENVIRONMENT";
 
-    private final SpiServiceRegistry serviceRegistry = new SpiServiceRegistry();
-    private final ExtensionFactory extensionFactory = new DefaultExtensionFactory(serviceRegistry, getClass().getClassLoader());
+  private final SpiServiceRegistry serviceRegistry = new SpiServiceRegistry();
+  private final ExtensionFactory extensionFactory = new DefaultExtensionFactory(serviceRegistry, getClass().getClassLoader());
 
-    @Override
-    public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv)
-    {
-        log("Starting Resources generator for Extensions");
-        ResourcesGenerator generator = new AnnotationProcessorResourceGenerator(fetchResourceFactories(), processingEnv);
+  @Override
+  public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
+    log("Starting Resources generator for Extensions");
+    ResourcesGenerator generator = new AnnotationProcessorResourceGenerator(fetchResourceFactories(), processingEnv);
 
-        try
-        {
-            getExtension(roundEnv).ifPresent(extensionElement -> {
-                final Class<?> extensionClass = AnnotationProcessorUtils.classFor(extensionElement, processingEnv);
-                withContextClassLoader(extensionClass.getClassLoader(), () -> {
-                    ExtensionModel extensionModel = parseExtension(extensionElement, roundEnv);
-                    generator.generateFor(extensionModel);
-                });
-            });
+    try {
+      getExtension(roundEnv).ifPresent(extensionElement -> {
+        final Class<?> extensionClass = AnnotationProcessorUtils.classFor(extensionElement, processingEnv);
+        withContextClassLoader(extensionClass.getClassLoader(), () -> {
+          ExtensionModel extensionModel = parseExtension(extensionElement, roundEnv);
+          generator.generateFor(extensionModel);
+        });
+      });
 
-            return false;
-        }
-        catch (Exception e)
-        {
-            processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR,
-                                                     format("%s\n%s", e.getMessage(), getFullStackTrace(e)));
-            throw e;
-        }
+      return false;
+    } catch (Exception e) {
+      processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, format("%s\n%s", e.getMessage(), getFullStackTrace(e)));
+      throw e;
+    }
+  }
+
+  private ExtensionModel parseExtension(TypeElement extensionElement, RoundEnvironment roundEnvironment) {
+    Class<?> extensionClass = AnnotationProcessorUtils.classFor(extensionElement, processingEnv);
+    Describer describer = new AnnotationsBasedDescriber(extensionClass, new StaticVersionResolver(getVersion()));
+
+    DescribingContext context = new DefaultDescribingContext(extensionClass.getClassLoader());
+    context.addParameter(EXTENSION_ELEMENT, extensionElement);
+    context.addParameter(PROCESSING_ENVIRONMENT, processingEnv);
+    context.addParameter(ROUND_ENVIRONMENT, roundEnvironment);
+
+    return extensionFactory.createFrom(describer.describe(context), context);
+  }
+
+  private Optional<TypeElement> getExtension(RoundEnvironment env) {
+    Set<TypeElement> elements = getTypeElementsAnnotatedWith(Extension.class, env);
+    if (elements.size() > 1) {
+
+      String message =
+          format("Only one extension is allowed per plugin, however several classes annotated with @%s were found. Offending classes are [%s]",
+                 Extension.class.getSimpleName(),
+                 Joiner.on(", ").join(elements.stream().map(TypeElement::getQualifiedName).collect(toList())));
+
+      throw new RuntimeException(message);
     }
 
-    private ExtensionModel parseExtension(TypeElement extensionElement, RoundEnvironment roundEnvironment)
-    {
-        Class<?> extensionClass = AnnotationProcessorUtils.classFor(extensionElement, processingEnv);
-        Describer describer = new AnnotationsBasedDescriber(extensionClass, new StaticVersionResolver(getVersion()));
+    return elements.stream().findFirst();
+  }
 
-        DescribingContext context = new DefaultDescribingContext(extensionClass.getClassLoader());
-        context.addParameter(EXTENSION_ELEMENT, extensionElement);
-        context.addParameter(PROCESSING_ENVIRONMENT, processingEnv);
-        context.addParameter(ROUND_ENVIRONMENT, roundEnvironment);
+  private void log(String message) {
+    processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, message);
+  }
 
-        return extensionFactory.createFrom(describer.describe(context), context);
+  private String getVersion() {
+    String extensionVersion = processingEnv.getOptions().get("extension.version");
+    if (extensionVersion == null) {
+      throw new RuntimeException("Cannot resolve version for extension %s: option extension.version is missing.");
     }
 
-    private Optional<TypeElement> getExtension(RoundEnvironment env)
-    {
-        Set<TypeElement> elements = getTypeElementsAnnotatedWith(Extension.class, env);
-        if (elements.size() > 1)
-        {
+    return extensionVersion;
+  }
 
-            String message = format("Only one extension is allowed per plugin, however several classes annotated with @%s were found. Offending classes are [%s]",
-                                    Extension.class.getSimpleName(),
-                                    Joiner.on(", ").join(elements.stream().map(TypeElement::getQualifiedName).collect(toList())));
-
-            throw new RuntimeException(message);
-        }
-
-        return elements.stream().findFirst();
-    }
-
-    private void log(String message)
-    {
-        processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, message);
-    }
-
-    private String getVersion()
-    {
-        String extensionVersion = processingEnv.getOptions().get("extension.version");
-        if (extensionVersion == null)
-        {
-            throw new RuntimeException("Cannot resolve version for extension %s: option extension.version is missing.");
-        }
-
-        return extensionVersion;
-    }
-
-    private List<GeneratedResourceFactory> fetchResourceFactories()
-    {
-        return copyOf(serviceRegistry.lookupProviders(GeneratedResourceFactory.class, getClass().getClassLoader()));
-    }
+  private List<GeneratedResourceFactory> fetchResourceFactories() {
+    return copyOf(serviceRegistry.lookupProviders(GeneratedResourceFactory.class, getClass().getClassLoader()));
+  }
 }

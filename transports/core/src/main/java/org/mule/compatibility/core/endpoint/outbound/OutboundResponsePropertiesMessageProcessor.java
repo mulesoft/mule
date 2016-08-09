@@ -16,47 +16,40 @@ import org.mule.runtime.core.processor.AbstractRequestResponseMessageProcessor;
 import java.io.Serializable;
 
 /**
- * Propagates properties from request message to response message as defined by
- * {@link OutboundEndpoint#getResponseProperties()}.
+ * Propagates properties from request message to response message as defined by {@link OutboundEndpoint#getResponseProperties()}.
  * <p>
- * //TODO This can became a standard MessageProcessor in the response chain if/when
- * event has a (immutable) reference to request message.
+ * //TODO This can became a standard MessageProcessor in the response chain if/when event has a (immutable) reference to request
+ * message.
  */
-public class OutboundResponsePropertiesMessageProcessor extends AbstractRequestResponseMessageProcessor
-{
+public class OutboundResponsePropertiesMessageProcessor extends AbstractRequestResponseMessageProcessor {
 
-    private OutboundEndpoint endpoint;
+  private OutboundEndpoint endpoint;
 
-    public OutboundResponsePropertiesMessageProcessor(OutboundEndpoint endpoint)
-    {
-        this.endpoint = endpoint;
-    }
+  public OutboundResponsePropertiesMessageProcessor(OutboundEndpoint endpoint) {
+    this.endpoint = endpoint;
+  }
 
-    @Override
-    protected MuleEvent processResponse(MuleEvent response, final MuleEvent request) throws MuleException
-    {
-        if (isEventValid(response))
-        {
-            final MuleMessage message = response.getMessage();
-            final Builder builder = MuleMessage.builder(message);
+  @Override
+  protected MuleEvent processResponse(MuleEvent response, final MuleEvent request) throws MuleException {
+    if (isEventValid(response)) {
+      final MuleMessage message = response.getMessage();
+      final Builder builder = MuleMessage.builder(message);
 
-            // Properties which should be carried over from the request message
-            // to the response message
-            for (String propertyName : endpoint.getResponseProperties())
-            {
-                Serializable propertyValue = request.getMessage().getOutboundProperty(propertyName);
-                if (propertyValue != null)
-                {
-                    builder.addOutboundProperty(propertyName, propertyValue);
-                }
-            }
-
-            request.getMessage().getCorrelation().getId().ifPresent(v -> builder.correlationId(v));
-            request.getMessage().getCorrelation().getSequence().ifPresent(v -> builder.correlationSequence(v));
-            request.getMessage().getCorrelation().getGroupSize().ifPresent(v -> builder.correlationGroupSize(v));
-
-            response.setMessage(builder.build());
+      // Properties which should be carried over from the request message
+      // to the response message
+      for (String propertyName : endpoint.getResponseProperties()) {
+        Serializable propertyValue = request.getMessage().getOutboundProperty(propertyName);
+        if (propertyValue != null) {
+          builder.addOutboundProperty(propertyName, propertyValue);
         }
-        return response;
+      }
+
+      request.getMessage().getCorrelation().getId().ifPresent(v -> builder.correlationId(v));
+      request.getMessage().getCorrelation().getSequence().ifPresent(v -> builder.correlationSequence(v));
+      request.getMessage().getCorrelation().getGroupSize().ifPresent(v -> builder.correlationGroupSize(v));
+
+      response.setMessage(builder.build());
     }
+    return response;
+  }
 }

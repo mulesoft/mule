@@ -18,36 +18,30 @@ import org.mule.tck.size.SmallTest;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
 
 @SmallTest
-public class AddFlowVariableTransformerTestCase extends AbstractAddVariablePropertyTransformerTestCase
-{
+public class AddFlowVariableTransformerTestCase extends AbstractAddVariablePropertyTransformerTestCase {
 
-    public AddFlowVariableTransformerTestCase()
-    {
-        super(new AddFlowVariableTransformer());
-    }
+  public AddFlowVariableTransformerTestCase() {
+    super(new AddFlowVariableTransformer());
+  }
 
-    @Override
-    protected void verifyAdded(MuleEvent event, String key, String value)
-    {
-        assertThat(event.getFlowVariable(key), is(value));
-    }
+  @Override
+  protected void verifyAdded(MuleEvent event, String key, String value) {
+    assertThat(event.getFlowVariable(key), is(value));
+  }
 
-    @Override
-    protected void verifyNotAdded(MuleEvent event)
-    {
-        assertThat(event.getFlowVariableNames(), empty());
-    }
+  @Override
+  protected void verifyNotAdded(MuleEvent event) {
+    assertThat(event.getFlowVariableNames(), empty());
+  }
 
-    @Override
-    protected void verifyRemoved(MuleEvent event, String key)
-    {
-        assertThat(event.getFlowVariable(key), is(nullValue()));
-    }
+  @Override
+  protected void verifyRemoved(MuleEvent event, String key) {
+    assertThat(event.getFlowVariable(key), is(nullValue()));
+  }
 
-    @Override
-    protected DataType getVariableDataType(MuleEvent event, String key)
-    {
-        return event.getFlowVariableDataType(key);
-    }
+  @Override
+  protected DataType getVariableDataType(MuleEvent event, String key) {
+    return event.getFlowVariableDataType(key);
+  }
 
 }

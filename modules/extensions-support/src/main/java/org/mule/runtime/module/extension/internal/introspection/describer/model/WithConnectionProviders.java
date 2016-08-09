@@ -13,11 +13,10 @@ import java.util.List;
  *
  * @since 4.0
  */
-public interface WithConnectionProviders
-{
+public interface WithConnectionProviders {
 
-    /**
-     * @return The list of {@link ConnectionProviderElement}
-     */
-    List<ConnectionProviderElement> getConnectionProviders();
+  /**
+   * @return The list of {@link ConnectionProviderElement}
+   */
+  List<ConnectionProviderElement> getConnectionProviders();
 }

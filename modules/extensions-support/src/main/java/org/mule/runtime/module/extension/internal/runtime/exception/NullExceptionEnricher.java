@@ -8,12 +8,10 @@ package org.mule.runtime.module.extension.internal.runtime.exception;
 
 import org.mule.runtime.extension.api.introspection.exception.ExceptionEnricher;
 
-public final class NullExceptionEnricher implements ExceptionEnricher
-{
+public final class NullExceptionEnricher implements ExceptionEnricher {
 
-    @Override
-    public Exception enrichException(Exception e)
-    {
-        return e;
-    }
+  @Override
+  public Exception enrichException(Exception e) {
+    return e;
+  }
 }

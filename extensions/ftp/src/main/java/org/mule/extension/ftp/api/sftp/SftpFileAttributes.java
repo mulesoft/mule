@@ -20,66 +20,59 @@ import java.util.Date;
  *
  * @since 4.0
  */
-public class SftpFileAttributes extends AbstractFileAttributes implements FtpFileAttributes
-{
+public class SftpFileAttributes extends AbstractFileAttributes implements FtpFileAttributes {
 
-    private final SftpATTRS attrs;
+  private final SftpATTRS attrs;
 
-    /**
-     * Creates a new instance
-     *
-     * @param path    the file's {@link Path}
-     * @param attrs the {@link SftpATTRS} which represents the file on the SFTP server
-     */
-    public SftpFileAttributes(Path path, SftpATTRS attrs)
-    {
-        super(path);
-        this.attrs = attrs;
-    }
+  /**
+   * Creates a new instance
+   *
+   * @param path the file's {@link Path}
+   * @param attrs the {@link SftpATTRS} which represents the file on the SFTP server
+   */
+  public SftpFileAttributes(Path path, SftpATTRS attrs) {
+    super(path);
+    this.attrs = attrs;
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public LocalDateTime getTimestamp()
-    {
-        Date timestamp = new Date(((long) attrs.getMTime()) * 1000L);
-        return asDateTime(timestamp.toInstant());
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public LocalDateTime getTimestamp() {
+    Date timestamp = new Date(((long) attrs.getMTime()) * 1000L);
+    return asDateTime(timestamp.toInstant());
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public long getSize()
-    {
-        return attrs.getSize();
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public long getSize() {
+    return attrs.getSize();
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean isRegularFile()
-    {
-        return attrs.isReg();
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean isRegularFile() {
+    return attrs.isReg();
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean isDirectory()
-    {
-        return attrs.isDir();
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean isDirectory() {
+    return attrs.isDir();
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean isSymbolicLink()
-    {
-        return attrs.isLink();
-    }
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean isSymbolicLink() {
+    return attrs.isLink();
+  }
 }

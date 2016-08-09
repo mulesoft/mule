@@ -12,15 +12,14 @@ import org.mule.runtime.core.api.MuleEvent;
 /**
  * SPI for identifiable dynamic route resolvers
  */
-public interface IdentifiableDynamicRouteResolver extends DynamicRouteResolver
-{
+public interface IdentifiableDynamicRouteResolver extends DynamicRouteResolver {
 
-    /**
-     * Returns an identifier of the {@link org.mule.runtime.core.routing.DynamicRouteResolver}.
-     *
-     * @param event the event holding the message to route
-     * @return an identifier of {@link org.mule.runtime.core.routing.DynamicRouteResolver}
-     * @throws MessagingException
-     */
-    String getRouteIdentifier(MuleEvent event) throws MessagingException;
+  /**
+   * Returns an identifier of the {@link org.mule.runtime.core.routing.DynamicRouteResolver}.
+   *
+   * @param event the event holding the message to route
+   * @return an identifier of {@link org.mule.runtime.core.routing.DynamicRouteResolver}
+   * @throws MessagingException
+   */
+  String getRouteIdentifier(MuleEvent event) throws MessagingException;
 }

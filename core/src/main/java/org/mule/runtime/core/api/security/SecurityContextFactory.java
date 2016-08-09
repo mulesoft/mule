@@ -7,12 +7,11 @@
 package org.mule.runtime.core.api.security;
 
 /**
- * <code>SecurityContextFactory</code> is responsible for creating a
- * SecurityContext instance. The factory itself is associated with an
- * Authentication class type on the SecurityManager
+ * <code>SecurityContextFactory</code> is responsible for creating a SecurityContext instance. The factory itself is associated
+ * with an Authentication class type on the SecurityManager
  */
 
-public interface SecurityContextFactory
-{
-    SecurityContext create(Authentication authentication);
+public interface SecurityContextFactory {
+
+  SecurityContext create(Authentication authentication);
 }

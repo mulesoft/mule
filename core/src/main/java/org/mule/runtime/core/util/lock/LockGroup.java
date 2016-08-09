@@ -11,34 +11,32 @@ import org.mule.runtime.core.api.lifecycle.Disposable;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Holds reference to all the obtained locks using {@link LockFactory} in order
- * to release memory of no longer referenced locks.
+ * Holds reference to all the obtained locks using {@link LockFactory} in order to release memory of no longer referenced locks.
  *
  */
-public interface LockGroup extends Disposable
-{
+public interface LockGroup extends Disposable {
 
-    /*
-     * Gets a lock over the resource identified with lockId
-     */
-    void lock(String lockId);
+  /*
+   * Gets a lock over the resource identified with lockId
+   */
+  void lock(String lockId);
 
-    /*
-     * Releases lock over the resource identified with lockId
-     */
-    void unlock(String lockId);
+  /*
+   * Releases lock over the resource identified with lockId
+   */
+  void unlock(String lockId);
 
-    /**
-     * Tries to acquire the lock for a certain amount of time
-     *
-     * @param timeout the time in timeUnit to wait until the lock is acquired
-     * @param timeUnit the time unit of timeout
-     * @return true if the lock was successfully acquired, false otherwise
-     * @throws java.lang.InterruptedException if thread was interrupted during the lock acquisition
-     */
-    boolean tryLock(String lockId, long timeout, TimeUnit timeUnit) throws InterruptedException;
+  /**
+   * Tries to acquire the lock for a certain amount of time
+   *
+   * @param timeout the time in timeUnit to wait until the lock is acquired
+   * @param timeUnit the time unit of timeout
+   * @return true if the lock was successfully acquired, false otherwise
+   * @throws java.lang.InterruptedException if thread was interrupted during the lock acquisition
+   */
+  boolean tryLock(String lockId, long timeout, TimeUnit timeUnit) throws InterruptedException;
 
-    boolean tryLock(String lockId);
+  boolean tryLock(String lockId);
 
-    void lockInterruptibly(String lockId) throws InterruptedException;
+  void lockInterruptibly(String lockId) throws InterruptedException;
 }

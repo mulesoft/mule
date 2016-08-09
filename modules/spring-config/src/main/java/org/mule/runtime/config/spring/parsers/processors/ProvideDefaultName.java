@@ -13,20 +13,16 @@ import org.mule.runtime.config.spring.parsers.assembly.configuration.PropertyCon
 
 import org.w3c.dom.Element;
 
-public class ProvideDefaultName implements PreProcessor
-{
-    
-    private String prefix;
+public class ProvideDefaultName implements PreProcessor {
 
-    public ProvideDefaultName(String prefix)
-    {
-        this.prefix = prefix;
-    }
+  private String prefix;
 
-    public void preProcess(PropertyConfiguration config, Element element)
-    {
-        element.setAttribute(AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME,
-                AutoIdUtils.getUniqueName(element, prefix));
-    }
+  public ProvideDefaultName(String prefix) {
+    this.prefix = prefix;
+  }
+
+  public void preProcess(PropertyConfiguration config, Element element) {
+    element.setAttribute(AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME, AutoIdUtils.getUniqueName(element, prefix));
+  }
 
 }

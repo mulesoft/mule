@@ -9,17 +9,14 @@ package org.mule.runtime.module.db.integration.xa;
 
 import org.mule.runtime.module.db.integration.model.AbstractTestDatabase;
 
-public class JbosstsXaTransactionalTestCase extends AbstractXaTransactionalTestCase
-{
+public class JbosstsXaTransactionalTestCase extends AbstractXaTransactionalTestCase {
 
-    public JbosstsXaTransactionalTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
-    {
-        super(dataSourceConfigResource, testDatabase);
-    }
+  public JbosstsXaTransactionalTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
+    super(dataSourceConfigResource, testDatabase);
+  }
 
-    @Override
-    protected String getTransactionManagerResource()
-    {
-        return "integration/xa/jbossts-config.xml";
-    }
+  @Override
+  protected String getTransactionManagerResource() {
+    return "integration/xa/jbossts-config.xml";
+  }
 }

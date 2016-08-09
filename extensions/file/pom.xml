@@ -17,6 +17,10 @@
     <name>Mule File Connector</name>
     <description>A Mule extension that provides functionality to manage files in a local file system</description>
 
+    <properties>
+        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.mule.modules</groupId>

@@ -14,22 +14,19 @@ import java.io.InputStream;
 
 import org.junit.Test;
 
-public class UdpSendAndReceiveStringTestCase extends SocketExtensionTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "udp-send-and-receive-string-config.xml";
-    }
+public class UdpSendAndReceiveStringTestCase extends SocketExtensionTestCase {
 
-    @Test
-    public void sendStringAndReceiveModifiedString() throws Exception
-    {
-        InputStream inputStream = (InputStream) flowRunner("udp-send-and-receive").
-                withPayload(TEST_STRING).
-                run().getMessage().getPayload();
+  @Override
+  protected String getConfigFile() {
+    return "udp-send-and-receive-string-config.xml";
+  }
 
-        String response = IOUtils.toString(inputStream);
-        assertEquals(response, RESPONSE_TEST_STRING);
-    }
+  @Test
+  public void sendStringAndReceiveModifiedString() throws Exception {
+    InputStream inputStream =
+        (InputStream) flowRunner("udp-send-and-receive").withPayload(TEST_STRING).run().getMessage().getPayload();
+
+    String response = IOUtils.toString(inputStream);
+    assertEquals(response, RESPONSE_TEST_STRING);
+  }
 }

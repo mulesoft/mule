@@ -8,19 +8,16 @@ package org.mule.test.config.spring;
 
 import org.junit.Test;
 
-public class NamedInterceptorTestCase extends AbstractInterceptorTestCase
-{
+public class NamedInterceptorTestCase extends AbstractInterceptorTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/config/spring/named-interceptor-test-flow.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/config/spring/named-interceptor-test-flow.xml";
+  }
 
-    @Test
-    public void testInterceptor() throws Exception
-    {
-        flowRunner("service").withPayload(MESSAGE).run();
-        assertMessageIntercepted();
-    }
+  @Test
+  public void testInterceptor() throws Exception {
+    flowRunner("service").withPayload(MESSAGE).run();
+    assertMessageIntercepted();
+  }
 }

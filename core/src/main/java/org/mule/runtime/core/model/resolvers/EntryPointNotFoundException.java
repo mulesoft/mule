@@ -10,14 +10,13 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 
 /**
- * Tis exception gets thrown by the {@link org.mule.runtime.core.model.resolvers.DefaultEntryPointResolverSet} if after trying
- * all entrypointResolvers it cannot fin the entrypoint on the service service
+ * Tis exception gets thrown by the {@link org.mule.runtime.core.model.resolvers.DefaultEntryPointResolverSet} if after trying all
+ * entrypointResolvers it cannot fin the entrypoint on the service service
  */
-public class EntryPointNotFoundException extends MuleException
-{
-    /** @param message the exception message */
-    public EntryPointNotFoundException(String message)
-    {
-        super(CoreMessages.failedToFindEntrypointForComponent(message));
-    }
+public class EntryPointNotFoundException extends MuleException {
+
+  /** @param message the exception message */
+  public EntryPointNotFoundException(String message) {
+    super(CoreMessages.failedToFindEntrypointForComponent(message));
+  }
 }

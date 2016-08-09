@@ -15,19 +15,17 @@ import org.mule.runtime.core.message.SessionHandler;
 /**
  * A session handler that ignores any session information
  */
-public class NullSessionHandler implements SessionHandler
-{
+public class NullSessionHandler implements SessionHandler {
 
-    @Override
-    public MuleSession retrieveSessionInfoFromMessage(MuleMessage message, MuleContext muleContext) throws MuleException
-    {
-        return null;
-    }
+  @Override
+  public MuleSession retrieveSessionInfoFromMessage(MuleMessage message, MuleContext muleContext) throws MuleException {
+    return null;
+  }
 
-    @Override
-    public MuleMessage storeSessionInfoToMessage(MuleSession session, MuleMessage message, MuleContext context) throws MuleException
-    {
-        return message;
-    }
+  @Override
+  public MuleMessage storeSessionInfoToMessage(MuleSession session, MuleMessage message, MuleContext context)
+      throws MuleException {
+    return message;
+  }
 
 }

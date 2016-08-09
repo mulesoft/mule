@@ -12,8 +12,8 @@ import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.extension.api.annotation.Alias;
 
 /**
- * Provides the capability of obtaining a {@link SocketClient} which is aware of the underlying connection and
- * can {@link SocketClient#write(Object)} and {@link SocketClient#read()} to and from the host to which it is connected.
+ * Provides the capability of obtaining a {@link SocketClient} which is aware of the underlying connection and can
+ * {@link SocketClient#write(Object)} and {@link SocketClient#read()} to and from the host to which it is connected.
  *
  * The {@link SocketClient} enables the {@link SocketOperations#send(RequesterConnection, Object, String, String, MuleMessage)}
  * operation.
@@ -21,12 +21,13 @@ import org.mule.runtime.extension.api.annotation.Alias;
  * @since 4.0
  */
 @Alias("request-connection")
-public interface RequesterConnection extends SocketConnection
-{
-    /**
-     * Returns a new instance of {@link SocketClient} particular to this connection.
-     * @return a {@link SocketClient} that can {@link SocketClient#read()} and {@link SocketClient#write(Object)}
-     * through the socket.
-     */
-    SocketClient getClient();
+public interface RequesterConnection extends SocketConnection {
+
+  /**
+   * Returns a new instance of {@link SocketClient} particular to this connection.
+   * 
+   * @return a {@link SocketClient} that can {@link SocketClient#read()} and {@link SocketClient#write(Object)} through the
+   *         socket.
+   */
+  SocketClient getClient();
 }

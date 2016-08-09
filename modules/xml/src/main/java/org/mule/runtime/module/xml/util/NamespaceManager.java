@@ -15,50 +15,42 @@ import java.util.Map;
 /**
  * A simple manager that holds a registry of global namespaces that will be recognised by all xml queries and transforms
  */
-public class NamespaceManager implements Initialisable
-{
-    private Map<String, String> namespaces = new HashMap<String, String>(2);
-    private Map<String, String> configNamespaces = new HashMap<String, String>(8);
+public class NamespaceManager implements Initialisable {
 
-    private boolean includeConfigNamespaces = false;
+  private Map<String, String> namespaces = new HashMap<String, String>(2);
+  private Map<String, String> configNamespaces = new HashMap<String, String>(8);
+
+  private boolean includeConfigNamespaces = false;
 
 
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        if (isIncludeConfigNamespaces())
-        {
-            namespaces.putAll(configNamespaces);
-        }
+  @Override
+  public void initialise() throws InitialisationException {
+    if (isIncludeConfigNamespaces()) {
+      namespaces.putAll(configNamespaces);
     }
+  }
 
-    public boolean isIncludeConfigNamespaces()
-    {
-        return includeConfigNamespaces;
-    }
+  public boolean isIncludeConfigNamespaces() {
+    return includeConfigNamespaces;
+  }
 
-    public void setIncludeConfigNamespaces(boolean includeConfigNamespaces)
-    {
-        this.includeConfigNamespaces = includeConfigNamespaces;
-    }
+  public void setIncludeConfigNamespaces(boolean includeConfigNamespaces) {
+    this.includeConfigNamespaces = includeConfigNamespaces;
+  }
 
-    public Map<String, String> getNamespaces()
-    {
-        return namespaces;
-    }
+  public Map<String, String> getNamespaces() {
+    return namespaces;
+  }
 
-    public void setNamespaces(Map<String, String> namespaces)
-    {
-        this.namespaces = namespaces;
-    }
+  public void setNamespaces(Map<String, String> namespaces) {
+    this.namespaces = namespaces;
+  }
 
-    public Map<String, String> getConfigNamespaces()
-    {
-        return configNamespaces;
-    }
+  public Map<String, String> getConfigNamespaces() {
+    return configNamespaces;
+  }
 
-    public void setConfigNamespaces(Map<String, String> configNamespaces)
-    {
-        this.configNamespaces = configNamespaces;
-    }
+  public void setConfigNamespaces(Map<String, String> configNamespaces) {
+    this.configNamespaces = configNamespaces;
+  }
 }

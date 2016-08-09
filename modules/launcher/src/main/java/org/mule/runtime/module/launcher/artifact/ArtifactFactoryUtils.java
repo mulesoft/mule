@@ -16,36 +16,27 @@ import java.io.File;
 /**
  * Utility class providing useful methods when creating {@link Artifact}s.
  */
-public class ArtifactFactoryUtils
-{
+public class ArtifactFactoryUtils {
 
-    private ArtifactFactoryUtils()
-    {
-    }
+  private ArtifactFactoryUtils() {}
 
-    /**
-     * Finds the deployment file within a given artifact.
-     *
-     * @param artifactDir the artifact directory where the deployment file should be present
-     * @return the artifact's deployment file or {@code null} if none was found
-     */
-    public static File getDeploymentFile(File artifactDir)
-    {
-        if (!artifactDir.exists())
-        {
-            throw new MuleRuntimeException(
-                    MessageFactory.createStaticMessage(
-                            String.format("Artifact directory does not exist: '%s'", artifactDir)));
-        }
-        File deployFile = new File(artifactDir, DEFAULT_DEPLOY_PROPERTIES_RESOURCE);
-        if (!deployFile.exists())
-        {
-            return null;
-        }
-        else
-        {
-            return deployFile;
-        }
+  /**
+   * Finds the deployment file within a given artifact.
+   *
+   * @param artifactDir the artifact directory where the deployment file should be present
+   * @return the artifact's deployment file or {@code null} if none was found
+   */
+  public static File getDeploymentFile(File artifactDir) {
+    if (!artifactDir.exists()) {
+      throw new MuleRuntimeException(MessageFactory
+          .createStaticMessage(String.format("Artifact directory does not exist: '%s'", artifactDir)));
     }
+    File deployFile = new File(artifactDir, DEFAULT_DEPLOY_PROPERTIES_RESOURCE);
+    if (!deployFile.exists()) {
+      return null;
+    } else {
+      return deployFile;
+    }
+  }
 
 }

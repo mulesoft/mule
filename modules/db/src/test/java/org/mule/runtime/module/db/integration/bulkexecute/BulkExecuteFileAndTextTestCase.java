@@ -11,19 +11,16 @@ import org.mule.runtime.module.db.integration.config.AbstractConfigurationErrorT
 
 import org.junit.Test;
 
-public class BulkExecuteFileAndTextTestCase extends AbstractConfigurationErrorTestCase
-{
+public class BulkExecuteFileAndTextTestCase extends AbstractConfigurationErrorTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "integration/bulkexecute/bulk-execute-file-and-text-config.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "integration/bulkexecute/bulk-execute-file-and-text-config.xml";
+  }
 
-    @Test
-    public void doesNotAllowSimultaneousQueryTextAndFile() throws Exception
-    {
-        assertConfigurationError("Able to define query text and file simultaneously");
+  @Test
+  public void doesNotAllowSimultaneousQueryTextAndFile() throws Exception {
+    assertConfigurationError("Able to define query text and file simultaneously");
 
-    }
+  }
 }

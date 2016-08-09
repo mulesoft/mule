@@ -30,106 +30,95 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class SubtypesModelValidatorTestCase extends AbstractMuleTestCase
-{
+public class SubtypesModelValidatorTestCase extends AbstractMuleTestCase {
 
-    @Mock(answer = RETURNS_DEEP_STUBS)
-    private ExtensionModel extensionModel;
+  @Mock(answer = RETURNS_DEEP_STUBS)
+  private ExtensionModel extensionModel;
 
-    private SubtypesModelValidator validator = new SubtypesModelValidator();
+  private SubtypesModelValidator validator = new SubtypesModelValidator();
 
 
-    @Test
-    public void validSubtypes()
-    {
-        Map<MetadataType, List<MetadataType>>  subtypes = new HashMap<>();
-        subtypes.put(toMetadataType(BaseAbstractPojo.class), asList(toMetadataType(Pojo.class)));
-        subtypes.put(toMetadataType(BaseCustomInterface.class), asList(toMetadataType(Pojo.class)));
+  @Test
+  public void validSubtypes() {
+    Map<MetadataType, List<MetadataType>> subtypes = new HashMap<>();
+    subtypes.put(toMetadataType(BaseAbstractPojo.class), asList(toMetadataType(Pojo.class)));
+    subtypes.put(toMetadataType(BaseCustomInterface.class), asList(toMetadataType(Pojo.class)));
 
-        when(extensionModel.getModelProperty(SubTypesModelProperty.class)).thenReturn(Optional.of(new SubTypesModelProperty(subtypes)));
-        when(extensionModel.getModelProperty(ImportedTypesModelProperty.class)).thenReturn(Optional.empty());
+    when(extensionModel.getModelProperty(SubTypesModelProperty.class))
+        .thenReturn(Optional.of(new SubTypesModelProperty(subtypes)));
+    when(extensionModel.getModelProperty(ImportedTypesModelProperty.class)).thenReturn(Optional.empty());
 
-        validator.validate(extensionModel);
+    validator.validate(extensionModel);
+  }
+
+  @Test(expected = IllegalModelDefinitionException.class)
+  public void invalidAbstractSubtypes() {
+    Map<MetadataType, List<MetadataType>> subtypes = new HashMap<>();
+    subtypes.put(toMetadataType(BaseAbstractPojo.class), asList(toMetadataType(AbstractPojo.class)));
+    subtypes.put(toMetadataType(BaseCustomInterface.class), asList(toMetadataType(CustomInterface.class)));
+
+    when(extensionModel.getModelProperty(SubTypesModelProperty.class))
+        .thenReturn(Optional.of(new SubTypesModelProperty(subtypes)));
+    when(extensionModel.getModelProperty(ImportedTypesModelProperty.class)).thenReturn(Optional.empty());
+
+    validator.validate(extensionModel);
+  }
+
+  @Test(expected = IllegalModelDefinitionException.class)
+  public void invalidNotSubtypesOfBaseType() {
+    Map<MetadataType, List<MetadataType>> subtypes = new HashMap<>();
+    subtypes.put(toMetadataType(BaseCustomInterface.class),
+                 asList(toMetadataType(AbstractPojo.class), toMetadataType(CustomInterface.class)));
+
+    when(extensionModel.getModelProperty(SubTypesModelProperty.class))
+        .thenReturn(Optional.of(new SubTypesModelProperty(subtypes)));
+    when(extensionModel.getModelProperty(ImportedTypesModelProperty.class)).thenReturn(Optional.empty());
+
+    validator.validate(extensionModel);
+  }
+
+  private static abstract class BaseAbstractPojo {
+
+    protected String basefield;
+
+    public String getBaseField() {
+      return basefield;
+    }
+  }
+
+  private static abstract class AbstractPojo extends BaseAbstractPojo {
+
+    protected String field;
+
+    public String getField() {
+      return field;
+    }
+  }
+
+  public static class Pojo extends AbstractPojo implements CustomInterface {
+
+    protected String childField;
+
+    public String getChildField() {
+      return childField;
     }
 
-    @Test(expected = IllegalModelDefinitionException.class)
-    public void invalidAbstractSubtypes()
-    {
-        Map<MetadataType, List<MetadataType>>  subtypes = new HashMap<>();
-        subtypes.put(toMetadataType(BaseAbstractPojo.class), asList(toMetadataType(AbstractPojo.class)));
-        subtypes.put(toMetadataType(BaseCustomInterface.class), asList(toMetadataType(CustomInterface.class)));
-
-        when(extensionModel.getModelProperty(SubTypesModelProperty.class)).thenReturn(Optional.of(new SubTypesModelProperty(subtypes)));
-        when(extensionModel.getModelProperty(ImportedTypesModelProperty.class)).thenReturn(Optional.empty());
-
-        validator.validate(extensionModel);
+    public String getBaseField() {
+      return "";
     }
 
-    @Test(expected = IllegalModelDefinitionException.class)
-    public void invalidNotSubtypesOfBaseType()
-    {
-        Map<MetadataType, List<MetadataType>>  subtypes = new HashMap<>();
-        subtypes.put(toMetadataType(BaseCustomInterface.class), asList(toMetadataType(AbstractPojo.class),
-                                                          toMetadataType(CustomInterface.class)));
-
-        when(extensionModel.getModelProperty(SubTypesModelProperty.class)).thenReturn(Optional.of(new SubTypesModelProperty(subtypes)));
-        when(extensionModel.getModelProperty(ImportedTypesModelProperty.class)).thenReturn(Optional.empty());
-
-        validator.validate(extensionModel);
+    public String getField() {
+      return "";
     }
+  }
 
-    private static abstract class BaseAbstractPojo
-    {
+  private interface BaseCustomInterface {
 
-        protected String basefield;
+    String getBaseField();
+  }
 
-        public String getBaseField()
-        {
-            return basefield;
-        }
-    }
+  private interface CustomInterface extends BaseCustomInterface {
 
-    private static abstract class AbstractPojo extends BaseAbstractPojo
-    {
-
-        protected String field;
-
-        public String getField()
-        {
-            return field;
-        }
-    }
-
-    public static class Pojo extends AbstractPojo implements CustomInterface
-    {
-
-        protected String childField;
-
-        public String getChildField()
-        {
-            return childField;
-        }
-
-        public String getBaseField()
-        {
-            return "";
-        }
-
-        public String getField()
-        {
-            return "";
-        }
-    }
-
-    private interface BaseCustomInterface
-    {
-
-        String getBaseField();
-    }
-
-    private interface CustomInterface extends BaseCustomInterface
-    {
-
-        String getField();
-    }
+    String getField();
+  }
 }

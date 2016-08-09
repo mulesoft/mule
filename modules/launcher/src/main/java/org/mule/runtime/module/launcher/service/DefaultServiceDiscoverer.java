@@ -17,30 +17,27 @@ import java.util.List;
 /**
  * Default implementation of {@link ServiceDiscoverer}
  */
-public class DefaultServiceDiscoverer implements ServiceDiscoverer
-{
+public class DefaultServiceDiscoverer implements ServiceDiscoverer {
 
-    private final ServiceResolver serviceResolver;
-    private final ServiceProviderDiscoverer serviceProviderDiscoverer;
+  private final ServiceResolver serviceResolver;
+  private final ServiceProviderDiscoverer serviceProviderDiscoverer;
 
-    /**
-     * Creates a new instance.
-     *
-     * @param serviceProviderDiscoverer  discovers available service providers. Non null.
-     * @param serviceResolver resolves dependencies on the discovered service providers. Non null.
-     */
-    public DefaultServiceDiscoverer(ServiceProviderDiscoverer serviceProviderDiscoverer, ServiceResolver serviceResolver)
-    {
-        checkArgument(serviceProviderDiscoverer != null,  "serviceProviderDiscoverer cannot be null");
-        checkArgument(serviceResolver != null, "serviceDependencyResolver cannot be null");
-        this.serviceResolver = serviceResolver;
-        this.serviceProviderDiscoverer = serviceProviderDiscoverer;
-    }
+  /**
+   * Creates a new instance.
+   *
+   * @param serviceProviderDiscoverer discovers available service providers. Non null.
+   * @param serviceResolver resolves dependencies on the discovered service providers. Non null.
+   */
+  public DefaultServiceDiscoverer(ServiceProviderDiscoverer serviceProviderDiscoverer, ServiceResolver serviceResolver) {
+    checkArgument(serviceProviderDiscoverer != null, "serviceProviderDiscoverer cannot be null");
+    checkArgument(serviceResolver != null, "serviceDependencyResolver cannot be null");
+    this.serviceResolver = serviceResolver;
+    this.serviceProviderDiscoverer = serviceProviderDiscoverer;
+  }
 
-    @Override
-    public List<Service> discoverServices() throws ServiceResolutionError
-    {
-        final List<ServiceProvider> serviceProviders = serviceProviderDiscoverer.discover();
-        return serviceResolver.resolveServices(serviceProviders);
-    }
+  @Override
+  public List<Service> discoverServices() throws ServiceResolutionError {
+    final List<ServiceProvider> serviceProviders = serviceProviderDiscoverer.discover();
+    return serviceResolver.resolveServices(serviceProviders);
+  }
 }

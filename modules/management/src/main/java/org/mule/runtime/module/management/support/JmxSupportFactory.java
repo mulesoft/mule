@@ -9,11 +9,12 @@ package org.mule.runtime.module.management.support;
 /**
  * Factory for instantiating JMX helper classes.
  */
-public interface JmxSupportFactory
-{
-    /**
-     * Create an instance of a JMX support class.
-     * @return class instance
-     */
-    JmxSupport getJmxSupport();
+public interface JmxSupportFactory {
+
+  /**
+   * Create an instance of a JMX support class.
+   * 
+   * @return class instance
+   */
+  JmxSupport getJmxSupport();
 }

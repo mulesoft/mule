@@ -16,26 +16,20 @@ import org.junit.Test;
 import org.junit.runners.Parameterized;
 
 @RunnerDelegateTo(Parameterized.class)
-public class TcpMultipleSendTestCase extends ParameterizedProtocolTestCase
-{
+public class TcpMultipleSendTestCase extends ParameterizedProtocolTestCase {
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "tcp-multiple-send-config.xml";
+  @Override
+  protected String getConfigFile() {
+    return "tcp-multiple-send-config.xml";
+  }
+
+  @Test
+  public void multipleSendString() throws Exception {
+    // TODO repeat this test with different messages and test that they arrive in the same order
+    for (int i = 0; i < REPETITIONS; i++) {
+      InputStream payload = (InputStream) flowRunner("tcp-send").withPayload(TEST_STRING).run().getMessage().getPayload();
+
+      assertEquals(RESPONSE_TEST_STRING, IOUtils.toString(payload));
     }
-
-    @Test
-    public void multipleSendString() throws Exception
-    {
-        // TODO repeat this test with different messages and test that they arrive in the same order
-        for (int i = 0; i < REPETITIONS; i++)
-        {
-            InputStream payload = (InputStream) flowRunner("tcp-send")
-                    .withPayload(TEST_STRING)
-                    .run().getMessage().getPayload();
-
-            assertEquals(RESPONSE_TEST_STRING, IOUtils.toString(payload));
-        }
-    }
+  }
 }

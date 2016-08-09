@@ -12,31 +12,26 @@ import org.mule.runtime.core.api.MuleMessage;
 /**
  *
  */
-public class DefaultMuleMessageBuilderFactory extends AbstractMuleMessageBuilderFactory
-{
+public class DefaultMuleMessageBuilderFactory extends AbstractMuleMessageBuilderFactory {
 
-    private static DefaultMuleMessageBuilderFactory INSTANCE = new DefaultMuleMessageBuilderFactory();
+  private static DefaultMuleMessageBuilderFactory INSTANCE = new DefaultMuleMessageBuilderFactory();
 
-    public static DefaultMuleMessageBuilderFactory getInstance()
-    {
-        return INSTANCE;
-    }
+  public static DefaultMuleMessageBuilderFactory getInstance() {
+    return INSTANCE;
+  }
 
-    @Override
-    public MuleMessage.Builder create()
-    {
-        return new DefaultMuleMessageBuilder();
-    }
+  @Override
+  public MuleMessage.Builder create() {
+    return new DefaultMuleMessageBuilder();
+  }
 
-    @Override
-    public MuleMessage.Builder create(org.mule.runtime.api.message.MuleMessage message)
-    {
-        return new DefaultMuleMessageBuilder(message);
-    }
+  @Override
+  public MuleMessage.Builder create(org.mule.runtime.api.message.MuleMessage message) {
+    return new DefaultMuleMessageBuilder(message);
+  }
 
-    public MuleMessage.Builder create(MuleMessage message)
-    {
-        return new DefaultMuleMessageBuilder(message);
-    }
+  public MuleMessage.Builder create(MuleMessage message) {
+    return new DefaultMuleMessageBuilder(message);
+  }
 
 }

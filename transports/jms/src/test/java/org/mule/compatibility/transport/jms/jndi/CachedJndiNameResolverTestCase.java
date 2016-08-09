@@ -25,31 +25,29 @@ import javax.naming.spi.InitialContextFactory;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-public class CachedJndiNameResolverTestCase extends AbstractMuleTestCase
-{
+public class CachedJndiNameResolverTestCase extends AbstractMuleTestCase {
 
-    private static final String RESOLVED_NAME = "resolvedName";
-    private static final String NAME = "name";
+  private static final String RESOLVED_NAME = "resolvedName";
+  private static final String NAME = "name";
 
-    @Test
-    public void testResolvesWithCache() throws NamingException, MuleException
-    {
+  @Test
+  public void testResolvesWithCache() throws NamingException, MuleException {
 
-        Context context = mock(Context.class);
-        when(context.lookup(NAME)).thenReturn(RESOLVED_NAME);
+    Context context = mock(Context.class);
+    when(context.lookup(NAME)).thenReturn(RESOLVED_NAME);
 
-        InitialContextFactory jndiContextFactory = mock(InitialContextFactory.class);
-        when(jndiContextFactory.getInitialContext(any(Hashtable.class))).thenReturn(context);
+    InitialContextFactory jndiContextFactory = mock(InitialContextFactory.class);
+    when(jndiContextFactory.getInitialContext(any(Hashtable.class))).thenReturn(context);
 
-        CachedJndiNameResolver jndiNameResolver = new CachedJndiNameResolver();
-        jndiNameResolver.setContextFactory(jndiContextFactory);
-        jndiNameResolver.setJndiInitialFactory("initialFactory");
-        jndiNameResolver.initialise();
+    CachedJndiNameResolver jndiNameResolver = new CachedJndiNameResolver();
+    jndiNameResolver.setContextFactory(jndiContextFactory);
+    jndiNameResolver.setJndiInitialFactory("initialFactory");
+    jndiNameResolver.initialise();
 
-        // First lookup should use the context, second should use the cache
-        assertEquals(RESOLVED_NAME, jndiNameResolver.lookup(NAME));
-        assertEquals(RESOLVED_NAME, jndiNameResolver.lookup(NAME));
+    // First lookup should use the context, second should use the cache
+    assertEquals(RESOLVED_NAME, jndiNameResolver.lookup(NAME));
+    assertEquals(RESOLVED_NAME, jndiNameResolver.lookup(NAME));
 
-        Mockito.verify(context, times(1)).lookup(NAME);
-    }
+    Mockito.verify(context, times(1)).lookup(NAME);
+  }
 }

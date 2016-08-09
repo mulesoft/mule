@@ -9,91 +9,90 @@ package org.mule.runtime.core.api.transaction;
 import org.mule.runtime.core.transaction.constraints.ConstraintFilter;
 
 /**
- * <code>TransactionConfig</code> defines transaction configuration for a
- * transactional endpoint.
+ * <code>TransactionConfig</code> defines transaction configuration for a transactional endpoint.
  */
-public interface TransactionConfig
-{
-    /** 
-     * Whether there is a transaction available or not, ignore it 
-     * <p>
-     * J2EE: NotSupported
-     */
-    byte ACTION_NONE = 0;
+public interface TransactionConfig {
 
-    /** 
-     * Will ensure that a new transaction is created for each invocation 
-     * <p>
-     * J2EE RequiresNew
-     */
-    byte ACTION_ALWAYS_BEGIN = 1;
+  /**
+   * Whether there is a transaction available or not, ignore it
+   * <p>
+   * J2EE: NotSupported
+   */
+  byte ACTION_NONE = 0;
 
-    /** 
-     * Will begin a new transaction if no transaction is already present 
-     * <p>
-     * J2EE: Required
-     */
-    byte ACTION_BEGIN_OR_JOIN = 2;
+  /**
+   * Will ensure that a new transaction is created for each invocation
+   * <p>
+   * J2EE RequiresNew
+   */
+  byte ACTION_ALWAYS_BEGIN = 1;
 
-    /** 
-     * There must always be a transaction present for the invocation 
-     * <p>
-     * J2EE: Mandatory
-     */
-    byte ACTION_ALWAYS_JOIN = 3;
+  /**
+   * Will begin a new transaction if no transaction is already present
+   * <p>
+   * J2EE: Required
+   */
+  byte ACTION_BEGIN_OR_JOIN = 2;
 
-    /** 
-     * If there is a transaction available, then use it, otherwise continue processing 
-     * <p>
-     * J2EE: Supports
-     */
-    byte ACTION_JOIN_IF_POSSIBLE = 4;
+  /**
+   * There must always be a transaction present for the invocation
+   * <p>
+   * J2EE: Mandatory
+   */
+  byte ACTION_ALWAYS_JOIN = 3;
 
-    /**
-     * There must not be a transaction present for the invocation
-     * <p>
-     * J2EE Never
-     */
-    byte ACTION_NEVER = 5;
+  /**
+   * If there is a transaction available, then use it, otherwise continue processing
+   * <p>
+   * J2EE: Supports
+   */
+  byte ACTION_JOIN_IF_POSSIBLE = 4;
 
-    /**
-     * Be indifferent to any active transaction.  Don;t check for one, and if there is one, don;t commit or abort it
-     * <p>
-     */
-    byte ACTION_INDIFFERENT = 6;
+  /**
+   * There must not be a transaction present for the invocation
+   * <p>
+   * J2EE Never
+   */
+  byte ACTION_NEVER = 5;
 
-    /*
-     * Executes outside any existent transaction
-     */
-    byte ACTION_NOT_SUPPORTED = 7;
+  /**
+   * Be indifferent to any active transaction. Don;t check for one, and if there is one, don;t commit or abort it
+   * <p>
+   */
+  byte ACTION_INDIFFERENT = 6;
 
-    /**
-     * Transaction action by default.  Note that before 3.2 it was ACTION_NONE
-     * <p>
-     */
-    byte ACTION_DEFAULT = ACTION_INDIFFERENT;
-    
-    TransactionFactory getFactory();
+  /*
+   * Executes outside any existent transaction
+   */
+  byte ACTION_NOT_SUPPORTED = 7;
 
-    void setFactory(TransactionFactory factory);
+  /**
+   * Transaction action by default. Note that before 3.2 it was ACTION_NONE
+   * <p>
+   */
+  byte ACTION_DEFAULT = ACTION_INDIFFERENT;
 
-    byte getAction();
+  TransactionFactory getFactory();
 
-    void setAction(byte action);
+  void setFactory(TransactionFactory factory);
 
-    boolean isTransacted();
+  byte getAction();
 
-    ConstraintFilter getConstraint();
+  void setAction(byte action);
 
-    void setConstraint(ConstraintFilter constraint);
+  boolean isTransacted();
 
-    void setTimeout(int timeout);
+  ConstraintFilter getConstraint();
 
-    int getTimeout();
+  void setConstraint(ConstraintFilter constraint);
 
-    boolean isInteractWithExternal();
+  void setTimeout(int timeout);
 
-    void setInteractWithExternal(boolean interactWithExternal);
-    
-    boolean isConfigured();
+  int getTimeout();
+
+  boolean isInteractWithExternal();
+
+  void setInteractWithExternal(boolean interactWithExternal);
+
+  boolean isConfigured();
 }

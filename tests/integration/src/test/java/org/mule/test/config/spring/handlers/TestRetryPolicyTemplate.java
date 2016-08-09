@@ -12,73 +12,62 @@ import org.mule.runtime.core.retry.policies.AbstractPolicyTemplate;
 
 import java.util.List;
 
-public class TestRetryPolicyTemplate extends AbstractPolicyTemplate
-{
-    protected boolean fooBar = false;
-    protected int revolutions = 200;
-    protected List connectionUrls;
+public class TestRetryPolicyTemplate extends AbstractPolicyTemplate {
 
-    public TestRetryPolicyTemplate()
-    {
-        super();
+  protected boolean fooBar = false;
+  protected int revolutions = 200;
+  protected List connectionUrls;
+
+  public TestRetryPolicyTemplate() {
+    super();
+  }
+
+  public TestRetryPolicyTemplate(boolean fooBar, int revolutions) {
+    super();
+    this.fooBar = fooBar;
+    this.revolutions = revolutions;
+  }
+
+  public RetryPolicy createRetryInstance() {
+    return new TestRetryPolicy(fooBar, revolutions);
+  }
+
+  protected static class TestRetryPolicy implements RetryPolicy {
+
+    protected boolean fooBar;
+    protected int revolutions;
+
+    public TestRetryPolicy(boolean fooBar, int revolutions) {
+      this.fooBar = fooBar;
+      this.revolutions = revolutions;
     }
 
-    public TestRetryPolicyTemplate(boolean fooBar, int revolutions)
-    {
-        super();
-        this.fooBar = fooBar;
-        this.revolutions = revolutions;
+    public PolicyStatus applyPolicy(Throwable cause) {
+      return PolicyStatus.policyExhausted(cause);
     }
+  }
 
-    public RetryPolicy createRetryInstance()
-    {
-        return new TestRetryPolicy(fooBar, revolutions);
-    }
+  public boolean isFooBar() {
+    return fooBar;
+  }
 
-    protected static class TestRetryPolicy implements RetryPolicy
-    {
-        protected boolean fooBar;
-        protected int revolutions;
+  public void setFooBar(boolean fooBar) {
+    this.fooBar = fooBar;
+  }
 
-        public TestRetryPolicy(boolean fooBar, int revolutions)
-        {
-            this.fooBar = fooBar;
-            this.revolutions = revolutions;
-        }
-        
-        public PolicyStatus applyPolicy(Throwable cause)
-        {
-            return PolicyStatus.policyExhausted(cause);
-        }
-    }
+  public int getRevolutions() {
+    return revolutions;
+  }
 
-    public boolean isFooBar()
-    {
-        return fooBar;
-    }
+  public void setRevolutions(int revolutions) {
+    this.revolutions = revolutions;
+  }
 
-    public void setFooBar(boolean fooBar)
-    {
-        this.fooBar = fooBar;
-    }
+  public List getConnectionUrls() {
+    return connectionUrls;
+  }
 
-    public int getRevolutions()
-    {
-        return revolutions;
-    }
-
-    public void setRevolutions(int revolutions)
-    {
-        this.revolutions = revolutions;
-    }
-
-    public List getConnectionUrls()
-    {
-        return connectionUrls;
-    }
-
-    public void setConnectionUrls(List connectionUrls)
-    {
-        this.connectionUrls = connectionUrls;
-    }
+  public void setConnectionUrls(List connectionUrls) {
+    this.connectionUrls = connectionUrls;
+  }
 }

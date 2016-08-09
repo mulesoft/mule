@@ -24,38 +24,28 @@ import java.util.List;
  *
  * @since 4.0
  */
-public interface ParameterizableTypeElement extends Type, WithParameters
-{
+public interface ParameterizableTypeElement extends Type, WithParameters {
 
-    /**
-     * {@inheritDoc}
-     */
-    default List<ExtensionParameter> getParameters()
-    {
-        return ImmutableList.<ExtensionParameter>builder()
-                .addAll(getAnnotatedFields(Parameter.class))
-                .addAll(getAnnotatedFields(ParameterGroup.class))
-                .addAll(getAnnotatedFields(Connection.class))
-                .addAll(getAnnotatedFields(UseConfig.class))
-                .build();
-    }
+  /**
+   * {@inheritDoc}
+   */
+  default List<ExtensionParameter> getParameters() {
+    return ImmutableList.<ExtensionParameter>builder().addAll(getAnnotatedFields(Parameter.class))
+        .addAll(getAnnotatedFields(ParameterGroup.class)).addAll(getAnnotatedFields(Connection.class))
+        .addAll(getAnnotatedFields(UseConfig.class)).build();
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    default List<ExtensionParameter> getParameterGroups()
-    {
-        return copyOf(getAnnotatedFields(ParameterGroup.class));
-    }
+  /**
+   * {@inheritDoc}
+   */
+  default List<ExtensionParameter> getParameterGroups() {
+    return copyOf(getAnnotatedFields(ParameterGroup.class));
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    default List<ExtensionParameter> getParametersAnnotatedWith(Class<? extends Annotation> annotationClass)
-    {
-        return getParameters()
-                .stream()
-                .filter(field -> field.getAnnotation(annotationClass).isPresent())
-                .collect(toList());
-    }
+  /**
+   * {@inheritDoc}
+   */
+  default List<ExtensionParameter> getParametersAnnotatedWith(Class<? extends Annotation> annotationClass) {
+    return getParameters().stream().filter(field -> field.getAnnotation(annotationClass).isPresent()).collect(toList());
+  }
 }

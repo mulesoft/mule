@@ -14,19 +14,17 @@ import org.mule.runtime.core.processor.LaxAsyncInterceptingMessageProcessor;
 import org.mule.runtime.core.processor.strategy.AsynchronousProcessingStrategy;
 
 /**
- * This processing strategy uses the 'asynchronous' strategy where possible, but if an event is
- * synchronous it processes it synchronously rather than failing.
+ * This processing strategy uses the 'asynchronous' strategy where possible, but if an event is synchronous it processes it
+ * synchronously rather than failing.
  */
-public class DefaultFlowProcessingStrategy extends AsynchronousProcessingStrategy
-{
+public class DefaultFlowProcessingStrategy extends AsynchronousProcessingStrategy {
 
-    @Override
-    protected AsyncInterceptingMessageProcessor createAsyncMessageProcessor(StageNameSource nameSource, MuleContext muleContext)
-    {
-        ThreadingProfile threadingProfile = createThreadingProfile(muleContext);
-        String stageName = nameSource.getName();
-        return new LaxAsyncInterceptingMessageProcessor(threadingProfile, getThreadPoolName(stageName, muleContext),
-                                                        muleContext.getConfiguration().getShutdownTimeout());
-    }
+  @Override
+  protected AsyncInterceptingMessageProcessor createAsyncMessageProcessor(StageNameSource nameSource, MuleContext muleContext) {
+    ThreadingProfile threadingProfile = createThreadingProfile(muleContext);
+    String stageName = nameSource.getName();
+    return new LaxAsyncInterceptingMessageProcessor(threadingProfile, getThreadPoolName(stageName, muleContext),
+                                                    muleContext.getConfiguration().getShutdownTimeout());
+  }
 
 }

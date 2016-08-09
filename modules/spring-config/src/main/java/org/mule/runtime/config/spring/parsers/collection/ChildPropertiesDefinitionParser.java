@@ -17,28 +17,24 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
 /**
- * Creates a single Properties object and processes standard Spring sub elements.  The properties are
- * injected into the parent object (the enclosing XML element).  
+ * Creates a single Properties object and processes standard Spring sub elements. The properties are injected into the parent
+ * object (the enclosing XML element).
  */
-public class ChildPropertiesDefinitionParser extends ChildDefinitionParser
-{
+public class ChildPropertiesDefinitionParser extends ChildDefinitionParser {
 
-    public ChildPropertiesDefinitionParser(String setterMethod)
-    {
-        super(setterMethod, /*clazz*/null);
-        addBeanFlag(MuleHierarchicalBeanDefinitionParserDelegate.MULE_NO_RECURSE);
-    }
-    
-    protected Class getBeanClass(Element element)
-    {
-        return PropertiesFactoryBean.class;
-    }
+  public ChildPropertiesDefinitionParser(String setterMethod) {
+    super(setterMethod, /* clazz */null);
+    addBeanFlag(MuleHierarchicalBeanDefinitionParserDelegate.MULE_NO_RECURSE);
+  }
 
-    protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
-    {
-        super.parseChild(element, parserContext, builder);
-        Properties parsedProps = parserContext.getDelegate().parsePropsElement(element);
-        builder.addPropertyValue("properties", parsedProps);
-    }
+  protected Class getBeanClass(Element element) {
+    return PropertiesFactoryBean.class;
+  }
+
+  protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
+    super.parseChild(element, parserContext, builder);
+    Properties parsedProps = parserContext.getDelegate().parsePropsElement(element);
+    builder.addPropertyValue("properties", parsedProps);
+  }
 
 }

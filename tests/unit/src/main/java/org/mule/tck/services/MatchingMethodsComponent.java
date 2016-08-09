@@ -13,15 +13,13 @@ import java.rmi.Remote;
 /**
  * A test service that has two service methods with matching signature
  */
-public class MatchingMethodsComponent implements Remote
-{
-    public String reverseString(String string)
-    {
-        return StringUtils.reverse(string);
-    }
+public class MatchingMethodsComponent implements Remote {
 
-    public String upperCaseString(String string)
-    {
-        return string.toUpperCase();
-    }
+  public String reverseString(String string) {
+    return StringUtils.reverse(string);
+  }
+
+  public String upperCaseString(String string) {
+    return string.toUpperCase();
+  }
 }

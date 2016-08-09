@@ -12,12 +12,10 @@ import org.mule.runtime.core.config.i18n.Message;
 /**
  * Exception throw when it's not possible to create the authentication request for a given request.
  */
-public class RequestAuthenticationException extends DefaultMuleException
-{
+public class RequestAuthenticationException extends DefaultMuleException {
 
-    public RequestAuthenticationException(Message message)
-    {
-        super(message);
-    }
+  public RequestAuthenticationException(Message message) {
+    super(message);
+  }
 
 }

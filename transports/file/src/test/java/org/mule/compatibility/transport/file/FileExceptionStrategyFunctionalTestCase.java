@@ -32,256 +32,227 @@ import java.util.concurrent.TimeUnit;
 import org.junit.Before;
 import org.junit.Test;
 
-public class FileExceptionStrategyFunctionalTestCase extends FunctionalTestCase
-{
-    public static final String TEST_MESSAGE = "Test file contents";
+public class FileExceptionStrategyFunctionalTestCase extends FunctionalTestCase {
 
-    public static final String FILE_WORKING_DIRECTORY_FOLDER = "temp/work-directory/";
+  public static final String TEST_MESSAGE = "Test file contents";
 
-    private Latch latch = new Latch();
-    protected File inputDir;
-    private Flow flow;
-    private File inputFile;
-    private PollingProber pollingProber = new PollingProber(5000, 200);
+  public static final String FILE_WORKING_DIRECTORY_FOLDER = "temp/work-directory/";
+
+  private Latch latch = new Latch();
+  protected File inputDir;
+  private Flow flow;
+  private File inputFile;
+  private PollingProber pollingProber = new PollingProber(5000, 200);
+
+  @Override
+  protected String getConfigFile() {
+    return "file-exception-strategy-config.xml";
+  }
+
+  @Test
+  public void testMoveFile() throws Exception {
+    attacheLatchCountdownProcessor("moveFile");
+    inputDir = getFileInsideWorkingDirectory("temp/input-move-file");
+    inputFile = createDataFile(inputDir, "test1.txt");
+    latch.await(2000l, MILLISECONDS);
+    flow.stop();
+    File outputFile = getFileInsideWorkingDirectory("temp/output-directory/" + inputFile.getName());
+    assertThat(inputFile.exists(), is(false));
+    assertThat(outputFile.exists(), is(true));
+  }
+
+  @Test
+  public void testMoveFileWithWorDir() throws Exception {
+    attacheLatchCountdownProcessor("moveFileWithWorkDir");
+    inputDir = getFileInsideWorkingDirectory("temp/input-move-file-wd");
+    inputFile = createDataFile(inputDir, "test1.txt");
+    latch.await(2000l, MILLISECONDS);
+    flow.stop();
+    File outputFile = getFileInsideWorkingDirectory("temp/output-directory/" + inputFile.getName());
+    File workDirFile = getFileInsideWorkingDirectory(FILE_WORKING_DIRECTORY_FOLDER + File.separator + inputFile.getName());
+    assertThat(inputFile.exists(), is(false));
+    assertThat(outputFile.exists(), is(true));
+    assertThat(workDirFile.exists(), is(false));
+  }
+
+
+  @Test
+  public void testCopyFile() throws Exception {
+    attacheLatchCountdownProcessor("copyFile");
+    inputDir = getFileInsideWorkingDirectory("temp/input-copy-file");
+    inputFile = createDataFile(inputDir, "test1.txt");
+    latch.await(2000l, MILLISECONDS);
+    flow.stop();
+    File outputFile = getFileInsideWorkingDirectory("temp/output-directory/" + inputFile.getName());
+    assertThat(inputFile.exists(), is(false));
+    assertThat(outputFile.exists(), is(false));
+  }
+
+
+  @Test
+  public void testCopyFileWithWorkDir() throws Exception {
+    attacheLatchCountdownProcessor("copyFileWithWorkDir");
+    inputDir = getFileInsideWorkingDirectory("temp/input-copy-file-with-work-directory");
+    inputFile = createDataFile(inputDir, "test1.txt");
+    latch.await(2000l, MILLISECONDS);
+    flow.stop();
+    File outputFile = getFileInsideWorkingDirectory("temp/output-directory/" + inputFile.getName());
+    File workDirFile = getFileInsideWorkingDirectory(FILE_WORKING_DIRECTORY_FOLDER + File.separator + inputFile.getName());
+    assertThat(inputFile.exists(), is(false));
+    assertThat(outputFile.exists(), is(false));
+    assertThat(workDirFile.exists(), is(false));
+  }
+
+  @Test
+  public void testConsumeFileWithExAndCatch() throws Exception {
+    inputDir = getFileInsideWorkingDirectory("temp/input-streaming-catch");
+    inputFile = createDataFile(inputDir, "test1.txt");
+    pollingProber.check(new Probe() {
+
+      @Override
+      public boolean isSatisfied() {
+        return !inputFile.exists();
+      }
+
+      @Override
+      public String describeFailure() {
+        return "input file should be deleted";
+      }
+    });
+  }
+
+  @Test
+  public void testConsumeFileWithExAndRollback() throws Exception {
+    final CountDownLatch countDownLatch = new CountDownLatch(2);
+    FunctionalTestComponent ftc = getFunctionalTestComponent("consumeFileWithStreamingAndRollback");
+    ftc.setEventCallback(new EventCallback() {
+
+      @Override
+      public void eventReceived(MuleEventContext context, Object component) throws Exception {
+        countDownLatch.countDown();
+        throw new RuntimeException();
+      }
+    });
+    inputDir = getFileInsideWorkingDirectory("temp/input-streaming-rollback");
+    inputFile = createDataFile(inputDir, "test1.txt");
+
+    if (!countDownLatch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS)) {
+      fail("file should not be consumed");
+    }
+  }
+
+  @Test
+  public void testConsumeFileWithExAndRollbackWithRedelivery() throws Exception {
+    final CountDownLatch countDownLatch = new CountDownLatch(3);
+    FunctionalTestComponent ftc = getFunctionalTestComponent("consumeFileWithStreamingAndRollbackWithRedelivery");
+    ftc.setEventCallback(new EventCallback() {
+
+      @Override
+      public void eventReceived(MuleEventContext context, Object component) throws Exception {
+        countDownLatch.countDown();
+        throw new RuntimeException();
+      }
+    });
+    inputDir = getFileInsideWorkingDirectory("temp/input-streaming-rollback-with-redelivery");
+    inputFile = createDataFile(inputDir, "test1.txt");
+    if (!countDownLatch.await(100000, TimeUnit.MILLISECONDS)) {
+      fail("file should not be consumed at this point");
+    }
+    pollingProber.check(new Probe() {
+
+      @Override
+      public boolean isSatisfied() {
+        return !inputFile.exists();
+      }
+
+      @Override
+      public String describeFailure() {
+        return "input file should be deleted";
+      }
+    });
+  }
+
+  @Test
+  public void testConsumeFileWithAsynchronousProcessingStrategy() throws Exception {
+    inputDir = getFileInsideWorkingDirectory("temp/input-streaming-and-async-processing-strategy");
+    inputFile = createDataFile(inputDir, "test1.txt");
+    BeforeCloseStream.releaseLatch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS);
+    assertThat(inputFile.exists(), is(true));
+    BeforeCloseStream.awaitLatch.release();
+    AfterCloseStream.releaseLatch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS);
+    pollingProber.check(new Probe() {
+
+      @Override
+      public boolean isSatisfied() {
+        return !inputFile.exists();
+      }
+
+      @Override
+      public String describeFailure() {
+        return "input file should be deleted";
+      }
+    });
+  }
+
+  private void attacheLatchCountdownProcessor(String flowName) {
+    flow = (Flow) muleContext.getRegistry().lookupFlowConstruct(flowName);
+    DefaultMessagingExceptionStrategy exceptionListener = (DefaultMessagingExceptionStrategy) flow.getExceptionListener();
+    exceptionListener.getMessageProcessors().add(new MessageProcessor() {
+
+      @Override
+      public MuleEvent process(MuleEvent event) throws MuleException {
+        latch.countDown();
+        return event;
+      }
+    });
+  }
+
+  @Override
+  @Before
+  public void doSetUp() {
+    getFileInsideWorkingDirectory(FILE_WORKING_DIRECTORY_FOLDER).mkdirs();
+  }
+
+  protected File createDataFile(File folder, final String testMessage) throws Exception {
+    return createDataFile(folder, testMessage, null);
+  }
+
+  protected File createDataFile(File folder, final String testMessage, String encoding) throws Exception {
+    folder.mkdirs();
+    File target = File.createTempFile("data", ".txt", folder);
+    target.deleteOnExit();
+    FileUtils.writeStringToFile(target, testMessage, encoding);
+    return target;
+  }
+
+  public static class BeforeCloseStream implements MessageProcessor {
+
+    public static Latch releaseLatch = new Latch();
+    public static Latch awaitLatch = new Latch();
+    public File file;
 
     @Override
-    protected String getConfigFile()
-    {
-        return "file-exception-strategy-config.xml";
+    public MuleEvent process(MuleEvent event) throws MuleException {
+      releaseLatch.release();
+      try {
+        awaitLatch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS);
+      } catch (InterruptedException e) {
+        throw new RuntimeException(e);
+      }
+      return event;
     }
+  }
 
-    @Test
-    public void testMoveFile() throws Exception
-    {
-        attacheLatchCountdownProcessor("moveFile");
-        inputDir = getFileInsideWorkingDirectory("temp/input-move-file");
-        inputFile = createDataFile(inputDir, "test1.txt");
-        latch.await(2000l, MILLISECONDS);
-        flow.stop();
-        File outputFile = getFileInsideWorkingDirectory("temp/output-directory/" + inputFile.getName());
-        assertThat(inputFile.exists(), is(false));
-        assertThat(outputFile.exists(), is(true));
-    }
+  public static class AfterCloseStream implements MessageProcessor {
 
-    @Test
-    public void testMoveFileWithWorDir() throws Exception
-    {
-        attacheLatchCountdownProcessor("moveFileWithWorkDir");
-        inputDir = getFileInsideWorkingDirectory("temp/input-move-file-wd");
-        inputFile = createDataFile(inputDir, "test1.txt");
-        latch.await(2000l, MILLISECONDS);
-        flow.stop();
-        File outputFile = getFileInsideWorkingDirectory("temp/output-directory/" + inputFile.getName());
-        File workDirFile = getFileInsideWorkingDirectory(FILE_WORKING_DIRECTORY_FOLDER + File.separator + inputFile.getName());
-        assertThat(inputFile.exists(), is(false));
-        assertThat(outputFile.exists(), is(true));
-        assertThat(workDirFile.exists(), is(false));
-    }
-
-
-    @Test
-    public void testCopyFile() throws Exception
-    {
-        attacheLatchCountdownProcessor("copyFile");
-        inputDir = getFileInsideWorkingDirectory("temp/input-copy-file");
-        inputFile = createDataFile(inputDir, "test1.txt");
-        latch.await(2000l, MILLISECONDS);
-        flow.stop();
-        File outputFile = getFileInsideWorkingDirectory("temp/output-directory/" + inputFile.getName());
-        assertThat(inputFile.exists(), is(false));
-        assertThat(outputFile.exists(), is(false));
-    }
-
-
-    @Test
-    public void testCopyFileWithWorkDir() throws Exception
-    {
-        attacheLatchCountdownProcessor("copyFileWithWorkDir");
-        inputDir = getFileInsideWorkingDirectory("temp/input-copy-file-with-work-directory");
-        inputFile = createDataFile(inputDir, "test1.txt");
-        latch.await(2000l, MILLISECONDS);
-        flow.stop();
-        File outputFile = getFileInsideWorkingDirectory("temp/output-directory/" + inputFile.getName());
-        File workDirFile = getFileInsideWorkingDirectory(FILE_WORKING_DIRECTORY_FOLDER + File.separator + inputFile.getName());
-        assertThat(inputFile.exists(), is(false));
-        assertThat(outputFile.exists(), is(false));
-        assertThat(workDirFile.exists(), is(false));
-    }
-
-    @Test
-    public void testConsumeFileWithExAndCatch() throws Exception
-    {
-        inputDir = getFileInsideWorkingDirectory("temp/input-streaming-catch");
-        inputFile = createDataFile(inputDir, "test1.txt");
-        pollingProber.check(new Probe()
-        {
-            @Override
-            public boolean isSatisfied()
-            {
-                return !inputFile.exists();
-            }
-
-            @Override
-            public String describeFailure()
-            {
-                return "input file should be deleted";
-            }
-        });
-    }
-
-    @Test
-    public void testConsumeFileWithExAndRollback() throws Exception
-    {
-        final CountDownLatch countDownLatch = new CountDownLatch(2);
-        FunctionalTestComponent ftc = getFunctionalTestComponent("consumeFileWithStreamingAndRollback");
-        ftc.setEventCallback(new EventCallback()
-        {
-            @Override
-            public void eventReceived(MuleEventContext context, Object component) throws Exception
-            {
-                countDownLatch.countDown();
-                throw new RuntimeException();
-            }
-        });
-        inputDir = getFileInsideWorkingDirectory("temp/input-streaming-rollback");
-        inputFile = createDataFile(inputDir, "test1.txt");
-
-        if (!countDownLatch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS))
-        {
-            fail("file should not be consumed");
-        }
-    }
-
-    @Test
-    public void testConsumeFileWithExAndRollbackWithRedelivery() throws Exception
-    {
-        final CountDownLatch countDownLatch = new CountDownLatch(3);
-        FunctionalTestComponent ftc = getFunctionalTestComponent("consumeFileWithStreamingAndRollbackWithRedelivery");
-        ftc.setEventCallback(new EventCallback()
-        {
-            @Override
-            public void eventReceived(MuleEventContext context, Object component) throws Exception
-            {
-                countDownLatch.countDown();
-                throw new RuntimeException();
-            }
-        });
-        inputDir = getFileInsideWorkingDirectory("temp/input-streaming-rollback-with-redelivery");
-        inputFile = createDataFile(inputDir, "test1.txt");
-        if (!countDownLatch.await(100000, TimeUnit.MILLISECONDS))
-        {
-            fail("file should not be consumed at this point");
-        }
-        pollingProber.check(new Probe()
-        {
-            @Override
-            public boolean isSatisfied()
-            {
-                return !inputFile.exists();
-            }
-
-            @Override
-            public String describeFailure()
-            {
-                return "input file should be deleted";
-            }
-        });
-    }
-    
-    @Test
-    public void testConsumeFileWithAsynchronousProcessingStrategy() throws Exception
-    {
-        inputDir = getFileInsideWorkingDirectory("temp/input-streaming-and-async-processing-strategy");
-        inputFile = createDataFile(inputDir, "test1.txt");
-        BeforeCloseStream.releaseLatch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS);
-        assertThat(inputFile.exists(),is(true));
-        BeforeCloseStream.awaitLatch.release();
-        AfterCloseStream.releaseLatch.await(RECEIVE_TIMEOUT,TimeUnit.MILLISECONDS);
-        pollingProber.check(new Probe()
-        {
-            @Override
-            public boolean isSatisfied()
-            {
-                return !inputFile.exists();
-            }
-
-            @Override
-            public String describeFailure()
-            {
-                return "input file should be deleted";
-            }
-        });
-    }
-
-    private void attacheLatchCountdownProcessor(String flowName)
-    {
-        flow = (Flow) muleContext.getRegistry().lookupFlowConstruct(flowName);
-        DefaultMessagingExceptionStrategy exceptionListener = (DefaultMessagingExceptionStrategy) flow.getExceptionListener();
-        exceptionListener.getMessageProcessors().add(new MessageProcessor()
-        {
-            @Override
-            public MuleEvent process(MuleEvent event) throws MuleException
-            {
-                latch.countDown();
-                return event;
-            }
-        });
-    }
+    public static Latch releaseLatch = new Latch();
+    public File file;
 
     @Override
-    @Before
-    public void doSetUp()
-    {
-        getFileInsideWorkingDirectory(FILE_WORKING_DIRECTORY_FOLDER).mkdirs();
+    public MuleEvent process(MuleEvent event) throws MuleException {
+      releaseLatch.release();
+      return event;
     }
-
-    protected File createDataFile(File folder, final String testMessage) throws Exception
-    {
-        return createDataFile(folder, testMessage, null);
-    }
-
-    protected File createDataFile(File folder, final String testMessage, String encoding) throws Exception
-    {
-        folder.mkdirs();
-        File target = File.createTempFile("data", ".txt", folder);
-        target.deleteOnExit();
-        FileUtils.writeStringToFile(target, testMessage, encoding);
-        return target;
-    }
-
-    public static class BeforeCloseStream implements MessageProcessor
-    {
-        public static Latch releaseLatch = new Latch();
-        public static Latch awaitLatch = new Latch();
-        public File file;
-        
-        @Override
-        public MuleEvent process(MuleEvent event) throws MuleException
-        {
-            releaseLatch.release();
-            try
-            {
-                awaitLatch.await(RECEIVE_TIMEOUT,TimeUnit.MILLISECONDS);
-            }
-            catch (InterruptedException e)
-            {
-                throw new RuntimeException(e);
-            }
-            return event;
-        }
-    }
-
-    public static class AfterCloseStream implements MessageProcessor
-    {
-        public static Latch releaseLatch = new Latch();
-        public File file;
-        
-        @Override
-        public MuleEvent process(MuleEvent event) throws MuleException
-        {
-            releaseLatch.release();
-            return event;
-        }
-    }
+  }
 
 }

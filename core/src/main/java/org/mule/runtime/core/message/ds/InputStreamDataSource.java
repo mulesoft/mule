@@ -17,42 +17,36 @@ import javax.activation.DataSource;
 /**
  * {@link DataSource} wapper for an {@link InputStream}.
  */
-public class InputStreamDataSource implements DataSource
-{
+public class InputStreamDataSource implements DataSource {
 
-    private final InputStream data;
-    private final MediaType contentType;
-    private final String name;
+  private final InputStream data;
+  private final MediaType contentType;
+  private final String name;
 
-    public InputStreamDataSource(InputStream data, MediaType contentType, String name)
-    {
-        this.data = data;
-        this.contentType = contentType;
-        this.name = name;
-    }
+  public InputStreamDataSource(InputStream data, MediaType contentType, String name) {
+    this.data = data;
+    this.contentType = contentType;
+    this.name = name;
+  }
 
-    @Override
-    public String getContentType()
-    {
-        return contentType.toString();
-    }
+  @Override
+  public String getContentType() {
+    return contentType.toString();
+  }
 
-    @Override
-    public InputStream getInputStream() throws IOException
-    {
-        return data;
-    }
+  @Override
+  public InputStream getInputStream() throws IOException {
+    return data;
+  }
 
-    @Override
-    public String getName()
-    {
-        return name;
-    }
+  @Override
+  public String getName() {
+    return name;
+  }
 
-    @Override
-    public OutputStream getOutputStream() throws IOException
-    {
-        throw new IOException("Cannot write into an InputStreamDataSource");
-    }
+  @Override
+  public OutputStream getOutputStream() throws IOException {
+    throw new IOException("Cannot write into an InputStreamDataSource");
+  }
 
 }

@@ -29,99 +29,82 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 /**
- * Checks that every type defined in JdbcTypes is defined in the schema and
- * vice versa.
+ * Checks that every type defined in JdbcTypes is defined in the schema and vice versa.
  */
-public class JdbcParamTypeTestCase extends AbstractMuleTestCase
-{
+public class JdbcParamTypeTestCase extends AbstractMuleTestCase {
 
-    private static final List<String> schemaJdbcTypes = getSchemaJdbcTypes();
+  private static final List<String> schemaJdbcTypes = getSchemaJdbcTypes();
 
-    @Test
-    public void definesJdbcTypesInSchemaValues() throws Exception
-    {
-        Set<String> schemaJdbcTypes = new HashSet<String>();
+  @Test
+  public void definesJdbcTypesInSchemaValues() throws Exception {
+    Set<String> schemaJdbcTypes = new HashSet<String>();
 
-        for (String schemaType : getSchemaJdbcTypes())
-        {
-            schemaJdbcTypes.add(schemaType);
-        }
-
-        for (DbType dbType : JdbcTypes.types)
-        {
-            assertThat(schemaJdbcTypes.contains(dbType.getName()), is(true));
-        }
+    for (String schemaType : getSchemaJdbcTypes()) {
+      schemaJdbcTypes.add(schemaType);
     }
 
-    @Test
-    public void definesSchemaValueInJdbcTypes() throws Exception
-    {
-        Set<String> jdbcTypes = new HashSet<String>();
-        for (DbType dbType : JdbcTypes.types)
-        {
-            jdbcTypes.add(dbType.getName());
-        }
+    for (DbType dbType : JdbcTypes.types) {
+      assertThat(schemaJdbcTypes.contains(dbType.getName()), is(true));
+    }
+  }
 
-        for (String schemaJdbcType : schemaJdbcTypes)
-        {
-            assertThat(jdbcTypes.contains(schemaJdbcType), is(true));
-        }
+  @Test
+  public void definesSchemaValueInJdbcTypes() throws Exception {
+    Set<String> jdbcTypes = new HashSet<String>();
+    for (DbType dbType : JdbcTypes.types) {
+      jdbcTypes.add(dbType.getName());
     }
 
-    private static List<String> getSchemaJdbcTypes()
-    {
-        try
-        {
-            List<String> schemaTypes = new ArrayList<String>();
+    for (String schemaJdbcType : schemaJdbcTypes) {
+      assertThat(jdbcTypes.contains(schemaJdbcType), is(true));
+    }
+  }
 
-            Document doc = parseSchema("/META-INF/mule-db.xsd");
+  private static List<String> getSchemaJdbcTypes() {
+    try {
+      List<String> schemaTypes = new ArrayList<String>();
 
-            Element jdbcTypes = findSimpleType(doc, "JdbcDataTypes");
+      Document doc = parseSchema("/META-INF/mule-db.xsd");
 
-            NodeList childNodes = jdbcTypes.getElementsByTagName("xsd:restriction");
-            Element type = (Element) childNodes.item(0);
+      Element jdbcTypes = findSimpleType(doc, "JdbcDataTypes");
 
-            NodeList enums = type.getElementsByTagName("xsd:enumeration");
-            for (int i = 0; i < enums.getLength(); i++)
-            {
-                Element currentElement = (Element) enums.item(i);
+      NodeList childNodes = jdbcTypes.getElementsByTagName("xsd:restriction");
+      Element type = (Element) childNodes.item(0);
 
-                schemaTypes.add(currentElement.getAttribute("value"));
-            }
+      NodeList enums = type.getElementsByTagName("xsd:enumeration");
+      for (int i = 0; i < enums.getLength(); i++) {
+        Element currentElement = (Element) enums.item(i);
 
-            return schemaTypes;
-        }
-        catch (Exception e)
-        {
-            throw new IllegalStateException("Unable to configure parameterized test", e);
-        }
+        schemaTypes.add(currentElement.getAttribute("value"));
+      }
+
+      return schemaTypes;
+    } catch (Exception e) {
+      throw new IllegalStateException("Unable to configure parameterized test", e);
+    }
+  }
+
+  private static Element findSimpleType(Document doc, String typeName) {
+    NodeList simpleTypes = doc.getElementsByTagName("xsd:simpleType");
+
+    for (int i = 0; i < simpleTypes.getLength(); i++) {
+      Element simpleType = (Element) simpleTypes.item(i);
+
+      if (typeName.equals(simpleType.getAttribute("name"))) {
+        return simpleType;
+      }
     }
 
-    private static Element findSimpleType(Document doc, String typeName)
-    {
-        NodeList simpleTypes = doc.getElementsByTagName("xsd:simpleType");
+    throw new IllegalStateException(String.format("Unable to locate element for simple type '%s", typeName));
+  }
 
-        for (int i = 0; i < simpleTypes.getLength(); i++)
-        {
-            Element simpleType = (Element) simpleTypes.item(i);
+  private static Document parseSchema(String schema) throws Exception {
+    URL resource = JdbcParamTypeTestCase.class.getResource(schema);
+    File file = new File(resource.toURI());
+    DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
+    DocumentBuilder docBuilder;
+    docBuilder = docBuilderFactory.newDocumentBuilder();
 
-            if (typeName.equals(simpleType.getAttribute("name")))
-            {
-                return simpleType;
-            }
-        }
-
-        throw new IllegalStateException(String.format("Unable to locate element for simple type '%s", typeName));
-    }
-
-    private static Document parseSchema(String schema) throws Exception
-    {
-        URL resource = JdbcParamTypeTestCase.class.getResource(schema);
-        File file = new File(resource.toURI());
-        DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder docBuilder;
-        docBuilder = docBuilderFactory.newDocumentBuilder();
-
-        return docBuilder.parse(file);
-    }
+    return docBuilder.parse(file);
+  }
 }

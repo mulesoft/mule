@@ -14,28 +14,27 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 
-public class JsonStringTestCase extends AbstractMuleContextTestCase
-{
-    public static final String TEST_JSON_MESSAGE = "{\"data\" : {\"value1\" : \"foo\", \"value2\" : \"bar\"}, \"replyTo\" : \"/response\"}";
+public class JsonStringTestCase extends AbstractMuleContextTestCase {
 
-    /**
-     * Test that a Json string doesn't get modified in any way
-     */
-    @Test
-    public void testTryConvertJsonStringToJsonString() throws Exception
-    {
-        ObjectToJson transformer = createObject(ObjectToJson.class);
-        Object result = transformer.transform(TEST_JSON_MESSAGE);
-        assertNotNull(result);
-        assertEquals(TEST_JSON_MESSAGE, result);
-    }
+  public static final String TEST_JSON_MESSAGE =
+      "{\"data\" : {\"value1\" : \"foo\", \"value2\" : \"bar\"}, \"replyTo\" : \"/response\"}";
+
+  /**
+   * Test that a Json string doesn't get modified in any way
+   */
+  @Test
+  public void testTryConvertJsonStringToJsonString() throws Exception {
+    ObjectToJson transformer = createObject(ObjectToJson.class);
+    Object result = transformer.transform(TEST_JSON_MESSAGE);
+    assertNotNull(result);
+    assertEquals(TEST_JSON_MESSAGE, result);
+  }
 
 
-    @Test
-    public void testTryConvertJsonStringToJustString() throws Exception
-    {
-        ObjectToJson transformer = createObject(ObjectToJson.class);
-        //This is still valid json
-        assertEquals("\"Hello\"", transformer.transform("Hello"));
-    }
+  @Test
+  public void testTryConvertJsonStringToJustString() throws Exception {
+    ObjectToJson transformer = createObject(ObjectToJson.class);
+    // This is still valid json
+    assertEquals("\"Hello\"", transformer.transform("Hello"));
+  }
 }

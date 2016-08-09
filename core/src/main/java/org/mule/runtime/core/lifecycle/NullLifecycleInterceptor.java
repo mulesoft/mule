@@ -10,38 +10,33 @@ import org.mule.runtime.core.api.lifecycle.LifecycleInterceptor;
 import org.mule.runtime.core.api.lifecycle.LifecyclePhase;
 
 /**
- * Implementation of the {@code null object} design pattern for
- * the {@link LifecycleInterceptor} interface
+ * Implementation of the {@code null object} design pattern for the {@link LifecycleInterceptor} interface
  *
  * @since 3.8
  */
-public final class NullLifecycleInterceptor implements LifecycleInterceptor
-{
+public final class NullLifecycleInterceptor implements LifecycleInterceptor {
 
-    /**
-     * @return always returns {@code true}
-     */
-    @Override
-    public boolean beforeLifecycle(LifecyclePhase phase, Object object)
-    {
-        return true;
-    }
+  /**
+   * @return always returns {@code true}
+   */
+  @Override
+  public boolean beforeLifecycle(LifecyclePhase phase, Object object) {
+    return true;
+  }
 
-    /**
-     * NoOp implementation
-     */
-    @Override
-    public void afterLifecycle(LifecyclePhase phase, Object object)
-    {
+  /**
+   * NoOp implementation
+   */
+  @Override
+  public void afterLifecycle(LifecyclePhase phase, Object object) {
 
-    }
+  }
 
-    /**
-     * NoOp implementation
-     */
-    @Override
-    public void onPhaseCompleted(LifecyclePhase phase)
-    {
+  /**
+   * NoOp implementation
+   */
+  @Override
+  public void onPhaseCompleted(LifecyclePhase phase) {
 
-    }
+  }
 }

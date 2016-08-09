@@ -12,25 +12,19 @@ import org.mule.runtime.config.spring.parsers.generic.TextDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
-public class GlobalFunctionsDefintionParser extends TextDefinitionParser
-{
+public class GlobalFunctionsDefintionParser extends TextDefinitionParser {
 
-    private static String FUNCTION_FILE_ATTRIBUTE_NAME = "file";
+  private static String FUNCTION_FILE_ATTRIBUTE_NAME = "file";
 
-    public GlobalFunctionsDefintionParser(String setterMethod)
-    {
-        super(setterMethod);
+  public GlobalFunctionsDefintionParser(String setterMethod) {
+    super(setterMethod);
+  }
+
+  @Override
+  protected void postProcess(ParserContext context, BeanAssembler assembler, Element element) {
+    super.postProcess(context, assembler, element);
+    if (element.hasAttribute(FUNCTION_FILE_ATTRIBUTE_NAME)) {
+      assembler.getTarget().getPropertyValues().add("globalFunctionsFile", element.getAttribute(FUNCTION_FILE_ATTRIBUTE_NAME));
     }
-
-    @Override
-    protected void postProcess(ParserContext context, BeanAssembler assembler, Element element)
-    {
-        super.postProcess(context, assembler, element);
-        if (element.hasAttribute(FUNCTION_FILE_ATTRIBUTE_NAME))
-        {
-            assembler.getTarget()
-                .getPropertyValues()
-                .add("globalFunctionsFile", element.getAttribute(FUNCTION_FILE_ATTRIBUTE_NAME));
-        }
-    }
+  }
 }

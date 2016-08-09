@@ -21,69 +21,59 @@ import org.mule.tck.TestingWorkListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ApplicationContextBuilder
-{
+public class ApplicationContextBuilder {
 
-    private MuleContext domainContext;
-    private String[] applicationResources;
-    private MuleContextBuilder muleContextBuilder = new DefaultMuleContextBuilder()
-    {
-        @Override
-        protected DefaultMuleContext createDefaultMuleContext()
-        {
-            DefaultMuleContext muleContext = super.createDefaultMuleContext();
-            muleContext.setArtifactType(APP);
-            return muleContext;
-        }
-    };
+  private MuleContext domainContext;
+  private String[] applicationResources;
+  private MuleContextBuilder muleContextBuilder = new DefaultMuleContextBuilder() {
 
-    public ApplicationContextBuilder setDomainContext(MuleContext domainContext)
-    {
-        this.domainContext = domainContext;
-        return this;
+    @Override
+    protected DefaultMuleContext createDefaultMuleContext() {
+      DefaultMuleContext muleContext = super.createDefaultMuleContext();
+      muleContext.setArtifactType(APP);
+      return muleContext;
     }
+  };
 
-    public ApplicationContextBuilder setApplicationResources(String[] applicationResources)
-    {
-        this.applicationResources = applicationResources;
-        return this;
-    }
+  public ApplicationContextBuilder setDomainContext(MuleContext domainContext) {
+    this.domainContext = domainContext;
+    return this;
+  }
 
-    public MuleContext build() throws Exception
-    {
-        // Should we set up the manager for every method?
-        MuleContext context = doBuildContext();
-        context.start();
-        return context;
-    }
+  public ApplicationContextBuilder setApplicationResources(String[] applicationResources) {
+    this.applicationResources = applicationResources;
+    return this;
+  }
 
-    protected MuleContext doBuildContext() throws Exception
-    {
-        MuleContext context;
-        MuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
-        List<ConfigurationBuilder> builders = new ArrayList<ConfigurationBuilder>();
-        builders.add(getAppBuilder(this.applicationResources));
-        configureMuleContext(muleContextBuilder);
-        context = muleContextFactory.createMuleContext(builders, muleContextBuilder);
-        return context;
-    }
+  public MuleContext build() throws Exception {
+    // Should we set up the manager for every method?
+    MuleContext context = doBuildContext();
+    context.start();
+    return context;
+  }
 
-    protected ConfigurationBuilder getAppBuilder(String[] configResource) throws Exception
-    {
-        SpringXmlConfigurationBuilder springXmlConfigurationBuilder = new SpringXmlConfigurationBuilder(configResource);
-        if (domainContext != null)
-        {
-            springXmlConfigurationBuilder.setParentContext(domainContext);
-        }
-        return springXmlConfigurationBuilder;
-    }
+  protected MuleContext doBuildContext() throws Exception {
+    MuleContext context;
+    MuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
+    List<ConfigurationBuilder> builders = new ArrayList<ConfigurationBuilder>();
+    builders.add(getAppBuilder(this.applicationResources));
+    configureMuleContext(muleContextBuilder);
+    context = muleContextFactory.createMuleContext(builders, muleContextBuilder);
+    return context;
+  }
 
-    /**
-     * Override this method to set properties of the MuleContextBuilder before it is
-     * used to create the MuleContext.
-     */
-    protected void configureMuleContext(MuleContextBuilder contextBuilder)
-    {
-        contextBuilder.setWorkListener(new TestingWorkListener());
+  protected ConfigurationBuilder getAppBuilder(String[] configResource) throws Exception {
+    SpringXmlConfigurationBuilder springXmlConfigurationBuilder = new SpringXmlConfigurationBuilder(configResource);
+    if (domainContext != null) {
+      springXmlConfigurationBuilder.setParentContext(domainContext);
     }
+    return springXmlConfigurationBuilder;
+  }
+
+  /**
+   * Override this method to set properties of the MuleContextBuilder before it is used to create the MuleContext.
+   */
+  protected void configureMuleContext(MuleContextBuilder contextBuilder) {
+    contextBuilder.setWorkListener(new TestingWorkListener());
+  }
 }

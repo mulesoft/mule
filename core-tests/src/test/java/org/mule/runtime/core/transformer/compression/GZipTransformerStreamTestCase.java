@@ -17,47 +17,37 @@ import java.io.InputStream;
 /**
  * Tests {@link GZipCompressTransformer} and its counterpart, the {@link GZipUncompressTransformer} with streams as inputs.
  */
-public class GZipTransformerStreamTestCase extends GZipTransformerTestCase
-{
+public class GZipTransformerStreamTestCase extends GZipTransformerTestCase {
 
-    @Override
-    public Object getResultData()
-    {
-        try
-        {
-            return strat.compressInputStream((InputStream) getTestData());
+  @Override
+  public Object getResultData() {
+    try {
+      return strat.compressInputStream((InputStream) getTestData());
 
-        }
-        catch (Exception e)
-        {
-            fail(e.getMessage());
-            return null;
-        }
+    } catch (Exception e) {
+      fail(e.getMessage());
+      return null;
+    }
+  }
+
+  @Override
+  public Object getTestData() {
+    return new ByteArrayInputStream(TEST_DATA.getBytes());
+  }
+
+  @Override
+  public Transformer getRoundTripTransformer() {
+    GZipUncompressTransformer transformer = new GZipUncompressTransformer();
+    transformer.setMuleContext(muleContext);
+
+    try {
+      transformer.initialise();
+    } catch (InitialisationException e) {
+      fail(e.getMessage());
     }
 
-    @Override
-    public Object getTestData()
-    {
-        return new ByteArrayInputStream(TEST_DATA.getBytes());
-    }
-
-    @Override
-    public Transformer getRoundTripTransformer()
-    {
-        GZipUncompressTransformer transformer = new GZipUncompressTransformer();
-        transformer.setMuleContext(muleContext);
-
-        try
-        {
-            transformer.initialise();
-        }
-        catch (InitialisationException e)
-        {
-            fail(e.getMessage());
-        }
-
-        return transformer;
-    }
+    return transformer;
+  }
 }
 
 

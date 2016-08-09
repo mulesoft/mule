@@ -25,95 +25,86 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.junit.Test;
 
 /**
- * IMPORTANT - DO NOT RUN THIS TEST IN AN IDE WITH LOG LEVEL OF DEBUG. USE INFO TO
- * SEE DIAGNOSTICS. OTHERWISE THE CONSOLE OUTPUT WILL BE SIMILAR SIZE TO DATA
- * TRANSFERRED, CAUSING CONFUSNG AND PROBABLY FATAL MEMORY USE.
+ * IMPORTANT - DO NOT RUN THIS TEST IN AN IDE WITH LOG LEVEL OF DEBUG. USE INFO TO SEE DIAGNOSTICS. OTHERWISE THE CONSOLE OUTPUT
+ * WILL BE SIMILAR SIZE TO DATA TRANSFERRED, CAUSING CONFUSNG AND PROBABLY FATAL MEMORY USE.
  */
-public abstract class AbstractStreamingCapacityTestCase extends FunctionalTestCase
-{
-    public static final long ONE_KB = 1024;
-    public static final long ONE_MB = ONE_KB * ONE_KB;
-    public static final long ONE_GB = ONE_KB * ONE_MB;
-    public static final int MESSAGES = 21;
+public abstract class AbstractStreamingCapacityTestCase extends FunctionalTestCase {
 
-    private long size;
+  public static final long ONE_KB = 1024;
+  public static final long ONE_MB = ONE_KB * ONE_KB;
+  public static final long ONE_GB = ONE_KB * ONE_MB;
+  public static final int MESSAGES = 21;
 
-    public AbstractStreamingCapacityTestCase(long size)
-    {
-        this.size = size;
-    }
+  private long size;
 
-    @Test
-    public void testSend() throws Exception
-    {
-        final CountDownLatch latch = new CountDownLatch(1);
-        final AtomicReference<String> message = new AtomicReference<String>();
+  public AbstractStreamingCapacityTestCase(long size) {
+    this.size = size;
+  }
 
-        EventCallback callback = new EventCallback()
-        {
-            @Override
-            public synchronized void eventReceived(MuleEventContext context, Object component)
-            {
-                try
-                {
-                    FunctionalStreamingTestComponent ftc = (FunctionalStreamingTestComponent) component;
-                    message.set(ftc.getSummary());
-                    latch.countDown();
-                }
-                catch (Exception e)
-                {
-                    logger.error(e.getMessage(), e);
-                }
-            }
-        };
+  @Test
+  public void testSend() throws Exception {
+    final CountDownLatch latch = new CountDownLatch(1);
+    final AtomicReference<String> message = new AtomicReference<String>();
 
-        Object ftc = getComponent("testComponent");
-        assertTrue("FunctionalStreamingTestComponent expected",
-            ftc instanceof FunctionalStreamingTestComponent);
-        assertNotNull(ftc);
-        ((FunctionalStreamingTestComponent) ftc).setEventCallback(callback, size);
+    EventCallback callback = new EventCallback() {
 
-        Runtime runtime = Runtime.getRuntime();
-        runtime.gc(); // i know, i know...
-        long freeStart = runtime.freeMemory();
-        long maxStart = runtime.maxMemory();
-        long timeStart = System.currentTimeMillis();
+      @Override
+      public synchronized void eventReceived(MuleEventContext context, Object component) {
+        try {
+          FunctionalStreamingTestComponent ftc = (FunctionalStreamingTestComponent) component;
+          message.set(ftc.getSummary());
+          latch.countDown();
+        } catch (Exception e) {
+          logger.error(e.getMessage(), e);
+        }
+      }
+    };
 
-        BigInputStream stream = new BigInputStream(size, MESSAGES);
-        MuleClient client = muleContext.getClient();
-        // dynamically get the endpoint to send to
-        client.dispatch(
-                ((InboundEndpoint) ((Flow) muleContext.getRegistry().lookupObject("testComponent")).getMessageSource()).getAddress(),
-                MuleMessage.builder().payload(stream).build());
+    Object ftc = getComponent("testComponent");
+    assertTrue("FunctionalStreamingTestComponent expected", ftc instanceof FunctionalStreamingTestComponent);
+    assertNotNull(ftc);
+    ((FunctionalStreamingTestComponent) ftc).setEventCallback(callback, size);
 
-        // if we assume 1MB/sec then we need at least...
-        long pause = Math.max(size / ONE_MB, 60 * 10) + 10;
-        logger.info("Waiting for up to " + pause + " seconds");
+    Runtime runtime = Runtime.getRuntime();
+    runtime.gc(); // i know, i know...
+    long freeStart = runtime.freeMemory();
+    long maxStart = runtime.maxMemory();
+    long timeStart = System.currentTimeMillis();
 
-        latch.await(pause, TimeUnit.SECONDS);
-        assertEquals(stream.summary(), message.get());
+    BigInputStream stream = new BigInputStream(size, MESSAGES);
+    MuleClient client = muleContext.getClient();
+    // dynamically get the endpoint to send to
+    client.dispatch(((InboundEndpoint) ((Flow) muleContext.getRegistry().lookupObject("testComponent")).getMessageSource())
+        .getAddress(), MuleMessage.builder().payload(stream).build());
 
-        // neither of these memory tests are really reliable, but if we stay with 1.4
-        // i don't
-        // know of anything better.
-        // if these fail in practice i guess we just remove them.
-        //
-        // REMing due to flakyness
-        // long freeEnd = runtime.freeMemory();
-        // long delta = freeStart - freeEnd;
-        // long timeEnd = System.currentTimeMillis();
-        // double speed = size / (double) (timeEnd - timeStart) * 1000 / ONE_MB;
-        // logger.info("Transfer speed " + speed + " MB/s (" + size + " B in " + (timeEnd - timeStart) + " ms)");
-        //
-        // double expectPercent = 10.5; // add a little more wiggle room than 10%, we have seen 10.0x% before
-        // double usePercent = 100.0 * delta / size;
-        // logger.info("Memory delta " + delta + " B = " + usePercent + "%");
-        //
-        // String assertMessage = String.format("Expected memory usage to be lower than %f%% but was %f%%",
-        // Double.valueOf(expectPercent), Double.valueOf(usePercent));
-        // assertTrue(assertMessage, usePercent < expectPercent);
-        //
-        // long maxEnd = runtime.maxMemory();
-        // assertEquals("Max memory shifted", 0, maxEnd - maxStart);
-    }
+    // if we assume 1MB/sec then we need at least...
+    long pause = Math.max(size / ONE_MB, 60 * 10) + 10;
+    logger.info("Waiting for up to " + pause + " seconds");
+
+    latch.await(pause, TimeUnit.SECONDS);
+    assertEquals(stream.summary(), message.get());
+
+    // neither of these memory tests are really reliable, but if we stay with 1.4
+    // i don't
+    // know of anything better.
+    // if these fail in practice i guess we just remove them.
+    //
+    // REMing due to flakyness
+    // long freeEnd = runtime.freeMemory();
+    // long delta = freeStart - freeEnd;
+    // long timeEnd = System.currentTimeMillis();
+    // double speed = size / (double) (timeEnd - timeStart) * 1000 / ONE_MB;
+    // logger.info("Transfer speed " + speed + " MB/s (" + size + " B in " + (timeEnd - timeStart) + " ms)");
+    //
+    // double expectPercent = 10.5; // add a little more wiggle room than 10%, we have seen 10.0x% before
+    // double usePercent = 100.0 * delta / size;
+    // logger.info("Memory delta " + delta + " B = " + usePercent + "%");
+    //
+    // String assertMessage = String.format("Expected memory usage to be lower than %f%% but was %f%%",
+    // Double.valueOf(expectPercent), Double.valueOf(usePercent));
+    // assertTrue(assertMessage, usePercent < expectPercent);
+    //
+    // long maxEnd = runtime.maxMemory();
+    // assertEquals("Max memory shifted", 0, maxEnd - maxStart);
+  }
 }

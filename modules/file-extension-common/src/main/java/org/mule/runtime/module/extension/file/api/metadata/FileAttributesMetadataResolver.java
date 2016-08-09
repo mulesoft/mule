@@ -20,26 +20,24 @@ import java.nio.file.FileSystemNotFoundException;
 import java.util.Optional;
 
 /**
- * Resolves the {@link MetadataType} of the {@link FileAttributes} for the
- * specific connection that is being used.
+ * Resolves the {@link MetadataType} of the {@link FileAttributes} for the specific connection that is being used.
  *
  * @since 1.0
  */
-public final class FileAttributesMetadataResolver implements MetadataAttributesResolver
-{
+public final class FileAttributesMetadataResolver implements MetadataAttributesResolver {
 
-    private ClassTypeLoader typeLoader;
+  private ClassTypeLoader typeLoader;
 
-    public FileAttributesMetadataResolver()
-    {
-       typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
-    }
+  public FileAttributesMetadataResolver() {
+    typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
+  }
 
-    @Override
-    public MetadataType getAttributesMetadata(MetadataContext context, Object key) throws MetadataResolvingException, ConnectionException
-    {
-        Optional<FileSystem> connection = context.getConnection();
-        FileSystem fileSystem = connection.orElseThrow(() -> new FileSystemNotFoundException("Could not found file system to retrieve metadata from"));
-        return typeLoader.load(fileSystem.getAttributesType());
-    }
+  @Override
+  public MetadataType getAttributesMetadata(MetadataContext context, Object key)
+      throws MetadataResolvingException, ConnectionException {
+    Optional<FileSystem> connection = context.getConnection();
+    FileSystem fileSystem =
+        connection.orElseThrow(() -> new FileSystemNotFoundException("Could not found file system to retrieve metadata from"));
+    return typeLoader.load(fileSystem.getAttributesType());
+  }
 }

@@ -12,29 +12,26 @@ import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.junit.Rule;
 
-public class StreamingSpeedMule1389TestCase extends AbstractStreamingCapacityTestCase
-{
-    @Rule
-    public DynamicPort dynamicPort1 = new DynamicPort("port1");
+public class StreamingSpeedMule1389TestCase extends AbstractStreamingCapacityTestCase {
 
-    @Rule
-    public DynamicPort dynamicPort2 = new DynamicPort("port2");
+  @Rule
+  public DynamicPort dynamicPort1 = new DynamicPort("port1");
 
-    public StreamingSpeedMule1389TestCase()
-    {
-        super(100 * ONE_MB);
-    }
+  @Rule
+  public DynamicPort dynamicPort2 = new DynamicPort("port2");
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "streaming-speed-mule-1389-flow.xml";
-    }
+  public StreamingSpeedMule1389TestCase() {
+    super(100 * ONE_MB);
+  }
 
-    @Override
-    protected boolean isDisabledInThisEnvironment()
-    {
-        // MULE-4713
-        return (SystemUtils.isIbmJDK() && SystemUtils.isJavaVersionAtLeast(160));
-    }
+  @Override
+  protected String getConfigFile() {
+    return "streaming-speed-mule-1389-flow.xml";
+  }
+
+  @Override
+  protected boolean isDisabledInThisEnvironment() {
+    // MULE-4713
+    return (SystemUtils.isIbmJDK() && SystemUtils.isJavaVersionAtLeast(160));
+  }
 }

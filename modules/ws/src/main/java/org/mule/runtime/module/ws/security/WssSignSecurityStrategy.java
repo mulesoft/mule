@@ -21,44 +21,39 @@ import org.apache.ws.security.WSPasswordCallback;
 /**
  * Signs the SOAP request that is being sent, using the private key of the key-store in the provided TLS context.
  */
-public class WssSignSecurityStrategy extends AbstractSecurityStrategy
-{
+public class WssSignSecurityStrategy extends AbstractSecurityStrategy {
 
-    private static final String WS_SIGN_PROPERTIES_KEY = "signProperties";
+  private static final String WS_SIGN_PROPERTIES_KEY = "signProperties";
 
-    private TlsContextFactory tlsContextFactory;
+  private TlsContextFactory tlsContextFactory;
 
-    @Override
-    public void apply(Map<String, Object> outConfigProperties, Map<String, Object> inConfigProperties)
-    {
-        final TlsContextKeyStoreConfiguration keyStoreConfig = tlsContextFactory.getKeyStoreConfiguration();
+  @Override
+  public void apply(Map<String, Object> outConfigProperties, Map<String, Object> inConfigProperties) {
+    final TlsContextKeyStoreConfiguration keyStoreConfig = tlsContextFactory.getKeyStoreConfiguration();
 
-        appendAction(outConfigProperties, SIGNATURE);
+    appendAction(outConfigProperties, SIGNATURE);
 
-        Properties signProperties = createKeyStoreProperties(keyStoreConfig);
+    Properties signProperties = createKeyStoreProperties(keyStoreConfig);
 
-        outConfigProperties.put(SIG_PROP_REF_ID, WS_SIGN_PROPERTIES_KEY);
-        outConfigProperties.put(WS_SIGN_PROPERTIES_KEY, signProperties);
-        outConfigProperties.put(SIGNATURE_USER, keyStoreConfig.getAlias());
+    outConfigProperties.put(SIG_PROP_REF_ID, WS_SIGN_PROPERTIES_KEY);
+    outConfigProperties.put(WS_SIGN_PROPERTIES_KEY, signProperties);
+    outConfigProperties.put(SIGNATURE_USER, keyStoreConfig.getAlias());
 
-        addPasswordCallbackHandler(outConfigProperties, new WSPasswordCallbackHandler(WSPasswordCallback.SIGNATURE)
-        {
-            @Override
-            public void handle(WSPasswordCallback passwordCallback)
-            {
-                passwordCallback.setPassword(keyStoreConfig.getKeyPassword());
-            }
-        });
-    }
+    addPasswordCallbackHandler(outConfigProperties, new WSPasswordCallbackHandler(WSPasswordCallback.SIGNATURE) {
 
-    public TlsContextFactory getTlsContext()
-    {
-        return tlsContextFactory;
-    }
+      @Override
+      public void handle(WSPasswordCallback passwordCallback) {
+        passwordCallback.setPassword(keyStoreConfig.getKeyPassword());
+      }
+    });
+  }
 
-    public void setTlsContext(TlsContextFactory tlsContextFactory)
-    {
-        this.tlsContextFactory = tlsContextFactory;
-    }
+  public TlsContextFactory getTlsContext() {
+    return tlsContextFactory;
+  }
+
+  public void setTlsContext(TlsContextFactory tlsContextFactory) {
+    this.tlsContextFactory = tlsContextFactory;
+  }
 
 }

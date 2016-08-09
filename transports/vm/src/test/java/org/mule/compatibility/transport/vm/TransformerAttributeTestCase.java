@@ -16,34 +16,28 @@ import org.mule.runtime.core.api.client.MuleClient;
 
 import org.junit.Test;
 
-public class TransformerAttributeTestCase extends FunctionalTestCase
-{
+public class TransformerAttributeTestCase extends FunctionalTestCase {
 
-    public static final String OUTBOUND_MESSAGE = "Test message";
+  public static final String OUTBOUND_MESSAGE = "Test message";
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "vm/transformer-attribute-test-flow.xml";
-    }
+  @Override
+  protected String getConfigFile() {
+    return "vm/transformer-attribute-test-flow.xml";
+  }
 
-    @Test
-    public void testSimple() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        MuleMessage message = client.send("vm://simple", OUTBOUND_MESSAGE, null);
-        assertNotNull(message);
-        assertEquals(StringAppendTestTransformer.appendDefault(OUTBOUND_MESSAGE)  + " Received",
-                getPayloadAsString(message));
-    }
+  @Test
+  public void testSimple() throws Exception {
+    MuleClient client = muleContext.getClient();
+    MuleMessage message = client.send("vm://simple", OUTBOUND_MESSAGE, null);
+    assertNotNull(message);
+    assertEquals(StringAppendTestTransformer.appendDefault(OUTBOUND_MESSAGE) + " Received", getPayloadAsString(message));
+  }
 
-    @Test
-    public void testThrough() throws Exception
-    {
-        MuleClient client = muleContext.getClient();
-        MuleMessage message = client.send("vm://chained", OUTBOUND_MESSAGE, null);
-        assertNotNull(message);
-        assertEquals(StringAppendTestTransformer.appendDefault(OUTBOUND_MESSAGE)  + " Received",
-                getPayloadAsString(message));
-    }
+  @Test
+  public void testThrough() throws Exception {
+    MuleClient client = muleContext.getClient();
+    MuleMessage message = client.send("vm://chained", OUTBOUND_MESSAGE, null);
+    assertNotNull(message);
+    assertEquals(StringAppendTestTransformer.appendDefault(OUTBOUND_MESSAGE) + " Received", getPayloadAsString(message));
+  }
 }

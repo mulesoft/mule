@@ -14,23 +14,19 @@ import org.mule.runtime.api.message.MuleMessage;
 
 import org.junit.Test;
 
-public class UdpSendAndReceivePojoTestCase extends SocketExtensionTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "udp-send-and-receive-pojo-config.xml";
-    }
+public class UdpSendAndReceivePojoTestCase extends SocketExtensionTestCase {
 
-    @Test
-    public void sendAndReceivePojo() throws Exception
-    {
-        MuleMessage message = flowRunner("udp-send-and-receive").
-                withPayload(testPojo).
-                run().getMessage();
+  @Override
+  protected String getConfigFile() {
+    return "udp-send-and-receive-pojo-config.xml";
+  }
 
-        TestPojo pojo = (TestPojo) deserializeMessage(message);
-        assertEquals(pojo.getAge(), RESPONSE_AGE);
-        assertEquals(pojo.getName(), RESPONSE_NAME);
-    }
+  @Test
+  public void sendAndReceivePojo() throws Exception {
+    MuleMessage message = flowRunner("udp-send-and-receive").withPayload(testPojo).run().getMessage();
+
+    TestPojo pojo = (TestPojo) deserializeMessage(message);
+    assertEquals(pojo.getAge(), RESPONSE_AGE);
+    assertEquals(pojo.getName(), RESPONSE_NAME);
+  }
 }

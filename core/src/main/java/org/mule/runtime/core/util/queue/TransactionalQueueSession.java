@@ -24,158 +24,124 @@ import javax.transaction.xa.Xid;
  * <p/>
  * This QueueSession can be used for local and xa transactions
  */
-public class TransactionalQueueSession extends AbstractQueueSession implements QueueSession
-{
+public class TransactionalQueueSession extends AbstractQueueSession implements QueueSession {
 
-    private final QueueXaResource queueXaResource;
-    private final AbstractResourceManager resourceManager;
-    private final LocalTxQueueTransactionJournal localTxTransactionJournal;
-    private final ReentrantReadWriteLock txContextReadWriteLock;
-    private LocalQueueTransactionContext singleResourceTxContext;
+  private final QueueXaResource queueXaResource;
+  private final AbstractResourceManager resourceManager;
+  private final LocalTxQueueTransactionJournal localTxTransactionJournal;
+  private final ReentrantReadWriteLock txContextReadWriteLock;
+  private LocalQueueTransactionContext singleResourceTxContext;
 
-    public TransactionalQueueSession(QueueProvider queueProvider,
-                                     QueueXaResourceManager xaResourceManager,
-                                     AbstractResourceManager resourceManager,
-                                     XaTransactionRecoverer xaTransactionRecoverer,
-                                     LocalTxQueueTransactionJournal localTxTransactionJournal,
-                                     MuleContext muleContext)
-    {
-        super(queueProvider, muleContext);
-        this.localTxTransactionJournal = localTxTransactionJournal;
-        this.resourceManager = resourceManager;
-        this.queueXaResource = new QueueXaResource(xaResourceManager, xaTransactionRecoverer, getQueueProvider());
-        this.txContextReadWriteLock = new ReentrantReadWriteLock();
+  public TransactionalQueueSession(QueueProvider queueProvider, QueueXaResourceManager xaResourceManager,
+                                   AbstractResourceManager resourceManager, XaTransactionRecoverer xaTransactionRecoverer,
+                                   LocalTxQueueTransactionJournal localTxTransactionJournal, MuleContext muleContext) {
+    super(queueProvider, muleContext);
+    this.localTxTransactionJournal = localTxTransactionJournal;
+    this.resourceManager = resourceManager;
+    this.queueXaResource = new QueueXaResource(xaResourceManager, xaTransactionRecoverer, getQueueProvider());
+    this.txContextReadWriteLock = new ReentrantReadWriteLock();
+  }
+
+  protected QueueTransactionContext getTransactionalContext() {
+    if (singleResourceTxContext != null) {
+      return singleResourceTxContext;
+    } else {
+      return queueXaResource.getTransactionContext();
     }
+  }
 
-    protected QueueTransactionContext getTransactionalContext()
-    {
-        if (singleResourceTxContext != null)
-        {
-            return singleResourceTxContext;
-        }
-        else
-        {
-            return queueXaResource.getTransactionContext();
-        }
+  // Local transaction implementation
+  public void begin() throws ResourceManagerException {
+    final ReentrantReadWriteLock.WriteLock writeLock = txContextReadWriteLock.writeLock();
+    writeLock.lock();
+    try {
+      if (getTransactionalContext() != null) {
+        throw new IllegalStateException("Cannot start local transaction. A local transaction already in progress.");
+      }
+      singleResourceTxContext =
+          new LocalTxQueueTransactionContext(localTxTransactionJournal, getQueueProvider(), txContextReadWriteLock.readLock());
+      resourceManager.beginTransaction((AbstractTransactionContext) singleResourceTxContext);
+    } finally {
+      writeLock.unlock();
     }
+  }
 
-    // Local transaction implementation
-    public void begin() throws ResourceManagerException
-    {
-        final ReentrantReadWriteLock.WriteLock writeLock = txContextReadWriteLock.writeLock();
-        writeLock.lock();
-        try
-        {
-            if (getTransactionalContext() != null)
-            {
-                throw new IllegalStateException(
-                        "Cannot start local transaction. A local transaction already in progress.");
-            }
-            singleResourceTxContext = new LocalTxQueueTransactionContext(localTxTransactionJournal, getQueueProvider(), txContextReadWriteLock.readLock());
-            resourceManager.beginTransaction((AbstractTransactionContext) singleResourceTxContext);
-        }
-        finally
-        {
-            writeLock.unlock();
-        }
+  public void commit() throws ResourceManagerException {
+    final ReentrantReadWriteLock.WriteLock writeLock = txContextReadWriteLock.writeLock();
+    writeLock.lock();
+    try {
+      if (singleResourceTxContext == null) {
+        throw new IllegalStateException("Cannot commit local transaction as no transaction was begun");
+      }
+      resourceManager.commitTransaction((AbstractTransactionContext) singleResourceTxContext);
+      singleResourceTxContext = null;
+    } finally {
+      writeLock.unlock();
     }
+  }
 
-    public void commit() throws ResourceManagerException
-    {
-        final ReentrantReadWriteLock.WriteLock writeLock = txContextReadWriteLock.writeLock();
-        writeLock.lock();
-        try
-        {
-            if (singleResourceTxContext == null)
-            {
-                throw new IllegalStateException("Cannot commit local transaction as no transaction was begun");
-            }
-            resourceManager.commitTransaction((AbstractTransactionContext) singleResourceTxContext);
-            singleResourceTxContext = null;
-        }
-        finally
-        {
-            writeLock.unlock();
-        }
+  public void rollback() throws ResourceManagerException {
+    final ReentrantReadWriteLock.WriteLock writeLock = txContextReadWriteLock.writeLock();
+    writeLock.lock();
+    try {
+      if (singleResourceTxContext == null) {
+        throw new IllegalStateException("Cannot commit local transaction as no transaction was begun");
+      }
+      resourceManager.rollbackTransaction((AbstractTransactionContext) singleResourceTxContext);
+      singleResourceTxContext = null;
+    } finally {
+      writeLock.unlock();
     }
+  }
 
-    public void rollback() throws ResourceManagerException
-    {
-        final ReentrantReadWriteLock.WriteLock writeLock = txContextReadWriteLock.writeLock();
-        writeLock.lock();
-        try
-        {
-            if (singleResourceTxContext == null)
-            {
-                throw new IllegalStateException("Cannot commit local transaction as no transaction was begun");
-            }
-            resourceManager.rollbackTransaction((AbstractTransactionContext) singleResourceTxContext);
-            singleResourceTxContext = null;
-        }
-        finally
-        {
-            writeLock.unlock();
-        }
-    }
+  // XA transaction delegation to QueueXaResource
+  @Override
+  public boolean isSameRM(XAResource xares) throws XAException {
+    return queueXaResource.isSameRM(xares);
+  }
 
-    // XA transaction delegation to QueueXaResource
-    @Override
-    public boolean isSameRM(XAResource xares) throws XAException
-    {
-        return queueXaResource.isSameRM(xares);
-    }
+  @Override
+  public void start(Xid xid, int flags) throws XAException {
+    queueXaResource.start(xid, flags);
+  }
 
-    @Override
-    public void start(Xid xid, int flags) throws XAException
-    {
-        queueXaResource.start(xid, flags);
-    }
+  @Override
+  public void end(Xid xid, int flags) throws XAException {
+    queueXaResource.end(xid, flags);
+  }
 
-    @Override
-    public void end(Xid xid, int flags) throws XAException
-    {
-        queueXaResource.end(xid, flags);
-    }
+  @Override
+  public void commit(Xid xid, boolean onePhase) throws XAException {
+    queueXaResource.commit(xid, onePhase);
+  }
 
-    @Override
-    public void commit(Xid xid, boolean onePhase) throws XAException
-    {
-        queueXaResource.commit(xid, onePhase);
-    }
+  @Override
+  public void rollback(Xid xid) throws XAException {
+    queueXaResource.rollback(xid);
+  }
 
-    @Override
-    public void rollback(Xid xid) throws XAException
-    {
-        queueXaResource.rollback(xid);
-    }
+  @Override
+  public int prepare(Xid xid) throws XAException {
+    return queueXaResource.prepare(xid);
+  }
 
-    @Override
-    public int prepare(Xid xid) throws XAException
-    {
-        return queueXaResource.prepare(xid);
-    }
+  @Override
+  public void forget(Xid xid) throws XAException {
+    queueXaResource.forget(xid);
+  }
 
-    @Override
-    public void forget(Xid xid) throws XAException
-    {
-        queueXaResource.forget(xid);
-    }
+  @Override
+  public int getTransactionTimeout() throws XAException {
+    return queueXaResource.getTransactionTimeout();
+  }
 
-    @Override
-    public int getTransactionTimeout() throws XAException
-    {
-        return queueXaResource.getTransactionTimeout();
-    }
+  @Override
+  public boolean setTransactionTimeout(int timeout) throws XAException {
+    return queueXaResource.setTransactionTimeout(timeout);
+  }
 
-    @Override
-    public boolean setTransactionTimeout(int timeout) throws XAException
-    {
-        return queueXaResource.setTransactionTimeout(timeout);
-    }
-
-    @Override
-    public Xid[] recover(int i) throws XAException
-    {
-        return queueXaResource.recover(i);
-    }
+  @Override
+  public Xid[] recover(int i) throws XAException {
+    return queueXaResource.recover(i);
+  }
 }

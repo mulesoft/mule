@@ -32,237 +32,191 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * <code>MuleWorkManager</code> is a JCA Work manager implementation used to manage
- * thread allocation for Mule components and connectors. This code has been adapted
- * from the Geronimo implementation.
+ * <code>MuleWorkManager</code> is a JCA Work manager implementation used to manage thread allocation for Mule components and
+ * connectors. This code has been adapted from the Geronimo implementation.
  */
-public class MuleWorkManager implements WorkManager, MuleContextAware
-{
-    /**
-     * logger used by this class
-     */
-    protected static final Logger logger = LoggerFactory.getLogger(MuleWorkManager.class);
+public class MuleWorkManager implements WorkManager, MuleContextAware {
 
-    /**
-     * Forced shutdown delay. The time the workManager will wait while threads are being
-     * interrupted. The graceful shutdown timeout which is the amount of time that
-     * the workManager will wait while the workManager completed pending and
-     * currently executing jobs is configured using {@link MuleConfiguration}.
-     */
-    private static final long FORCEFUL_SHUTDOWN_TIMEOUT = 5000L;
+  /**
+   * logger used by this class
+   */
+  protected static final Logger logger = LoggerFactory.getLogger(MuleWorkManager.class);
 
-    /**
-     * The ThreadingProfile used for creation of the underlying ExecutorService
-     */
-    private final ThreadingProfile threadingProfile;
+  /**
+   * Forced shutdown delay. The time the workManager will wait while threads are being interrupted. The graceful shutdown timeout
+   * which is the amount of time that the workManager will wait while the workManager completed pending and currently executing
+   * jobs is configured using {@link MuleConfiguration}.
+   */
+  private static final long FORCEFUL_SHUTDOWN_TIMEOUT = 5000L;
 
-    /**
-     * The actual pool of threads used by this MuleWorkManager to process the Work
-     * instances submitted via the (do,start,schedule)Work methods.
-     */
-    private volatile ExecutorService workExecutorService;
-    private final String name;
-    private int gracefulShutdownTimeout;
-    private MuleContext muleContext;
-    
-    /**
-     * Various policies used for work execution
-     */
-    private final WorkExecutor scheduleWorkExecutor = new ScheduleWorkExecutor();
-    private final WorkExecutor startWorkExecutor = new StartWorkExecutor();
-    private final WorkExecutor syncWorkExecutor = new SyncWorkExecutor();
+  /**
+   * The ThreadingProfile used for creation of the underlying ExecutorService
+   */
+  private final ThreadingProfile threadingProfile;
 
-    public MuleWorkManager(ThreadingProfile profile, String name, int shutdownTimeout)
-    {
-        super();
+  /**
+   * The actual pool of threads used by this MuleWorkManager to process the Work instances submitted via the
+   * (do,start,schedule)Work methods.
+   */
+  private volatile ExecutorService workExecutorService;
+  private final String name;
+  private int gracefulShutdownTimeout;
+  private MuleContext muleContext;
 
-        if (name == null)
-        {
-            name = "WorkManager#" + hashCode();
-        }
+  /**
+   * Various policies used for work execution
+   */
+  private final WorkExecutor scheduleWorkExecutor = new ScheduleWorkExecutor();
+  private final WorkExecutor startWorkExecutor = new StartWorkExecutor();
+  private final WorkExecutor syncWorkExecutor = new SyncWorkExecutor();
 
-        this.threadingProfile = new ImmutableThreadingProfile(profile);
-        this.name = name;
-        gracefulShutdownTimeout = shutdownTimeout;
+  public MuleWorkManager(ThreadingProfile profile, String name, int shutdownTimeout) {
+    super();
+
+    if (name == null) {
+      name = "WorkManager#" + hashCode();
     }
 
-    public synchronized void start() throws MuleException
-    {
-        gracefulShutdownTimeout = getMuleContext().getConfiguration().getShutdownTimeout();
-        
-        if (workExecutorService == null)
-        {
-            workExecutorService = threadingProfile.createPool(name);
-        }
-    }
+    this.threadingProfile = new ImmutableThreadingProfile(profile);
+    this.name = name;
+    gracefulShutdownTimeout = shutdownTimeout;
+  }
 
-    public synchronized void dispose()
-    {
-        if (workExecutorService != null)
-        {
-            // Disable new tasks from being submitted
-            workExecutorService.shutdown();
-            try
-            {
-                // Wait a while for existing tasks to terminate
-                if (!workExecutorService.awaitTermination(gracefulShutdownTimeout, TimeUnit.MILLISECONDS))
-                {
-                    // Cancel currently executing tasks and return list of pending
-                    // tasks
-                    List outstanding = workExecutorService.shutdownNow();
-                    // Wait a while for tasks to respond to being cancelled
-                    if (!workExecutorService.awaitTermination(FORCEFUL_SHUTDOWN_TIMEOUT, TimeUnit.MILLISECONDS))
-                    {
-                        logger.warn(MessageFormat.format(
-                            "Pool {0} did not terminate in time; {1} work items were cancelled.", name,
-                            outstanding.isEmpty() ? "No" : Integer.toString(outstanding.size())));
-                    }
-                    else
-                    {
-                        if (!outstanding.isEmpty())
-                        {
-                            logger.warn(MessageFormat.format(
-                                "Pool {0} terminated; {1} work items were cancelled.", name,
-                                Integer.toString(outstanding.size())));
-                        }
-                    }
-                }
+  public synchronized void start() throws MuleException {
+    gracefulShutdownTimeout = getMuleContext().getConfiguration().getShutdownTimeout();
+
+    if (workExecutorService == null) {
+      workExecutorService = threadingProfile.createPool(name);
+    }
+  }
+
+  public synchronized void dispose() {
+    if (workExecutorService != null) {
+      // Disable new tasks from being submitted
+      workExecutorService.shutdown();
+      try {
+        // Wait a while for existing tasks to terminate
+        if (!workExecutorService.awaitTermination(gracefulShutdownTimeout, TimeUnit.MILLISECONDS)) {
+          // Cancel currently executing tasks and return list of pending
+          // tasks
+          List outstanding = workExecutorService.shutdownNow();
+          // Wait a while for tasks to respond to being cancelled
+          if (!workExecutorService.awaitTermination(FORCEFUL_SHUTDOWN_TIMEOUT, TimeUnit.MILLISECONDS)) {
+            logger.warn(MessageFormat.format("Pool {0} did not terminate in time; {1} work items were cancelled.", name,
+                                             outstanding.isEmpty() ? "No" : Integer.toString(outstanding.size())));
+          } else {
+            if (!outstanding.isEmpty()) {
+              logger.warn(MessageFormat.format("Pool {0} terminated; {1} work items were cancelled.", name,
+                                               Integer.toString(outstanding.size())));
             }
-            catch (InterruptedException ie)
-            {
-                // (Re-)Cancel if current thread also interrupted
-                workExecutorService.shutdownNow();
-                // Preserve interrupt status
-                Thread.currentThread().interrupt();
-            }
-            finally
-            {
-                workExecutorService = null;
-            }
+          }
         }
+      } catch (InterruptedException ie) {
+        // (Re-)Cancel if current thread also interrupted
+        workExecutorService.shutdownNow();
+        // Preserve interrupt status
+        Thread.currentThread().interrupt();
+      } finally {
+        workExecutorService = null;
+      }
+    }
+  }
+
+
+  // TODO
+  public XATerminator getXATerminator() {
+    return null;
+  }
+
+  public void doWork(Work work) throws WorkException {
+    executeWork(new WorkerContext(work), syncWorkExecutor);
+  }
+
+  public void doWork(Work work, long startTimeout, ExecutionContext execContext, WorkListener workListener) throws WorkException {
+    WorkerContext workWrapper = new WorkerContext(work, startTimeout, execContext, workListener);
+    workWrapper.setThreadPriority(Thread.currentThread().getPriority());
+    executeWork(workWrapper, syncWorkExecutor);
+  }
+
+  public long startWork(Work work) throws WorkException {
+    WorkerContext workWrapper = new WorkerContext(work);
+    workWrapper.setThreadPriority(Thread.currentThread().getPriority());
+    executeWork(workWrapper, startWorkExecutor);
+    return System.currentTimeMillis() - workWrapper.getAcceptedTime();
+  }
+
+  public long startWork(Work work, long startTimeout, ExecutionContext execContext, WorkListener workListener)
+      throws WorkException {
+    WorkerContext workWrapper = new WorkerContext(work, startTimeout, execContext, workListener);
+    workWrapper.setThreadPriority(Thread.currentThread().getPriority());
+    executeWork(workWrapper, startWorkExecutor);
+    return System.currentTimeMillis() - workWrapper.getAcceptedTime();
+  }
+
+  public void scheduleWork(Work work) throws WorkException {
+    WorkerContext workWrapper = new WorkerContext(work);
+    workWrapper.setThreadPriority(Thread.currentThread().getPriority());
+    executeWork(workWrapper, scheduleWorkExecutor);
+  }
+
+  public void scheduleWork(Work work, long startTimeout, ExecutionContext execContext, WorkListener workListener)
+      throws WorkException {
+    WorkerContext workWrapper = new WorkerContext(work, startTimeout, execContext, workListener);
+    workWrapper.setThreadPriority(Thread.currentThread().getPriority());
+    executeWork(workWrapper, scheduleWorkExecutor);
+  }
+
+  /**
+   * @see Executor#execute(Runnable)
+   */
+  public void execute(Runnable work) {
+    if (!isStarted()) {
+      throw new IllegalStateException("This MuleWorkManager '" + name + "' is stopped");
+    }
+    workExecutorService.execute(work);
+  }
+
+  /**
+   * Execute the specified Work.
+   *
+   * @param work Work to be executed.
+   * @exception WorkException Indicates that the Work execution has been unsuccessful.
+   */
+  private void executeWork(WorkerContext work, WorkExecutor workExecutor) throws WorkException {
+    if (!isStarted()) {
+      throw new IllegalStateException("This MuleWorkManager '" + name + "' is stopped");
     }
 
-
-    // TODO
-    public XATerminator getXATerminator()
-    {
-        return null;
+    try {
+      work.workAccepted(this);
+      workExecutor.doExecute(work, workExecutorService);
+      WorkException exception = work.getWorkException();
+      if (null != exception) {
+        throw exception;
+      }
+    } catch (InterruptedException e) {
+      WorkCompletedException wcj = new WorkCompletedException("The execution has been interrupted for WorkManager: " + name, e);
+      wcj.setErrorCode(WorkException.INTERNAL);
+      throw wcj;
     }
+  }
 
-    public void doWork(Work work) throws WorkException
-    {
-        executeWork(new WorkerContext(work), syncWorkExecutor);
+  public boolean isStarted() {
+    return (workExecutorService != null && !workExecutorService.isShutdown());
+  }
+
+  public MuleContext getMuleContext() {
+    return muleContext;
+  }
+
+  public void setMuleContext(MuleContext muleContext) {
+    this.muleContext = muleContext;
+    if (this.threadingProfile != null && muleContext != null) {
+      threadingProfile.setMuleContext(muleContext);
     }
+  }
 
-    public void doWork(Work work, long startTimeout, ExecutionContext execContext, WorkListener workListener)
-        throws WorkException
-    {
-        WorkerContext workWrapper = new WorkerContext(work, startTimeout, execContext, workListener);
-        workWrapper.setThreadPriority(Thread.currentThread().getPriority());
-        executeWork(workWrapper, syncWorkExecutor);
-    }
-
-    public long startWork(Work work) throws WorkException
-    {
-        WorkerContext workWrapper = new WorkerContext(work);
-        workWrapper.setThreadPriority(Thread.currentThread().getPriority());
-        executeWork(workWrapper, startWorkExecutor);
-        return System.currentTimeMillis() - workWrapper.getAcceptedTime();
-    }
-
-    public long startWork(Work work,
-                          long startTimeout,
-                          ExecutionContext execContext,
-                          WorkListener workListener) throws WorkException
-    {
-        WorkerContext workWrapper = new WorkerContext(work, startTimeout, execContext, workListener);
-        workWrapper.setThreadPriority(Thread.currentThread().getPriority());
-        executeWork(workWrapper, startWorkExecutor);
-        return System.currentTimeMillis() - workWrapper.getAcceptedTime();
-    }
-
-    public void scheduleWork(Work work) throws WorkException
-    {
-        WorkerContext workWrapper = new WorkerContext(work);
-        workWrapper.setThreadPriority(Thread.currentThread().getPriority());
-        executeWork(workWrapper, scheduleWorkExecutor);
-    }
-
-    public void scheduleWork(Work work,
-                             long startTimeout,
-                             ExecutionContext execContext,
-                             WorkListener workListener) throws WorkException
-    {
-        WorkerContext workWrapper = new WorkerContext(work, startTimeout, execContext, workListener);
-        workWrapper.setThreadPriority(Thread.currentThread().getPriority());
-        executeWork(workWrapper, scheduleWorkExecutor);
-    }
-
-    /**
-     * @see Executor#execute(Runnable)
-     */
-    public void execute(Runnable work)
-    {
-        if (!isStarted())
-        {
-            throw new IllegalStateException("This MuleWorkManager '" + name + "' is stopped");
-        }
-        workExecutorService.execute(work);
-    }
-
-    /**
-     * Execute the specified Work.
-     *
-     * @param work Work to be executed.
-     * @exception WorkException Indicates that the Work execution has been
-     *                unsuccessful.
-     */
-    private void executeWork(WorkerContext work, WorkExecutor workExecutor) throws WorkException
-    {
-        if (!isStarted())
-        {
-            throw new IllegalStateException("This MuleWorkManager '" + name + "' is stopped");
-        }
-
-        try
-        {
-            work.workAccepted(this);
-            workExecutor.doExecute(work, workExecutorService);
-            WorkException exception = work.getWorkException();
-            if (null != exception)
-            {
-                throw exception;
-            }
-        }
-        catch (InterruptedException e)
-        {
-            WorkCompletedException wcj = new WorkCompletedException("The execution has been interrupted for WorkManager: " + name, e);
-            wcj.setErrorCode(WorkException.INTERNAL);
-            throw wcj;
-        }
-    }
-
-    public boolean isStarted()
-    {
-        return (workExecutorService != null && !workExecutorService.isShutdown());
-    }
-
-    public MuleContext getMuleContext()
-    {
-        return muleContext;
-    }
-
-    public void setMuleContext(MuleContext muleContext)
-    {
-        this.muleContext = muleContext;
-        if (this.threadingProfile != null && muleContext != null)
-        {
-            threadingProfile.setMuleContext(muleContext);
-        }
-    }
-
-    protected ThreadingProfile getThreadingProfile()
-    {
-        return threadingProfile;
-    }
+  protected ThreadingProfile getThreadingProfile() {
+    return threadingProfile;
+  }
 }

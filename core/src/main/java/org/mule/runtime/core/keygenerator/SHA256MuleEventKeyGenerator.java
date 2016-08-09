@@ -18,38 +18,31 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Implements {@link org.mule.runtime.core.api.MuleEventKeyGenerator} applying SHA-256 digest to the event's
- * message payload.
+ * Implements {@link org.mule.runtime.core.api.MuleEventKeyGenerator} applying SHA-256 digest to the event's message payload.
  */
-public class SHA256MuleEventKeyGenerator implements MuleEventKeyGenerator
-{
+public class SHA256MuleEventKeyGenerator implements MuleEventKeyGenerator {
 
-    private static final Logger logger = LoggerFactory.getLogger(SHA256MuleEventKeyGenerator.class);
+  private static final Logger logger = LoggerFactory.getLogger(SHA256MuleEventKeyGenerator.class);
 
-    public Serializable generateKey(MuleEvent event) throws NotSerializableException
-    {
-        try
-        {
-            byte[] bytesOfMessage = event.getMessageAsBytes();
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
-            String key = StringUtils.toHexString(md.digest(bytesOfMessage));
+  public Serializable generateKey(MuleEvent event) throws NotSerializableException {
+    try {
+      byte[] bytesOfMessage = event.getMessageAsBytes();
+      MessageDigest md = MessageDigest.getInstance("SHA-256");
+      String key = StringUtils.toHexString(md.digest(bytesOfMessage));
 
-            if (logger.isDebugEnabled())
-            {
-                logger.debug(String.format("Generated key for event: %s key: %s", event, key));
-            }
+      if (logger.isDebugEnabled()) {
+        logger.debug(String.format("Generated key for event: %s key: %s", event, key));
+      }
 
-            return key;
-        }
-        catch (Exception e)
-        {
-            // TODO: The exception may not necessarily be caused by a serialization problem, but we still throw
-            // NotSerializableException to keep backwards compatibility. The interface needs to be changed.
+      return key;
+    } catch (Exception e) {
+      // TODO: The exception may not necessarily be caused by a serialization problem, but we still throw
+      // NotSerializableException to keep backwards compatibility. The interface needs to be changed.
 
-            NotSerializableException notSerializableException = new NotSerializableException(e.getMessage());
-            notSerializableException.initCause(e);
+      NotSerializableException notSerializableException = new NotSerializableException(e.getMessage());
+      notSerializableException.initCause(e);
 
-            throw notSerializableException;
-        }
+      throw notSerializableException;
     }
+  }
 }

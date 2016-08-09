@@ -10,53 +10,47 @@ import org.mule.runtime.extension.api.introspection.EnrichableModel;
 import org.mule.runtime.extension.api.introspection.ModelProperty;
 
 /**
- * An immutable model property which indicates that the owning {@link EnrichableModel}
- * was derived from a given {@link #type}
+ * An immutable model property which indicates that the owning {@link EnrichableModel} was derived from a given {@link #type}
  *
  * @since 4.0
  */
-public final class ImplementingTypeModelProperty implements ModelProperty
-{
+public final class ImplementingTypeModelProperty implements ModelProperty {
 
-    private final Class<?> type;
+  private final Class<?> type;
 
-    /**
-     * Creates a new instance referencing the given {@code type}
-     *
-     * @param type a {@link Class} which defines the owning {@link EnrichableModel}
-     */
-    public ImplementingTypeModelProperty(Class<?> type)
-    {
-        this.type = type;
-    }
+  /**
+   * Creates a new instance referencing the given {@code type}
+   *
+   * @param type a {@link Class} which defines the owning {@link EnrichableModel}
+   */
+  public ImplementingTypeModelProperty(Class<?> type) {
+    this.type = type;
+  }
 
-    /**
-     * @return a {@link Class} which defines the owning {@link EnrichableModel}
-     */
-    public Class<?> getType()
-    {
-        return type;
-    }
+  /**
+   * @return a {@link Class} which defines the owning {@link EnrichableModel}
+   */
+  public Class<?> getType() {
+    return type;
+  }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @return {@code implementingType}
-     */
-    @Override
-    public String getName()
-    {
-        return "implementingType";
-    }
+  /**
+   * {@inheritDoc}
+   *
+   * @return {@code implementingType}
+   */
+  @Override
+  public String getName() {
+    return "implementingType";
+  }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @return {@code false}
-     */
-    @Override
-    public boolean isExternalizable()
-    {
-        return false;
-    }
+  /**
+   * {@inheritDoc}
+   *
+   * @return {@code false}
+   */
+  @Override
+  public boolean isExternalizable() {
+    return false;
+  }
 }

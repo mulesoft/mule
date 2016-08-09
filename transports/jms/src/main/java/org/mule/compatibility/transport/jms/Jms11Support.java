@@ -26,271 +26,192 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * <code>Jms11Support</code> is a template class to provide an abstraction to to
- * the JMS 1.1 API specification.
+ * <code>Jms11Support</code> is a template class to provide an abstraction to to the JMS 1.1 API specification.
  */
 
-public class Jms11Support implements JmsSupport
-{
+public class Jms11Support implements JmsSupport {
 
-    /**
-     * logger used by this class
-     */
-    protected final Logger logger = LoggerFactory.getLogger(getClass());
+  /**
+   * logger used by this class
+   */
+  protected final Logger logger = LoggerFactory.getLogger(getClass());
 
-    protected JmsConnector connector;
+  protected JmsConnector connector;
 
-    public Jms11Support(JmsConnector connector)
-    {
-        this.connector = connector;
+  public Jms11Support(JmsConnector connector) {
+    this.connector = connector;
+  }
+
+  @Override
+  public Connection createConnection(ConnectionFactory connectionFactory, String username, String password) throws JMSException {
+    if (connectionFactory == null) {
+      throw new IllegalArgumentException("connectionFactory cannot be null");
+    }
+    return connectionFactory.createConnection(username, password);
+  }
+
+  @Override
+  public Connection createConnection(ConnectionFactory connectionFactory) throws JMSException {
+    if (connectionFactory == null) {
+      throw new IllegalArgumentException("connectionFactory cannot be null");
+    }
+    return connectionFactory.createConnection();
+  }
+
+  @Override
+  public Session createSession(Connection connection, boolean topic, boolean transacted, int ackMode, boolean noLocal)
+      throws JMSException {
+    return connection.createSession(transacted, (transacted ? Session.SESSION_TRANSACTED : ackMode));
+  }
+
+  @Override
+  public MessageProducer createProducer(Session session, Destination destination, boolean topic) throws JMSException {
+    return session.createProducer(destination);
+  }
+
+  @Override
+  public MessageConsumer createConsumer(Session session, Destination destination, boolean topic, ImmutableEndpoint endpoint)
+      throws JMSException {
+    return createConsumer(session, destination, null, false, null, topic, endpoint);
+  }
+
+  @Override
+  public MessageConsumer createConsumer(Session session, Destination destination, String messageSelector, boolean noLocal,
+                                        String durableName, boolean topic, ImmutableEndpoint endpoint)
+      throws JMSException {
+    if (durableName == null) {
+      if (topic) {
+        return session.createConsumer(destination, messageSelector, noLocal);
+      } else {
+        return session.createConsumer(destination, messageSelector);
+      }
+    } else {
+      if (topic) {
+        return session.createDurableSubscriber((Topic) destination, durableName, messageSelector, noLocal);
+      } else {
+        throw new JMSException("A durable subscriber name was set but the destination was not a Topic");
+      }
+    }
+  }
+
+  @Override
+  public Destination createDestination(Session session, ImmutableEndpoint endpoint) throws JMSException {
+    String address = endpoint.getEndpointURI().toString();
+    if (address.contains(JmsConstants.TOPIC_PROPERTY + ":")) {
+      // cut prefixes
+      address = address.substring((connector.getProtocol() + "://" + JmsConstants.TOPIC_PROPERTY + ":").length());
+      // cut any endpoint uri params, if any
+      if (address.contains("?")) {
+        address = address.substring(0, address.indexOf('?'));
+      }
+    } else {
+      address = endpoint.getEndpointURI().getAddress();
+    }
+    return createDestination(session, address, connector.getTopicResolver().isTopic(endpoint), endpoint);
+  }
+
+  @Override
+  public Destination createDestination(Session session, String name, boolean topic, ImmutableEndpoint endpoint)
+      throws JMSException {
+    if (connector.isJndiDestinations()) {
+      try {
+        Destination dest = getJndiDestination(name);
+        if (dest != null) {
+          if (logger.isDebugEnabled()) {
+            logger.debug(MessageFormat.format("Destination {0} located in JNDI, will use it now", name));
+          }
+          return dest;
+        } else {
+          throw new JMSException("JNDI destination not found with name: " + name);
+        }
+      } catch (JMSException e) {
+        if (connector.isForceJndiDestinations()) {
+          throw e;
+        } else {
+          logger.warn("Unable to look up JNDI destination " + name + ": " + e.getMessage());
+        }
+      }
     }
 
-    @Override
-    public Connection createConnection(ConnectionFactory connectionFactory, String username, String password)
-        throws JMSException
-    {
-        if (connectionFactory == null)
-        {
-            throw new IllegalArgumentException("connectionFactory cannot be null");
-        }
-        return connectionFactory.createConnection(username, password);
+    if (logger.isDebugEnabled()) {
+      logger.debug("Using non-JNDI destination " + name + ", will create one now");
     }
 
-    @Override
-    public Connection createConnection(ConnectionFactory connectionFactory) throws JMSException
-    {
-        if (connectionFactory == null)
-        {
-            throw new IllegalArgumentException("connectionFactory cannot be null");
-        }
-        return connectionFactory.createConnection();
+    if (session == null) {
+      throw new IllegalArgumentException("Session cannot be null when creating a destination");
+    }
+    if (name == null) {
+      throw new IllegalArgumentException("Destination name cannot be null when creating a destination");
     }
 
-    @Override
-    public Session createSession(Connection connection,
-                                 boolean topic,
-                                 boolean transacted,
-                                 int ackMode,
-                                 boolean noLocal) throws JMSException
-    {
-        return connection.createSession(transacted, (transacted ? Session.SESSION_TRANSACTED : ackMode));
+    if (topic) {
+      return session.createTopic(name);
+    } else {
+      return session.createQueue(name);
+    }
+  }
+
+  protected Destination getJndiDestination(String name) throws JMSException {
+    Object temp;
+    try {
+      if (logger.isDebugEnabled()) {
+        logger.debug(MessageFormat.format("Looking up {0} from JNDI", name));
+      }
+      temp = connector.lookupFromJndi(name);
+    } catch (NamingException e) {
+      if (logger.isDebugEnabled()) {
+        logger.debug("Cannot retrieve JNDI resource '{}'", name, e);
+      }
+      String message = MessageFormat.format("Failed to look up destination {0}. Reason: {1}", name, e.getMessage());
+      throw new JMSException(message);
     }
 
-    @Override
-    public MessageProducer createProducer(Session session, Destination destination, boolean topic)
-        throws JMSException
-    {
-        return session.createProducer(destination);
+    if (temp != null) {
+      if (temp instanceof Destination) {
+        return (Destination) temp;
+      }
+    }
+    return null;
+  }
+
+  @Override
+  public Destination createTemporaryDestination(Session session, boolean topic) throws JMSException {
+    if (session == null) {
+      throw new IllegalArgumentException("Session cannot be null when creating a destination");
     }
 
-    @Override
-    public MessageConsumer createConsumer(Session session, Destination destination, boolean topic, ImmutableEndpoint endpoint)
-        throws JMSException
-    {
-        return createConsumer(session, destination, null, false, null, topic, endpoint);
+    if (topic) {
+      return session.createTemporaryTopic();
+    } else {
+      return session.createTemporaryQueue();
     }
+  }
 
-    @Override
-    public MessageConsumer createConsumer(Session session,
-                                          Destination destination,
-                                          String messageSelector,
-                                          boolean noLocal,
-                                          String durableName,
-                                          boolean topic, ImmutableEndpoint endpoint) throws JMSException
-    {
-        if (durableName == null)
-        {
-            if (topic)
-            {
-                return session.createConsumer(destination, messageSelector, noLocal);
-            }
-            else
-            {
-                return session.createConsumer(destination, messageSelector);
-            }
-        }
-        else
-        {
-            if (topic)
-            {
-                return session.createDurableSubscriber((Topic) destination, durableName, messageSelector,
-                    noLocal);
-            }
-            else
-            {
-                throw new JMSException(
-                    "A durable subscriber name was set but the destination was not a Topic");
-            }
-        }
-    }
+  @Override
+  public void send(MessageProducer producer, Message message, boolean topic, ImmutableEndpoint endpoint) throws JMSException {
+    send(producer, message, connector.isPersistentDelivery(), Message.DEFAULT_PRIORITY, Message.DEFAULT_TIME_TO_LIVE, topic,
+         endpoint);
+  }
 
-    @Override
-    public Destination createDestination(Session session, ImmutableEndpoint endpoint) throws JMSException
-    {
-        String address = endpoint.getEndpointURI().toString();
-        if (address.contains(JmsConstants.TOPIC_PROPERTY + ":"))
-        {
-            // cut prefixes
-            address = address.substring((connector.getProtocol() + "://" + JmsConstants.TOPIC_PROPERTY + ":").length());
-            // cut any endpoint uri params, if any
-            if (address.contains("?"))
-            {
-                address = address.substring(0, address.indexOf('?'));
-            }
-        }
-        else
-        {
-            address = endpoint.getEndpointURI().getAddress();
-        }
-        return createDestination(session, address, connector.getTopicResolver().isTopic(endpoint), endpoint);
-    }
+  @Override
+  public void send(MessageProducer producer, Message message, Destination dest, boolean topic, ImmutableEndpoint endpoint)
+      throws JMSException {
+    send(producer, message, dest, connector.isPersistentDelivery(), Message.DEFAULT_PRIORITY, Message.DEFAULT_TIME_TO_LIVE, topic,
+         endpoint);
+  }
 
-    @Override
-    public Destination createDestination(Session session, String name, boolean topic, ImmutableEndpoint endpoint) throws JMSException
-    {
-        if (connector.isJndiDestinations())
-        {
-            try
-            {
-                Destination dest = getJndiDestination(name);
-                if (dest != null)
-                {
-                    if (logger.isDebugEnabled())
-                    {
-                        logger.debug(MessageFormat.format("Destination {0} located in JNDI, will use it now", name));
-                    }
-                    return dest;
-                }
-                else
-                {
-                    throw new JMSException("JNDI destination not found with name: " + name);
-                }
-            }
-            catch (JMSException e)
-            {
-                if (connector.isForceJndiDestinations())
-                {
-                    throw e;
-                }
-                else 
-                {
-                    logger.warn("Unable to look up JNDI destination " + name + ": " + e.getMessage());
-                }
-            }
-        }
+  @Override
+  public void send(MessageProducer producer, Message message, boolean persistent, int priority, long ttl, boolean topic,
+                   ImmutableEndpoint endpoint)
+      throws JMSException {
+    producer.send(message, (persistent ? DeliveryMode.PERSISTENT : DeliveryMode.NON_PERSISTENT), priority, ttl);
+  }
 
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Using non-JNDI destination " + name + ", will create one now");
-        }
-
-        if (session == null)
-        {
-            throw new IllegalArgumentException("Session cannot be null when creating a destination");
-        }
-        if (name == null)
-        {
-            throw new IllegalArgumentException("Destination name cannot be null when creating a destination");
-        }
-
-        if (topic)
-        {
-            return session.createTopic(name);
-        }
-        else
-        {
-            return session.createQueue(name);
-        }
-    }
-    
-    protected Destination getJndiDestination(String name) throws JMSException
-    {
-        Object temp;
-        try
-        {
-            if (logger.isDebugEnabled())
-            {
-                logger.debug(MessageFormat.format("Looking up {0} from JNDI", name));
-            }
-            temp = connector.lookupFromJndi(name);
-        }
-        catch (NamingException e)
-        {
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Cannot retrieve JNDI resource '{}'", name, e);
-            }
-            String message = MessageFormat.format("Failed to look up destination {0}. Reason: {1}",
-                                                  name, e.getMessage());
-            throw new JMSException(message);
-        }
-        
-        if (temp != null)
-        {
-            if (temp instanceof Destination)
-            {
-                return (Destination) temp;
-            }
-        }
-        return null;
-    }
-
-    @Override
-    public Destination createTemporaryDestination(Session session, boolean topic) throws JMSException
-    {
-        if (session == null)
-        {
-            throw new IllegalArgumentException("Session cannot be null when creating a destination");
-        }
-
-        if (topic)
-        {
-            return session.createTemporaryTopic();
-        }
-        else
-        {
-            return session.createTemporaryQueue();
-        }
-    }
-
-    @Override
-    public void send(MessageProducer producer, Message message, boolean topic, ImmutableEndpoint endpoint) throws JMSException
-    {
-        send(producer, message, connector.isPersistentDelivery(), Message.DEFAULT_PRIORITY,
-            Message.DEFAULT_TIME_TO_LIVE, topic, endpoint);
-    }
-
-    @Override
-    public void send(MessageProducer producer, Message message, Destination dest, boolean topic, ImmutableEndpoint endpoint)
-        throws JMSException
-    {
-        send(producer, message, dest, connector.isPersistentDelivery(), Message.DEFAULT_PRIORITY,
-            Message.DEFAULT_TIME_TO_LIVE, topic, endpoint);
-    }
-
-    @Override
-    public void send(MessageProducer producer,
-                     Message message,
-                     boolean persistent,
-                     int priority,
-                     long ttl,
-                     boolean topic, ImmutableEndpoint endpoint) throws JMSException
-    {
-        producer.send(message, (persistent ? DeliveryMode.PERSISTENT : DeliveryMode.NON_PERSISTENT),
-            priority, ttl);
-    }
-
-    @Override
-    public void send(MessageProducer producer,
-                     Message message,
-                     Destination dest,
-                     boolean persistent,
-                     int priority,
-                     long ttl,
-                     boolean topic, ImmutableEndpoint endpoint) throws JMSException
-    {
-        producer.send(dest, message, (persistent ? DeliveryMode.PERSISTENT : DeliveryMode.NON_PERSISTENT),
-            priority, ttl);
-    }
+  @Override
+  public void send(MessageProducer producer, Message message, Destination dest, boolean persistent, int priority, long ttl,
+                   boolean topic, ImmutableEndpoint endpoint)
+      throws JMSException {
+    producer.send(dest, message, (persistent ? DeliveryMode.PERSISTENT : DeliveryMode.NON_PERSISTENT), priority, ttl);
+  }
 
 }

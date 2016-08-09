@@ -11,41 +11,39 @@ import org.mule.runtime.api.message.Attributes;
 /**
  * Canonical representation of a file's metadata attributes.
  * <p>
- * It contains information such as a file's name, size, timestamp,
- * properties, etc.
+ * It contains information such as a file's name, size, timestamp, properties, etc.
  *
  * @since 4.0
  */
-public interface FileAttributes extends Attributes
-{
+public interface FileAttributes extends Attributes {
 
-    /**
-     * @return The file size in bytes
-     */
-    long getSize();
+  /**
+   * @return The file size in bytes
+   */
+  long getSize();
 
-    /**
-     * @return {@code true} if the file is not a directory nor a symbolic link
-     */
-    boolean isRegularFile();
+  /**
+   * @return {@code true} if the file is not a directory nor a symbolic link
+   */
+  boolean isRegularFile();
 
-    /**
-     * @return {@code true} if the file is a directory
-     */
-    boolean isDirectory();
+  /**
+   * @return {@code true} if the file is a directory
+   */
+  boolean isDirectory();
 
-    /**
-     * @return {@code true} if the file is a symbolic link
-     */
-    boolean isSymbolicLink();
+  /**
+   * @return {@code true} if the file is a symbolic link
+   */
+  boolean isSymbolicLink();
 
-    /**
-     * @return The file's path
-     */
-    String getPath();
+  /**
+   * @return The file's path
+   */
+  String getPath();
 
-    /**
-     * @return The file's name
-     */
-    String getName();
+  /**
+   * @return The file's name
+   */
+  String getName();
 }

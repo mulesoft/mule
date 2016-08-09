@@ -6,17 +6,14 @@
  */
 package org.mule.runtime.core.context.notification;
 
-public class SubEvent2 extends Event2
-{
+public class SubEvent2 extends Event2 {
 
-    public SubEvent2()
-    {
-        // empty
-    }
+  public SubEvent2() {
+    // empty
+  }
 
-    public SubEvent2(String id)
-    {
-        super(id);
-    }
+  public SubEvent2(String id) {
+    super(id);
+  }
 
 }

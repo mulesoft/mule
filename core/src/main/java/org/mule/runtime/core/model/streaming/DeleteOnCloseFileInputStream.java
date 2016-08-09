@@ -14,35 +14,29 @@ import java.io.IOException;
 /**
  * FileInputStream which deletes the underlying file when the stream is closed.
  */
-public class DeleteOnCloseFileInputStream extends FileInputStream
-{
-    private File file;
+public class DeleteOnCloseFileInputStream extends FileInputStream {
 
-    /**
-     * Builds a {@link DeleteOnCloseFileInputStream}.
-     *
-     * @param file #see
-     * @throws java.io.FileNotFoundException If there is a problem regarding the file.
-     */
-    public DeleteOnCloseFileInputStream(File file) throws FileNotFoundException
-    {
-        super(file);
-        this.file = file;
-    }
+  private File file;
 
-    public void close() throws IOException
-    {
-        try
-        {
-            super.close();
-        }
-        finally
-        {
-            if (file != null)
-            {
-                file.delete();
-                file = null;
-            }
-        }
+  /**
+   * Builds a {@link DeleteOnCloseFileInputStream}.
+   *
+   * @param file #see
+   * @throws java.io.FileNotFoundException If there is a problem regarding the file.
+   */
+  public DeleteOnCloseFileInputStream(File file) throws FileNotFoundException {
+    super(file);
+    this.file = file;
+  }
+
+  public void close() throws IOException {
+    try {
+      super.close();
+    } finally {
+      if (file != null) {
+        file.delete();
+        file = null;
+      }
     }
+  }
 }

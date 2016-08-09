@@ -12,26 +12,23 @@ import org.mule.runtime.core.api.processor.MessageProcessor;
 
 import org.junit.Test;
 
-public class CompositeMessageProcessorDefinitionParserTestCase extends AbstractIntegrationTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "org/mule/config/spring/parsers/specific/composite-message-processor.xml";
-    }
+public class CompositeMessageProcessorDefinitionParserTestCase extends AbstractIntegrationTestCase {
 
-    @Test
-    public void testInterceptingComposite() throws Exception
-    {
-        MessageProcessor composite = muleContext.getRegistry().lookupObject("composite1");
-        assertEquals("0123", composite.process(getTestEvent("0")).getMessageAsString());
-    }
+  @Override
+  protected String getConfigFile() {
+    return "org/mule/config/spring/parsers/specific/composite-message-processor.xml";
+  }
 
-    @Test
-    public void testInterceptingNestedComposite() throws Exception
-    {
-        MessageProcessor composite = muleContext.getRegistry().lookupObject("composite2");
-        assertEquals("01abc2", composite.process(getTestEvent("0")).getMessageAsString());
-    }
+  @Test
+  public void testInterceptingComposite() throws Exception {
+    MessageProcessor composite = muleContext.getRegistry().lookupObject("composite1");
+    assertEquals("0123", composite.process(getTestEvent("0")).getMessageAsString());
+  }
+
+  @Test
+  public void testInterceptingNestedComposite() throws Exception {
+    MessageProcessor composite = muleContext.getRegistry().lookupObject("composite2");
+    assertEquals("01abc2", composite.process(getTestEvent("0")).getMessageAsString());
+  }
 
 }

@@ -11,33 +11,32 @@ import java.io.Serializable;
 import org.apache.commons.lang.NotImplementedException;
 
 /**
- * Internal queue interface that hold queue configuration that will execute operations directly to the queue storage.
- * Stores information about a Queue.
+ * Internal queue interface that hold queue configuration that will execute operations directly to the queue storage. Stores
+ * information about a Queue.
  */
-public interface QueueStore
-{
+public interface QueueStore {
 
-    String getName();
+  String getName();
 
-    void putNow(Serializable o) throws InterruptedException;
+  void putNow(Serializable o) throws InterruptedException;
 
-    boolean offer(Serializable o, int room, long timeout) throws InterruptedException;
+  boolean offer(Serializable o, int room, long timeout) throws InterruptedException;
 
-    Serializable poll(long timeout) throws InterruptedException;
+  Serializable poll(long timeout) throws InterruptedException;
 
-    Serializable peek() throws InterruptedException;
+  Serializable peek() throws InterruptedException;
 
-    void untake(Serializable item) throws InterruptedException;
+  void untake(Serializable item) throws InterruptedException;
 
-    int getSize();
+  int getSize();
 
-    void clear() throws InterruptedException;
+  void clear() throws InterruptedException;
 
-    void dispose();
+  void dispose();
 
-    int getCapacity();
+  int getCapacity();
 
-    void close();
+  void close();
 
-    boolean isPersistent();
+  boolean isPersistent();
 }

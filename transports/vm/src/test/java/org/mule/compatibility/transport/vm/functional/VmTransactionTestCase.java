@@ -17,49 +17,43 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class VmTransactionTestCase extends FunctionalTestCase
-{
+public class VmTransactionTestCase extends FunctionalTestCase {
 
-    protected static volatile boolean serviceComponentAck = false;
-    protected static final Logger logger = LoggerFactory.getLogger(VmTransactionTestCase.class);
+  protected static volatile boolean serviceComponentAck = false;
+  protected static final Logger logger = LoggerFactory.getLogger(VmTransactionTestCase.class);
 
-    @Override
-    protected String getConfigFile()
-    {
-        return "vm/vm-transaction-flow.xml";
+  @Override
+  protected String getConfigFile() {
+    return "vm/vm-transaction-flow.xml";
+  }
+
+  @Test
+  public void testDispatch() throws Exception {
+    serviceComponentAck = false;
+    MuleClient client = muleContext.getClient();
+    client.dispatch("vm://dispatchIn", "TEST", null);
+    MuleMessage message = client.request("vm://out", 10000);
+    assertNotNull("Message", message);
+  }
+
+  @Test
+  public void testSend() throws Exception {
+    serviceComponentAck = false;
+    MuleClient client = muleContext.getClient();
+    MuleMessage message = client.send("vm://sendRequestIn", "TEST", null);
+    assertNotNull("Message", message);
+    assertTrue("Service component acknowledgement", serviceComponentAck);
+  }
+
+  public static class TestComponent {
+
+    public Object process(Object message) throws Exception {
+      if (TransactionCoordination.getInstance().getTransaction() != null) {
+        serviceComponentAck = true;
+      }
+      return message;
     }
 
-    @Test
-    public void testDispatch() throws Exception
-    {
-        serviceComponentAck = false;
-        MuleClient client = muleContext.getClient();
-        client.dispatch("vm://dispatchIn", "TEST", null);
-        MuleMessage message = client.request("vm://out", 10000);
-        assertNotNull("Message", message);
-    }
-
-    @Test
-    public void testSend() throws Exception
-    {
-        serviceComponentAck = false;
-        MuleClient client = muleContext.getClient();
-        MuleMessage message = client.send("vm://sendRequestIn", "TEST", null);
-        assertNotNull("Message", message);
-        assertTrue("Service component acknowledgement", serviceComponentAck);
-    }
-
-    public static class TestComponent
-    {
-        public Object process(Object message) throws Exception
-        {
-            if (TransactionCoordination.getInstance().getTransaction() != null)
-            {
-                serviceComponentAck = true;
-            }
-            return message;
-        }
-
-    }
+  }
 
 }
