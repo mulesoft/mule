@@ -47,8 +47,6 @@ public class LayoutModelPropertyTestCase extends AbstractAnnotationsBasedDescrib
 
         assertParameterPlacement(findParameter(parameters, "labeledRicin"), RICIN_GROUP_NAME, 1);
         assertParameterPlacement(findParameter(parameters, "ricinPacks"), RICIN_GROUP_NAME, 2);
-
-        assertParameterPlacement(findParameter(parameters, "ricinPacks"), RICIN_GROUP_NAME, 2);
     }
 
     @Test
@@ -58,10 +56,11 @@ public class LayoutModelPropertyTestCase extends AbstractAnnotationsBasedDescrib
         ExtensionDeclaration extensionDeclaration = declarer.getDeclaration();
         List<ParameterDeclaration> parameters = extensionDeclaration.getConfigurations().get(0).getParameters();
 
-        assertParameterPlacement(findParameter(parameters, "dateOfBirth"), PERSONAL_INFORMATION_GROUP_NAME, null);
-        assertParameterPlacement(findParameter(parameters, "dateOfDeath"), PERSONAL_INFORMATION_GROUP_NAME, null);
-        assertParameterPlacement(findParameter(parameters, "age"), PERSONAL_INFORMATION_GROUP_NAME, null);
-        assertParameterPlacement(findParameter(parameters, "myName"), PERSONAL_INFORMATION_GROUP_NAME, null);
+        assertParameterPlacement(findParameter(parameters, "myName"), PERSONAL_INFORMATION_GROUP_NAME, 1);
+        assertParameterPlacement(findParameter(parameters, "age"), PERSONAL_INFORMATION_GROUP_NAME, 2);
+        assertParameterPlacement(findParameter(parameters, "dateOfConception"), PERSONAL_INFORMATION_GROUP_NAME, 3);
+        assertParameterPlacement(findParameter(parameters, "dateOfBirth"), PERSONAL_INFORMATION_GROUP_NAME, 4);
+        assertParameterPlacement(findParameter(parameters, "dateOfDeath"), PERSONAL_INFORMATION_GROUP_NAME, 5);
     }
 
     @Test

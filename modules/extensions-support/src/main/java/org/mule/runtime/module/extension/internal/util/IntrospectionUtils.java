@@ -10,7 +10,6 @@ import static java.lang.String.format;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
-import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.mule.metadata.java.api.JavaTypeLoader.JAVA;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
@@ -21,6 +20,7 @@ import static org.reflections.ReflectionUtils.getAllMethods;
 import static org.reflections.ReflectionUtils.withAnnotation;
 import static org.reflections.ReflectionUtils.withModifier;
 import static org.reflections.ReflectionUtils.withName;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.AnyType;
@@ -440,6 +440,13 @@ public final class IntrospectionUtils
                 .collect(new ImmutableListCollector<>());
     }
 
+    public static List<Field> getFields(Class<?> clazz)
+    {
+        return getDescendingHierarchy(clazz).stream()
+                .flatMap(type -> stream(type.getDeclaredFields()))
+                .collect(new ImmutableListCollector<>());
+    }
+
     private static List<Class<?>> getDescendingHierarchy(Class<?> type)
     {
         List<Class<?>> types = new LinkedList<>();
@@ -459,6 +466,11 @@ public final class IntrospectionUtils
         {
             return allFields;
         }
+        return getFieldsWithGetterAndSetters(extensionType);
+    }
+
+    public static Set<Field> getFieldsWithGetterAndSetters(Class<?> extensionType)
+    {
         try
         {
             PropertyDescriptor[] propertyDescriptors = Introspector.getBeanInfo(extensionType).getPropertyDescriptors();
@@ -492,13 +504,6 @@ public final class IntrospectionUtils
     {
         String alias = aliasAnnotation != null ? aliasAnnotation.value() : null;
         return StringUtils.isEmpty(alias) ? defaultName : alias;
-    }
-
-    public static String getAlias(Field field)
-    {
-        Alias alias = field.getAnnotation(Alias.class);
-        String name = alias != null ? alias.value() : EMPTY;
-        return StringUtils.isEmpty(name) ? field.getName() : name;
     }
 
     public static String getSourceName(Class<? extends Source> sourceType)
@@ -581,25 +586,6 @@ public final class IntrospectionUtils
     }
 
     /**
-     * Given an {@link AnnotatedElement} (class {@link Field} or method {@link java.lang.reflect.Parameter}), the
-     * {@link Type} of it, and a {@link ClassTypeLoader}, indicates if the given {@link AnnotatedElement} is considered
-     * as a multilevel {@link MetadataKeyId}
-     *
-     * @param annotatedElement that represent a component parameter
-     * @param type             of the component parameter
-     * @param typeLoader       to load the {@link MetadataType} of the {@param type}
-     * @return a boolean indicating if the Parameter is considered as a multilevel {@link MetadataKeyId}
-     */
-    public static boolean isMultiLevelMetadataKeyId(AnnotatedElement annotatedElement, Type type, ClassTypeLoader typeLoader)
-    {
-        final Set<Class<? extends Annotation>> classSet = stream(annotatedElement.getAnnotations())
-                .map(Annotation::annotationType)
-                .collect(toSet());
-
-        return isMultiLevelMetadataKeyId(classSet, typeLoader.load(type));
-    }
-
-    /**
      * Given a {@link Set} of annotation classes and a {@link MetadataType} of a component parameter, indicates
      * if the parameter is a parameter container.
      * <p>
@@ -613,36 +599,6 @@ public final class IntrospectionUtils
     public static boolean isParameterContainer(Set<Class<? extends Annotation>> annotations, MetadataType parameterType)
     {
         return (annotations.contains(ParameterGroup.class) || isMultiLevelMetadataKeyId(annotations, parameterType));
-    }
-
-    /**
-     * Retrieves all the considered parameter containers from a given class {@param annotatedType}
-     *
-     * @param annotatedType the class to be introspected
-     * @param typeLoader    {@link ClassTypeLoader} to be used to retrieve the type of each component parameter
-     * @return a immutable {@link Collection<Field>} with all the found parameters considered as parameter container
-     * @see IntrospectionUtils#isParameterContainer(Set, MetadataType)
-     */
-    public static Collection<Field> getParameterContainers(Class<?> annotatedType, ClassTypeLoader typeLoader)
-    {
-        return ImmutableList.<Field>builder()
-                .addAll(getParameterGroupFields(annotatedType))
-                .addAll(getMultilevelMetadataKeys(annotatedType, typeLoader)).build();
-    }
-
-    /**
-     * Retrieves all the considered as multilevel metadatakeys from a given class {@param annotatedType}
-     *
-     * @param annotatedType the class to be introspected
-     * @param typeLoader    {@link ClassTypeLoader} to be used to retrieve the type of each component parameter
-     * @return a immutable {@link Collection<Field>} with all the found parameters considered as multilevel metadata key
-     * @see IntrospectionUtils#isMultiLevelMetadataKeyId(Set, MetadataType)
-     */
-    public static Collection<Field> getMultilevelMetadataKeys(Class<?> annotatedType, ClassTypeLoader typeLoader)
-    {
-        return stream(annotatedType.getDeclaredFields())
-                .filter(field -> isMultiLevelMetadataKeyId(field, field.getType(), typeLoader))
-                .collect(new ImmutableListCollector<>());
     }
 
     public static String getComponentModelTypeName(Object component)
@@ -678,5 +634,4 @@ public final class IntrospectionUtils
 
         throw new IllegalArgumentException(format("Model '%s' is not a named type"));
     }
-
 }

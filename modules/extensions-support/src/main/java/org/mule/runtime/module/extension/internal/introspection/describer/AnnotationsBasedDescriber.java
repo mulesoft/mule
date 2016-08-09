@@ -7,112 +7,91 @@
 package org.mule.runtime.module.extension.internal.introspection.describer;
 
 import static java.lang.String.format;
-import static java.util.Arrays.stream;
-import static java.util.stream.Collectors.toCollection;
+import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.extension.api.introspection.connection.ConnectionManagementType.CACHED;
 import static org.mule.runtime.extension.api.introspection.connection.ConnectionManagementType.NONE;
 import static org.mule.runtime.extension.api.introspection.connection.ConnectionManagementType.POOLING;
-import static org.mule.runtime.module.extension.internal.ExtensionProperties.THREADING_PROFILE_ATTRIBUTE_NAME;
-import static org.mule.runtime.module.extension.internal.ExtensionProperties.TLS_ATTRIBUTE_NAME;
-import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.addConfigTypeModelProperty;
-import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.addConnectionTypeModelProperty;
+import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.getExceptionEnricherFactory;
 import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.getExtension;
-import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.getMemberName;
 import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.parseLayoutAnnotations;
-import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.parseMetadataAnnotations;
-import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.parseParameters;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotatedFields;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotation;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getExposedFields;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getExpressionSupport;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getInterfaceGenerics;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldsWithGetterAndSetters;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMethodReturnAttributesType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMethodReturnType;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getOperationMethods;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getParameterContainers;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getParameterFields;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getSourceName;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getSuperClassGenerics;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isMultiLevelMetadataKeyId;
+
 import org.mule.metadata.api.ClassTypeLoader;
-import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.MuleVersion;
 import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.PoolingConnectionProvider;
-import org.mule.runtime.api.tls.TlsContextFactory;
-import org.mule.runtime.core.api.config.ThreadingProfile;
-import org.mule.runtime.core.internal.metadata.DefaultMetadataResolverFactory;
-import org.mule.runtime.core.internal.metadata.NullMetadataResolverFactory;
 import org.mule.runtime.core.util.ArrayUtils;
-import org.mule.runtime.core.util.CollectionUtils;
-import org.mule.runtime.core.util.collection.ImmutableListCollector;
-import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Configuration;
-import org.mule.runtime.extension.api.annotation.Configurations;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.Extensible;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.ExtensionOf;
-import org.mule.runtime.extension.api.annotation.OnException;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.Parameter;
-import org.mule.runtime.extension.api.annotation.Sources;
-import org.mule.runtime.extension.api.annotation.connector.Providers;
+import org.mule.runtime.extension.api.annotation.RestrictedTo;
 import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
-import org.mule.runtime.extension.api.annotation.metadata.Content;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
-import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.runtime.extension.api.introspection.ComponentModel;
-import org.mule.runtime.extension.api.introspection.ExtensionModel;
+import org.mule.runtime.extension.api.introspection.Named;
 import org.mule.runtime.extension.api.introspection.connection.ConnectionManagementType;
 import org.mule.runtime.extension.api.introspection.declaration.DescribingContext;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.ComponentDeclarer;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ConfigurationDeclarer;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ConnectionProviderDeclarer;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.HasConnectionProviderDeclarer;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.HasModelProperties;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.HasOperationDeclarer;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.HasSourceDeclarer;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.OperationDeclarer;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.OutputDeclarer;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.ParameterDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ParameterDeclarer;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ParameterizedDeclarer;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.SourceDeclarer;
 import org.mule.runtime.extension.api.introspection.declaration.spi.Describer;
 import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
-import org.mule.runtime.extension.api.introspection.exception.ExceptionEnricherFactory;
-import org.mule.runtime.extension.api.introspection.metadata.MetadataResolverFactory;
+import org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport;
 import org.mule.runtime.extension.api.introspection.property.LayoutModelProperty;
-import org.mule.runtime.extension.api.introspection.property.LayoutModelPropertyBuilder;
-import org.mule.runtime.extension.api.introspection.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.manifest.DescriberManifest;
 import org.mule.runtime.extension.api.runtime.operation.InterceptingCallback;
-import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.xml.dsl.api.property.XmlHintsModelProperty;
 import org.mule.runtime.module.extension.internal.exception.IllegalConfigurationModelDefinitionException;
 import org.mule.runtime.module.extension.internal.exception.IllegalConnectionProviderModelDefinitionException;
 import org.mule.runtime.module.extension.internal.exception.IllegalOperationModelDefinitionException;
 import org.mule.runtime.module.extension.internal.exception.IllegalParameterModelDefinitionException;
-import org.mule.runtime.module.extension.internal.introspection.ParameterGroup;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.ConfigurationElement;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.ConnectionProviderElement;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.ComponentElement;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.ExtensionElement;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.ExtensionParameter;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.ExtensionTypeFactory;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.FieldElement;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.InfrastructureTypeMapping;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.MethodElement;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.OperationContainerElement;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.ParameterElement;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.SourceElement;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.Type;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.WithAnnotations;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.WithConnectionProviders;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.WithMessageSources;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.WithOperationContainers;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.runtime.FieldWrapper;
 import org.mule.runtime.module.extension.internal.introspection.version.VersionResolver;
-import org.mule.runtime.module.extension.internal.metadata.MetadataScopeAdapter;
+import org.mule.runtime.module.extension.internal.model.property.DeclaringMemberModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ExtendingOperationModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingMethodModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingParameterModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingTypeModelProperty;
+import org.mule.runtime.module.extension.internal.model.property.InfrastructureParameterModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.InterceptingModelProperty;
-import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.TypeRestrictionModelProperty;
-import org.mule.runtime.module.extension.internal.runtime.exception.DefaultExceptionEnricherFactory;
 import org.mule.runtime.module.extension.internal.runtime.executor.ReflectiveOperationExecutorFactory;
 import org.mule.runtime.module.extension.internal.runtime.source.DefaultSourceFactory;
 
@@ -121,18 +100,12 @@ import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.Multimap;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.AnnotatedElement;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.Type;
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 /**
  * Implementation of {@link Describer} which generates a {@link ExtensionDeclarer} by
@@ -166,11 +139,7 @@ public final class AnnotationsBasedDescriber implements Describer
     private final Map<Class<?>, SourceDeclarer> sourceDeclarers = new HashMap<>();
     private final Map<Class<?>, ConnectionProviderDeclarer> connectionProviderDeclarers = new HashMap<>();
 
-    /**
-     * An ordered {@link List} used to locate a {@link FieldDescriber} that can handle
-     * an specific {@link Field}
-     */
-    private List<FieldDescriber> fieldDescribers;
+    private List<ParameterDeclarerContributor> fielParameterContributor = ImmutableList.of(new InfrastructureFieldContributor());
 
     public AnnotationsBasedDescriber(Class<?> extensionType, VersionResolver versionResolver)
     {
@@ -178,15 +147,6 @@ public final class AnnotationsBasedDescriber implements Describer
         this.extensionType = extensionType;
         this.versionResolver = versionResolver;
         typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(extensionType.getClassLoader());
-
-        initialiseFieldDescribers();
-    }
-
-    private void initialiseFieldDescribers()
-    {
-        fieldDescribers = ImmutableList.of(new InfrastructureFieldDescriber(TlsContextFactory.class, TLS_ATTRIBUTE_NAME, typeLoader),
-                                           new InfrastructureFieldDescriber(ThreadingProfile.class, THREADING_PROFILE_ATTRIBUTE_NAME, typeLoader),
-                                           new DefaultFieldDescriber(typeLoader));
     }
 
     /**
@@ -195,7 +155,8 @@ public final class AnnotationsBasedDescriber implements Describer
     @Override
     public final ExtensionDeclarer describe(DescribingContext context)
     {
-        Extension extension = getExtension(extensionType);
+        final ExtensionElement extensionElement = ExtensionTypeFactory.getExtensionType(this.extensionType);
+        Extension extension = getExtension(this.extensionType);
         ExtensionDeclarer declaration = context.getExtensionDeclarer()
                 .named(extension.name())
                 .onVersion(getVersion(extension))
@@ -203,13 +164,13 @@ public final class AnnotationsBasedDescriber implements Describer
                 .withCategory(extension.category())
                 .withMinMuleVersion(new MuleVersion(extension.minMuleVersion()))
                 .describedAs(extension.description())
-                .withExceptionEnricherFactory(getExceptionEnricherFactory(extensionType))
-                .withModelProperty(new ImplementingTypeModelProperty(extensionType));
+                .withExceptionEnricherFactory(getExceptionEnricherFactory(extensionElement))
+                .withModelProperty(new ImplementingTypeModelProperty(this.extensionType));
 
-        declareConfigurations(declaration, extensionType);
-        declareOperations(declaration, extensionType);
-        declareConnectionProviders(declaration, extensionType);
-        declareMessageSources(declaration, extensionType);
+        declareConfigurations(declaration, extensionElement);
+        declareOperations(declaration, extensionElement);
+        declareConnectionProviders(declaration, extensionElement);
+        declareMessageSources(declaration, extensionElement);
 
         return declaration;
     }
@@ -219,59 +180,43 @@ public final class AnnotationsBasedDescriber implements Describer
         return versionResolver.resolveVersion(extension);
     }
 
-    private void declareConfigurations(ExtensionDeclarer declaration, Class<?> extensionType)
+    private void declareConfigurations(ExtensionDeclarer declaration, ExtensionElement extensionElement)
     {
-        Class<?>[] configurationClasses = getConfigurationClasses(extensionType);
-        if (ArrayUtils.isEmpty(configurationClasses))
+        List<ConfigurationElement> configurations = extensionElement.getConfigurations();
+        if (configurations.isEmpty())
         {
-            declareConfiguration(declaration, extensionType, extensionType);
+            declareConfiguration(declaration, extensionElement, extensionElement);
         }
         else
         {
-            for (Class<?> configurationClass : configurationClasses)
+            for (ConfigurationElement configuration : configurations)
             {
-                declareConfiguration(declaration, extensionType, configurationClass);
+                declareConfiguration(declaration, extensionElement, configuration);
             }
         }
     }
 
-    private Class<?>[] getConfigurationClasses(Class<?> extensionType)
+    private void declareConfiguration(ExtensionDeclarer declaration, ExtensionElement extensionType, ComponentElement configurationType)
     {
-        Configurations configs = extensionType.getAnnotation(Configurations.class);
-        return configs == null ? ArrayUtils.EMPTY_CLASS_ARRAY : configs.value();
-    }
-
-    private void declareMessageSources(HasSourceDeclarer declarer, Class<?> extensionType)
-    {
-        Sources sources = extensionType.getAnnotation(Sources.class);
-        if (sources != null)
-        {
-            for (Class<? extends Source> declaringClass : sources.value())
-            {
-                declareMessageSource(declarer, declaringClass);
-            }
-        }
-    }
-
-    private void declareConfiguration(ExtensionDeclarer declaration, Class<?> extensionType, Class<?> configurationType)
-    {
-        checkConfigurationIsNotAnOperation(configurationType);
+        checkConfigurationIsNotAnOperation(configurationType.getDeclaredClass());
         ConfigurationDeclarer configurationDeclarer;
 
-        Configuration configurationAnnotation = configurationType.getAnnotation(Configuration.class);
-        if (configurationAnnotation != null)
+        Optional<Configuration> configurationAnnotation = configurationType.getAnnotation(Configuration.class);
+        if (configurationAnnotation.isPresent())
         {
-            configurationDeclarer = declaration.withConfig(configurationAnnotation.name()).describedAs(configurationAnnotation.description());
+            final Configuration configuration = configurationAnnotation.get();
+            configurationDeclarer = declaration.withConfig(configuration.name()).describedAs(configuration.description());
         }
         else
         {
             configurationDeclarer = declaration.withConfig(Extension.DEFAULT_CONFIG_NAME).describedAs(Extension.DEFAULT_CONFIG_DESCRIPTION);
         }
 
-        configurationDeclarer.createdWith(new TypeAwareConfigurationFactory(configurationType, extensionType.getClassLoader()))
-                .withModelProperty(new ImplementingTypeModelProperty(configurationType));
+        configurationDeclarer
+                .createdWith(new TypeAwareConfigurationFactory(configurationType.getDeclaredClass(), extensionType.getDeclaredClass().getClassLoader()))
+                .withModelProperty(new ImplementingTypeModelProperty(configurationType.getDeclaredClass()));
 
-        declareAnnotatedParameters(configurationType, configurationDeclarer);
+        declareFieldBasedParameters(configurationDeclarer, configurationType.getParameters());
 
         if (!extensionType.equals(configurationType))
         {
@@ -279,6 +224,205 @@ public final class AnnotationsBasedDescriber implements Describer
             declareMessageSources(configurationDeclarer, configurationType);
             declareConnectionProviders(configurationDeclarer, configurationType);
         }
+    }
+
+    private void declareMessageSources(HasSourceDeclarer declarer, WithMessageSources typeComponent)
+    {
+        //TODO: MULE-9220: Add a Syntax validator which checks that a Source class doesn't try to declare operations, configs, etc
+        typeComponent.getSources().forEach(source -> declareMessageSource(declarer, source));
+    }
+
+    private void declareMessageSource(HasSourceDeclarer declarer, SourceElement sourceType)
+    {
+        SourceDeclarer source = sourceDeclarers.get(sourceType.getDeclaredClass());
+        if (source != null)
+        {
+            declarer.withMessageSource(source);
+            return;
+        }
+
+        source = declarer.withMessageSource(sourceType.getAlias());
+        List<java.lang.reflect.Type> sourceGenerics = sourceType.getSuperClassGenerics();
+
+        if (sourceGenerics.size() != 2)
+        {
+            //TODO: MULE-9220: Add a syntax validator for this
+            throw new IllegalModelDefinitionException(format("Message source class '%s' was expected to have 2 generic types " +
+                                                             "(one for the Payload type and another for the Attributes type) but %d were found",
+                                                             sourceType.getName(), sourceGenerics.size()));
+        }
+
+        source.sourceCreatedBy(new DefaultSourceFactory(sourceType.getDeclaredClass()))
+                .withExceptionEnricherFactory(getExceptionEnricherFactory(sourceType))
+                .withModelProperty(new ImplementingTypeModelProperty(sourceType.getDeclaredClass()));
+
+        source.withOutput().ofType(typeLoader.load(sourceGenerics.get(0)));
+        source.withOutputAttributes().ofType(typeLoader.load(sourceGenerics.get(1)));
+        declareFieldBasedParameters(source, sourceType.getParameters());
+
+        sourceDeclarers.put(sourceType.getDeclaredClass(), source);
+    }
+
+    private void declareOperations(HasOperationDeclarer declarer, WithOperationContainers operationContainers)
+    {
+        operationContainers.getOperationContainers().forEach(operationContainer -> declareOperation(declarer, operationContainer));
+    }
+
+    private Class<?>[] getOperationClasses(Class<?> extensionType)
+    {
+        Operations operations = extensionType.getAnnotation(Operations.class);
+        return operations == null ? ArrayUtils.EMPTY_CLASS_ARRAY : operations.value();
+    }
+
+    private void declareOperation(HasOperationDeclarer declarer, OperationContainerElement operationsContainer)
+    {
+        final Class<?> declaredClass = operationsContainer.getDeclaredClass();
+        if (operationDeclarers.containsKey(declaredClass))
+        {
+            operationDeclarers.get(declaredClass).forEach(declarer::withOperation);
+            return;
+        }
+
+        checkOperationIsNotAnExtension(declaredClass);
+
+        for (MethodElement operationMethod : operationsContainer.getOperations())
+        {
+
+            final OperationDeclarer operation = declarer.withOperation(operationMethod.getAlias())
+                    .withModelProperty(new ImplementingMethodModelProperty(operationMethod.getMethod()))
+                    .executorsCreatedBy(new ReflectiveOperationExecutorFactory<>(declaredClass, operationMethod.getMethod()))
+                    .withExceptionEnricherFactory(getExceptionEnricherFactory(operationMethod));
+
+            operation.withOutput().ofType(getMethodReturnType(operationMethod.getMethod(), typeLoader));
+            operation.withOutputAttributes().ofType(getMethodReturnAttributesType(operationMethod.getMethod(), typeLoader));
+            addInterceptingCallbackModelProperty(operationMethod, operation);
+            declareMethodBasedParameters(operation, operationMethod.getParameters());
+            calculateExtendedTypes(declaredClass, operationMethod.getMethod(), operation);
+            operationDeclarers.put(declaredClass, operation);
+        }
+    }
+
+    private void declareConnectionProviders(HasConnectionProviderDeclarer declarer, WithConnectionProviders withConnectionProviders)
+    {
+        withConnectionProviders.getConnectionProviders().forEach(provider -> declareConnectionProvider(declarer, provider));
+    }
+
+    private void declareConnectionProvider(HasConnectionProviderDeclarer declarer, ConnectionProviderElement providerType)
+    {
+        final Class<?> providerClass = providerType.getDeclaredClass();
+        ConnectionProviderDeclarer providerDeclarer = connectionProviderDeclarers.get(providerClass);
+        if (providerDeclarer != null)
+        {
+            declarer.withConnectionProvider(providerDeclarer);
+            return;
+        }
+
+        String name = providerType.getAlias() + CUSTOM_CONNECTION_PROVIDER_SUFFIX;
+        String description = providerType.getDescription();
+
+        if (providerType.getName().equals(providerType.getAlias()))
+        {
+            name = DEFAULT_CONNECTION_PROVIDER_NAME;
+        }
+
+        List<Class<?>> providerGenerics = providerType.getInterfaceGenerics(ConnectionProvider.class);
+
+        if (providerGenerics.size() != 1)
+        {
+            //TODO: MULE-9220: Add a syntax validator for this
+            throw new IllegalConnectionProviderModelDefinitionException(format("Connection provider class '%s' was expected to have 1 generic type " +
+                                                                               "(for the connection type) but %d were found",
+                                                                               providerType.getName(), providerGenerics.size()));
+        }
+
+        providerDeclarer = declarer.withConnectionProvider(name)
+                .describedAs(description)
+                .createdWith(new DefaultConnectionProviderFactory<>(providerClass, extensionType.getClassLoader()))
+                .whichGivesConnectionsOfType(providerGenerics.get(0))
+                .withModelProperty(new ImplementingTypeModelProperty(providerClass));
+
+        ConnectionManagementType managementType = NONE;
+        if (PoolingConnectionProvider.class.isAssignableFrom(providerClass))
+        {
+            managementType = POOLING;
+        }
+        else if (CachedConnectionProvider.class.isAssignableFrom(providerClass))
+        {
+            managementType = CACHED;
+        }
+
+        providerDeclarer.withConnectionManagementType(managementType);
+
+        connectionProviderDeclarers.put(providerClass, providerDeclarer);
+        declareFieldBasedParameters(providerDeclarer, providerType.getParameters());
+    }
+
+    private List<ParameterDeclarer> declareFieldBasedParameters(ParameterizedDeclarer component, List<ExtensionParameter> parameters)
+    {
+        return declareParameters(component, parameters, this.fielParameterContributor, null);
+    }
+
+    private List<ParameterDeclarer> declareMethodBasedParameters(ParameterizedDeclarer component, List<ExtensionParameter> parameters)
+    {
+        return declareParameters(component, parameters, emptyList(), null);
+    }
+
+    private List<ParameterDeclarer> declareParameters(ParameterizedDeclarer component, List<ExtensionParameter> parameters, List<ParameterDeclarerContributor> contributors, ExtensionParameter parameterGroupOwner)
+    {
+        List<ParameterDeclarer> declarerList = new ArrayList<>();
+        checkAnnotationsNotUsedMoreThanOnce(parameters, Connection.class, UseConfig.class, MetadataKeyId.class);
+        for (ExtensionParameter extensionParameter : parameters)
+        {
+            if (extensionParameter.shouldBeAdvertised())
+            {
+                ParameterDeclarer parameter = extensionParameter.isRequired()
+                                              ? component.withRequiredParameter(extensionParameter.getAlias())
+                                              : component.withOptionalParameter(extensionParameter.getAlias()).defaultingTo(
+                        extensionParameter.defaultValue().isPresent() ? extensionParameter.defaultValue().get() : null);
+                parameter.ofType(extensionParameter.getMetadataType(typeLoader));
+
+                parameter.describedAs(EMPTY);
+                addExpressionModelProperty(extensionParameter, parameter);
+                addTypeRestrictions(extensionParameter, parameter);
+                addLayoutModelProperty(extensionParameter, parameter, parameterGroupOwner);
+                addImplementingTypeModelProperty(extensionParameter, parameter);
+                addXmlHintsModelProperty(extensionParameter, parameter);
+                contributors.forEach(contributor -> contributor.contribute(extensionParameter, parameter));
+                declarerList.add(parameter);
+            }
+
+            if (extensionParameter.isAnnotatedWith(org.mule.runtime.extension.api.annotation.ParameterGroup.class))
+            {
+                final Type type = extensionParameter.getType();
+                final List<ExtensionParameter> annotatedParameters = ImmutableList.<ExtensionParameter>builder()
+                        .addAll(type.getAnnotatedFields(Parameter.class))
+                        .addAll(type.getAnnotatedFields(org.mule.runtime.extension.api.annotation.ParameterGroup.class))
+                        .build();
+
+                //TODO: MULE-9220: Add a syntax validator for this
+                if (extensionParameter.isAnnotatedWith(org.mule.runtime.extension.api.annotation.param.Optional.class))
+                {
+                    throw new IllegalParameterModelDefinitionException(format("@%s can not be applied along with @%s. Affected field [%s].",
+                                                                              org.mule.runtime.extension.api.annotation.param.Optional.class.getSimpleName(),
+                                                                              org.mule.runtime.extension.api.annotation.ParameterGroup.class.getSimpleName(),
+                                                                              extensionParameter.getName()));
+                }
+
+                if (!annotatedParameters.isEmpty())
+                {
+                    declareParameters(component, annotatedParameters, contributors, extensionParameter);
+                }
+                else
+                {
+                    declareParameters(component, getFieldsWithGetterAndSetters(type.getDeclaredClass())
+                            .stream()
+                            .map(FieldWrapper::new)
+                            .collect(toList()), contributors, extensionParameter);
+                }
+            }
+        }
+
+        return declarerList;
     }
 
     private void checkConfigurationIsNotAnOperation(Class<?> configurationType)
@@ -301,366 +445,6 @@ public final class AnnotationsBasedDescriber implements Describer
             throw new IllegalOperationModelDefinitionException(format("Operation class '%s' cannot be the same class (nor a derivative) of the extension class '%s",
                                                                       operationType.getName(), extensionType.getName()));
         }
-    }
-
-    //TODO: MULE-9220: Add a Syntax validator which checks that a Source class doesn't try to declare operations, configs, etc
-    private void declareMessageSource(HasSourceDeclarer declarer, Class<? extends Source> sourceType)
-    {
-        SourceDeclarer source = sourceDeclarers.get(sourceType);
-        if (source != null)
-        {
-            declarer.withMessageSource(source);
-            return;
-        }
-
-        source = declarer.withMessageSource(getSourceName(sourceType));
-
-        List<Type> sourceGenerics = getSuperClassGenerics(sourceType, Source.class);
-
-        if (sourceGenerics.size() != 2)
-        {
-            //TODO: MULE-9220: Add a syntax validator for this
-            throw new IllegalModelDefinitionException(format("Message source class '%s' was expected to have 2 generic types " +
-                                                             "(one for the Payload type and another for the Attributes type) but %d were found",
-                                                             sourceType.getName(), sourceGenerics.size()));
-        }
-
-        MetadataScopeAdapter metadataScope = new MetadataScopeAdapter(getMetadataScope(sourceType));
-        MetadataResolverFactory metadataResolverFactory = getMetadataResolverFactory(metadataScope);
-
-        source.sourceCreatedBy(new DefaultSourceFactory(sourceType))
-                .withExceptionEnricherFactory(getExceptionEnricherFactory(sourceType))
-                .withModelProperty(new ImplementingTypeModelProperty(sourceType))
-                .withMetadataResolverFactory(metadataResolverFactory);
-
-        declareOutputType(source, metadataScope, typeLoader.load(sourceGenerics.get(0)));
-        declareOutputAttributesType(source, metadataScope, typeLoader.load(sourceGenerics.get(1)));
-        if (metadataScope.isCustomScope())
-        {
-            declareMetadataKeyId(sourceType, source);
-        }
-        sourceDeclarers.put(sourceType, source);
-        declareMetadataKeyId(sourceType, source);
-        declareSingleParameters(getParameterFields(sourceType)
-                                        .stream()
-                                        .filter(field -> !isMultiLevelMetadataKeyId(field, field.getType(), typeLoader))
-                                        .collect(toCollection(LinkedHashSet::new)),
-                                source, MuleExtensionAnnotationParser::parseMetadataAnnotations);
-
-        declareSourceConnection(sourceType, source);
-        declareSourceConfig(sourceType, source);
-        declareParameterGroups(sourceType, source);
-
-        sourceDeclarers.put(sourceType, source);
-    }
-
-    private void declareSourceConfig(Class<? extends Source> sourceType, SourceDeclarer source)
-    {
-        getAnnotatedFields(sourceType, UseConfig.class).forEach(f -> addConfigTypeModelProperty(typeLoader.load(f.getDeclaringClass()), source));
-    }
-
-    private void declareSourceConnection(Class<? extends Source> sourceType, SourceDeclarer source)
-    {
-        getAnnotatedFields(sourceType, Connection.class).forEach(f -> addConnectionTypeModelProperty(typeLoader.load(f.getType()), source));
-    }
-
-    private void declareMetadataKeyId(Class<?> sourceType, SourceDeclarer source)
-    {
-        final List<Field> annotatedFields = getAnnotatedFields(sourceType, MetadataKeyId.class);
-
-        if (!annotatedFields.isEmpty())
-        {
-            if (annotatedFields.size() > 1)
-            {
-                throw new IllegalModelDefinitionException(String.format("A Source cannot define more than one MetadataKeyId. Affecting Source: [%s]", sourceType.getSimpleName()));
-            }
-
-            source.withModelProperty(new MetadataKeyIdModelProperty(typeLoader.load(annotatedFields.get(0).getType())));
-        }
-    }
-
-    private void declareAnnotatedParameters(Class<?> annotatedType, ParameterizedDeclarer parameterDeclarer)
-    {
-        declareSingleParameters(getAnnotatedFields(annotatedType, Parameter.class), parameterDeclarer);
-        declareParameterGroups(annotatedType, parameterDeclarer);
-    }
-
-    private List<ParameterGroup> declareParameterGroups(Class<?> annotatedType, ParameterizedDeclarer parameterDeclarer)
-    {
-        List<ParameterGroup> groups = declareConfigurationParametersGroups(annotatedType, parameterDeclarer, null);
-        if (!CollectionUtils.isEmpty(groups) && parameterDeclarer instanceof HasModelProperties)
-        {
-            ((HasModelProperties) parameterDeclarer).withModelProperty(new ParameterGroupModelProperty(groups));
-        }
-        return groups;
-    }
-
-    private Optional<ExceptionEnricherFactory> getExceptionEnricherFactory(AnnotatedElement element)
-    {
-        OnException onExceptionAnnotation = element.getAnnotation(OnException.class);
-        if (onExceptionAnnotation != null)
-        {
-            return Optional.of(new DefaultExceptionEnricherFactory(onExceptionAnnotation.value()));
-        }
-        return Optional.empty();
-    }
-
-    private List<ParameterGroup> declareConfigurationParametersGroups(Class<?> annotatedType, ParameterizedDeclarer parameterDeclarer, ParameterGroup parent)
-    {
-        List<ParameterGroup> groups = new LinkedList<>();
-        for (Field field : getParameterContainers(annotatedType, typeLoader))
-        {
-            //TODO: MULE-9220
-            if (field.isAnnotationPresent(org.mule.runtime.extension.api.annotation.param.Optional.class))
-            {
-                throw new IllegalParameterModelDefinitionException(format("@%s can not be applied along with @%s. Affected field [%s] in [%s].",
-                                                                          org.mule.runtime.extension.api.annotation.param.Optional.class.getSimpleName(),
-                                                                          org.mule.runtime.extension.api.annotation.ParameterGroup.class.getSimpleName(),
-                                                                          field.getName(),
-                                                                          annotatedType));
-            }
-
-            Set<ParameterDeclarer> parameters = declareSingleParameters(getExposedFields(field.getType()), parameterDeclarer);
-
-            if (!parameters.isEmpty())
-            {
-                ParameterGroup<Field> group = new ParameterGroup(field.getType(), field);
-                groups.add(group);
-
-                for (ParameterDeclarer descriptor : parameters)
-                {
-                    ParameterDeclaration parameter = inheritGroupParentDisplayProperties(parent, field, group, descriptor);
-                    group.addParameter(getField(field.getType(), getMemberName(parameter, parameter.getName())));
-                }
-
-                List<ParameterGroup> childGroups = declareConfigurationParametersGroups(field.getType(), parameterDeclarer, group);
-                if (!CollectionUtils.isEmpty(childGroups))
-                {
-                    group.addModelProperty(new ParameterGroupModelProperty(childGroups));
-                }
-            }
-        }
-
-        return groups;
-    }
-
-    private ParameterDeclaration inheritGroupParentDisplayProperties(ParameterGroup<Field> parent, Field field, ParameterGroup<Field> group, ParameterDeclarer parameterDeclarer)
-    {
-        ParameterDeclaration parameter = parameterDeclarer.getDeclaration();
-        Optional<LayoutModelProperty> parameterDisplayProperty = parameterDeclarer.getDeclaration().getModelProperty(LayoutModelProperty.class);
-
-        LayoutModelPropertyBuilder builder = parameterDisplayProperty.isPresent()
-                                             ? LayoutModelPropertyBuilder.create(parameterDisplayProperty.get())
-                                             : LayoutModelPropertyBuilder.create();
-
-        // Inherit parent placement model properties
-        LayoutModelProperty groupDisplay;
-        LayoutModelProperty parentDisplay = parent != null ? parent.getModelProperty(LayoutModelProperty.class).orElse(null) : null;
-        if (parentDisplay != null)
-        {
-            builder.groupName(parentDisplay.getGroupName())
-                    .tabName(parentDisplay.getTabName())
-                    .order(parentDisplay.getOrder());
-
-            groupDisplay = builder.build();
-        }
-        else
-        {
-            groupDisplay = parseLayoutAnnotations(field, field.getName(), builder);
-        }
-
-        if (groupDisplay != null)
-        {
-            parameterDeclarer.withModelProperty(groupDisplay);
-            group.addModelProperty(groupDisplay);
-        }
-
-        return parameter;
-    }
-
-    private Set<ParameterDeclarer> declareSingleParameters(Collection<Field> parameterFields,
-                                                           ParameterizedDeclarer parameterizedDeclarer,
-                                                           ModelPropertyContributor... contributors)
-    {
-        return parameterFields.stream()
-                .map(field ->
-                     {
-                         final ParameterDeclarer describe = getFieldDescriber(field).describe(field, parameterizedDeclarer);
-                         stream(contributors).forEach(contributor -> contributor.contribute(field, describe));
-                         return describe;
-                     })
-                .collect(toCollection(LinkedHashSet::new));
-    }
-
-    private FieldDescriber getFieldDescriber(Field field)
-    {
-        Optional<FieldDescriber> describer = fieldDescribers.stream()
-                .filter(fieldDescriber -> fieldDescriber.accepts(field))
-                .findFirst();
-
-        if (describer.isPresent())
-        {
-            return describer.get();
-        }
-
-        throw new IllegalModelDefinitionException(format(
-                "Could not find a %s capable of parsing the field '%s' on class '%s'",
-                FieldDescriber.class.getSimpleName(), field.getName(), field.getDeclaringClass().getName()));
-    }
-
-    private void declareOperations(HasOperationDeclarer declarer, Class<?> extensionType)
-    {
-        Class<?>[] operations = getOperationClasses(extensionType);
-        for (Class<?> actingClass : operations)
-        {
-            declareOperation(declarer, actingClass);
-        }
-    }
-
-    private Class<?>[] getOperationClasses(Class<?> extensionType)
-    {
-        Operations operations = extensionType.getAnnotation(Operations.class);
-        return operations == null ? ArrayUtils.EMPTY_CLASS_ARRAY : operations.value();
-    }
-
-    private <T> void declareOperation(HasOperationDeclarer declarer, Class<T> actingClass)
-    {
-        if (operationDeclarers.containsKey(actingClass))
-        {
-            operationDeclarers.get(actingClass).forEach(declarer::withOperation);
-            return;
-        }
-
-        checkOperationIsNotAnExtension(actingClass);
-
-        for (Method operationMethod : getOperationMethods(actingClass))
-        {
-            MetadataScopeAdapter metadataScope = new MetadataScopeAdapter(getMetadataScope(operationMethod));
-            MetadataResolverFactory metadataResolverFactory = getMetadataResolverFactory(metadataScope);
-
-            final OperationDeclarer operation = declarer.withOperation(operationMethod.getName())
-                    .withModelProperty(new ImplementingMethodModelProperty(operationMethod))
-                    .executorsCreatedBy(new ReflectiveOperationExecutorFactory<>(actingClass, operationMethod))
-                    .withExceptionEnricherFactory(getExceptionEnricherFactory(operationMethod))
-                    .withMetadataResolverFactory(metadataResolverFactory);
-
-            declareOutputType(operation, metadataScope, getMethodReturnType(operationMethod, typeLoader));
-            declareOutputAttributesType(operation, metadataScope, getMethodReturnAttributesType(operationMethod, typeLoader));
-            if (metadataScope.isCustomScope())
-            {
-                declareOperationMetadataKeyId(operationMethod, operation);
-            }
-
-            if (InterceptingCallback.class.isAssignableFrom(operationMethod.getReturnType()))
-            {
-                operation.withModelProperty(new InterceptingModelProperty());
-            }
-
-            declareOperationParameters(operationMethod, operation, metadataScope);
-            calculateExtendedTypes(actingClass, operationMethod, operation);
-
-            operationDeclarers.put(actingClass, operation);
-        }
-    }
-
-    private void declareOperationMetadataKeyId(Method method, OperationDeclarer operation)
-    {
-        stream(method.getParameters())
-                .filter(p -> p.isAnnotationPresent(MetadataKeyId.class))
-                .findFirst()
-                .ifPresent(p -> operation.withModelProperty(new MetadataKeyIdModelProperty(typeLoader.load(p.getType()))));
-    }
-
-    private MetadataResolverFactory getMetadataResolverFactory(MetadataScopeAdapter scope)
-    {
-        return scope.isCustomScope() ? new DefaultMetadataResolverFactory(scope.getKeysResolver(), scope.getContentResolver(),
-                                                                          scope.getOutputResolver(), scope.getAttributesResolver())
-                                     : new NullMetadataResolverFactory();
-
-    }
-
-    private void declareConnectionProviders(HasConnectionProviderDeclarer declarer, Class<?> extensionType)
-    {
-        Providers providers = extensionType.getAnnotation(Providers.class);
-        if (providers != null)
-        {
-            for (Class<?> providerClass : providers.value())
-            {
-                declareConnectionProvider(declarer, providerClass);
-            }
-        }
-    }
-
-    /**
-     * Checks if the method is annotated with {@link MetadataScope}, if not looks whether the
-     * operation class containing the method is annotated or not. And lastly, if no annotation
-     * was found so far, checks if the extension class is annotated.
-     */
-    private MetadataScope getMetadataScope(Method method)
-    {
-        MetadataScope scope = method.getAnnotation(MetadataScope.class);
-        return scope != null ? scope : getMetadataScope(method.getDeclaringClass());
-    }
-
-    /**
-     * Checks if the {@link ComponentModel Component's} type is annotated with {@link MetadataScope},
-     * if it doesn't then looks if the {@link ExtensionModel Extension's} type is annotated.
-     */
-    private MetadataScope getMetadataScope(Class<?> componentClass)
-    {
-        MetadataScope scope = getAnnotation(componentClass, MetadataScope.class);
-        return scope != null ? scope : getAnnotation(extensionType, MetadataScope.class);
-    }
-
-    private <T> void declareConnectionProvider(HasConnectionProviderDeclarer declarer, Class<T> providerClass)
-    {
-        ConnectionProviderDeclarer providerDeclarer = connectionProviderDeclarers.get(providerClass);
-        if (providerDeclarer != null)
-        {
-            declarer.withConnectionProvider(providerDeclarer);
-            return;
-        }
-
-        String name = DEFAULT_CONNECTION_PROVIDER_NAME;
-        String description = EMPTY;
-
-        Alias aliasAnnotation = providerClass.getAnnotation(Alias.class);
-        if (aliasAnnotation != null)
-        {
-            name = aliasAnnotation.value() + CUSTOM_CONNECTION_PROVIDER_SUFFIX;
-            description = aliasAnnotation.description();
-        }
-
-        List<Class<?>> providerGenerics = getInterfaceGenerics(providerClass, ConnectionProvider.class);
-
-        if (providerGenerics.size() != 1)
-        {
-            //TODO: MULE-9220: Add a syntax validator for this
-            throw new IllegalConnectionProviderModelDefinitionException(format("Connection provider class '%s' was expected to have 1 generic type " +
-                                                                               "(for the connection type) but %d were found",
-                                                                               providerClass.getName(), providerGenerics.size()));
-        }
-
-        providerDeclarer = declarer.withConnectionProvider(name)
-                .describedAs(description)
-                .createdWith(new DefaultConnectionProviderFactory<>(providerClass, extensionType.getClassLoader()))
-                .whichGivesConnectionsOfType(providerGenerics.get(0))
-                .withModelProperty(new ImplementingTypeModelProperty(providerClass));
-
-        ConnectionManagementType managementType = NONE;
-        if (PoolingConnectionProvider.class.isAssignableFrom(providerClass))
-        {
-            managementType = POOLING;
-        }
-        else if (CachedConnectionProvider.class.isAssignableFrom(providerClass))
-        {
-            managementType = CACHED;
-        }
-
-        providerDeclarer.withConnectionManagementType(managementType);
-
-        connectionProviderDeclarers.put(providerClass, providerDeclarer);
-        declareAnnotatedParameters(providerClass, providerDeclarer);
     }
 
     private void calculateExtendedTypes(Class<?> actingClass, Method method, OperationDeclarer operation)
@@ -686,116 +470,89 @@ public final class AnnotationsBasedDescriber implements Describer
         return extensionType.getAnnotation(Extensible.class) != null;
     }
 
-    private void declareOperationParameters(Method method, OperationDeclarer operation, MetadataScopeAdapter metadataScope)
+    private void addExpressionModelProperty(ExtensionParameter extensionParameter, ParameterDeclarer parameter)
     {
-        List<ParsedParameter> descriptors = parseParameters(method, typeLoader, operation);
-
-        //TODO: MULE-9220
-        checkAnnotationsNotUsedMoreThanOnce(method, operation, UseConfig.class, Connection.class, MetadataKeyId.class, Content.class);
-
-        for (ParsedParameter parsedParameter : descriptors)
+        final Optional<Expression> annotation = extensionParameter.getAnnotation(Expression.class);
+        if (annotation.isPresent())
         {
-            if (parsedParameter.isAdvertised())
+            parameter.withExpressionSupport(getExpressionSupport(annotation.get()));
+        }
+    }
+
+    private void addLayoutModelProperty(ExtensionParameter extensionParameter, ParameterDeclarer parameter, ExtensionParameter parameterGroupOwner)
+    {
+        LayoutModelProperty layoutModelProperty = parseLayoutAnnotations(extensionParameter, extensionParameter.getAlias());
+        if (layoutModelProperty != null)
+        {
+            parameter.withModelProperty(layoutModelProperty);
+        }
+    }
+
+    private void addXmlHintsModelProperty(ExtensionParameter extensionParameter, ParameterDeclarer parameter)
+    {
+        Optional<XmlHints> elementStyle = extensionParameter.getAnnotation(XmlHints.class);
+        if (elementStyle.isPresent())
+        {
+            parameter.withModelProperty(new XmlHintsModelProperty(elementStyle.get()));
+        }
+    }
+
+    private void checkAnnotationsNotUsedMoreThanOnce(List<ExtensionParameter> parameters, Class<? extends Annotation>... annotations)
+    {
+        for (Class<? extends Annotation> annotation : annotations)
+        {
+            final long count = parameters.stream().filter(param -> param.isAnnotatedWith(annotation)).count();
+            if (count > 1)
             {
-                ParameterDeclarer parameter = parsedParameter.isRequired()
-                                              ? operation.withRequiredParameter(parsedParameter.getName())
-                                              : operation.withOptionalParameter(parsedParameter.getName()).defaultingTo(parsedParameter.getDefaultValue());
-
-                parameter = parsedParameter.isAnnotationPresent(Content.class)
-                            ? declareContentType(parameter, metadataScope, parsedParameter.getType())
-                            : parameter.ofType(parsedParameter.getType());
-
-                parameter.withExpressionSupport(getExpressionSupport(parsedParameter.getAnnotation(Expression.class)));
-                parameter.describedAs(EMPTY);
-
-                addTypeRestrictions(parameter, parsedParameter);
-                LayoutModelProperty layoutModelProperty = parseLayoutAnnotations(parsedParameter, parsedParameter.getName());
-                if (layoutModelProperty != null)
-                {
-                    parameter.withModelProperty(layoutModelProperty);
-                }
-
-                enrichWithImplementingParameterProperty(parsedParameter, parameter);
-                parseMetadataAnnotations(parsedParameter, parameter);
-
-                XmlHints elementStyle = parsedParameter.getAnnotation(XmlHints.class);
-                if (elementStyle != null)
-                {
-                    parameter.withModelProperty(new XmlHintsModelProperty(elementStyle));
-                }
-            }
-
-            if (parsedParameter.isAnnotationPresent(Connection.class))
-            {
-                addConnectionTypeModelProperty(parsedParameter.getType(), operation);
-            }
-
-            if (parsedParameter.isAnnotationPresent(UseConfig.class))
-            {
-                addConfigTypeModelProperty(parsedParameter.getType(), operation);
+                throw new IllegalModelDefinitionException(format("The defined parameters %s from %s, uses the annotation @%s more than once",
+                                                                 parameters.stream().map(Named::getName).collect(toList()),
+                                                                 parameters.get(0).getOwnerDescription(),
+                                                                 annotation.getSimpleName()));
             }
         }
     }
 
-    private ParameterDeclarer declareContentType(ParameterDeclarer parameter, MetadataScopeAdapter metadataScope, MetadataType type)
+    private void addTypeRestrictions(WithAnnotations withAnnotations, ParameterDeclarer parameter)
     {
-        return metadataScope.hasContentResolver() ? parameter.ofDynamicType(type)
-                                                  : parameter.ofType(type);
-    }
-
-    private OutputDeclarer declareOutputType(ComponentDeclarer component, MetadataScopeAdapter metadataScope, MetadataType type)
-    {
-        return metadataScope.hasOutputResolver() ? component.withOutput().ofDynamicType(type)
-                                                 : component.withOutput().ofType(type);
-    }
-
-    private OutputDeclarer declareOutputAttributesType(ComponentDeclarer component, MetadataScopeAdapter metadataScope, MetadataType type)
-    {
-        return metadataScope.hasAttributesResolver() ? component.withOutputAttributes().ofDynamicType(type)
-                                                     : component.withOutputAttributes().ofType(type);
-    }
-
-    private void checkAnnotationsNotUsedMoreThanOnce(Method method, OperationDeclarer operation, Class<? extends Annotation>... annotations)
-    {
-        stream(annotations).forEach(annotation ->
-                                    {
-                                        List<java.lang.reflect.Parameter> annotatedParameters =
-                                                stream(method.getParameters())
-                                                        .filter(parameter -> parameter.isAnnotationPresent(annotation))
-                                                        .collect(new ImmutableListCollector<>());
-
-                                        if (annotatedParameters.size() > 1)
-                                        {
-                                            throw new IllegalModelDefinitionException(format("Method [%s] defined in Class [%s] of extension [%s] uses the annotation @%s more than once",
-                                                                                             method.getName(),
-                                                                                             method.getDeclaringClass(),
-                                                                                             operation.getDeclaration().getName(),
-                                                                                             annotation.getSimpleName()));
-                                        }
-                                    });
-    }
-
-    private void addTypeRestrictions(ParameterDeclarer parameter, ParsedParameter descriptor)
-    {
-        Class<?> restriction = descriptor.getTypeRestriction();
-        if (restriction != null)
+        Optional<RestrictedTo> typeRestriction = withAnnotations.getAnnotation(RestrictedTo.class);
+        if (typeRestriction.isPresent())
         {
-            parameter.withModelProperty(new TypeRestrictionModelProperty<>(restriction));
+            parameter.withModelProperty(new TypeRestrictionModelProperty<>(typeRestriction.get().value()));
         }
     }
 
-    private void enrichWithImplementingParameterProperty(ParsedParameter parsedParameter, ParameterDeclarer parameter)
+    private void addImplementingTypeModelProperty(ExtensionParameter extensionParameter, ParameterDeclarer parameter)
     {
-        final Optional<java.lang.reflect.Parameter> implementingParameter = parsedParameter.getImplementingParameter();
-        if (implementingParameter.isPresent())
+        parameter.withModelProperty(extensionParameter.isFieldBased()
+                                    ? new DeclaringMemberModelProperty(((FieldElement) extensionParameter).getField())
+                                    : new ImplementingParameterModelProperty(((ParameterElement) extensionParameter).getParameter()));
+    }
+
+    private void addInterceptingCallbackModelProperty(MethodElement operationMethod, OperationDeclarer operation)
+    {
+        if (InterceptingCallback.class.isAssignableFrom(operationMethod.getReturnType()))
         {
-            parameter.withModelProperty(new ImplementingParameterModelProperty(implementingParameter.get()));
+            operation.withModelProperty(new InterceptingModelProperty());
         }
     }
 
-    private interface ModelPropertyContributor
+    private interface ParameterDeclarerContributor
     {
 
-        void contribute(AnnotatedElement annotatedElement, HasModelProperties descriptor);
+        void contribute(ExtensionParameter parameter, ParameterDeclarer declarer);
+    }
+
+    private static class InfrastructureFieldContributor implements ParameterDeclarerContributor
+    {
+
+        @Override
+        public void contribute(ExtensionParameter parameter, ParameterDeclarer declarer)
+        {
+            if (InfrastructureTypeMapping.getMap().containsKey(parameter.getType().getDeclaredClass()))
+            {
+                declarer.withModelProperty(new InfrastructureParameterModelProperty());
+                declarer.withExpressionSupport(ExpressionSupport.NOT_SUPPORTED);
+            }
+        }
     }
 }

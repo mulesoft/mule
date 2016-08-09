@@ -11,19 +11,31 @@ import static org.mule.runtime.extension.api.connectivity.OperationTransactional
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.TRANSACTIONAL_ACTION_PARAMETER_DESCRIPTION;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.TRANSACTIONAL_ACTION_PARAMETER_NAME;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.connectivity.OperationTransactionalAction;
 import org.mule.runtime.extension.api.introspection.declaration.DescribingContext;
+import org.mule.runtime.extension.api.introspection.declaration.fluent.BaseDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ParameterDeclaration;
-import org.mule.runtime.extension.api.introspection.declaration.spi.ModelEnricher;
+import org.mule.runtime.extension.api.introspection.declaration.fluent.SourceDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.introspection.operation.OperationModel;
 import org.mule.runtime.module.extension.internal.exception.IllegalOperationModelDefinitionException;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.ExtensionParameter;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.WithParameters;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.runtime.MethodWrapper;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.runtime.ParameterizableTypeWrapper;
 import org.mule.runtime.module.extension.internal.model.property.ConnectivityModelProperty;
+import org.mule.runtime.module.extension.internal.model.property.ImplementingMethodModelProperty;
+import org.mule.runtime.module.extension.internal.model.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ConnectionInterceptor;
 import org.mule.runtime.module.extension.internal.util.IdempotentDeclarationWalker;
+
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Adds a {@link ConnectionInterceptor} to all {@link OperationModel operations} which
@@ -31,10 +43,11 @@ import org.mule.runtime.module.extension.internal.util.IdempotentDeclarationWalk
  *
  * @since 4.0
  */
-public class ConnectionModelEnricher implements ModelEnricher
+public class ConnectionModelEnricher extends AbstractAnnotatedModelEnricher
 {
 
     private final MetadataType transactionalActionType;
+    private ClassTypeLoader typeLoader;
 
 
     public ConnectionModelEnricher()
@@ -46,22 +59,31 @@ public class ConnectionModelEnricher implements ModelEnricher
     @Override
     public void enrich(DescribingContext describingContext)
     {
-        new IdempotentDeclarationWalker()
+        final Class<?> extensionType = extractExtensionType(describingContext.getExtensionDeclarer().getDeclaration());
+        if (extensionType != null)
         {
-            @Override
-            protected void onOperation(OperationDeclaration declaration)
+            typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(Thread.currentThread().getContextClassLoader());
+            new IdempotentDeclarationWalker()
             {
-                declaration.getModelProperty(ConnectivityModelProperty.class)
-                        .ifPresent(property ->
-                                   {
-                                       declaration.addInterceptorFactory(ConnectionInterceptor::new);
-                                       if (property.supportsTransactions())
-                                       {
-                                           addTransactionalActionParameter(describingContext, declaration);
-                                       }
-                                   });
-            }
-        }.walk(describingContext.getExtensionDeclarer().getDeclaration());
+                @Override
+                public void onOperation(OperationDeclaration declaration)
+                {
+                    final Optional<ImplementingMethodModelProperty> implementingProperty = declaration.getModelProperty(ImplementingMethodModelProperty.class);
+                    if (implementingProperty.isPresent())
+                    {
+                        final Optional<ConnectivityModelProperty> connectivityModelProperty = addModelProperty(declaration, new MethodWrapper(implementingProperty.get().getMethod()));
+                        connectivityModelProperty.ifPresent(connection -> addConnectionInterceptors(declaration, describingContext, connection));
+                    }
+                }
+
+                @Override
+                public void onSource(SourceDeclaration declaration)
+                {
+                    declaration.getModelProperty(ImplementingTypeModelProperty.class)
+                            .ifPresent(implementingProperty -> addModelProperty(declaration, new ParameterizableTypeWrapper(implementingProperty.getType())));
+                }
+            }.walk(describingContext.getExtensionDeclarer().getDeclaration());
+        }
     }
 
     private void addTransactionalActionParameter(DescribingContext describingContext, OperationDeclaration declaration)
@@ -86,5 +108,26 @@ public class ConnectionModelEnricher implements ModelEnricher
         transactionParameter.setDescription(TRANSACTIONAL_ACTION_PARAMETER_DESCRIPTION);
 
         declaration.addParameter(transactionParameter);
+    }
+
+    private void addConnectionInterceptors(OperationDeclaration declaration, DescribingContext describingContext, ConnectivityModelProperty connection)
+    {
+        declaration.addInterceptorFactory(ConnectionInterceptor::new);
+        if (connection.supportsTransactions())
+        {
+            addTransactionalActionParameter(describingContext, declaration);
+        }
+    }
+
+    private Optional<ConnectivityModelProperty> addModelProperty(BaseDeclaration declaration, WithParameters methodWrapper)
+    {
+        final List<ExtensionParameter> connectionParameters = methodWrapper.getParametersAnnotatedWith(Connection.class);
+        if (!connectionParameters.isEmpty())
+        {
+            ConnectivityModelProperty modelProperty = new ConnectivityModelProperty(connectionParameters.get(0).getMetadataType(typeLoader));
+            declaration.addModelProperty(modelProperty);
+            return Optional.of(modelProperty);
+        }
+        return Optional.empty();
     }
 }

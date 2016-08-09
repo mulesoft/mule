@@ -102,20 +102,19 @@ public final class ExclusiveParameterModelValidator implements ModelValidator
                     throw new IllegalParameterModelDefinitionException(format("In %s '%s', parameter group '%s' should contain more than one field marked as optional inside but %d was/were found", getComponentModelTypeName(model), getModelName(model), pg.getType().getName(), optionalParametersCount));
                 }
 
-                pg.getOptionalParameters().stream()
-                        .forEach(f -> getFieldMetadataType(f, typeLoader).accept(new MetadataTypeVisitor()
-                        {
-                            @Override
-                            protected void defaultVisit(MetadataType metadataType)
-                            {
-                                throw new IllegalModelDefinitionException(format("In %s '%s', parameter group '%s' uses exclusion and cannot contain any complex field inside but '%s' was found", getComponentModelTypeName(model), getModelName(model), pg.getType().getName(), f.getType().getName()));
-                            }
+                pg.getOptionalParameters().forEach(f -> getFieldMetadataType(f, typeLoader).accept(new MetadataTypeVisitor()
+                {
+                    @Override
+                    protected void defaultVisit(MetadataType metadataType)
+                    {
+                        throw new IllegalModelDefinitionException(format("In %s '%s', parameter group '%s' uses exclusion and cannot contain any complex field inside but '%s' was found", getComponentModelTypeName(model), getModelName(model), pg.getType().getName(), f.getType().getName()));
+                    }
 
-                            @Override
-                            public void visitSimpleType(SimpleType simpleType)
-                            {
-                            }
-                        }));
+                    @Override
+                    public void visitSimpleType(SimpleType simpleType)
+                    {
+                    }
+                }));
             }
         });
     }

@@ -6,63 +6,41 @@
  */
 package org.mule.runtime.module.extension.internal.introspection.describer;
 
-import static java.util.Arrays.stream;
-import static org.apache.commons.collections.CollectionUtils.isEmpty;
-import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.core.util.Preconditions.checkState;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMethodArgumentTypes;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isParameterContainer;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getDefaultValue;
-import org.mule.metadata.api.ClassTypeLoader;
-import org.mule.metadata.api.model.MetadataType;
-import org.mule.runtime.api.message.MuleMessage;
-import org.mule.runtime.core.api.MuleEvent;
+
 import org.mule.runtime.core.util.ClassUtils;
-import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Extension;
-import org.mule.runtime.extension.api.annotation.Parameter;
-import org.mule.runtime.extension.api.annotation.ParameterGroup;
-import org.mule.runtime.extension.api.annotation.RestrictedTo;
+import org.mule.runtime.extension.api.annotation.OnException;
 import org.mule.runtime.extension.api.annotation.metadata.Content;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyPart;
-import org.mule.runtime.extension.api.annotation.param.Connection;
-import org.mule.runtime.extension.api.annotation.param.Optional;
-import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.annotation.param.display.Password;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Text;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.BaseDeclaration;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.HasModelProperties;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.OperationDeclarer;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ParameterDeclarer;
+import org.mule.runtime.extension.api.introspection.exception.ExceptionEnricherFactory;
 import org.mule.runtime.extension.api.introspection.property.LayoutModelProperty;
 import org.mule.runtime.extension.api.introspection.property.LayoutModelPropertyBuilder;
 import org.mule.runtime.extension.api.introspection.property.MetadataContentModelProperty;
 import org.mule.runtime.extension.api.introspection.property.MetadataKeyPartModelProperty;
-import org.mule.runtime.module.extension.internal.model.property.ConfigTypeModelProperty;
-import org.mule.runtime.module.extension.internal.model.property.ConnectivityModelProperty;
+import org.mule.runtime.module.extension.internal.introspection.describer.model.WithAnnotations;
 import org.mule.runtime.module.extension.internal.model.property.DeclaringMemberModelProperty;
-import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
+import org.mule.runtime.module.extension.internal.runtime.exception.DefaultExceptionEnricherFactory;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Repeatable;
 import java.lang.reflect.AnnotatedElement;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Function;
 
-import org.apache.commons.lang.StringUtils;
 
 /**
  * Utilities for reading annotations as a mean to describe extensions
@@ -71,17 +49,6 @@ import org.apache.commons.lang.StringUtils;
  */
 public final class MuleExtensionAnnotationParser
 {
-
-    private static final Set<Class<?>> IMPLICIT_ARGUMENT_TYPES = ImmutableSet.<Class<?>>builder()
-            .add(MuleEvent.class)
-            .add(MuleMessage.class)
-            .add(org.mule.runtime.core.api.MuleMessage.class)
-            .build();
-
-    static String getAliasName(Field field)
-    {
-        return IntrospectionUtils.getAliasName(field.getName(), field.getAnnotation(Alias.class));
-    }
 
     public static String getMemberName(BaseDeclaration<?> declaration, String defaultName)
     {
@@ -94,43 +61,6 @@ public final class MuleExtensionAnnotationParser
         checkState(extension != null, String.format("%s is not a Mule extension since it's not annotated with %s",
                                                     extensionType.getName(), Extension.class.getName()));
         return extension;
-    }
-
-    static List<ParsedParameter> parseParameters(Method method, ClassTypeLoader typeLoader, OperationDeclarer operation)
-    {
-        List<String> paramNames = getParamNames(method);
-
-        if (isEmpty(paramNames))
-        {
-            return ImmutableList.of();
-        }
-
-        MetadataType[] parameterTypes = getMethodArgumentTypes(method, typeLoader);
-        Annotation[][] parameterAnnotations = method.getParameterAnnotations();
-
-        List<ParsedParameter> parsedParameters = new LinkedList<>();
-        List<org.mule.runtime.module.extension.internal.introspection.ParameterGroup> groups = new LinkedList<>();
-        for (int i = 0; i < paramNames.size(); i++)
-        {
-            Map<Class<? extends Annotation>, Annotation> annotations = toMap(parameterAnnotations[i]);
-            if (isParameterContainer(annotations.keySet(), parameterTypes[i]))
-            {
-                groups.add(parseGroupParameters(parameterTypes[i], parsedParameters, typeLoader, method.getParameters()[i]));
-            }
-            else
-            {
-                ParsedParameter parsedParameter = doParseParameter(paramNames.get(i), parameterTypes[i], annotations, typeLoader.getClassLoader());
-                parsedParameter.setImplementingParameter(method.getParameters()[i]);
-                parsedParameters.add(parsedParameter);
-            }
-        }
-
-        if (!groups.isEmpty())
-        {
-            operation.withModelProperty(new ParameterGroupModelProperty(groups));
-        }
-
-        return parsedParameters;
     }
 
     public static <T extends Annotation> List<T> parseRepeatableAnnotation(Class<?> extensionType, Class<T> annotation,
@@ -155,80 +85,6 @@ public final class MuleExtensionAnnotationParser
         }
 
         return annotationDeclarations;
-    }
-
-    private static org.mule.runtime.module.extension.internal.introspection.ParameterGroup parseGroupParameters(MetadataType parameterType, List<ParsedParameter> parsedParameters, ClassTypeLoader typeLoader, Object container)
-    {
-        org.mule.runtime.module.extension.internal.introspection.ParameterGroup group = new org.mule.runtime.module.extension.internal.introspection.ParameterGroup(getType(parameterType, typeLoader.getClassLoader()), container);
-        List<org.mule.runtime.module.extension.internal.introspection.ParameterGroup> childGroups = new LinkedList<>();
-
-        stream(getType(parameterType).getDeclaredFields())
-                .filter(MuleExtensionAnnotationParser::isParameterOrParameterContainer)
-                .forEach(field ->
-                         {
-                             group.addParameter(field);
-
-                             final Map<Class<? extends Annotation>, Annotation> annotations = toMap(field.getAnnotations());
-                             final MetadataType fieldType = typeLoader.load(field.getType());
-
-                             if (isParameterContainer(annotations.keySet(), fieldType))
-                             {
-                                 childGroups.add(parseGroupParameters(fieldType, parsedParameters, typeLoader, field));
-                             }
-                             else
-                             {
-                                 parsedParameters.add(doParseParameter(field.getName(), fieldType, annotations, typeLoader.getClassLoader()));
-                             }
-                         });
-
-        if (!childGroups.isEmpty())
-        {
-            group.addModelProperty(new ParameterGroupModelProperty(childGroups));
-        }
-
-        return group;
-    }
-
-    private static boolean isParameterOrParameterContainer(Field paramField)
-    {
-        return paramField.isAnnotationPresent(ParameterGroup.class) || paramField.isAnnotationPresent(MetadataKeyId.class)
-               || paramField.isAnnotationPresent(Parameter.class) || paramField.isAnnotationPresent(MetadataKeyPart.class);
-    }
-
-    private static ParsedParameter doParseParameter(String paramName,
-                                                    MetadataType metadataType,
-                                                    Map<Class<? extends Annotation>, Annotation> annotations, ClassLoader classLoader)
-    {
-        ParsedParameter parameter = new ParsedParameter(annotations);
-        parameter.setAdvertised(shouldAdvertise(metadataType, annotations, classLoader));
-
-        parameter.setName(IntrospectionUtils.getAliasName(paramName, (Alias) annotations.get(Alias.class)));
-        parameter.setType(metadataType);
-
-        Optional optional = (Optional) annotations.get(Optional.class);
-        if (optional != null)
-        {
-            parameter.setRequired(false);
-            parameter.setDefaultValue(getDefaultValue(optional));
-        }
-        else
-        {
-            parameter.setRequired(true);
-        }
-
-        RestrictedTo typeRestriction = (RestrictedTo) annotations.get(RestrictedTo.class);
-        if (typeRestriction != null)
-        {
-            parameter.setTypeRestriction(typeRestriction.value());
-        }
-        return parameter;
-    }
-
-    private static boolean shouldAdvertise(MetadataType parameterType, Map<Class<? extends Annotation>, Annotation> annotations, ClassLoader classLoader)
-    {
-        return !(IMPLICIT_ARGUMENT_TYPES.contains(getType(parameterType, classLoader)) ||
-                 annotations.containsKey(UseConfig.class) ||
-                 annotations.containsKey(Connection.class));
     }
 
     public static List<String> getParamNames(Method method)
@@ -269,6 +125,20 @@ public final class MuleExtensionAnnotationParser
         }
     }
 
+    private static void parseLayoutAnnotations(WithAnnotations annotatedElement, LayoutModelPropertyBuilder builder)
+    {
+        java.util.Optional<Password> passwordAnnotation = annotatedElement.getAnnotation(Password.class);
+        if (passwordAnnotation.isPresent())
+        {
+            builder.withPassword(true);
+        }
+        java.util.Optional<Text> textAnnotation = annotatedElement.getAnnotation(Text.class);
+        if (textAnnotation.isPresent())
+        {
+            builder.withText(true);
+        }
+    }
+
     private static void parsePlacementAnnotation(AnnotatedElement annotatedElement, LayoutModelPropertyBuilder builder)
     {
         Placement placementAnnotation = annotatedElement.getAnnotation(Placement.class);
@@ -279,15 +149,37 @@ public final class MuleExtensionAnnotationParser
                     tabName(placementAnnotation.tab());
         }
     }
-
-    private static String getFormattedDisplayName(String fieldName)
+    private static void parsePlacementAnnotation(WithAnnotations annotatedElement, LayoutModelPropertyBuilder builder)
     {
-        return StringUtils.join(StringUtils.splitByCharacterTypeCamelCase(StringUtils.capitalize(fieldName)), ' ');
+        java.util.Optional<Placement> placementAnnotation = annotatedElement.getAnnotation(Placement.class);
+        if (placementAnnotation.isPresent())
+        {
+            Placement placement = placementAnnotation.get();
+            builder.order(placement.order()).
+                    groupName(placement.group()).
+                    tabName(placement.tab());
+        }
     }
 
     static LayoutModelProperty parseLayoutAnnotations(AnnotatedElement annotatedElement, String name)
     {
         return parseLayoutAnnotations(annotatedElement, name, LayoutModelPropertyBuilder.create());
+    }
+
+    static LayoutModelProperty parseLayoutAnnotations(WithAnnotations annotatedElement, String name)
+    {
+        return parseLayoutAnnotations(annotatedElement, name, LayoutModelPropertyBuilder.create());
+    }
+
+    static LayoutModelProperty parseLayoutAnnotations(WithAnnotations annotatedElement, String name, LayoutModelPropertyBuilder builder)
+    {
+        if (isDisplayAnnotationPresent(annotatedElement))
+        {
+            parseLayoutAnnotations(annotatedElement, builder);
+            parsePlacementAnnotation(annotatedElement, builder);
+            return builder.build();
+        }
+        return null;
     }
 
     static LayoutModelProperty parseLayoutAnnotations(AnnotatedElement annotatedElement, String name, LayoutModelPropertyBuilder builder)
@@ -307,39 +199,45 @@ public final class MuleExtensionAnnotationParser
         return displayAnnotations.stream().anyMatch(annotation -> annotatedElement.getAnnotation(annotation) != null);
     }
 
+    private static boolean isDisplayAnnotationPresent(WithAnnotations annotatedElement)
+    {
+        List<Class> displayAnnotations = Arrays.asList(Password.class, Text.class, Placement.class);
+        return displayAnnotations.stream().anyMatch(annotation -> annotatedElement.getAnnotation(annotation) != null);
+    }
+
     /**
      * Enriches the {@link ParameterDeclarer} with a {@link MetadataKeyPartModelProperty} or a {@link MetadataContentModelProperty} if the parsedParameter is
      * annotated either as {@link MetadataKeyId}, {@link MetadataKeyPart} or {@link Content} respectibly.
      *
      * @param element                    the method annotated parameter parsed
-     * @param elementWithModelProperties the {@link ParameterDeclarer} associated to the parsed parameter
+     * @param baseDeclaration the {@link ParameterDeclarer} associated to the parsed parameter
      */
-    public static void parseMetadataAnnotations(AnnotatedElement element, HasModelProperties elementWithModelProperties)
+    public static void parseMetadataAnnotations(AnnotatedElement element, BaseDeclaration baseDeclaration)
     {
         if (element.isAnnotationPresent(Content.class))
         {
-            elementWithModelProperties.withModelProperty(new MetadataContentModelProperty());
+            baseDeclaration.addModelProperty(new MetadataContentModelProperty());
         }
 
         if (element.isAnnotationPresent(MetadataKeyId.class))
         {
-            elementWithModelProperties.withModelProperty(new MetadataKeyPartModelProperty(1));
+            baseDeclaration.addModelProperty(new MetadataKeyPartModelProperty(1));
         }
 
         if (element.isAnnotationPresent(MetadataKeyPart.class))
         {
             MetadataKeyPart metadataKeyPart = element.getAnnotation(MetadataKeyPart.class);
-            elementWithModelProperties.withModelProperty(new MetadataKeyPartModelProperty(metadataKeyPart.order()));
+            baseDeclaration.addModelProperty(new MetadataKeyPartModelProperty(metadataKeyPart.order()));
         }
     }
 
-    static void addConnectionTypeModelProperty(MetadataType annotatedFieldClass, HasModelProperties parameter)
+    static java.util.Optional<ExceptionEnricherFactory> getExceptionEnricherFactory(WithAnnotations element)
     {
-        parameter.withModelProperty(new ConnectivityModelProperty(annotatedFieldClass));
-    }
-
-    static void addConfigTypeModelProperty(MetadataType annotatedFieldClass, HasModelProperties parameter)
-    {
-        parameter.withModelProperty(new ConfigTypeModelProperty(annotatedFieldClass));
+        final java.util.Optional<OnException> onExceptionAnnotation = element.getAnnotation(OnException.class);
+        if (onExceptionAnnotation.isPresent())
+        {
+            return java.util.Optional.of(new DefaultExceptionEnricherFactory(onExceptionAnnotation.get().value()));
+        }
+        return java.util.Optional.empty();
     }
 }

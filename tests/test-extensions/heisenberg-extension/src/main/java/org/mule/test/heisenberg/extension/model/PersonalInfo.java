@@ -8,9 +8,12 @@ package org.mule.test.heisenberg.extension.model;
 
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.AGE;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
+import static org.mule.test.heisenberg.extension.HeisenbergExtension.PERSONAL_INFORMATION_GROUP_NAME;
+
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.display.Placement;
 
 public class PersonalInfo
 {
@@ -18,10 +21,12 @@ public class PersonalInfo
     @Parameter
     @Alias("myName")
     @Optional(defaultValue = HEISENBERG)
+    @Placement(group = PERSONAL_INFORMATION_GROUP_NAME, order = 1)
     private String name;
 
     @Parameter
     @Optional(defaultValue = AGE)
+    @Placement(group = PERSONAL_INFORMATION_GROUP_NAME, order = 2)
     private Integer age;
 
     public String getName()
