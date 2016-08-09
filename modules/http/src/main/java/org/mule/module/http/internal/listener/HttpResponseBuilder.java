@@ -177,7 +177,9 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
                     if (httpEntity instanceof EmptyHttpEntity)
                     {
                         setupContentLengthEncoding(httpResponseHeaderBuilder, 0);
-                    } else {
+                    }
+                    else
+                    {
                         ByteArrayHttpEntity byteArrayHttpEntity = (ByteArrayHttpEntity) httpEntity;
                         setupContentLengthEncoding(httpResponseHeaderBuilder, byteArrayHttpEntity.getContent().length);
                     }
